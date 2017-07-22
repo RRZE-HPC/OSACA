@@ -3,7 +3,7 @@
 import os
 from subprocess import call
 from math import ceil
-from Params import Register
+from Params import *
 
 class Testcase(object):
     
@@ -23,12 +23,14 @@ class Testcase(object):
     'ymm10', 'ymm11', 'ymm12', 'ymm13', 'ymm14', 'ymm15']
     zmms = ['zmm0', 'zmm1', 'zmm2', 'zmm3', 'zmm4', 'zmm5', 'zmm6', 'zmm7', 'zmm8', 'zmm9',
     'zmm10', 'zmm11', 'zmm12', 'zmm13', 'zmm14', 'zmm15']
+# Lookup table for memory
+    mems = ['[rip+PI]','[rip+PI]','[rip+PI]','[rip+PI]','[rip+PI]','[rip+PI]','[rip+PI]','[rip+PI]']
 # TODO Differentiate between AVX512 (with additional xmm16-31) and the rest
 #       ...
 #       ...
 # end TODO
 
-    ops = {'gpr64':gprs64, 'gpr32':gprs32, 'gpr16':gprs16, 'gpr8':gprs8, 'fpu':fpus, 'mmx':mmxs,  'k':ks, 'bnd':bnds, 'xmm':xmms, 'ymm':ymms, 'zmm':zmms}
+    ops = {'gpr64':gprs64, 'gpr32':gprs32, 'gpr16':gprs16, 'gpr8':gprs8, 'fpu':fpus, 'mmx':mmxs,  'k':ks, 'bnd':bnds, 'xmm':xmms, 'ymm':ymms, 'zmm':zmms, 'mem':mems}
 
 # Create Single Precision 1.0
     sp1 =  '\t\t# create SP 1.0\n'
@@ -56,8 +58,8 @@ class Testcase(object):
 # num_instr must be an even number
         self.num_instr = str(ceil(int(_num_instr)/2)*2)
 # Check for the number of operands and initialise the GPRs if necessary
-        self.reg_a, self.reg_b, self.reg_c, self.gprPush, self.gprPop, self.zeroGPR, self.copy = self.__define_regs()
-        self.num_regs = len(self.param_list)
+        self.op_a, self.op_b, self.op_c, self.gprPush, self.gprPop, self.zeroGPR, self.copy = self.__define_operands()
+        self.num_operands = len(self.param_list)
 
 # Create asm header 
         self.def_instr, self.ninstr, self.init, self.expand = self.__define_header()
@@ -70,11 +72,11 @@ class Testcase(object):
         regs = self.param_list
         extension = ''
 # Add operands
-        sep1 = '_' if (self.num_regs > 1) else ''
-        sep2 = '_' if (self.num_regs > 2) else ''
-        extension += ('-'+(self.reg_a if ('gpr' not in self.reg_a) else 'r'+self.reg_a[3:]) + sep1 +
-                     (self.reg_b if ('gpr' not in self.reg_b) else 'r'+self.reg_b[3:]) + sep2 + 
-                     (self.reg_c if ('gpr' not in self.reg_c) else 'r'+self.reg_c[3:]))
+        sep1 = '_' if (self.num_operands > 1) else ''
+        sep2 = '_' if (self.num_operands > 2) else ''
+        extension += ('-'+(self.op_a if ('gpr' not in self.op_a) else 'r'+self.op_a[3:]) + sep1 +
+                     (self.op_b if ('gpr' not in self.op_b) else 'r'+self.op_b[3:]) + sep2 + 
+                     (self.op_c if ('gpr' not in self.op_c) else 'r'+self.op_c[3:]))
 # Write latency file
         call(['mkdir', '-p', 'testcases'])
         f = open('./testcases/'+self.instr+extension+'.S', 'w')
@@ -88,33 +90,45 @@ class Testcase(object):
         f.close()
 
 
-# Check register
-    def __define_regs(self):
-        regs = self.param_list
-        reg_a, reg_b, reg_c = ('', '', '')
+# Check operands
+    def __define_operands(self):
+        oprnds = self.param_list
+        op_a, op_b, op_c = ('', '', '')
         gprPush, gprPop, zeroGPR = ('', '', '')
-        reg_a = regs[0].reg_type.lower()
-        if(reg_a == 'gpr'):
+        if(isinstance(oprnds[0], Register)):
+            op_a = oprnds[0].reg_type.lower()
+        elif(isinstance(oprnds[0], MemAddr)):
+            op_a = 'mem'
+        if(op_a == 'gpr'):
             gprPush, gprPop, zeroGPR = self.__initialise_gprs()
-            reg_a += str(regs[0].size)
-        if(len(regs) > 1):
-            reg_b = regs[1].reg_type.lower()
-            if(reg_b == 'gpr'):
-                reg_b += str(regs[1].size)
-                if('gpr' not in reg_a):
+            op_a += str(oprnds[0].size)
+        if(len(oprnds) > 1):
+            if(isinstance(oprnds[1], Register)):
+                op_b = oprnds[1].reg_type.lower()
+            elif(isinstance(oprnds[1], MemAddr)):
+                op_b = 'mem'           
+            if(op_b == 'gpr'):
+                op_b += str(oprnds[1].size)
+                if('gpr' not in op_a):
                     gprPush, gprPop, zeroGPR = self.__initialise_gprs()
-        if(len(regs) == 3):
-            reg_c = regs[2].reg_type.lower()
-            if(reg_c == 'gpr'):
-                reg_c += str(regs[2].size)
-                if(('gpr' not in reg_a) and ('gpr'not in reg_b)):
+        if(len(oprnds) == 3):
+            if(isinstance(oprnds[2], Register)):
+                op_c = oprnds[2].reg_type.lower()
+            elif(isinstance(oprnds[2], MemAddr)):
+                op_c = 'mem'
+            if(op_c == 'gpr'):
+                op_c += str(oprnds[2].size)
+                if(('gpr' not in op_a) and ('gpr'not in op_b)):
                     gprPush, gprPop, zeroGPR = self.__initialise_gprs()
-        if(len(regs) == 1):
-            copy = self.__copy_regs(regs[0])
+        if(len(oprnds) == 1 and isinstance(oprnds[0], Register)):
+            copy = self.__copy_regs(oprnds[0])
+        elif(len(oprnds) > 1 and isinstance(oprnds[1], Register)):
+            copy = self.__copy_regs(oprnds[1])
+        elif(len(oprnds) > 2 and isinstance(oprnds[2], Register)):
+            copy = self.__copy_regs(oprnds[1])
         else:
-            copy = self.__copy_regs(regs[1])
-        return (reg_a, reg_b, reg_c, gprPush, gprPop, zeroGPR, copy)
-
+            copy = ''
+        return (op_a, op_b, op_c, gprPush, gprPop, zeroGPR, copy)            
 
 # Initialise 11 general purpose registers and set them to zero
     def __initialise_gprs(self):
@@ -168,6 +182,11 @@ class Testcase(object):
     def __define_header(self):
         def_instr = '#define INSTR '+self.instr+'\n'
         ninstr = '#define NINST '+self.num_instr+'\n'
+        pi = ('PI:\n'
+                '.long  0xf01b866e, 0x400921f9, 0xf01b866e, 0x400921f9, '  #128 bit
+                '0xf01b866e, 0x400921f9, 0xf01b866e, 0x400921f9, '          #256 bit
+                '0xf01b866e, 0x400921f9, 0xf01b866e, 0x400921f9, '          #384 bit
+                '0xf01b866e, 0x400921f9, 0xf01b866e, 0x400921f9\n')         #512 bit
         init = ('#define N edi\n' \
                '#define i r8d\n\n\n'
                '.intel_syntax noprefix\n'
@@ -175,22 +194,24 @@ class Testcase(object):
                '.data\n'
                'ninst:\n'
                '.long NINST\n'
+               '.align 32\n'
+               +pi+
                '.text\n'
                '.globl latency\n'
                '.type latency, @function\n'
                '.align 32\n'
                'latency:\n'
-               '\t\tpush\trbp\n'
-               '\t\tmov\trbp, rsp\n'
-               '\t\txor\ti, i\n'
-               '\t\ttest\tN, N\n'
-               '\t\tjle\tdone\n')
+               '\t\tpush      rbp\n'
+               '\t\tmov       rbp, rsp\n'
+               '\t\txor       i, i\n'
+               '\t\ttest      N, N\n'
+               '\t\tjle       done\n')
 # Expand to AVX(512) if necessary
         expand = ''
-        if(self.reg_a == 'ymm' or self.reg_b == 'ymm' or self.reg_c == 'ymm'):
+        if(self.op_a == 'ymm' or self.op_b == 'ymm' or self.op_c == 'ymm'):
             expand = ('\t\t# expand from SSE to AVX\n'
                       '\t\tvinsertf128 ymm0, ymm0, xmm0, 0x1\n')
-        if(self.reg_a == 'zmm' or self.reg_b == 'zmm' or self.reg_c == 'zmm'):
+        if(self.op_a == 'zmm' or self.op_b == 'zmm' or self.op_c == 'zmm'):
             expand = ('\t\t# expand from SSE to AVX\n'
                       '\t\tvinsertf128 ymm0, ymm0, xmm0, 0x1\n'
                       '\t\t# expand from AVX to AVX512\n'
@@ -201,25 +222,25 @@ class Testcase(object):
     def __define_loop_lat(self):
         loop_lat = ('loop:\n'
                     '\t\tinc      i\n')
-        if(self.num_regs == 1):
+        if(self.num_operands == 1):
             for i in range(0, int(self.num_instr)):
-                loop_lat += '\t\tINSTR    {}\n'.format(self.ops[self.reg_a][0])
-        elif(self.num_regs == 2 and self.reg_a == self.reg_b):
+                loop_lat += '\t\tINSTR    {}\n'.format(self.ops[self.op_a][0])
+        elif(self.num_operands == 2 and self.op_a == self.op_b):
             for i in range(0, int(self.num_instr), 2):
-                loop_lat += '\t\tINSTR    {}, {}\n'.format(self.ops[self.reg_a][0], self.ops[self.reg_b][1])
-                loop_lat += '\t\tINSTR    {}, {}\n'.format(self.ops[self.reg_b][1], self.ops[self.reg_b][0])
-        elif(self.num_regs == 2 and self.reg_a != self.reg_b):
+                loop_lat += '\t\tINSTR    {}, {}\n'.format(self.ops[self.op_a][0], self.ops[self.op_b][1])
+                loop_lat += '\t\tINSTR    {}, {}\n'.format(self.ops[self.op_b][1], self.ops[self.op_b][0])
+        elif(self.num_operands == 2 and self.op_a != self.op_b):
             for i in range(0, int(self.num_instr), 2):
-                loop_lat += '\t\tINSTR    {}, {}\n'.format(self.ops[self.reg_a][0], self.ops[self.reg_b][0])
-                loop_lat += '\t\tINSTR    {}, {}\n'.format(self.ops[self.reg_a][0], self.ops[self.reg_b][0])
-        elif(self.num_regs == 3 and self.reg_a == self.reg_b):
+                loop_lat += '\t\tINSTR    {}, {}\n'.format(self.ops[self.op_a][0], self.ops[self.op_b][0])
+                loop_lat += '\t\tINSTR    {}, {}\n'.format(self.ops[self.op_a][0], self.ops[self.op_b][0])
+        elif(self.num_operands == 3 and self.op_a == self.op_b):
             for i in range(0, int(self.num_instr), 2):
-                loop_lat += '\t\tINSTR    {}, {}, {}\n'.format(self.ops[self.reg_a][0], self.ops[self.reg_b][1],      self.ops[self.reg_c][0])
-                loop_lat += '\t\tINSTR    {}, {}, {}\n'.format(self.ops[self.reg_a][1], self.ops[self.reg_b][0],      self.ops[self.reg_c][0])
-        elif(self.num_regs == 3 and self.reg_a == self.reg_c):
+                loop_lat += '\t\tINSTR    {}, {}, {}\n'.format(self.ops[self.op_a][0], self.ops[self.op_b][1],      self.ops[self.op_c][0])
+                loop_lat += '\t\tINSTR    {}, {}, {}\n'.format(self.ops[self.op_a][1], self.ops[self.op_b][0],      self.ops[self.op_c][0])
+        elif(self.num_operands == 3 and self.op_a == self.op_c):
             for i in range(0, int(self.num_instr), 2):
-                loop_lat += '\t\tINSTR    {}, {}, {}\n'.format(self.ops[self.reg_a][0], self.ops[self.reg_b][0],      self.ops[self.reg_c][0])
-                loop_lat += '\t\tINSTR    {}, {}, {}\n'.format(self.ops[self.reg_a][1], self.ops[self.reg_b][0],      self.ops[self.reg_c][0])
+                loop_lat += '\t\tINSTR    {}, {}, {}\n'.format(self.ops[self.op_a][0], self.ops[self.op_b][0],      self.ops[self.op_c][0])
+                loop_lat += '\t\tINSTR    {}, {}, {}\n'.format(self.ops[self.op_a][1], self.ops[self.op_b][0],      self.ops[self.op_c][0])
         loop_lat += ('\t\tcmp      i, N\n'
                      '\t\tjl       loop\n')
         return loop_lat
@@ -231,18 +252,18 @@ class Testcase(object):
         ext = ''
         ext1 = False
         ext2 = False
-        if(self.num_regs == 2):
+        if(self.num_operands == 2):
             ext1 = True
-        if(self.num_regs == 3):
+        if(self.num_operands == 3):
             ext1 = True
             ext2 = True
         for i in range(0, int(self.num_instr)):
             if(ext1):
-                ext = ', {}'.format(self.ops[self.reg_b][i%3])
+                ext = ', {}'.format(self.ops[self.op_b][i%3])
             if(ext2):
-                ext += ', {}'.format(self.ops[self.reg_c][i%3])
-            regNum = i%len(self.ops[self.reg_a]) if (i > 2) else (i+3)%len(self.ops[self.reg_a])
-            loop_thrpt += '\t\tINSTR    {}{}\n'.format(self.ops[self.reg_a][regNum], ext)
+                ext += ', {}'.format(self.ops[self.op_c][i%3])
+            regNum = (i%(len(self.ops[self.op_a])-3))+3
+            loop_thrpt += '\t\tINSTR    {}{}\n'.format(self.ops[self.op_a][regNum], ext)
         loop_thrpt += ('\t\tcmp      i, N\n'
                         '\t\tjl       loop\n')
         return loop_thrpt

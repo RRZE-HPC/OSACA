@@ -8,7 +8,7 @@ import re
 from  Params import *
 import pandas as pd
 from datetime import datetime
-
+import numpy as np
 
 #----------Global variables--------------
 arch = ''
@@ -373,12 +373,15 @@ def include_ibench():
     
     print('Everything seems fine! Let\'s start checking!')
     newData = []
+    addedValues = 0
     for line in srcCode:
         if('TP' in line):
 # We found a command with a throughput value. Get instruction and the number of clock cycles
             instr = line.split()[0][:-1]
             clkC = line.split()[1]
+            clkC_tmp = clkC
             clkC = validate_TP(clkC, instr)
+            txtOutput = True if (clkC_tmp == clkC) else False
             tp = -1
             new = False
             try:
@@ -387,14 +390,20 @@ def include_ibench():
 # Instruction not in database yet --> add it
                 newData.append([instr,clkC])
                 new = True
+                addedValues += 1
                 pass
-            if(not new and tp != clkC):
+            if(not new and abs((tp/np.float64(clkC))-1) > 0.05):
                 print('Different measurement for {}: {}(old) vs. {}(new)\nPlease check for correctness (no changes were made).'.format(instr, tp, clkC))
+                txtOutput = True
+            if(txtOutput):
+                print()
+                txtOutput = False
 # Now merge the DataFrames and write new csv file
     df = df.append(pd.DataFrame(newData, columns=['instr','clock_cycles']), ignore_index=True)
     csv = df.to_csv(index=False)
     write_csv(csv)
     print('ibench output {} successfully in database included.'.format(filepath.split('/')[-1]))
+    print('{} values were added.'.format(addedValues))
 
                 
 # main function of the tool
