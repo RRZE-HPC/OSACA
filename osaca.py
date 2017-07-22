@@ -5,7 +5,7 @@ import sys
 import subprocess 
 import os
 import re
-import Params
+from  Params import *
 import pandas as pd
 from datetime import datetime
 
@@ -20,7 +20,6 @@ asm_line = re.compile(r'\s[0-9a-f]+[:]')
 numSeps = 0
 sem = 0
 firstAppearance = True
-lncnt = 0
 instrForms = list()
 df = ''
 output = ''
@@ -132,20 +131,20 @@ def check_instr(instr):
     for i in range(len(param_list)):
         op = param_list[i]
         if(len(op) <= 0):
-            op = Params.Parameter('NONE')
+            op = Parameter('NONE')
         elif(op[0] == '$'):
-            op = Params.Parameter('IMD')
+            op = Parameter('IMD')
         elif(op[0] == '%' and '(' not in op):
             j = len(op)
             opmask = False
             if('{' in op):
                 j = op.index('{')
                 opmask = True
-            op = Params.Register(op[1:j], opmask)
+            op = Register(op[1:j], opmask)
         elif('<' in op):
-            op = Params.Parameter('LBL')
+            op = Parameter('LBL')
         else:
-            op = Params.MemAddr(op)
+            op = MemAddr(op)
         param_list[i] = op.print()
         param_list_types[i] = op
 #Add to list
@@ -213,12 +212,12 @@ def create_output():
         avx512 = False
         opExt = []
         for i in range(1, len(elem)-1):
-            opExt.append('r'+str(elem[i].size) if (isinstance(elem[i], Params.Register) and elem[i].reg_type == 'GPR') else elem[i].print().lower())
+            opExt.append('r'+str(elem[i].size) if (isinstance(elem[i], Register) and elem[i].reg_type == 'GPR') else elem[i].print().lower())
 # Due to the fact we store the explicit operands, we don't need anyu avx/avx512 extension
 #        for op in elem[1:-1]:
-#            if(isinstance(op,Params.Register) and op.reg_type == 'YMM'):
+#            if(isinstance(op,Register) and op.reg_type == 'YMM'):
 #                avx = True
-#            elif(isinstance(op,Params.Register) and op.reg_type == 'ZMM'):
+#            elif(isinstance(op,Register) and op.reg_type == 'ZMM'):
 #                avx512 = True
 #                break
 #        if(avx512):
@@ -228,6 +227,11 @@ def create_output():
         operands = '_'.join(opExt)
 # Now look up the value in the dataframe
 # Check if there is a stored throughput value in database
+#        print(elem[0]+'-'+operands+'-TP')
+        #operands = operands.replace(r'(',r'\(')
+        #operands = operands.replace(r')', r'\)')
+        import warnings
+        warnings.filterwarnings("ignore", 'This pattern has match groups')
         series = df['instr'].str.contains(elem[0]+'-'+operands+'-TP')
         if( True in series.values):
 # It's a match!
@@ -251,24 +255,31 @@ def create_output():
                     pass
             if(not True in opExtRegs):
 # No register in whole instruction form. How can I found out what regsize we need?
-                print('Feature not included yet')
+                print('Feature not included yet: ', end='')
+                print(elem[0]+' for '+operands)
                 tp = 0
                 notFound = True
                 warning = True
+
+                numWhitespaces = longestInstr-len(elem[-1])
+                ws = ' '*numWhitespaces+'|  '
+                n_f = ' '*(5-len(str(tp)))+'*'
+                data = '| '+elem[-1]+ws+str(tp)+n_f+'\n'
+                output += data
                 continue
             if(opExtRegs[0] == False):
 # Instruction stores result in memory. Check for storing in register instead
                 if(len(opExt) > 1):
                     if(opExtRegs[1] == True):
                         opExt[0] = opExt[1]
-                    elif(len(optExt > 2):
+                    elif(len(optExt > 2)):
                         if(opExtRegs[2] == True):
                             opExt[0] = opExt[2]
             if(len(opExtRegs) == 2 and opExtRegs[1] == False):
 # Instruction loads value from memory and has only two operands. Check for loading from register instead
                 if(opExtRegs[0] == True):
                     opExt[1] = opExt[0]
-            if(len)opExtRegs) == 3 and opExtRegs[2] == False):
+            if(len(opExtRegs) == 3 and opExtRegs[2] == False):
 # Instruction loads value from memorz and has three operands. Check for loading from register instead
                 opExt[2] = opExt[0]
             operands = '_'.join(opExt)
@@ -279,6 +290,10 @@ def create_output():
                 notFound = False
                 try:
                     tp = df[df.instr == elem[0]+'-'+operands+'-TP'].clock_cycles.values[0]
+# TODO: Add throughput estimation out of register equivalent and load/store instruction
+#                    ...
+#                    ...
+# end TODO
                 except IndexError:
 # Something went wrong
                     print('Error while fetching data from database')
@@ -396,7 +411,6 @@ def inspect_binary():
 
     print('Everything seems fine! Let\'s start checking!')
     for line in srcCode:
-        lncnt += 1
         check_line(line)
     create_output()
     print(output)
@@ -404,7 +418,6 @@ def inspect_binary():
 ##------------------------------------------------------------------------------
 ##------------Main method--------------
 def main():
-    global lncnt
     global inp
     global arch
     global filepath
@@ -417,6 +430,8 @@ def main():
 
 # Store args in global variables
     inp = parser.parse_args()
+    if(inp.arch is None):
+        raise ValueError('Please specify an architecture')
     arch = inp.arch.upper()
     filepath = inp.filepath
     inclIbench = inp.incl

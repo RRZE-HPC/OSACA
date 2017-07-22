@@ -141,7 +141,7 @@ def check_instr(instr):
 #            print()
 #Create testcase with reversed param list, due to the fact its intel syntax!
 #            create_testcase(mnemonic, list(reversed(regList)))  
-            tc = Testcase(mnemonic, list(reversed(regList)), '24')
+            tc = Testcase(mnemonic, list(reversed(regList)), '12')
             tc.write_testcase()
 #        print("-----------")
 
@@ -329,7 +329,8 @@ if __name__ == "__main__":
     r0 = Register("ymm0")
     r1 = Register("xmm0")
     r2 = Register("rax")
-#    create_testcase("VMOVQ", [r1,r2])
+    mem0 = MemAddr('(%rax, %esi, 4)')
+#    Testcase("ADD", [mem0,r1])
 #    create_testcase("VADDPD", [r0, r0, r0])
     if(len(sys.argv) > 1):
         for i in range(1,len(sys.argv)):

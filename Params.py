@@ -41,17 +41,17 @@ class MemAddr(Parameter):
                 raise NameError("Type not supported: "+name)
     
     def print(self):
-        self.mem_format = "MEM("
+        mem_format = "MEM("
         if(self.sreg):
-            self.mem_format += "sreg:"
+            mem_format += "sreg:"
         if(self.offset):
-            self.mem_format += "offset"
+            mem_format += "offset"
         if(self.base and not self.index):
-            self.mem_format += "(base)"
+            mem_format += "(base)"
         elif(self.base and self.index and self.scale):
-            self.mem_format += "(base, index, scale)"
-        self.mem_format += ")"
-        return self.mem_format
+            mem_format += "(base, index, scale)"
+        mem_format += ")"
+        return mem_format
         
 
 
@@ -78,9 +78,9 @@ class Register(Parameter):
 #Opmask Register
     "K0":(64,"K"), "K1":(64,"K"), "K2":(64,"K"), "K3":(64,"K"), "K4":(64,"K"), "K5":(64,"K"), "K6":(64,"K"), "K7":(64,"K"), 
 #Bounds Registers
-    "BND0":(128,"BND"),"BND1":(128,"BND"),"BND2":(128,"BND"),"BND3":(128,"BND")
+    "BND0":(128,"BND"),"BND1":(128,"BND"),"BND2":(128,"BND"),"BND3":(128,"BND"),
 #Registers in gerneral
-    "GPR8":(8,"GPR"), "GPR16":(16,"GPR"), "GPR32":(32,"GPR"), "GPR64":(64,"GPR"), "FPU":(80,"FPU"), "MMX":(64,"MMX"), "XMM":(128,"XMM"), "YMM":(256,"YMM"), "ZMM":(512,"ZMM"), "K":(64,"K"), "BND":(128,"BND")
+    "R8":(8,"GPR"), "R16":(16,"GPR"), "R32":(32,"GPR"), "R64":(64,"GPR"), "FPU":(80,"FPU"), "MMX":(64,"MMX"), "XMM":(128,"XMM"), "YMM":(256,"YMM"), "ZMM":(512,"ZMM"), "K":(64,"K"), "BND":(128,"BND")
     }
 
     def __init__(self,name,mask=False):
