@@ -310,11 +310,6 @@ def create_output():
                 tp = 0
                 notFound = True
                 warning = True
-# Check for cmp (not in database due to the fact we never want to count it no matter what operands it compares
-            if(elem[0] == 'cmp'):
-                tp = 0.0
-                warning = False
-                notFound = False
 # Add it to the overall throughput
         total_tp += tp
 # Check the alignement again
