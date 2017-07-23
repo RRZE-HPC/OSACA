@@ -25,12 +25,14 @@ class Testcase(object):
     'zmm10', 'zmm11', 'zmm12', 'zmm13', 'zmm14', 'zmm15']
 # Lookup table for memory
     mems = ['[rip+PI]','[rip+PI]','[rip+PI]','[rip+PI]','[rip+PI]','[rip+PI]','[rip+PI]','[rip+PI]']
+# Lookup table for immediates
+    imds = ['1', '2', '13', '22', '8', '78', '159', '222', '3', '9', '5', '55', '173', '317', '254', '255']
 # TODO Differentiate between AVX512 (with additional xmm16-31) and the rest
 #       ...
 #       ...
 # end TODO
 
-    ops = {'gpr64':gprs64, 'gpr32':gprs32, 'gpr16':gprs16, 'gpr8':gprs8, 'fpu':fpus, 'mmx':mmxs,  'k':ks, 'bnd':bnds, 'xmm':xmms, 'ymm':ymms, 'zmm':zmms, 'mem':mems}
+    ops = {'gpr64':gprs64, 'gpr32':gprs32, 'gpr16':gprs16, 'gpr8':gprs8, 'fpu':fpus, 'mmx':mmxs,  'k':ks, 'bnd':bnds, 'xmm':xmms, 'ymm':ymms, 'zmm':zmms, 'mem':mems, 'imd':imds}
 
 # Create Single Precision 1.0
     sp1 =  '\t\t# create SP 1.0\n'
@@ -99,6 +101,8 @@ class Testcase(object):
             op_a = oprnds[0].reg_type.lower()
         elif(isinstance(oprnds[0], MemAddr)):
             op_a = 'mem'
+        elif(isinstance(oprnds[0], Parameter) and oprnds[0].print() == 'IMD'):
+            op_a = 'imd'
         if(op_a == 'gpr'):
             gprPush, gprPop, zeroGPR = self.__initialise_gprs()
             op_a += str(oprnds[0].size)
@@ -107,6 +111,8 @@ class Testcase(object):
                 op_b = oprnds[1].reg_type.lower()
             elif(isinstance(oprnds[1], MemAddr)):
                 op_b = 'mem'           
+            elif(isinstance(oprnds[1], Parameter) and oprnds[1].print() == 'IMD'):
+                op_b = 'imd'
             if(op_b == 'gpr'):
                 op_b += str(oprnds[1].size)
                 if('gpr' not in op_a):
@@ -116,6 +122,8 @@ class Testcase(object):
                 op_c = oprnds[2].reg_type.lower()
             elif(isinstance(oprnds[2], MemAddr)):
                 op_c = 'mem'
+            elif(isinstance(oprnds[2], Parameter) and oprnds[2].print() == 'IMD'):
+                op_c = 'imd'
             if(op_c == 'gpr'):
                 op_c += str(oprnds[2].size)
                 if(('gpr' not in op_a) and ('gpr'not in op_b)):

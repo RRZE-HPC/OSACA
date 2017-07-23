@@ -143,16 +143,15 @@ def check_instr(instr):
 
 
 #Only create benchmark if no label (LBL) is part of the operands
-# And for now only for instr forms without immediates (will be implemented soon)
         do_bench = True
         for par in opList:
-            if(not isinstance(par, Register) and not isinstance(par, MemAddr)):
+            if(par.print() == 'LBL'):
                 do_bench = False
         if(do_bench):
 #Create testcase with reversed param list, due to the fact its intel syntax!
 #            create_testcase(mnemonic, list(reversed(opList))) 
 #            print('menmonic: '+mnemonic+' ops: '+str(list(reversed(opList))))
-            tc = Testcase(mnemonic, list(reversed(opList)), '32')
+            tc = Testcase(mnemonic, list(reversed(opList)), '64')
             tc.write_testcase()
 #        print("-----------")
 
