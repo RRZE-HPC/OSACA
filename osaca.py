@@ -212,7 +212,14 @@ def create_output():
         avx512 = False
         opExt = []
         for i in range(1, len(elem)-1):
-            opExt.append('r'+str(elem[i].size) if (isinstance(elem[i], Register) and elem[i].reg_type == 'GPR') else elem[i].print().lower())
+            optmp = ''
+            if(isinstance(elem[i], Register) and elem[i].reg_type == 'GPR'):
+                optmp = 'r'+str(elem[i].size)
+            elif(isinstance(elem[i], MemAddr)):
+                optmp = 'mem'
+            else:
+                optmp = elem[i].print().lower()
+            opExt.append(optmp)
 # Due to the fact we store the explicit operands, we don't need anyu avx/avx512 extension
 #        for op in elem[1:-1]:
 #            if(isinstance(op,Register) and op.reg_type == 'YMM'):
@@ -303,6 +310,11 @@ def create_output():
                 tp = 0
                 notFound = True
                 warning = True
+# Check for cmp (not in database due to the fact we never want to count it no matter what operands it compares
+            if(elem[0] == 'cmp'):
+                tp = 0.0
+                warning = False
+                notFound = False
 # Add it to the overall throughput
         total_tp += tp
 # Check the alignement again
@@ -311,7 +323,7 @@ def create_output():
         n_f = ''
         if(notFound):
             n_f = ' '*(5-len(str(tp)))+'*'
-        data = '| '+elem[-1]+ws+str(tp)+n_f+'\n'
+        data = '| '+elem[-1]+ws+'{:3.2f}'.format(tp)+n_f+'\n'
         output += data
 # Finally write the total throughput
     numWhitespaces = longestInstr-27
