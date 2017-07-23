@@ -12,21 +12,22 @@ xmm = Register('xmm0')
 ymm = Register('ymm0')
 zmm = Register('zmm0')
 mem0 = MemAddr('(%rax, %esi, 4)')
+imd1 = Parameter('IMD')
 
 
 #-----------------------------------------------
 #-USER INPUT------------------------------------
 #-----------------------------------------------
 # Enter your mnemonic
-mnemonic = 'vmovupd'
+mnemonic = 'cmp'
 
 # Define your operands. If you don't need it, just type in None
-dst = xmm
-op1 = mem0
+dst = reg64
+op1 = imd1
 op2 = None
 
 # Define the number of instructions per loop (default: 12)
-per_loop = '12'
+per_loop = '100'
 
 #-----------------------------------------------
 #-----------------------------------------------
