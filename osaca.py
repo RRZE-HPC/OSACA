@@ -324,8 +324,7 @@ def create_output():
 # Finally write the total throughput
     numWhitespaces = longestInstr-27
     ws = '  '+' '*numWhitespaces
-    output += ( '| '+horizontalSeparator+'\n'
-                '| TOTAL ESTIMATED THROUGHPUT:'+ws+str(np.ceil(total_tp)))
+    output += '| '+horizontalSeparator+'\n'
     if(warning):
         output += ('\n\n* There was no throughput value found '
                     'for the specific instruction form.'
