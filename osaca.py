@@ -180,7 +180,8 @@ def flatten(l):
 
 def read_csv():
     global df
-    df = pd.read_csv('data/'+arch.lower()+'_throughput.csv')
+    currDir = os.path.realpath(__file__)[:-8]
+    df = pd.read_csv(currDir+'data/'+arch.lower()+'_throughput.csv')
 
 def create_horiz_sep():
     global horizontalSeparator
