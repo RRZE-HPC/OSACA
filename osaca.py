@@ -440,7 +440,7 @@ def main():
 # Parse args
     parser = argparse.ArgumentParser(description='Analyzes a marked innermost loop snippet for a given architecture type and prints out the estimated average throughput')
     parser.add_argument('--version', '-V', action='version', version='%(prog)s 0.1')
-    parser.add_argument('--arch', dest='arch', type=str, help='define architecture')
+    parser.add_argument('--arch', dest='arch', type=str, help='define architecture (SNB, IVB, HSW, BDW, SKL)')
     parser.add_argument('filepath', type=str, help='path to object (Binary, CSV)')
     parser.add_argument('--include-ibench', '-i', dest='incl', action='store_true', help='includes the given values in form of the output of ibench in the database')
 
