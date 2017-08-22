@@ -33,6 +33,9 @@ class MemAddr(Parameter):
             self.commacnt = self.parentheses.count(',')
             if(self.commacnt == 0):
                 self.base = True
+            elif(self.commacnt == 1 or self.commacnt == 2 and int(self.parentheses[-1:]) == 1):
+                self.base = True
+                self.index = True
             elif(self.commacnt == 2 and int(self.parentheses[-1:]) in self.scales):
                 self.base = True
                 self.index = True
