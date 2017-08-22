@@ -28,6 +28,10 @@ total_tp = 0
 longestInstr = 30
 cycList = []
 reciList = []
+# Matches every variation of the IACA start marker
+iaca_sm = re.compile(r'\s*movl[ \t]+\$111[ \t]*,[ \t]*%ebx[ \t]*\n\s*\.byte[ \t]+100[ \t]*((,[ \t]*103[ \t]*((,[ \t]*144)|(\n\s*\.byte[ \t]+144)))|(\n\s*\.byte[ \t]+103[ \t]*((,[ \t]*144)|(\n\s*\.byte[ \t]+144))))')
+# Matches every variation of the IACA end marker
+iaca_em = re.compile(r'\s*movl[ \t]+\$222[ \t]*,[ \t]*%ebx[ \t]*\n\s*\.byte[ \t]+100[ \t]*((,[ \t]*103[ \t]*((,[ \t]*144)|(\n\s*\.byte[ \t]+144)))|(\n\s*\.byte[ \t]+103[ \t]*((,[ \t]*144)|(\n\s*\.byte[ \t]+144))))')
 #---------------------------------------
 
 # Check if the architecture arg is valid
@@ -46,9 +50,9 @@ def check_elffile():
     return False
 
 # Check if the given filepath exists
-def check_file():
+def check_file(iacaFlag=False):
     if(os.path.isfile(filepath)):
-        get_file()
+        get_file(iacaFlag)
         return True
     return False
 
@@ -58,8 +62,9 @@ def create_elffile():
     srcCode = subprocess.run(['objdump', '--source', filepath], stdout=subprocess.PIPE).stdout.decode('utf-8').split('\n')
 
 # Load arbitrary file in variable srcCode and separate by line
-def get_file():
+def get_file(iacaFlag):
     global srcCode
+    srcCode = ''
     try:
         f = open(filepath, 'r')
     except IOError:
@@ -67,6 +72,8 @@ def get_file():
     for line in f:
         srcCode += line
     f.close()
+    if(iacaFlag):
+        return
     srcCode = srcCode.split('\n')
 
 
@@ -141,7 +148,7 @@ def check_instr(instr):
                 j = op.index('{')
                 opmask = True
             op = Register(op[1:j], opmask)
-        elif('<' in op):
+        elif('<' in op or op.startswith('.')):
             op = Parameter('LBL')
         else:
             op = MemAddr(op)
@@ -152,6 +159,60 @@ def check_instr(instr):
         longestInstr = len(instr)
     instrForm = [mnemonic]+list(reversed(param_list_types))+[instr]
     instrForms.append(instrForm)
+
+
+# Extract instruction forms out of binary file
+def iaca_bin():
+    global marker
+    global sem
+
+    marker = r'fs addr32 nop'
+    for line in srcCode:
+# Check if marker is in line
+        if(marker in line):
+            sem += 1
+        elif(sem == 1):
+# We're in the marked code snippet
+# Check if the line is ASM code
+            match = re.search(asm_line, line)
+            if(match):
+# Further analysis of instructions
+# Check if there are comments in line
+                if(r'//' in line):
+                    continue
+# Do the same instruction check as for the OSACA marker line check
+                check_instr(''.join(re.split(r'\t', line)[-1:]))
+        elif(sem == 2):
+# Not in the loop anymore. Due to the fact it's the IACA marker we can stop here
+            return
+            
+
+# Extract instruction forms out of assembly file
+def iaca_asm():
+# Extract the code snippet surround by the IACA markers
+    code = srcCode
+# Search for the start marker
+    match = re.match(iaca_sm, code)
+    while(not match):
+        code = code.split('\n',1)[1]
+        match = re.match(iaca_sm, code)
+# Search for the end marker
+    code = (code.split('144',1)[1]).split('\n',1)[1]
+    res = ''
+    match = re.match(iaca_em, code)
+    while(not match):
+        res += code.split('\n',1)[0]+'\n'
+        code = code.split('\n',1)[1]
+        match = re.match(iaca_em, code)
+# Split the result by line go on like with OSACA markers
+    res = res.split('\n')
+    for line in res:
+        line = line.split('#')[0]
+        line = line.lstrip()
+        if(len(line) == 0 or '//' in line or line.startswith('..')):
+            continue
+        check_instr(line)
+
 
 def separate_params(params):
     param_list = [params]
@@ -221,7 +282,7 @@ def create_output():
             else:
                 optmp = elem[i].print().lower()
             opExt.append(optmp)
-# Due to the fact we store the explicit operands, we don't need anyu avx/avx512 extension
+# Due to the fact we store the explicit operands, we don't need any avx/avx512 extension
 #        for op in elem[1:-1]:
 #            if(isinstance(op,Register) and op.reg_type == 'YMM'):
 #                avx = True
@@ -431,6 +492,37 @@ def inspect_binary():
     create_output()
     print(output)
 
+
+# main function of the tool with IACA markers instead of OSACA marker
+def inspect_with_iaca():
+# Check args and exit program if something's wrong
+    if(not check_arch()):
+        print('Invalid microarchitecture.')
+        sys.exit()
+# Check if input file is a binary or assembly file
+    try:
+        binaryFile = True
+        if(not check_elffile()):
+            print('Invalid file path or file format.')
+            sys.exit()
+    except (TypeError,IndexError):
+        binaryFile = False
+        if(not check_file(True)):
+            print('Invalid file path or file format.')
+            sys.exit()       
+# Finally check for database for the chosen architecture
+    read_csv()
+
+    print('Everything seems fine! Let\'s start checking!')
+    if(binaryFile):
+        iaca_bin()
+    else:
+        iaca_asm()
+    create_output()
+    print(output)
+
+
+
 ##------------------------------------------------------------------------------
 ##------------Main method--------------
 def main():
@@ -439,21 +531,37 @@ def main():
     global filepath
 # Parse args
     parser = argparse.ArgumentParser(description='Analyzes a marked innermost loop snippet for a given architecture type and prints out the estimated average throughput')
-    parser.add_argument('--version', '-V', action='version', version='%(prog)s 0.1')
+    parser.add_argument('-V', '--version', action='version', version='%(prog)s 0.1')
     parser.add_argument('--arch', dest='arch', type=str, help='define architecture (SNB, IVB, HSW, BDW, SKL)')
-    parser.add_argument('filepath', type=str, help='path to object (Binary, CSV)')
-    parser.add_argument('--include-ibench', '-i', dest='incl', action='store_true', help='includes the given values in form of the output of ibench in the database')
+    parser.add_argument('filepath', type=str, help='path to object (Binary, ASM, CSV)')
+    group = parser.add_mutually_exclusive_group(required=False)
+    group.add_argument('-i', '--include-ibench', dest='incl', action='store_true', help='includes the given values in form of the output of ibench in the database')
+    group.add_argument('--iaca', dest='iaca', action='store_true', help='search for IACA markers instead the OSACA marker')
+    group.add_argument('-m', '--insert-marker', dest='insert_marker', action='store_true', help='try to find blocks probably corresponding to loops in assembly and insert IACA marker')
 
 # Store args in global variables
     inp = parser.parse_args()
-    if(inp.arch is None):
+    if(inp.arch is None and inp.insert_marker is None):
         raise ValueError('Please specify an architecture')
-    arch = inp.arch.upper()
+    if(inp.arch is not None):
+        arch = inp.arch.upper()
     filepath = inp.filepath
     inclIbench = inp.incl
+    iacaFlag = inp.iaca
+    insert_m = inp.insert_marker
     
     if(inclIbench):
         include_ibench()
+    if(iacaFlag):
+        inspect_with_iaca()
+    if(insert_m):
+        try:
+            from kerncrafts import iaca
+        except ImportError:
+           print('ImportError: Module kerncraft not installed. Use \'pip install --user kerncraft\' for installation.\nFor more information see https://github.com/RRZE-HPC/kerncraft')
+           sys.exit()
+        iaca.iaca_instrumentation(input_file=filepath, output_file=filepath,
+                                  block_selection='manual', pointer_increment=1)
     else:
         inspect_binary()
 
