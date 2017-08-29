@@ -242,7 +242,7 @@ def flatten(l):
 def read_csv():
     global df
     currDir = os.path.realpath(__file__)[:-8]
-    df = pd.read_csv(currDir+'data/'+arch.lower()+'_throughput.csv')
+    df = pd.read_csv(currDir+'data/'+arch.lower()+'_data.csv')
 
 def create_horiz_sep():
     global horizontalSeparator
@@ -301,12 +301,12 @@ def create_output():
         #operands = operands.replace(r')', r'\)')
         import warnings
         warnings.filterwarnings("ignore", 'This pattern has match groups')
-        series = df['instr'].str.contains(elem[0]+'-'+operands+'-TP')
+        series = df['instr'].str.contains(elem[0]+'-'+operands)
         if( True in series.values):
 # It's a match!
             notFound = False
             try:
-                tp = df[df.instr == elem[0]+'-'+operands+'-TP'].clock_cycles.values[0]
+                tp = df[df.instr == elem[0]+'-'+operands].TP.values[0]
             except IndexError:
 # Something went wrong
                 print('Error while fetching data from database')
@@ -353,12 +353,12 @@ def create_output():
                 opExt[2] = opExt[0]
             operands = '_'.join(opExt)
 # Check for register equivalent instruction
-            series = df['instr'].str.contains(elem[0]+'-'+operands+'-TP')
+            series = df['instr'].str.contains(elem[0]+'-'+operands)
             if( True in series.values):
 # It's a match!
                 notFound = False
                 try:
-                    tp = df[df.instr == elem[0]+'-'+operands+'-TP'].clock_cycles.values[0]
+                    tp = df[df.instr == elem[0]+'-'+operands].TP.values[0]
 # TODO: Add throughput estimation out of register equivalent and load/store instruction
 #                    ...
 #                    ...
@@ -400,24 +400,28 @@ def create_sequences():
         cycList.append(i)
         reciList.append(1/i)
 
-def validate_TP(clkC, instr):
+def validate_val(clkC, instr, isTP):
+    clmn = 'LT'
+    if(isTP):
+        clmn = 'TP'
     for i in range(0, 100):
         if(cycList[i]*1.05 > float(clkC) and cycList[i]*0.95 < float(clkC)):
 # Value is probably correct, so round it to the estimated value
             return cycList[i]
-        elif(reciList[i]*1.05 > float(clkC) and reciList[i]*0.95 < float(clkC)):
+# Check reciprocal only if it is a throughput value
+        elif(isTP and reciList[i]*1.05 > float(clkC) and reciList[i]*0.95 < float(clkC)):
 # Value is probably correct, so round it to the estimated value
             return reciList[i]
 # No value close to an integer or its reciprokal found, we assume the measurement is incorrect
-    print('Your measurement for {} is probably wrong. Please inspect your benchmark!'.format(instr))
+    print('Your measurement for {} ({}) is probably wrong. Please inspect your benchmark!'.format(instr, clmn))
     print('The program will continue with the given value')
     return clkC
 
 def write_csv(csv):
     try:
-        f = open('data/'+arch.lower()+'_throughput.csv', 'w')
+        f = open('data/'+arch.lower()+'_data.csv', 'w')
     except IOError:
-        print('IOError: file \'{}\' not found in ./data'.format(arch.lower()+'_throughput.csv'))
+        print('IOError: file \'{}\' not found in ./data'.format(arch.lower()+'_data.csv'))
     f.write(csv)
     f.close()
 
@@ -439,35 +443,61 @@ def include_ibench():
 # Create sequence of numbers and their reciprokals for validate the measurements
     create_sequences()
     
-    print('Everything seems fine! Let\'s start checking!')
+    print('Everything seems fine! Let\'s start!')
     newData = []
     addedValues = 0
     for line in srcCode:
+        if('Using frequency' in line or len(line) == 0):
+            continue
+        clmn = 'LT'
+        instr = line.split()[0][:-1]
         if('TP' in line):
 # We found a command with a throughput value. Get instruction and the number of clock cycles
-            instr = line.split()[0][:-1]
-            clkC = line.split()[1]
-            clkC_tmp = clkC
-            clkC = validate_TP(clkC, instr)
-            txtOutput = True if (clkC_tmp == clkC) else False
-            tp = -1
-            new = False
-            try:
-                tp = df.loc[lambda df: df.instr == instr,'clock_cycles'].values[0]
-            except IndexError:
+# and remove the '-TP' suffix
+            clmn = 'TP'
+            instr = instr[:-3]
+# Otherwise stay with Latency
+        clkC = line.split()[1]
+        clkC_tmp = clkC
+        clkC = validate_val(clkC, instr, True if (clmn == 'TP') else False)
+        txtOutput = True if (clkC_tmp == clkC) else False
+        val = -2
+        new = False
+        try:
+            entry = df.loc[lambda df: df.instr == instr,clmn]
+            val = entry.values[0]
+        except IndexError:
 # Instruction not in database yet --> add it
-                newData.append([instr,clkC])
-                new = True
-                addedValues += 1
-                pass
-            if(not new and abs((tp/np.float64(clkC))-1) > 0.05):
-                print('Different measurement for {}: {}(old) vs. {}(new)\nPlease check for correctness (no changes were made).'.format(instr, tp, clkC))
-                txtOutput = True
-            if(txtOutput):
-                print()
-                txtOutput = False
+            new = True
+# First check if LT or TP value has already been added before
+            for i,item in enumerate(newData):
+                if(instr in item):
+                    if(clmn == 'TP'):
+                        newData[i][1] = clkC
+                    elif(clmn == 'LT'):
+                        newData[i][2] = clkC
+                    new = False
+                    break
+            if(new and clmn == 'TP'):
+                newData.append([instr,clkC,'-1'])
+            elif(new and clmn == 'LT'):
+                newData.append([instr,'-1',clkC])              
+            new = True
+            addedValues += 1
+            pass
+# If val is -1 (= not filled with a valid value) add it immediately
+        if(val == -1):
+            df.set_value(entry.index[0], clmn, clkC)
+            addedValues += 1
+            continue
+        if(not new and abs((val/np.float64(clkC))-1) > 0.05):
+            print('Different measurement for {} ({}): {}(old) vs. {}(new)\nPlease check for correctness (no changes were made).'.format(instr, clmn, val, clkC))
+            txtOutput = True
+        if(txtOutput):
+            print()
+            txtOutput = False
 # Now merge the DataFrames and write new csv file
-    df = df.append(pd.DataFrame(newData, columns=['instr','clock_cycles']), ignore_index=True)
+    df = df.append(pd.DataFrame(newData, columns=['instr','TP','LT']), ignore_index=True)
     csv = df.to_csv(index=False)
     write_csv(csv)
     print('ibench output {} successfully in database included.'.format(filepath.split('/')[-1]))
@@ -552,9 +582,9 @@ def main():
     
     if(inclIbench):
         include_ibench()
-    if(iacaFlag):
+    elif(iacaFlag):
         inspect_with_iaca()
-    if(insert_m):
+    elif(insert_m):
         try:
             from kerncrafts import iaca
         except ImportError:
