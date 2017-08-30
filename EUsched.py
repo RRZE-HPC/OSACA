@@ -41,6 +41,8 @@ class Scheduler(object):
                 searchString = instrForm[0]+'-'+self.get_operand_suffix(instrForm)
                 entry = self.df.loc[lambda df: df.instr == searchString,'LT':'ports']
                 tup = entry.ports.values[0]
+                if(len(tup) == 1 and tup[0] == -1):
+                    raise IndexError()
             except IndexError:
 # Instruction form not in CSV
                 sched += self.get_line([0]*self.ports,'* '+instrForm[-1])
@@ -48,7 +50,6 @@ class Scheduler(object):
             found = False
             while(not found):
                 for portOcc in tup:
-#                    print('test if {} is possible for ports {}'.format(portOcc, occ_ports))
 # Test if chosen instruction form port occupation suits the current CPU port occupation
                     if(self.test_ports_FCFS(occ_ports, portOcc)):
 # Current port occupation fits for chosen port occupation of the instruction!
