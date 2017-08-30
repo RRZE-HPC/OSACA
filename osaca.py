@@ -6,6 +6,7 @@ import subprocess
 import os
 import re
 from  Params import *
+from EUsched import *
 import pandas as pd
 from datetime import datetime
 import numpy as np
@@ -22,9 +23,7 @@ sem = 0
 firstAppearance = True
 instrForms = list()
 df = ''
-output = ''
 horizontalSeparator = ''
-total_tp = 0
 longestInstr = 30
 cycList = []
 reciList = []
@@ -165,6 +164,7 @@ def check_instr(instr):
 def iaca_bin():
     global marker
     global sem
+    global instrForms
 
     marker = r'fs addr32 nop'
     for line in srcCode:
@@ -184,6 +184,8 @@ def iaca_bin():
                 check_instr(''.join(re.split(r'\t', line)[-1:]))
         elif(sem == 2):
 # Not in the loop anymore. Due to the fact it's the IACA marker we can stop here
+# After removing the last line which belongs to the IACA marker
+            del instrForms[-1:]
             return
             
 
@@ -248,11 +250,8 @@ def create_horiz_sep():
     global horizontalSeparator
     horizontalSeparator = '-'*(longestInstr+8)
 
-def create_output():
-    global total_tp
-    global output
+def create_output(tp_list=False,pr_sched=True):
     global longestInstr
-    warning = False
     
 #Check the output alignment depending on the longest instruction
     if(longestInstr > 70):
@@ -263,15 +262,29 @@ def create_output():
     output = (  '--'+horizontalSeparator+'\n'
                 '| Analyzing of file:\t'+os.getcwd()+'/'+filepath+'\n'
                 '| Architecture:\t\t'+arch+'\n'
-                '| Timestamp:\t\t'+datetime.now().strftime('%Y-%m-%d %H:%M:%S')+'\n'
-                '|\n| INSTRUCTION'+ws+'CLOCK CYCLES\n'
+                '| Timestamp:\t\t'+datetime.now().strftime('%Y-%m-%d %H:%M:%S')+'\n')
+
+    if(tp_list):
+        output += create_TP_list(instrForms)
+    if(pr_sched):
+        output += '\n\n'
+        sched = Scheduler(arch, instrForms) 
+        schedOutput,totalTP = sched.schedule_FCFS()
+        output += sched.get_head()+schedOutput
+        output += 'Total number of estimated throughput: '+str(totalTP)
+    return output
+
+
+def create_TP_list(instrForms):        
+    warning = False
+    ws = ' '*(len(horizontalSeparator)-23)
+
+    output =   ('\n| INSTRUCTION'+ws+'CLOCK CYCLES\n'
                 '| '+horizontalSeparator+'\n|\n')
 # Check for the throughput data in CSV
-# First determine if we're searching for the SSE, AVX or AVX512 type of instruction
+# First determine if we're searching for the SSE, AVX or AVX512 type of instruction      
     for elem in instrForms:
         extension = ''
-        avx = False
-        avx512 = False
         opExt = []
         for i in range(1, len(elem)-1):
             optmp = ''
@@ -282,23 +295,9 @@ def create_output():
             else:
                 optmp = elem[i].print().lower()
             opExt.append(optmp)
-# Due to the fact we store the explicit operands, we don't need any avx/avx512 extension
-#        for op in elem[1:-1]:
-#            if(isinstance(op,Register) and op.reg_type == 'YMM'):
-#                avx = True
-#            elif(isinstance(op,Register) and op.reg_type == 'ZMM'):
-#                avx512 = True
-#                break
-#        if(avx512):
-#            extension = '-avx512'
-#        elif(avx):
-#            extension = '-avx'
         operands = '_'.join(opExt)
 # Now look up the value in the dataframe
 # Check if there is a stored throughput value in database
-#        print(elem[0]+'-'+operands+'-TP')
-        #operands = operands.replace(r'(',r'\(')
-        #operands = operands.replace(r')', r'\)')
         import warnings
         warnings.filterwarnings("ignore", 'This pattern has match groups')
         series = df['instr'].str.contains(elem[0]+'-'+operands)
@@ -349,7 +348,7 @@ def create_output():
                 if(opExtRegs[0] == True):
                     opExt[1] = opExt[0]
             if(len(opExtRegs) == 3 and opExtRegs[2] == False):
-# Instruction loads value from memorz and has three operands. Check for loading from register instead
+# Instruction loads value from memory and has three operands. Check for loading from register instead
                 opExt[2] = opExt[0]
             operands = '_'.join(opExt)
 # Check for register equivalent instruction
@@ -359,10 +358,7 @@ def create_output():
                 notFound = False
                 try:
                     tp = df[df.instr == elem[0]+'-'+operands].TP.values[0]
-# TODO: Add throughput estimation out of register equivalent and load/store instruction
-#                    ...
-#                    ...
-# end TODO
+
                 except IndexError:
 # Something went wrong
                     print('Error while fetching data from database')
@@ -372,8 +368,6 @@ def create_output():
                 tp = 0
                 notFound = True
                 warning = True
-# Add it to the overall throughput
-        total_tp += tp
 # Check the alignement again
         numWhitespaces = longestInstr-len(elem[-1])
         ws = ' '*numWhitespaces+'|  '
@@ -382,7 +376,7 @@ def create_output():
             n_f = ' '*(5-len(str(tp)))+'*'
         data = '| '+elem[-1]+ws+'{:3.2f}'.format(tp)+n_f+'\n'
         output += data
-# Finally write the total throughput
+# Finally end the list of  throughput values
     numWhitespaces = longestInstr-27
     ws = '  '+' '*numWhitespaces
     output += '| '+horizontalSeparator+'\n'
@@ -391,6 +385,8 @@ def create_output():
                     'for the specific instruction form.'
                     '\n  Please create a testcase via the create_testcase-method '
                     'or add a value manually.')
+    return output
+
 
 def create_sequences():
     global cycList
@@ -519,7 +515,7 @@ def inspect_binary():
     print('Everything seems fine! Let\'s start checking!')
     for line in srcCode:
         check_line(line)
-    create_output()
+    output = create_output()
     print(output)
 
 
@@ -548,7 +544,7 @@ def inspect_with_iaca():
         iaca_bin()
     else:
         iaca_asm()
-    create_output()
+    output = create_output()
     print(output)
 
 
