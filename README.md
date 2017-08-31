@@ -5,7 +5,7 @@ This tool allows automatic instruction fetching of assembly code, auto-generatin
 
 ## Getting started
 ### *Dependencies:*
-- Python 3.5 or higher
-- Pandas 0.20 or higher
-- Numpy
-- kerncraft
+- [Python](https://www.python.org/) 3.5.2 or higher
+- [pandas](http://pandas.pydata.org/) 0.18.1 or higher
+- [NumPy](http://www.numpy.org/) 1.11.1 or higher
+- [kerncraft](https://github.com/RRZE-HPC/kerncraft) 0.4.11 or higher
