@@ -24,8 +24,8 @@ class Scheduler(object):
             sys.exit()
         self.instrList = instructionList
         currDir = os.path.realpath(__file__)[:-10]
-        self.df = pd.read_csv(currDir+'data/skl_data.csv', quotechar='"', converters={'ports':ast.literal_eval})
-                                        #'+arch.lower()+'
+        self.df = pd.read_csv(currDir+'data/'+arch.lower()+'_data.csv', quotechar='"', converters={'ports':ast.literal_eval})
+
 
     def schedule_FCFS(self):
         '''
