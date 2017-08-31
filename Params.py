@@ -7,6 +7,14 @@ class Parameter(object):
             raise NameError("Type not supported: "+ptype)
     
     def print(self):
+        '''
+        Prints Parameter.
+
+        Returns
+        -------
+        str
+            Parameter as string
+        '''
         if(self.ptype == "NONE"):
             return ""
         else:
@@ -44,6 +52,14 @@ class MemAddr(Parameter):
                 raise NameError("Type not supported: "+name)
     
     def print(self):
+        '''
+        Prints MemAddr.
+
+        Returns
+        -------
+        str
+            MemAddr as string
+        '''
         mem_format = "MEM("
         if(self.sreg):
             mem_format += "sreg:"
@@ -100,6 +116,14 @@ class Register(Parameter):
 #            print(lncnt)
 	
     def print(self):
+        '''
+        Prints Register.
+
+        Returns
+        -------
+        str
+            Register as string
+        '''
         opmask = ""
         if(self.mask):
             opmask = "{opmask}"

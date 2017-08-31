@@ -30,7 +30,11 @@ class Scheduler(object):
     def schedule_FCFS(self):
         '''
         Schedules Instruction Form list via First Come First Serve algorithm.
-        Returns a tuple containing the graphic output as string and the total throughput time as int
+
+        Returns 
+        -------
+        (str, int)
+            A tuple containing the graphic output as string and the total throughput time as int.
         '''
         sched = ''
         total = 0
@@ -41,7 +45,7 @@ class Scheduler(object):
                 searchString = instrForm[0]+'-'+self.get_operand_suffix(instrForm)
                 entry = self.df.loc[lambda df: df.instr == searchString,'LT':'ports']
                 tup = entry.ports.values[0]
-                if(len(tup) == 1 and tup[0] == -1):
+                if(len(tup) == 1 and tup[0][0] == -1):
                     raise IndexError()
             except IndexError:
 # Instruction form not in CSV
@@ -68,7 +72,20 @@ class Scheduler(object):
 
     def test_ports_FCFS(self, occ_ports, needed_ports):
         '''
-        tests if current configuration of ports is possible and returns boolean
+        Test if current configuration of ports is possible and returns boolean
+
+        Parameters
+        ----------
+        occ_ports : [int]
+            Tuple to inspect for current port occupation
+        needed_ports : (int)
+            Tuple with needed port(s) for particular instruction form
+
+        Returns
+        -------
+        bool
+            True    if needed ports can get scheduled on current port occupation
+            False   if not
         '''
         for port in needed_ports:
             if(occ_ports[port] != 0):
@@ -76,10 +93,21 @@ class Scheduler(object):
         return True
 
     def schedule_Tomasulo(self):
+        '''
+        Not implement yet.  Schedules Instruction Form list via Tomasulo algorithm.
+        '''
         print('Scheduling with Tomasulo algorithm...')
         return ''
 
     def get_head(self):
+        '''
+        Creates right heading for CPU architecture.
+
+        Returns
+        -------
+        str
+            String containing the header
+        '''
         analysis = 'Throughput Analysis Report\n'+('-'*26)+'\n'
         annotations = ( '* - No information for this instruction in database\n'
                         '\n')
@@ -93,6 +121,21 @@ class Scheduler(object):
         return head
 
     def get_line(self, occ_ports, instrName):
+        '''
+        Create line with port occupation for output.
+
+        Parameters
+        ----------
+        occ_ports : (int)
+            Integer tuple containing needed ports
+        instrName : str
+            Name of instruction form for output
+
+        Returns
+        -------
+        str
+            String for output containing port scheduling for instrName
+        '''
         line = ''
         for i in occ_ports:
             cycles = '   ' if (i == 0) else float(i)
@@ -102,6 +145,19 @@ class Scheduler(object):
 
 
     def get_operand_suffix(self, instrForm):
+        '''
+        Creates operand suffix out of list of Parameters.
+
+        Parameters
+        ----------
+        instrForm : [str, Parameter, ..., Parameter, str]
+            Instruction Form data structure
+
+        Returns
+        -------
+        str
+            Operand suffix for searching in database
+        '''
         extension = ''
         opExt = []
         for i in range(1, len(instrForm)-1):

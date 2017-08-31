@@ -54,7 +54,7 @@ class Testcase(object):
 ##----------------------------------------------------------------
 
 # Constructor
-    def __init__(self, _mnemonic, _param_list, _num_instr='12'):
+    def __init__(self, _mnemonic, _param_list, _num_instr='32'):
         self.instr = _mnemonic.lower()
         self.param_list = _param_list
 # num_instr must be an even number
@@ -71,6 +71,9 @@ class Testcase(object):
 
 
     def write_testcase(self):
+        """
+        Write testcase for class attributes in a file.
+        """
         regs = self.param_list
         extension = ''
 # Add operands
@@ -94,6 +97,15 @@ class Testcase(object):
 
 # Check operands
     def __define_operands(self):
+        """
+        Check for the number of operands and initialise the GPRs if necessary.
+
+        Returns
+        -------
+        (str, str, str, str, str, str)
+            String tuple containing types of operands and if needed push/pop operations, the 
+            initialisation of general purpose regs and the copy if registers.
+        """
         oprnds = self.param_list
         op_a, op_b, op_c = ('', '', '')
         gprPush, gprPop, zeroGPR = ('', '', '')
@@ -138,8 +150,17 @@ class Testcase(object):
             copy = ''
         return (op_a, op_b, op_c, gprPush, gprPop, zeroGPR, copy)            
 
-# Initialise 11 general purpose registers and set them to zero
+
     def __initialise_gprs(self):
+        """
+        Initialise eleven general purpose registers and set them to zero.
+
+        Returns
+        -------
+        (str, str, str)
+            String tuple for push, pop and initalisation operations
+        """
+
         gprPush = ''
         gprPop = ''
         zeroGPR = ''
@@ -154,6 +175,19 @@ class Testcase(object):
 
 # Copy created values in specific register
     def __copy_regs(self, reg):
+        """
+        Copy created values in specific register.
+
+        Parameters
+        ----------
+        reg : Register
+            Register for copying the value
+        
+        Returns
+        -------
+        str
+            String containing the copy instructions
+        """
         copy = '\t\t# copy DP 1.0\n'
 # Different handling for GPR, MMX and SSE/AVX registers
         if(reg.reg_type == 'GPR'):
@@ -188,6 +222,14 @@ class Testcase(object):
 
 
     def __define_header(self):
+        """
+        Define header.
+
+        Returns
+        -------
+        (str, str, str, str)
+            String tuple containing the header, value initalisations and extensions
+        """
         def_instr = '#define INSTR '+self.instr+'\n'
         ninstr = '#define NINST '+self.num_instr+'\n'
         pi = ('PI:\n'
@@ -226,8 +268,16 @@ class Testcase(object):
                       '\t\tvinsert64x4 zmm0, zmm0, ymm0, 0x1\n')
         return (def_instr, ninstr, init, expand)
 
-# Create latency loop
+
     def __define_loop_lat(self):
+        """
+        Create latency loop.
+
+        Returns
+        -------
+        str
+            Latency loop as string
+        """
         loop_lat = ('loop:\n'
                     '\t\tinc      i\n')
         if(self.num_operands == 1):
@@ -253,8 +303,16 @@ class Testcase(object):
                      '\t\tjl       loop\n')
         return loop_lat
 
-# Create throughput loop
+ 
     def __define_loop_thrpt(self):
+        """
+        Create throughput loop.
+
+        Returns
+        -------
+        str
+            Throughput loop as string
+        """
         loop_thrpt = ('loop:\n'
                       '\t\tinc      i\n')
         ext = ''
@@ -278,6 +336,22 @@ class Testcase(object):
 
 
     def __is_in_dir(self, name, path):
+        """
+        Check if file with the name name  is in directory path.
+
+        Parameters
+        ----------
+        name : str
+            Name of file
+        path : str
+            Path of directory
+
+        Returns
+        -------
+        bool
+            True    if file is in directory
+            False   if file is not in directory
+        """
         for root, dirs, files in os.walk(path):
             if name in files:
                 return True
