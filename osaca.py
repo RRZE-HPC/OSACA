@@ -610,7 +610,7 @@ class Osaca(object):
         ws = ' '*(len(horizLine)-23)
 # Write general information about the benchmark
         output = (  '--'+horizLine+'\n'
-                    '| Analyzing of file:\t'+os.getcwd()+'/'+self.filepath+'\n'
+                    '| Analyzing of file:\t'+os.path.abspath(self.filepath)+'\n'
                     '| Architecture:\t\t'+self.arch+'\n'
                     '| Timestamp:\t\t'+datetime.now().strftime('%Y-%m-%d %H:%M:%S')+'\n')
     
@@ -619,9 +619,11 @@ class Osaca(object):
         if(pr_sched):
             output += '\n\n'
             sched = Scheduler(self.arch, self.instrForms) 
-            schedOutput,totalTP = sched.schedule_FCFS()
-            output += sched.get_head()+schedOutput
-            output += 'Total number of estimated throughput: '+str(totalTP)
+            schedOutput,portBinding = sched.schedule()
+            binding = sched.get_port_binding(portBinding)
+            output += sched.get_report_info()+'\n'+binding+'\n\n'+schedOutput
+            blockTP = round(max(portBinding), 2)
+            output += 'Total number of estimated throughput: '+str(blockTP)
         return output
     
     

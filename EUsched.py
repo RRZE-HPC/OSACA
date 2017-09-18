@@ -5,6 +5,7 @@ import os
 import math
 import ast
 from Params import *
+from operator import add
 import pandas as pd
 
 class Scheduler(object):
@@ -27,16 +28,61 @@ class Scheduler(object):
         self.df = pd.read_csv(currDir+'data/'+arch.lower()+'_data.csv', quotechar='"', converters={'ports':ast.literal_eval})
 
 
+    def schedule(self):
+        '''
+        Schedules Instruction Form list and calculates port bindings.
+
+        Returns 
+        -------
+        (str, [int, ...])
+            A tuple containing the graphic output of the schedule as string and
+            the port bindings as list of ints.
+        '''
+        sched = self.get_head()
+# Initialize ports
+#        groups = [[] for x in range(len(set(portOccurances))-1)]
+        occ_ports = [[0]*self.ports for x in range(len(self.instrList))]
+#        occ_ports = [[0]*self.ports]*len(self.instrList)
+        port_bndgs = [0]*self.ports
+# Check if there's a port occupation stored in the CSV, otherwise leave the
+# occ_port list item empty
+        for i,instrForm in enumerate(self.instrList):
+            try:
+                searchString = instrForm[0]+'-'+self.get_operand_suffix(instrForm)
+                entry = self.df.loc[lambda df: df.instr == searchString,'TP':'ports']
+                tup = entry.ports.values[0]
+                if(len(tup) == 1 and tup[0][0] == -1):
+                    raise IndexError()
+            except IndexError:
+# Instruction form not in CSV
+                sched += self.get_line(occ_ports[i], '* '+instrForm[-1])
+                continue
+# Get the occurance of each port from the occupation list
+            portOccurances = self.get_port_occurances(tup)
+# Get 'occurance groups'
+            occuranceGroups = self.get_occurance_groups(portOccurances)
+# Calculate port dependent throughput
+            TPGes = entry.TP.values[0]*len(occuranceGroups[0])
+            for occGroup in occuranceGroups:
+                for port in occGroup:
+                    occ_ports[i][port] = TPGes/len(occGroup)
+# Write schedule line
+            sched += self.get_line(occ_ports[i], instrForm[-1])
+# Add throughput to total port binding
+            port_bndgs = list(map(add, port_bndgs, occ_ports[i]))
+        return (sched, port_bndgs)
+
+   
     def schedule_FCFS(self):
         '''
-        Schedules Instruction Form list via First Come First Serve algorithm.
+        Schedules Instruction Form list for a single run with latencies.
 
         Returns 
         -------
         (str, int)
             A tuple containing the graphic output as string and the total throughput time as int.
         '''
-        sched = ''
+        sched = self.get_head()
         total = 0
 # Initialize ports
         occ_ports = [0]*self.ports
@@ -70,6 +116,57 @@ class Scheduler(object):
         total += max(occ_ports)
         return (sched, total)
 
+
+    def get_occurance_groups(self, portOccurances):
+        '''
+        Groups ports in groups by the number of their occurance and sorts
+        groups by cardinality
+
+        Parameters
+        ----------
+        portOccurances : [int, ...]
+            List with the length of ports containing the number of occurances
+            of each port
+
+        Returns
+        -------
+        [[int, ...], ...]
+            List of lists with all occurance groups sorted by cardinality
+            (smallest group first)
+        '''
+        groups = [[] for x in range(len(set(portOccurances))-1)]
+        for i,groupInd in enumerate(range(min(list(filter(lambda x: x > 0, portOccurances))),max(portOccurances)+1)):
+            for p, occurs in enumerate(portOccurances):
+                if groupInd == occurs:
+                    groups[i].append(p)
+# Sort groups by cardinality
+        groups.sort(key=len)
+        return groups
+
+
+    def get_port_occurances(self, tups):
+        '''
+        Returns the number of each port occurance for the possible port 
+        occupations
+
+        Parameters
+        ----------
+        tups : ((int, ...), ...)
+            Tuple of tuples of possible port occupations
+
+        Returns
+        -------
+        [int, ...]
+            List in the length of the number of ports for the current architecture,
+            containing the amount of occurances for each port
+        '''
+        ports = [0]*self.ports
+        for tup in tups:
+            for elem in tup:
+                ports[elem] += 1
+        return ports
+
+    
     def test_ports_FCFS(self, occ_ports, needed_ports):
         '''
         Test if current configuration of ports is possible and returns boolean
@@ -92,12 +189,21 @@ class Scheduler(object):
                 return False
         return True
 
-    def schedule_Tomasulo(self):
+    
+    def get_report_info(self):
         '''
-        Not implement yet.  Schedules Instruction Form list via Tomasulo algorithm.
+        Creates Report information including all needed annotations.
+
+        Returns
+        -------
+        str
+            String containing the report information
         '''
-        print('Scheduling with Tomasulo algorithm...')
-        return ''
+        analysis = 'Throughput Analysis Report\n'+('-'*26)+'\n'
+        annotations = ( '* - No information for this instruction in database\n'
+                        '\n')
+        return analysis+annotations
+
 
     def get_head(self):
         '''
@@ -108,25 +214,23 @@ class Scheduler(object):
         str
             String containing the header
         '''
-        analysis = 'Throughput Analysis Report\n'+('-'*26)+'\n'
-        annotations = ( '* - No information for this instruction in database\n'
-                        '\n')
-        horizLine = '-'*6*self.ports+'-\n'
+        horizLine = '-'*7*self.ports+'-\n'
         portAnno = ' '*(math.floor((len(horizLine)-24)/2))+'Ports Pressure in cycles'+' '*(math.ceil((len(horizLine)-24)/2))+'\n'
         portLine = ''
         for i in range(0,self.ports):
-            portLine += '|  {}  '.format(i)
+            portLine += '|  {}   '.format(i)
         portLine += '|\n'
-        head = analysis+annotations+portAnno+portLine + horizLine
+        head = portAnno+portLine+horizLine
         return head
 
+    
     def get_line(self, occ_ports, instrName):
         '''
         Create line with port occupation for output.
 
         Parameters
         ----------
-        occ_ports : (int)
+        occ_ports : (int, ...)
             Integer tuple containing needed ports
         instrName : str
             Name of instruction form for output
@@ -138,10 +242,38 @@ class Scheduler(object):
         '''
         line = ''
         for i in occ_ports:
-            cycles = '   ' if (i == 0) else float(i)
-            line += '| '+str(cycles)+' '
+            cycles = '    ' if (i == 0) else '%.2f' % float(i)
+            line += '| '+cycles+' '
         line += '| '+instrName+'\n'
         return line
+
+    
+    def get_port_binding(self, port_bndg):
+        '''
+        Creates port binding out of scheduling result.
+
+        Parameters
+        ----------
+        port_bndg : [int, ...]
+            Integer list containing port bindings
+
+        Returns
+        -------
+        str
+            String containing the port binding graphical output
+        ''' 
+        header = 'Port Binding in Cycles Per Iteration:\n'
+        horizLine = '-'*10+'-'*6*self.ports+'\n'
+        portLine = '|  Port  |'
+        for i in range(0, self.ports):
+            portLine += '  {}  |'.format(i)
+        portLine += '\n'
+        cycLine = '| Cycles |'
+        for i in range(len(port_bndg)):
+            cycLine += ' {} |'.format(round(port_bndg[i], 2))
+        cycLine += '\n'
+        binding = header+horizLine+portLine+horizLine+cycLine+horizLine
+        return binding
 
 
     def get_operand_suffix(self, instrForm):
@@ -191,8 +323,9 @@ if __name__ == '__main__':
     ['jb',Parameter('LBL'),'jb             400bc2 <main+0x62>']
     ]
 
-    sched = Scheduler('skl', data)
-    print(sched.get_head(),end='')
-    output,total = sched.schedule_FCFS()
+    sched = Scheduler('ivb', data)
+    output,binding = sched.schedule()
+    print(sched.get_port_binding(binding))
+    print(sched.get_report_info(),end='')
     print(output)
-    print('Total number of estimated throughput: '+str(total))
+    print('Block Throughput: {}'.format(round(max(binding),2)))
