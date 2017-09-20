@@ -7,6 +7,7 @@ import os
 import re
 from  Params import *
 from EUsched import *
+from Testcase import *
 import pandas as pd
 from datetime import datetime
 import numpy as np
@@ -530,6 +531,15 @@ class Osaca(object):
             self.longestInstr = len(instr)
         instrForm = [mnemonic]+list(reversed(param_list_types))+[instr]
         self.instrForms.append(instrForm)
+# If flag is set, create testcase for instruction form
+# Do this in reversed param list order, du to the fact it's intel syntax
+# Only create benchmark if no label (LBL) is part of the operands
+        if('LBL' in param_list or '' in param_list):
+            return 
+        tc = Testcase(mnemonic, list(reversed(param_list_types)), '64')
+# Only write a testcase if it not already exists
+        writeTP, writeLT = tc._Testcase__is_in_dir()
+        tc.write_testcase(not writeTP, not writeLT)
     
 
     def separate_params(self,params):

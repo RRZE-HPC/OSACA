@@ -68,31 +68,39 @@ class Testcase(object):
 # Create latency and throughput loop
         self.loop_lat = self.__define_loop_lat()
         self.loop_thrpt = self.__define_loop_thrpt()
-
-
-    def write_testcase(self):
-        """
-        Write testcase for class attributes in a file.
-        """
-        regs = self.param_list
-        extension = ''
-# Add operands
+# Create extension for testcase name
         sep1 = '_' if (self.num_operands > 1) else ''
         sep2 = '_' if (self.num_operands > 2) else ''
-        extension += ('-'+(self.op_a if ('gpr' not in self.op_a) else 'r'+self.op_a[3:]) + sep1 +
-                     (self.op_b if ('gpr' not in self.op_b) else 'r'+self.op_b[3:]) + sep2 + 
-                     (self.op_c if ('gpr' not in self.op_c) else 'r'+self.op_c[3:]))
+        self.extension = ('-'+(self.op_a if ('gpr' not in self.op_a) else 'r' + self.op_a[3:]) + sep1 + (self.op_b if ('gpr' not in self.op_b) else 'r'+self.op_b[3:]) + sep2 + (self.op_c if ('gpr' not in self.op_c) else 'r'+self.op_c[3:]))
+
+
+    def write_testcase(self, TP=True, LT=True):
+        """
+        Write testcase for class attributes in a file.
+
+        Parameters
+        ----------
+        TP : bool
+            Controls if throughput testcase should be written
+            (default True)
+
+        LT : bool
+            Controls if latency testcase should be written
+            (default True)
+        """
+        if(LT):
 # Write latency file
-        call(['mkdir', '-p', 'testcases'])
-        f = open('./testcases/'+self.instr+extension+'.S', 'w')
-        data = (self.def_instr+self.ninstr+self.init+self.dp1+self.expand+self.gprPush+self.zeroGPR+self.copy+self.loop_lat+self.gprPop+self.done)
-        f.write(data)
-        f.close()
+            call(['mkdir', '-p', 'testcases'])
+            f = open(os.path.dirname(__file__)+'/testcases/'+self.instr+self.extension+'.S', 'w')
+            data = (self.def_instr+self.ninstr+self.init+self.dp1+self.expand+self.gprPush+self.zeroGPR+self.copy+self.loop_lat+self.gprPop+self.done)
+            f.write(data)
+            f.close()
+        if(TP):
 # Write throughput file
-        f = open('./testcases/'+self.instr+extension+'-TP.S', 'w')
-        data = (self.def_instr+self.ninstr+self.init+self.dp1+self.expand+self.gprPush+self.zeroGPR+self.copy+self.loop_thrpt+self.gprPop+self.done)
-        f.write(data)
-        f.close()
+            f = open(os.path.dirname(__file__)+'/testcases/'+self.instr+self.extension+'-TP.S', 'w')
+            data = (self.def_instr+self.ninstr+self.init+self.dp1+self.expand+self.gprPush+self.zeroGPR+self.copy+self.loop_thrpt+self.gprPop+self.done)
+            f.write(data)
+            f.close()
 
 
 # Check operands
@@ -335,24 +343,25 @@ class Testcase(object):
         return loop_thrpt
 
 
-    def __is_in_dir(self, name, path):
+    def __is_in_dir(self):
         """
-        Check if file with the name name  is in directory path.
-
-        Parameters
-        ----------
-        name : str
-            Name of file
-        path : str
-            Path of directory
+        Check if testcases with the same name already exist in testcase
+        directory.
 
         Returns
         -------
-        bool
+        (bool, bool)
             True    if file is in directory
             False   if file is not in directory
+            While the first value stands for the throughput testcase
+            and the second value stands for the latency testcase
         """
-        for root, dirs, files in os.walk(path):
-            if name in files:
-                return True
-        return False
+        TP = False
+        LT = False
+        name = self.instr+self.extension
+        for root, dirs, files in os.walk(os.path.dirname(__file__)+'/testcases'):
+            if((name+'-TP.S') in files):
+                TP = True
+            if name+'.S' in files:
+                LT = True
+        return (TP,LT)
