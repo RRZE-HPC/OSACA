@@ -34,7 +34,7 @@ per_loop = '100'
 
 # Start
 operands = [x for x in [dst, op1, op2] if x is not None]
-opListStr = ', '.join([x.print() for x in operands])
+opListStr = ', '.join([str(x) for x in operands])
 print('Create Testcase for {} {}'.format(mnemonic, opListStr ), end='')
 tc = Testcase(mnemonic, operands, per_loop)
 tc.write_testcase()

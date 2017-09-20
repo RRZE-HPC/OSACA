@@ -299,7 +299,7 @@ class Scheduler(object):
             elif(isinstance(instrForm[i], MemAddr)):
                 optmp = 'mem'
             else:
-                optmp = instrForm[i].print().lower()
+                optmp = str(instrForm[i]).lower()
             opExt.append(optmp)
         operands = '_'.join(opExt)
         return operands

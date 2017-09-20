@@ -121,7 +121,7 @@ class Testcase(object):
             op_a = oprnds[0].reg_type.lower()
         elif(isinstance(oprnds[0], MemAddr)):
             op_a = 'mem'
-        elif(isinstance(oprnds[0], Parameter) and oprnds[0].print() == 'IMD'):
+        elif(isinstance(oprnds[0], Parameter) and str(oprnds[0]) == 'IMD'):
             op_a = 'imd'
         if(op_a == 'gpr'):
             gprPush, gprPop, zeroGPR = self.__initialise_gprs()
@@ -131,7 +131,7 @@ class Testcase(object):
                 op_b = oprnds[1].reg_type.lower()
             elif(isinstance(oprnds[1], MemAddr)):
                 op_b = 'mem'           
-            elif(isinstance(oprnds[1], Parameter) and oprnds[1].print() == 'IMD'):
+            elif(isinstance(oprnds[1], Parameter) and str(oprnds[1]) == 'IMD'):
                 op_b = 'imd'
             if(op_b == 'gpr'):
                 op_b += str(oprnds[1].size)
@@ -142,7 +142,7 @@ class Testcase(object):
                 op_c = oprnds[2].reg_type.lower()
             elif(isinstance(oprnds[2], MemAddr)):
                 op_c = 'mem'
-            elif(isinstance(oprnds[2], Parameter) and oprnds[2].print() == 'IMD'):
+            elif(isinstance(oprnds[2], Parameter) and str(oprnds[2]) == 'IMD'):
                 op_c = 'imd'
             if(op_c == 'gpr'):
                 op_c += str(oprnds[2].size)

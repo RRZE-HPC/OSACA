@@ -524,7 +524,7 @@ class Osaca(object):
                 op = Parameter('LBL')
             else:
                 op = MemAddr(op)
-            param_list[i] = op.print()
+            param_list[i] = str(op)
             param_list_types[i] = op
 # Add to list
         if(len(instr) > self.longestInstr):
@@ -679,7 +679,7 @@ class Osaca(object):
                 elif(isinstance(elem[i], MemAddr)):
                     optmp = 'mem'
                 else:
-                    optmp = elem[i].print().lower()
+                    optmp = str(elem[i]).lower()
                 opExt.append(optmp)
             operands = '_'.join(opExt)
 # Now look up the value in the dataframe

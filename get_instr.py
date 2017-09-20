@@ -114,7 +114,7 @@ def check_instr(instr):
             op = Parameter("LBL")
         else:
             op = MemAddr(op)
-        param_list[i] = op.print()
+        param_list[i] = str(op)
         opList[i] = op
 #Join mnemonic and operand(s) to an instruction form
     if(len(mnemonic) > 7):
@@ -145,7 +145,7 @@ def check_instr(instr):
 #Only create benchmark if no label (LBL) is part of the operands
         do_bench = True
         for par in opList:
-            if(par.print() == 'LBL'):
+            if(str(par) == 'LBL'):
                 do_bench = False
         if(do_bench):
 #Create testcase with reversed param list, due to the fact its intel syntax!
