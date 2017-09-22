@@ -145,7 +145,7 @@ def check_instr(instr):
 #Only create benchmark if no label (LBL) is part of the operands
         do_bench = True
         for par in opList:
-            if(par.print() == 'LBL' or par.print() == ''):
+            if(str(par) == 'LBL' or str(par) == ''):
                 do_bench = False
         if(do_bench):
 #Create testcase with reversed param list, due to the fact its intel syntax!
