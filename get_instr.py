@@ -114,7 +114,7 @@ def check_instr(instr):
             op = Parameter("LBL")
         else:
             op = MemAddr(op)
-        param_list[i] = op.print()
+        param_list[i] = str(op)
         opList[i] = op
 #Join mnemonic and operand(s) to an instruction form
     if(len(mnemonic) > 7):
