@@ -1,7 +1,7 @@
 #!/apps/python/3.5-anaconda/bin/python
 class Parameter(object):
     type_list = ["REG", "MEM", "IMD", "LBL", "NONE"]
-    def __init__(self, ptype, name=""):
+    def __init__(self, ptype, name="NONE"):
         self.ptype = ptype.upper()
         if(self.ptype not in self.type_list):
             raise NameError("Type not supported: "+ptype)
