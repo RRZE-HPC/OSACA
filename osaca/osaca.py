@@ -1,10 +1,8 @@
 #!/apps/python/3.5-anaconda/bin/python
 
 import argparse
-import sys
+import sys, os, io, re
 import subprocess 
-import os
-import re
 from  param import *
 from eu_sched import *
 from testcase import *
@@ -775,14 +773,34 @@ class Osaca(object):
                        '\n  Please create a testcase via the create_testcase-method '
                        'or add a value manually.')
         return output
-    
+   
 
+# Stolen from pip
+def __read(*names, **kwargs):
+    with io.open(
+        os.path.join(os.path.dirname(__file__), *names),
+        encoding=kwargs.get("encoding", "utf8")
+    ) as fp:
+        return fp.read()
+
+# Stolen from pip
+def __find_version(*file_paths):
+    version_file = __read(*file_paths)
+    version_match = re.search(r"^__version__ = ['\"]([^'\"]*)['\"]",version_file, re.M)
+    if version_match:
+        return version_match.group(1)
+    raise RuntimeError("Unable to find version string.")
 ##------------------------------------------------------------------------------
 ##------------Main method--------------
 def main():
 # Parse args
+    ver = '0.1'
     parser = argparse.ArgumentParser(description='Analyzes a marked innermost loop snippet for a given architecture type and prints out the estimated average throughput')
-    parser.add_argument('-V', '--version', action='version', version='%(prog)s 0.1')
+    parser.add_argument('-V', '--version', action='version', version='%(prog)s '
+                        +__find_version('__init__.py'))
+
+    #__find_version('__init.py')
+    #version='%(prog)s 0.1')
     parser.add_argument('--arch', dest='arch', type=str, help='define architecture (SNB, IVB, HSW, BDW, SKL)')
     parser.add_argument('filepath', type=str, help='path to object (Binary, ASM, CSV)')
     group = parser.add_mutually_exclusive_group(required=False)
