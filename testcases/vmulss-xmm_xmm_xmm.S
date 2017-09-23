@@ -1,5 +1,5 @@
 #define INSTR vmulss
-#define NINST 32
+#define NINST 64
 #define N edi
 #define i r8d
 
@@ -35,6 +35,38 @@ latency:
 		vdivpd xmm2, xmm0, xmm1
 loop:
 		inc      i
+		INSTR    xmm0, xmm1, xmm0
+		INSTR    xmm1, xmm0, xmm0
+		INSTR    xmm0, xmm1, xmm0
+		INSTR    xmm1, xmm0, xmm0
+		INSTR    xmm0, xmm1, xmm0
+		INSTR    xmm1, xmm0, xmm0
+		INSTR    xmm0, xmm1, xmm0
+		INSTR    xmm1, xmm0, xmm0
+		INSTR    xmm0, xmm1, xmm0
+		INSTR    xmm1, xmm0, xmm0
+		INSTR    xmm0, xmm1, xmm0
+		INSTR    xmm1, xmm0, xmm0
+		INSTR    xmm0, xmm1, xmm0
+		INSTR    xmm1, xmm0, xmm0
+		INSTR    xmm0, xmm1, xmm0
+		INSTR    xmm1, xmm0, xmm0
+		INSTR    xmm0, xmm1, xmm0
+		INSTR    xmm1, xmm0, xmm0
+		INSTR    xmm0, xmm1, xmm0
+		INSTR    xmm1, xmm0, xmm0
+		INSTR    xmm0, xmm1, xmm0
+		INSTR    xmm1, xmm0, xmm0
+		INSTR    xmm0, xmm1, xmm0
+		INSTR    xmm1, xmm0, xmm0
+		INSTR    xmm0, xmm1, xmm0
+		INSTR    xmm1, xmm0, xmm0
+		INSTR    xmm0, xmm1, xmm0
+		INSTR    xmm1, xmm0, xmm0
+		INSTR    xmm0, xmm1, xmm0
+		INSTR    xmm1, xmm0, xmm0
+		INSTR    xmm0, xmm1, xmm0
+		INSTR    xmm1, xmm0, xmm0
 		INSTR    xmm0, xmm1, xmm0
 		INSTR    xmm1, xmm0, xmm0
 		INSTR    xmm0, xmm1, xmm0

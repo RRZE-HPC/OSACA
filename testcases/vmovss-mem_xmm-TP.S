@@ -1,5 +1,5 @@
 #define INSTR vmovss
-#define NINST 32
+#define NINST 64
 #define N edi
 #define i r8d
 
@@ -67,6 +67,38 @@ loop:
 		INSTR    [rip+PI], xmm2
 		INSTR    [rip+PI], xmm0
 		INSTR    [rip+PI], xmm1
+		INSTR    [rip+PI], xmm2
+		INSTR    [rip+PI], xmm0
+		INSTR    [rip+PI], xmm1
+		INSTR    [rip+PI], xmm2
+		INSTR    [rip+PI], xmm0
+		INSTR    [rip+PI], xmm1
+		INSTR    [rip+PI], xmm2
+		INSTR    [rip+PI], xmm0
+		INSTR    [rip+PI], xmm1
+		INSTR    [rip+PI], xmm2
+		INSTR    [rip+PI], xmm0
+		INSTR    [rip+PI], xmm1
+		INSTR    [rip+PI], xmm2
+		INSTR    [rip+PI], xmm0
+		INSTR    [rip+PI], xmm1
+		INSTR    [rip+PI], xmm2
+		INSTR    [rip+PI], xmm0
+		INSTR    [rip+PI], xmm1
+		INSTR    [rip+PI], xmm2
+		INSTR    [rip+PI], xmm0
+		INSTR    [rip+PI], xmm1
+		INSTR    [rip+PI], xmm2
+		INSTR    [rip+PI], xmm0
+		INSTR    [rip+PI], xmm1
+		INSTR    [rip+PI], xmm2
+		INSTR    [rip+PI], xmm0
+		INSTR    [rip+PI], xmm1
+		INSTR    [rip+PI], xmm2
+		INSTR    [rip+PI], xmm0
+		INSTR    [rip+PI], xmm1
+		INSTR    [rip+PI], xmm2
+		INSTR    [rip+PI], xmm0
 		cmp      i, N
 		jl       loop
 done:

@@ -1,5 +1,5 @@
 #define INSTR inc
-#define NINST 32
+#define NINST 64
 #define N edi
 #define i r8d
 
@@ -59,6 +59,38 @@ latency:
 		vmovq rax, xmm0
 loop:
 		inc      i
+		INSTR    rdx
+		INSTR    r9
+		INSTR    r10
+		INSTR    r11
+		INSTR    r12
+		INSTR    r13
+		INSTR    r14
+		INSTR    r15
+		INSTR    rdx
+		INSTR    r9
+		INSTR    r10
+		INSTR    r11
+		INSTR    r12
+		INSTR    r13
+		INSTR    r14
+		INSTR    r15
+		INSTR    rdx
+		INSTR    r9
+		INSTR    r10
+		INSTR    r11
+		INSTR    r12
+		INSTR    r13
+		INSTR    r14
+		INSTR    r15
+		INSTR    rdx
+		INSTR    r9
+		INSTR    r10
+		INSTR    r11
+		INSTR    r12
+		INSTR    r13
+		INSTR    r14
+		INSTR    r15
 		INSTR    rdx
 		INSTR    r9
 		INSTR    r10

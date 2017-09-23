@@ -1,0 +1,4 @@
+Using frequency 2.20GHz.
+lea-r64_mem-TP:	1.003 (clock cycles)	[DEBUG - result: 3.141590]
+jan-xmm_xmm-TP:	0.995 (clock cycles)	[DEBUG - result: 3.141590]
+jan-xmm_xmm:	2.037 (clock cycles)	[DEBUG - result: 3.141590]

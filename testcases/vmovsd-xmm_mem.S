@@ -1,5 +1,5 @@
-#define INSTR vmovss
-#define NINST 32
+#define INSTR vmovsd
+#define NINST 64
 #define N edi
 #define i r8d
 
@@ -28,6 +28,38 @@ latency:
 		vpsrlq xmm0, xmm0, 2			# logical right shift: 1 bit for sign; leading      mantissa bit is zero
 loop:
 		inc      i
+		INSTR    xmm0, [rip+PI]
+		INSTR    xmm0, [rip+PI]
+		INSTR    xmm0, [rip+PI]
+		INSTR    xmm0, [rip+PI]
+		INSTR    xmm0, [rip+PI]
+		INSTR    xmm0, [rip+PI]
+		INSTR    xmm0, [rip+PI]
+		INSTR    xmm0, [rip+PI]
+		INSTR    xmm0, [rip+PI]
+		INSTR    xmm0, [rip+PI]
+		INSTR    xmm0, [rip+PI]
+		INSTR    xmm0, [rip+PI]
+		INSTR    xmm0, [rip+PI]
+		INSTR    xmm0, [rip+PI]
+		INSTR    xmm0, [rip+PI]
+		INSTR    xmm0, [rip+PI]
+		INSTR    xmm0, [rip+PI]
+		INSTR    xmm0, [rip+PI]
+		INSTR    xmm0, [rip+PI]
+		INSTR    xmm0, [rip+PI]
+		INSTR    xmm0, [rip+PI]
+		INSTR    xmm0, [rip+PI]
+		INSTR    xmm0, [rip+PI]
+		INSTR    xmm0, [rip+PI]
+		INSTR    xmm0, [rip+PI]
+		INSTR    xmm0, [rip+PI]
+		INSTR    xmm0, [rip+PI]
+		INSTR    xmm0, [rip+PI]
+		INSTR    xmm0, [rip+PI]
+		INSTR    xmm0, [rip+PI]
+		INSTR    xmm0, [rip+PI]
+		INSTR    xmm0, [rip+PI]
 		INSTR    xmm0, [rip+PI]
 		INSTR    xmm0, [rip+PI]
 		INSTR    xmm0, [rip+PI]

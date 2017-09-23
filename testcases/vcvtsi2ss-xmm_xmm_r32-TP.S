@@ -1,5 +1,5 @@
 #define INSTR vcvtsi2ss
-#define NINST 32
+#define NINST 64
 #define N edi
 #define i r8d
 
@@ -89,6 +89,38 @@ loop:
 		INSTR    xmm6, xmm2, ecx
 		INSTR    xmm7, xmm0, eax
 		INSTR    xmm8, xmm1, ebx
+		INSTR    xmm9, xmm2, ecx
+		INSTR    xmm10, xmm0, eax
+		INSTR    xmm11, xmm1, ebx
+		INSTR    xmm12, xmm2, ecx
+		INSTR    xmm13, xmm0, eax
+		INSTR    xmm14, xmm1, ebx
+		INSTR    xmm15, xmm2, ecx
+		INSTR    xmm3, xmm0, eax
+		INSTR    xmm4, xmm1, ebx
+		INSTR    xmm5, xmm2, ecx
+		INSTR    xmm6, xmm0, eax
+		INSTR    xmm7, xmm1, ebx
+		INSTR    xmm8, xmm2, ecx
+		INSTR    xmm9, xmm0, eax
+		INSTR    xmm10, xmm1, ebx
+		INSTR    xmm11, xmm2, ecx
+		INSTR    xmm12, xmm0, eax
+		INSTR    xmm13, xmm1, ebx
+		INSTR    xmm14, xmm2, ecx
+		INSTR    xmm15, xmm0, eax
+		INSTR    xmm3, xmm1, ebx
+		INSTR    xmm4, xmm2, ecx
+		INSTR    xmm5, xmm0, eax
+		INSTR    xmm6, xmm1, ebx
+		INSTR    xmm7, xmm2, ecx
+		INSTR    xmm8, xmm0, eax
+		INSTR    xmm9, xmm1, ebx
+		INSTR    xmm10, xmm2, ecx
+		INSTR    xmm11, xmm0, eax
+		INSTR    xmm12, xmm1, ebx
+		INSTR    xmm13, xmm2, ecx
+		INSTR    xmm14, xmm0, eax
 		cmp      i, N
 		jl       loop
 		pop     r15

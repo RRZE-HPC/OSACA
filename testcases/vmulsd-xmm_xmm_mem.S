@@ -1,5 +1,5 @@
-#define INSTR vaddss
-#define NINST 32
+#define INSTR vmulsd
+#define NINST 64
 #define N edi
 #define i r8d
 
@@ -35,6 +35,38 @@ latency:
 		vdivpd xmm2, xmm0, xmm1
 loop:
 		inc      i
+		INSTR    xmm0, xmm1, [rip+PI]
+		INSTR    xmm1, xmm0, [rip+PI]
+		INSTR    xmm0, xmm1, [rip+PI]
+		INSTR    xmm1, xmm0, [rip+PI]
+		INSTR    xmm0, xmm1, [rip+PI]
+		INSTR    xmm1, xmm0, [rip+PI]
+		INSTR    xmm0, xmm1, [rip+PI]
+		INSTR    xmm1, xmm0, [rip+PI]
+		INSTR    xmm0, xmm1, [rip+PI]
+		INSTR    xmm1, xmm0, [rip+PI]
+		INSTR    xmm0, xmm1, [rip+PI]
+		INSTR    xmm1, xmm0, [rip+PI]
+		INSTR    xmm0, xmm1, [rip+PI]
+		INSTR    xmm1, xmm0, [rip+PI]
+		INSTR    xmm0, xmm1, [rip+PI]
+		INSTR    xmm1, xmm0, [rip+PI]
+		INSTR    xmm0, xmm1, [rip+PI]
+		INSTR    xmm1, xmm0, [rip+PI]
+		INSTR    xmm0, xmm1, [rip+PI]
+		INSTR    xmm1, xmm0, [rip+PI]
+		INSTR    xmm0, xmm1, [rip+PI]
+		INSTR    xmm1, xmm0, [rip+PI]
+		INSTR    xmm0, xmm1, [rip+PI]
+		INSTR    xmm1, xmm0, [rip+PI]
+		INSTR    xmm0, xmm1, [rip+PI]
+		INSTR    xmm1, xmm0, [rip+PI]
+		INSTR    xmm0, xmm1, [rip+PI]
+		INSTR    xmm1, xmm0, [rip+PI]
+		INSTR    xmm0, xmm1, [rip+PI]
+		INSTR    xmm1, xmm0, [rip+PI]
+		INSTR    xmm0, xmm1, [rip+PI]
+		INSTR    xmm1, xmm0, [rip+PI]
 		INSTR    xmm0, xmm1, [rip+PI]
 		INSTR    xmm1, xmm0, [rip+PI]
 		INSTR    xmm0, xmm1, [rip+PI]
