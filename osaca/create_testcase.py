@@ -1,7 +1,7 @@
 #!/apps/python/3.5-anaconda/bin/python
 
-from param import *
-from testcase import *
+from param import Register, MemAddr, Parameter
+from testcase import Testcase
 
 # Choose out of various operands
 reg8 = Register('al')
