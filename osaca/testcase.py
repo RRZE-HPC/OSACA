@@ -221,7 +221,7 @@ class Testcase(object):
             copy += '\t\tvmovq {}, xmm0\n'.format(self.ops['mmx'][1])
             copy += '\t\tvmovq {}, xmm0\n'.format(self.ops['gpr64'][0])
             copy += '\t\t# Create DP 2.0\n'
-            copy += '\t\tadd {}, {}\n'.format(ops['mmx'][1], ops['mmx'][0])
+            copy += '\t\tadd {}, {}\n'.format(self.ops['mmx'][1], self.ops['mmx'][0])
             copy += '\t\t# Create DP 0.5\n'
             copy += '\t\tdiv {}\n'.format(self.ops['gpr64'][0])
             copy += '\t\tmovq {}, {}\n'.format(self.ops['mmx'][2], self.ops['gpr64'][0])
