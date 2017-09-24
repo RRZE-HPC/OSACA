@@ -72,8 +72,7 @@ def set_counter_char(line):
     elif(numSpaces == 0 and numTabs != 0):
         cntChar = '\t'
     else:
-        raise NotImplementedError("Indentation of code is only supported for whitespaces and 
-                                  tabs.")
+        raise NotImplementedError("Indentation of code is only supported for whitespaces and tabs.")
 
 
 def check_instr(instr):
