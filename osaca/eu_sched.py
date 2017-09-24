@@ -48,7 +48,7 @@ class Scheduler(object):
         for i,instrForm in enumerate(self.instrList):
             try:
                 search_string = instrForm[0]+'-'+self.get_operand_suffix(instrForm)
-                entry = self.df.loc[lambda df, sStr=search_string: df.instr == sStr,'TP':'ports']
+                entry = self.df.loc[lambda df, sStr=search_string: df.instr == sStr]
                 tup = entry.ports.values[0]
                 if(len(tup) == 1 and tup[0][0] == -1):
                     raise IndexError()
@@ -88,7 +88,7 @@ class Scheduler(object):
         for instrForm in self.instrList:
             try:
                 search_string = instrForm[0]+'-'+self.get_operand_suffix(instrForm)
-                entry = self.df.loc[lambda df, sStr=search_string: df.instr == sStr,'LT':'ports']
+                entry = self.df.loc[lambda df, sStr=search_string: df.instr == sStr]
                 tup = entry.ports.values[0]
                 if(len(tup) == 1 and tup[0][0] == -1):
                     raise IndexError()
