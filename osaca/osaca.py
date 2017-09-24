@@ -81,7 +81,7 @@ class Osaca(object):
             val = -2
             new = False
             try:
-                entry = self.df.loc[lambda df,col=clmn: df.instr == instr,col]
+                entry = self.df.loc[lambda df: df.instr == instr,clmn]
                 val = entry.values[0]
             except IndexError:
                 # Instruction not in database yet --> add it
