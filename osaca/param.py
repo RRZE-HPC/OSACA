@@ -5,7 +5,7 @@ class Parameter(object):
         self.ptype = ptype.upper()
         if(self.ptype not in self.type_list):
             raise NameError("Type not supported: "+ptype)
-    
+
     def __str__(self):
         '''returns string representation'''
         if(self.ptype == "NONE"):
@@ -57,7 +57,7 @@ class MemAddr(Parameter):
             mem_format += "(base, index, scale)"
         mem_format += ")"
         return mem_format
-        
+
 
 
 class Register(Parameter):
@@ -130,9 +130,8 @@ class Register(Parameter):
             self.size = self.sizes[self.name][0]
             self.reg_type = self.sizes[self.name][1]
         else:
-            print(lncnt)
             raise NameError("Register name not in dictionary: "+self.name)
-	
+
 
     def __str__(self):
         '''returns string representation'''
