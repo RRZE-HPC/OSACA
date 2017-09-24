@@ -1,8 +1,8 @@
 #!/apps/python/3.5-anaconda/bin/python
 import sys
 import re
-from testcase import *
-from param import *
+from testcase import Testcase
+from param import Register, MemAddr, Parameter
 
 marker = r'//STARTLOOP'
 asm_line = re.compile(r'\s[0-9a-f]+[:]')
