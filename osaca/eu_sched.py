@@ -47,8 +47,8 @@ class Scheduler(object):
         # occ_port list item empty
         for i,instrForm in enumerate(self.instrList):
             try:
-                searchString = instrForm[0]+'-'+self.get_operand_suffix(instrForm)
-                entry = self.df.loc[lambda df, sStr=searchString: df.instr == sStr,'TP':'ports']
+                search_string = instrForm[0]+'-'+self.get_operand_suffix(instrForm)
+                entry = self.df.loc[lambda df, sStr=search_string: df.instr == sStr,'TP':'ports']
                 tup = entry.ports.values[0]
                 if(len(tup) == 1 and tup[0][0] == -1):
                     raise IndexError()
@@ -87,8 +87,8 @@ class Scheduler(object):
         occ_ports = [0]*self.ports
         for instrForm in self.instrList:
             try:
-                searchString = instrForm[0]+'-'+self.get_operand_suffix(instrForm)
-                entry = self.df.loc[lambda df: df.instr == searchString,'LT':'ports']
+                search_string = instrForm[0]+'-'+self.get_operand_suffix(instrForm)
+                entry = self.df.loc[lambda df, sStr=search_string: df.instr == sStr,'LT':'ports']
                 tup = entry.ports.values[0]
                 if(len(tup) == 1 and tup[0][0] == -1):
                     raise IndexError()
@@ -217,8 +217,8 @@ class Scheduler(object):
             String containing the header
         '''
         horizLine = '-'*7*self.ports+'-\n'
-        portAnno = ' '*(math.floor((len(horizLine)-24)/2))+'Ports Pressure in cycles'+' '
-                   *(math.ceil((len(horizLine)-24)/2))+'\n'
+        portAnno = (' '*(math.floor((len(horizLine)-24)/2))+'Ports Pressure in cycles'+' '
+                   *(math.ceil((len(horizLine)-24)/2))+'\n')
         portLine = ''
         for i in range(0,self.ports):
             portLine += '|  {}   '.format(i)
