@@ -4,16 +4,16 @@ import sys
 import os
 import math
 import ast
-from param import *
+from param import Register, MemAddr, Parameter
 from operator import add
 import pandas as pd
 
 class Scheduler(object):
     arch_dict = {'SNB':6, 'IVB':6, 'HSW':8, 'BDW':8, 'SKL':8}
-    ports = None        #type: int
-    instrList = None    #type: list<list<str,Param[,Param][,Param],str>>
-                        #               instr, operand(s), instr form
-    df = None           #type: DataFrame
+    ports = None        # type: int
+    instrList = None    # type: list<list<str,Param[,Param][,Param],str>>
+                        # most inner list: instr, operand(s), instr form
+    df = None           # type: DataFrame
 
 
     def __init__(self, arch, instructionList):
@@ -25,7 +25,8 @@ class Scheduler(object):
             sys.exit()
         self.instrList = instructionList
         currDir = os.path.realpath(__file__)[:-11]
-        self.df = pd.read_csv(currDir+'data/'+arch.lower()+'_data.csv', quotechar='"', converters={'ports':ast.literal_eval})
+        self.df = pd.read_csv(currDir+'data/'+arch.lower()+'_data.csv', quotechar='"',
+                  converters={'ports':ast.literal_eval})
 
 
     def schedule(self):
@@ -39,36 +40,34 @@ class Scheduler(object):
             the port bindings as list of ints.
         '''
         sched = self.get_head()
-# Initialize ports
-#        groups = [[] for x in range(len(set(portOccurances))-1)]
+        # Initialize ports
         occ_ports = [[0]*self.ports for x in range(len(self.instrList))]
-#        occ_ports = [[0]*self.ports]*len(self.instrList)
         port_bndgs = [0]*self.ports
-# Check if there's a port occupation stored in the CSV, otherwise leave the
-# occ_port list item empty
+        # Check if there's a port occupation stored in the CSV, otherwise leave the
+        # occ_port list item empty
         for i,instrForm in enumerate(self.instrList):
             try:
                 searchString = instrForm[0]+'-'+self.get_operand_suffix(instrForm)
-                entry = self.df.loc[lambda df: df.instr == searchString,'TP':'ports']
+                entry = self.df.loc[lambda df, sStr=searchString: df.instr == sStr,'TP':'ports']
                 tup = entry.ports.values[0]
                 if(len(tup) == 1 and tup[0][0] == -1):
                     raise IndexError()
             except IndexError:
-# Instruction form not in CSV
+                # Instruction form not in CSV
                 sched += self.get_line(occ_ports[i], '* '+instrForm[-1])
                 continue
-# Get the occurance of each port from the occupation list
+            # Get the occurance of each port from the occupation list
             portOccurances = self.get_port_occurances(tup)
-# Get 'occurance groups'
+            # Get 'occurance groups'
             occuranceGroups = self.get_occurance_groups(portOccurances)
-# Calculate port dependent throughput
+            # Calculate port dependent throughput
             TPGes = entry.TP.values[0]*len(occuranceGroups[0])
             for occGroup in occuranceGroups:
                 for port in occGroup:
                     occ_ports[i][port] = TPGes/len(occGroup)
-# Write schedule line
+            # Write schedule line
             sched += self.get_line(occ_ports[i], instrForm[-1])
-# Add throughput to total port binding
+            # Add throughput to total port binding
             port_bndgs = list(map(add, port_bndgs, occ_ports[i]))
         return (sched, port_bndgs)
 
@@ -84,9 +83,9 @@ class Scheduler(object):
         '''
         sched = self.get_head()
         total = 0
-# Initialize ports
+        # Initialize ports
         occ_ports = [0]*self.ports
-        for i,instrForm in enumerate(self.instrList):
+        for instrForm in self.instrList:
             try:
                 searchString = instrForm[0]+'-'+self.get_operand_suffix(instrForm)
                 entry = self.df.loc[lambda df: df.instr == searchString,'LT':'ports']
@@ -94,22 +93,24 @@ class Scheduler(object):
                 if(len(tup) == 1 and tup[0][0] == -1):
                     raise IndexError()
             except IndexError:
-# Instruction form not in CSV
+                # Instruction form not in CSV
                 sched += self.get_line([0]*self.ports,'* '+instrForm[-1])
                 continue
             found = False
             while(not found):
                 for portOcc in tup:
-# Test if chosen instruction form port occupation suits the current CPU port occupation
+                    # Test if chosen instruction form port occupation suits the current CPU port
+                    # occupation
                     if(self.test_ports_FCFS(occ_ports, portOcc)):
-# Current port occupation fits for chosen port occupation of the instruction!
+                        # Current port occupation fits for chosen port occupation of instruction!
                         found = True
-                        good = [entry.LT.values[0] if (j in portOcc) else 0 for j in range(0,self.ports)]
+                        good = [entry.LT.values[0] if (j in portOcc) else 0 for j in 
+                               range(0,self.ports)]
                         sched += self.get_line(good, instrForm[-1])
-# Add new occupation
+                        # Add new occupation
                         occ_ports = [occ_ports[j]+good[j] for j in range(0, self.ports)]
                         break
-# Step
+                # Step
                 occ_ports = [j-1 if (j > 0) else 0 for j in occ_ports]                
                 if(entry.LT.values[0] != 0):
                     total += 1
@@ -135,11 +136,12 @@ class Scheduler(object):
             (smallest group first)
         '''
         groups = [[] for x in range(len(set(portOccurances))-1)]
-        for i,groupInd in enumerate(range(min(list(filter(lambda x: x > 0, portOccurances))),max(portOccurances)+1)):
+        for i,groupInd in enumerate(range(min(list(filter(lambda x: x > 0, portOccurances))),
+                          max(portOccurances)+1)):
             for p, occurs in enumerate(portOccurances):
                 if groupInd == occurs:
                     groups[i].append(p)
-# Sort groups by cardinality
+        # Sort groups by cardinality
         groups.sort(key=len)
         return groups
 
@@ -215,7 +217,8 @@ class Scheduler(object):
             String containing the header
         '''
         horizLine = '-'*7*self.ports+'-\n'
-        portAnno = ' '*(math.floor((len(horizLine)-24)/2))+'Ports Pressure in cycles'+' '*(math.ceil((len(horizLine)-24)/2))+'\n'
+        portAnno = ' '*(math.floor((len(horizLine)-24)/2))+'Ports Pressure in cycles'+' '
+                   *(math.ceil((len(horizLine)-24)/2))+'\n'
         portLine = ''
         for i in range(0,self.ports):
             portLine += '|  {}   '.format(i)
@@ -290,7 +293,6 @@ class Scheduler(object):
         str
             Operand suffix for searching in database
         '''
-        extension = ''
         opExt = []
         for i in range(1, len(instrForm)-1):
             optmp = ''
