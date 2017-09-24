@@ -3,12 +3,12 @@
 import os
 from subprocess import call
 from math import ceil
-from param import *
+from param import Register, MemAddr, Parameter
 
 class Testcase(object):
     
-##------------------Constant variables--------------------------
-# Lookup tables for regs
+    ##------------------Constant variables--------------------------
+    # Lookup tables for regs
     gprs64 = ['rax', 'rbx', 'rcx', 'rdx', 'r9', 'r10', 'r11', 'r12', 'r13', 'r14', 'r15']
     gprs32 = ['eax', 'ebx', 'ecx', 'edx', 'r9d', 'r10d', 'r11d', 'r12d', 'r13d', 'r14d', 'r15d']
     gprs16 = ['ax', 'bx', 'cx', 'dx', 'r9w', 'r10w', 'r11w', 'r12w', 'r13w', 'r14w', 'r15w']
@@ -23,55 +23,61 @@ class Testcase(object):
     'ymm10', 'ymm11', 'ymm12', 'ymm13', 'ymm14', 'ymm15']
     zmms = ['zmm0', 'zmm1', 'zmm2', 'zmm3', 'zmm4', 'zmm5', 'zmm6', 'zmm7', 'zmm8', 'zmm9',
     'zmm10', 'zmm11', 'zmm12', 'zmm13', 'zmm14', 'zmm15']
-# Lookup table for memory
+    # Lookup table for memory
     mems = ['[rip+PI]','[rip+PI]','[rip+PI]','[rip+PI]','[rip+PI]','[rip+PI]','[rip+PI]','[rip+PI]']
-# Lookup table for immediates
-    imds = ['1', '2', '13', '22', '8', '78', '159', '222', '3', '9', '5', '55', '173', '317', '254', '255']
-# TODO Differentiate between AVX512 (with additional xmm16-31) and the rest
-#       ...
-#       ...
-# end TODO
+    # Lookup table for immediates
+    imds = ['1', '2', '13', '22', '8', '78', '159', '222', '3', '9', '5', '55', '173', '317', 
+            '254', '255']
+    # TODO Differentiate between AVX512 (with additional xmm16-31) and the rest
+    #       ...
+    #       ...
+    # end TODO
 
-    ops = {'gpr64':gprs64, 'gpr32':gprs32, 'gpr16':gprs16, 'gpr8':gprs8, 'fpu':fpus, 'mmx':mmxs,  'k':ks, 'bnd':bnds, 'xmm':xmms, 'ymm':ymms, 'zmm':zmms, 'mem':mems, 'imd':imds}
+    ops = {'gpr64':gprs64, 'gpr32':gprs32, 'gpr16':gprs16, 'gpr8':gprs8, 'fpu':fpus, 'mmx':mmxs,
+           'k':ks, 'bnd':bnds, 'xmm':xmms, 'ymm':ymms, 'zmm':zmms, 'mem':mems, 'imd':imds}
 
-# Create Single Precision 1.0
+    # Create Single Precision 1.0
     sp1 =  '\t\t# create SP 1.0\n'
     sp1 += '\t\tvpcmpeqw xmm0, xmm0, xmm0\n'
     sp1 += '\t\tvpslld xmm0, xmm0, 25\t\t\t# logical left shift: 11111110..0 (25=32-(8-1))\n'
-    sp1 += '\t\tvpsrld xmm0, xmm0, 2\t\t\t# logical right shift: 1 bit for sign; leading      mantissa bit is zero\n'
+    sp1 += ('\t\tvpsrld xmm0, xmm0, 2\t\t\t# logical right shift: 1 bit for sign; leading '
+           + 'mantissa bit is zero\n')
     sp1 += '\t\t# copy SP 1.0\n'
-# Create Double Precision 1.0
+    # Create Double Precision 1.0
     dp1 =  '\t\t# create DP 1.0\n'
     dp1 += '\t\tvpcmpeqw xmm0, xmm0, xmm0\t\t# all ones\n'
     dp1 += '\t\tvpsllq xmm0, xmm0, 54\t\t\t# logical left shift: 11111110..0 (54=64-(10-1))\n'
-    dp1 += '\t\tvpsrlq xmm0, xmm0, 2\t\t\t# logical right shift: 1 bit for sign; leading      mantissa bit is zero\n'
-# Create epilogue
+    dp1 += ('\t\tvpsrlq xmm0, xmm0, 2\t\t\t# logical right shift: 1 bit for sign; leading '
+           + 'mantissa bit is zero\n')
+    # Create epilogue
     done = ('done:\n'
             '\t\tmov\trsp, rbp\n'
             '\t\tpop\trbp\n'
             '\t\tret\n'
             '.size latency, .-latency')
-##----------------------------------------------------------------
+    ##----------------------------------------------------------------
 
-# Constructor
+    # Constructor
     def __init__(self, _mnemonic, _param_list, _num_instr='32'):
         self.instr = _mnemonic.lower()
         self.param_list = _param_list
-# num_instr must be an even number
+        # num_instr must be an even number
         self.num_instr = str(ceil(int(_num_instr)/2)*2)
-# Check for the number of operands and initialise the GPRs if necessary
+        # Check for the number of operands and initialise the GPRs if necessary
         self.op_a, self.op_b, self.op_c, self.gprPush, self.gprPop, self.zeroGPR, self.copy = self.__define_operands()
         self.num_operands = len(self.param_list)
 
-# Create asm header 
+        # Create asm header 
         self.def_instr, self.ninstr, self.init, self.expand = self.__define_header()
-# Create latency and throughput loop
+        # Create latency and throughput loop
         self.loop_lat = self.__define_loop_lat()
         self.loop_thrpt = self.__define_loop_thrpt()
-# Create extension for testcase name
+        # Create extension for testcase name
         sep1 = '_' if (self.num_operands > 1) else ''
         sep2 = '_' if (self.num_operands > 2) else ''
-        self.extension = ('-'+(self.op_a if ('gpr' not in self.op_a) else 'r' + self.op_a[3:]) + sep1 + (self.op_b if ('gpr' not in self.op_b) else 'r'+self.op_b[3:]) + sep2 + (self.op_c if ('gpr' not in self.op_c) else 'r'+self.op_c[3:]))
+        self.extension = ('-'+(self.op_a if ('gpr' not in self.op_a) else 'r' + self.op_a[3:]) 
+                         + sep1 + (self.op_b if ('gpr' not in self.op_b) else 'r'+self.op_b[3:]) 
+                         + sep2 + (self.op_c if ('gpr' not in self.op_c) else 'r'+self.op_c[3:]))
 
 
     def write_testcase(self, TP=True, LT=True):
@@ -89,21 +95,24 @@ class Testcase(object):
             (default True)
         """
         if(LT):
-# Write latency file
+            # Write latency file
             call(['mkdir', '-p', os.path.dirname(__file__)+'/../testcases'])
             f = open(os.path.dirname(__file__)+'/../testcases/'+self.instr+self.extension+'.S', 'w')
-            data = (self.def_instr+self.ninstr+self.init+self.dp1+self.expand+self.gprPush+self.zeroGPR+self.copy+self.loop_lat+self.gprPop+self.done)
+            data = (self.def_instr+self.ninstr+self.init+self.dp1+self.expand+self.gprPush
+                   +self.zeroGPR+self.copy+self.loop_lat+self.gprPop+self.done)
             f.write(data)
             f.close()
         if(TP):
-# Write throughput file
-            f = open(os.path.dirname(__file__)+'/../testcases/'+self.instr+self.extension+'-TP.S', 'w')
-            data = (self.def_instr+self.ninstr+self.init+self.dp1+self.expand+self.gprPush+self.zeroGPR+self.copy+self.loop_thrpt+self.gprPop+self.done)
+            # Write throughput file
+            f = open(os.path.dirname(__file__)+'/../testcases/'+self.instr+self.extension
+                     +'-TP.S', 'w')
+            data = (self.def_instr+self.ninstr+self.init+self.dp1+self.expand+self.gprPush
+                   +self.zeroGPR+self.copy+self.loop_thrpt+self.gprPop+self.done)
             f.write(data)
             f.close()
 
 
-# Check operands
+    # Check operands
     def __define_operands(self):
         """
         Check for the number of operands and initialise the GPRs if necessary.
@@ -221,9 +230,11 @@ class Testcase(object):
             copy +=  '\t\tvmovaps {}, {}\n'.format(self.ops[key][0], self.ops[key][0])
             copy += '\t\tvmovaps {}, {}\n'.format(self.ops[key][1], self.ops[key][0])
             copy += '\t\t# Create DP 2.0\n'
-            copy += '\t\tvaddpd {}, {}, {}\n'.format(self.ops[key][1], self.ops[key][1], self.ops[key][1])
+            copy += '\t\tvaddpd {}, {}, {}\n'.format(self.ops[key][1], self.ops[key][1], 
+                                                    self.ops[key][1])
             copy += '\t\t# Create DP 0.5\n'
-            copy += '\t\tvdivpd {}, {}, {}\n'.format(self.ops[key][2], self.ops[key][0], self.ops[key][1])
+            copy += '\t\tvdivpd {}, {}, {}\n'.format(self.ops[key][2], self.ops[key][0], 
+                                                    self.ops[key][1])
         else:
             copy = ''
         return copy
@@ -293,20 +304,28 @@ class Testcase(object):
                 loop_lat += '\t\tINSTR    {}\n'.format(self.ops[self.op_a][0])
         elif(self.num_operands == 2 and self.op_a == self.op_b):
             for i in range(0, int(self.num_instr), 2):
-                loop_lat += '\t\tINSTR    {}, {}\n'.format(self.ops[self.op_a][0], self.ops[self.op_b][1])
-                loop_lat += '\t\tINSTR    {}, {}\n'.format(self.ops[self.op_b][1], self.ops[self.op_b][0])
+                loop_lat += '\t\tINSTR    {}, {}\n'.format(self.ops[self.op_a][0], 
+                                                           self.ops[self.op_b][1])
+                loop_lat += '\t\tINSTR    {}, {}\n'.format(self.ops[self.op_b][1], 
+                                                           self.ops[self.op_b][0])
         elif(self.num_operands == 2 and self.op_a != self.op_b):
             for i in range(0, int(self.num_instr), 2):
-                loop_lat += '\t\tINSTR    {}, {}\n'.format(self.ops[self.op_a][0], self.ops[self.op_b][0])
-                loop_lat += '\t\tINSTR    {}, {}\n'.format(self.ops[self.op_a][0], self.ops[self.op_b][0])
+                loop_lat += '\t\tINSTR    {}, {}\n'.format(self.ops[self.op_a][0], 
+                                                           self.ops[self.op_b][0])
+                loop_lat += '\t\tINSTR    {}, {}\n'.format(self.ops[self.op_a][0], 
+                                                           self.ops[self.op_b][0])
         elif(self.num_operands == 3 and self.op_a == self.op_b):
             for i in range(0, int(self.num_instr), 2):
-                loop_lat += '\t\tINSTR    {}, {}, {}\n'.format(self.ops[self.op_a][0], self.ops[self.op_b][1],      self.ops[self.op_c][0])
-                loop_lat += '\t\tINSTR    {}, {}, {}\n'.format(self.ops[self.op_a][1], self.ops[self.op_b][0],      self.ops[self.op_c][0])
+                loop_lat += '\t\tINSTR    {}, {}, {}\n'.format(self.ops[self.op_a][0], 
+                                                self.ops[self.op_b][1], self.ops[self.op_c][0])
+                loop_lat += '\t\tINSTR    {}, {}, {}\n'.format(self.ops[self.op_a][1], 
+                                                self.ops[self.op_b][0], self.ops[self.op_c][0])
         elif(self.num_operands == 3 and self.op_a == self.op_c):
             for i in range(0, int(self.num_instr), 2):
-                loop_lat += '\t\tINSTR    {}, {}, {}\n'.format(self.ops[self.op_a][0], self.ops[self.op_b][0],      self.ops[self.op_c][0])
-                loop_lat += '\t\tINSTR    {}, {}, {}\n'.format(self.ops[self.op_a][1], self.ops[self.op_b][0],      self.ops[self.op_c][0])
+                loop_lat += '\t\tINSTR    {}, {}, {}\n'.format(self.ops[self.op_a][0], 
+                                                self.ops[self.op_b][0], self.ops[self.op_c][0])
+                loop_lat += '\t\tINSTR    {}, {}, {}\n'.format(self.ops[self.op_a][1], 
+                                                self.ops[self.op_b][0], self.ops[self.op_c][0])
         loop_lat += ('\t\tcmp      i, N\n'
                      '\t\tjl       loop\n')
         return loop_lat
