@@ -81,7 +81,7 @@ class Osaca(object):
             val = -2
             new = False
             try:
-                entry = self.df.loc[lambda df: df.instr == instr,clmn]
+                entry = self.df.loc[lambda df, inst=instr, col=clmn: df.instr == inst,col]
                 val = entry.values[0]
             except IndexError:
                 # Instruction not in database yet --> add it
@@ -430,7 +430,8 @@ class Osaca(object):
         elif(numSpaces == 0 and numTabs != 0):
             return '\t'
         else:
-            raise NotImplementedError('Indentation of code is only supported for whitespaces and tabs.')
+            err_msg = 'Indentation of code is only supported for whitespaces and tabs.'
+            raise NotImplementedError(err_msg)
     
    
     def iaca_bin(self):
@@ -707,7 +708,9 @@ class Osaca(object):
                 opExtRegs = []
                 for operand in opExt:
                     try:
-                        regTmp = Register(operand)
+                        # regTmp = Register(operand)
+                        # Create Register only to see if it is one
+                        Register(operand)
                         opExtRegs.append(True)
                     except KeyError:
                         opExtRegs.append(False)
@@ -730,7 +733,7 @@ class Osaca(object):
                     if(len(opExt) > 1):
                         if(opExtRegs[1] is True):
                             opExt[0] = opExt[1]
-                        elif(len(optExt > 2)):
+                        elif(len(opExt > 2)):
                             if(opExtRegs[2] is True):
                                 opExt[0] = opExt[2]
                 if(len(opExtRegs) == 2 and opExtRegs[1] is False):
@@ -803,7 +806,8 @@ def __find_version(*file_paths):
 ##------------Main method--------------
 def main():
     # Parse args
-    parser = argparse.ArgumentParser(description='Analyzes a marked innermost loop snippet for a given architecture type and prints out the estimated average throughput')
+    parser = argparse.ArgumentParser(description='Analyzes a marked innermost loop snippet'
+                +'for a given architecture type and prints out the estimated average throughput')
     parser.add_argument('-V', '--version', action='version', version='%(prog)s '
                         +__find_version('__init__.py'))
     parser.add_argument('--arch', dest='arch', type=str, help='define architecture '
