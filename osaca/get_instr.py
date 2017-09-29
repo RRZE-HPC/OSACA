@@ -1,5 +1,5 @@
 #!/apps/python/3.5-anaconda/bin/python
-import sys, os, re
+import os, re
 import argparse
 from testcase import Testcase
 from param import Register, MemAddr, Parameter
@@ -14,7 +14,6 @@ class Instr_extractor(object):
     db = {} 
     sorted_db = []
     lncnt = 1
-    fname = ''
     cntChar = ''
     first = True
     # Constant variables
@@ -38,7 +37,6 @@ class Instr_extractor(object):
        
 
     def extract_instr(self, asmFile):
-        fname = asmFile
         # Check if parameter is in the correct file format
         if(not self.is_elffile(asmFile)):
             print('Invalid argument')
@@ -170,7 +168,7 @@ class Instr_extractor(object):
    
 
     def sort_db(self):
-            self.sorted_db=sorted(self.db.items(), key=lambda x:x[1], reverse=True)
+        self.sorted_db=sorted(self.db.items(), key=lambda x:x[1], reverse=True)
 
 
     def print_sorted_db(self):
@@ -185,10 +183,10 @@ class Instr_extractor(object):
 
 
     def save_db(self):
-            file = open('.cnt_asm_ops.db','w')
-            for i in self.db.items():
-                file.write(i[0]+'\t'+str(i[1])+'\n')
-            file.close()
+        file = open('.cnt_asm_ops.db','w')
+        for i in self.db.items():
+            file.write(i[0]+'\t'+str(i[1])+'\n')
+        file.close()
 
 
     def load_db(self):
