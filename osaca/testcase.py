@@ -1,4 +1,4 @@
-#!/apps/python/3.5-anaconda/bin/python
+#!/usr/bin/python
 
 import os
 from subprocess import call
@@ -362,7 +362,7 @@ class Testcase(object):
         return loop_thrpt
 
 
-    def __is_in_dir(self):
+    def is_in_dir(self):
         """
         Check if testcases with the same name already exist in testcase
         directory.

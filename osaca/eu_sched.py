@@ -1,4 +1,4 @@
-#!/apps/python/3.5-anaconda/bin/python
+#!/usr/bin/python
 
 import sys
 import os
@@ -30,7 +30,7 @@ class Scheduler(object):
 
 
     def schedule(self):
-        '''
+        """
         Schedules Instruction Form list and calculates port bindings.
 
         Returns 
@@ -38,7 +38,7 @@ class Scheduler(object):
         (str, [int, ...])
             A tuple containing the graphic output of the schedule as string and
             the port bindings as list of ints.
-        '''
+        """
         sched = self.get_head()
         # Initialize ports
         occ_ports = [[0]*self.ports for x in range(len(self.instrList))]
@@ -73,14 +73,14 @@ class Scheduler(object):
 
    
     def schedule_FCFS(self):
-        '''
+        """
         Schedules Instruction Form list for a single run with latencies.
 
         Returns 
         -------
         (str, int)
             A tuple containing the graphic output as string and the total throughput time as int.
-        '''
+        """
         sched = self.get_head()
         total = 0
         # Initialize ports
@@ -119,7 +119,7 @@ class Scheduler(object):
 
 
     def get_occurance_groups(self, portOccurances):
-        '''
+        """
         Groups ports in groups by the number of their occurance and sorts
         groups by cardinality
 
@@ -134,7 +134,7 @@ class Scheduler(object):
         [[int, ...], ...]
             List of lists with all occurance groups sorted by cardinality
             (smallest group first)
-        '''
+        """
         groups = [[] for x in range(len(set(portOccurances))-1)]
         for i,groupInd in enumerate(range(min(list(filter(lambda x: x > 0, portOccurances))),
                           max(portOccurances)+1)):
@@ -147,7 +147,7 @@ class Scheduler(object):
 
 
     def get_port_occurances(self, tups):
-        '''
+        """
         Returns the number of each port occurance for the possible port 
         occupations
 
@@ -161,7 +161,7 @@ class Scheduler(object):
         [int, ...]
             List in the length of the number of ports for the current architecture,
             containing the amount of occurances for each port
-        '''
+        """
         ports = [0]*self.ports
         for tup in tups:
             for elem in tup:
@@ -170,7 +170,7 @@ class Scheduler(object):
 
     
     def test_ports_FCFS(self, occ_ports, needed_ports):
-        '''
+        """
         Test if current configuration of ports is possible and returns boolean
 
         Parameters
@@ -185,7 +185,7 @@ class Scheduler(object):
         bool
             True    if needed ports can get scheduled on current port occupation
             False   if not
-        '''
+        """
         for port in needed_ports:
             if(occ_ports[port] != 0):
                 return False
@@ -193,14 +193,14 @@ class Scheduler(object):
 
     
     def get_report_info(self):
-        '''
+        """
         Creates Report information including all needed annotations.
 
         Returns
         -------
         str
             String containing the report information
-        '''
+        """
         analysis = 'Throughput Analysis Report\n'+('-'*26)+'\n'
         annotations = ( '* - No information for this instruction in database\n'
                         '\n')
@@ -208,14 +208,14 @@ class Scheduler(object):
 
 
     def get_head(self):
-        '''
+        """
         Creates right heading for CPU architecture.
 
         Returns
         -------
         str
             String containing the header
-        '''
+        """
         horizLine = '-'*7*self.ports+'-\n'
         portAnno = (' '*(math.floor((len(horizLine)-24)/2))+'Ports Pressure in cycles'+' '
                    *(math.ceil((len(horizLine)-24)/2))+'\n')
@@ -228,7 +228,7 @@ class Scheduler(object):
 
     
     def get_line(self, occ_ports, instrName):
-        '''
+        """
         Create line with port occupation for output.
 
         Parameters
@@ -242,7 +242,7 @@ class Scheduler(object):
         -------
         str
             String for output containing port scheduling for instrName
-        '''
+        """
         line = ''
         for i in occ_ports:
             cycles = '    ' if (i == 0) else '%.2f' % float(i)
@@ -252,7 +252,7 @@ class Scheduler(object):
 
     
     def get_port_binding(self, port_bndg):
-        '''
+        """
         Creates port binding out of scheduling result.
 
         Parameters
@@ -264,7 +264,7 @@ class Scheduler(object):
         -------
         str
             String containing the port binding graphical output
-        ''' 
+        """ 
         header = 'Port Binding in Cycles Per Iteration:\n'
         horizLine = '-'*10+'-'*6*self.ports+'\n'
         portLine = '|  Port  |'
@@ -280,7 +280,7 @@ class Scheduler(object):
 
 
     def get_operand_suffix(self, instrForm):
-        '''
+        """
         Creates operand suffix out of list of Parameters.
 
         Parameters
@@ -292,7 +292,7 @@ class Scheduler(object):
         -------
         str
             Operand suffix for searching in database
-        '''
+        """
         opExt = []
         for i in range(1, len(instrForm)-1):
             optmp = ''
@@ -308,26 +308,26 @@ class Scheduler(object):
 
 
 if __name__ == '__main__':
-    data = [
-    ['lea',Register('RAX'),MemAddr('%edx,(%rax,%rax,1)'),'lea    0x1(%rax,%rax,1),%edx'],
-    ['vcvtsi2ss',Register('XMM0'),Register('XMM0'),Register('RAX'),'vcvtsi2ss %edx,%xmm2,%xmm2'],
-    ['vmulss',Register('XMM0'),Register('XMM0'),Register('XMM0'),'vmulss %xmm2,%xmm0,     %xmm3'],
-    ['lea',Register('RAX'),MemAddr('%edx,(%rax,%rax,1)'),'lea    0x2(%rax,%rax,1),%ecx'],
-    ['vaddss',Register('XMM0'),Register('XMM0'),Register('XMM0'),'vaddss %xmm3,%xmm1,%xmm4'],
-    ['vxorps',Register('XMM0'),Register('XMM0'),Register('XMM0'),'vxorps %xmm1, %xmm1,%xmm1'],
-    ['vcvtsi2ss',Register('XMM0'),Register('XMM0'),Register('RAX'),'vcvtsi2ss %ecx,%xmm1, %xmm1'],
-    ['vmulss',Register('XMM0'),Register('XMM0'),Register('XMM0'),'vmulss %xmm1,%xmm0,%xmm5'],
-    ['vmovss',MemAddr('%edx,(%rax,%rax,1)'),Register('XMM0'),'vmovss %xmm4,0x4(%rsp,%rax,8)'],
-    ['vaddss',Register('XMM0'),Register('XMM0'),Register('XMM0'),'vaddss %xmm5,%xmm4,%xmm1'],
-    ['vmovss',MemAddr('%edx,(%rax,%rax,1)'),Register('XMM0'),'vmovss %xmm1,0x8(%rsp,%rax,8)'],
-    ['inc',Register('RAX'),'inc    %rax'],
-    ['cmp',Register('RAX'),Parameter('IMD'),'cmp    $0x1f3,%rax'],
-    ['jb',Parameter('LBL'),'jb             400bc2 <main+0x62>']
-    ]
+#    data = [
+#    ['lea',Register('RAX'),MemAddr('%edx,(%rax,%rax,1)'),'lea    0x1(%rax,%rax,1),%edx'],
+#    ['vcvtsi2ss',Register('XMM0'),Register('XMM0'),Register('RAX'),'vcvtsi2ss %edx,%xmm2,%xmm2'],
+#    ['vmulss',Register('XMM0'),Register('XMM0'),Register('XMM0'),'vmulss %xmm2,%xmm0,     %xmm3'],
+#    ['lea',Register('RAX'),MemAddr('%edx,(%rax,%rax,1)'),'lea    0x2(%rax,%rax,1),%ecx'],
+#    ['vaddss',Register('XMM0'),Register('XMM0'),Register('XMM0'),'vaddss %xmm3,%xmm1,%xmm4'],
+#    ['vxorps',Register('XMM0'),Register('XMM0'),Register('XMM0'),'vxorps %xmm1, %xmm1,%xmm1'],
+#    ['vcvtsi2ss',Register('XMM0'),Register('XMM0'),Register('RAX'),'vcvtsi2ss %ecx,%xmm1, %xmm1'],
+#    ['vmulss',Register('XMM0'),Register('XMM0'),Register('XMM0'),'vmulss %xmm1,%xmm0,%xmm5'],
+#    ['vmovss',MemAddr('%edx,(%rax,%rax,1)'),Register('XMM0'),'vmovss %xmm4,0x4(%rsp,%rax,8)'],
+#    ['vaddss',Register('XMM0'),Register('XMM0'),Register('XMM0'),'vaddss %xmm5,%xmm4,%xmm1'],
+#    ['vmovss',MemAddr('%edx,(%rax,%rax,1)'),Register('XMM0'),'vmovss %xmm1,0x8(%rsp,%rax,8)'],
+#    ['inc',Register('RAX'),'inc    %rax'],
+#    ['cmp',Register('RAX'),Parameter('IMD'),'cmp    $0x1f3,%rax'],
+#    ['jb',Parameter('LBL'),'jb             400bc2 <main+0x62>']
+#    ]
 
-    sched = Scheduler('ivb', data)
-    output,binding = sched.schedule()
-    print(sched.get_port_binding(binding))
-    print(sched.get_report_info(),end='')
-    print(output)
-    print('Block Throughput: {}'.format(round(max(binding),2)))
+#    sched = Scheduler('ivb', data)
+#    output,binding = sched.schedule()
+#    print(sched.get_port_binding(binding))
+#    print(sched.get_report_info(),end='')
+#    print(output)
+#    print('Block Throughput: {}'.format(round(max(binding),2)))

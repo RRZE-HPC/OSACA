@@ -1,4 +1,4 @@
-#!/apps/python/3.5-anaconda/bin/python
+#!/usr/bin/python
 
 from param import Register, MemAddr, Parameter
 from testcase import Testcase

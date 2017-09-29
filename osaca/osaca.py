@@ -1,4 +1,4 @@
-#!/apps/python/3.5-anaconda/bin/python
+#!/usr/bin/python
 
 import argparse
 import sys, os, io, re
