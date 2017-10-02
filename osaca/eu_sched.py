@@ -212,12 +212,12 @@ class Scheduler(object):
         """
         horiz_line = '-' * 7 * self.ports + '-\n'
         port_anno = (' ' * (math.floor((len(horiz_line) - 24) / 2)) + 'Ports Pressure in cycles'
-                    + ' ' * (math.ceil((len(horiz_line) - 24) / 2)) + '\n')
+                     + ' ' * (math.ceil((len(horiz_line) - 24) / 2)) + '\n')
         port_line = ''
         for i in range(0, self.ports):
             port_line += '|  {}   '.format(i)
         port_line += '|\n'
-        head = port_anno + portLine + horiz_line
+        head = port_anno + port_line + horiz_line
         return head
 
     def get_line(self, occ_ports, instr_name):
@@ -259,15 +259,15 @@ class Scheduler(object):
         """
         header = 'Port Binding in Cycles Per Iteration:\n'
         horiz_line = '-' * 10 + '-' * 6 * self.ports + '\n'
-        portLine = '|  Port  |'
+        port_line = '|  Port  |'
         for i in range(0, self.ports):
-            portLine += '  {}  |'.format(i)
-        portLine += '\n'
+            port_line += '  {}  |'.format(i)
+        port_line += '\n'
         cyc_line = '| Cycles |'
         for i in range(len(port_bndg)):
             cyc_line += ' {} |'.format(round(port_bndg[i], 2))
         cyc_line += '\n'
-        binding = header + horiz_line + portLine + horiz_line + cyc_line + horiz_line
+        binding = header + horiz_line + port_line + horiz_line + cyc_line + horiz_line
         return binding
 
     def get_operand_suffix(self, instr_form):
