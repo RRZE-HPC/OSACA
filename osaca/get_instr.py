@@ -1,17 +1,17 @@
 #!/usr/bin/python
-import os, re
+import os
+import re
 import argparse
 from testcase import Testcase
 from param import Register, MemAddr, Parameter
 
 
 class Instr_extractor(object):
-    
     filepaths = []
     # Variables for checking lines
     numSeps = 0
     sem = 0
-    db = {} 
+    db = {}
     sorted_db = []
     lncnt = 1
     cntChar = ''
@@ -24,7 +24,7 @@ class Instr_extractor(object):
         self.filepaths = filepath
 
     def check_all(self):
-        for i in range(0,len(self.filepaths)):
+        for i in range(0, len(self.filepaths)):
             self.extract_instr(self.filepaths[i])
 
     def is_elffile(self, filepath):
@@ -34,7 +34,6 @@ class Instr_extractor(object):
             if('format elf64' in src):
                 return True
             return False
-       
 
     def extract_instr(self, asmFile):
         # Check if parameter is in the correct file format
@@ -43,7 +42,7 @@ class Instr_extractor(object):
             return
         # Open file
         try:
-            f=open(asmFile, 'r')
+            f = open(asmFile, 'r')
         except IOError:
             print('IOError: File not found')
         # Analyse code line by line and check the instructions
@@ -53,7 +52,6 @@ class Instr_extractor(object):
             self.lncnt += 1
         f.close()
 
-
     def check_line(self, line):
         # Check if MARKER is in line and count the number of whitespaces if so
         if(self.MARKER in line):
@@ -61,8 +59,8 @@ class Instr_extractor(object):
             if(self.first):
                 self.set_counter_char(line)
                 self.first = False
-            self.numSeps = (re.split(self.MARKER,line)[0]).count(self.cntChar)
-            self.sem = 2;
+            self.numSeps = (re.split(self.MARKER, line)[0]).count(self.cntChar)
+            self.sem = 2
         elif(self.sem > 0):
             # We're in the marked code snipped
             # Check if the line is ASM code and - if not - check if we're still in the loop
@@ -72,15 +70,15 @@ class Instr_extractor(object):
                 # Check if there are commetns in line
                 if(r'//' in line):
                     return
-                self.check_instr(''.join(re.split(r'\t',line)[-1:]))
-            elif((re.split(r'\S',line)[0]).count(self.cntChar) <= self.numSeps):
+                self.check_instr(''.join(re.split(r'\t', line)[-1:]))
+            elif((re.split(r'\S', line)[0]).count(self.cntChar) <= self.numSeps):
                 # Not in the loop anymore - or yet - so we decrement the semaphore
                 self.sem = self.sem-1
 
-    # Check if seperator is either tabulator or whitespace 
+    # Check if seperator is either tabulator or whitespace
     def set_counter_char(self, line):
-        numSpaces = (re.split(self.MARKER,line)[0]).count(' ')
-        numTabs = (re.split(self.MARKER,line)[0]).count('\t')
+        numSpaces = (re.split(self.MARKER, line)[0]).count(' ')
+        numTabs = (re.split(self.MARKER, line)[0]).count('\t')
         if(numSpaces != 0 and numTabs == 0):
             self.cntChar = ' '
         elif(numSpaces == 0 and numTabs != 0):
@@ -88,7 +86,6 @@ class Instr_extractor(object):
         else:
             err_msg = 'Indentation of code is only supported for whitespaces and tabs.'
             raise NotImplementedError(err_msg)
-
 
     def check_instr(self, instr):
         # Check for strange clang padding bytes
@@ -104,7 +101,7 @@ class Instr_extractor(object):
         # Check if there's one or more operand and store all in a list
         param_list = self.flatten(self.separate_params(params))
         opList = list(param_list)
-        # Check operands and seperate them by IMMEDIATE (IMD), REGISTER (REG), MEMORY (MEM) or 
+        # Check operands and seperate them by IMMEDIATE (IMD), REGISTER (REG), MEMORY (MEM) or
         # LABEL (LBL)
         for i in range(len(param_list)):
             op = param_list[i]
@@ -147,7 +144,6 @@ class Instr_extractor(object):
                 tc = Testcase(mnemonic, list(reversed(opList)), '64')
                 tc.write_testcase()
 
-
     def separate_params(self, params):
         param_list = [params]
         if(',' in params):
@@ -157,19 +153,17 @@ class Instr_extractor(object):
                 elif(params.index('(') < params.index(',')):
                     return param_list
                 else:
-                    i = params.index(',') 
+                    i = params.index(',')
             else:
                 i = params.index(',')
-            param_list = [params[:i],self.separate_params(params[i+1:])]
+            param_list = [params[:i], self.separate_params(params[i+1:])]
         elif('#' in params):
             i = params.index('#')
-            param_list = [params[:i]] 
+            param_list = [params[:i]]
         return param_list
-   
 
     def sort_db(self):
-        self.sorted_db=sorted(self.db.items(), key=lambda x:x[1], reverse=True)
-
+        self.sorted_db = sorted(self.db.items(), key=lambda x: x[1], reverse=True)
 
     def print_sorted_db(self):
         self.sort_db()
@@ -181,13 +175,11 @@ class Instr_extractor(object):
             total += self.sorted_db[i][1]
         print('\nCumulated number of instructions: '+str(total))
 
-
     def save_db(self):
-        file = open('.cnt_asm_ops.db','w')
+        file = open('.cnt_asm_ops.db', 'w')
         for i in self.db.items():
             file.write(i[0]+'\t'+str(i[1])+'\n')
         file.close()
-
 
     def load_db(self):
         try:
@@ -210,7 +202,6 @@ class Instr_extractor(object):
             self.db[instr_form] = int(numCalls)
         file.close()
 
-
     def flatten(self, l):
         if l == []:
             return l
@@ -222,13 +213,13 @@ class Instr_extractor(object):
 def main():
     # Parse args
     parser = argparse.ArgumentParser(description='Returns a list of all instruction forms in the'
-                                    +'given files sorted by their number of occurences.')
+                                     + 'given files sorted by their number of occurences.')
     parser.add_argument('-V', '--version', action='version', version='%(prog)s 0.2')
     parser.add_argument('filepath', nargs='+', help='path to objdump(s)')
     parser.add_argument('-l', '--load', dest='load', action='store_true', help='load database'
-                        +' before checking new files')
+                        + ' before checking new files')
     parser.add_argument('-s', '--store', dest='store', action='store_true', help='store database '
-                        +'before checking new files')
+                        + 'before checking new files')
 
     # Create object and store arguments as attribute
     inp = parser.parse_args()
@@ -242,6 +233,6 @@ def main():
     if(inp.store):
         ie.save_db()
 
-## ---------main method----------
+# ---------main method----------
 if __name__ == '__main__':
     main()
