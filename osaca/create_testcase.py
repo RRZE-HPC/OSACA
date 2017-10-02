@@ -15,10 +15,10 @@ mem0 = MemAddr('(%rax, %esi, 4)')
 imd1 = Parameter('IMD')
 
 
-#-----------------------------------------------
-#-USER INPUT------------------------------------
-#-----------------------------------------------
-# Enter your mnemonic
+# -----------------------------------------------
+# -USER INPUT------------------------------------
+# -----------------------------------------------
+#  Enter your mnemonic
 mnemonic = 'vxorpd'
 
 # Define your operands. If you don't need it, just type in None
@@ -29,13 +29,13 @@ op2 = xmm
 # Define the number of instructions per loop (default: 12)
 per_loop = '128'
 
-#-----------------------------------------------
-#-----------------------------------------------
+# -----------------------------------------------
+# -----------------------------------------------
 
 # Start
 operands = [x for x in [dst, op1, op2] if x is not None]
 opListStr = ', '.join([str(x) for x in operands])
-print('Create Testcase for {} {}'.format(mnemonic, opListStr ), end='')
+print('Create Testcase for {} {}'.format(mnemonic, opListStr), end='')
 tc = Testcase(mnemonic, operands, per_loop)
 tc.write_testcase()
 print('  --------> SUCCEEDED')
