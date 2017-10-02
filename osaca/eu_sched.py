@@ -4,7 +4,7 @@ import sys
 import os
 import math
 import ast
-from param import Register, MemAddr, Parameter
+from param import Register, MemAddr
 from operator import add
 import pandas as pd
 
@@ -17,16 +17,16 @@ class Scheduler(object):
     # content of most inner list in instrList: instr, operand(s), instr form
     df = None           # type: DataFrame
 
-    def __init__(self, arch, instructionList):
+    def __init__(self, arch, instruction_list):
         arch = arch.upper()
         try:
             self.ports = self.arch_dict[arch]
         except KeyError:
             print('Architecture not supportet for EU scheduling.')
             sys.exit()
-        self.instrList = instructionList
-        currDir = os.path.realpath(__file__)[:-11]
-        self.df = pd.read_csv(currDir + 'data/' + arch.lower() + '_data.csv', quotechar='"',
+        self.instrList = instruction_list
+        curr_dir = os.path.realpath(__file__)[:-11]
+        self.df = pd.read_csv(curr_dir + 'data/' + arch.lower() + '_data.csv', quotechar='"',
                               converters={'ports': ast.literal_eval})
 
     def schedule(self):
@@ -57,21 +57,21 @@ class Scheduler(object):
                 sched += self.get_line(occ_ports[i], '* ' + instrForm[-1])
                 continue
             # Get the occurance of each port from the occupation list
-            portOccurances = self.get_port_occurances(tup)
+            port_occurances = self.get_port_occurances(tup)
             # Get 'occurance groups'
-            occuranceGroups = self.get_occurance_groups(portOccurances)
+            occurance_groups = self.get_occurance_groups(port_occurances)
             # Calculate port dependent throughput
-            TPGes = entry.TP.values[0] * len(occuranceGroups[0])
-            for occGroup in occuranceGroups:
+            tp_ges = entry.TP.values[0] * len(occurance_groups[0])
+            for occGroup in occurance_groups:
                 for port in occGroup:
-                    occ_ports[i][port] = TPGes/len(occGroup)
+                    occ_ports[i][port] = tp_ges/len(occGroup)
             # Write schedule line
             sched += self.get_line(occ_ports[i], instrForm[-1])
             # Add throughput to total port binding
             port_bndgs = list(map(add, port_bndgs, occ_ports[i]))
         return (sched, port_bndgs)
 
-    def schedule_FCFS(self):
+    def schedule_fcfs(self):
         """
         Schedules Instruction Form list for a single run with latencies.
 
@@ -100,7 +100,7 @@ class Scheduler(object):
                 for portOcc in tup:
                     # Test if chosen instruction form port occupation suits the current CPU port
                     # occupation
-                    if(self.test_ports_FCFS(occ_ports, portOcc)):
+                    if(self.test_ports_fcfs(occ_ports, portOcc)):
                         # Current port occupation fits for chosen port occupation of instruction!
                         found = True
                         good = [entry.LT.values[0] if (j in portOcc) else 0 for j in
@@ -116,14 +116,14 @@ class Scheduler(object):
         total += max(occ_ports)
         return (sched, total)
 
-    def get_occurance_groups(self, portOccurances):
+    def get_occurance_groups(self, port_occurances):
         """
         Groups ports in groups by the number of their occurance and sorts
         groups by cardinality
 
         Parameters
         ----------
-        portOccurances : [int, ...]
+        port_occurances : [int, ...]
             List with the length of ports containing the number of occurances
             of each port
 
@@ -133,10 +133,10 @@ class Scheduler(object):
             List of lists with all occurance groups sorted by cardinality
             (smallest group first)
         """
-        groups = [[] for x in range(len(set(portOccurances))-1)]
-        for i, groupInd in enumerate(range(min(list(filter(lambda x: x > 0, portOccurances))),
-                                           max(portOccurances) + 1)):
-            for p, occurs in enumerate(portOccurances):
+        groups = [[] for x in range(len(set(port_occurances))-1)]
+        for i, groupInd in enumerate(range(min(list(filter(lambda x: x > 0, port_occurances))),
+                                           max(port_occurances) + 1)):
+            for p, occurs in enumerate(port_occurances):
                 if groupInd == occurs:
                     groups[i].append(p)
         # Sort groups by cardinality
@@ -165,7 +165,7 @@ class Scheduler(object):
                 ports[elem] += 1
         return ports
 
-    def test_ports_FCFS(self, occ_ports, needed_ports):
+    def test_ports_fcfs(self, occ_ports, needed_ports):
         """
         Test if current configuration of ports is possible and returns boolean
 
@@ -210,17 +210,17 @@ class Scheduler(object):
         str
             String containing the header
         """
-        horizLine = '-' * 7 * self.ports + '-\n'
-        portAnno = (' ' * (math.floor((len(horizLine) - 24) / 2)) + 'Ports Pressure in cycles'
-                    + ' ' * (math.ceil((len(horizLine) - 24) / 2)) + '\n')
-        portLine = ''
+        horiz_line = '-' * 7 * self.ports + '-\n'
+        port_anno = (' ' * (math.floor((len(horiz_line) - 24) / 2)) + 'Ports Pressure in cycles'
+                    + ' ' * (math.ceil((len(horiz_line) - 24) / 2)) + '\n')
+        port_line = ''
         for i in range(0, self.ports):
-            portLine += '|  {}   '.format(i)
-        portLine += '|\n'
-        head = portAnno + portLine + horizLine
+            port_line += '|  {}   '.format(i)
+        port_line += '|\n'
+        head = port_anno + portLine + horiz_line
         return head
 
-    def get_line(self, occ_ports, instrName):
+    def get_line(self, occ_ports, instr_name):
         """
         Create line with port occupation for output.
 
@@ -228,19 +228,19 @@ class Scheduler(object):
         ----------
         occ_ports : (int, ...)
             Integer tuple containing needed ports
-        instrName : str
+        instr_name : str
             Name of instruction form for output
 
         Returns
         -------
         str
-            String for output containing port scheduling for instrName
+            String for output containing port scheduling for instr_name
         """
         line = ''
         for i in occ_ports:
             cycles = '    ' if (i == 0) else '%.2f' % float(i)
             line += '| ' + cycles + ' '
-        line += '| ' + instrName + '\n'
+        line += '| ' + instr_name + '\n'
         return line
 
     def get_port_binding(self, port_bndg):
@@ -258,25 +258,25 @@ class Scheduler(object):
             String containing the port binding graphical output
         """
         header = 'Port Binding in Cycles Per Iteration:\n'
-        horizLine = '-' * 10 + '-' * 6 * self.ports + '\n'
+        horiz_line = '-' * 10 + '-' * 6 * self.ports + '\n'
         portLine = '|  Port  |'
         for i in range(0, self.ports):
             portLine += '  {}  |'.format(i)
         portLine += '\n'
-        cycLine = '| Cycles |'
+        cyc_line = '| Cycles |'
         for i in range(len(port_bndg)):
-            cycLine += ' {} |'.format(round(port_bndg[i], 2))
-        cycLine += '\n'
-        binding = header + horizLine + portLine + horizLine + cycLine + horizLine
+            cyc_line += ' {} |'.format(round(port_bndg[i], 2))
+        cyc_line += '\n'
+        binding = header + horiz_line + portLine + horiz_line + cyc_line + horiz_line
         return binding
 
-    def get_operand_suffix(self, instrForm):
+    def get_operand_suffix(self, instr_form):
         """
         Creates operand suffix out of list of Parameters.
 
         Parameters
         ----------
-        instrForm : [str, Parameter, ..., Parameter, str]
+        instr_form : [str, Parameter, ..., Parameter, str]
             Instruction Form data structure
 
         Returns
@@ -284,17 +284,17 @@ class Scheduler(object):
         str
             Operand suffix for searching in database
         """
-        opExt = []
-        for i in range(1, len(instrForm)-1):
+        op_ext = []
+        for i in range(1, len(instr_form)-1):
             optmp = ''
-            if(isinstance(instrForm[i], Register) and instrForm[i].reg_type == 'GPR'):
-                optmp = 'r' + str(instrForm[i].size)
-            elif(isinstance(instrForm[i], MemAddr)):
+            if(isinstance(instr_form[i], Register) and instr_form[i].reg_type == 'GPR'):
+                optmp = 'r' + str(instr_form[i].size)
+            elif(isinstance(instr_form[i], MemAddr)):
                 optmp = 'mem'
             else:
-                optmp = str(instrForm[i]).lower()
-            opExt.append(optmp)
-        operands = '_'.join(opExt)
+                optmp = str(instr_form[i]).lower()
+            op_ext.append(optmp)
+        operands = '_'.join(op_ext)
         return operands
 
 
