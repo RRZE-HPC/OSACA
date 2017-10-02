@@ -19,7 +19,7 @@ class Osaca(object):
     filepath = None
     srcCode = None
     df = None
-    instrForms = None
+    instr_forms = None
     # Variables for checking lines
     numSeps = 0
     indentChar = ''
@@ -42,7 +42,7 @@ class Osaca(object):
     def __init__(self, _arch, _filepath):
         self.arch = _arch
         self.filepath = _filepath
-        self.instrForms = []
+        self.instr_forms = []
 
     # -----------------main functions depending on arguments--------------------
     def include_ibench(self):
@@ -60,10 +60,10 @@ class Osaca(object):
         # Check for database for the chosen architecture
         self.df = self.read_csv()
         # Create sequence of numbers and their reciprokals for validate the measurements
-        cycList, reciList = self.create_sequences()
+        cyc_list, reci_list = self.create_sequences()
         print('Everything seems fine! Let\'s start!')
-        newData = []
-        addedValues = 0
+        new_data = []
+        added_vals = 0
         for line in self.srcCode:
             if('Using frequency' in line or len(line) == 0):
                 continue
@@ -75,11 +75,11 @@ class Osaca(object):
                 clmn = 'TP'
                 instr = instr[:-3]
             # Otherwise it is a latency value. Nothing to do.
-            clkC = line.split()[1]
-            clkC_tmp = clkC
-            clkC = self.validate_val(clkC, instr, True if (clmn == 'TP') else False,
-                                     cycList, reciList)
-            txtOutput = True if (clkC_tmp == clkC) else False
+            clk_cyc = line.split()[1]
+            clk_cyc_tmp = clk_cyc
+            clk_cyc = self.validate_val(clk_cyc, instr, True if (clmn == 'TP') else False,
+                                     cyc_list, reci_list)
+            txt_output = True if (clk_cyc_tmp == clk_cyc) else False
             val = -2
             new = False
             try:
@@ -89,41 +89,41 @@ class Osaca(object):
                 # Instruction not in database yet --> add it
                 new = True
                 # First check if LT or TP value has already been added before
-                for i, item in enumerate(newData):
+                for i, item in enumerate(new_data):
                     if(instr in item):
                         if(clmn == 'TP'):
-                            newData[i][1] = clkC
+                            new_data[i][1] = clk_cyc
                         elif(clmn == 'LT'):
-                            newData[i][2] = clkC
+                            new_data[i][2] = clk_cyc
                         new = False
                         break
                 if(new and clmn == 'TP'):
-                    newData.append([instr, clkC, '-1', ((-1,),)])
+                    new_data.append([instr, clk_cyc, '-1', ((-1,),)])
                 elif(new and clmn == 'LT'):
-                    newData.append([instr, '-1', clkC, ((-1,),)])
+                    new_data.append([instr, '-1', clk_cyc, ((-1,),)])
                 new = True
-                addedValues += 1
+                added_vals += 1
             # If val is -1 (= not filled with a valid value) add it immediately
             if(val == -1):
-                self.df.set_value(entry.index[0], clmn, clkC)
-                addedValues += 1
+                self.df.set_value(entry.index[0], clmn, clk_cyc)
+                added_vals += 1
                 continue
-            if(not new and abs((val/np.float64(clkC))-1) > 0.05):
+            if(not new and abs((val/np.float64(clk_cyc))-1) > 0.05):
                 print('Different measurement for {} ({}): {}(old) vs. '.format(instr, clmn, val)
-                      + '{}(new)\nPlease check for correctness '.format(clkC)
+                      + '{}(new)\nPlease check for correctness '.format(clk_cyc)
                       + '(no changes were made).')
-                txtOutput = True
-            if(txtOutput):
+                txt_output = True
+            if(txt_output):
                 print()
-                txtOutput = False
+                txt_output = False
         # Now merge the DataFrames and write new csv file
-        self.df = self.df.append(pd.DataFrame(newData, columns=['instr', 'TP', 'LT', 'ports']),
+        self.df = self.df.append(pd.DataFrame(new_data, columns=['instr', 'TP', 'LT', 'ports']),
                                  ignore_index=True)
         csv = self.df.to_csv(index=False)
         self.write_csv(csv)
         print('ibench output {} '.format(self.filepath.split('/')[-1])
               + 'successfully in database included.')
-        print('{} values were added.'.format(addedValues))
+        print('{} values were added.'.format(added_vals))
 
     def inspect_binary(self):
         """
@@ -159,12 +159,12 @@ class Osaca(object):
             sys.exit()
         # Check if input file is a binary or assembly file
         try:
-            binaryFile = True
+            binary_file = True
             if(not self.check_elffile()):
                 print('Invalid file path or file format.')
                 sys.exit()
         except (TypeError, IndexError):
-            binaryFile = False
+            binary_file = False
             if(not self.check_file(True)):
                 print('Invalid file path or file format.')
                 sys.exit()
@@ -172,7 +172,7 @@ class Osaca(object):
         self.read_csv()
 
         print('Everything seems fine! Let\'s start checking!')
-        if(binaryFile):
+        if(binary_file):
             self.iaca_bin()
         else:
             self.iaca_asm()
@@ -192,8 +192,8 @@ class Osaca(object):
             False   if arch is not supported
 
         """
-        archList = ['SNB', 'IVB', 'HSW', 'BDW', 'SKL']
-        if(self.arch in archList):
+        arch_list = ['SNB', 'IVB', 'HSW', 'BDW', 'SKL']
+        if(self.arch in arch_list):
             return True
         else:
             return False
@@ -211,19 +211,19 @@ class Osaca(object):
 
         """
         if(os.path.isfile(self.filepath)):
-            self.store_srcCode_elf()
+            self.store_src_code_elf()
             if('file format elf64' in self.srcCode[1]):
                 return True
         return False
 
-    def check_file(self, iacaFlag=False):
+    def check_file(self, iaca_flag=False):
         """
         Check if the given filepath exists and store file data in attribute
         srcCode.
 
         Parameters
         ----------
-        iacaFlag : bool
+        iaca_flag : bool
             store file data as a string in attribute srcCode if True,
             store it as a list of strings (lines) if False (default False)
 
@@ -235,11 +235,11 @@ class Osaca(object):
 
         """
         if(os.path.isfile(self.filepath)):
-            self.store_srcCode(iacaFlag)
+            self.store_src_code(iaca_flag)
             return True
         return False
 
-    def store_srcCode_elf(self):
+    def store_src_code_elf(self):
         """
         Load binary file compiled with '-g' in class attribute srcCode and
         separate by line.
@@ -247,13 +247,13 @@ class Osaca(object):
         self.srcCode = (subprocess.run(['objdump', '--source', self.filepath],
                                        stdout=subprocess.PIPE).stdout.decode('utf-8').split('\n'))
 
-    def store_srcCode(self, iacaFlag=False):
+    def store_src_code(self, iaca_flag=False):
         """
         Load arbitrary file in class attribute srcCode.
 
         Parameters
         ----------
-        iacaFlag : bool
+        iaca_flag : bool
                 store file data as a string in attribute srcCode if True,
                 store it as a list of strings (lines) if False (default False)
         """
@@ -265,7 +265,7 @@ class Osaca(object):
         for line in f:
             self.srcCode += line
         f.close()
-        if(iacaFlag):
+        if(iaca_flag):
             return
         self.srcCode = self.srcCode.split('\n')
 
@@ -278,8 +278,8 @@ class Osaca(object):
         DataFrame
             CSV as DataFrame object
         """
-        currDir = '/'.join(os.path.realpath(__file__).split('/')[:-1])
-        df = pd.read_csv(currDir+'/data/'+self.arch.lower()+'_data.csv')
+        curr_dir = '/'.join(os.path.realpath(__file__).split('/')[:-1])
+        df = pd.read_csv(curr_dir+'/data/'+self.arch.lower()+'_data.csv')
         return df
 
     def write_csv(self, csv):
@@ -310,64 +310,64 @@ class Osaca(object):
         Returns
         -------
         [int]
-            cycList of integers
+            cyc_list of integers
         [float]
-            reciList of floats
+            reci_list of floats
         """
-        cycList = []
-        reciList = []
+        cyc_list = []
+        reci_list = []
         for i in range(1, end):
-            cycList.append(i)
-            reciList.append(1/i)
-        return cycList, reciList
+            cyc_list.append(i)
+            reci_list.append(1/i)
+        return cyc_list, reci_list
 
-    def validate_val(self, clkC, instr, isTP, cycList, reciList):
+    def validate_val(self, clk_cyc, instr, is_tp, cyc_list, reci_list):
         """
-        Validate given clock cycle clkC and return rounded value in case of
+        Validate given clock cycle clk_cyc and return rounded value in case of
         success.
 
-        A succeeded validation means the clock cycle clkC is only 5% higher or
-        lower than an integer value from cycList or - if clkC is a throughput
-        value - 5% higher or lower than a reciprocal from the reciList.
+        A succeeded validation means the clock cycle clk_cyc is only 5% higher or
+        lower than an integer value from cyc_list or - if clk_cyc is a throughput
+        value - 5% higher or lower than a reciprocal from the reci_list.
 
         Parameters
         ----------
-        clkC : float
+        clk_cyc : float
             Clock cycle to validate
         instr : str
             Instruction for warning output
-        isTP : bool
+        is_tp : bool
             True if a throughput value is to check, False for a latency value
-        cycList : [int]
+        cyc_list : [int]
             Cycle list for validating
-        reciList : [float]
+        reci_list : [float]
             Reciprocal cycle list for validating
 
         Returns
         -------
         float
             Clock cycle, either rounded to an integer or its reciprocal or the
-            given clkC parameter
+            given clk_cyc parameter
         """
         clmn = 'LT'
-        if(isTP):
+        if(is_tp):
             clmn = 'TP'
-        for i in range(0, len(cycList)):
-            if(cycList[i]*1.05 > float(clkC) and cycList[i]*0.95 < float(clkC)):
+        for i in range(0, len(cyc_list)):
+            if(cyc_list[i]*1.05 > float(clk_cyc) and cyc_list[i]*0.95 < float(clk_cyc)):
                 # Value is probably correct, so round it to the estimated value
-                return cycList[i]
+                return cyc_list[i]
             # Check reciprocal only if it is a throughput value
-            elif(isTP and reciList[i]*1.05 > float(clkC) and reciList[i]*0.95 < float(clkC)):
+            elif(is_tp and reci_list[i]*1.05 > float(clk_cyc) and reci_list[i]*0.95 < float(clk_cyc)):
                 # Value is probably correct, so round it to the estimated value
-                return reciList[i]
+                return reci_list[i]
         # No value close to an integer or its reciprocal found, we assume the
         # measurement is incorrect
         print('Your measurement for {} ({}) is probably wrong. '.format(instr, clmn)
               + 'Please inspect your benchmark!')
         print('The program will continue with the given value')
-        return clkC
+        return clk_cyc
 
-    def check_line(self, line, firstAppearance=False):
+    def check_line(self, line, first_appearance=False):
         """
         Inspect line of source code and process it if inside the marked snippet.
 
@@ -375,13 +375,13 @@ class Osaca(object):
         ---------
         line : str
             Line of source code
-        firstAppearance : bool
+        first_appearance : bool
             Necessary for setting indenting character (default False)
         """
         # Check if marker is in line
         if(self.marker in line):
             # First, check if high level code in indented with whitespaces or tabs
-            if(firstAppearance):
+            if(first_appearance):
                 self.indentChar = self.get_indent_chars(line)
             # Now count the number of whitespaces
             self.numSeps = (re.split(self.marker, line)[0]).count(self.indentChar)
@@ -414,11 +414,11 @@ class Osaca(object):
         str
             Indentation character as string
         """
-        numSpaces = (re.split(self.marker, line)[0]).count(' ')
-        numTabs = (re.split(self.marker, line)[0]).count('\t')
-        if(numSpaces != 0 and numTabs == 0):
+        num_spaces = (re.split(self.marker, line)[0]).count(' ')
+        num_tabs = (re.split(self.marker, line)[0]).count('\t')
+        if(num_spaces != 0 and num_tabs == 0):
             return ' '
-        elif(numSpaces == 0 and numTabs != 0):
+        elif(num_spaces == 0 and num_tabs != 0):
             return '\t'
         else:
             err_msg = 'Indentation of code is only supported for whitespaces and tabs.'
@@ -447,7 +447,7 @@ class Osaca(object):
             elif(self.sem == 2):
                 # Not in the loop anymore. Due to the fact it's the IACA marker we can stop here
                 # After removing the last line which belongs to the IACA marker
-                del self.instrForms[-1:]
+                del self.instr_forms[-1:]
                 return
 
     def iaca_asm(self):
@@ -481,7 +481,7 @@ class Osaca(object):
     def check_instr(self, instr):
         """
         Inspect instruction for its parameters and add it to the instruction forms
-        pool instrForm.
+        pool instr_form.
 
         Parameters
         ----------
@@ -525,8 +525,8 @@ class Osaca(object):
         # Add to list
         if(len(instr) > self.longestInstr):
             self.longestInstr = len(instr)
-        instrForm = [mnemonic]+list(reversed(param_list_types))+[instr]
-        self.instrForms.append(instrForm)
+        instr_form = [mnemonic]+list(reversed(param_list_types))+[instr]
+        self.instr_forms.append(instr_form)
         # If flag is set, create testcase for instruction form
         # Do this in reversed param list order, du to the fact it's intel syntax
         # Only create benchmark if no label (LBL) is part of the operands
@@ -610,22 +610,22 @@ class Osaca(object):
         # Check the output alignment depending on the longest instruction
         if(self.longestInstr > 70):
             self.longestInstr = 70
-        horizLine = self.create_horiz_sep()
+        horiz_line = self.create_horiz_sep()
         # Write general information about the benchmark
-        output = ('--' + horizLine + '\n'
+        output = ('--' + horiz_line + '\n'
                   + '| Analyzing of file:\t' + os.path.abspath(self.filepath) + '\n'
                   + '| Architecture:\t\t' + self.arch + '\n'
                   + '| Timestamp:\t\t' + datetime.now().strftime('%Y-%m-%d %H:%M:%S') + '\n')
         if(tp_list):
-            output += self.create_TP_list(horizLine)
+            output += self.create_tp_list(horiz_line)
         if(pr_sched):
             output += '\n\n'
-            sched = Scheduler(self.arch, self.instrForms)
-            schedOutput, portBinding = sched.schedule()
-            binding = sched.get_port_binding(portBinding)
-            output += sched.get_report_info() + '\n' + binding + '\n\n' + schedOutput
-            blockTP = round(max(portBinding), 2)
-            output += 'Total number of estimated throughput: ' + str(blockTP)
+            sched = Scheduler(self.arch, self.instr_forms)
+            sched_output, port_binding = sched.schedule()
+            binding = sched.get_port_binding(port_binding)
+            output += sched.get_report_info() + '\n' + binding + '\n\n' + sched_output
+            block_tp = round(max(port_binding), 2)
+            output += 'Total number of estimated throughput: ' + str(block_tp)
         return output
 
     def create_horiz_sep(self):
@@ -639,13 +639,13 @@ class Osaca(object):
         """
         return '-'*(self.longestInstr+8)
 
-    def create_TP_list(self, horizLine):
+    def create_tp_list(self, horiz_line):
         """
         Create list of instruction forms with the proper throughput value.
 
         Parameter
         ---------
-        horizLine : str
+        horiz_line : str
             Calculated horizontal line for nice alignement
 
         Returns
@@ -654,13 +654,13 @@ class Osaca(object):
             Throughput list output for printing
         """
         warning = False
-        ws = ' '*(len(horizLine)-23)
+        ws = ' '*(len(horiz_line)-23)
 
         output = ('\n| INSTRUCTION' + ws + 'CLOCK CYCLES\n'
-                  + '| ' + horizLine + '\n|\n')
+                  + '| ' + horiz_line + '\n|\n')
         # Check for the throughput data in CSV
-        for elem in self.instrForms:
-            opExt = []
+        for elem in self.instr_forms:
+            op_ext = []
             for i in range(1, len(elem)-1):
                 optmp = ''
                 if(isinstance(elem[i], Register) and elem[i].reg_type == 'GPR'):
@@ -669,8 +669,8 @@ class Osaca(object):
                     optmp = 'mem'
                 else:
                     optmp = str(elem[i]).lower()
-                opExt.append(optmp)
-            operands = '_'.join(opExt)
+                op_ext.append(optmp)
+            operands = '_'.join(op_ext)
             # Now look up the value in the dataframe
             # Check if there is a stored throughput value in database
             import warnings
@@ -678,7 +678,7 @@ class Osaca(object):
             series = self.df['instr'].str.contains(elem[0] + '-' + operands)
             if(True in series.values):
                 # It's a match!
-                notFound = False
+                not_found = False
                 try:
                     tp = self.df[self.df.instr == elem[0] + '-' + operands].TP.values[0]
                 except IndexError:
@@ -688,51 +688,51 @@ class Osaca(object):
             # Did not found the exact instruction form.
             # Try to find the instruction form for register operands only
             else:
-                opExtRegs = []
-                for operand in opExt:
+                op_ext_regs = []
+                for operand in op_ext:
                     try:
                         # regTmp = Register(operand)
                         # Create Register only to see if it is one
                         Register(operand)
-                        opExtRegs.append(True)
+                        op_ext_regs.append(True)
                     except KeyError:
-                        opExtRegs.append(False)
-                if(True not in opExtRegs):
+                        op_ext_regs.append(False)
+                if(True not in op_ext_regs):
                     # No register in whole instr form. How can I find out what regsize we need?
                     print('Feature not included yet: ', end='')
                     print(elem[0]+' for '+operands)
                     tp = 0
-                    notFound = True
+                    not_found = True
                     warning = True
-                    numWhitespaces = self.longestInstr-len(elem[-1])
-                    ws = ' '*numWhitespaces+'|  '
-                    n_f = ' '*(5-len(str(tp)))+'*'
-                    data = '| '+elem[-1]+ws+str(tp)+n_f+'\n'
+                    num_whitespaces = self.longestInstr-len(elem[-1])
+                    ws = ' ' * num_whitespaces + '|  '
+                    n_f = ' ' * (5 - len(str(tp))) + '*'
+                    data = '| ' + elem[-1] + ws + str(tp) + n_f + '\n'
                     output += data
                     continue
-                if(opExtRegs[0] is False):
+                if(op_ext_regs[0] is False):
                     # Instruction stores result in memory. Check for storing in register instead.
-                    if(len(opExt) > 1):
-                        if(opExtRegs[1] is True):
-                            opExt[0] = opExt[1]
-                        elif(len(opExt > 2)):
-                            if(opExtRegs[2] is True):
-                                opExt[0] = opExt[2]
-                if(len(opExtRegs) == 2 and opExtRegs[1] is False):
+                    if(len(op_ext) > 1):
+                        if(op_ext_regs[1] is True):
+                            op_ext[0] = op_ext[1]
+                        elif(len(op_ext > 2)):
+                            if(op_ext_regs[2] is True):
+                                op_ext[0] = op_ext[2]
+                if(len(op_ext_regs) == 2 and op_ext_regs[1] is False):
                     # Instruction loads value from memory and has only two operands. Check for
                     # loading from register instead
-                    if(opExtRegs[0] is True):
-                        opExt[1] = opExt[0]
-                if(len(opExtRegs) == 3 and opExtRegs[2] is False):
+                    if(op_ext_regs[0] is True):
+                        op_ext[1] = op_ext[0]
+                if(len(op_ext_regs) == 3 and op_ext_regs[2] is False):
                     # Instruction loads value from memory and has three operands. Check for loading
                     # from register instead
-                    opExt[2] = opExt[0]
-                operands = '_'.join(opExt)
+                    op_ext[2] = op_ext[0]
+                operands = '_'.join(op_ext)
                 # Check for register equivalent instruction
                 series = self.df['instr'].str.contains(elem[0]+'-'+operands)
                 if(True in series.values):
                     # It's a match!
-                    notFound = False
+                    not_found = False
                     try:
                         tp = self.df[self.df.instr == elem[0]+'-'+operands].TP.values[0]
                     except IndexError:
@@ -743,20 +743,20 @@ class Osaca(object):
                 # throughput 0
                 else:
                     tp = 0
-                    notFound = True
+                    not_found = True
                     warning = True
             # Check the alignement again
-            numWhitespaces = self.longestInstr-len(elem[-1])
-            ws = ' '*numWhitespaces+'|  '
+            num_whitespaces = self.longestInstr - len(elem[-1])
+            ws = ' ' * num_whitespaces + '|  '
             n_f = ''
-            if(notFound):
-                n_f = ' '*(5-len(str(tp)))+'*'
-            data = '| '+elem[-1]+ws+'{:3.2f}'.format(tp)+n_f+'\n'
+            if(not_found):
+                n_f = ' ' * (5 - len(str(tp))) + '*'
+            data = '| ' + elem[-1] + ws + '{:3.2f}'.format(tp) + n_f + '\n'
             output += data
         # Finally end the list of  throughput values
-        numWhitespaces = self.longestInstr-27
-        ws = '  '+' '*numWhitespaces
-        output += '| '+horizLine+'\n'
+        num_whitespaces = self.longestInstr - 27
+        ws = '  ' + ' ' * num_whitespaces
+        output += '| ' + horiz_line + '\n'
         if(warning):
             output += ('\n\n* There was no throughput value found '
                        'for the specific instruction form.'
@@ -812,17 +812,17 @@ def main():
     if(inp.arch is not None):
         arch = inp.arch.upper()
     filepath = inp.filepath
-    inclIbench = inp.incl
-    iacaFlag = inp.iaca
+    incl_ibench = inp.incl
+    iaca_flag = inp.iaca
     insert_m = inp.insert_marker
 
     # Create Osaca object
     if(inp.arch is not None):
         osaca = Osaca(arch, filepath)
 
-    if(inclIbench):
+    if(incl_ibench):
         osaca.include_ibench()
-    elif(iacaFlag):
+    elif(iaca_flag):
         osaca.inspect_with_iaca()
     elif(insert_m):
         try:
