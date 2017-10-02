@@ -78,7 +78,7 @@ class Osaca(object):
             clk_cyc = line.split()[1]
             clk_cyc_tmp = clk_cyc
             clk_cyc = self.validate_val(clk_cyc, instr, True if (clmn == 'TP') else False,
-                                     cyc_list, reci_list)
+                                        cyc_list, reci_list)
             txt_output = True if (clk_cyc_tmp == clk_cyc) else False
             val = -2
             new = False
@@ -357,7 +357,8 @@ class Osaca(object):
                 # Value is probably correct, so round it to the estimated value
                 return cyc_list[i]
             # Check reciprocal only if it is a throughput value
-            elif(is_tp and reci_list[i]*1.05 > float(clk_cyc) and reci_list[i]*0.95 < float(clk_cyc)):
+            elif(is_tp and reci_list[i]*1.05 > float(clk_cyc)
+                 and reci_list[i]*0.95 < float(clk_cyc)):
                 # Value is probably correct, so round it to the estimated value
                 return reci_list[i]
         # No value close to an integer or its reciprocal found, we assume the
