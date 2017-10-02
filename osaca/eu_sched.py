@@ -299,6 +299,7 @@ class Scheduler(object):
 
 
 if __name__ == '__main__':
+    print('Nothing to do.')
     # data = [
     # ['lea',Register('RAX'),MemAddr('%edx,(%rax,%rax,1)'),'lea    0x1(%rax,%rax,1),%edx'],
     # ['vcvtsi2ss',Register('XMM0'),Register('XMM0'),Register('RAX'),'vcvtsi2ss %edx,%xmm2,%xmm2'],
