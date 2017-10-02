@@ -177,16 +177,16 @@ class Testcase(object):
             String tuple for push, pop and initalisation operations
         """
 
-        gprPush = ''
-        gprPop = ''
-        zeroGPR = ''
+        gpr_push = ''
+        gpr_pop = ''
+        zero_gpr = ''
         for reg in self.gprs64:
-            gprPush += '\t\tpush    {}\n'.format(reg)
+            gpr_push += '\t\tpush    {}\n'.format(reg)
         for reg in reversed(self.gprs64):
-            gprPop += '\t\tpop     {}\n'.format(reg)
+            gpr_pop += '\t\tpop     {}\n'.format(reg)
         for reg in self.gprs64:
-            zeroGPR += '\t\txor     {}, {}\n'.format(reg, reg)
-        return (gprPush, gprPop, zeroGPR)
+            zero_gpr += '\t\txor     {}, {}\n'.format(reg, reg)
+        return (gpr_push, gpr_pop, zero_gpr)
 
 
 # Copy created values in specific register
