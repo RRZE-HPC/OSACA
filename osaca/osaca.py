@@ -1,9 +1,12 @@
 #!/usr/bin/python
 
 import argparse
-import sys, os, io, re
-import subprocess 
-from  param import Register, MemAddr, Parameter
+import sys
+import os
+import io
+import re
+import subprocess
+from param import Register, MemAddr, Parameter
 from eu_sched import Scheduler
 from testcase import Testcase
 import pandas as pd
@@ -29,23 +32,22 @@ class Osaca(object):
     ASM_LINE = re.compile(r'\s[0-9a-f]+[:]')
     # Matches every variation of the IACA start marker
     IACA_SM = re.compile(r'\s*movl[ \t]+\$111[ \t]*,[ \t]*%ebx[ \t]*\n\s*\.byte[ \t]+100[ \t]*'
-                        +r'((,[ \t]*103[ \t]*((,[ \t]*144)|(\n\s*\.byte[ \t]+144)))|(\n\s*\.byte'
-                        +r'[ \t]+103[ \t]*((,[ \t]*144)|(\n\s*\.byte[ \t]+144))))')
+                         + r'((,[ \t]*103[ \t]*((,[ \t]*144)|(\n\s*\.byte[ \t]+144)))|(\n\s*\.byte'
+                         + r'[ \t]+103[ \t]*((,[ \t]*144)|(\n\s*\.byte[ \t]+144))))')
     # Matches every variation of the IACA end marker
     IACA_EM = re.compile(r'\s*movl[ \t]+\$222[ \t]*,[ \t]*%ebx[ \t]*\n\s*\.byte[ \t]+100[ \t]*'
-                        +r'((,[ \t]*103[ \t]*((,[ \t]*144)|(\n\s*\.byte[ \t]+144)))|(\n\s*\.byte'
-                        +r'[ \t]+103[ \t]*((,[ \t]*144)|(\n\s*\.byte[ \t]+144))))')
+                         + r'((,[ \t]*103[ \t]*((,[ \t]*144)|(\n\s*\.byte[ \t]+144)))|(\n\s*\.byte'
+                         + r'[ \t]+103[ \t]*((,[ \t]*144)|(\n\s*\.byte[ \t]+144))))')
 
     def __init__(self, _arch, _filepath):
         self.arch = _arch
         self.filepath = _filepath
         self.instrForms = []
 
-
-    ##-----------------main functions depending on arguments--------------------
+    # -----------------main functions depending on arguments--------------------
     def include_ibench(self):
         """
-        Reads ibench output and includes it in the architecture specific csv 
+        Reads ibench output and includes it in the architecture specific csv
         file.
         """
         # Check args and exit program if something's wrong
@@ -58,7 +60,7 @@ class Osaca(object):
         # Check for database for the chosen architecture
         self.df = self.read_csv()
         # Create sequence of numbers and their reciprokals for validate the measurements
-        cycList,reciList = self.create_sequences() 
+        cycList, reciList = self.create_sequences()
         print('Everything seems fine! Let\'s start!')
         newData = []
         addedValues = 0
@@ -68,26 +70,26 @@ class Osaca(object):
             clmn = 'LT'
             instr = line.split()[0][:-1]
             if('TP' in line):
-                # We found a command with a throughput value. Get instruction and the number of 
+                # We found a command with a throughput value. Get instruction and the number of
                 # clock cycles and remove the '-TP' suffix.
                 clmn = 'TP'
                 instr = instr[:-3]
             # Otherwise it is a latency value. Nothing to do.
             clkC = line.split()[1]
             clkC_tmp = clkC
-            clkC = self.validate_val(clkC, instr, True if (clmn == 'TP') else False, 
-                                    cycList, reciList)
+            clkC = self.validate_val(clkC, instr, True if (clmn == 'TP') else False,
+                                     cycList, reciList)
             txtOutput = True if (clkC_tmp == clkC) else False
             val = -2
             new = False
             try:
-                entry = self.df.loc[lambda df, inst=instr: df.instr == inst,clmn]
+                entry = self.df.loc[lambda df, inst=instr: df.instr == inst, clmn]
                 val = entry.values[0]
             except IndexError:
                 # Instruction not in database yet --> add it
                 new = True
                 # First check if LT or TP value has already been added before
-                for i,item in enumerate(newData):
+                for i, item in enumerate(newData):
                     if(instr in item):
                         if(clmn == 'TP'):
                             newData[i][1] = clkC
@@ -96,9 +98,9 @@ class Osaca(object):
                         new = False
                         break
                 if(new and clmn == 'TP'):
-                    newData.append([instr,clkC,'-1',((-1,),)])
+                    newData.append([instr, clkC, '-1', ((-1,),)])
                 elif(new and clmn == 'LT'):
-                    newData.append([instr,'-1',clkC,((-1,),)])              
+                    newData.append([instr, '-1', clkC, ((-1,),)])
                 new = True
                 addedValues += 1
             # If val is -1 (= not filled with a valid value) add it immediately
@@ -108,20 +110,20 @@ class Osaca(object):
                 continue
             if(not new and abs((val/np.float64(clkC))-1) > 0.05):
                 print('Different measurement for {} ({}): {}(old) vs. '.format(instr, clmn, val)
-                     +'{}(new)\nPlease check for correctness (no changes were made).'.format(clkC))
+                      + '{}(new)\nPlease check for correctness '.format(clkC)
+                      + '(no changes were made).')
                 txtOutput = True
             if(txtOutput):
                 print()
                 txtOutput = False
         # Now merge the DataFrames and write new csv file
-        self.df = self.df.append(pd.DataFrame(newData, columns=['instr','TP','LT','ports']),
-                                ignore_index=True)
+        self.df = self.df.append(pd.DataFrame(newData, columns=['instr', 'TP', 'LT', 'ports']),
+                                 ignore_index=True)
         csv = self.df.to_csv(index=False)
         self.write_csv(csv)
         print('ibench output {} '.format(self.filepath.split('/')[-1])
-             +'successfully in database included.')
+              + 'successfully in database included.')
         print('{} values were added.'.format(addedValues))
-
 
     def inspect_binary(self):
         """
@@ -136,16 +138,15 @@ class Osaca(object):
             sys.exit()
         # Finally check for database for the chosen architecture
         self.read_csv()
-    
+
         print('Everything seems fine! Let\'s start checking!')
-        for i,line in enumerate(self.srcCode):
+        for i, line in enumerate(self.srcCode):
             if(i == 0):
                 self.check_line(line, True)
             else:
                 self.check_line(line)
         output = self.create_output()
         print(output)
-    
 
     def inspect_with_iaca(self):
         """
@@ -162,14 +163,14 @@ class Osaca(object):
             if(not self.check_elffile()):
                 print('Invalid file path or file format.')
                 sys.exit()
-        except (TypeError,IndexError):
+        except (TypeError, IndexError):
             binaryFile = False
             if(not self.check_file(True)):
                 print('Invalid file path or file format.')
-                sys.exit()       
+                sys.exit()
         # Finally check for database for the chosen architecture
         self.read_csv()
-    
+
         print('Everything seems fine! Let\'s start checking!')
         if(binaryFile):
             self.iaca_bin()
@@ -177,8 +178,8 @@ class Osaca(object):
             self.iaca_asm()
         output = self.create_output()
         print(output)
-    
-    ##--------------------------------------------------------------------------
+
+    # --------------------------------------------------------------------------
 
     def check_arch(self):
         """
@@ -189,18 +190,17 @@ class Osaca(object):
         bool
             True    if arch is supported
             False   if arch is not supported
-    
+
         """
-        archList = ['SNB','IVB','HSW', 'BDW', 'SKL']
+        archList = ['SNB', 'IVB', 'HSW', 'BDW', 'SKL']
         if(self.arch in archList):
             return True
         else:
             return False
-    
 
     def check_elffile(self):
         """
-        Check if the given filepath exists, if the format is the needed elf64  
+        Check if the given filepath exists, if the format is the needed elf64
         and store file data in attribute srcCode.
 
         Returns
@@ -216,49 +216,47 @@ class Osaca(object):
                 return True
         return False
 
-
-    def check_file(self,iacaFlag=False):
+    def check_file(self, iacaFlag=False):
         """
         Check if the given filepath exists and store file data in attribute
         srcCode.
-        
+
         Parameters
         ----------
-        iacaFlag : bool 
+        iacaFlag : bool
             store file data as a string in attribute srcCode if True,
             store it as a list of strings (lines) if False (default False)
-    
+
         Returns
         -------
         bool
             True    if file exists
             False   if file does not exist
-    
+
         """
         if(os.path.isfile(self.filepath)):
             self.store_srcCode(iacaFlag)
             return True
         return False
-    
+
     def store_srcCode_elf(self):
         """
         Load binary file compiled with '-g' in class attribute srcCode and
         separate by line.
         """
-        self.srcCode = (subprocess.run(['objdump', '--source', self.filepath], 
-                                      stdout=subprocess.PIPE).stdout.decode('utf-8').split('\n'))
-    
-    
-    def store_srcCode(self,iacaFlag=False):
+        self.srcCode = (subprocess.run(['objdump', '--source', self.filepath],
+                                       stdout=subprocess.PIPE).stdout.decode('utf-8').split('\n'))
+
+    def store_srcCode(self, iacaFlag=False):
         """
         Load arbitrary file in class attribute srcCode.
-    
+
         Parameters
         ----------
-        iacaFlag : bool 
+        iacaFlag : bool
                 store file data as a string in attribute srcCode if True,
                 store it as a list of strings (lines) if False (default False)
-        """    
+        """
         try:
             f = open(self.filepath, 'r')
         except IOError:
@@ -271,11 +269,10 @@ class Osaca(object):
             return
         self.srcCode = self.srcCode.split('\n')
 
-
     def read_csv(self):
         """
         Reads architecture dependent CSV from data directory.
-    
+
         Returns
         -------
         DataFrame
@@ -285,11 +282,10 @@ class Osaca(object):
         df = pd.read_csv(currDir+'/data/'+self.arch.lower()+'_data.csv')
         return df
 
-
-    def write_csv(self,csv):
+    def write_csv(self, csv):
         """
         Writes architecture dependent CSV into data directory.
-    
+
         Parameters
         ----------
         csv : str
@@ -301,18 +297,16 @@ class Osaca(object):
             print('IOError: file \'{}\' not found in ./data'.format(self.arch.lower()+'_data.csv'))
         f.write(csv)
         f.close()
-    
 
-
-    def create_sequences(self,end=101):
+    def create_sequences(self, end=101):
         """
         Creates list of integers from 1 to end and list of their reciprocals.
-    
+
         Parameters
         ----------
-        end : int 
+        end : int
             End value for list of integers (default 101)
-    
+
         Returns
         -------
         [int]
@@ -325,18 +319,17 @@ class Osaca(object):
         for i in range(1, end):
             cycList.append(i)
             reciList.append(1/i)
-        return cycList,reciList
+        return cycList, reciList
 
-
-    def validate_val(self,clkC, instr, isTP, cycList, reciList):
+    def validate_val(self, clkC, instr, isTP, cycList, reciList):
         """
         Validate given clock cycle clkC and return rounded value in case of
         success.
-    
+
         A succeeded validation means the clock cycle clkC is only 5% higher or
         lower than an integer value from cycList or - if clkC is a throughput
         value - 5% higher or lower than a reciprocal from the reciList.
-    
+
         Parameters
         ----------
         clkC : float
@@ -349,11 +342,11 @@ class Osaca(object):
             Cycle list for validating
         reciList : [float]
             Reciprocal cycle list for validating
-    
+
         Returns
         -------
         float
-            Clock cycle, either rounded to an integer or its reciprocal or the 
+            Clock cycle, either rounded to an integer or its reciprocal or the
             given clkC parameter
         """
         clmn = 'LT'
@@ -370,15 +363,14 @@ class Osaca(object):
         # No value close to an integer or its reciprocal found, we assume the
         # measurement is incorrect
         print('Your measurement for {} ({}) is probably wrong. '.format(instr, clmn)
-            +'Please inspect your benchmark!')
+              + 'Please inspect your benchmark!')
         print('The program will continue with the given value')
         return clkC
 
-
-    def check_line(self,line,firstAppearance=False):
+    def check_line(self, line, firstAppearance=False):
         """
         Inspect line of source code and process it if inside the marked snippet.
-        
+
         Parameter
         ---------
         line : str
@@ -407,17 +399,16 @@ class Osaca(object):
             elif((re.split(r'\S', line)[0]).count(self.indentChar) <= self.numSeps):
                 # Not in the loop anymore - or yet. We decrement the semaphore
                 self.sem = self.sem-1
-        
 
-    def get_indent_chars(self,line):
+    def get_indent_chars(self, line):
         """
         Check if indentation characters are either tabulators or whitespaces
-    
+
         Parameters
         ----------
         line : str
             Line with start marker in it
-    
+
         Returns
         -------
         str
@@ -432,8 +423,7 @@ class Osaca(object):
         else:
             err_msg = 'Indentation of code is only supported for whitespaces and tabs.'
             raise NotImplementedError(err_msg)
-    
-   
+
     def iaca_bin(self):
         """
         Extract instruction forms out of binary file using IACA markers.
@@ -459,8 +449,7 @@ class Osaca(object):
                 # After removing the last line which belongs to the IACA marker
                 del self.instrForms[-1:]
                 return
-                
-    
+
     def iaca_asm(self):
         """
         Extract instruction forms out of assembly file using IACA markers.
@@ -470,15 +459,15 @@ class Osaca(object):
         # Search for the start marker
         match = re.match(self.IACA_SM, code)
         while(not match):
-            code = code.split('\n',1)[1]
+            code = code.split('\n', 1)[1]
             match = re.match(self.IACA_SM, code)
         # Search for the end marker
-        code = (code.split('144',1)[1]).split('\n',1)[1]
+        code = (code.split('144', 1)[1]).split('\n', 1)[1]
         res = ''
         match = re.match(self.IACA_EM, code)
         while(not match):
-            res += code.split('\n',1)[0]+'\n'
-            code = code.split('\n',1)[1]
+            res += code.split('\n', 1)[0]+'\n'
+            code = code.split('\n', 1)[1]
             match = re.match(self.IACA_EM, code)
         # Split the result by line go on like with OSACA markers
         res = res.split('\n')
@@ -488,13 +477,12 @@ class Osaca(object):
             if(len(line) == 0 or '//' in line or line.startswith('..')):
                 continue
             self.check_instr(line)
-    
 
-    def check_instr(self,instr):
+    def check_instr(self, instr):
         """
-        Inspect instruction for its parameters and add it to the instruction forms 
+        Inspect instruction for its parameters and add it to the instruction forms
         pool instrForm.
-    
+
         Parameters
         ----------
         instr : str
@@ -513,7 +501,7 @@ class Osaca(object):
         # Check if there's one or more operands and store all in a list
         param_list = self.flatten(self.separate_params(params))
         param_list_types = list(param_list)
-        # Check operands and separate them by IMMEDIATE (IMD), REGISTER (REG), 
+        # Check operands and separate them by IMMEDIATE (IMD), REGISTER (REG),
         # MEMORY (MEM) or LABEL(LBL)
         for i in range(len(param_list)):
             op = param_list[i]
@@ -543,22 +531,21 @@ class Osaca(object):
         # Do this in reversed param list order, du to the fact it's intel syntax
         # Only create benchmark if no label (LBL) is part of the operands
         if('LBL' in param_list or '' in param_list):
-            return 
+            return
         tc = Testcase(mnemonic, list(reversed(param_list_types)), '64')
         # Only write a testcase if it not already exists
         writeTP, writeLT = tc.is_in_dir()
         tc.write_testcase(not writeTP, not writeLT)
-    
 
-    def separate_params(self,params):
+    def separate_params(self, params):
         """
         Delete comments, separates parameters and return them as a list.
-    
+
         Parameters
         ----------
         params : str
             Splitted line after mnemonic
-    
+
         Returns
         -------
         [[...[str]]]
@@ -576,21 +563,21 @@ class Osaca(object):
                     i = params.index(',')
             else:
                 i = params.index(',')
-            param_list = [params[:i],self.separate_params(params[i+1:])]
+            param_list = [params[:i], self.separate_params(params[i+1:])]
         elif('#' in params):
             i = params.index('#')
             param_list = [params[:i]]
         return param_list
-    
-    def flatten(self,l):
+
+    def flatten(self, l):
         """
         Flatten a nested list of strings.
-    
+
         Parameters
         ----------
         l : [[...[str]]]
             Nested list of strings
-    
+
         Returns
         -------
         [str]
@@ -601,21 +588,20 @@ class Osaca(object):
         if(isinstance(l[0], list)):
             return self.flatten(l[0]) + self.flatten(l[1:])
         return l[:1] + self.flatten(l[1:])
-    
-   
-    def create_output(self,tp_list=False,pr_sched=True):    
+
+    def create_output(self, tp_list=False, pr_sched=True):
         """
         Creates output of analysed file including a time stamp.
-    
+
         Parameters
         ----------
         tp_list : bool
-            Boolean for indicating the need for the throughput list as output 
+            Boolean for indicating the need for the throughput list as output
             (default False)
         pr_sched : bool
-            Boolean for indicating the need for predicting a scheduling 
+            Boolean for indicating the need for predicting a scheduling
             (default True)
-    
+
         Returns
         -------
         str
@@ -626,45 +612,42 @@ class Osaca(object):
             self.longestInstr = 70
         horizLine = self.create_horiz_sep()
         # Write general information about the benchmark
-        output = (  '--'+horizLine+'\n'
-                    '| Analyzing of file:\t'+os.path.abspath(self.filepath)+'\n'
-                    '| Architecture:\t\t'+self.arch+'\n'
-                    '| Timestamp:\t\t'+datetime.now().strftime('%Y-%m-%d %H:%M:%S')+'\n')
-    
+        output = ('--' + horizLine + '\n'
+                  + '| Analyzing of file:\t' + os.path.abspath(self.filepath) + '\n'
+                  + '| Architecture:\t\t' + self.arch + '\n'
+                  + '| Timestamp:\t\t' + datetime.now().strftime('%Y-%m-%d %H:%M:%S') + '\n')
         if(tp_list):
             output += self.create_TP_list(horizLine)
         if(pr_sched):
             output += '\n\n'
-            sched = Scheduler(self.arch, self.instrForms) 
-            schedOutput,portBinding = sched.schedule()
+            sched = Scheduler(self.arch, self.instrForms)
+            schedOutput, portBinding = sched.schedule()
             binding = sched.get_port_binding(portBinding)
-            output += sched.get_report_info()+'\n'+binding+'\n\n'+schedOutput
+            output += sched.get_report_info() + '\n' + binding + '\n\n' + schedOutput
             blockTP = round(max(portBinding), 2)
-            output += 'Total number of estimated throughput: '+str(blockTP)
+            output += 'Total number of estimated throughput: ' + str(blockTP)
         return output
-    
-    
+
     def create_horiz_sep(self):
         """
         Calculate and return horizontal separator line.
-    
+
         Returns
         -------
         str
             Horizontal separator line
         """
         return '-'*(self.longestInstr+8)
-    
-    
-    def create_TP_list(self,horizLine):        
+
+    def create_TP_list(self, horizLine):
         """
         Create list of instruction forms with the proper throughput value.
-    
+
         Parameter
         ---------
         horizLine : str
             Calculated horizontal line for nice alignement
-    
+
         Returns
         -------
         str
@@ -672,9 +655,9 @@ class Osaca(object):
         """
         warning = False
         ws = ' '*(len(horizLine)-23)
-    
-        output =   ('\n| INSTRUCTION'+ws+'CLOCK CYCLES\n'
-                    '| '+horizLine+'\n|\n')
+
+        output = ('\n| INSTRUCTION' + ws + 'CLOCK CYCLES\n'
+                  + '| ' + horizLine + '\n|\n')
         # Check for the throughput data in CSV
         for elem in self.instrForms:
             opExt = []
@@ -692,12 +675,12 @@ class Osaca(object):
             # Check if there is a stored throughput value in database
             import warnings
             warnings.filterwarnings("ignore", 'This pattern has match groups')
-            series = self.df['instr'].str.contains(elem[0]+'-'+operands)
-            if( True in series.values):
+            series = self.df['instr'].str.contains(elem[0] + '-' + operands)
+            if(True in series.values):
                 # It's a match!
                 notFound = False
                 try:
-                    tp = self.df[self.df.instr == elem[0]+'-'+operands].TP.values[0]
+                    tp = self.df[self.df.instr == elem[0] + '-' + operands].TP.values[0]
                 except IndexError:
                     # Something went wrong
                     print('Error while fetching data from database')
@@ -721,7 +704,6 @@ class Osaca(object):
                     tp = 0
                     notFound = True
                     warning = True
-    
                     numWhitespaces = self.longestInstr-len(elem[-1])
                     ws = ' '*numWhitespaces+'|  '
                     n_f = ' '*(5-len(str(tp)))+'*'
@@ -748,12 +730,11 @@ class Osaca(object):
                 operands = '_'.join(opExt)
                 # Check for register equivalent instruction
                 series = self.df['instr'].str.contains(elem[0]+'-'+operands)
-                if( True in series.values):
+                if(True in series.values):
                     # It's a match!
                     notFound = False
                     try:
                         tp = self.df[self.df.instr == elem[0]+'-'+operands].TP.values[0]
-    
                     except IndexError:
                         # Something went wrong
                         print('Error while fetching data from database')
@@ -782,9 +763,9 @@ class Osaca(object):
                        '\n  Please create a testcase via the create_testcase-method '
                        'or add a value manually.')
         return output
-  
 
-##------------------------------------------------------------------------------
+
+# ------------------------------------------------------------------------------
 # Stolen from pip
 def __read(*names, **kwargs):
     with io.open(
@@ -797,30 +778,32 @@ def __read(*names, **kwargs):
 # Stolen from pip
 def __find_version(*file_paths):
     version_file = __read(*file_paths)
-    version_match = re.search(r"^__version__ = ['\"]([^'\"]*)['\"]",version_file, re.M)
+    version_match = re.search(r"^__version__ = ['\"]([^'\"]*)['\"]", version_file, re.M)
     if version_match:
         return version_match.group(1)
-    raise RuntimeError("Unable to find version string.")
+    raise RuntimeError('Unable to find version string.')
 
 
-##------------Main method--------------
+# ------------Main method--------------
 def main():
     # Parse args
     parser = argparse.ArgumentParser(description='Analyzes a marked innermost loop snippet'
-                +'for a given architecture type and prints out the estimated average throughput')
+                                     + 'for a given architecture type and prints out the estimated'
+                                     + 'average throughput.')
     parser.add_argument('-V', '--version', action='version', version='%(prog)s '
-                        +__find_version('__init__.py'))
+                        + __find_version('__init__.py'))
     parser.add_argument('--arch', dest='arch', type=str, help='define architecture '
-                                                             +'(SNB, IVB, HSW, BDW, SKL)')
+                                                              + '(SNB, IVB, HSW, BDW, SKL)')
     parser.add_argument('filepath', type=str, help='path to object (Binary, ASM, CSV)')
     group = parser.add_mutually_exclusive_group(required=False)
-    group.add_argument('-i', '--include-ibench', dest='incl', action='store_true', 
-                help='includes the given values in form of the output of ibench in the database')
-    group.add_argument('--iaca', dest='iaca', action='store_true', 
-                help='search for IACA markers instead the OSACA marker')
-    group.add_argument('-m', '--insert-marker', dest='insert_marker', action='store_true', 
-                help='try to find blocks probably corresponding to loops in assembly and insert '
-                    +'IACA marker')
+    group.add_argument('-i', '--include-ibench', dest='incl', action='store_true',
+                       help='includes the given values in form of the output of ibench in the'
+                            + 'database')
+    group.add_argument('--iaca', dest='iaca', action='store_true',
+                       help='search for IACA markers instead the OSACA marker')
+    group.add_argument('-m', '--insert-marker', dest='insert_marker', action='store_true',
+                       help='try to find blocks probably corresponding to loops in assembly and'
+                       + 'insert IACA marker')
 
     # Store args in global variables
     inp = parser.parse_args()
@@ -836,7 +819,7 @@ def main():
     # Create Osaca object
     if(inp.arch is not None):
         osaca = Osaca(arch, filepath)
-    
+
     if(inclIbench):
         osaca.include_ibench()
     elif(iacaFlag):
@@ -846,8 +829,8 @@ def main():
             from kerncraft import iaca
         except ImportError:
             print('ImportError: Module kerncraft not installed. Use '
-                 +'\'pip install --user kerncraft\' for installation.\nFor more information see '
-                 +'https://github.com/RRZE-HPC/kerncraft')
+                  + '\'pip install --user kerncraft\' for installation.\nFor more information see '
+                  + 'https://github.com/RRZE-HPC/kerncraft')
             sys.exit()
         iaca.iaca_instrumentation(input_file=filepath, output_file=filepath,
                                   block_selection='manual', pointer_increment=1)
@@ -855,6 +838,6 @@ def main():
         osaca.inspect_binary()
 
 
-##------------Main method--------------
+# ------------Main method--------------
 if __name__ == '__main__':
     main()
