@@ -6,7 +6,7 @@ from testcase import Testcase
 from param import Register, MemAddr, Parameter
 
 
-class Instr_extractor(object):
+class InstrExtractor(object):
     filepaths = []
     # Variables for checking lines
     numSeps = 0
@@ -35,14 +35,14 @@ class Instr_extractor(object):
                 return True
             return False
 
-    def extract_instr(self, asmFile):
+    def extract_instr(self, asm_file):
         # Check if parameter is in the correct file format
-        if(not self.is_elffile(asmFile)):
+        if(not self.is_elffile(asm_file)):
             print('Invalid argument')
             return
         # Open file
         try:
-            f = open(asmFile, 'r')
+            f = open(asm_file, 'r')
         except IOError:
             print('IOError: File not found')
         # Analyse code line by line and check the instructions
@@ -77,11 +77,11 @@ class Instr_extractor(object):
 
     # Check if seperator is either tabulator or whitespace
     def set_counter_char(self, line):
-        numSpaces = (re.split(self.MARKER, line)[0]).count(' ')
-        numTabs = (re.split(self.MARKER, line)[0]).count('\t')
-        if(numSpaces != 0 and numTabs == 0):
+        num_spaces = (re.split(self.MARKER, line)[0]).count(' ')
+        num_tabs = (re.split(self.MARKER, line)[0]).count('\t')
+        if(num_spaces != 0 and num_tabs == 0):
             self.cntChar = ' '
-        elif(numSpaces == 0 and numTabs != 0):
+        elif(num_spaces == 0 and num_tabs != 0):
             self.cntChar = '\t'
         else:
             err_msg = 'Indentation of code is only supported for whitespaces and tabs.'
@@ -100,7 +100,7 @@ class Instr_extractor(object):
             return
         # Check if there's one or more operand and store all in a list
         param_list = self.flatten(self.separate_params(params))
-        opList = list(param_list)
+        op_list = list(param_list)
         # Check operands and seperate them by IMMEDIATE (IMD), REGISTER (REG), MEMORY (MEM) or
         # LABEL (LBL)
         for i in range(len(param_list)):
@@ -121,7 +121,7 @@ class Instr_extractor(object):
             else:
                 op = MemAddr(op)
             param_list[i] = str(op) if (type(op) is not Register) else str(op)+str(op.size)
-            opList[i] = op
+            op_list[i] = op
         # Join mnemonic and operand(s) to an instruction form
         if(len(mnemonic) > 7):
             tabs = '\t'
@@ -136,12 +136,12 @@ class Instr_extractor(object):
             # Create testcase for instruction form, since it is the first appearance of it
             # Only create benchmark if no label (LBL) is part of the operands
             do_bench = True
-            for par in opList:
+            for par in op_list:
                 if(str(par) == 'LBL' or str(par) == ''):
                     do_bench = False
             if(do_bench):
                 # Create testcase with reversed param list, due to the fact its intel syntax!
-                tc = Testcase(mnemonic, list(reversed(opList)), '64')
+                tc = Testcase(mnemonic, list(reversed(op_list)), '64')
                 tc.write_testcase()
 
     def separate_params(self, params):
@@ -193,13 +193,13 @@ class Instr_extractor(object):
             if(len(mnemonic) > 7):
                 tabs = '\t'
                 params = line.split('\t')[1]
-                numCalls = line.split('\t')[2][:-1]
+                num_calls = line.split('\t')[2][:-1]
             else:
                 tabs = '\t\t'
                 params = line.split('\t')[2]
-                numCalls = line.split('\t')[3][:-1]
+                num_calls = line.split('\t')[3][:-1]
             instr_form = mnemonic+tabs+params
-            self.db[instr_form] = int(numCalls)
+            self.db[instr_form] = int(num_calls)
         file.close()
 
     def flatten(self, l):
@@ -223,7 +223,7 @@ def main():
 
     # Create object and store arguments as attribute
     inp = parser.parse_args()
-    ie = Instr_extractor(inp.filepath)
+    ie = InstrExtractor(inp.filepath)
 
     # Do work
     if(inp.load):
