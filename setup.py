@@ -6,26 +6,24 @@ from setuptools import setup, find_packages
 from codecs import open
 import os, io, re
 
-here = path.abspath(path.dirname(__file__))
+here = os.path.abspath(os.path.dirname(__file__))
 
 # Stolen from pip
 def read(*names, **kwargs):
-    with io.open(
-            os.path.join(os.path.dirname(__file__), *names),
-                    encoding=kwargs.get("encoding", "utf8")
-                        ) as fp:
-                                return fp.read()
+    with io.open(os.path.join(os.path.dirname(__file__), *names),
+                 encoding=kwargs.get("encoding", "utf8")) as fp:
+        return fp.read()
+
 # Stolen from pip
 def find_version(*file_paths):
     version_file = read(*file_paths)
-        version_match = re.search(r"^__version__ = ['\"]([^'\"]*)['\"]",
-                                      version_file, re.M)
-            if version_match:
-                        return version_match.group(1)
-            raise RuntimeError("Unable to find version string.")
+    version_match = re.search(r"^__version__ = ['\"]([^'\"]*)['\"]", version_file, re.M)
+    if version_match:
+        return version_match.group(1)
+    raise RuntimeError("Unable to find version string.")
 
 # Get the long description from the README file
-with open(path.join(here, 'README.rst'), encoding='utf-8') as f:
+with open(os.path.join(here, 'README.rst'), encoding='utf-8') as f:
     long_description = f.read()
 
 setup(
@@ -43,7 +41,7 @@ setup(
     url='https://github.com/RRZE-HPC/OSACA',
 
     #Author details
-    author='Jan Laukemann'
+    author='Jan Laukemann',
     author_email='jan.laukemann@fau.de',
 
     #Choose your license
@@ -74,7 +72,7 @@ setup(
     ],
 
     # What doesd your project relate to?
-    keywords='hpc performance benchmark analysis architecture'
+    keywords='hpc performance benchmark analysis architecture',
 
 
     # You can just specify the packages manually here if your project is
