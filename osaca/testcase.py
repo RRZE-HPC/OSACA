@@ -81,21 +81,21 @@ class Testcase(object):
                           + sep1 + (self.op_b if ('gpr' not in self.op_b) else 'r' + self.op_b[3:])
                           + sep2 + (self.op_c if ('gpr' not in self.op_c) else 'r' + self.op_c[3:]))
 
-    def write_testcase(self, TP=True, LT=True):
+    def write_testcase(self, tp=True, lt=True):
         """
         Write testcase for class attributes in a file.
 
         Parameters
         ----------
-        TP : bool
+        tp : bool
             Controls if throughput testcase should be written
             (default True)
 
-        LT : bool
+        lt : bool
             Controls if latency testcase should be written
             (default True)
         """
-        if(LT):
+        if(lt):
             # Write latency file
             call(['mkdir', '-p', os.path.dirname(__file__)+'/../testcases'])
             f = open(os.path.dirname(__file__)+'/../testcases/'+self.instr+self.extension+'.S', 'w')
@@ -103,10 +103,10 @@ class Testcase(object):
                     + self.zeroGPR + self.copy + self.loop_lat + self.gprPop + self.done)
             f.write(data)
             f.close()
-        if(TP):
+        if(tp):
             # Write throughput file
             f = open(os.path.dirname(__file__) + '/../testcases/' + self.instr + self.extension
-                     + '-TP.S', 'w')
+                     + '-tp.S', 'w')
             data = (self.def_instr + self.ninstr + self.init + self.dp1 + self.expand + self.gprPush
                     + self.zeroGPR + self.copy + self.loop_thrpt + self.gprPop + self.done)
             f.write(data)
@@ -125,7 +125,7 @@ class Testcase(object):
         """
         oprnds = self.param_list
         op_a, op_b, op_c = ('', '', '')
-        gprPush, gprPop, zeroGPR = ('', '', '')
+        gpr_push, gpr_pop, zero_gpr = ('', '', '')
         if(isinstance(oprnds[0], Register)):
             op_a = oprnds[0].reg_type.lower()
         elif(isinstance(oprnds[0], MemAddr)):
@@ -133,7 +133,7 @@ class Testcase(object):
         elif(isinstance(oprnds[0], Parameter) and str(oprnds[0]) == 'IMD'):
             op_a = 'imd'
         if(op_a == 'gpr'):
-            gprPush, gprPop, zeroGPR = self.__initialise_gprs()
+            gpr_push, gpr_pop, zero_gpr = self.__initialise_gprs()
             op_a += str(oprnds[0].size)
         if(len(oprnds) > 1):
             if(isinstance(oprnds[1], Register)):
@@ -145,7 +145,7 @@ class Testcase(object):
             if(op_b == 'gpr'):
                 op_b += str(oprnds[1].size)
                 if('gpr' not in op_a):
-                    gprPush, gprPop, zeroGPR = self.__initialise_gprs()
+                    gpr_push, gpr_pop, zero_gpr = self.__initialise_gprs()
         if(len(oprnds) == 3):
             if(isinstance(oprnds[2], Register)):
                 op_c = oprnds[2].reg_type.lower()
@@ -156,7 +156,7 @@ class Testcase(object):
             if(op_c == 'gpr'):
                 op_c += str(oprnds[2].size)
                 if(('gpr' not in op_a) and ('gpr'not in op_b)):
-                    gprPush, gprPop, zeroGPR = self.__initialise_gprs()
+                    gpr_push, gpr_pop, zero_gpr = self.__initialise_gprs()
         if(len(oprnds) == 1 and isinstance(oprnds[0], Register)):
             copy = self.__copy_regs(oprnds[0])
         elif(len(oprnds) > 1 and isinstance(oprnds[1], Register)):
@@ -165,7 +165,7 @@ class Testcase(object):
             copy = self.__copy_regs(oprnds[1])
         else:
             copy = ''
-        return (op_a, op_b, op_c, gprPush, gprPop, zeroGPR, copy)
+        return (op_a, op_b, op_c, gpr_push, gpr_pop, zero_gpr, copy)
 
     def __initialise_gprs(self):
         """
@@ -355,8 +355,8 @@ class Testcase(object):
                 ext = ', {}'.format(self.ops[self.op_b][i % 3])
             if(ext2):
                 ext += ', {}'.format(self.ops[self.op_c][i % 3])
-            regNum = (i % (len(self.ops[self.op_a]) - 3)) + 3
-            loop_thrpt += '\t\tINSTR    {}{}\n'.format(self.ops[self.op_a][regNum], ext)
+            reg_num = (i % (len(self.ops[self.op_a]) - 3)) + 3
+            loop_thrpt += '\t\tINSTR    {}{}\n'.format(self.ops[self.op_a][reg_num], ext)
         loop_thrpt += ('\t\tcmp      i, N\n'
                        '\t\tjl       loop\n')
         return loop_thrpt
@@ -374,12 +374,12 @@ class Testcase(object):
             While the first value stands for the throughput testcase
             and the second value stands for the latency testcase
         """
-        TP = False
-        LT = False
+        tp = False
+        lt = False
         name = self.instr+self.extension
         for root, dirs, files in os.walk(os.path.dirname(__file__)+'/testcases'):
-            if((name+'-TP.S') in files):
-                TP = True
+            if((name+'-tp.S') in files):
+                tp = True
             if name+'.S' in files:
-                LT = True
-        return (TP, LT)
+                lt = True
+        return (tp, lt)
