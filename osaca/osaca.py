@@ -524,6 +524,7 @@ class Osaca(object):
             param_list[i] = str(op)
             param_list_types[i] = op
         # Add to list
+        instr = instr.rstrip()
         if(len(instr) > self.longestInstr):
             self.longestInstr = len(instr)
         instr_form = [mnemonic]+list(reversed(param_list_types))+[instr]
@@ -700,6 +701,7 @@ class Osaca(object):
                         op_ext_regs.append(False)
                 if(True not in op_ext_regs):
                     # No register in whole instr form. How can I find out what regsize we need?
+                    print('test')
                     print('Feature not included yet: ', end='')
                     print(elem[0]+' for '+operands)
                     tp = 0
