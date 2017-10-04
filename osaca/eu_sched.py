@@ -4,9 +4,11 @@ import sys
 import os
 import math
 import ast
-from param import Register, MemAddr
 from operator import add
+
 import pandas as pd
+
+from .param import Register, MemAddr
 
 
 class Scheduler(object):

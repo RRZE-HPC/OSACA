@@ -2,8 +2,8 @@
 import os
 import re
 import argparse
-from testcase import Testcase
-from param import Register, MemAddr, Parameter
+from .testcase import Testcase
+from .param import Register, MemAddr, Parameter
 
 
 class InstrExtractor(object):

@@ -6,9 +6,9 @@ import os
 import io
 import re
 import subprocess
-from param import Register, MemAddr, Parameter
-from eu_sched import Scheduler
-from testcase import Testcase
+from .param import Register, MemAddr, Parameter
+from .eu_sched import Scheduler
+from .testcase import Testcase
 import pandas as pd
 from datetime import datetime
 import numpy as np
@@ -53,10 +53,10 @@ class Osaca(object):
         # Check args and exit program if something's wrong
         if(not self.check_arch()):
             print('Invalid microarchitecture.')
-            sys.exit()
+            sys.exit(1)
         if(not self.check_file()):
-            print('Invalid file path or file format.')
-            sys.exit()
+            print('Invalid file path or file format.', file=sys.stderr)
+            sys.exit(1)
         # Check for database for the chosen architecture
         self.df = self.read_csv()
         # Create sequence of numbers and their reciprokals for validate the measurements
@@ -132,10 +132,10 @@ class Osaca(object):
         # Check args and exit program if something's wrong
         if(not self.check_arch()):
             print('Invalid microarchitecture.')
-            sys.exit()
+            sys.exit(1)
         if(not self.check_elffile()):
             print('Invalid file path or file format.')
-            sys.exit()
+            sys.exit(1)
         # Finally check for database for the chosen architecture
         self.read_csv()
 
@@ -210,9 +210,10 @@ class Osaca(object):
             False   if file does not exist or is not an elf64 file
 
         """
+        print(self.filepath, os.path.isfile(self.filepath))
         if(os.path.isfile(self.filepath)):
             self.store_src_code_elf()
-            if('file format elf64' in self.srcCode[1]):
+            if('file format elf64' in self.srcCode[1].lower()):
                 return True
         return False
 
