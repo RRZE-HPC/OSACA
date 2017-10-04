@@ -267,10 +267,10 @@ class Scheduler(object):
         port_line += '\n'
         cyc_line = '| Cycles |'
         for i in range(len(port_bndg)):
-            space = ' '
+            space = ''
             cyc = str(round(port_bndg[i], 2))
-            if(len(cyc) == 4):
-                space = ''
+            if(len(cyc) < 4):
+                space = ' ' * (4 - len(cyc))
             cyc_line += ' {}{}|'.format(cyc, space)
         cyc_line += '\n'
         binding = header + horiz_line + port_line + horiz_line + cyc_line + horiz_line

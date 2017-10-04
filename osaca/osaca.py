@@ -212,7 +212,6 @@ class Osaca(object):
             False   if file does not exist or is not an elf64 file
 
         """
-        print(self.filepath, os.path.isfile(self.filepath))
         if(os.path.isfile(self.filepath)):
             self.store_src_code_elf()
             if('file format elf64' in self.srcCode[1].lower()):
