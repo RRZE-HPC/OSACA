@@ -8,7 +8,7 @@ from operator import add
 
 import pandas as pd
 
-from .param import Register, MemAddr
+from osaca.param import Register, MemAddr
 
 
 class Scheduler(object):

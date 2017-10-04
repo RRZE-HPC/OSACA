@@ -2,8 +2,9 @@
 import os
 import re
 import argparse
-from .testcase import Testcase
-from .param import Register, MemAddr, Parameter
+
+from osaca.testcase import Testcase
+from osaca.param import Register, MemAddr, Parameter
 
 
 class InstrExtractor(object):

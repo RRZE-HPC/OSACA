@@ -6,12 +6,14 @@ import os
 import io
 import re
 import subprocess
-from .param import Register, MemAddr, Parameter
-from .eu_sched import Scheduler
-from .testcase import Testcase
-import pandas as pd
 from datetime import datetime
+
+import pandas as pd
 import numpy as np
+
+from osaca.param import Register, MemAddr, Parameter
+from osaca.eu_sched import Scheduler
+from osaca.testcase import Testcase
 
 
 class Osaca(object):
