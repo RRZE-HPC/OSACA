@@ -4,7 +4,9 @@
 from setuptools import setup, find_packages
 # To use a consistent encoding
 from codecs import open
-import os, io, re
+import os
+import io
+import re
 
 here = os.path.abspath(os.path.dirname(__file__))
 
