@@ -24,8 +24,8 @@ class Scheduler(object):
         try:
             self.ports = self.arch_dict[arch]
         except KeyError:
-            print('Architecture not supportet for EU scheduling.')
-            sys.exit()
+            print('Architecture not supportet for EU scheduling.', file=sys.stderr)
+            sys.exit(1)
         self.instrList = instruction_list
         curr_dir = os.path.realpath(__file__)[:-11]
         self.df = pd.read_csv(curr_dir + 'data/' + arch.lower() + '_data.csv', quotechar='"',

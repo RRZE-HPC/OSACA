@@ -54,7 +54,7 @@ class Osaca(object):
         """
         # Check args and exit program if something's wrong
         if(not self.check_arch()):
-            print('Invalid microarchitecture.')
+            print('Invalid microarchitecture.', file=sys.stderr)
             sys.exit(1)
         if(not self.check_file()):
             print('Invalid file path or file format.', file=sys.stderr)
@@ -133,10 +133,10 @@ class Osaca(object):
         """
         # Check args and exit program if something's wrong
         if(not self.check_arch()):
-            print('Invalid microarchitecture.')
+            print('Invalid microarchitecture.', file=sys.stderr)
             sys.exit(1)
         if(not self.check_elffile()):
-            print('Invalid file path or file format.')
+            print('Invalid file path or file format. Not an ELF file.', file=sys.stderr)
             sys.exit(1)
         # Finally check for database for the chosen architecture
         self.read_csv()
@@ -157,19 +157,19 @@ class Osaca(object):
         """
         # Check args and exit program if something's wrong
         if(not self.check_arch()):
-            print('Invalid microarchitecture.')
+            print('Invalid microarchitecture.', file=sys.stderr)
             sys.exit()
         # Check if input file is a binary or assembly file
         try:
             binary_file = True
             if(not self.check_elffile()):
-                print('Invalid file path or file format.')
-                sys.exit()
+                print('Invalid file path or file format. Not an ELF file.', file=sys.stderr)
+                sys.exit(1)
         except (TypeError, IndexError):
             binary_file = False
             if(not self.check_file(True)):
-                print('Invalid file path or file format.')
-                sys.exit()
+                print('Invalid file path or file format.', file=sys.stderr)
+                sys.exit(1)
         # Finally check for database for the chosen architecture
         self.read_csv()
 
@@ -835,8 +835,8 @@ def main():
         except ImportError:
             print('ImportError: Module kerncraft not installed. Use '
                   + '\'pip install --user kerncraft\' for installation.\nFor more information see '
-                  + 'https://github.com/RRZE-HPC/kerncraft')
-            sys.exit()
+                  + 'https://github.com/RRZE-HPC/kerncraft', file=sys.stderr)
+            sys.exit(1)
         iaca.iaca_instrumentation(input_file=filepath, output_file=filepath,
                                   block_selection='manual', pointer_increment=1)
     else:
