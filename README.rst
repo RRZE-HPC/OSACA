@@ -22,13 +22,14 @@ On most systems with python pip and setuputils installed, just run:
 ::
    pip install --user osaca
 for the latest release.
-If you want to build from source, clone this repository using ``git clone https://github.com/RRZE-HPC/OSACA`` and run int the root directory:
+If you want to build from source, clone this repository using ``git clone https://github.com/RRZE-HPC/OSACA`` and run in the root directory:
 ::
    python ./setup.py install
 
 *Dependencies:*
 ~~~~~~~~~~~~~~~
 Additional requirements are:
+
 -  `Python <https://www.python.org/>`__ 3.5.2 or higher
 -  `pandas <http://pandas.pydata.org/>`__ 0.18.1 or higher
 -  `NumPy <http://www.numpy.org/>`__ 1.11.1 or higher
