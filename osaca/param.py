@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python3
 class Parameter(object):
     type_list = ['REG', 'MEM', 'IMD', 'LBL', 'NONE']
 
