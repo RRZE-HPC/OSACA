@@ -9,6 +9,9 @@ auto-generating of testcases for assembly instructions creating latency
 and throughput benchmarks on a specific instruction form and thorughput
 analysis and throughput prediction for a inner-most loop code snippet.
 
+.. image:: https://travis-ci.com/RRZE-HPC/OSACA.svg?token=393L6z2HEXNiGLtZ43s6&branch=master
+    :target: https://travis-ci.com/RRZE-HPC/OSACA
+
 .. image:: https://landscape.io/github/RRZE-HPC/OSACA/master/landscape.svg?style=flat&badge_auth_token=c95f01b247f94bc79c09d21c5c827697
    :target: https://landscape.io/github/RRZE-HPC/OSACA/master
    :alt: Code Health
