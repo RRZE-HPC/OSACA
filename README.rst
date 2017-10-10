@@ -9,7 +9,7 @@ auto-generating of testcases for assembly instructions creating latency
 and throughput benchmarks on a specific instruction form and thorughput
 analysis and throughput prediction for a inner-most loop code snippet.
 
-.. image:: https://landscape.io/github/RRZE-HPC/OSACA/master/landscape.svg?style=flat
+.. image:: https://landscape.io/github/RRZE-HPC/OSACA/master/landscape.svg?style=flat&badge_auth_token=c95f01b247f94bc79c09d21c5c827697
    :target: https://landscape.io/github/RRZE-HPC/OSACA/master
    :alt: Code Health
 
@@ -46,4 +46,4 @@ Implementation: Jan Laukemann
 
 License
 =======
-AGPL-3.0
+:doc:`AGPL-3.0 </LICENSE>`
