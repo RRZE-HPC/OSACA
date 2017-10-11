@@ -1,0 +1,26 @@
+Port Binding in Cycles Per Iteration:
+----------------------------------------------
+|  Port  |  0  |  1  |  2  |  3  |  4  |  5  |
+----------------------------------------------
+| Cycles | 4.0 | 5.0 | 3.0 | 3.0 | 2.0 | 2.0 |
+----------------------------------------------
+
+
+          Ports Pressure in cycles          
+|  0   |  1   |  2   |  3   |  4   |  5   |
+-------------------------------------------
+|      |      | 1.00 | 1.00 |      |      | lea    0x1(%rax,%rax,1),%edx
+| 0.50 | 1.00 |      |      |      | 0.50 | vcvtsi2ss %edx,%xmm2,%xmm2
+| 1.00 |      |      |      |      |      | vmulss %xmm2,%xmm0,%xmm3
+|      |      | 1.00 | 1.00 |      |      | lea    0x2(%rax,%rax,1),%ecx
+|      | 1.00 |      |      |      |      | vaddss %xmm3,%xmm1,%xmm4
+| 0.33 | 0.33 |      |      |      | 0.33 | vxorps %xmm1,%xmm1,%xmm1
+| 0.50 | 1.00 |      |      |      | 0.50 | vcvtsi2ss %ecx,%xmm1,%xmm1
+| 1.00 |      |      |      |      |      | vmulss %xmm1,%xmm0,%xmm5
+|      |      | 0.50 | 0.50 | 1.00 |      | vmovss %xmm4,0x4(%rsp,%rax,8)
+|      | 1.00 |      |      |      |      | vaddss %xmm5,%xmm4,%xmm1
+|      |      | 0.50 | 0.50 | 1.00 |      | vmovss %xmm1,0x8(%rsp,%rax,8)
+| 0.33 | 0.33 |      |      |      | 0.33 | inc    %rax
+| 0.33 | 0.33 |      |      |      | 0.33 | cmp    $0x1f3,%rax
+|      |      |      |      |      |      | jb     400bc2 <main+0x62>
+Total number of estimated throughput: 5.0

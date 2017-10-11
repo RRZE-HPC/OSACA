@@ -22,6 +22,7 @@ class Osaca(object):
     srcCode = None
     df = None
     instr_forms = None
+    file_output = ''
     # Variables for checking lines
     numSeps = 0
     indentChar = ''
@@ -41,10 +42,11 @@ class Osaca(object):
                          + r'((,[ \t]*103[ \t]*((,[ \t]*144)|(\n\s*\.byte[ \t]+144)))|(\n\s*\.byte'
                          + r'[ \t]+103[ \t]*((,[ \t]*144)|(\n\s*\.byte[ \t]+144))))')
 
-    def __init__(self, _arch, _filepath):
+    def __init__(self, _arch, _filepath, output=sys.stdout):
         self.arch = _arch
         self.filepath = _filepath
         self.instr_forms = []
+        self.file_output = output
 
     # -----------------main functions depending on arguments--------------------
     def include_ibench(self):
@@ -63,7 +65,7 @@ class Osaca(object):
         self.df = self.read_csv()
         # Create sequence of numbers and their reciprokals for validate the measurements
         cyc_list, reci_list = self.create_sequences()
-        print('Everything seems fine! Let\'s start!')
+        print('Everything seems fine! Let\'s start!', file=self.file_output)
         new_data = []
         added_vals = 0
         for line in self.srcCode:
@@ -113,10 +115,10 @@ class Osaca(object):
             if(not new and abs((val/np.float64(clk_cyc))-1) > 0.05):
                 print('Different measurement for {} ({}): {}(old) vs. '.format(instr, clmn, val)
                       + '{}(new)\nPlease check for correctness '.format(clk_cyc)
-                      + '(no changes were made).')
+                      + '(no changes were made).', file=self.file_output)
                 txt_output = True
             if(txt_output):
-                print()
+                print('', file=self.file_output)
                 txt_output = False
         # Now merge the DataFrames and write new csv file
         self.df = self.df.append(pd.DataFrame(new_data, columns=['instr', 'TP', 'LT', 'ports']),
@@ -124,8 +126,8 @@ class Osaca(object):
         csv = self.df.to_csv(index=False)
         self.write_csv(csv)
         print('ibench output {} '.format(self.filepath.split('/')[-1])
-              + 'successfully in database included.')
-        print('{} values were added.'.format(added_vals))
+              + 'successfully in database included.', file=self.file_output)
+        print('{} values were added.'.format(added_vals), file=self.file_output)
 
     def inspect_binary(self):
         """
@@ -141,14 +143,14 @@ class Osaca(object):
         # Finally check for database for the chosen architecture
         self.read_csv()
 
-        print('Everything seems fine! Let\'s start checking!')
+        print('Everything seems fine! Let\'s start checking!', file=self.file_output)
         for i, line in enumerate(self.srcCode):
             if(i == 0):
                 self.check_line(line, True)
             else:
                 self.check_line(line)
         output = self.create_output()
-        print(output)
+        print(output, file=self.file_output)
 
     def inspect_with_iaca(self):
         """
@@ -173,13 +175,13 @@ class Osaca(object):
         # Finally check for database for the chosen architecture
         self.read_csv()
 
-        print('Everything seems fine! Let\'s start checking!')
+        print('Everything seems fine! Let\'s start checking!', file=self.file_output)
         if(binary_file):
             self.iaca_bin()
         else:
             self.iaca_asm()
         output = self.create_output()
-        print(output)
+        print(output, file=self.file_output)
 
     # --------------------------------------------------------------------------
 
@@ -262,7 +264,7 @@ class Osaca(object):
         try:
             f = open(self.filepath, 'r')
         except IOError:
-            print('IOError: file \'{}\' not found'.format(self.filepath))
+            print('IOError: file \'{}\' not found'.format(self.filepath), file=self.file_output)
         self.srcCode = ''
         for line in f:
             self.srcCode += line
@@ -296,7 +298,8 @@ class Osaca(object):
         try:
             f = open('data/'+self.arch.lower()+'_data.csv', 'w')
         except IOError:
-            print('IOError: file \'{}\' not found in ./data'.format(self.arch.lower()+'_data.csv'))
+            print('IOError: file \'{}\' not found in ./data'.format(self.arch.lower()+'_data.csv'),
+                  file=self.file_output)
         f.write(csv)
         f.close()
 
@@ -366,8 +369,8 @@ class Osaca(object):
         # No value close to an integer or its reciprocal found, we assume the
         # measurement is incorrect
         print('Your measurement for {} ({}) is probably wrong. '.format(instr, clmn)
-              + 'Please inspect your benchmark!')
-        print('The program will continue with the given value')
+              + 'Please inspect your benchmark!', file=self.file_output)
+        print('The program will continue with the given value', file=self.file_output)
         return clk_cyc
 
     def check_line(self, line, first_appearance=False):
@@ -687,7 +690,7 @@ class Osaca(object):
                     tp = self.df[self.df.instr == elem[0] + '-' + operands].TP.values[0]
                 except IndexError:
                     # Something went wrong
-                    print('Error while fetching data from database')
+                    print('Error while fetching data from database', file=self.file_output)
                     continue
             # Did not found the exact instruction form.
             # Try to find the instruction form for register operands only
@@ -703,9 +706,8 @@ class Osaca(object):
                         op_ext_regs.append(False)
                 if(True not in op_ext_regs):
                     # No register in whole instr form. How can I find out what regsize we need?
-                    print('test')
-                    print('Feature not included yet: ', end='')
-                    print(elem[0]+' for '+operands)
+                    print('Feature not included yet: ', end='', file=self.file_output)
+                    print(elem[0]+' for '+operands, file=self.file_output)
                     tp = 0
                     not_found = True
                     warning = True
@@ -742,7 +744,7 @@ class Osaca(object):
                         tp = self.df[self.df.instr == elem[0]+'-'+operands].TP.values[0]
                     except IndexError:
                         # Something went wrong
-                        print('Error while fetching data from database')
+                        print('Error while fetching data from database', file=self.file_output)
                         continue
                 # Did not found the register instruction form. Set warning and go on with
                 # throughput 0
