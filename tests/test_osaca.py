@@ -16,7 +16,9 @@ class TestOsaca(unittest.TestCase):
         osa = Osaca('IVB', curr_dir+'/testfiles/taxCalc-ivb-iaca', out)
         osa.inspect_with_iaca()
         result = out.getvalue()
+        print(result)
         result = '\n'.join(result.split('\n')[-27:])
+#        print(result)
         with open(curr_dir+'/test_osaca_iaca.out', encoding='utf-8') as f:
             assertion = f.read()
-        self.assertEqual(result, assertion)
+        self.assertEqual(assertion, result)
