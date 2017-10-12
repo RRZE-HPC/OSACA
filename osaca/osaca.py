@@ -437,7 +437,7 @@ class Osaca(object):
         """
         Extract instruction forms out of binary file using IACA markers.
         """
-        self.marker = r'fs addr32 nop'
+        self.marker = r'fs.*[\n]?.*addr32 nop'
         for line in self.srcCode:
             # Check if marker is in line
             if(self.marker in line):
