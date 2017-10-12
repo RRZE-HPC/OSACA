@@ -176,7 +176,9 @@ class Osaca(object):
         self.read_csv()
 
         print('Everything seems fine! Let\'s start checking!', file=self.file_output)
-        print(self.code, file=self.output_file) #for testing
+        print(self.srcCode, file=self.output_file) #for testing
+        print(subprocess.run(['objdump', '--version'], stdout=subprocess.PIPE).stdout.decode('utf-8'),
+              file=self.output_file)
         if(binary_file):
             self.iaca_bin()
         else:
