@@ -176,7 +176,7 @@ class Osaca(object):
         self.read_csv()
 
         print('Everything seems fine! Let\'s start checking!', file=self.file_output)
-        print((self.srcCode), file=self.file_output) #for testing
+        print('\n'.join.(self.srcCode), file=self.file_output) #for testing
         print(subprocess.run(['objdump', '--version'], stdout=subprocess.PIPE).stdout.decode('utf-8'),
               file=self.file_output)
         if(binary_file):
@@ -441,7 +441,7 @@ class Osaca(object):
         part1 = re.compile(r'64\s+fs')
         part2 = re.compile(r'67 90\s+addr32 nop')
         is_2_lines = False
-        for i, line in enumerate(self.srcCode):
+        for line in self.srcCode:
             # Check if marker is in line
             if(self.marker in line):
                 self.sem += 1
@@ -463,9 +463,9 @@ class Osaca(object):
                 # Not in the loop anymore. Due to the fact it's the IACA marker we can stop here
                 # After removing the last line which belongs to the IACA marker
                 del self.instr_forms[-1:]
-                if(is_2_lines):
+                #if(is_2_lines):
                     # The marker is splitted into two lines, therefore delete another line
-                    del self.instr_forms[-1:]
+                #    del self.instr_forms[-1:]
                 return
 
     def iaca_asm(self):
