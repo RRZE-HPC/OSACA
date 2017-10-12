@@ -98,15 +98,15 @@ class Testcase(object):
         """
         if(lt):
             # Write latency file
-            call(['mkdir', '-p', os.path.dirname(__file__)+'/../testcases'])
-            f = open(os.path.dirname(__file__)+'/../testcases/'+self.instr+self.extension+'.S', 'w')
+            call(['mkdir', '-p', os.path.dirname(__file__)+'/../benchmarks'])
+            f = open(os.path.dirname(__file__)+'/../benchmarks/'+self.instr+self.extension+'.S', 'w')
             data = (self.def_instr + self.ninstr + self.init + self.dp1 + self.expand + self.gprPush
                     + self.zeroGPR + self.copy + self.loop_lat + self.gprPop + self.done)
             f.write(data)
             f.close()
         if(tp):
             # Write throughput file
-            f = open(os.path.dirname(__file__) + '/../testcases/' + self.instr + self.extension
+            f = open(os.path.dirname(__file__) + '/../benchmarks/' + self.instr + self.extension
                      + '-tp.S', 'w')
             data = (self.def_instr + self.ninstr + self.init + self.dp1 + self.expand + self.gprPush
                     + self.zeroGPR + self.copy + self.loop_thrpt + self.gprPop + self.done)
@@ -378,7 +378,7 @@ class Testcase(object):
         tp = False
         lt = False
         name = self.instr+self.extension
-        for root, dirs, files in os.walk(os.path.dirname(__file__)+'/testcases'):
+        for root, dirs, files in os.walk(os.path.dirname(__file__)+'/benchmarks'):
             if((name+'-tp.S') in files):
                 tp = True
             if name+'.S' in files:
