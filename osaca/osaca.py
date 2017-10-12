@@ -437,11 +437,15 @@ class Osaca(object):
         """
         Extract instruction forms out of binary file using IACA markers.
         """
-        self.marker = r'fs.*[\n]?.*addr32 nop'
-        for line in self.srcCode:
+        self.marker = r'fs addr32 nop'
+        part1 = r'64\sfs'
+        part2 = r'67 90\saddr32 nop'
+        for i, line in enumerate(self.srcCode):
             # Check if marker is in line
             if(self.marker in line):
                 self.sem += 1
+            elif(part1 in line or part2 in line):
+                self.sem += 0.5
             elif(self.sem == 1):
                 # We're in the marked code snippet
                 # Check if the line is ASM code
