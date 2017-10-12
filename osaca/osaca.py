@@ -176,7 +176,7 @@ class Osaca(object):
         self.read_csv()
 
         print('Everything seems fine! Let\'s start checking!', file=self.file_output)
-        print('\n'.join.(self.srcCode), file=self.file_output) #for testing
+        print('\n'.join(self.srcCode), file=self.file_output) #for testing
         print(subprocess.run(['objdump', '--version'], stdout=subprocess.PIPE).stdout.decode('utf-8'),
               file=self.file_output)
         if(binary_file):
