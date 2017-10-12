@@ -176,6 +176,7 @@ class Osaca(object):
         self.read_csv()
 
         print('Everything seems fine! Let\'s start checking!', file=self.file_output)
+        print(self.code, file=self.output_file) #for testing
         if(binary_file):
             self.iaca_bin()
         else:
