@@ -34,13 +34,13 @@ class Osaca(object):
     # Constants
     ASM_LINE = re.compile(r'\s[0-9a-f]+[:]')
     # Matches every variation of the IACA start marker
-    IACA_SM = re.compile(r'\s*movl[ \t]+\$111[ \t]*,[ \t]*%ebx[ \t]*\n\s*\.byte[ \t]+100[ \t]*'
-                         + r'((,[ \t]*103[ \t]*((,[ \t]*144)|(\n\s*\.byte[ \t]+144)))|(\n\s*\.byte'
-                         + r'[ \t]+103[ \t]*((,[ \t]*144)|(\n\s*\.byte[ \t]+144))))')
+    IACA_SM = re.compile(r'\s*movl[ \t]+\$111[ \t]*,[ \t]*%ebx.*\n\s*\.byte[ \t]+100.*'
+                         + r'((,[ \t]*103.*((,[ \t]*144)|(\n\s*\.byte[ \t]+144)))|(\n\s*\.byte'
+                         + r'[ \t]+103.*((,[ \t]*144)|(\n\s*\.byte[ \t]+144))))')
     # Matches every variation of the IACA end marker
-    IACA_EM = re.compile(r'\s*movl[ \t]+\$222[ \t]*,[ \t]*%ebx[ \t]*\n\s*\.byte[ \t]+100[ \t]*'
-                         + r'((,[ \t]*103[ \t]*((,[ \t]*144)|(\n\s*\.byte[ \t]+144)))|(\n\s*\.byte'
-                         + r'[ \t]+103[ \t]*((,[ \t]*144)|(\n\s*\.byte[ \t]+144))))')
+    IACA_EM = re.compile(r'\s*movl[ \t]+\$222[ \t]*,[ \t]*%ebx.*\n\s*\.byte[ \t]+100.*'
+                         + r'((,[ \t]*103.*((,[ \t]*144)|(\n\s*\.byte[ \t]+144)))|(\n\s*\.byte'
+                         + r'[ \t]+103.*((,[ \t]*144)|(\n\s*\.byte[ \t]+144))))')
 
     def __init__(self, _arch, _filepath, output=sys.stdout):
         self.arch = _arch
