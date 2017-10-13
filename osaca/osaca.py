@@ -162,12 +162,8 @@ class Osaca(object):
             print('Invalid microarchitecture.', file=sys.stderr)
             sys.exit()
         # Check if input file is a binary or assembly file
-#        try:
         binary_file = True
         if(not self.check_elffile()):
-#                print('Invalid file path or file format. Not an ELF file.', file=sys.stderr)
-#                sys.exit(1)
-#        except (TypeError, IndexError):
             binary_file = False
             if(not self.check_file(True)):
                 print('Invalid file path or file format.', file=sys.stderr)
@@ -241,12 +237,6 @@ class Osaca(object):
             False   if file does not exist
 
         """
-        # For testing
-        print(os.path.isfile(self.filepath))
-        p = '/'.join(self.filepath.split('/')[:-1])
-        p = (subprocess.run(['ls', p],
-                            stdout=subprocess.PIPE).stdout.decode('utf-8'))
-        print(p)
         if(os.path.isfile(self.filepath)):
             self.store_src_code(iaca_flag)
             return True
@@ -258,7 +248,8 @@ class Osaca(object):
         separate by line.
         """
         self.srcCode = (subprocess.run(['objdump', '--source', self.filepath],
-                                       stdout=subprocess.PIPE).stdout.decode('utf-8').split('\n'))
+                                       stdout=subprocess.PIPE, 
+                                       stderr=subprocess.PIPE).stdout.decode('utf-8').split('\n'))
 
     def store_src_code(self, iaca_flag=False):
         """
