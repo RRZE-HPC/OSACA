@@ -246,6 +246,7 @@ class Osaca(object):
         p = split('/', self.filepath)
         p = (subprocess.run(['ls', p],
                             stdout=subprocess.PIPE).stdout.decode('utf-8'))
+        print(p)
         if(os.path.isfile(self.filepath)):
             self.store_src_code(iaca_flag)
             return True
