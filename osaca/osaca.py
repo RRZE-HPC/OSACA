@@ -162,12 +162,12 @@ class Osaca(object):
             print('Invalid microarchitecture.', file=sys.stderr)
             sys.exit()
         # Check if input file is a binary or assembly file
-        try:
-            binary_file = True
-            if(not self.check_elffile()):
-                print('Invalid file path or file format. Not an ELF file.', file=sys.stderr)
-                sys.exit(1)
-        except (TypeError, IndexError):
+#        try:
+        binary_file = True
+        if(not self.check_elffile()):
+#                print('Invalid file path or file format. Not an ELF file.', file=sys.stderr)
+#                sys.exit(1)
+#        except (TypeError, IndexError):
             binary_file = False
             if(not self.check_file(True)):
                 print('Invalid file path or file format.', file=sys.stderr)
@@ -216,8 +216,11 @@ class Osaca(object):
         """
         if(os.path.isfile(self.filepath)):
             self.store_src_code_elf()
-            if('file format elf64' in self.srcCode[1].lower()):
-                return True
+            try:
+                if('file format elf64' in self.srcCode[1].lower()):
+                    return True
+            except(IndexError):
+                return False
         return False
 
     def check_file(self, iaca_flag=False):
