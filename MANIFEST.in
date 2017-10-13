@@ -4,4 +4,4 @@ include tox.ini
 recursive-include osaca/data/ *.csv
 include examples/*
 recursive-include tests *.py *.out
-include tests/testfiles/*
+recursive-include tests/testfiles/ *
