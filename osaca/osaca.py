@@ -243,7 +243,7 @@ class Osaca(object):
         """
         # For testing
         print(os.path.isfile(self.filepath))
-        p = split('/', self.filepath)
+        p = self.filepath.split('/')
         p = (subprocess.run(['ls', p],
                             stdout=subprocess.PIPE).stdout.decode('utf-8'))
         print(p)
