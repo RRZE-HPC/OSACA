@@ -241,6 +241,9 @@ class Osaca(object):
             False   if file does not exist
 
         """
+        # For testing
+        print(os.path.isfile(self.filepath))
+        print(self.filepath)
         if(os.path.isfile(self.filepath)):
             self.store_src_code(iaca_flag)
             return True
