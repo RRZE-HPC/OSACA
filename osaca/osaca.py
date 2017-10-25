@@ -22,6 +22,7 @@ class Osaca(object):
     srcCode = None
     df = None
     instr_forms = None
+    tp_list = False
     file_output = ''
     # Variables for checking lines
     numSeps = 0
@@ -141,7 +142,7 @@ class Osaca(object):
             print('Invalid file path or file format. Not an ELF file.', file=sys.stderr)
             sys.exit(1)
         # Finally check for database for the chosen architecture
-        self.read_csv()
+        self.df = self.read_csv()
 
         print('Everything seems fine! Let\'s start checking!', file=self.file_output)
         for i, line in enumerate(self.srcCode):
@@ -149,7 +150,7 @@ class Osaca(object):
                 self.check_line(line, True)
             else:
                 self.check_line(line)
-        output = self.create_output()
+        output = self.create_output(self.tp_list)
         print(output, file=self.file_output)
 
     def inspect_with_iaca(self):
@@ -169,14 +170,14 @@ class Osaca(object):
                 print('Invalid file path or file format.', file=sys.stderr)
                 sys.exit(1)
         # Finally check for database for the chosen architecture
-        self.read_csv()
+        self.df = self.read_csv()
 
         print('Everything seems fine! Let\'s start checking!', file=self.file_output)
         if(binary_file):
             self.iaca_bin()
         else:
             self.iaca_asm()
-        output = self.create_output()
+        output = self.create_output(self.tp_list)
         print(output, file=self.file_output)
 
     # --------------------------------------------------------------------------
@@ -810,7 +811,8 @@ def main():
                         + __find_version('__init__.py'))
     parser.add_argument('--arch', dest='arch', type=str, help='define architecture '
                                                               + '(SNB, IVB, HSW, BDW, SKL)')
-    parser.add_argument('filepath', type=str, help='path to object (Binary, ASM, CSV)')
+    parser.add_argument('--tp-list', dest='tp_list', action='store_true',
+                        help='print an additional list of all throughput values for the kernel')
     group = parser.add_mutually_exclusive_group(required=False)
     group.add_argument('-i', '--include-ibench', dest='incl', action='store_true',
                        help='includes the given values in form of the output of ibench in the'
@@ -820,6 +822,7 @@ def main():
     group.add_argument('-m', '--insert-marker', dest='insert_marker', action='store_true',
                        help='try to find blocks probably corresponding to loops in assembly and'
                        + 'insert IACA marker')
+    parser.add_argument('filepath', type=str, help='path to object (Binary, ASM, CSV)')
 
     # Store args in global variables
     inp = parser.parse_args()
@@ -835,6 +838,8 @@ def main():
     # Create Osaca object
     if(inp.arch is not None):
         osaca = Osaca(arch, filepath)
+    if(inp.tp_list):
+        osaca.tp_list = True
 
     if(incl_ibench):
         osaca.include_ibench()
