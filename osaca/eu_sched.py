@@ -5,7 +5,7 @@ import os
 import math
 import ast
 from operator import add
-
+import pdb
 import pandas as pd
 
 from osaca.param import Register, MemAddr
@@ -41,6 +41,7 @@ class Scheduler(object):
             A tuple containing the graphic output of the schedule as string and
             the port bindings as list of ints.
         """
+        wTP = False
         sched = self.get_head()
         # Initialize ports
         occ_ports = [[0] * self.ports for x in range(len(self.instrList))]
@@ -58,21 +59,37 @@ class Scheduler(object):
                 # Instruction form not in CSV
                 sched += self.get_line(occ_ports[i], '* ' + instrForm[-1])
                 continue
-            # Get the occurance of each port from the occupation list
-            port_occurances = self.get_port_occurances(tup)
-            # Get 'occurance groups'
-            occurance_groups = self.get_occurance_groups(port_occurances)
-            # Calculate port dependent throughput
-            tp_ges = entry.TP.values[0] * len(occurance_groups[0])
-            for occGroup in occurance_groups:
-                for port in occGroup:
-                    occ_ports[i][port] = tp_ges/len(occGroup)
+            if(wTP):
+                # Get the occurance of each port from the occupation list
+                port_occurances = self.get_port_occurances(tup)
+                # Get 'occurance groups'
+                occurance_groups = self.get_occurance_groups(port_occurances)
+                # Calculate port dependent throughput
+                tp_ges = entry.TP.values[0] * len(occurance_groups[0])
+                for occGroup in occurance_groups:
+                    for port in occGroup:
+                        occ_ports[i][port] = tp_ges/len(occGroup)
+            else:
+                variations = len(tup)
+                t_all = self.flatten(tup)
+                if(entry.TP.values[0] == 0):
+                    t_all = ()
+                for j in range(0, self.ports):
+                    occ_ports[i][j] =  t_all.count(j) / variations
             # Write schedule line
             sched += self.get_line(occ_ports[i], instrForm[-1])
             # Add throughput to total port binding
             port_bndgs = list(map(add, port_bndgs, occ_ports[i]))
         return (sched, port_bndgs)
 
+    
+    def flatten(self, l):
+        if(len(l) == 0):
+            return l
+        if(isinstance(l[0], type(l))):
+            return self.flatten(l[0]) + self.flatten(l[1:])
+        return l[:1] + self.flatten(l[1:])
+    
     def schedule_fcfs(self):
         """
         Schedules Instruction Form list for a single run with latencies.
@@ -135,6 +152,7 @@ class Scheduler(object):
             List of lists with all occurance groups sorted by cardinality
             (smallest group first)
         """
+        pdb.set_trace()
         groups = [[] for x in range(len(set(port_occurances))-1)]
         for i, groupInd in enumerate(range(min(list(filter(lambda x: x > 0, port_occurances))),
                                            max(port_occurances) + 1)):
