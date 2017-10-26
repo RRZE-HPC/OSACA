@@ -828,7 +828,7 @@ def main():
     # Store args in global variables
     inp = parser.parse_args()
     if(inp.arch is None and inp.insert_marker is None):
-        raise ValueError('Please specify an architecture')
+        raise ValueError('Please specify an architecture.', file-sys.stderr)
     if(inp.arch is not None):
         arch = inp.arch.upper()
     filepath = inp.filepath
@@ -843,9 +843,15 @@ def main():
         osaca.tp_list = True
 
     if(incl_ibench):
-        osaca.include_ibench()
+        try:
+            osaca.include_ibench()
+        except UnboundLocalError:
+            print('Please specify an architecture.', file=sys.stderr)
     elif(iaca_flag):
-        osaca.inspect_with_iaca()
+        try:
+            osaca.inspect_with_iaca()
+        except UnboundLocalError:
+            print('Please specify an architecture.', file=sys.stderr)
     elif(insert_m):
         try:
             from kerncraft import iaca

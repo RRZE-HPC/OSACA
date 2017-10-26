@@ -107,7 +107,7 @@ class Testcase(object):
         if(tp):
             # Write throughput file
             f = open(os.path.dirname(__file__) + '/../benchmarks/' + self.instr + self.extension
-                     + '-tp.S', 'w')
+                     + '-TP.S', 'w')
             data = (self.def_instr + self.ninstr + self.init + self.dp1 + self.expand + self.gprPush
                     + self.zeroGPR + self.copy + self.loop_thrpt + self.gprPop + self.done)
             f.write(data)
