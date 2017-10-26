@@ -296,8 +296,9 @@ class Osaca(object):
         csv : str
             CSV data as string
         """
+        curr_dir = '/'.join(os.path.realpath(__file__).split('/')[:-1])
         try:
-            f = open('data/'+self.arch.lower()+'_data.csv', 'w')
+            f = open(curr_dir+'/data/'+self.arch.lower()+'_data.csv', 'w')
         except IOError:
             print('IOError: file \'{}\' not found in ./data'.format(self.arch.lower()+'_data.csv'),
                   file=self.file_output)
