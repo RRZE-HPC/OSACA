@@ -393,7 +393,7 @@ class Osaca(object):
                 self.indentChar = self.get_indent_chars(line)
             # Now count the number of whitespaces
             self.numSeps = (re.split(self.marker, line)[0]).count(self.indentChar)
-            self.sem = 2
+            self.sem = 3
         elif(self.sem > 0):
             # We're in the marked code snippet
             # Check if the line is ASM code and - if not - check if we're still in the loop
