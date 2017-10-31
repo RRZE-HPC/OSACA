@@ -550,7 +550,7 @@ class Osaca(object):
         # Only create benchmark if no label (LBL) is part of the operands
         if('LBL' in param_list or '' in param_list):
             return
-        tc = Testcase(mnemonic, list(reversed(param_list_types)), '64')
+        tc = Testcase(mnemonic, list(reversed(param_list_types)), '32')
         # Only write a testcase if it not already exists
         writeTP, writeLT = tc.is_in_dir()
         tc.write_testcase(not writeTP, not writeLT)
@@ -828,7 +828,7 @@ def main():
     # Store args in global variables
     inp = parser.parse_args()
     if(inp.arch is None and inp.insert_marker is None):
-        raise ValueError('Please specify an architecture.', file-sys.stderr)
+        raise ValueError('Please specify an architecture.', file=sys.stderr)
     if(inp.arch is not None):
         arch = inp.arch.upper()
     filepath = inp.filepath
