@@ -75,7 +75,8 @@ class Scheduler(object):
                 if(entry.TP.values[0] == 0):
                     t_all = ()
                 if(variations == 1):
-                    occ_ports[i] = [entry.TP.values[0] for x in range(self.ports)]
+                    for j in tup[0]:
+                        occ_ports[i][j] = entry.TP.values[0]
                 else:
                     for j in range(0, self.ports):
                         occ_ports[i][j] =  t_all.count(j) / variations
