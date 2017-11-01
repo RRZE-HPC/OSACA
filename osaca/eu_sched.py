@@ -74,8 +74,11 @@ class Scheduler(object):
                 t_all = self.flatten(tup)
                 if(entry.TP.values[0] == 0):
                     t_all = ()
-                for j in range(0, self.ports):
-                    occ_ports[i][j] =  t_all.count(j) / variations
+                if(variations == 1):
+                    occ_ports[i] = [entry.TP.values[0] for x in range(self.ports)]
+                else:
+                    for j in range(0, self.ports):
+                        occ_ports[i][j] =  t_all.count(j) / variations
             # Write schedule line
             sched += self.get_line(occ_ports[i], instrForm[-1])
             # Add throughput to total port binding
