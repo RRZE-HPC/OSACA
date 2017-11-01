@@ -384,3 +384,15 @@ class Testcase(object):
             if name+'.S' in files:
                 lt = True
         return (tp, lt)
+
+    def get_entryname(self):
+        """
+        Returns the name of the entry the instruction form would be the data file
+
+        Returns
+        -------
+        str
+            The composited string out of instruction mnemonic and operands
+        """
+        name = self.instr+self.extension
+        return name

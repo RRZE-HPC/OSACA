@@ -19,15 +19,15 @@ imd1 = Parameter('IMD')
 # -USER INPUT------------------------------------
 # -----------------------------------------------
 #  Enter your mnemonic
-mnemonic = 'vxorpd'
+mnemonic = 'add'
 
 # Define your operands. If you don't need it, just type in None
-dst = xmm
-op1 = xmm
-op2 = xmm
+dst = mem0
+op1 = imd1
+op2 = None
 
 # Define the number of instructions per loop (default: 12)
-per_loop = '128'
+per_loop = '32'
 
 # -----------------------------------------------
 # -----------------------------------------------

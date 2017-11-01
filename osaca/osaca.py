@@ -551,9 +551,11 @@ class Osaca(object):
         if('LBL' in param_list or '' in param_list):
             return
         tc = Testcase(mnemonic, list(reversed(param_list_types)), '32')
-        # Only write a testcase if it not already exists
+        # Only write a testcase if it not already exists or already in data file
         writeTP, writeLT = tc.is_in_dir()
-        tc.write_testcase(not writeTP, not writeLT)
+        inDB = len(self.df.loc[lambda df: df.instr == tc.get_entryname()])
+        if(inDB == 0):
+            tc.write_testcase(not writeTP, not writeLT)
 
     def separate_params(self, params):
         """
