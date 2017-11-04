@@ -57,9 +57,9 @@ class Scheduler(object):
             except IndexError:
                 # Instruction form not in CSV
                 if(instrForm[0][:3] == 'nop'):
-                    sched += self.get_line(occ_ports[i], '\" ' + instrForm[-1])
-                else:
                     sched += self.get_line(occ_ports[i], '* ' + instrForm[-1])
+                else:
+                    sched += self.get_line(occ_ports[i], 'X ' + instrForm[-1])
                 continue
             if(wTP):
                 # Get the occurance of each port from the occupation list
