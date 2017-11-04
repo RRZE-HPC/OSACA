@@ -5,7 +5,6 @@ import os
 import math
 import ast
 from operator import add
-import pdb
 import pandas as pd
 
 from osaca.param import Register, MemAddr
@@ -57,7 +56,10 @@ class Scheduler(object):
                     raise IndexError()
             except IndexError:
                 # Instruction form not in CSV
-                sched += self.get_line(occ_ports[i], '* ' + instrForm[-1])
+                if(instrForm[0][:3] == 'nop'):
+                    sched += self.get_line(occ_ports[i], '\" ' + instrForm[-1])
+                else:
+                    sched += self.get_line(occ_ports[i], '* ' + instrForm[-1])
                 continue
             if(wTP):
                 # Get the occurance of each port from the occupation list
@@ -156,7 +158,6 @@ class Scheduler(object):
             List of lists with all occurance groups sorted by cardinality
             (smallest group first)
         """
-        pdb.set_trace()
         groups = [[] for x in range(len(set(port_occurances))-1)]
         for i, groupInd in enumerate(range(min(list(filter(lambda x: x > 0, port_occurances))),
                                            max(port_occurances) + 1)):
@@ -222,6 +223,7 @@ class Scheduler(object):
         """
         analysis = 'Throughput Analysis Report\n' + ('-' * 26) + '\n'
         annotations = ('* - No information for this instruction in database\n'
+                       '\" - Instruction micro-ops not bound to a port\n'
                        '\n')
         return analysis + annotations
 
@@ -281,22 +283,27 @@ class Scheduler(object):
         str
             String containing the port binding graphical output
         """
+        sp_left, sp_right, total = self.get_spaces(port_bndg)
         header = 'Port Binding in Cycles Per Iteration:\n'
-        horiz_line = '-' * 10 + '-' * 6 * self.ports + '\n'
+        horiz_line = '-' * 10 + '-' * total + '\n'
         port_line = '|  Port  |'
         for i in range(0, self.ports):
-            port_line += '  {}  |'.format(i)
+            port_line += ' ' * sp_left[i] + str(i) + ' ' * sp_right[i] + '|'
         port_line += '\n'
         cyc_line = '| Cycles |'
         for i in range(len(port_bndg)):
-            space = ''
             cyc = str(round(port_bndg[i], 2))
-            if(len(cyc) < 4):
-                space = ' ' * (4 - len(cyc))
-            cyc_line += ' {}{}|'.format(cyc, space)
+            cyc_line += ' {} |'.format(cyc)
         cyc_line += '\n'
         binding = header + horiz_line + port_line + horiz_line + cyc_line + horiz_line
         return binding
+
+    def get_spaces(self, port_bndg):
+        len_list = [len(str(round(x, 2)))+1 for x in port_bndg]
+        total = sum([x+2 for x in len_list])
+        sp_left = [math.ceil(x/2) for x in len_list]
+        sp_right = [math.floor(x/2) for x in len_list]
+        return sp_left, sp_right, total
 
     def get_operand_suffix(self, instr_form):
         """
