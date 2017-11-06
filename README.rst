@@ -45,7 +45,10 @@ Design
 ======
 A schematic design of OSACA's workflow is shown below:
 [image]
-.. :: doc/osaca-workflow.svg
+
+.. figure:: doc/osaca-workflow.svg
+   :width: 80%
+   :alt: OSACA workflow
 
 
 Usage
@@ -73,7 +76,7 @@ For extracting the right kernel, one has to mark it beforehand. For this there a
 
 | **High level code**
 The OSACA marker is ``//STARTLOOP`` and must be put in one line in front of the loop head, and the loop code must be indented consistently. This means the marker and the head must have the same indentation level while the whole loop body needs to be more indented than the code before and after. For instance, this is a valid OSACA marker:
-.. code:: c
+.. code::
     int i = 0;
     //STARTLOOP
     while(i < N){
@@ -81,11 +84,11 @@ The OSACA marker is ``//STARTLOOP`` and must be put in one line in front of the 
         i++;
     }
 
-**Assembly code**
+| **Assembly code**
 Another way for marking a kernel is to insert the IACA byte markers in the assembly file in before and after the loop.
 For this, the start marker has to be inserted right in front of the loop label and the end marker directly after the jump instruction.
 Start and end marker can be seen in the example below:
-.. code:: assembly
+.. code::
     movl    $111,%ebx       #IACA START MARKER
     .byte   100,103,144     #IACA START MARKER
     # LABEL
@@ -107,7 +110,7 @@ The handling of ibench is shortly described in the example section below.
 
 Insert IACA markers
 ~~~~~~~~~~~~~~~~~~~
-Using the ``-m`` or ``--insert-marker`` flags for a given file, OSACA calls the implemented Kerncraft module for identifying and marking the inner-loop block in *manual mode*. More information about how this is done can be found in the `Kerncraft repository <https://github.com/RRZE-HPC/kerncraft>`.
+Using the ``-m`` or ``--insert-marker`` flags for a given file, OSACA calls the implemented Kerncraft module for identifying and marking the inner-loop block in *manual mode*. More information about how this is done can be found in the `Kerncraft repository <https://github.com/RRZE-HPC/kerncraft>`_.
 
 Example
 =======
