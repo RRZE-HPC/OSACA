@@ -25,7 +25,8 @@ Installation
 .. ::
    pip install --user osaca
 .. for the latest release.
-To build OSACA from source, clone this repository using ``git clone https://github.com/RRZE-HPC/OSACA`` and run in the root directory::
+To build OSACA from source, clone this repository using ``git clone https://github.com/RRZE-HPC/OSACA`` and run in the root directory:
+::
    python ./setup.py install
 
 After installation, OSACA can be started with the command ``osaca`` in the CLI.
@@ -37,18 +38,21 @@ Additional requirements are:
 -  `Python3 <https://www.python.org/>`_
 -  `pandas <http://pandas.pydata.org/>`_
 -  `NumPy <http://www.numpy.org/>`_
--  `Kerncraft <https://github.com/RRZE-HPC/kerncraft>`_
+-  `Kerncraft <https://github.com/RRZE-HPC/kerncraft>`_ for marker insertion
 -   `ibench <https://github.com/hofm/ibench>`_ for throughput/latency measurements
 
 Design
 ======
-A schematic design of OSACA is shown below:
+A schematic design of OSACA's workflow is shown below:
 [image]
+.. :: doc/osaca-workflow.svg
+
 
 Usage
 =====
 
-The usage of OSACA can be listed as::
+The usage of OSACA can be listed as:
+::
     osaca [-h] [-V] [--arch ARCH] [--tp-list] [-i | --iaca | -m] FILEPATH
 
 - ``-h`` or ``--help`` prints out the help message.
@@ -63,11 +67,13 @@ Hereinafter OSACA's scope of function will be described.
 
 Throughput analysis
 ~~~~~~~~~~~~~~~~~~~
-As main functionality of OSACA this process starts by default. It is necessary to specify the core architecture by the flag ``--arch ARCH``, where ``ARCH`` can stand for ``SNB``, ``IVB``, ``HSW``, ``BDW`` or ``SKL``.
+As main functionality of OSACA this process starts by default. It is always necessary to specify the core architecture by the flag ``--arch ARCH``, where ``ARCH`` can stand for ``SNB``, ``IVB``, ``HSW``, ``BDW`` or ``SKL``.
 
 For extracting the right kernel, one has to mark it beforehand. For this there are two different approaches:
-**High level code**
-The OSACA marker is ``//STARTLOOP`` and must be put in one line in front of the loop head, and the loop code must be indented consistently. This means the marker and the head must have the same indentation level while the whole loop body needs to be more indented than the code before and after. For instance, this is a valid OSACA marker::
+
+| **High level code**
+The OSACA marker is ``//STARTLOOP`` and must be put in one line in front of the loop head, and the loop code must be indented consistently. This means the marker and the head must have the same indentation level while the whole loop body needs to be more indented than the code before and after. For instance, this is a valid OSACA marker:
+.. code:: c
     int i = 0;
     //STARTLOOP
     while(i < N){
@@ -78,7 +84,8 @@ The OSACA marker is ``//STARTLOOP`` and must be put in one line in front of the 
 **Assembly code**
 Another way for marking a kernel is to insert the IACA byte markers in the assembly file in before and after the loop.
 For this, the start marker has to be inserted right in front of the loop label and the end marker directly after the jump instruction.
-Start and end marker can be seen in the example below::
+Start and end marker can be seen in the example below:
+.. code:: assembly
     movl    $111,%ebx       #IACA START MARKER
     .byte   100,103,144     #IACA START MARKER
     # LABEL
@@ -104,7 +111,7 @@ Using the ``-m`` or ``--insert-marker`` flags for a given file, OSACA calls the 
 
 Example
 =======
-example
+
 
 Credits
 =======
