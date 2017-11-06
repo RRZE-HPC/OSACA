@@ -35,11 +35,11 @@ Dependencies:
 ~~~~~~~~~~~~~~~
 Additional requirements are:
 
--  `Python3 <https://www.python.org/>`
--  `pandas <http://pandas.pydata.org/>`
--  `NumPy <http://www.numpy.org/>`
--  `Kerncraft <https://github.com/RRZE-HPC/kerncraft>`
--   `ibench <https://github.com/hofm/ibench` for throughput/latency measurements
+-  `Python3 <https://www.python.org/>`_
+-  `pandas <http://pandas.pydata.org/>`_
+-  `NumPy <http://www.numpy.org/>`_
+-  `Kerncraft <https://github.com/RRZE-HPC/kerncraft>`_
+-   `ibench <https://github.com/hofm/ibench`_    for throughput/latency measurements
    
 Usage
 =====
@@ -50,14 +50,10 @@ The usage of OSACA can be listed as:
 
 - ``-h`` or ``--help`` prints out the help message.
 - ``-V`` or ``--version`` shows the program’s version number.
-- ``ARCH`` needs to be replaced with the wished architecture abbreviation. This flag is necessary for the
-    throughput analysis (default function) and the inclusion of an ibench output (``-i``). Possible options are ``SNB``, ``IVB``,  
-    ``HSW``, ``BDW`` and ``SKL`` for the latest Intel micro architectures starting from Intel Sandy Bridge.
-- While in the throughput analysis mode, one can add ``--tp-list`` for printing the additional throughput list of the kernel or 
-    ``--iaca`` for letting OSACA to know it has to search for IACA binary markers.
+- ``ARCH`` needs to be replaced with the wished architecture abbreviation. This flag is necessary for the throughput analysis (default function) and the inclusion of an ibench output (``-i``). Possible options are ``SNB``, ``IVB``, ``HSW``, ``BDW`` and ``SKL`` for the latest Intel micro architectures starting from Intel Sandy Bridge.
+- While in the throughput analysis mode, one can add ``--tp-list`` for printing the additional throughput list of the kernel or ``--iaca`` for letting OSACA to know it has to search for IACA binary markers.
 - ``-i`` or ``--include-ibench`` starts the integration of ibench output into the CSV data file determined by ``ARCH``.
-- With the flag ``-m`` or ``--insert-marker`` OSACA calls the Kerncraft module for the interactively insertion of 
-    `IACA <https://software.intel.com/en-us/articles/intel-architecture-code-analyzer>` marker in suggested assembly blocks.
+- With the flag ``-m`` or ``--insert-marker`` OSACA calls the Kerncraft module for the interactively insertion of `IACA <https://software.intel.com/en-us/articles/intel-architecture-code-analyzer>`_ marker in suggested assembly blocks.
 - ``FILEPATH`` describes the filepath to the file to work with and is always necessary
 
 Hereinafter the main tasks will be described.
