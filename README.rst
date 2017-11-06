@@ -6,8 +6,8 @@ Open Source Architecture Code Analyzer
 
 This tool allows automatic instruction fetching of assembly code,
 auto-generating of testcases for assembly instructions creating latency
-and throughput benchmarks on a specific instruction form and thorughput
-analysis and throughput prediction for a inner-most loop code snippet.
+and throughput benchmarks on a specific instruction form and throughput
+analysis and throughput prediction for a innermost loop kernel.
 
 .. image:: https://travis-ci.com/RRZE-HPC/OSACA.svg?token=393L6z2HEXNiGLtZ43s6&branch=master
     :target: https://travis-ci.com/RRZE-HPC/OSACA
@@ -21,27 +21,59 @@ Getting started
 
 Installation
 ~~~~~~~~~~~~
-On most systems with python pip and setuputils installed, just run:
-::
+.. On most systems with python pip and setuputils installed, just run:
+.. ::
    pip install --user osaca
-for the latest release.
-If you want to build from source, clone this repository using ``git clone https://github.com/RRZE-HPC/OSACA`` and run in the root directory:
+.. for the latest release.
+To build OSACA from source, clone this repository using ``git clone https://github.com/RRZE-HPC/OSACA`` and run in the root directory:
 ::
    python ./setup.py install
 
-*Dependencies:*
+After installation, OSACA can be started with the command ``osaca`` in the CLI.
+
+Dependencies:
 ~~~~~~~~~~~~~~~
 Additional requirements are:
 
--  `Python <https://www.python.org/>`__ 3.5.2 or higher
--  `pandas <http://pandas.pydata.org/>`__ 0.18.1 or higher
--  `NumPy <http://www.numpy.org/>`__ 1.11.1 or higher
--  `kerncraft <https://github.com/RRZE-HPC/kerncraft>`__ 0.4.11 or
-   higher
+-  `Python3 <https://www.python.org/>`
+-  `pandas <http://pandas.pydata.org/>`
+-  `NumPy <http://www.numpy.org/>`
+-  `Kerncraft <https://github.com/RRZE-HPC/kerncraft>`
+-   `ibench <https://github.com/hofm/ibench` for throughput/latency measurements
    
 Usage
 =====
-Yet to be written.
+
+The usage of OSACA can be listed as:
+::
+    osaca [-h] [-V] [--arch ARCH] [--tp-list] [-i | --iaca | -m] FILEPATH
+
+- ``-h`` or ``--help`` prints out the help message.
+- ``-V`` or ``--version`` shows the program’s version number.
+- ``ARCH`` needs to be replaced with the wished architecture abbreviation. This flag is necessary for the
+    throughput analysis (default function) and the inclusion of an ibench output (``-i``). Possible options are ``SNB``, ``IVB``,  
+    ``HSW``, ``BDW`` and ``SKL`` for the latest Intel micro architectures starting from Intel Sandy Bridge.
+- While in the throughput analysis mode, one can add ``--tp-list`` for printing the additional throughput list of the kernel or 
+    ``--iaca`` for letting OSACA to know it has to search for IACA binary markers.
+- ``-i`` or ``--include-ibench`` starts the integration of ibench output into the CSV data file determined by ``ARCH``.
+- With the flag ``-m`` or ``--insert-marker`` OSACA calls the Kerncraft module for the interactively insertion of 
+    `IACA <https://software.intel.com/en-us/articles/intel-architecture-code-analyzer>` marker in suggested assembly blocks.
+- ``FILEPATH`` describes the filepath to the file to work with and is always necessary
+
+Hereinafter the main tasks will be described.
+
+Throughput analysis
+~~~~~~~~~~~~~~~~~~~
+Lorem ipsum
+
+Include new measurements into the data file
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Lorem ipsum
+
+Insert IACA markers
+~~~~~~~~~~~~~~~~~~~
+Lorem ipsum
+
 
 Credits
 =======
