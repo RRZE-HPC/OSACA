@@ -44,8 +44,10 @@ Additional requirements are:
 Design
 ======
 A schematic design of OSACA's workflow is shown below:
-[image]
-.. :: doc/osaca-workflow.svg
+
+.. image:: doc/osaca-workflow.png
+   :alt: OSACA workflow
+   :width: 80%
 
 
 Usage
