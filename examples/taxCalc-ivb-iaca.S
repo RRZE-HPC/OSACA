@@ -47,13 +47,10 @@ main:
         vxorps    %xmm1, %xmm1, %xmm1                           #9.5
         vmovss    %xmm1, (%rsp)                                 #9.5
 
-        movl $111,%ebx
-        .byte 100,103,144
+        movl $111,%ebx          #IACA START
+        .byte 100,103,144       #IACA START
                                 # LOE rax rbx r12 r13 r14 r15 xmm0 xmm1
-        movl      $111, %ebx # INSERTED BY KERNCRAFT IACA MARKER UTILITY
-        .byte     100        # INSERTED BY KERNCRAFT IACA MARKER UTILITY
-        .byte     103        # INSERTED BY KERNCRAFT IACA MARKER UTILITY
-        .byte     144        # INSERTED BY KERNCRAFT IACA MARKER UTILITY
+
 ..B1.4:                         # Preds ..B1.4 ..B1.3
         lea       1(%rax,%rax), %edx                            #12.9
         vcvtsi2ss %edx, %xmm2, %xmm2                            #12.27
@@ -69,13 +66,11 @@ main:
         incq      %rax                                          #11.5
         cmpq      $499, %rax                                    #11.5
         jb        ..B1.4        # Prob 99%                      #11.5
-        movl      $222, %ebx # INSERTED BY KERNCRAFT IACA MARKER UTILITY
-        .byte     100        # INSERTED BY KERNCRAFT IACA MARKER UTILITY
-        .byte     103        # INSERTED BY KERNCRAFT IACA MARKER UTILITY
-        .byte     144        # INSERTED BY KERNCRAFT IACA MARKER UTILITY
+
+        movl $222,%ebx          #IACA END
+        .byte 100,103,144       #IACA END
+
                                 # LOE rax rbx r12 r13 r14 r15 xmm0 xmm1
-        movl $222,%ebx
-        .byte 100,103,144
 ..B1.5:                         # Preds ..B1.4
         vmovss    3992(%rsp), %xmm0                             #12.18
         movl      $il0_peep_printf_format_1, %edi               #15.5
