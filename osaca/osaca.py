@@ -103,9 +103,9 @@ class Osaca(object):
                         new = False
                         break
                 if(new and clmn == 'TP'):
-                    new_data.append([instr, clk_cyc, '-1', ((-1,),)])
+                    new_data.append([instr, clk_cyc, '-1', (-1,)])
                 elif(new and clmn == 'LT'):
-                    new_data.append([instr, '-1', clk_cyc, ((-1,),)])
+                    new_data.append([instr, '-1', clk_cyc, (-1,)])
                 new = True
                 added_vals += 1
             # If val is -1 (= not filled with a valid value) add it immediately
@@ -641,7 +641,7 @@ class Osaca(object):
         if(pr_sched):
             output += '\n\n'
             sched = Scheduler(self.arch, self.instr_forms)
-            sched_output, port_binding = sched.schedule()
+            sched_output, port_binding = sched.new_schedule()
             binding = sched.get_port_binding(port_binding)
             output += sched.get_report_info() + '\n' + binding + '\n\n' + sched_output
             block_tp = round(max(port_binding), 2)
