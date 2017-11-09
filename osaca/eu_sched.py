@@ -29,6 +29,42 @@ class Scheduler(object):
         curr_dir = os.path.realpath(__file__)[:-11]
         self.df = pd.read_csv(curr_dir + 'data/' + arch.lower() + '_data.csv', quotechar='"',
                               converters={'ports': ast.literal_eval})
+    def new_schedule(self):
+        """
+        Schedules Instruction Form list and calculates port bindings.
+
+        Returns
+        -------
+        (str, [int, ...])
+            A tuple containing the graphic output of the schedule as string and
+            the port bindings as list of ints.
+        """
+        sched = self.get_head()
+        # Initialize ports
+        occ_ports = [[0] * self.ports for x in range(len(self.instrList))]
+        port_bndgs = [0] * self.ports
+        # Check if there's a port occupation stored in the CSV, otherwise leave the
+        # occ_port list item empty
+        for i, instrForm in enumerate(self.instrList):
+            try:
+                search_string = instrForm[0] + '-' + self.get_operand_suffix(instrForm)
+                entry = self.df.loc[lambda df, sStr=search_string: df.instr == sStr]
+                tup = entry.ports.values[0]
+                if(len(tup) == 1 and tup[0] == -1):
+                    raise IndexError()
+            except IndexError:
+                # Instruction form not in CSV
+                if(instrForm[0][:3] == 'nop'):
+                    sched += self.get_line(occ_ports[i], '* ' + instrForm[-1])
+                else:
+                    sched += self.get_line(occ_ports[i], 'X ' + instrForm[-1])
+                continue
+            occ_ports[i] = list(tup)
+            # Write schedule line
+            sched += self.get_line(occ_ports[i], instrForm[-1])
+            # Add throughput to total port binding
+            port_bndgs = list(map(add, port_bndgs, occ_ports[i]))
+        return (sched, port_bndgs)
 
     def schedule(self):
         """
@@ -87,15 +123,14 @@ class Scheduler(object):
             # Add throughput to total port binding
             port_bndgs = list(map(add, port_bndgs, occ_ports[i]))
         return (sched, port_bndgs)
-
     
     def flatten(self, l):
         if(len(l) == 0):
             return l
         if(isinstance(l[0], type(l))):
             return self.flatten(l[0]) + self.flatten(l[1:])
-        return l[:1] + self.flatten(l[1:])
-    
+        return l[:1] + self.flatten(l[1:])   
+
     def schedule_fcfs(self):
         """
         Schedules Instruction Form list for a single run with latencies.
@@ -222,8 +257,8 @@ class Scheduler(object):
             String containing the report information
         """
         analysis = 'Throughput Analysis Report\n' + ('-' * 26) + '\n'
-        annotations = ('* - No information for this instruction in database\n'
-                       '\" - Instruction micro-ops not bound to a port\n'
+        annotations = ('X - No information for this instruction in database\n'
+                       '* - Instruction micro-ops not bound to a port\n'
                        '\n')
         return analysis + annotations
 
@@ -265,7 +300,10 @@ class Scheduler(object):
         line = ''
         for i in occ_ports:
             cycles = '    ' if (i == 0) else '%.2f' % float(i)
-            line += '| ' + cycles + ' '
+            if(i >= 10):
+                line += '|' + cycles + ' '
+            else:
+                line += '| ' + cycles + ' '
         line += '| ' + instr_name + '\n'
         return line
 
