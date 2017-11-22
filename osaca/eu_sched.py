@@ -26,8 +26,9 @@ class Scheduler(object):
             print('Architecture not supportet for EU scheduling.', file=sys.stderr)
             sys.exit(1)
         self.instrList = instruction_list
-        curr_dir = os.path.realpath(__file__)[:-11]
-        self.df = pd.read_csv(curr_dir + 'data/' + arch.lower() + '_data.csv', quotechar='"',
+        #curr_dir = os.path.realpath(__file__)[:-11]
+        osaca_dir = os.path.expanduser('~/.osaca/')
+        self.df = pd.read_csv(osaca_dir + 'data/' + arch.lower() + '_data.csv', quotechar='"',
                               converters={'ports': ast.literal_eval})
     def new_schedule(self):
         """
