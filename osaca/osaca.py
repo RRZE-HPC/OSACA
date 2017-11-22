@@ -24,6 +24,7 @@ class Osaca(object):
     instr_forms = None
     tp_list = False
     file_output = ''
+    osaca_dir = os.path.expanduser('~') + '/.osaca/'
     # Variables for checking lines
     numSeps = 0
     indentChar = ''
@@ -48,6 +49,14 @@ class Osaca(object):
         self.filepath = _filepath
         self.instr_forms = []
         self.file_output = output
+        # Check if data files are already in usr dir, otherwise create them
+        if(not os.path.isdir(self.osaca_dir + 'data')):
+            print('Copying files in user directory...', file=self.file_output, end='')
+            subprocess.call(['mkdir', '-p', self.osaca_dir])
+            subprocess.call(['cp', '-r', 
+                             '/'.join(os.path.realpath(__file__).split('/')[:-1]) + '/data',
+                             self.osaca_dir])
+            print('Done!', file=self.file_output)
 
     # -----------------main functions depending on arguments--------------------
     def include_ibench(self):
@@ -283,8 +292,8 @@ class Osaca(object):
         DataFrame
             CSV as DataFrame object
         """
-        curr_dir = '/'.join(os.path.realpath(__file__).split('/')[:-1])
-        df = pd.read_csv(curr_dir+'/data/'+self.arch.lower()+'_data.csv')
+        #curr_dir = '/'.join(os.path.realpath(__file__).split('/')[:-1])
+        df = pd.read_csv(self.osaca_dir+'data/'+self.arch.lower()+'_data.csv')
         return df
 
     def write_csv(self, csv):
@@ -296,12 +305,12 @@ class Osaca(object):
         csv : str
             CSV data as string
         """
-        curr_dir = '/'.join(os.path.realpath(__file__).split('/')[:-1])
+        #curr_dir = '/'.join(os.path.realpath(__file__).split('/')[:-1])
         try:
-            f = open(curr_dir+'/data/'+self.arch.lower()+'_data.csv', 'w')
+            f = open(self.osaca_dir+'data/'+self.arch.lower()+'_data.csv', 'w')
         except IOError:
-            print('IOError: file \'{}\' not found in ./data'.format(self.arch.lower()+'_data.csv'),
-                  file=self.file_output)
+            print('IOError: file \'{}\' not found in $HOME/.osaca/data'.format(self.arch.lower()
+                  + '_data.csv'), file=self.file_output)
         f.write(csv)
         f.close()
 
