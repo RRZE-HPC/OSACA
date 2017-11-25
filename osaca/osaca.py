@@ -136,7 +136,7 @@ class Osaca(object):
         csv = self.df.to_csv(index=False)
         self.write_csv(csv)
         print('ibench output {} '.format(self.filepath.split('/')[-1])
-              + 'successfully in database included.', file=self.file_output)
+              + 'successfully in data file included.', file=self.file_output)
         print('{} values were added.'.format(added_vals), file=self.file_output)
 
     def inspect_binary(self):
@@ -712,7 +712,7 @@ class Osaca(object):
                     tp = self.df[self.df.instr == elem[0] + '-' + operands].TP.values[0]
                 except IndexError:
                     # Something went wrong
-                    print('Error while fetching data from database', file=self.file_output)
+                    print('Error while fetching data from data file', file=self.file_output)
                     continue
             # Did not found the exact instruction form.
             # Try to find the instruction form for register operands only
@@ -766,7 +766,7 @@ class Osaca(object):
                         tp = self.df[self.df.instr == elem[0]+'-'+operands].TP.values[0]
                     except IndexError:
                         # Something went wrong
-                        print('Error while fetching data from database', file=self.file_output)
+                        print('Error while fetching data from data file', file=self.file_output)
                         continue
                 # Did not found the register instruction form. Set warning and go on with
                 # throughput 0
@@ -828,7 +828,7 @@ def main():
     group = parser.add_mutually_exclusive_group(required=False)
     group.add_argument('-i', '--include-ibench', dest='incl', action='store_true',
                        help='includes the given values in form of the output of ibench in the'
-                            + 'database')
+                            + 'data file')
     group.add_argument('--iaca', dest='iaca', action='store_true',
                        help='search for IACA markers instead the OSACA marker')
     group.add_argument('-m', '--insert-marker', dest='insert_marker', action='store_true',
