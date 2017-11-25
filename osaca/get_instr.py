@@ -129,7 +129,7 @@ class InstrExtractor(object):
         else:
             tabs = '\t\t'
         instr_form = mnemonic+tabs+('  '.join(param_list))
-        # Check in database for instruction form and increment the counter
+        # Check in data file for instruction form and increment the counter
         if(instr_form in self.db):
             self.db[instr_form] = self.db[instr_form]+1
         else:
@@ -186,7 +186,7 @@ class InstrExtractor(object):
         try:
             file = open('.cnt_asm_ops.db', 'r')
         except FileNotFoundError:
-            print('no database found in current directory')
+            print('no data file found in current directory')
             return
         for line in file:
             mnemonic = line.split('\t')[0]
@@ -217,9 +217,9 @@ def main():
                                      + 'given files sorted by their number of occurences.')
     parser.add_argument('-V', '--version', action='version', version='%(prog)s 0.2')
     parser.add_argument('filepath', nargs='+', help='path to objdump(s)')
-    parser.add_argument('-l', '--load', dest='load', action='store_true', help='load database'
+    parser.add_argument('-l', '--load', dest='load', action='store_true', help='load data file'
                         + ' before checking new files')
-    parser.add_argument('-s', '--store', dest='store', action='store_true', help='store database '
+    parser.add_argument('-s', '--store', dest='store', action='store_true', help='store data file '
                         + 'before checking new files')
 
     # Create object and store arguments as attribute

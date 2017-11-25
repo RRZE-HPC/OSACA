@@ -258,7 +258,7 @@ class Scheduler(object):
             String containing the report information
         """
         analysis = 'Throughput Analysis Report\n' + ('-' * 26) + '\n'
-        annotations = ('X - No information for this instruction in database\n'
+        annotations = ('X - No information for this instruction in data file\n'
                        '* - Instruction micro-ops not bound to a port\n'
                        '\n')
         return analysis + annotations
@@ -356,7 +356,7 @@ class Scheduler(object):
         Returns
         -------
         str
-            Operand suffix for searching in database
+            Operand suffix for searching in data file
         """
         op_ext = []
         for i in range(1, len(instr_form)-1):
