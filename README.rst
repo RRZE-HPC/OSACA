@@ -1,3 +1,7 @@
+.. image:: doc/osaca-logo.png
+   :alt: OSACA logo
+   :width: 80%
+   
 OSACA
 =====
 
