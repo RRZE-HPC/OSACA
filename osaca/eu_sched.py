@@ -12,7 +12,7 @@ from osaca.param import Register, MemAddr
 
 class Scheduler(object):
 
-    arch_dict = {'SNB': 6, 'IVB': 6, 'HSW': 8, 'BDW': 8, 'SKL': 8}
+    arch_dict = {'SNB': 6, 'IVB': 6, 'HSW': 8, 'BDW': 8, 'SKL': 8, 'ZEN': 10}
     ports = None        # type: int
     instrList = None    # type: list<list<str,Param[,Param][,Param],str>>,
     # content of most inner list in instrList: instr, operand(s), instr form

@@ -202,7 +202,7 @@ class Osaca(object):
             False   if arch is not supported
 
         """
-        arch_list = ['SNB', 'IVB', 'HSW', 'BDW', 'SKL']
+        arch_list = ['SNB', 'IVB', 'HSW', 'BDW', 'SKL', 'ZEN']
         if(self.arch in arch_list):
             return True
         else:
