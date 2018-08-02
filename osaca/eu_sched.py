@@ -17,6 +17,11 @@ class Scheduler(object):
     instrList = None    # type: list<list<str,Param[,Param][,Param],str>>,
     # content of most inner list in instrList: instr, operand(s), instr form
     df = None           # type: DataFrame
+    # for parallel ld/st in archs with 1 st/cy and >1 ld/cy, able to do 1 st and 1 ld in 1cy
+    ld_ports = None     # type: list<int>
+    # enable flag for parallel ld/st
+    en_par_ldst = False # type: boolean
+
 
     def __init__(self, arch, instruction_list):
         arch = arch.upper()
@@ -25,6 +30,10 @@ class Scheduler(object):
         except KeyError:
             print('Architecture not supportet for EU scheduling.', file=sys.stderr)
             sys.exit(1)
+        # check for parallel ld/st in a cycle
+        if(arch == 'ZEN'):
+            self.en_par_ldst = True
+            self.ld_ports = [8, 9]
         self.instrList = instruction_list
         #curr_dir = os.path.realpath(__file__)[:-11]
         osaca_dir = os.path.expanduser('~/.osaca/')
@@ -44,6 +53,14 @@ class Scheduler(object):
         # Initialize ports
         occ_ports = [[0] * self.ports for x in range(len(self.instrList))]
         port_bndgs = [0] * self.ports
+        # Store instruction counter for parallel ld/st
+        par_ldst = 0
+        # Count the number of store instr if we schedule for an architecture with par ld/st
+        if(self.en_par_ldst):
+            for i, instrForm in enumerate(self.instrList):
+                if(isinstance(instrForm[1], MemAddr)):
+                    print('({}) is st --> par_ldst = {}'.format(i, par_ldst + 1))
+                    par_ldst += 1
         # Check if there's a port occupation stored in the CSV, otherwise leave the
         # occ_port list item empty
         for i, instrForm in enumerate(self.instrList):
@@ -61,8 +78,24 @@ class Scheduler(object):
                     sched += self.get_line(occ_ports[i], 'X ' + instrForm[-1])
                 continue
             occ_ports[i] = list(tup)
+            # Check if it's a ld including instr 
+            p_flg = ''
+            if(self.en_par_ldst):
+                # Check for ld
+                if(isinstance(instrForm[-2], MemAddr) or 
+                  (len(instrForm) > 4 and isinstance(instrForm[2], MemAddr))):
+                    if(par_ldst > 0):
+                        par_ldst -= 1
+                        p_flg = 'P '
+                        for port in self.ld_ports:
+                            occ_ports[i][port] = '(' + str(occ_ports[i][port]) + ')'
             # Write schedule line
-            sched += self.get_line(occ_ports[i], instrForm[-1])
+            if(len(p_flg) > 0):
+                sched += self.get_line(occ_ports[i], p_flg + instrForm[-1])
+                for port in self.ld_ports:
+                    occ_ports[i][port] = 0
+            else:
+                sched += self.get_line(occ_ports[i], instrForm[-1])
             # Add throughput to total port binding
             port_bndgs = list(map(add, port_bndgs, occ_ports[i]))
         return (sched, port_bndgs)
@@ -258,7 +291,8 @@ class Scheduler(object):
             String containing the report information
         """
         analysis = 'Throughput Analysis Report\n' + ('-' * 26) + '\n'
-        annotations = ('X - No information for this instruction in data file\n'
+        annotations = ('P - Load operation can be hidden behind a past or future store instruction\n'
+                       'X - No information for this instruction in data file\n'
                        '* - Instruction micro-ops not bound to a port\n'
                        '\n')
         return analysis + annotations
@@ -299,12 +333,19 @@ class Scheduler(object):
             String for output containing port scheduling for instr_name
         """
         line = ''
+        r_space = ' '
         for i in occ_ports:
-            cycles = '    ' if (i == 0) else '%.2f' % float(i)
-            if(i >= 10):
-                line += '|' + cycles + ' '
+            if(isinstance(i, str)):
+                cycles = i
+                i = float(i[1:-1])
+                r_space = ''
             else:
-                line += '| ' + cycles + ' '
+                cycles = '    ' if (i == 0) else '%.2f' % float(i)
+                r_space = ' '
+            if(i >= 10):
+                line += '|' + cycles + r_space
+            else:
+                line += '| ' + cycles + r_space
         line += '| ' + instr_name + '\n'
         return line
 
