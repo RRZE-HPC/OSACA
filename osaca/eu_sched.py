@@ -58,7 +58,7 @@ class Scheduler(object):
         # Count the number of store instr if we schedule for an architecture with par ld/st
         if(self.en_par_ldst):
             for i, instrForm in enumerate(self.instrList):
-                if(isinstance(instrForm[1], MemAddr)):
+                if(isinstance(instrForm[1], MemAddr) and len(instrForm) > 3):
                     print('({}) is st --> par_ldst = {}'.format(i, par_ldst + 1))
                     par_ldst += 1
         # Check if there's a port occupation stored in the CSV, otherwise leave the
