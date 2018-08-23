@@ -871,8 +871,12 @@ def main():
                   + '\'pip install --user kerncraft\' for installation.\nFor more information see '
                   + 'https://github.com/RRZE-HPC/kerncraft', file=sys.stderr)
             sys.exit(1)
-        iaca.iaca_instrumentation(input_file=filepath, output_file=filepath,
-                                  block_selection='manual', pointer_increment=1)
+        # Change due to newer kerncraft version (hopefully temporary)
+        #iaca.iaca_instrumentation(input_file=filepath, output_file=filepath,
+        #                          block_selection='manual', pointer_increment=1)
+        with open(filepath, 'r') as f_in, open(filepath[:-2] + '-iaca.s', 'w') as f_out:
+            iaca.iaca_instrumentation(input_file=f_in, output_file=f_out, 
+                                      block_selection='manual', pointer_increment=1)
     else:
         osaca.inspect_binary()
 
