@@ -13,6 +13,7 @@ from osaca.param import Register, MemAddr
 class Scheduler(object):
 
     arch_dict = {'SNB': 6, 'IVB': 6, 'HSW': 8, 'BDW': 8, 'SKL': 8, 'ZEN': 10}
+    dv_port_dict = {'SKL': 0, 'ZEN': 3}
     ports = None        # type: int
     instrList = None    # type: list<list<str,Param[,Param][,Param],str>>,
     # content of most inner list in instrList: instr, operand(s), instr form
@@ -21,6 +22,7 @@ class Scheduler(object):
     ld_ports = None     # type: list<int>
     # enable flag for parallel ld/st
     en_par_ldst = False # type: boolean
+    dv_port = -1        # type: int
 
 
     def __init__(self, arch, instruction_list):
@@ -34,6 +36,13 @@ class Scheduler(object):
         if(arch == 'ZEN'):
             self.en_par_ldst = True
             self.ld_ports = [8, 9]
+        # check for DV port
+        try:
+            self.dv_port = self.dv_port_dict[arch]
+        except KeyError:
+            # no DV port available (yet, new feature in OSACA v0.2)
+            # do nothing
+            pass
         self.instrList = instruction_list
         #curr_dir = os.path.realpath(__file__)[:-11]
         osaca_dir = os.path.expanduser('~/.osaca/')
@@ -51,8 +60,12 @@ class Scheduler(object):
         """
         sched = self.get_head()
         # Initialize ports
-        occ_ports = [[0] * self.ports for x in range(len(self.instrList))]
-        port_bndgs = [0] * self.ports
+        # Add DV port, if it is existing
+        tmp_port = 0
+        if(self.dv_port != -1):
+            tmp_port = 1
+        occ_ports = [[0] * (self.ports + tmp_port) for x in range(len(self.instrList))]
+        port_bndgs = [0] * (self.ports + tmp_port)
         # Store instruction counter for parallel ld/st
         par_ldst = 0
         # Count the number of store instr if we schedule for an architecture with par ld/st
@@ -307,12 +320,17 @@ class Scheduler(object):
         str
             String containing the header
         """
-        horiz_line = '-' * 7 * self.ports + '-\n'
+        horiz_line = '-' * 7 * self.ports
+        if(self.dv_port != -1):
+            horiz_line += '-' * 6
+        horiz_line += '-\n'
         port_anno = (' ' * (math.floor((len(horiz_line) - 24) / 2)) + 'Ports Pressure in cycles'
                      + ' ' * (math.ceil((len(horiz_line) - 24) / 2)) + '\n')
         port_line = ''
         for i in range(0, self.ports):
             port_line += '|  {}   '.format(i)
+            if(i == self.dv_port):
+                port_line = port_line + '-  DV  '
         port_line += '|\n'
         head = port_anno + port_line + horiz_line
         return head
@@ -335,7 +353,8 @@ class Scheduler(object):
         """
         line = ''
         r_space = ' '
-        for i in occ_ports:
+        for p_num, i in enumerate(occ_ports):
+            pipe = '|'
             if(isinstance(i, str)):
                 cycles = i
                 i = float(i[1:-1])
@@ -343,10 +362,12 @@ class Scheduler(object):
             else:
                 cycles = '    ' if (i == 0) else '%.2f' % float(i)
                 r_space = ' '
+            if(p_num == self.dv_port + 1 and p_num != 0):
+                pipe = ' '
             if(i >= 10):
-                line += '|' + cycles + r_space
+                line += pipe + cycles + r_space
             else:
-                line += '| ' + cycles + r_space
+                line += pipe + ' ' + cycles + r_space
         line += '| ' + instr_name + '\n'
         return line
 
@@ -368,13 +389,21 @@ class Scheduler(object):
         header = 'Port Binding in Cycles Per Iteration:\n'
         horiz_line = '-' * 10 + '-' * total + '\n'
         port_line = '|  Port  |'
+        after_dv = 0
         for i in range(0, self.ports):
-            port_line += ' ' * sp_left[i] + str(i) + ' ' * sp_right[i] + '|'
+            if(i == self.dv_port):
+                port_line += ' ' * sp_left[i] + str(i) + ' ' * sp_right[i] + '-'
+                port_line += ' ' * (sp_left[i+1] - 1) + 'DV' + ' ' * sp_right[i+1] + '|'
+                after_dv = 1
+            else:
+                port_line += ' ' * sp_left[i + after_dv] + str(i) + ' ' * sp_right[i + after_dv] 
+                port_line += '|'
         port_line += '\n'
         cyc_line = '| Cycles |'
         for i in range(len(port_bndg)):
+            pipe = '|' if (i != self.dv_port) else ' '
             cyc = str(round(port_bndg[i], 2))
-            cyc_line += ' {} |'.format(cyc)
+            cyc_line += ' {} {}'.format(cyc, pipe)
         cyc_line += '\n'
         binding = header + horiz_line + port_line + horiz_line + cyc_line + horiz_line
         return binding
@@ -416,26 +445,3 @@ class Scheduler(object):
 
 if __name__ == '__main__':
     print('Nothing to do.')
-    # data = [
-    # ['lea',Register('RAX'),MemAddr('%edx,(%rax,%rax,1)'),'lea    0x1(%rax,%rax,1),%edx'],
-    # ['vcvtsi2ss',Register('XMM0'),Register('XMM0'),Register('RAX'),'vcvtsi2ss %edx,%xmm2,%xmm2'],
-    # ['vmulss',Register('XMM0'),Register('XMM0'),Register('XMM0'),'vmulss %xmm2,%xmm0,%xmm3'],
-    # ['lea',Register('RAX'),MemAddr('%edx,(%rax,%rax,1)'),'lea    0x2(%rax,%rax,1),%ecx'],
-    # ['vaddss',Register('XMM0'),Register('XMM0'),Register('XMM0'),'vaddss %xmm3,%xmm1,%xmm4'],
-    # ['vxorps',Register('XMM0'),Register('XMM0'),Register('XMM0'),'vxorps %xmm1, %xmm1,%xmm1'],
-    # ['vcvtsi2ss',Register('XMM0'),Register('XMM0'),Register('RAX'),'vcvtsi2ss %ecx,%xmm1,%xmm1'],
-    # ['vmulss',Register('XMM0'),Register('XMM0'),Register('XMM0'),'vmulss %xmm1,%xmm0,%xmm5'],
-    # ['vmovss',MemAddr('%edx,(%rax,%rax,1)'),Register('XMM0'),'vmovss %xmm4,0x4(%rsp,%rax,8)'],
-    # ['vaddss',Register('XMM0'),Register('XMM0'),Register('XMM0'),'vaddss %xmm5,%xmm4,%xmm1'],
-    # ['vmovss',MemAddr('%edx,(%rax,%rax,1)'),Register('XMM0'),'vmovss %xmm1,0x8(%rsp,%rax,8)'],
-    # ['inc',Register('RAX'),'inc    %rax'],
-    # ['cmp',Register('RAX'),Parameter('IMD'),'cmp    $0x1f3,%rax'],
-    # ['jb',Parameter('LBL'),'jb             400bc2 <main+0x62>']
-    # ]
-
-    # sched = Scheduler('ivb', data)
-    # output,binding = sched.schedule()
-    # print(sched.get_port_binding(binding))
-    # print(sched.get_report_info(),end='')
-    # print(output)
-    # print('Block Throughput: {}'.format(round(max(binding),2)))
