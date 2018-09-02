@@ -822,7 +822,7 @@ def main():
     parser.add_argument('-V', '--version', action='version', version='%(prog)s '
                         + __find_version('__init__.py'))
     parser.add_argument('--arch', dest='arch', type=str, help='define architecture '
-                                                              + '(SNB, IVB, HSW, BDW, SKL)')
+                                                              + '(SNB, IVB, HSW, BDW, SKL, ZEN)')
     parser.add_argument('--tp-list', dest='tp_list', action='store_true',
                         help='print an additional list of all throughput values for the kernel')
     group = parser.add_mutually_exclusive_group(required=False)
