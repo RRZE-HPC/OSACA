@@ -96,17 +96,19 @@ class Testcase(object):
             Controls if latency testcase should be written
             (default True)
         """
+        osaca_dir = os.path.expanduser('~') + '/.osaca/'
         if(lt):
             # Write latency file
-            call(['mkdir', '-p', os.path.dirname(__file__)+'/../benchmarks'])
-            f = open(os.path.dirname(__file__)+'/../benchmarks/'+self.instr+self.extension+'.S', 'w')
+            call(['mkdir', '-p', osaca_dir + 'benchmarks'])
+            f = open(osaca_dir + 'benchmarks/'+self.instr+self.extension+'.S', 'w')
             data = (self.def_instr + self.ninstr + self.init + self.dp1 + self.expand + self.gprPush
                     + self.zeroGPR + self.copy + self.loop_lat + self.gprPop + self.done)
             f.write(data)
             f.close()
         if(tp):
             # Write throughput file
-            f = open(os.path.dirname(__file__) + '/../benchmarks/' + self.instr + self.extension
+            call(['mkdir', '-p', osaca_dir + 'benchmarks'])
+            f = open(osaca_dir + 'benchmarks/' + self.instr + self.extension
                      + '-TP.S', 'w')
             data = (self.def_instr + self.ninstr + self.init + self.dp1 + self.expand + self.gprPush
                     + self.zeroGPR + self.copy + self.loop_thrpt + self.gprPop + self.done)
