@@ -35,7 +35,7 @@ class Scheduler(object):
         # check for parallel ld/st in a cycle
         if(arch == 'ZEN'):
             self.en_par_ldst = True
-            self.ld_ports = [8, 9]
+            self.ld_ports = [9, 10]
         # check for DV port
         try:
             self.dv_port = self.dv_port_dict[arch]
@@ -102,6 +102,7 @@ class Scheduler(object):
                         par_ldst -= 1
                         p_flg = 'P '
                         for port in self.ld_ports:
+                            tmp_port_add = 1 if(self.dv_port != -1 and self.dv_port < port) else 0
                             occ_ports[i][port] = '(' + str(occ_ports[i][port]) + ')'
             # Write schedule line
             if(len(p_flg) > 0):
