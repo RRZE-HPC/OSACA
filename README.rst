@@ -27,7 +27,8 @@ Installation
 ~~~~~~~~~~~~
 On most systems with python pip and setuputils installed, just run:
 
-::
+.. code:: bash
+
     pip install --user osaca
 
 for the latest release.
@@ -63,7 +64,8 @@ Usage
 
 The usage of OSACA can be listed as:
 
-::
+.. code:: bash
+
     osaca [-h] [-V] [--arch ARCH] [--tp-list] [-i | --iaca | -m] FILEPATH
 
 - ``-h`` or ``--help`` prints out the help message.
@@ -144,7 +146,8 @@ written in vector ``a``.
 After including the OSACA marker ``//STARTLOOP`` and compiling the source, one can
 start the analysis typing 
 
-::
+.. code:: bash
+
     osaca --arch IVB PATH/TO/FILE
 
 in the command line. Optionally, one can create the assembly code out of the file, identify and mark the kernel of interest and run OSACA with the additional ``--iaca`` flag.
@@ -203,13 +206,15 @@ subdirectory’s name and the shared objects. For running the tests the frequenc
 constant value and this has to be given as an argument together with the directory of the shared objects to
 ibench, e.g.:
 
-::
+.. code:: bash
+
     ./ibench ./AVX 2.2
     
 for running ibench in the directory ``AVX`` with a core frequency of 2.2 GHz.
 We get an output like:
 
-::
+.. code:: bash
+
     Using frequency 2.20GHz.
     add-mem_imd-TP: 1.023 (clock cycles) [DEBUG - result: 1.000000]
     add-mem_imd: 6.050 (clock cycles) [DEBUG - result: 1.000000]
@@ -226,7 +231,8 @@ The ibench output information can be included by OSACA running the program with 
 For now no automatic allocation of ports for a instruction form is implemented, so for getting an output in the Ports Pressure table, one must add the port occupation by hand.
 We know that the inserted instruction form must be assigned always to Port 2, 3 and 4 and additionally to either 0, 1 or 5, a valid data file therefore would look like this:
 
-::
+.. code:: bash
+
     addl-mem_imd,1.0,6.0,"(0.33,0.33,1.00,1.00,1.00,0.33)"
     
 Another thorughput analysis with OSACA now returns all information for the kernel:
