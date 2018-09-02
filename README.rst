@@ -25,10 +25,11 @@ Getting started
 
 Installation
 ~~~~~~~~~~~~
-.. On most systems with python pip and setuputils installed, just run:
-.. ::
-   pip install --user osaca
-.. for the latest release.
+On most systems with python pip and setuputils installed, just run:
+::
+ pip install --user osaca
+for the latest release.
+
 To build OSACA from source, clone this repository using ``git clone https://github.com/RRZE-HPC/OSACA`` and run in the root directory:
 
 .. code:: bash
@@ -64,7 +65,7 @@ The usage of OSACA can be listed as:
 
 - ``-h`` or ``--help`` prints out the help message.
 - ``-V`` or ``--version`` shows the program’s version number.
-- ``ARCH`` needs to be replaced with the wished architecture abbreviation. This flag is necessary for the throughput analysis (default function) and the inclusion of an ibench output (``-i``). Possible options are ``SNB``, ``IVB``, ``HSW``, ``BDW`` and ``SKL`` for the latest Intel micro architectures starting from Intel Sandy Bridge.
+- ``ARCH`` needs to be replaced with the wished architecture abbreviation. This flag is necessary for the throughput analysis (default function) and the inclusion of an ibench output (``-i``). Possible options are ``SNB``, ``IVB``, ``HSW``, ``BDW`` and ``SKL`` for the latest Intel micro architectures starting from Intel Sandy Bridge and ``ZEN`` for AMD Zen (17h family) architecture .
 - While in the throughput analysis mode, one can add ``--tp-list`` for printing the additional throughput list of the kernel or ``--iaca`` for letting OSACA to know it has to search for IACA binary markers.
 - ``-i`` or ``--include-ibench`` starts the integration of ibench output into the CSV data file determined by ``ARCH``.
 - With the flag ``-m`` or ``--insert-marker`` OSACA calls the Kerncraft module for the interactively insertion of `IACA <https://software.intel.com/en-us/articles/intel-architecture-code-analyzer>`_ marker in suggested assembly blocks.
@@ -74,7 +75,7 @@ Hereinafter OSACA's scope of function will be described.
 
 Throughput analysis
 ~~~~~~~~~~~~~~~~~~~
-As main functionality of OSACA this process starts by default. It is always necessary to specify the core architecture by the flag ``--arch ARCH``, where ``ARCH`` can stand for ``SNB``, ``IVB``, ``HSW``, ``BDW`` or ``SKL``.
+As main functionality of OSACA this process starts by default. It is always necessary to specify the core architecture by the flag ``--arch ARCH``, where ``ARCH`` can stand for ``SNB``, ``IVB``, ``HSW``, ``BDW``, ``SKL`` or ``ZEN``.
 
 For extracting the right kernel, one has to mark it beforehand. For this there are two different approaches:
 
