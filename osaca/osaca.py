@@ -202,7 +202,7 @@ class Osaca(object):
             False   if arch is not supported
 
         """
-        arch_list = ['SNB', 'IVB', 'HSW', 'BDW', 'SKL']
+        arch_list = ['SNB', 'IVB', 'HSW', 'BDW', 'SKL', 'ZEN']
         if(self.arch in arch_list):
             return True
         else:
@@ -822,7 +822,7 @@ def main():
     parser.add_argument('-V', '--version', action='version', version='%(prog)s '
                         + __find_version('__init__.py'))
     parser.add_argument('--arch', dest='arch', type=str, help='define architecture '
-                                                              + '(SNB, IVB, HSW, BDW, SKL)')
+                                                              + '(SNB, IVB, HSW, BDW, SKL, ZEN)')
     parser.add_argument('--tp-list', dest='tp_list', action='store_true',
                         help='print an additional list of all throughput values for the kernel')
     group = parser.add_mutually_exclusive_group(required=False)
@@ -871,8 +871,12 @@ def main():
                   + '\'pip install --user kerncraft\' for installation.\nFor more information see '
                   + 'https://github.com/RRZE-HPC/kerncraft', file=sys.stderr)
             sys.exit(1)
-        iaca.iaca_instrumentation(input_file=filepath, output_file=filepath,
-                                  block_selection='manual', pointer_increment=1)
+        # Change due to newer kerncraft version (hopefully temporary)
+        #iaca.iaca_instrumentation(input_file=filepath, output_file=filepath,
+        #                          block_selection='manual', pointer_increment=1)
+        with open(filepath, 'r') as f_in, open(filepath[:-2] + '-iaca.s', 'w') as f_out:
+            iaca.iaca_instrumentation(input_file=f_in, output_file=f_out, 
+                                      block_selection='manual', pointer_increment=1)
     else:
         osaca.inspect_binary()
 
