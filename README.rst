@@ -26,8 +26,10 @@ Getting started
 Installation
 ~~~~~~~~~~~~
 On most systems with python pip and setuputils installed, just run:
+
 ::
- pip install --user osaca
+    pip install --user osaca
+
 for the latest release.
 
 To build OSACA from source, clone this repository using ``git clone https://github.com/RRZE-HPC/OSACA`` and run in the root directory:
@@ -60,6 +62,7 @@ Usage
 =====
 
 The usage of OSACA can be listed as:
+
 ::
     osaca [-h] [-V] [--arch ARCH] [--tp-list] [-i | --iaca | -m] FILEPATH
 
@@ -80,6 +83,7 @@ As main functionality of OSACA this process starts by default. It is always nece
 For extracting the right kernel, one has to mark it beforehand. For this there are two different approaches:
 
 | **High level code**
+
 The OSACA marker is ``//STARTLOOP`` and must be put in one line in front of the loop head, and the loop code must be indented consistently. This means the marker and the head must have the same indentation level while the whole loop body needs to be more indented than the code before and after. For instance, this is a valid OSACA marker:
 
 .. code-block:: c
@@ -92,11 +96,12 @@ The OSACA marker is ``//STARTLOOP`` and must be put in one line in front of the 
     }
 
 | **Assembly code**
+
 Another way for marking a kernel is to insert the IACA byte markers in the assembly file in before and after the loop.
 For this, the start marker has to be inserted right in front of the loop label and the end marker directly after the jump instruction.
 Start and end marker can be seen in the example below:
 
-.. code-block:: assembly
+.. code-block:: gas
 
     movl    $111,%ebx       ;IACA START MARKER
     .byte   100,103,144     ;IACA START MARKER
@@ -138,6 +143,7 @@ The code shows a simple scalar multiplication of a vector ``b`` and a floating-p
 written in vector ``a``.
 After including the OSACA marker ``//STARTLOOP`` and compiling the source, one can
 start the analysis typing 
+
 ::
     osaca --arch IVB PATH/TO/FILE
 
@@ -196,11 +202,13 @@ from OSACA need to be placed in a subdirectory of src in root so ibench can crea
 subdirectory’s name and the shared objects. For running the tests the frequencies of all cores must set to a
 constant value and this has to be given as an argument together with the directory of the shared objects to
 ibench, e.g.:
+
 ::
     ./ibench ./AVX 2.2
     
 for running ibench in the directory ``AVX`` with a core frequency of 2.2 GHz.
 We get an output like:
+
 ::
     Using frequency 2.20GHz.
     add-mem_imd-TP: 1.023 (clock cycles) [DEBUG - result: 1.000000]
@@ -217,6 +225,7 @@ The ibench output information can be included by OSACA running the program with 
 
 For now no automatic allocation of ports for a instruction form is implemented, so for getting an output in the Ports Pressure table, one must add the port occupation by hand.
 We know that the inserted instruction form must be assigned always to Port 2, 3 and 4 and additionally to either 0, 1 or 5, a valid data file therefore would look like this:
+
 ::
     addl-mem_imd,1.0,6.0,"(0.33,0.33,1.00,1.00,1.00,0.33)"
     
