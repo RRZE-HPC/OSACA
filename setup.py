@@ -38,6 +38,7 @@ setup(
 
     description='Open Source Architecture Code Analyzer',
     long_description=long_description,
+    long_description_content_type='text/x-rst',
 
     # The project's main homepage
     url='https://github.com/RRZE-HPC/OSACA',
