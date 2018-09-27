@@ -10,11 +10,13 @@ import re
 
 here = os.path.abspath(os.path.dirname(__file__))
 
+
 # Stolen from pip
 def read(*names, **kwargs):
     with io.open(os.path.join(os.path.dirname(__file__), *names),
                  encoding=kwargs.get("encoding", "utf8")) as fp:
         return fp.read()
+
 
 # Stolen from pip
 def find_version(*file_paths):
@@ -23,6 +25,7 @@ def find_version(*file_paths):
     if version_match:
         return version_match.group(1)
     raise RuntimeError("Unable to find version string.")
+
 
 # Get the long description from the README file
 with open(os.path.join(here, 'README.rst'), encoding='utf-8') as f:
@@ -43,11 +46,11 @@ setup(
     # The project's main homepage
     url='https://github.com/RRZE-HPC/OSACA',
 
-    #Author details
+    # Author details
     author='Jan Laukemann',
     author_email='jan.laukemann@fau.de',
 
-    #Choose your license
+    # Choose your license
     license='AGPLv3',
 
     # See https://pypi.python.org/pypi?%3Aaction=list_classifiers
@@ -77,7 +80,6 @@ setup(
     # What doesd your project relate to?
     keywords='hpc performance benchmark analysis architecture',
 
-
     # You can just specify the packages manually here if your project is
     # simple. Or you can use find_packages().
     packages=find_packages(exclude=['contrib', 'docs', 'tests']),
@@ -97,10 +99,10 @@ setup(
     # dependencies). You can install these using the following syntax,
     # for example:
     # $ pip install -e .[dev,test]
-    #extras_require={
+    # extras_require={
     #    'dev': ['check-manifest'],
     #    'test': ['coverage'],
-    #},
+    # },
 
     # If there are data files included in your packages that need to be
     # installed, specify them here.  If using Python 2.6 or less, then these
@@ -111,7 +113,7 @@ setup(
     # need to place data files outside of your packages. See:
     # http://docs.python.org/3.4/distutils/setupscript.html#installing-additional-files # noqa
     # In this case, 'data_file' will be installed into '<sys.prefix>/my_data'
-    #data_files=[('my_data', ['data/data_file'])],
+    # data_files=[('my_data', ['data/data_file'])],
 
     # To provide executable scripts, use entry points in preference to the
     # "scripts" keyword. Entry points provide cross-platform support and allow
@@ -122,7 +124,3 @@ setup(
         ],
     },
 )
-
-    
-
-
