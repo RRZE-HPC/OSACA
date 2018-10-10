@@ -173,7 +173,7 @@ class Testcase(object):
 
     def __initialise_gprs(self):
         """
-        Initialise eleven general purpose registers and set them to zero.
+        Initialize eleven general purpose registers and set them to zero.
 
         Returns
         -------
@@ -193,7 +193,7 @@ class Testcase(object):
         return gpr_push, gpr_pop, zero_gpr
 
 
-# Copy created values in specific register
+    # Copy created values in specific register
     def __copy_regs(self, reg):
         """
         Copy created values in specific register.
@@ -209,7 +209,7 @@ class Testcase(object):
             String containing the copy instructions
         """
         copy = '\t\t# copy DP 1.0\n'
-# Different handling for GPR, MMX and SSE/AVX registers
+        # Different handling for GPR, MMX and SSE/AVX registers
         if reg.reg_type == 'GPR':
             copy += '\t\tvmovq {}, xmm0\n'.format(self.ops['gpr64'][0])
             copy += '\t\tvmovq {}, xmm0\n'.format(self.ops['gpr64'][1])
@@ -390,7 +390,7 @@ class Testcase(object):
 
     def get_entryname(self):
         """
-        Returns the name of the entry the instruction form would be the data file
+        Return the name of the entry the instruction form would be the data file
 
         Returns
         -------

@@ -16,9 +16,8 @@ from osaca.eu_sched import Scheduler
 from osaca.testcase import Testcase
 
 
-class Osaca(object):
+class OSACA(object):
     arch = None
-    filepath = None
     srcCode = None
     df = None
     instr_forms = None
@@ -37,16 +36,16 @@ class Osaca(object):
     ASM_LINE = re.compile(r'\s[0-9a-f]+[:]')
     # Matches every variation of the IACA start marker
     IACA_SM = re.compile(r'\s*movl[ \t]+\$111[ \t]*,[ \t]*%ebx.*\n\s*\.byte[ \t]+100.*'
-                         + r'((,[ \t]*103.*((,[ \t]*144)|(\n\s*\.byte[ \t]+144)))|(\n\s*\.byte'
-                         + r'[ \t]+103.*((,[ \t]*144)|(\n\s*\.byte[ \t]+144))))')
+                         r'((,[ \t]*103.*((,[ \t]*144)|(\n\s*\.byte[ \t]+144)))|(\n\s*\.byte'
+                         r'[ \t]+103.*((,[ \t]*144)|(\n\s*\.byte[ \t]+144))))')
     # Matches every variation of the IACA end marker
     IACA_EM = re.compile(r'\s*movl[ \t]+\$222[ \t]*,[ \t]*%ebx.*\n\s*\.byte[ \t]+100.*'
-                         + r'((,[ \t]*103.*((,[ \t]*144)|(\n\s*\.byte[ \t]+144)))|(\n\s*\.byte'
-                         + r'[ \t]+103.*((,[ \t]*144)|(\n\s*\.byte[ \t]+144))))')
+                         r'((,[ \t]*103.*((,[ \t]*144)|(\n\s*\.byte[ \t]+144)))|(\n\s*\.byte'
+                         r'[ \t]+103.*((,[ \t]*144)|(\n\s*\.byte[ \t]+144))))')
 
-    def __init__(self, _arch, _filepath, output=sys.stdout):
+    def __init__(self, _arch, file_path, output=sys.stdout):
         self.arch = _arch
-        self.filepath = _filepath
+        self.file_path = file_path
         self.instr_forms = []
         self.file_output = output
         # Check if data files are already in usr dir, otherwise create them
@@ -61,8 +60,7 @@ class Osaca(object):
     # -----------------main functions depending on arguments--------------------
     def include_ibench(self):
         """
-        Reads ibench output and includes it in the architecture specific csv
-        file.
+        Read ibench output and include it in the architecture specific csv file.
         """
         # Check args and exit program if something's wrong
         if not self.check_arch():
@@ -134,8 +132,8 @@ class Osaca(object):
                                  ignore_index=True)
         csv = self.df.to_csv(index=False)
         self.write_csv(csv)
-        print('ibench output {} '.format(self.filepath.split('/')[-1])
-              + 'successfully in data file included.', file=self.file_output)
+        print('ibench output {}'.format(self.file_path.split('/')[-1]),
+              'successfully in data file included.', file=self.file_output)
         print('{} values were added.'.format(added_vals), file=self.file_output)
 
     def inspect_binary(self):
@@ -219,7 +217,7 @@ class Osaca(object):
             False   if file does not exist or is not an elf64 file
 
         """
-        if os.path.isfile(self.filepath):
+        if os.path.isfile(self.file_path):
             self.store_src_code_elf()
             try:
                 if 'file format elf64' in self.srcCode[1].lower():
@@ -246,7 +244,7 @@ class Osaca(object):
             False   if file does not exist
 
         """
-        if os.path.isfile(self.filepath):
+        if os.path.isfile(self.file_path):
             self.store_src_code(iaca_flag)
             return True
         return False
@@ -256,7 +254,7 @@ class Osaca(object):
         Load binary file compiled with '-g' in class attribute srcCode and
         separate by line.
         """
-        self.srcCode = (subprocess.run(['objdump', '--source', self.filepath],
+        self.srcCode = (subprocess.run(['objdump', '--source', self.file_path],
                                        stdout=subprocess.PIPE,
                                        stderr=subprocess.PIPE).stdout.decode('utf-8').split('\n'))
 
@@ -270,7 +268,7 @@ class Osaca(object):
                 store file data as a string in attribute srcCode if True,
                 store it as a list of strings (lines) if False (default False)
         """
-        f = open(self.filepath, 'r')
+        f = open(self.file_path, 'r')
         self.srcCode = ''
         for line in f:
             self.srcCode += line
@@ -281,7 +279,7 @@ class Osaca(object):
 
     def read_csv(self):
         """
-        Reads architecture dependent CSV from data directory.
+        Read architecture dependent CSV from data directory.
 
         Returns
         -------
@@ -294,7 +292,7 @@ class Osaca(object):
 
     def write_csv(self, csv):
         """
-        Writes architecture dependent CSV into data directory.
+        Write architecture dependent CSV into data directory.
 
         Parameters
         ----------
@@ -308,7 +306,7 @@ class Osaca(object):
 
     def create_sequences(self, end=101):
         """
-        Creates list of integers from 1 to end and list of their reciprocals.
+        Create list of integers from 1 to end and list of their reciprocals.
 
         Parameters
         ----------
@@ -630,18 +628,18 @@ class Osaca(object):
             self.longestInstr = 70
         horiz_line = self.create_horiz_sep()
         # Write general information about the benchmark
-        output = ('--' + horiz_line + '\n'
-                  + '| Analyzing of file:\t' + os.path.abspath(self.filepath) + '\n'
-                  + '| Architecture:\t\t' + self.arch + '\n'
-                  + '| Timestamp:\t\t' + datetime.now().strftime('%Y-%m-%d %H:%M:%S') + '\n')
+        output = '--{}\n| Analyzing of file:\t{}| Architecture:\t\t{}\n| Timestamp:\t\t{}\n'.format(
+            horiz_line, os.path.abspath(self.file_path), self.arch,
+            datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        )
         if tp_list:
             output += self.create_tp_list(horiz_line)
         if pr_sched:
             output += '\n\n'
-            sched = Scheduler(self.arch, self.instr_forms)
-            sched_output, port_binding = sched.new_schedule()
-            binding = sched.get_port_binding(port_binding)
-            output += sched.get_report_info() + '\n' + binding + '\n\n' + sched_output
+            schedule = Scheduler(self.arch, self.instr_forms)
+            schedule_output, port_binding = schedule.new_schedule()
+            binding = schedule.get_port_binding(port_binding)
+            output += schedule.get_report_info() + '\n' + binding + '\n\n' + schedule_output
             block_tp = round(max(port_binding), 2)
             output += 'Total number of estimated throughput: ' + str(block_tp)
         return output
@@ -674,8 +672,7 @@ class Osaca(object):
         warning = False
         ws = ' ' * (len(horiz_line) - 23)
 
-        output = ('\n| INSTRUCTION' + ws + 'CLOCK CYCLES\n'
-                  + '| ' + horiz_line + '\n|\n')
+        output = '\n| INSTRUCTION{}CLOCK CYCLES\n| {}\n|\n'.format(ws, horiz_line)
         # Check for the throughput data in CSV
         for elem in self.instr_forms:
             op_ext = []
@@ -772,10 +769,9 @@ class Osaca(object):
         # Finally end the list of  throughput values
         output += '| ' + horiz_line + '\n'
         if warning:
-            output += ('\n\n* There was no throughput value found '
-                       'for the specific instruction form.'
-                       '\n  Please create a testcase via the create_testcase-method '
-                       'or add a value manually.')
+            output += ('\n\n* There was no throughput value found  for the specific instruction '
+                       'form.\n  Please create a testcase via the create_testcase-method or add a '
+                       'value manually.')
         return output
 
 
@@ -832,7 +828,7 @@ def main():
     insert_m = inp.insert_marker
 
     # Create Osaca object
-    osaca = Osaca(arch, filepath)
+    osaca = OSACA(arch, filepath)
     if inp.tp_list:
         osaca.tp_list = True
 
@@ -850,9 +846,9 @@ def main():
         try:
             from kerncraft import iaca
         except ImportError:
-            print('ImportError: Module kerncraft not installed. Use '
-                  + '\'pip install --user kerncraft\' for installation.\nFor more information see '
-                  + 'https://github.com/RRZE-HPC/kerncraft', file=sys.stderr)
+            print("ImportError: Module kerncraft not installed. Use 'pip install --user "
+                  "kerncraft' for installation.\nFor more information see "
+                  "https://github.com/RRZE-HPC/kerncraft", file=sys.stderr)
             sys.exit(1)
         # Change due to newer kerncraft version (hopefully temporary)
         # iaca.iaca_instrumentation(input_file=filepath, output_file=filepath,

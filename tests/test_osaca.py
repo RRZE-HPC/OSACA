@@ -7,14 +7,14 @@ import os
 import unittest
 
 sys.path.insert(0, '..')
-from osaca.osaca import Osaca
+from osaca.osaca import OSACA
 
 
 class TestOsaca(unittest.TestCase):
     def testIACABinary(self):
         out = StringIO()
         curr_dir = '/'.join(os.path.realpath(__file__).split('/')[:-1])
-        osa = Osaca('IVB', curr_dir + '/testfiles/taxCalc-ivb-iaca', out)
+        osa = OSACA('IVB', curr_dir + '/testfiles/taxCalc-ivb-iaca', out)
         osa.inspect_with_iaca()
         result = out.getvalue()
         result = '\n'.join(result.split('\n')[-27:])
@@ -26,7 +26,7 @@ class TestOsaca(unittest.TestCase):
     def testIACAasm1(self):
         out = StringIO()
         curr_dir = '/'.join(os.path.realpath(__file__).split('/')[:-1])
-        osa = Osaca('IVB', curr_dir + '/testfiles/taxCalc-ivb-iaca.S', out)
+        osa = OSACA('IVB', curr_dir + '/testfiles/taxCalc-ivb-iaca.S', out)
         osa.inspect_with_iaca()
         result = out.getvalue()
         result = '\n'.join(result.split('\n')[-27:])
@@ -38,7 +38,7 @@ class TestOsaca(unittest.TestCase):
     def testIACAasm2(self):
         out = StringIO()
         curr_dir = '/'.join(os.path.realpath(__file__).split('/')[:-1])
-        osa = Osaca('IVB', curr_dir + '/testfiles/taxCalc-ivb-iaca2.S', out)
+        osa = OSACA('IVB', curr_dir + '/testfiles/taxCalc-ivb-iaca2.S', out)
         osa.inspect_with_iaca()
         result = out.getvalue()
         result = '\n'.join(result.split('\n')[-27:])

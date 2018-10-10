@@ -49,7 +49,7 @@ class Scheduler(object):
 
     def new_schedule(self):
         """
-        Schedules Instruction Form list and calculates port bindings.
+        Schedule Instruction Form list and calculate port bindings.
 
         Returns
         -------
@@ -115,7 +115,7 @@ class Scheduler(object):
 
     def schedule(self):
         """
-        Schedules Instruction Form list and calculates port bindings.
+        Schedule Instruction Form list and calculate port bindings.
 
         Returns
         -------
@@ -179,7 +179,7 @@ class Scheduler(object):
 
     def schedule_fcfs(self):
         """
-        Schedules Instruction Form list for a single run with latencies.
+        Schedule Instruction Form list for a single run with latencies.
 
         Returns
         -------
@@ -224,8 +224,7 @@ class Scheduler(object):
 
     def get_occurance_groups(self, port_occurances):
         """
-        Groups ports in groups by the number of their occurance and sorts
-        groups by cardinality
+        Group ports in groups by the number of their occurrence and sorts groups by cardinality.
 
         Parameters
         ----------
@@ -250,8 +249,7 @@ class Scheduler(object):
 
     def get_port_occurances(self, tups):
         """
-        Returns the number of each port occurance for the possible port
-        occupations
+        Return the number of each port occurrence for the possible port occupations.
 
         Parameters
         ----------
@@ -272,7 +270,7 @@ class Scheduler(object):
 
     def test_ports_fcfs(self, occ_ports, needed_ports):
         """
-        Test if current configuration of ports is possible and returns boolean
+        Test if current configuration of ports is possible and returns boolean.
 
         Parameters
         ----------
@@ -294,7 +292,7 @@ class Scheduler(object):
 
     def get_report_info(self):
         """
-        Creates Report information including all needed annotations.
+        Create Report information including all needed annotations.
 
         Returns
         -------
@@ -310,7 +308,7 @@ class Scheduler(object):
 
     def get_head(self):
         """
-        Creates right heading for CPU architecture.
+        Create right heading for CPU architecture.
 
         Returns
         -------
@@ -369,7 +367,7 @@ class Scheduler(object):
 
     def get_port_binding(self, port_bndg):
         """
-        Creates port binding out of scheduling result.
+        Create port binding out of scheduling result.
 
         Parameters
         ----------
@@ -414,7 +412,7 @@ class Scheduler(object):
 
     def get_operand_suffix(self, instr_form):
         """
-        Creates operand suffix out of list of Parameters.
+        Create operand suffix out of list of Parameters.
 
         Parameters
         ----------

@@ -8,7 +8,7 @@ class Parameter(object):
             raise NameError('Type not supported: '+ptype)
 
     def __str__(self):
-        """returns string representation"""
+        """Return string representation."""
         if self.ptype == 'NONE':
             return ''
         else:
@@ -142,7 +142,7 @@ class Register(Parameter):
             raise NameError('Register name not in dictionary: {}'.format(self.name))
 
     def __str__(self):
-        """returns string representation"""
+        """Return string representation."""
         opmask = ''
         if self.mask:
             opmask = '{opmask}'
