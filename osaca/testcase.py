@@ -127,46 +127,46 @@ class Testcase(object):
             String tuple containing types of operands and if needed push/pop operations, the
             initialisation of general purpose regs and the copy if registers.
         """
-        oprnds = self.param_list
+        operands = self.param_list
         op_a, op_b, op_c = ('', '', '')
         gpr_push, gpr_pop, zero_gpr = ('', '', '')
-        if isinstance(oprnds[0], Register):
-            op_a = oprnds[0].reg_type.lower()
-        elif isinstance(oprnds[0], MemAddr):
+        if isinstance(operands[0], Register):
+            op_a = operands[0].reg_type.lower()
+        elif isinstance(operands[0], MemAddr):
             op_a = 'mem'
-        elif isinstance(oprnds[0], Parameter) and str(oprnds[0]) == 'IMD':
+        elif isinstance(operands[0], Parameter) and str(operands[0]) == 'IMD':
             op_a = 'imd'
         if op_a == 'gpr':
             gpr_push, gpr_pop, zero_gpr = self.__initialise_gprs()
-            op_a += str(oprnds[0].size)
-        if len(oprnds) > 1:
-            if isinstance(oprnds[1], Register):
-                op_b = oprnds[1].reg_type.lower()
-            elif isinstance(oprnds[1], MemAddr):
+            op_a += str(operands[0].size)
+        if len(operands) > 1:
+            if isinstance(operands[1], Register):
+                op_b = operands[1].reg_type.lower()
+            elif isinstance(operands[1], MemAddr):
                 op_b = 'mem'
-            elif isinstance(oprnds[1], Parameter) and str(oprnds[1]) == 'IMD':
+            elif isinstance(operands[1], Parameter) and str(operands[1]) == 'IMD':
                 op_b = 'imd'
             if op_b == 'gpr':
-                op_b += str(oprnds[1].size)
+                op_b += str(operands[1].size)
                 if 'gpr' not in op_a:
                     gpr_push, gpr_pop, zero_gpr = self.__initialise_gprs()
-        if len(oprnds) == 3:
-            if isinstance(oprnds[2], Register):
-                op_c = oprnds[2].reg_type.lower()
-            elif isinstance(oprnds[2], MemAddr):
+        if len(operands) == 3:
+            if isinstance(operands[2], Register):
+                op_c = operands[2].reg_type.lower()
+            elif isinstance(operands[2], MemAddr):
                 op_c = 'mem'
-            elif isinstance(oprnds[2], Parameter) and str(oprnds[2]) == 'IMD':
+            elif isinstance(operands[2], Parameter) and str(operands[2]) == 'IMD':
                 op_c = 'imd'
             if op_c == 'gpr':
-                op_c += str(oprnds[2].size)
+                op_c += str(operands[2].size)
                 if ('gpr' not in op_a) and ('gpr' not in op_b):
                     gpr_push, gpr_pop, zero_gpr = self.__initialise_gprs()
-        if len(oprnds) == 1 and isinstance(oprnds[0], Register):
-            copy = self.__copy_regs(oprnds[0])
-        elif len(oprnds) > 1 and isinstance(oprnds[1], Register):
-            copy = self.__copy_regs(oprnds[1])
-        elif len(oprnds) > 2 and isinstance(oprnds[2], Register):
-            copy = self.__copy_regs(oprnds[1])
+        if len(operands) == 1 and isinstance(operands[0], Register):
+            copy = self.__copy_regs(operands[0])
+        elif len(operands) > 1 and isinstance(operands[1], Register):
+            copy = self.__copy_regs(operands[1])
+        elif len(operands) > 2 and isinstance(operands[2], Register):
+            copy = self.__copy_regs(operands[1])
         else:
             copy = ''
         return op_a, op_b, op_c, gpr_push, gpr_pop, zero_gpr, copy
