@@ -73,7 +73,7 @@ class Osaca(object):
             sys.exit(1)
         # Check for database for the chosen architecture
         self.df = self.read_csv()
-        # Create sequence of numbers and their reciprokals for validate the measurements
+        # Create sequence of numbers and their reciprocals for validate the measurements
         cyc_list, reci_list = self.create_sequences()
         print('Everything seems fine! Let\'s start!', file=self.file_output)
         new_data = []
@@ -93,12 +93,17 @@ class Osaca(object):
             clk_cyc_tmp = clk_cyc
             clk_cyc = self.validate_val(clk_cyc, instr, True if (clmn == 'TP') else False,
                                         cyc_list, reci_list)
-            txt_output = True if (clk_cyc_tmp == clk_cyc) else False
+            txt_output = (clk_cyc_tmp == clk_cyc)
             val = -2
             new = False
             try:
                 entry = self.df.loc[lambda df, inst=instr: df.instr == inst, clmn]
                 val = entry.values[0]
+                # If val is -1 (= not filled with a valid value) add it immediately
+                if val == -1:
+                    self.df.set_value(entry.index[0], clmn, clk_cyc)
+                    added_vals += 1
+                    continue
             except IndexError:
                 # Instruction not in database yet --> add it
                 new = True
@@ -117,11 +122,6 @@ class Osaca(object):
                     new_data.append([instr, '-1', clk_cyc, (-1,)])
                 new = True
                 added_vals += 1
-            # If val is -1 (= not filled with a valid value) add it immediately
-            if val == -1:
-                self.df.set_value(entry.index[0], clmn, clk_cyc)
-                added_vals += 1
-                continue
             if not new and abs((val / np.float64(clk_cyc)) - 1) > 0.05:
                 print('Different measurement for {} ({}): {}(old) vs. '.format(instr, clmn, val)
                       + '{}(new)\nPlease check for correctness '.format(clk_cyc)
@@ -770,7 +770,6 @@ class Osaca(object):
             data = '| ' + elem[-1] + ws + '{:3.2f}'.format(tp) + n_f + '\n'
             output += data
         # Finally end the list of  throughput values
-        num_whitespaces = self.longestInstr - 27
         output += '| ' + horiz_line + '\n'
         if warning:
             output += ('\n\n* There was no throughput value found '
