@@ -79,27 +79,27 @@ class OSACA(object):
         for line in self.srcCode:
             if 'Using frequency' in line or len(line) == 0:
                 continue
-            clmn = 'LT'
+            column = 'LT'
             instr = line.split()[0][:-1]
             if 'TP' in line:
                 # We found a command with a throughput value. Get instruction and the number of
                 # clock cycles and remove the '-TP' suffix.
-                clmn = 'TP'
+                column = 'TP'
                 instr = instr[:-3]
             # Otherwise it is a latency value. Nothing to do.
             clk_cyc = float(line.split()[1])
             clk_cyc_tmp = clk_cyc
-            clk_cyc = self.validate_val(clk_cyc, instr, True if (clmn == 'TP') else False,
+            clk_cyc = self.validate_val(clk_cyc, instr, True if (column == 'TP') else False,
                                         cyc_list, reci_list)
             txt_output = (clk_cyc_tmp == clk_cyc)
             val = -2
             new = False
             try:
-                entry = self.df.loc[lambda df, inst=instr: df.instr == inst, clmn]
+                entry = self.df.loc[lambda df, inst=instr: df.instr == inst, column]
                 val = entry.values[0]
                 # If val is -1 (= not filled with a valid value) add it immediately
                 if val == -1:
-                    self.df.set_value(entry.index[0], clmn, clk_cyc)
+                    self.df.set_value(entry.index[0], column, clk_cyc)
                     added_vals += 1
                     continue
             except IndexError:
@@ -108,20 +108,20 @@ class OSACA(object):
                 # First check if LT or TP value has already been added before
                 for i, item in enumerate(new_data):
                     if instr in item:
-                        if clmn == 'TP':
+                        if column == 'TP':
                             new_data[i][1] = clk_cyc
-                        elif clmn == 'LT':
+                        elif column == 'LT':
                             new_data[i][2] = clk_cyc
                         new = False
                         break
-                if new and clmn == 'TP':
+                if new and column == 'TP':
                     new_data.append([instr, clk_cyc, '-1', (-1,)])
-                elif new and clmn == 'LT':
+                elif new and column == 'LT':
                     new_data.append([instr, '-1', clk_cyc, (-1,)])
                 new = True
                 added_vals += 1
             if not new and abs((val / np.float64(clk_cyc)) - 1) > 0.05:
-                print('Different measurement for {} ({}): {}(old) vs. '.format(instr, clmn, val)
+                print('Different measurement for {} ({}): {}(old) vs. '.format(instr, column, val)
                       + '{}(new)\nPlease check for correctness '.format(clk_cyc)
                       + '(no changes were made).', file=self.file_output)
                 txt_output = True
@@ -355,9 +355,9 @@ class OSACA(object):
             Clock cycle, either rounded to an integer or its reciprocal or the
             given clk_cyc parameter
         """
-        clmn = 'LT'
+        column = 'LT'
         if is_tp:
-            clmn = 'TP'
+            column = 'TP'
         for i in range(0, len(cyc_list)):
             if cyc_list[i] * 1.05 > float(clk_cyc) > cyc_list[i] * 0.95:
                 # Value is probably correct, so round it to the estimated value
@@ -368,7 +368,7 @@ class OSACA(object):
                 return reci_list[i]
         # No value close to an integer or its reciprocal found, we assume the
         # measurement is incorrect
-        print('Your measurement for {} ({}) is probably wrong. '.format(instr, clmn)
+        print('Your measurement for {} ({}) is probably wrong. '.format(instr, column)
               + 'Please inspect your benchmark!', file=self.file_output)
         print('The program will continue with the given value', file=self.file_output)
         return clk_cyc
@@ -819,7 +819,7 @@ def main():
 
     # Store args in global variables
     inp = parser.parse_args()
-    if inp.arch is None:
+    if inp.arch is None and inp.insert_marker is None:
         raise ValueError('Please specify an architecture.', file=sys.stderr)
     arch = inp.arch.upper()
     filepath = inp.filepath
