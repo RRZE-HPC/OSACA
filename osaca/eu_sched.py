@@ -238,6 +238,7 @@ class Scheduler(object):
             List of lists with all occurance groups sorted by cardinality
             (smallest group first)
         """
+        groups = [[] for x in range(len(set(port_occurances))-1)]
         for i, groupInd in enumerate(range(min(list(filter(lambda x: x > 0, port_occurances))),
                                            max(port_occurances) + 1)):
             for p, occurs in enumerate(port_occurances):
