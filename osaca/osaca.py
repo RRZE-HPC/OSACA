@@ -218,7 +218,7 @@ class OSACA(object):
 
         """
         if os.path.isfile(self.file_path):
-            self.store_src_code_elf()
+            self.store_src_code_binary()
             try:
                 if 'file format elf64' in self.srcCode[1].lower():
                     return True
@@ -249,7 +249,7 @@ class OSACA(object):
             return True
         return False
 
-    def store_src_code_elf(self):
+    def store_src_code_binary(self):
         """
         Load binary file compiled with '-g' in class attribute srcCode and
         separate by line.
