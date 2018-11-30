@@ -67,7 +67,8 @@ class Testcase(object):
         # num_instr must be an even number
         self.num_instr = str(ceil(int(_num_instr)/2)*2)
         # Check for the number of operands and initialise the GPRs if necessary
-        self.op_a, self.op_b, self.op_c, self.gprPush, self.gprPop, self.zeroGPR, self.copy = self.__define_operands()
+        self.op_a, self.op_b, self.op_c, self.gprPush, self.gprPop, self.zeroGPR, self.copy = \
+            self.__define_operands()
         self.num_operands = len(self.param_list)
 
         # Create asm header
@@ -97,7 +98,7 @@ class Testcase(object):
             (default True)
         """
         osaca_dir = os.path.expanduser('~') + '/.osaca/'
-        if(lt):
+        if lt:
             # Write latency file
             call(['mkdir', '-p', osaca_dir + 'benchmarks'])
             f = open(osaca_dir + 'benchmarks/'+self.instr+self.extension+'.S', 'w')
@@ -105,7 +106,7 @@ class Testcase(object):
                     + self.zeroGPR + self.copy + self.loop_lat + self.gprPop + self.done)
             f.write(data)
             f.close()
-        if(tp):
+        if tp:
             # Write throughput file
             call(['mkdir', '-p', osaca_dir + 'benchmarks'])
             f = open(osaca_dir + 'benchmarks/' + self.instr + self.extension
@@ -126,53 +127,53 @@ class Testcase(object):
             String tuple containing types of operands and if needed push/pop operations, the
             initialisation of general purpose regs and the copy if registers.
         """
-        oprnds = self.param_list
+        operands = self.param_list
         op_a, op_b, op_c = ('', '', '')
         gpr_push, gpr_pop, zero_gpr = ('', '', '')
-        if(isinstance(oprnds[0], Register)):
-            op_a = oprnds[0].reg_type.lower()
-        elif(isinstance(oprnds[0], MemAddr)):
+        if isinstance(operands[0], Register):
+            op_a = operands[0].reg_type.lower()
+        elif isinstance(operands[0], MemAddr):
             op_a = 'mem'
-        elif(isinstance(oprnds[0], Parameter) and str(oprnds[0]) == 'IMD'):
+        elif isinstance(operands[0], Parameter) and str(operands[0]) == 'IMD':
             op_a = 'imd'
-        if(op_a == 'gpr'):
+        if op_a == 'gpr':
             gpr_push, gpr_pop, zero_gpr = self.__initialise_gprs()
-            op_a += str(oprnds[0].size)
-        if(len(oprnds) > 1):
-            if(isinstance(oprnds[1], Register)):
-                op_b = oprnds[1].reg_type.lower()
-            elif(isinstance(oprnds[1], MemAddr)):
+            op_a += str(operands[0].size)
+        if len(operands) > 1:
+            if isinstance(operands[1], Register):
+                op_b = operands[1].reg_type.lower()
+            elif isinstance(operands[1], MemAddr):
                 op_b = 'mem'
-            elif(isinstance(oprnds[1], Parameter) and str(oprnds[1]) == 'IMD'):
+            elif isinstance(operands[1], Parameter) and str(operands[1]) == 'IMD':
                 op_b = 'imd'
-            if(op_b == 'gpr'):
-                op_b += str(oprnds[1].size)
-                if('gpr' not in op_a):
+            if op_b == 'gpr':
+                op_b += str(operands[1].size)
+                if 'gpr' not in op_a:
                     gpr_push, gpr_pop, zero_gpr = self.__initialise_gprs()
-        if(len(oprnds) == 3):
-            if(isinstance(oprnds[2], Register)):
-                op_c = oprnds[2].reg_type.lower()
-            elif(isinstance(oprnds[2], MemAddr)):
+        if len(operands) == 3:
+            if isinstance(operands[2], Register):
+                op_c = operands[2].reg_type.lower()
+            elif isinstance(operands[2], MemAddr):
                 op_c = 'mem'
-            elif(isinstance(oprnds[2], Parameter) and str(oprnds[2]) == 'IMD'):
+            elif isinstance(operands[2], Parameter) and str(operands[2]) == 'IMD':
                 op_c = 'imd'
-            if(op_c == 'gpr'):
-                op_c += str(oprnds[2].size)
-                if(('gpr' not in op_a) and ('gpr'not in op_b)):
+            if op_c == 'gpr':
+                op_c += str(operands[2].size)
+                if ('gpr' not in op_a) and ('gpr' not in op_b):
                     gpr_push, gpr_pop, zero_gpr = self.__initialise_gprs()
-        if(len(oprnds) == 1 and isinstance(oprnds[0], Register)):
-            copy = self.__copy_regs(oprnds[0])
-        elif(len(oprnds) > 1 and isinstance(oprnds[1], Register)):
-            copy = self.__copy_regs(oprnds[1])
-        elif(len(oprnds) > 2 and isinstance(oprnds[2], Register)):
-            copy = self.__copy_regs(oprnds[1])
+        if len(operands) == 1 and isinstance(operands[0], Register):
+            copy = self.__copy_regs(operands[0])
+        elif len(operands) > 1 and isinstance(operands[1], Register):
+            copy = self.__copy_regs(operands[1])
+        elif len(operands) > 2 and isinstance(operands[2], Register):
+            copy = self.__copy_regs(operands[1])
         else:
             copy = ''
-        return (op_a, op_b, op_c, gpr_push, gpr_pop, zero_gpr, copy)
+        return op_a, op_b, op_c, gpr_push, gpr_pop, zero_gpr, copy
 
     def __initialise_gprs(self):
         """
-        Initialise eleven general purpose registers and set them to zero.
+        Initialize eleven general purpose registers and set them to zero.
 
         Returns
         -------
@@ -189,10 +190,10 @@ class Testcase(object):
             gpr_pop += '\t\tpop     {}\n'.format(reg)
         for reg in self.gprs64:
             zero_gpr += '\t\txor     {}, {}\n'.format(reg, reg)
-        return (gpr_push, gpr_pop, zero_gpr)
+        return gpr_push, gpr_pop, zero_gpr
 
 
-# Copy created values in specific register
+    # Copy created values in specific register
     def __copy_regs(self, reg):
         """
         Copy created values in specific register.
@@ -208,8 +209,8 @@ class Testcase(object):
             String containing the copy instructions
         """
         copy = '\t\t# copy DP 1.0\n'
-# Different handling for GPR, MMX and SSE/AVX registers
-        if(reg.reg_type == 'GPR'):
+        # Different handling for GPR, MMX and SSE/AVX registers
+        if reg.reg_type == 'GPR':
             copy += '\t\tvmovq {}, xmm0\n'.format(self.ops['gpr64'][0])
             copy += '\t\tvmovq {}, xmm0\n'.format(self.ops['gpr64'][1])
             copy += '\t\t# Create DP 2.0\n'
@@ -218,7 +219,7 @@ class Testcase(object):
             copy += '\t\tdiv {}\n'.format(self.ops['gpr64'][0])
             copy += '\t\tmovq {}, {}\n'.format(self.ops['gpr64'][2], self.ops['gpr64'][0])
             copy += '\t\tvmovq {}, xmm0\n'.format(self.ops['gpr64'][0])
-        elif(reg.reg_type == 'MMX'):
+        elif reg.reg_type == 'MMX':
             copy += '\t\tvmovq {}, xmm0\n'.format(self.ops['mmx'][0])
             copy += '\t\tvmovq {}, xmm0\n'.format(self.ops['mmx'][1])
             copy += '\t\tvmovq {}, xmm0\n'.format(self.ops['gpr64'][0])
@@ -227,7 +228,7 @@ class Testcase(object):
             copy += '\t\t# Create DP 0.5\n'
             copy += '\t\tdiv {}\n'.format(self.ops['gpr64'][0])
             copy += '\t\tmovq {}, {}\n'.format(self.ops['mmx'][2], self.ops['gpr64'][0])
-        elif(reg.reg_type == 'XMM' or reg.reg_type == 'YMM' or reg.reg_type == 'ZMM'):
+        elif reg.reg_type == 'XMM' or reg.reg_type == 'YMM' or reg.reg_type == 'ZMM':
             key = reg.reg_type.lower()
             copy += '\t\tvmovaps {}, {}\n'.format(self.ops[key][0], self.ops[key][0])
             copy += '\t\tvmovaps {}, {}\n'.format(self.ops[key][1], self.ops[key][0])
@@ -278,15 +279,15 @@ class Testcase(object):
                 '\t\tjle       done\n')
         # Expand to AVX(512) if necessary
         expand = ''
-        if(self.op_a == 'ymm' or self.op_b == 'ymm' or self.op_c == 'ymm'):
+        if self.op_a == 'ymm' or self.op_b == 'ymm' or self.op_c == 'ymm':
             expand = ('\t\t# expand from SSE to AVX\n'
                       '\t\tvinsertf128 ymm0, ymm0, xmm0, 0x1\n')
-        if(self.op_a == 'zmm' or self.op_b == 'zmm' or self.op_c == 'zmm'):
+        if self.op_a == 'zmm' or self.op_b == 'zmm' or self.op_c == 'zmm':
             expand = ('\t\t# expand from SSE to AVX\n'
                       '\t\tvinsertf128 ymm0, ymm0, xmm0, 0x1\n'
                       '\t\t# expand from AVX to AVX512\n'
                       '\t\tvinsert64x4 zmm0, zmm0, ymm0, 0x1\n')
-        return (def_instr, ninstr, init, expand)
+        return def_instr, ninstr, init, expand
 
     def __define_loop_lat(self):
         """
@@ -299,22 +300,22 @@ class Testcase(object):
         """
         loop_lat = ('loop:\n'
                     '\t\tinc      i\n')
-        if(self.num_operands == 1):
+        if self.num_operands == 1:
             for i in range(0, int(self.num_instr)):
                 loop_lat += '\t\tINSTR    {}\n'.format(self.ops[self.op_a][0])
-        elif(self.num_operands == 2 and self.op_a == self.op_b):
+        elif self.num_operands == 2 and self.op_a == self.op_b:
             for i in range(0, int(self.num_instr), 2):
                 loop_lat += '\t\tINSTR    {}, {}\n'.format(self.ops[self.op_a][0],
                                                            self.ops[self.op_b][1])
                 loop_lat += '\t\tINSTR    {}, {}\n'.format(self.ops[self.op_b][1],
                                                            self.ops[self.op_b][0])
-        elif(self.num_operands == 2 and self.op_a != self.op_b):
+        elif self.num_operands == 2 and self.op_a != self.op_b:
             for i in range(0, int(self.num_instr), 2):
                 loop_lat += '\t\tINSTR    {}, {}\n'.format(self.ops[self.op_a][0],
                                                            self.ops[self.op_b][0])
                 loop_lat += '\t\tINSTR    {}, {}\n'.format(self.ops[self.op_a][0],
                                                            self.ops[self.op_b][0])
-        elif(self.num_operands == 3 and self.op_a == self.op_b):
+        elif self.num_operands == 3 and self.op_a == self.op_b:
             for i in range(0, int(self.num_instr), 2):
                 loop_lat += '\t\tINSTR    {}, {}, {}\n'.format(self.ops[self.op_a][0],
                                                                self.ops[self.op_b][1],
@@ -322,7 +323,7 @@ class Testcase(object):
                 loop_lat += '\t\tINSTR    {}, {}, {}\n'.format(self.ops[self.op_a][1],
                                                                self.ops[self.op_b][0],
                                                                self.ops[self.op_c][0])
-        elif(self.num_operands == 3 and self.op_a == self.op_c):
+        elif self.num_operands == 3 and self.op_a == self.op_c:
             for i in range(0, int(self.num_instr), 2):
                 loop_lat += '\t\tINSTR    {}, {}, {}\n'.format(self.ops[self.op_a][0],
                                                                self.ops[self.op_b][0],
@@ -348,15 +349,15 @@ class Testcase(object):
         ext = ''
         ext1 = False
         ext2 = False
-        if(self.num_operands == 2):
+        if self.num_operands == 2:
             ext1 = True
-        if(self.num_operands == 3):
+        if self.num_operands == 3:
             ext1 = True
             ext2 = True
         for i in range(0, int(self.num_instr)):
-            if(ext1):
+            if ext1:
                 ext = ', {}'.format(self.ops[self.op_b][i % 3])
-            if(ext2):
+            if ext2:
                 ext += ', {}'.format(self.ops[self.op_c][i % 3])
             reg_num = (i % (len(self.ops[self.op_a]) - 3)) + 3
             loop_thrpt += '\t\tINSTR    {}{}\n'.format(self.ops[self.op_a][reg_num], ext)
@@ -381,15 +382,15 @@ class Testcase(object):
         lt = False
         name = self.instr+self.extension
         for root, dirs, files in os.walk(os.path.dirname(__file__)+'/benchmarks'):
-            if((name+'-tp.S') in files):
+            if (name + '-tp.S') in files:
                 tp = True
             if name+'.S' in files:
                 lt = True
-        return (tp, lt)
+        return tp, lt
 
     def get_entryname(self):
         """
-        Returns the name of the entry the instruction form would be the data file
+        Return the name of the entry the instruction form would be the data file
 
         Returns
         -------

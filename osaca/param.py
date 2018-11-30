@@ -4,12 +4,12 @@ class Parameter(object):
 
     def __init__(self, ptype):
         self.ptype = ptype.upper()
-        if(self.ptype not in self.type_list):
+        if self.ptype not in self.type_list:
             raise NameError('Type not supported: '+ptype)
 
     def __str__(self):
-        """returns string representation"""
-        if(self.ptype == 'NONE'):
+        """Return string representation."""
+        if self.ptype == 'NONE':
             return ''
         else:
             return self.ptype
@@ -20,27 +20,28 @@ class MemAddr(Parameter):
     scales = [1, 2, 4, 8]
 
     def __init__(self, name):
+        super().__init__("MEM")
         self.sreg = False
         self.offset = False
         self.base = False
         self.index = False
         self.scale = False
-        if(':' in name):
-            if(name[1:name.index(':')].upper() not in self.segment_regs):
+        if ':' in name:
+            if name[1:name.index(':')].upper() not in self.segment_regs:
                 raise NameError('Type not supported: '+name)
             self.sreg = True
             self.offset = True
-        if('(' not in name or ('(' in name and name.index('(') != 0)):
+        if '(' not in name or ('(' in name and name.index('(') != 0):
             self.offset = True
-        if('(' in name):
+        if '(' in name:
             self.parentheses = name[name.index('(')+1:-1]
             self.commacnt = self.parentheses.count(',')
-            if(self.commacnt == 0):
+            if self.commacnt == 0:
                 self.base = True
-            elif(self.commacnt == 1 or self.commacnt == 2 and int(self.parentheses[-1:]) == 1):
+            elif self.commacnt == 1 or self.commacnt == 2 and int(self.parentheses[-1:]) == 1:
                 self.base = True
                 self.index = True
-            elif(self.commacnt == 2 and int(self.parentheses[-1:]) in self.scales):
+            elif self.commacnt == 2 and int(self.parentheses[-1:]) in self.scales:
                 self.base = True
                 self.index = True
                 self.scale = True
@@ -50,13 +51,13 @@ class MemAddr(Parameter):
     def __str__(self):
         """returns string representation"""
         mem_format = 'MEM('
-        if(self.sreg):
+        if self.sreg:
             mem_format += 'sreg:'
-        if(self.offset):
+        if self.offset:
             mem_format += 'offset'
-        if(self.base and not self.index):
+        if self.base and not self.index:
             mem_format += '(base)'
-        elif(self.base and self.index and self.scale):
+        elif self.base and self.index and self.scale:
             mem_format += '(base, index, scale)'
         mem_format += ')'
         return mem_format
@@ -131,17 +132,18 @@ class Register(Parameter):
     }
 
     def __init__(self, name, mask=False):
+        super().__init__("REG")
         self.name = name.upper()
         self.mask = mask
-        if[name in self.sizes]:
+        if self.name in self.sizes:
             self.size = self.sizes[self.name][0]
             self.reg_type = self.sizes[self.name][1]
         else:
-            raise NameError('Register name not in dictionary: '+self.name)
+            raise NameError('Register name not in dictionary: {}'.format(self.name))
 
     def __str__(self):
-        """returns string representation"""
+        """Return string representation."""
         opmask = ''
-        if(self.mask):
+        if self.mask:
             opmask = '{opmask}'
-        return(self.reg_type+opmask)
+        return self.reg_type + opmask
