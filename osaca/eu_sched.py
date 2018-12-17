@@ -8,6 +8,7 @@ from operator import add
 import pandas as pd
 
 from osaca.param import Register, MemAddr
+#from param import Register, MemAddr
 
 
 class Scheduler(object):
@@ -48,15 +49,22 @@ class Scheduler(object):
         osaca_dir = os.path.expanduser('~/.osaca/')
         self.df = pd.read_csv(osaca_dir + 'data/' + arch.lower() + '_data.csv', quotechar='"',
                               converters={'ports': ast.literal_eval})
-    def new_schedule(self):
+    def new_schedule(self, machine_readable=False):
         """
         Schedules Instruction Form list and calculates port bindings.
 
+        Parameters
+        ----------
+        machine_readable : bool
+            Boolean for indicating if the return value should be human readable (if False) or 
+            machine readable (if True)
+
         Returns
         -------
-        (str, [int, ...])
-            A tuple containing the graphic output of the schedule as string and
-            the port bindings as list of ints.
+        (str, [float, ...]) or ([[float, ...], ...], [float, ...])
+            A tuple containing the output of the schedule as string (if machine_readable is not
+            given or False) or as list of lists (if machine_readable is True) and the port bindings
+            as list of float.
         """
         sched = self.get_head()
         # Initialize ports
@@ -113,6 +121,9 @@ class Scheduler(object):
                 sched += self.get_line(occ_ports[i], instrForm[-1])
             # Add throughput to total port binding
             port_bndgs = list(map(add, port_bndgs, occ_ports[i]))
+        if(machine_readable):
+            list(map(self.append, occ_ports, self.instrList))
+            return (occ_ports, port_bndgs)
         return (sched, port_bndgs)
 
     def schedule(self):
@@ -180,6 +191,10 @@ class Scheduler(object):
             return self.flatten(l[0]) + self.flatten(l[1:])
         return l[:1] + self.flatten(l[1:])   
 
+    def append(self, l, e):
+        if(isinstance(l, list)):
+            l.append(e)
+    
     def schedule_fcfs(self):
         """
         Schedules Instruction Form list for a single run with latencies.
