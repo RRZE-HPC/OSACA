@@ -62,6 +62,9 @@ class OSACA(object):
                              DATA_DIR])
             print(' Done!', file=self.file_output)
 
+        # Check for database for the chosen architecture
+        self.df = self.read_csv()
+
 
     # -----------------main functions depending on arguments--------------------
     def include_ibench(self):
@@ -71,8 +74,6 @@ class OSACA(object):
         if not self.check_file():
             print('Invalid file path or file format.', file=sys.stderr)
             sys.exit(1)
-        # Check for database for the chosen architecture
-        self.df = self.read_csv()
         # Create sequence of numbers and their reciprocals for validate the measurements
         cyc_list, reci_list = self.create_sequences()
         print('Everything seems fine! Let\'s start!', file=self.file_output)
@@ -132,8 +133,7 @@ class OSACA(object):
         # Now merge the DataFrames and write new csv file
         self.df = self.df.append(pd.DataFrame(new_data, columns=['instr', 'TP', 'LT', 'ports']),
                                  ignore_index=True)
-        csv = self.df.to_csv(index=False)
-        self.write_csv(csv)
+        self.write_csv()
         print('ibench output {}'.format(self.file_path.split('/')[-1]),
               'successfully in data file included.', file=self.file_output)
         print('{} values were added.'.format(added_vals), file=self.file_output)
@@ -143,16 +143,11 @@ class OSACA(object):
         Main function of OSACA. Inspect binary file and create analysis.
         """
         # Check args and exit program if something's wrong
-        if not self.check_arch():
-            print('Invalid microarchitecture.', file=sys.stderr)
-            sys.exit(1)
         if not self.check_elffile():
             print('Invalid file path or file format. Not an ELF file.', file=sys.stderr)
             sys.exit(1)
-        # Finally check for database for the chosen architecture
-        self.df = self.read_csv()
 
-        print('Everything seems fine! Let\'s start checking!', file=self.file_output)
+        print("Everything seems fine! Let's start checking!", file=self.file_output)
         for i, line in enumerate(self.srcCode):
             if i == 0:
                 self.check_line(line, True)
@@ -166,10 +161,6 @@ class OSACA(object):
         Main function of OSACA with IACA markers instead of OSACA marker.
         Inspect binary file and create analysis.
         """
-        # Check args and exit program if something's wrong
-        if not self.check_arch():
-            print('Invalid microarchitecture.', file=sys.stderr)
-            sys.exit()
         # Check if input file is a binary or assembly file
         binary_file = True
         if not self.check_elffile():
@@ -177,8 +168,6 @@ class OSACA(object):
             if not self.check_file(True):
                 print('Invalid file path or file format.', file=sys.stderr)
                 sys.exit(1)
-        # Finally check for database for the chosen architecture
-        self.df = self.read_csv()
 
         print('Everything seems fine! Let\'s start checking!', file=self.file_output)
         if binary_file:
@@ -253,11 +242,9 @@ class OSACA(object):
                 store file data as a string in attribute srcCode if True,
                 store it as a list of strings (lines) if False (default False)
         """
-        f = open(self.file_path, 'r')
-        self.srcCode = ''
-        for line in f:
-            self.srcCode += line
-        f.close()
+        with open(self.file_path, 'r') as f:
+            self.srcCode = f.read()
+
         if iaca_flag:
             return
         self.srcCode = self.srcCode.split('\n')
@@ -272,22 +259,16 @@ class OSACA(object):
             CSV as DataFrame object
         """
         # curr_dir = '/'.join(os.path.realpath(__file__).split('/')[:-1])
-        df = pd.read_csv(self.osaca_dir + 'data/' + self.arch.lower() + '_data.csv')
-        return df
+        return pd.read_csv(DATA_DIR + 'data/' + self.arch.lower() + '_data.csv')
 
-    def write_csv(self, csv):
+    def write_csv(self):
         """
-        Write architecture dependent CSV into data directory.
-
-        Parameters
-        ----------
-        csv : str
-            CSV data as string
+        Write architecture DataFrame as CSV into data directory.
         """
         # curr_dir = '/'.join(os.path.realpath(__file__).split('/')[:-1])
-        f = open(self.osaca_dir + 'data/' + self.arch.lower() + '_data.csv', 'w')
-        f.write(csv)
-        f.close()
+        csv = self.df.to_csv(index=False)
+        with open(DATA_DIR + 'data/' + self.arch.lower() + '_data.csv', 'w') as f:
+            f.write(csv)
 
     def create_sequences(self, end=101):
         """
@@ -457,7 +438,11 @@ class OSACA(object):
         # Search for the start marker
         match = re.match(self.IACA_SM, code)
         while not match:
-            code = code.split('\n', 1)[1]
+            code = code.split('\n', 1)
+            if len(code) > 1:
+                code = code[1]
+            else:
+                raise ValueError("No IACA-style markers found in assembly code.")
             match = re.match(self.IACA_SM, code)
         # Search for the end marker
         code = (code.split('144', 1)[1]).split('\n', 1)[1]
