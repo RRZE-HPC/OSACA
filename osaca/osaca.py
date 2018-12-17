@@ -14,6 +14,9 @@ import numpy as np
 from osaca.param import Register, MemAddr, Parameter
 from osaca.eu_sched import Scheduler
 from osaca.testcase import Testcase
+#from param import Register, MemAddr, Parameter
+#from eu_sched import Scheduler
+#from testcase import Testcase
 
 
 class Osaca(object):
@@ -33,6 +36,7 @@ class Osaca(object):
 
     # Variables for creating output
     longestInstr = 30
+    machine_readable = False
     # Constants
     ASM_LINE = re.compile(r'\s[0-9a-f]+[:]')
     # Matches every variation of the IACA start marker
@@ -75,7 +79,7 @@ class Osaca(object):
         self.df = self.read_csv()
         # Create sequence of numbers and their reciprokals for validate the measurements
         cyc_list, reci_list = self.create_sequences()
-        print('Everything seems fine! Let\'s start!', file=self.file_output)
+        #print('Everything seems fine! Let\'s start!', file=self.file_output)
         new_data = []
         added_vals = 0
         for line in self.srcCode:
@@ -153,14 +157,17 @@ class Osaca(object):
         # Finally check for database for the chosen architecture
         self.df = self.read_csv()
 
-        print('Everything seems fine! Let\'s start checking!', file=self.file_output)
+        #print('Everything seems fine! Let\'s start checking!', file=self.file_output)
         for i, line in enumerate(self.srcCode):
             if(i == 0):
                 self.check_line(line, True)
             else:
                 self.check_line(line)
-        output = self.create_output(self.tp_list)
-        print(output, file=self.file_output)
+        output = self.create_output(self.tp_list, True, self.machine_readable)
+        if(self.machine_readable):
+            return output
+        else:
+            print(output, file=self.file_output)
 
     def inspect_with_iaca(self):
         """
@@ -181,13 +188,16 @@ class Osaca(object):
         # Finally check for database for the chosen architecture
         self.df = self.read_csv()
 
-        print('Everything seems fine! Let\'s start checking!', file=self.file_output)
+        #print('Everything seems fine! Let\'s start checking!', file=self.file_output)
         if(binary_file):
             self.iaca_bin()
         else:
             self.iaca_asm()
-        output = self.create_output(self.tp_list)
-        print(output, file=self.file_output)
+        output = self.create_output(self.tp_list, True, self.machine_readable)
+        if(self.machine_readable):
+            return output
+        else:
+            print(output, file=self.file_output)
 
     # --------------------------------------------------------------------------
 
@@ -618,7 +628,7 @@ class Osaca(object):
             return self.flatten(l[0]) + self.flatten(l[1:])
         return l[:1] + self.flatten(l[1:])
 
-    def create_output(self, tp_list=False, pr_sched=True):
+    def create_output(self, tp_list=False, pr_sched=True, machine_readable=False):
         """
         Creates output of analysed file including a time stamp.
 
@@ -650,7 +660,10 @@ class Osaca(object):
         if(pr_sched):
             output += '\n\n'
             sched = Scheduler(self.arch, self.instr_forms)
-            sched_output, port_binding = sched.new_schedule()
+            sched_output, port_binding = sched.new_schedule(machine_readable)
+            # if machine_readable, we're already done here
+            if(machine_readable):
+                return sched_output
             binding = sched.get_port_binding(port_binding)
             output += sched.get_report_info() + '\n' + binding + '\n\n' + sched_output
             block_tp = round(max(port_binding), 2)
@@ -834,6 +847,8 @@ def main():
     group.add_argument('-m', '--insert-marker', dest='insert_marker', action='store_true',
                        help='try to find blocks probably corresponding to loops in assembly and'
                        + 'insert IACA marker')
+    parser.add_argument('-l', '--list-output', dest='machine_readable', action='store_true',
+                       help='returns output as machine readable list of lists')
     parser.add_argument('filepath', type=str, help='path to object (Binary, ASM, CSV)')
 
     # Store args in global variables
@@ -852,6 +867,10 @@ def main():
         osaca = Osaca(arch, filepath)
     if(inp.tp_list):
         osaca.tp_list = True
+    if(inp.machine_readable):
+        osaca.machine_readable = True
+        osaca.output = None
+    
 
     if(incl_ibench):
         try:
@@ -860,7 +879,7 @@ def main():
             print('Please specify an architecture.', file=sys.stderr)
     elif(iaca_flag):
         try:
-            osaca.inspect_with_iaca()
+            return osaca.inspect_with_iaca()
         except UnboundLocalError:
             print('Please specify an architecture.', file=sys.stderr)
     elif(insert_m):
@@ -878,7 +897,7 @@ def main():
             iaca.iaca_instrumentation(input_file=f_in, output_file=f_out, 
                                       block_selection='manual', pointer_increment=1)
     else:
-        osaca.inspect_binary()
+        return osaca.inspect_binary()
 
 
 # ------------Main method--------------
