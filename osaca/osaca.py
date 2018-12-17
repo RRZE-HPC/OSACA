@@ -16,19 +16,17 @@ from osaca.eu_sched import Scheduler
 from osaca.testcase import Testcase
 
 
+DATA_DIR = os.path.expanduser('~') + '/.osaca/'
+
+
 class OSACA(object):
-    arch = None
     srcCode = None
-    df = None
-    instr_forms = None
     tp_list = False
-    file_output = ''
-    osaca_dir = os.path.expanduser('~') + '/.osaca/'
     # Variables for checking lines
     numSeps = 0
     indentChar = ''
     sem = 0
-    marker = r'//STARTLOOP'
+    CODE_MARKER = r'//STARTLOOP'
 
     # Variables for creating output
     longestInstr = 30
@@ -43,29 +41,33 @@ class OSACA(object):
                          r'((,[ \t]*103.*((,[ \t]*144)|(\n\s*\.byte[ \t]+144)))|(\n\s*\.byte'
                          r'[ \t]+103.*((,[ \t]*144)|(\n\s*\.byte[ \t]+144))))')
 
-    def __init__(self, _arch, file_path, output=sys.stdout):
-        self.arch = _arch
+    VALID_ARCHS = ['SNB', 'IVB', 'HSW', 'BDW', 'SKL', 'ZEN']
+
+    def __init__(self, arch, file_path, output=sys.stdout):
+        # Check architecture
+        if arch not in self.VALID_ARCHS:
+            raise ValueError("Invalid architecture ({!r}), must be one of {}.".format(
+                arch, self.VALID_ARCHS))
+        self.arch = arch
+
         self.file_path = file_path
         self.instr_forms = []
         self.file_output = output
         # Check if data files are already in usr dir, otherwise create them
-        if not os.path.isdir(self.osaca_dir + 'data'):
+        if not os.path.isdir(os.path.join(DATA_DIR, 'data')):
             print('Copying files in user directory...', file=self.file_output, end='')
-            subprocess.call(['mkdir', '-p', self.osaca_dir])
+            os.makedirs(os.path.join(DATA_DIR, 'data'))
             subprocess.call(['cp', '-r',
                              '/'.join(os.path.realpath(__file__).split('/')[:-1]) + '/data',
-                             self.osaca_dir])
-            print('Done!', file=self.file_output)
+                             DATA_DIR])
+            print(' Done!', file=self.file_output)
+
 
     # -----------------main functions depending on arguments--------------------
     def include_ibench(self):
         """
         Read ibench output and include it in the architecture specific csv file.
         """
-        # Check args and exit program if something's wrong
-        if not self.check_arch():
-            print('Invalid microarchitecture.', file=sys.stderr)
-            sys.exit(1)
         if not self.check_file():
             print('Invalid file path or file format.', file=sys.stderr)
             sys.exit(1)
@@ -187,23 +189,6 @@ class OSACA(object):
         print(output, file=self.file_output)
 
     # --------------------------------------------------------------------------
-
-    def check_arch(self):
-        """
-        Check if the architecture is valid.
-
-        Returns
-        -------
-        bool
-            True    if arch is supported
-            False   if arch is not supported
-
-        """
-        arch_list = ['SNB', 'IVB', 'HSW', 'BDW', 'SKL', 'ZEN']
-        if self.arch in arch_list:
-            return True
-        else:
-            return False
 
     def check_elffile(self):
         """
@@ -385,12 +370,12 @@ class OSACA(object):
             Necessary for setting indenting character (default False)
         """
         # Check if marker is in line
-        if self.marker in line:
+        if self.CODE_MARKER in line:
             # First, check if high level code in indented with whitespaces or tabs
             if first_appearance:
                 self.indentChar = self.get_indent_chars(line)
             # Now count the number of whitespaces
-            self.numSeps = (re.split(self.marker, line)[0]).count(self.indentChar)
+            self.numSeps = (re.split(self.CODE_MARKER, line)[0]).count(self.indentChar)
             self.sem = 3
         elif self.sem > 0:
             # We're in the marked code snippet
@@ -420,8 +405,8 @@ class OSACA(object):
         str
             Indentation character as string
         """
-        num_spaces = (re.split(self.marker, line)[0]).count(' ')
-        num_tabs = (re.split(self.marker, line)[0]).count('\t')
+        num_spaces = (re.split(self.CODE_MARKER, line)[0]).count(' ')
+        num_tabs = (re.split(self.CODE_MARKER, line)[0]).count('\t')
         if num_spaces != 0 and num_tabs == 0:
             return ' '
         elif num_spaces == 0 and num_tabs != 0:
@@ -434,12 +419,12 @@ class OSACA(object):
         """
         Extract instruction forms out of binary file using IACA markers.
         """
-        self.marker = r'fs addr32 nop'
+        self.CODE_MARKER = r'fs addr32 nop'
         part1 = re.compile(r'64\s+fs')
         part2 = re.compile(r'67 90\s+addr32 nop')
         for line in self.srcCode:
             # Check if marker is in line
-            if self.marker in line:
+            if self.CODE_MARKER in line:
                 self.sem += 1
             elif re.search(part1, line) or re.search(part2, line):
                 self.sem += 0.5
