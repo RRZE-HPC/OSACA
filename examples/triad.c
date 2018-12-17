@@ -1,6 +1,6 @@
 
 void triad(int N){
-    void dummy(dobule*);
+    void dummy(double*);
     double a[N], b[N], c[N], d[N];
     double s;
 
