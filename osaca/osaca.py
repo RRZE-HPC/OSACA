@@ -25,7 +25,6 @@ class OSACA(object):
     numSeps = 0
     indentChar = ''
     sem = 0
-    CODE_MARKER = r'//STARTLOOP'
 
     # Variables for creating output
     longestInstr = 30
@@ -184,27 +183,6 @@ class OSACA(object):
 
     # --------------------------------------------------------------------------
 
-    def check_elffile(self):
-        """
-        Check if the given filepath exists, if the format is the needed elf64
-        and store file data in attribute srcCode.
-
-        Returns
-        -------
-        bool
-            True    if file is expected elf64 file
-            False   if file does not exist or is not an elf64 file
-
-        """
-        if os.path.isfile(self.file_path):
-            self.store_src_code_binary()
-            try:
-                if 'file format elf64' in self.srcCode[1].lower():
-                    return True
-            except IndexError:
-                return False
-        return False
-
     def check_file(self, iaca_flag=False):
         """
         Check if the given filepath exists and store file data in attribute
@@ -227,15 +205,6 @@ class OSACA(object):
             self.store_src_code(iaca_flag)
             return True
         return False
-
-    def store_src_code_binary(self):
-        """
-        Load binary file compiled with '-g' in class attribute srcCode and
-        separate by line.
-        """
-        self.srcCode = (subprocess.run(['objdump', '--source', self.file_path],
-                                       stdout=subprocess.PIPE,
-                                       stderr=subprocess.PIPE).stdout.decode('utf-8').split('\n'))
 
     def store_src_code(self, iaca_flag=False):
         """
@@ -343,63 +312,6 @@ class OSACA(object):
               + 'Please inspect your benchmark!', file=self.file_output)
         print('The program will continue with the given value', file=self.file_output)
         return clk_cyc
-
-    def check_line(self, line, first_appearance=False):
-        """
-        Inspect line of source code and process it if inside the marked snippet.
-
-        Parameter
-        ---------
-        line : str
-            Line of source code
-        first_appearance : bool
-            Necessary for setting indenting character (default False)
-        """
-        # Check if marker is in line
-        if self.CODE_MARKER in line:
-            # First, check if high level code in indented with whitespaces or tabs
-            if first_appearance:
-                self.indentChar = self.get_indent_chars(line)
-            # Now count the number of whitespaces
-            self.numSeps = (re.split(self.CODE_MARKER, line)[0]).count(self.indentChar)
-            self.sem = 3
-        elif self.sem > 0:
-            # We're in the marked code snippet
-            # Check if the line is ASM code and - if not - check if we're still in the loop
-            match = re.search(self.ASM_LINE, line)
-            if match:
-                # Further analysis of instructions
-                # Check if there are comments in line
-                if r'//' in line:
-                    return
-                self.check_instr(''.join(re.split(r'\t', line)[-1:]))
-            elif (re.split(r'\S', line)[0]).count(self.indentChar) <= self.numSeps:
-                # Not in the loop anymore - or yet. We decrement the semaphore
-                self.sem = self.sem - 1
-
-    def get_indent_chars(self, line):
-        """
-        Check if indentation characters are either tabulators or whitespaces
-
-        Parameters
-        ----------
-        line : str
-            Line with start marker in it
-
-        Returns
-        -------
-        str
-            Indentation character as string
-        """
-        num_spaces = (re.split(self.CODE_MARKER, line)[0]).count(' ')
-        num_tabs = (re.split(self.CODE_MARKER, line)[0]).count('\t')
-        if num_spaces != 0 and num_tabs == 0:
-            return ' '
-        elif num_spaces == 0 and num_tabs != 0:
-            return '\t'
-        else:
-            err_msg = 'Indentation of code is only supported for whitespaces and tabs.'
-            raise NotImplementedError(err_msg)
 
     def iaca_bin(self):
         """
@@ -603,10 +515,8 @@ class OSACA(object):
             self.longestInstr = 70
         horiz_line = self.create_horiz_sep()
         # Write general information about the benchmark
-        output = '--{}\n| Analyzing of file:\t{}| Architecture:\t\t{}\n| Timestamp:\t\t{}\n'.format(
-            horiz_line, os.path.abspath(self.file_path), self.arch,
-            datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        )
+        output = '--{}\n| Architecture:\t\t{}\n|\n'.format(
+            horiz_line, self.arch)
         if tp_list:
             output += self.create_tp_list(horiz_line)
         if pr_sched:
@@ -833,7 +743,7 @@ def main():
             iaca.iaca_instrumentation(input_file=f_in, output_file=f_out,
                                       block_selection='manual', pointer_increment=1)
     else:
-        return osaca.inspect_binary()
+        raise Exception("Not clear what to do.")
 
 
 # ------------Main method--------------
