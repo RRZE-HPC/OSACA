@@ -15,7 +15,6 @@ from osaca.param import Register, MemAddr, Parameter
 from osaca.eu_sched import Scheduler
 from osaca.testcase import Testcase
 
-
 DATA_DIR = os.path.expanduser('~') + '/.osaca/'
 
 
@@ -66,7 +65,6 @@ class OSACA(object):
         # Check for database for the chosen architecture
         self.df = self.read_csv()
 
-
     # -----------------main functions depending on arguments--------------------
     def include_ibench(self):
         """
@@ -77,7 +75,7 @@ class OSACA(object):
             sys.exit(1)
         # Create sequence of numbers and their reciprocals for validate the measurements
         cyc_list, reci_list = self.create_sequences()
-        #print('Everything seems fine! Let\'s start!', file=self.file_output)
+        # print('Everything seems fine! Let\'s start!', file=self.file_output)
         new_data = []
         added_vals = 0
         for line in self.srcCode:
@@ -135,8 +133,7 @@ class OSACA(object):
         self.df = self.df.append(pd.DataFrame(new_data, columns=['instr', 'TP', 'LT', 'ports']),
                                  ignore_index=True)
         self.write_csv()
-        print('ibench output {}'.format(self.file_path.split('/')[-1]),
-              'successfully in data file included.', file=self.file_output)
+        print('ibench output included successfully in data file .', file=self.file_output)
         print('{} values were added.'.format(added_vals), file=self.file_output)
 
     def inspect_binary(self):
@@ -148,7 +145,7 @@ class OSACA(object):
             print('Invalid file path or file format. Not an ELF file.', file=sys.stderr)
             sys.exit(1)
 
-        #print('Everything seems fine! Let\'s start checking!', file=self.file_output)
+        # print('Everything seems fine! Let\'s start checking!', file=self.file_output)
 
         for i, line in enumerate(self.srcCode):
             if i == 0:
@@ -156,7 +153,7 @@ class OSACA(object):
             else:
                 self.check_line(line)
         output = self.create_output(self.tp_list, True, self.machine_readable)
-        if(self.machine_readable):
+        if self.machine_readable:
             return output
         else:
             print(output, file=self.file_output)
@@ -174,13 +171,13 @@ class OSACA(object):
                 print('Invalid file path or file format.', file=sys.stderr)
                 sys.exit(1)
 
-        #print('Everything seems fine! Let\'s start checking!', file=self.file_output)
-        if(binary_file):
+        # print('Everything seems fine! Let\'s start checking!', file=self.file_output)
+        if binary_file:
             self.iaca_bin()
         else:
             self.iaca_asm()
         output = self.create_output(self.tp_list, True, self.machine_readable)
-        if(self.machine_readable):
+        if self.machine_readable:
             return output
         else:
             print(output, file=self.file_output)
@@ -617,7 +614,7 @@ class OSACA(object):
             sched = Scheduler(self.arch, self.instr_forms)
             sched_output, port_binding = sched.new_schedule(machine_readable)
             # if machine_readable, we're already done here
-            if(machine_readable):
+            if machine_readable:
                 return sched_output
             binding = sched.get_port_binding(port_binding)
             output += sched.get_report_info() + '\n' + binding + '\n\n' + sched_output
@@ -783,53 +780,45 @@ def main():
                                                  'estimated average throughput.')
     parser.add_argument('-V', '--version', action='version',
                         version='%(prog)s ' + __find_version('__init__.py'))
-    parser.add_argument('--arch', dest='arch', type=str,
+    parser.add_argument('--arch', type=str, required=True,
                         help='define architecture (SNB, IVB, HSW, BDW, SKL, ZEN)')
-    parser.add_argument('--tp-list', dest='tp_list', action='store_true',
+    parser.add_argument('--tp-list', action='store_true',
                         help='print an additional list of all throughput values for the kernel')
     group = parser.add_mutually_exclusive_group(required=False)
-    group.add_argument('-i', '--include-ibench', dest='incl', action='store_true',
+    group.add_argument('-i', '--include-ibench', action='store_true',
                        help='includes the given values in form of the output of ibench in the'
                             'data file')
-    group.add_argument('--iaca', dest='iaca', action='store_true',
+    group.add_argument('--iaca', action='store_true',
                        help='search for IACA markers instead the OSACA marker')
-    group.add_argument('-m', '--insert-marker', dest='insert_marker', action='store_true',
+    group.add_argument('--insert-marker', '-m', action='store_true',
                        help='try to find blocks probably corresponding to loops in assembly and'
                             'insert IACA marker')
     parser.add_argument('-l', '--list-output', dest='machine_readable', action='store_true',
-                       help='returns output as machine readable list of lists')
+                        help='returns output as machine readable list of lists')
     parser.add_argument('filepath', type=str, help='path to object (Binary, ASM, CSV)')
 
     # Store args in global variables
-    inp = parser.parse_args()
-    if inp.arch is None and inp.insert_marker is None:
-        raise ValueError('Please specify an architecture.', file=sys.stderr)
-    arch = inp.arch.upper()
-    filepath = inp.filepath
-    incl_ibench = inp.incl
-    iaca_flag = inp.iaca
-    insert_m = inp.insert_marker
+    args = parser.parse_args()
 
-    # Create Osaca object
-    osaca = OSACA(arch, filepath)
-    if inp.tp_list:
+    # Create OSACA object
+    osaca = OSACA(args.arch.upper(), args.filepath)
+    if args.tp_list:
         osaca.tp_list = True
-    if(inp.machine_readable):
+    if args.machine_readable:
         osaca.machine_readable = True
         osaca.output = None
-    
 
-    if incl_ibench:
+    if args.include_ibench:
         try:
             osaca.include_ibench()
         except UnboundLocalError:
             print('Please specify an architecture.', file=sys.stderr)
-    elif iaca_flag:
+    elif args.iaca:
         try:
             return osaca.inspect_with_iaca()
         except UnboundLocalError:
             print('Please specify an architecture.', file=sys.stderr)
-    elif insert_m:
+    elif args.insert_marker:
         try:
             from kerncraft import iaca
         except ImportError:
@@ -840,7 +829,7 @@ def main():
         # Change due to newer kerncraft version (hopefully temporary)
         # iaca.iaca_instrumentation(input_file=filepath, output_file=filepath,
         #                          block_selection='manual', pointer_increment=1)
-        with open(filepath, 'r') as f_in, open(filepath[:-2] + '-iaca.s', 'w') as f_out:
+        with open(args.filepath, 'r') as f_in, open(args.filepath[:-2] + '-iaca.s', 'w') as f_out:
             iaca.iaca_instrumentation(input_file=f_in, output_file=f_out,
                                       block_selection='manual', pointer_increment=1)
     else:
