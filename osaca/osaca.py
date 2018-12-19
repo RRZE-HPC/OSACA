@@ -39,6 +39,16 @@ def flatten(l):
     return l[:1] + flatten(l[1:])
 
 
+def get_assembly_from_binary(file_path):
+    """
+    Load binary file compiled with '-g' in class attribute srcCode and
+    separate by line.
+    """
+    return subprocess.run(['objdump', '--source', file_path],
+                          stdout=subprocess.PIPE,
+                          stderr=subprocess.PIPE).stdout.decode('utf-8').split('\n')
+
+
 class OSACA(object):
     srcCode = None
     tp_list = False
@@ -155,6 +165,19 @@ class OSACA(object):
         self.write_csv()
         print('ibench output included successfully in data file .', file=self.file_output)
         print('{} values were added.'.format(added_vals), file=self.file_output)
+
+    def check_elffile(self):
+        """
+        Check if the format is elf64 and then load into srcCode
+
+        :return: true if file could be loaded and is an elf64 file
+        """
+        # FIXME remove this workaround when restructuring is complete
+        srcCode = get_assembly_from_binary(self.file_path)
+        if len(srcCode) > 2 and 'file format elf64' in srcCode[1].lower():
+            self.srcCode = srcCode
+            return True
+        return False
 
     def inspect_binary(self):
         """
@@ -420,7 +443,7 @@ class OSACA(object):
         if re.match(empty_byte, mnemonic) and len(mnemonic) == 2:
             return
         # Check if there's one or more operands and store all in a list
-        param_list = flatten(self.separate_params(params))
+        param_list = flatten(self._separate_params(params))
         param_list_types = list(param_list)
         # Check operands and separate them by IMMEDIATE (IMD), REGISTER (REG),
         # MEMORY (MEM) or LABEL(LBL)
@@ -461,7 +484,7 @@ class OSACA(object):
         if inDB == 0:
             tc.write_testcase(not writeTP, not writeLT)
 
-    def separate_params(self, params):
+    def _separate_params(self, params):
         """
         Delete comments, separates parameters and return them as a list.
 
@@ -487,7 +510,7 @@ class OSACA(object):
                     i = params.index(',')
             else:
                 i = params.index(',')
-            param_list = [params[:i], self.separate_params(params[i + 1:])]
+            param_list = [params[:i], self._separate_params(params[i + 1:])]
         elif '#' in params:
             i = params.index('#')
             param_list = [params[:i]]
