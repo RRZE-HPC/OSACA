@@ -18,6 +18,27 @@ from osaca.testcase import Testcase
 DATA_DIR = os.path.expanduser('~') + '/.osaca/'
 
 
+def flatten(l):
+    """
+    Flatten a nested list of strings.
+
+    Parameters
+    ----------
+    l : [[...[str]]]
+        Nested list of strings
+
+    Returns
+    -------
+    [str]
+        List of strings
+    """
+    if not l:
+        return l
+    if isinstance(l[0], list):
+        return flatten(l[0]) + flatten(l[1:])
+    return l[:1] + flatten(l[1:])
+
+
 class OSACA(object):
     srcCode = None
     tp_list = False
@@ -399,7 +420,7 @@ class OSACA(object):
         if re.match(empty_byte, mnemonic) and len(mnemonic) == 2:
             return
         # Check if there's one or more operands and store all in a list
-        param_list = self.flatten(self.separate_params(params))
+        param_list = flatten(self.separate_params(params))
         param_list_types = list(param_list)
         # Check operands and separate them by IMMEDIATE (IMD), REGISTER (REG),
         # MEMORY (MEM) or LABEL(LBL)
@@ -471,26 +492,6 @@ class OSACA(object):
             i = params.index('#')
             param_list = [params[:i]]
         return param_list
-
-    def flatten(self, l):
-        """
-        Flatten a nested list of strings.
-
-        Parameters
-        ----------
-        l : [[...[str]]]
-            Nested list of strings
-
-        Returns
-        -------
-        [str]
-            List of strings
-        """
-        if not l:
-            return l
-        if isinstance(l[0], list):
-            return self.flatten(l[0]) + self.flatten(l[1:])
-        return l[:1] + self.flatten(l[1:])
 
     def create_output(self, tp_list=False, pr_sched=True, machine_readable=False):
         """
