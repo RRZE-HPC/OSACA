@@ -722,8 +722,6 @@ def main():
     group.add_argument('-i', '--include-ibench', action='store_true',
                        help='includes the given values in form of the output of ibench in the'
                             'data file')
-    group.add_argument('--iaca', action='store_true',
-                       help='search for IACA markers instead the OSACA marker')
     group.add_argument('--insert-marker', '-m', action='store_true',
                        help='try to find blocks probably corresponding to loops in assembly and'
                             'insert IACA marker')
@@ -743,15 +741,7 @@ def main():
         osaca.output = None
 
     if args.include_ibench:
-        try:
-            osaca.include_ibench()
-        except UnboundLocalError:
-            print('Please specify an architecture.', file=sys.stderr)
-    elif args.iaca:
-        try:
-            return osaca.inspect_with_iaca()
-        except UnboundLocalError:
-            print('Please specify an architecture.', file=sys.stderr)
+        osaca.include_ibench()
     elif args.insert_marker:
         try:
             from kerncraft import iaca
@@ -767,7 +757,7 @@ def main():
             iaca.iaca_instrumentation(input_file=f_in, output_file=f_out,
                                       block_selection='manual', pointer_increment=1)
     else:
-        raise Exception("Not clear what to do.")
+        return osaca.inspect_with_iaca()
 
 
 # ------------Main method--------------
