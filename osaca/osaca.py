@@ -91,7 +91,7 @@ def get_assembly_from_binary(bin_path):
     new_labels = {}
     for a in asm:
         if a['instr'] is not None:
-            m = re.search(r'[\-]?[0-9]+ <(?P<label>[0-9a-zA-Z_\.]+)'
+            m = re.search(r'[\-]?[0-9a-fA-F]+ <(?P<label>[0-9a-zA-Z_\.]+)'
                           r'(?:\+(?P<offset>0x[0-9a-fA-F]+))?>',
                           a['instr'])
             if m and m.group('label') in label_offsets:
