@@ -138,6 +138,9 @@ def get_assembly_from_binary(bin_path):
         if m:
             assembly = assembly[:m.start()] + str(int(m.group(0), base=16)) + assembly[m.end():]
 
+    # Remove trailing ",1)" from offsets
+    assembly.replace(',1)', ')')
+
     return assembly
 
 
