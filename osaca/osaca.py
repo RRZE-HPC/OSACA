@@ -94,7 +94,7 @@ def get_assembly_from_binary(bin_path):
             m = re.search(r'[\-]?[0-9]+ <(?P<label>[0-9a-zA-Z_\.]+)'
                           r'(?:\+(?P<offset>0x[0-9a-fA-F]+))?>',
                           a['instr'])
-            if m:
+            if m and m.group('label') in label_offsets:
                 target = label_offsets[m.group('label')]
                 label_name = m.group('label')
                 if m.group('offset') is not None:
