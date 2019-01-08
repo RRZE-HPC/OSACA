@@ -13,6 +13,7 @@ from osaca import osaca
 class TestOsaca(unittest.TestCase):
     maxDiff = None
 
+    @unittest.skip("Binary analysis is error prone and currently not working with FSF's objdump")
     def testIACABinary(self):
         curr_dir = '/'.join(os.path.realpath(__file__).split('/')[:-1])
         assembly = osaca.get_assembly_from_binary(curr_dir + '/testfiles/taxCalc-ivb-iaca')
