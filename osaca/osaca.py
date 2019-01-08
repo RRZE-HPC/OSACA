@@ -361,6 +361,8 @@ class OSACA(object):
         Run analysis.
         """
         for line in self.assembly:
+            if re.match(r'^[a-zA-Z0-9\_\.]+:$', line):
+                continue
             self.check_instr(line)
 
     def check_instr(self, instr):
@@ -374,14 +376,12 @@ class OSACA(object):
             Instruction as string
         """
         # Ignore labels
-        if re.match(r'^[a-zA-Z0-9\_\.]+:$', instr):
-            return
         # Check for strange clang padding bytes
         while instr.startswith('data32'):
             instr = instr[7:]
         # Separate mnemonic and operands
         mnemonic = instr.split()[0]
-        params = ''.join(instr.split()[1:])
+        params = instr.split()[1:]
         # Check if line is not only a byte
         empty_byte = re.compile(r'[0-9a-f]{2}')
         if re.match(empty_byte, mnemonic) and len(mnemonic) == 2:
@@ -403,7 +403,7 @@ class OSACA(object):
                 if '{' in op:
                     j = op.index('{')
                     opmask = True
-                op = Register(op[1:j], opmask)
+                op = Register(op[1:j].strip(" ,"), opmask)
             elif '<' in op or op.startswith('.'):
                 op = Parameter('LBL')
             else:
