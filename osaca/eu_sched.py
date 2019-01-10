@@ -13,35 +13,27 @@ from osaca.param import Register, MemAddr
 
 class Scheduler(object):
     arch_dict = {'SNB': 6, 'IVB': 6, 'HSW': 8, 'BDW': 8, 'SKL': 8, 'ZEN': 10}
-    dv_port_dict = {'SKL': 0, 'ZEN': 3}
-    ports = None  # type: int
-    instrList = None  # type: list<list<str,Param[,Param][,Param],str>>,
+    dv_ports_dict = {'SKL': [0], 'ZEN': [3]}
     # content of most inner list in instrList: instr, operand(s), instr form
     df = None  # type: DataFrame
     # for parallel ld/st in archs with 1 st/cy and >1 ld/cy, able to do 1 st and 1 ld in 1cy
     ld_ports = None  # type: list<int>
     # enable flag for parallel ld/st
     en_par_ldst = False  # type: boolean
-    dv_port = -1  # type: int
 
     def __init__(self, arch, instruction_list):
         arch = arch.upper()
         try:
             self.ports = self.arch_dict[arch]
         except KeyError:
-            print('Architecture not supportet for EU scheduling.', file=sys.stderr)
+            print('Architecture not supported for EU scheduling.', file=sys.stderr)
             sys.exit(1)
         # check for parallel ld/st in a cycle
         if arch == 'ZEN':
             self.en_par_ldst = True
             self.ld_ports = [9, 10]
         # check for DV port
-        try:
-            self.dv_port = self.dv_port_dict[arch]
-        except KeyError:
-            # no DV port available (yet, new feature in OSACA v0.2)
-            # do nothing
-            pass
+        self.dv_ports = self.dv_ports_dict.get(arch, [])
         self.instrList = instruction_list
         # curr_dir = os.path.realpath(__file__)[:-11]
         osaca_dir = os.path.expanduser('~/.osaca/')
@@ -68,11 +60,8 @@ class Scheduler(object):
         sched = self.get_head()
         # Initialize ports
         # Add DV port, if it is existing
-        tmp_port = 0
-        if self.dv_port != -1:
-            tmp_port = 1
-        occ_ports = [[0] * (self.ports + tmp_port) for x in range(len(self.instrList))]
-        port_bndgs = [0] * (self.ports + tmp_port)
+        occ_ports = [[0] * (self.ports + len(self.dv_ports)) for x in range(len(self.instrList))]
+        port_bndgs = [0] * (self.ports + len(self.dv_ports))
         # Store instruction counter for parallel ld/st
         par_ldst = 0
         # Count the number of store instr if we schedule for an architecture with par ld/st
@@ -94,9 +83,9 @@ class Scheduler(object):
             except IndexError:
                 # Instruction form not in CSV
                 if instrForm[0][:3] == 'nop':
-                    sched += self.get_line(occ_ports[i], '* ' + instrForm[-1])
+                    sched += self.format_port_occupation_line(occ_ports[i], '* ' + instrForm[-1])
                 else:
-                    sched += self.get_line(occ_ports[i], 'X ' + instrForm[-1])
+                    sched += self.format_port_occupation_line(occ_ports[i], 'X ' + instrForm[-1])
                 continue
             occ_ports[i] = list(tup)
             # Check if it's a ld including instr 
@@ -112,11 +101,11 @@ class Scheduler(object):
                             occ_ports[i][port] = '(' + str(occ_ports[i][port]) + ')'
             # Write schedule line
             if len(p_flg) > 0:
-                sched += self.get_line(occ_ports[i], p_flg + instrForm[-1])
+                sched += self.format_port_occupation_line(occ_ports[i], p_flg + instrForm[-1])
                 for port in self.ld_ports:
                     occ_ports[i][port] = 0
             else:
-                sched += self.get_line(occ_ports[i], instrForm[-1])
+                sched += self.format_port_occupation_line(occ_ports[i], instrForm[-1])
             # Add throughput to total port binding
             port_bndgs = list(map(add, port_bndgs, occ_ports[i]))
         if machine_readable:
@@ -150,9 +139,9 @@ class Scheduler(object):
             except IndexError:
                 # Instruction form not in CSV
                 if instrForm[0][:3] == 'nop':
-                    sched += self.get_line(occ_ports[i], '* ' + instrForm[-1])
+                    sched += self.format_port_occupation_line(occ_ports[i], '* ' + instrForm[-1])
                 else:
-                    sched += self.get_line(occ_ports[i], 'X ' + instrForm[-1])
+                    sched += self.format_port_occupation_line(occ_ports[i], 'X ' + instrForm[-1])
                 continue
             if wTP:
                 # Get the occurance of each port from the occupation list
@@ -176,7 +165,7 @@ class Scheduler(object):
                     for j in range(0, self.ports):
                         occ_ports[i][j] = t_all.count(j) / variations
             # Write schedule line
-            sched += self.get_line(occ_ports[i], instrForm[-1])
+            sched += self.format_port_occupation_line(occ_ports[i], instrForm[-1])
             # Add throughput to total port binding
             port_bndgs = list(map(add, port_bndgs, occ_ports[i]))
         return sched, port_bndgs
@@ -214,7 +203,7 @@ class Scheduler(object):
                     raise IndexError()
             except IndexError:
                 # Instruction form not in CSV
-                sched += self.get_line([0] * self.ports, '* ' + instrForm[-1])
+                sched += self.format_port_occupation_line([0] * self.ports, '* ' + instrForm[-1])
                 continue
             found = False
             while not found:
@@ -226,7 +215,7 @@ class Scheduler(object):
                         found = True
                         good = [entry.LT.values[0] if (j in portOcc) else 0 for j in
                                 range(0, self.ports)]
-                        sched += self.get_line(good, instrForm[-1])
+                        sched += self.format_port_occupation_line(good, instrForm[-1])
                         # Add new occupation
                         occ_ports = [occ_ports[j] + good[j] for j in range(0, self.ports)]
                         break
@@ -331,22 +320,15 @@ class Scheduler(object):
         str
             String containing the header
         """
-        horiz_line = '-' * 7 * self.ports
-        if self.dv_port != -1:
-            horiz_line += '-' * 6
-        horiz_line += '-\n'
-        port_anno = (' ' * int(math.floor((len(horiz_line) - 24) / 2)) + 'Ports Pressure in cycles'
-                     + ' ' * int(math.ceil((len(horiz_line) - 24) / 2)) + '\n')
-        port_line = ''
-        for i in range(0, self.ports):
-            port_line += '|  {}   '.format(i)
-            if i == self.dv_port:
-                port_line = port_line + '-  DV  '
-        port_line += '|\n'
-        head = port_anno + port_line + horiz_line
-        return head
+        port_names = self.get_port_naming()
 
-    def get_line(self, occ_ports, instr_name):
+        port_line = ''.join('|{:^6}'.format(pn) for pn in port_names) + '|\n'
+        horiz_line = '-' * (len(port_line) - 1) + '\n'
+        port_anno = ' ' * ((len(port_line) - 25) // 2) + 'Ports Pressure in cycles\n'
+
+        return port_anno + port_line + horiz_line
+
+    def format_port_occupation_line(self, occ_ports, instr_name):
         """
         Create line with port occupation for output.
 
@@ -363,23 +345,30 @@ class Scheduler(object):
             String for output containing port scheduling for instr_name
         """
         line = ''
-        for p_num, i in enumerate(occ_ports):
-            pipe = '|'
-            if isinstance(i, str):
-                cycles = i
-                i = float(i[1:-1])
-                r_space = ''
+        for cycles in occ_ports:
+            if cycles == 0:
+                line += '|' + ' ' * 6
+            elif cycles >= 10:
+                line += '|{:^6.1f}'.format(cycles)
             else:
-                cycles = '    ' if (i == 0) else '%.2f' % float(i)
-                r_space = ' '
-            if p_num == self.dv_port + 1 and p_num != 0:
-                pipe = ' '
-            if i >= 10:
-                line += pipe + cycles + r_space
-            else:
-                line += pipe + ' ' + cycles + r_space
+                line += '|{:^6.2f}'.format(cycles)
         line += '| ' + instr_name + '\n'
         return line
+
+    def get_port_naming(self):
+        """
+        Return list of port names
+
+        :return: list of strings
+        """
+        port_names = []
+        dv_ports_appended = 0
+        for i in range(self.ports):
+            port_names.append(str(i))
+            if i in self.dv_ports:
+                dv_ports_appended += 1
+                port_names.append(str(i)+'DV')
+        return port_names
 
     def get_port_binding(self, port_bndg):
         """
@@ -395,36 +384,23 @@ class Scheduler(object):
         str
             String containing the port binding graphical output
         """
-        sp_left, sp_right, total = self.get_spaces(port_bndg)
+        col_widths = self.get_column_widths(port_bndg)
         header = 'Port Binding in Cycles Per Iteration:\n'
-        horiz_line = '-' * 10 + '-' * total + '\n'
+        horiz_line = '-' * 10 + '-' * (sum(col_widths) + len(col_widths)) + '\n'
         port_line = '|  Port  |'
-        after_dv = 0
-        for i in range(0, self.ports):
-            if i == self.dv_port:
-                port_line += ' ' * int(sp_left[i]) + str(i) + ' ' * int(sp_right[i]) + '-'
-                port_line += ' ' * int(sp_left[i + 1] - 1) + 'DV' + ' ' * int(sp_right[i + 1]) + '|'
-                after_dv = 1
-            else:
-                port_line += (' ' * int(sp_left[i + after_dv]) + str(i)
-                              + ' ' * int(sp_right[i + after_dv]))
-                port_line += '|'
+        for i, port_name in enumerate(self.get_port_naming()):
+            port_line += port_name.center(col_widths[i]) + '|'
         port_line += '\n'
         cyc_line = '| Cycles |'
         for i in range(len(port_bndg)):
-            pipe = '|' if (i != self.dv_port) else ' '
-            cyc = str(round(port_bndg[i], 2))
-            cyc_line += ' {} {}'.format(cyc, pipe)
+            cyc_line += '{}|'.format(str(round(port_bndg[i], 2)).center(col_widths[i]))
         cyc_line += '\n'
         binding = header + horiz_line + port_line + horiz_line + cyc_line + horiz_line
         return binding
 
-    def get_spaces(self, port_bndg):
-        len_list = [len(str(round(x, 2))) + 1 for x in port_bndg]
-        total = sum([x + 2 for x in len_list])
-        sp_left = [math.ceil(x / 2) for x in len_list]
-        sp_right = [math.floor(x / 2) for x in len_list]
-        return sp_left, sp_right, total
+    def get_column_widths(self, port_bndg):
+        return [max(len(str(round(x, 2))), len(name)) + 2
+                for x, name in zip(port_bndg, self.get_port_naming())]
 
     def get_operand_suffix(self, instr_form):
         """
