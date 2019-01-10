@@ -1,4 +1,7 @@
 #!/usr/bin/env python3
+import re
+
+
 class Parameter(object):
     type_list = ['REG', 'MEM', 'IMD', 'LBL', 'NONE']
 
@@ -21,38 +24,27 @@ class MemAddr(Parameter):
 
     def __init__(self, name):
         super().__init__("MEM")
-        self.sreg = False
-        self.offset = False
-        self.base = False
-        self.index = False
-        self.scale = False
-        if ':' in name:
-            if name[1:name.index(':')].upper() not in self.segment_regs:
-                raise NameError('Type not supported: '+name)
-            self.sreg = True
-            self.offset = True
-        if '(' not in name or ('(' in name and name.index('(') != 0):
-            self.offset = True
-        if '(' in name:
-            self.parentheses = name[name.index('(')+1:-1]
-            self.commacnt = self.parentheses.count(',')
-            if self.commacnt == 0:
-                self.base = True
-            elif self.commacnt == 1 or self.commacnt == 2 and int(self.parentheses[-1:]) == 1:
-                self.base = True
-                self.index = True
-            elif self.commacnt == 2 and int(self.parentheses[-1:]) in self.scales:
-                self.base = True
-                self.index = True
-                self.scale = True
-            else:
-                raise NameError('Type not supported: '+name)
+        name = name.strip(', \t')
+        self.offset = None
+        self.base = None
+        self.index = None
+        self.scale = None
+
+        m = re.match(r'(?P<offset>[x0-9a-fA-F]*)\((?P<base>[^,\)]+)(?:,\s*(?P<index>[^,\)]+)'
+                     r'(?:,\s*(?P<scale>[^,\)]+))?)?\)', name)
+
+        if not m:
+            raise ValueError('Type not supported: {!r}'.format(name))
+
+        self.offset = m.group('offset') or None
+        self.base = m.group('base') or None
+        self.index = m.group('index') or None
+        self.scale = m.group('scale') or None
+
 
     def __str__(self):
         """returns string representation"""
         mem_format = 'MEM('
-        if self.sreg:
-            mem_format += 'sreg:'
         if self.offset:
             mem_format += 'offset'
         if self.base and not self.index:
