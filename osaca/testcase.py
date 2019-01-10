@@ -5,6 +5,7 @@ from subprocess import call
 from math import ceil
 
 from osaca.param import Register, MemAddr, Parameter
+#from param import Register, MemAddr, Parameter
 
 
 class Testcase(object):
