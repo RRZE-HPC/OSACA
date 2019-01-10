@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import argparse
+import collections
 import sys
 import os
 import io
@@ -316,7 +317,40 @@ def strip_assembly(assembly):
     return '\n'.join(asm_lines)
 
 
+# TODO replacement for instr_forms entries in OSACA
+# class InstructionForm:
+#     def __init__(self, mnemonic, parameters, line=None):
+#         self.mnemonic = mnemonic
+#         self.parameters = parameters
+#         self.line = line
+#
+#     @classmethod
+#     def from_assembly(cls, line):
+#         # Skip clang padding bytes
+#         while line.startswith('data32 '):
+#             line = line[7:]
+#
+#         line_split = line.split()
+#         mnemonic = line_split[0]
+#         if len(line_split) > 1:
+#             parameters = line_split[1:]
+#         else:
+#             parameters = None
+#
+#         return cls(mnemonic, parameters, line)
+#
+#     def __str__(self):
+#         return line
+#
+#     def __repr__(self):
+#         return '{}({!r}, {!r}, {!r})'.format(
+#             self.__class__.__name__, self.mnemonic, self.parameters, self.line)
+
+
 class OSACA(object):
+    """
+    A single OSACA analysis.
+    """
     srcCode = None
     tp_list = False
     # Variables for checking lines
@@ -331,6 +365,13 @@ class OSACA(object):
     VALID_ARCHS = ['SNB', 'IVB', 'HSW', 'BDW', 'SKL', 'ZEN']
 
     def __init__(self, arch, assembly, extract_with_markers=True):
+        """
+        Create and run analysis on assembly for architecture.
+
+        :param arch: architecture abbreviation
+        :param assembly: assembly code as string
+        :param extract_with_markers: if True, use markers to isolate relavent section
+        """
         # Check architecture
         if arch not in self.VALID_ARCHS:
             raise ValueError("Invalid architecture ({!r}), must be one of {}.".format(
@@ -353,14 +394,20 @@ class OSACA(object):
         # Check for database for the chosen architecture
         self.df = read_csv(arch)
 
-        # Run analysis
+        # Run analysis and populate instr_forms
         self.inspect()
+
+        # Create schedule
+        self.schedule = Scheduler(self.arch, self.instr_forms)
 
     def inspect(self):
         """
         Run analysis.
         """
         for line in self.assembly:
+            # TODO potential replacement for instr_forms entries in OSACA
+            # InstructionForm.from_assembly(line)
+
             if re.match(r'^[a-zA-Z0-9\_\.]+:$', line):
                 continue
             self.check_instr(line)
@@ -391,8 +438,7 @@ class OSACA(object):
         param_list_types = list(param_list)
         # Check operands and separate them by IMMEDIATE (IMD), REGISTER (REG),
         # MEMORY (MEM) or LABEL(LBL)
-        for i in range(len(param_list)):
-            op = param_list[i]
+        for i, op in enumerate(param_list):
             if len(op) <= 0:
                 op = Parameter('NONE')
             elif op[0] == '$':
@@ -404,10 +450,10 @@ class OSACA(object):
                     j = op.index('{')
                     opmask = True
                 op = Register(op[1:j].strip(" ,"), opmask)
-            elif '<' in op or op.startswith('.'):
+            elif '<' in op or re.match(r'^([a-zA-Z\._]+[a-zA-Z0-9_\.]*)+$', op):
                 op = Parameter('LBL')
             else:
-                op = MemAddr(op, )
+                op = MemAddr(op)
             param_list[i] = str(op)
             param_list_types[i] = op
         # Add to list
@@ -464,6 +510,8 @@ class OSACA(object):
         """
         Creates output of analysed file including a time stamp.
 
+        Used to interface with Kerncraft.
+
         Parameters
         ----------
         tp_list : bool
@@ -489,16 +537,39 @@ class OSACA(object):
             output += self.create_tp_list(horiz_line)
         if pr_sched:
             output += '\n\n'
-            sched = Scheduler(self.arch, self.instr_forms)
-            sched_output, port_binding = sched.new_schedule(machine_readable)
+            sched_output, port_binding = self.schedule.new_schedule(machine_readable)
             # if machine_readable, we're already done here
             if machine_readable:
                 return sched_output
-            binding = sched.get_port_binding(port_binding)
-            output += sched.get_report_info() + '\n' + binding + '\n\n' + sched_output
+            binding = self.schedule.get_port_binding(port_binding)
+            output += self.schedule.get_report_info() + '\n' + binding + '\n\n' + sched_output
             block_tp = round(max(port_binding), 2)
             output += 'Total number of estimated throughput: {}\n'.format(block_tp)
+
         return output
+
+    def get_port_occupation_cycles(self):
+        """
+        Build dict with port names and cycles they are occupied during one block execution
+
+        Used to interface with Kerncraft.
+
+        :return: dictionary of ports and cycles
+        """
+        sched_output, port_binding = self.schedule.new_schedule()
+        return collections.OrderedDict([
+            (port_name, port_binding[i])
+            for i, port_name in enumerate(self.schedule.get_port_naming())])
+
+    def get_total_throughput(self):
+        """
+        Return total cycles estimated per block execution. Including (potential) penalties.
+
+        Used to interface with Kerncraft.
+
+        :return: float of cycles
+        """
+        return max(self.get_port_occupation_cycles().values())
 
     def create_horiz_sep(self):
         """
