@@ -39,8 +39,9 @@ def extract_model(tree, arch):
 
         # Extract parameter components
         parameters = []  # used to store string representations
-        parameter_tags = instruction_tag.findall('operand')
-        for parameter_tag in sorted(parameter_tags, key=lambda p: int(p.attrib['idx'])):
+        parameter_tags = sorted(instruction_tag.findall("operand"),
+                                 key=lambda p: int(p.attrib['idx']))
+        for parameter_tag in parameter_tags:
             # Ignore parameters with suppressed=1
             if int(parameter_tag.attrib.get('suppressed', '0')):
                 continue
@@ -110,10 +111,39 @@ def extract_model(tree, arch):
             # print("No data available for this architecture:", mnemonic, file=sys.stderr)
             continue
 
-        model_data.append((mnemonic.lower() + '-' + '_'.join(parameters),
-                           throughput, latency, port_occupancy))
+        for m, p in build_variants(mnemonic, parameters):
+            model_data.append((m.lower() + '-' + '_'.join(p),
+                              throughput, latency, port_occupancy))
 
     return model_data
+
+
+def all_or_false(iter):
+    if not iter:
+        return False
+    else:
+        return all(iter)
+
+
+def build_variants(mnemonic, parameters):
+    """Yield all resonable variants of this instruction form."""
+    # The one that was given
+    mnemonic = mnemonic.upper()
+    yield mnemonic, parameters
+
+    # Without opmask
+    if any(['{opmask}' in p for p in parameters]):
+        yield mnemonic, list([p.replace('{opmask}', '') for p in parameters])
+
+    # With suffix (assuming suffix was not already present)
+    suffixes = {'Q': 'r64',
+                'L': 'r32',
+                'W': 'r16',
+                'B': 'r8'}
+    for s, reg in suffixes.items():
+        if not mnemonic.endswith(s) and all_or_false(
+                [p == reg for p in parameters if p not in ['mem', 'imd']]):
+            yield mnemonic+s, parameters
 
 
 def architectures(tree):
@@ -135,8 +165,6 @@ def dump_csv(model_data):
         csv_line = '{},{},{},"({})"\n'.format(mnemonic, throughput, latency,
                                               ','.join([str(c) for p, c in po_items]))
         csv += csv_line
-        if '{opmask}' in csv_line:
-            csv += csv_line.replace('{opmask}', '')
     return csv
 
 

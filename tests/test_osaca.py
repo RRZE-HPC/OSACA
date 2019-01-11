@@ -49,7 +49,7 @@ class TestOsaca(unittest.TestCase):
     #@unittest.skip("Skip until required instructions are supported.")
     def test_asm_API(self):
         with open(self.curr_dir + '/testfiles/3d-7pt.iaca_marked.s') as f:
-            osa = osaca.OSACA('SKL', f.read())
+            osa = osaca.OSACA('SKX', f.read())
 
         text_output = osa.create_output()
         print(text_output)
