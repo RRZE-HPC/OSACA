@@ -362,7 +362,7 @@ class OSACA(object):
     longestInstr = 30
     machine_readable = False
 
-    VALID_ARCHS = ['SNB', 'IVB', 'HSW', 'BDW', 'SKL', 'ZEN']
+    VALID_ARCHS = Scheduler.arch_dict
 
     def __init__(self, arch, assembly, extract_with_markers=True):
         """

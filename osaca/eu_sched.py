@@ -12,8 +12,8 @@ from osaca.param import Register, MemAddr
 
 
 class Scheduler(object):
-    arch_dict = {'SNB': 6, 'IVB': 6, 'HSW': 8, 'BDW': 8, 'SKL': 8, 'ZEN': 10}
-    dv_ports_dict = {'SKL': [0], 'ZEN': [3]}
+    arch_dict = {'SNB': 6, 'IVB': 6, 'HSW': 8, 'BDW': 8, 'SKL': 8, 'SKX': 8, 'ZEN': 10}
+    dv_ports_dict = {'ZEN': [3]}  # FIXME 'SKL': [0], 'SKX': [0] disabled due to uops.info export
     # content of most inner list in instrList: instr, operand(s), instr form
     df = None  # type: DataFrame
     # for parallel ld/st in archs with 1 st/cy and >1 ld/cy, able to do 1 st and 1 ld in 1cy
