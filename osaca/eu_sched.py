@@ -75,7 +75,6 @@ class Scheduler(object):
         # occ_port list item empty
         for i, instrForm in enumerate(self.instrList):
             search_string = instrForm[0] + '-' + self.get_operand_suffix(instrForm)
-            print(search_string)
             try:
                 entry = self.df.loc[lambda df, sStr=search_string: df.instr == sStr]
                 tup = entry.ports.values[0]
