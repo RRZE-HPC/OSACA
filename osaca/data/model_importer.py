@@ -132,8 +132,11 @@ def dump_csv(model_data):
             if p not in port_occupancy:
                 port_occupancy[p] = 0.0
         po_items = sorted(port_occupancy.items())
-        csv += '{},{},{},"({})"\n'.format(mnemonic, throughput, latency,
-                                          ','.join([str(c) for p, c in po_items]))
+        csv_line = '{},{},{},"({})"\n'.format(mnemonic, throughput, latency,
+                                              ','.join([str(c) for p, c in po_items]))
+        csv += csv_line
+        if '{opmask}' in csv_line:
+            csv += csv_line.replace('{opmask}', '')
     return csv
 
 
