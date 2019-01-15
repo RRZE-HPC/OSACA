@@ -62,7 +62,8 @@ def extract_model(tree, arch):
                               file=sys.stderr)
                         ignore = True
                     elif reg_groups[0][1] == 'GPR':
-                        parameters.append('r{}'.format(reg_groups[0][0]))  # Register(possible_regs[0]))
+                        parameters.append('r{}'.format(reg_groups[0][0]))
+                        # Register(possible_regs[0]))
                     elif '{' in parameter_tag.text:
                         # We have a mask
                         parameters[-1] += '{opmask}'
