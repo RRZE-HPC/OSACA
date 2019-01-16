@@ -7,6 +7,7 @@ import argparse
 from distutils.version import StrictVersion
 
 from osaca.param import Parameter, Register
+from osaca.eu_sched import Scheduler
 
 
 def normalize_reg_name(reg_name):
@@ -18,16 +19,68 @@ def normalize_reg_name(reg_name):
     return reg_name
 
 
-def port_occupancy_from_tag_attributes(attrib):
+def port_occupancy_from_tag_attributes(attrib, arch):
     occupancy = defaultdict(int)
     for k, v in attrib.items():
-        if not k.startswith('port'):
+        m = re.match('^port([0-9]+)', k)
+        if not m:
             continue
-        potential_ports = list(k[4:])
+        ports = m.group(1)
+        # Ignore Port7 on HSW, BDW, SKL and SKX if present in combination with ports 2 and 3.
+        # Port7 is only used for simple address generation, while 2 and 3 handle all addressing,
+        # but uops.info does not differentiate.
+        if arch in ['HSW', 'BDW', 'SKL', 'SKX'] and ports == '237':
+            ports = ports.replace('7', '')
+        potential_ports = list(ports)
         per_port_occupancy = int(v) / len(potential_ports)
         for pp in potential_ports:
             occupancy[pp] += per_port_occupancy
+
+    # Also consider DIV pipeline
+    if 'div_cycles' in attrib:
+        occupancy['0DV'] = int(attrib['div_cycles'])
+
     return dict(occupancy)
+
+
+def extract_paramters(instruction_tag):
+    # Extract parameter components
+    parameters = []  # used to store string representations
+    parameter_tags = sorted(instruction_tag.findall("operand"),
+                            key=lambda p: int(p.attrib['idx']))
+    for parameter_tag in parameter_tags:
+        # Ignore parameters with suppressed=1
+        if int(parameter_tag.attrib.get('suppressed', '0')):
+            continue
+
+        p_type = parameter_tag.attrib['type']
+        if p_type == 'imm':
+            parameters.append('imd')  # Parameter('IMD')
+        elif p_type == 'mem':
+            parameters.append('mem')  # Parameter('MEM')
+        elif p_type == 'reg':
+            possible_regs = [normalize_reg_name(r)
+                             for r in parameter_tag.text.split(',')]
+            reg_groups = [Register.sizes.get(r, None) for r in possible_regs]
+            if reg_groups[1:] == reg_groups[:-1]:
+                if reg_groups[0] is None:
+                    raise ValueError("Unknown register type for {} with {}.".format(
+                        parameter_tag.attrib, parameter_tag.text))
+                elif reg_groups[0][1] == 'GPR':
+                    parameters.append('r{}'.format(reg_groups[0][0]))
+                    # Register(possible_regs[0]))
+                elif '{' in parameter_tag.text:
+                    # We have a mask
+                    parameters[-1] += '{opmask}'
+                else:
+                    parameters.append(reg_groups[0][1].lower())
+        elif p_type == 'relbr':
+            parameters.append('LBL')
+        elif p_type == 'agen':
+            parameters.append('mem')
+        else:
+            raise ValueError("Unknown paramter type {}".format(parameter_tag.attrib))
+    return parameters
 
 
 def extract_model(tree, arch):
@@ -38,45 +91,10 @@ def extract_model(tree, arch):
         mnemonic = instruction_tag.attrib['asm']
 
         # Extract parameter components
-        parameters = []  # used to store string representations
-        parameter_tags = sorted(instruction_tag.findall("operand"),
-                                 key=lambda p: int(p.attrib['idx']))
-        for parameter_tag in parameter_tags:
-            # Ignore parameters with suppressed=1
-            if int(parameter_tag.attrib.get('suppressed', '0')):
-                continue
-
-            p_type = parameter_tag.attrib['type']
-            if p_type == 'imm':
-                parameters.append('imd')  # Parameter('IMD')
-            elif p_type == 'mem':
-                parameters.append('mem')  # Parameter('MEM')
-            elif p_type == 'reg':
-                possible_regs = [normalize_reg_name(r)
-                                 for r in parameter_tag.text.split(',')]
-                reg_groups = [Register.sizes.get(r, None) for r in possible_regs]
-                if reg_groups[1:] == reg_groups[:-1]:
-                    if reg_groups[0] is None:
-                        print('Unknown register type for', mnemonic, ':',
-                              parameter_tag.attrib, parameter_tag.text,
-                              file=sys.stderr)
-                        ignore = True
-                    elif reg_groups[0][1] == 'GPR':
-                        parameters.append('r{}'.format(reg_groups[0][0]))
-                        # Register(possible_regs[0]))
-                    elif '{' in parameter_tag.text:
-                        # We have a mask
-                        parameters[-1] += '{opmask}'
-                    else:
-                        parameters.append(reg_groups[0][1].lower())
-            elif p_type == 'relbr':
-                parameters.append('LBL')
-            elif p_type == 'agen':
-                parameters.append('mem')
-            else:
-                print("Unknown paramter type:", parameter_tag.attrib, file=sys.stderr)
-                ignore = True
-        if ignore: continue
+        try:
+            parameters = extract_paramters(instruction_tag)
+        except ValueError as e:
+            print(e, file=sys.stderr)
 
         # Extract port occupation, throughput and latency
         port_occupancy, throughput, latency = [], 0.0, None
@@ -85,7 +103,7 @@ def extract_model(tree, arch):
             continue
         # We collect all measurement and IACA information and compare them later
         for measurement_tag in arch_tag.iter('measurement'):
-            port_occupancy.append(port_occupancy_from_tag_attributes(measurement_tag.attrib))
+            port_occupancy.append(port_occupancy_from_tag_attributes(measurement_tag.attrib, arch))
             # FIXME handle min/max Latencies ('maxCycles' and 'minCycles')
             latencies = [int(l_tag.attrib['cycles'])
                          for l_tag in measurement_tag.iter('latency') if 'latency' in l_tag.attrib]
@@ -98,7 +116,7 @@ def extract_model(tree, arch):
         # Ordered by IACA version (newest last)
         for iaca_tag in sorted(arch_tag.iter('IACA'),
                                key=lambda i: StrictVersion(i.attrib['version'])):
-            port_occupancy.append(port_occupancy_from_tag_attributes(iaca_tag.attrib))
+            port_occupancy.append(port_occupancy_from_tag_attributes(iaca_tag.attrib, arch))
         if ignore: continue
 
         # Check if all are equal
@@ -119,11 +137,11 @@ def extract_model(tree, arch):
     return model_data
 
 
-def all_or_false(iter):
-    if not iter:
+def all_or_false(iterator):
+    if not iterator:
         return False
     else:
-        return all(iter)
+        return all(iterator)
 
 
 def build_variants(mnemonic, parameters):
@@ -151,12 +169,25 @@ def architectures(tree):
     return set([a.attrib['name'] for a in tree.findall('.//architecture')])
 
 
-def dump_csv(model_data):
+def int_or_zero(s):
+    try:
+        return int(s)
+    except ValueError:
+        return 0
+
+
+def dump_csv(model_data, arch):
     csv = 'instr,TP,LT,ports\n'
     ports = set()
     for mnemonic, throughput, latency, port_occupancy in model_data:
         for p in port_occupancy:
             ports.add(p)
+    ports = sorted(ports)
+    # If not all ports have been used (happens with port7 due to blacklist
+    # port_occupancy_from_tag_attributes), extend list accordingly:
+    while len(ports) < Scheduler.arch_dict[arch] + len(Scheduler.arch_pipeline_ports.get(arch, [])):
+        max_index = ports.index(str(max(map(int_or_zero, ports))))
+        ports.insert(max_index + 1, str(max(map(int_or_zero, ports)) + 1))
 
     for mnemonic, throughput, latency, port_occupancy in model_data:
         for p in ports:
@@ -180,12 +211,12 @@ def main():
     tree = ET.parse(args.xml)
     if args.arch:
         model_data = extract_model(tree, args.arch)
-        print(dump_csv(model_data))
+        print(dump_csv(model_data, args.arch))
     else:
         for arch in architectures(tree):
             model_data = extract_model(tree, arch)
             with open('{}_data.csv'.format(arch), 'w') as f:
-                f.write(dump_csv(model_data))
+                f.write(dump_csv(model_data, arch))
 
 
 if __name__ == '__main__':
