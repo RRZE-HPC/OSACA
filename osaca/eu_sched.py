@@ -28,7 +28,7 @@ class Scheduler(object):
         'HSW': ['0DV'], 'BDW': ['0DV'],
         'SKL': ['0DV'], 'SKX': ['0DV'],
         'KBL': ['0DV'], 'CFL': ['0DV'],
-        'ZEN': ['0DV'],}
+        'ZEN': ['3DV'],}
     # content of most inner list in instrList: instr, operand(s), instr form
     df = None  # type: DataFrame
     # for parallel ld/st in archs with 1 st/cy and >1 ld/cy, able to do 1 st and 1 ld in 1cy
@@ -107,13 +107,14 @@ class Scheduler(object):
             p_flg = ''
             if self.en_par_ldst:
                 # Check for ld
+                # FIXME remove special load handling from here and place in machine model
                 if (isinstance(instrForm[-2], MemAddr) or
                         (len(instrForm) > 4 and isinstance(instrForm[2], MemAddr))):
                     if par_ldst > 0:
                         par_ldst -= 1
                         p_flg = 'P '
                         for port in self.ld_ports:
-                            occ_ports[i][port] = '(' + str(occ_ports[i][port]) + ')'
+                            occ_ports[i][port] = 0.0  # '(' + str(occ_ports[i][port]) + ')'
             # Write schedule line
             if len(p_flg) > 0:
                 sched += self.format_port_occupation_line(occ_ports[i], p_flg + instrForm[-1])
