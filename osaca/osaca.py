@@ -564,6 +564,15 @@ class OSACA(object):
             (port_name, port_binding[i])
             for i, port_name in enumerate(self.schedule.get_port_naming())])
 
+    def get_unmatched_instruction_ratio(self):
+        """
+        Calculate ratio of unmatched vs total instructions
+
+        :return: float
+        """
+        sched_output, port_binding = self.schedule.new_schedule()
+        return sched_output.count('| X ') / len(self.instr_forms)
+
     def get_total_throughput(self):
         """
         Return total cycles estimated per block execution. Including (potential) penalties.
