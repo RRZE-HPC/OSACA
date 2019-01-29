@@ -408,7 +408,11 @@ class OSACA(object):
             # TODO potential replacement for instr_forms entries in OSACA
             # InstructionForm.from_assembly(line)
 
+            # Ignore labels
             if re.match(r'^[a-zA-Z0-9\_\.]+:$', line):
+                continue
+            # Ignore .loc
+            if re.match(r'^\.loc\s+', line):
                 continue
             self.check_instr(line)
 
@@ -422,7 +426,6 @@ class OSACA(object):
         instr : str
             Instruction as string
         """
-        # Ignore labels
         # Check for strange clang padding bytes
         while instr.startswith('data32'):
             instr = instr[7:]
