@@ -812,7 +812,7 @@ def main():
                                   block_selection='manual', pointer_increment=1)
 
         marked_assembly.seek(0)
-        assembly = marked_assembly.read(0)
+        assembly = marked_assembly.read()
 
     osaca = OSACA(args.arch, assembly)
     print(osaca.generate_text_output())
