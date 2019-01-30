@@ -2,6 +2,7 @@
 
 import argparse
 import collections
+import filecmp
 import sys
 import os
 import io
@@ -18,6 +19,7 @@ from osaca.eu_sched import Scheduler
 from osaca.testcase import Testcase
 
 DATA_DIR = os.path.expanduser('~') + '/.osaca/'
+MODULE_DATA_DIR = os.path.join((os.path.split(__file__)[0]), 'data')
 
 # Matches every variation of the IACA start marker
 IACA_START_MARKER = re.compile(r'\s*movl?[ \t]+\$(?:111|0x6f)[ \t]*,[ \t]*%ebx.*\n\s*'
@@ -387,9 +389,17 @@ class OSACA(object):
             #print('Copying files in user directory...', file=self.file_output, end='')
             os.makedirs(os.path.join(DATA_DIR, 'data'))
             subprocess.call(['cp', '-r',
-                             '/'.join(os.path.realpath(__file__).split('/')[:-1]) + '/data',
+                             MODULE_DATA_DIR,
                              DATA_DIR])
             #print(' Done!', file=self.file_output)
+        else:
+            # Compare and warn if files in DATA_DIR are different
+            dircmp = filecmp.dircmp(os.path.join(DATA_DIR, 'data'), MODULE_DATA_DIR)
+            if dircmp.left_list != dircmp.same_files:
+                print("WARNING: data in {0} differs from {1}. Check or delete {1}.".format(
+                    MODULE_DATA_DIR,
+                    DATA_DIR
+                ), file=sys.stderr)
 
         # Check for database for the chosen architecture
         self.df = read_csv(arch)
