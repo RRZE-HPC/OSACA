@@ -6,6 +6,7 @@ import unittest
 sys.path[0:0] = ['.', '..']
 suite = unittest.TestLoader().loadTestsFromNames(
     [
+        'test_parser_x86_att'
     ]
 )
 

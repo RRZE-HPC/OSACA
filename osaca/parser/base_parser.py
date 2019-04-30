@@ -3,6 +3,7 @@
 
 class BaseParser(object):
     # Identifiers for operand types
+    COMMENT_ID = 'comment'
     DIRECTIVE_ID = 'directive'
     IMMEDIATE_ID = 'immediate'
     LABEL_ID = 'label'
