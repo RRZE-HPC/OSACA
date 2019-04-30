@@ -12,8 +12,23 @@ from osaca.param import Register, MemAddr
 
 
 class Scheduler(object):
-    arch_dict = {'SNB': 6, 'IVB': 6, 'HSW': 8, 'BDW': 8, 'SKL': 8, 'ZEN': 10}
-    dv_ports_dict = {'SKL': [0], 'ZEN': [3]}
+    arch_dict = {
+        # Intel
+        'NHM': 5, 'WSM': 5,  # Nehalem, Westmere
+        'SNB': 6, 'IVB': 6,  # Sandy Bridge, Ivy Bridge
+        'HSW': 8, 'BDW': 8,  # Haswell, Broadwell
+        'SKL': 8, 'SKX': 8,  # Skylake(-X)
+        'KBL': 8, 'CFL': 8,  # Kaby Lake, Coffee Lake
+        # AMD
+        'ZEN': 10,  # Zen/Ryzen/EPYC
+    }
+    arch_pipeline_ports = {
+        'NHM': ['0DV'], 'WSM': ['0DV'],
+        'SNB': ['0DV'], 'IVB': ['0DV'],
+        'HSW': ['0DV'], 'BDW': ['0DV'],
+        'SKL': ['0DV'], 'SKX': ['0DV'],
+        'KBL': ['0DV'], 'CFL': ['0DV'],
+        'ZEN': ['3DV'],}
     # content of most inner list in instrList: instr, operand(s), instr form
     df = None  # type: DataFrame
     # for parallel ld/st in archs with 1 st/cy and >1 ld/cy, able to do 1 st and 1 ld in 1cy
@@ -33,7 +48,7 @@ class Scheduler(object):
             self.en_par_ldst = True
             self.ld_ports = [9, 10]
         # check for DV port
-        self.dv_ports = self.dv_ports_dict.get(arch, [])
+        self.pipeline_ports = self.arch_pipeline_ports.get(arch, [])
         self.instrList = instruction_list
         # curr_dir = os.path.realpath(__file__)[:-11]
         osaca_dir = os.path.expanduser('~/.osaca/')
@@ -60,8 +75,8 @@ class Scheduler(object):
         sched = self.get_head()
         # Initialize ports
         # Add DV port, if it is existing
-        occ_ports = [[0] * (self.ports + len(self.dv_ports)) for x in range(len(self.instrList))]
-        port_bndgs = [0] * (self.ports + len(self.dv_ports))
+        occ_ports = [[0] * (self.ports + len(self.pipeline_ports)) for x in range(len(self.instrList))]
+        port_bndgs = [0] * (self.ports + len(self.pipeline_ports))
         # Store instruction counter for parallel ld/st
         par_ldst = 0
         # Count the number of store instr if we schedule for an architecture with par ld/st
@@ -74,8 +89,8 @@ class Scheduler(object):
         # Check if there's a port occupation stored in the CSV, otherwise leave the
         # occ_port list item empty
         for i, instrForm in enumerate(self.instrList):
+            search_string = instrForm[0] + '-' + self.get_operand_suffix(instrForm)
             try:
-                search_string = instrForm[0] + '-' + self.get_operand_suffix(instrForm)
                 entry = self.df.loc[lambda df, sStr=search_string: df.instr == sStr]
                 tup = entry.ports.values[0]
                 if len(tup) == 1 and tup[0] == -1:
@@ -92,13 +107,14 @@ class Scheduler(object):
             p_flg = ''
             if self.en_par_ldst:
                 # Check for ld
+                # FIXME remove special load handling from here and place in machine model
                 if (isinstance(instrForm[-2], MemAddr) or
                         (len(instrForm) > 4 and isinstance(instrForm[2], MemAddr))):
                     if par_ldst > 0:
                         par_ldst -= 1
                         p_flg = 'P '
                         for port in self.ld_ports:
-                            occ_ports[i][port] = '(' + str(occ_ports[i][port]) + ')'
+                            occ_ports[i][port] = 0.0  # '(' + str(occ_ports[i][port]) + ')'
             # Write schedule line
             if len(p_flg) > 0:
                 sched += self.format_port_occupation_line(occ_ports[i], p_flg + instrForm[-1])
@@ -361,14 +377,7 @@ class Scheduler(object):
 
         :return: list of strings
         """
-        port_names = []
-        dv_ports_appended = 0
-        for i in range(self.ports):
-            port_names.append(str(i))
-            if i in self.dv_ports:
-                dv_ports_appended += 1
-                port_names.append(str(i)+'DV')
-        return port_names
+        return sorted([str(i) for i in range(self.ports)] + self.pipeline_ports)
 
     def get_port_binding(self, port_bndg):
         """
