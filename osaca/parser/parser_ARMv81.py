@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 
-from .parser import Parser
+from .base_parser import BaseParser
 
 
-class ParserARMv81(Parser):
+class ParserARMv81(BaseParser):
     # TODO
 
     def __init__(self):
