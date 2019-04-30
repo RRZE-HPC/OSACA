@@ -19,38 +19,43 @@ class TestParserX86ATT(unittest.TestCase):
     ##################
 
     def test_comment_parser(self):
-        self.assertEqual(self.get_comment('# some comments'), 'some comments')
-        self.assertEqual(self.get_comment('\t\t#AA BB CC \t end \t'), 'AA BB CC end')
-        self.assertEqual(self.get_comment('\t## comment ## comment'), '# comment ## comment')
+        self.assertEqual(get_comment(self.parser, '# some comments'), 'some comments')
+        self.assertEqual(get_comment(self.parser, '\t\t#AA BB CC \t end \t'), 'AA BB CC end')
+        self.assertEqual(
+            get_comment(self.parser, '\t## comment ## comment'), '# comment ## comment'
+        )
 
     def test_label_parser(self):
-        self.assertEqual(self.get_label('main:')['name'], 'main')
-        self.assertEqual(self.get_label('..B1.10:')['name'], '.B1.10')
-        self.assertEqual(self.get_label('.2.3_2_pack.3:')['name'], '.2.3_2_pack.3')
-        self.assertEqual(self.get_label('.L1:\t\t\t#label1')['name'], '.L1')
-        self.assertEqual(self.get_label('.L1:\t\t\t#label1')['comment'], 'label1')
+        self.assertEqual(get_label(self.parser, 'main:')['name'], 'main')
+        self.assertEqual(get_label(self.parser, '..B1.10:')['name'], '.B1.10')
+        self.assertEqual(get_label(self.parser, '.2.3_2_pack.3:')['name'], '.2.3_2_pack.3')
+        self.assertEqual(get_label(self.parser, '.L1:\t\t\t#label1')['name'], '.L1')
+        self.assertEqual(get_label(self.parser, '.L1:\t\t\t#label1')['comment'], 'label1')
         with self.assertRaises(ParseException):
-            self.get_label('\t.cfi_startproc')
+            get_label(self.parser, '\t.cfi_startproc')
 
     def test_directive_parser(self):
-        self.assertEqual(self.get_directive('\t.text')['name'], 'text')
-        self.assertEqual(len(self.get_directive('\t.text')['parameters']), 0)
-        self.assertEqual(self.get_directive('\t.align\t16,0x90')['name'], 'align')
-        self.assertEqual(len(self.get_directive('\t.align\t16,0x90')['parameters']), 2)
-        self.assertEqual(self.get_directive('\t.align\t16,0x90')['parameters'][1], '0x90')
+        self.assertEqual(get_directive(self.parser, '\t.text')['name'], 'text')
+        self.assertEqual(len(get_directive(self.parser, '\t.text')['parameters']), 0)
+        self.assertEqual(get_directive(self.parser, '\t.align\t16,0x90')['name'], 'align')
+        self.assertEqual(len(get_directive(self.parser, '\t.align\t16,0x90')['parameters']), 2)
+        self.assertEqual(get_directive('\t.align\t16,0x90')['parameters'][1], '0x90')
         self.assertEqual(
-            self.get_directive('        .byte 100,103,144       #IACA START')['name'], 'byte'
+            get_directive(self.parser, '        .byte 100,103,144       #IACA START')['name'],
+            'byte',
         )
         self.assertEqual(
-            self.get_directive('        .byte 100,103,144       #IACA START')['parameters'][2],
+            get_directive(self.parser, '        .byte 100,103,144       #IACA START')[
+                'parameters'
+            ][2],
             '144',
         )
         self.assertEqual(
-            self.get_directive('        .byte 100,103,144       #IACA START')['comment'],
+            get_directive(self.parser, '        .byte 100,103,144       #IACA START')['comment'],
             'IACA START',
         )
 
-    def test_parse_instruciton(self):
+    def test_parse_instruction(self):
         instr1 = '\t\tvcvtsi2ss %edx, %xmm2, %xmm2\t\t\t#12.27'
         instr2 = 'jb        ..B1.4 \t'
         instr3 = '        movl $222,%ebx          #IACA END'
@@ -135,16 +140,17 @@ class TestParserX86ATT(unittest.TestCase):
         self.assertEqual(parsed_3, instruction_form_3)
         # self.assertEqual(parsed_4, instruction_form_4)
 
-    ##################
-    # Helper functions
-    ##################
-    def get_comment(self, comment):
-        return ' '.join(
-            self.parser.comment.parseString(comment, parseAll=True).asDict()['comment']
-        )
 
-    def get_label(self, label):
-        return self.parser.label.parseString(label, parseAll=True).asDict()
+##################
+# Helper functions
+##################
+def get_comment(parser, comment):
+    return ' '.join(parser.comment.parseString(comment, parseAll=True).asDict()['comment'])
 
-    def get_directive(self, directive):
-        return self.parser.directive.parseString(directive, parseAll=True).asDict()
+
+def get_label(parser, label):
+    return parser.label.parseString(label, parseAll=True).asDict()
+
+
+def get_directive(parser, directive):
+    return parser.directive.parseString(directive, parseAll=True).asDict()
