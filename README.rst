@@ -20,6 +20,9 @@ analysis and throughput prediction for a innermost loop kernel.
    :target: https://landscape.io/github/RRZE-HPC/OSACA/master
    :alt: Code Health
 
+.. image:: https://img.shields.io/badge/code%20style-black-000000.svg
+    :target: https://github.com/ambv/black
+
 Getting started
 ===============
 
