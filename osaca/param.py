@@ -29,14 +29,15 @@ class MemAddr(Parameter):
         self.base = None
         self.index = None
         self.scale = None
-
-        m = re.match(r'(?P<offset>[x0-9a-fA-F]*)\((?P<base>[^,\)]+)(?:,\s*(?P<index>[^,\)]+)'
-                     r'(?:,\s*(?P<scale>[^,\)]+))?)?\)', name)
+        
+        m = re.match(r'((?P<offset_hex>[x0-9a-fA-F]*)|(?P<offset_dec>\-?[0-9]*))'
+                     r'\((?P<base>[^,\)]+)(?:,\s*(?P<index>[^,\)]+)(?:,\s*'
+                     r'(?P<scale>[^,\)]+))?)?\)', name)
 
         if not m:
             raise ValueError('Type not supported: {!r}'.format(name))
 
-        self.offset = m.group('offset') or None
+        self.offset = m.group('offset_dec') or m.group('offset_hex') or None
         self.base = m.group('base') or None
         self.index = m.group('index') or None
         self.scale = m.group('scale') or None
