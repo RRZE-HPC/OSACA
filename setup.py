@@ -91,6 +91,7 @@ setup(
     install_requires=[
         'numpy',
         'pandas',
+        'pyparsing',
         'kerncraft',
     ],
     python_requires='>=3.5',
