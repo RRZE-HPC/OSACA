@@ -1,14 +1,11 @@
-#!/usr//bin/env python
+#!/usr/bin/env python3
 
 import sys
-
 import unittest
-
 
 sys.path[0:0] = ['.', '..']
 suite = unittest.TestLoader().loadTestsFromNames(
     [
-        'test_osaca'
     ]
 )
 
