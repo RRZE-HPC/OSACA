@@ -54,14 +54,12 @@ class ParserX86ATT(BaseParser):
                 + pp.Word(pp.alphanums).setResultsName('mask')
                 + pp.Literal('}')
             )
-            + pp.Optional(pp.Suppress(pp.Literal(',')))
         ).setResultsName(self.REGISTER_ID)
         # Immediate: pp.Regex('^\$(-?[0-9]+)|(0x[0-9a-fA-F]+),?')
         symbol_immediate = '$'
         immediate = pp.Group(
             pp.Literal(symbol_immediate)
             + (hex_number | decimal_number)
-            + pp.Optional(pp.Suppress(pp.Literal(',')))
         ).setResultsName(self.IMMEDIATE_ID)
         # Memory: offset(base, index, scale)
         offset = identifier | hex_number | decimal_number
@@ -69,11 +67,12 @@ class ParserX86ATT(BaseParser):
         memory = pp.Group(
             pp.Optional(offset.setResultsName('offset'))
             + pp.Literal('(')
-            + (register.setResultsName('base') | (pp.Suppress(pp.Literal(',')) + scale))
+            + pp.Optional(register.setResultsName('base'))
+            + pp.Optional(pp.Suppress(pp.Literal(',')))
             + pp.Optional(register.setResultsName('index'))
+            + pp.Optional(pp.Suppress(pp.Literal(',')))
             + pp.Optional(scale.setResultsName('scale'))
             + pp.Literal(')')
-            + pp.Optional(pp.Suppress(pp.Literal(',')))
         ).setResultsName(self.MEMORY_ID)
         # Combine to instruction form
         operand1 = pp.Group(register ^ immediate ^ memory ^ identifier).setResultsName('operand1')
@@ -82,7 +81,9 @@ class ParserX86ATT(BaseParser):
         self.instruction_parser = (
             mnemonic
             + pp.Optional(operand1)
+            + pp.Optional(pp.Suppress(pp.Literal(',')))
             + pp.Optional(operand2)
+            + pp.Optional(pp.Suppress(pp.Literal(',')))
             + pp.Optional(operand3)
             + pp.Optional(self.comment)
         )
