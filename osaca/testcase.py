@@ -78,9 +78,10 @@ class Testcase(object):
         self.loop_lat = self.__define_loop_lat()
         self.loop_thrpt = self.__define_loop_thrpt()
         # Create extension for testcase name
+        sep0 = '-' if (self.num_operands > 0) else ''
         sep1 = '_' if (self.num_operands > 1) else ''
         sep2 = '_' if (self.num_operands > 2) else ''
-        self.extension = ('-' + (self.op_a if ('gpr' not in self.op_a) else 'r' + self.op_a[3:])
+        self.extension = (sep0 + (self.op_a if ('gpr' not in self.op_a) else 'r' + self.op_a[3:])
                           + sep1 + (self.op_b if ('gpr' not in self.op_b) else 'r' + self.op_b[3:])
                           + sep2 + (self.op_c if ('gpr' not in self.op_c) else 'r' + self.op_c[3:]))
 
@@ -131,15 +132,16 @@ class Testcase(object):
         operands = self.param_list
         op_a, op_b, op_c = ('', '', '')
         gpr_push, gpr_pop, zero_gpr = ('', '', '')
-        if isinstance(operands[0], Register):
-            op_a = operands[0].reg_type.lower()
-        elif isinstance(operands[0], MemAddr):
-            op_a = 'mem'
-        elif isinstance(operands[0], Parameter) and str(operands[0]) == 'IMD':
-            op_a = 'imd'
-        if op_a == 'gpr':
-            gpr_push, gpr_pop, zero_gpr = self.__initialise_gprs()
-            op_a += str(operands[0].size)
+        if len(operands) > 0:
+            if isinstance(operands[0], Register):
+                op_a = operands[0].reg_type.lower()
+            elif isinstance(operands[0], MemAddr):
+                op_a = 'mem'
+            elif isinstance(operands[0], Parameter) and str(operands[0]) == 'IMD':
+                op_a = 'imd'
+            if op_a == 'gpr':
+                gpr_push, gpr_pop, zero_gpr = self.__initialise_gprs()
+                op_a += str(operands[0].size)
         if len(operands) > 1:
             if isinstance(operands[1], Register):
                 op_b = operands[1].reg_type.lower()
@@ -301,6 +303,9 @@ class Testcase(object):
         """
         loop_lat = ('loop:\n'
                     '\t\tinc      i\n')
+        if self.num_operands == 0:
+            for i in range(0, int(self.num_instr)):
+                loop_lat += '\t\tINSTR\n'
         if self.num_operands == 1:
             for i in range(0, int(self.num_instr)):
                 loop_lat += '\t\tINSTR    {}\n'.format(self.ops[self.op_a][0])
@@ -356,6 +361,9 @@ class Testcase(object):
             ext1 = True
             ext2 = True
         for i in range(0, int(self.num_instr)):
+            if self.num_operands == 0:
+                loop_thrpt += '\t\tINSTR\n'
+                continue
             if ext1:
                 ext = ', {}'.format(self.ops[self.op_b][i % 3])
             if ext2:

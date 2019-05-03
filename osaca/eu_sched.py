@@ -89,7 +89,7 @@ class Scheduler(object):
         # Check if there's a port occupation stored in the CSV, otherwise leave the
         # occ_port list item empty
         for i, instrForm in enumerate(self.instrList):
-            search_string = instrForm[0] + '-' + self.get_operand_suffix(instrForm)
+            search_string = instrForm[0] + self.get_operand_suffix(instrForm)
             try:
                 entry = self.df.loc[lambda df, sStr=search_string: df.instr == sStr]
                 tup = entry.ports.values[0]
@@ -426,6 +426,9 @@ class Scheduler(object):
             Operand suffix for searching in data file
         """
         op_ext = []
+        operands = ''
+        if len(instr_form) > 2:
+            operands = '-'
         for i in range(1, len(instr_form) - 1):
             if isinstance(instr_form[i], Register) and instr_form[i].reg_type == 'GPR':
                 optmp = 'r' + str(instr_form[i].size)
@@ -434,7 +437,7 @@ class Scheduler(object):
             else:
                 optmp = str(instr_form[i]).lower()
             op_ext.append(optmp)
-        operands = '_'.join(op_ext)
+        operands += '_'.join(op_ext)
         return operands
 
 
