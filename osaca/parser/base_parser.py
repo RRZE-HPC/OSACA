@@ -29,7 +29,7 @@ class BaseParser(object):
         for i, line in enumerate(lines):
             if line == '':
                 continue
-            asm_instructions.append(self.parseLine(line, i + 1))
+            asm_instructions.append(self.parse_line(line, i + 1))
         return asm_instructions
 
     def parse_line(self, line, line_number):
@@ -38,18 +38,6 @@ class BaseParser(object):
 
     def parse_instruction(self, instruction):
         # Done in derived classes
-        raise NotImplementedError()
-
-    def parse_register(self, register):
-        # Done in derived classed
-        raise NotImplementedError()
-
-    def parse_memory(self, memory_address):
-        # Done in derived classed
-        raise NotImplementedError()
-
-    def parse_immediate(self, immediate):
-        # Done in derived classed
         raise NotImplementedError()
 
     def construct_parser(self):

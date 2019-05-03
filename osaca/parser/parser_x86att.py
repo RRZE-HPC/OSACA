@@ -28,9 +28,11 @@ class ParserX86ATT(BaseParser):
             pp.Optional(pp.Literal('-')) + pp.Word(pp.nums)
         ).setResultsName('value')
         hex_number = pp.Combine(pp.Literal('0x') + pp.Word(pp.hexnums)).setResultsName('value')
-        commaSeparatedList = pp.delimitedList(
-            pp.Optional(pp.quotedString | identifier | hex_number | decimal_number), delim=','
+        directive_option = pp.Combine(pp.Word('#@.', exact=1) + pp.Word(pp.printables))
+        directive_parameter = (
+            pp.quotedString | directive_option | identifier | hex_number | decimal_number
         )
+        commaSeparatedList = pp.delimitedList(pp.Optional(directive_parameter), delim=',')
         self.directive = pp.Group(
             pp.Literal('.')
             + pp.Word(pp.alphanums + '_').setResultsName('name')
@@ -58,8 +60,7 @@ class ParserX86ATT(BaseParser):
         # Immediate: pp.Regex('^\$(-?[0-9]+)|(0x[0-9a-fA-F]+),?')
         symbol_immediate = '$'
         immediate = pp.Group(
-            pp.Literal(symbol_immediate)
-            + (hex_number | decimal_number)
+            pp.Literal(symbol_immediate) + (hex_number | decimal_number | identifier)
         ).setResultsName(self.IMMEDIATE_ID)
         # Memory: offset(base, index, scale)
         offset = identifier | hex_number | decimal_number
@@ -140,7 +141,14 @@ class ParserX86ATT(BaseParser):
 
         # 4. Parse instruction
         if result is None:
-            result = self.parse_instruction(line)
+            try:
+                result = self.parse_instruction(line)
+            except pp.ParseException:
+                print(
+                    '\n\n*-*-*-*-*-*-*-*-*-*-\n{}: {}\n*-*-*-*-*-*-*-*-*-*-\n\n'.format(
+                        line_number, line
+                    )
+                )
             instruction_form['instruction'] = result['instruction']
             instruction_form['operands'] = result['operands']
             instruction_form['comment'] = result['comment']
@@ -153,19 +161,19 @@ class ParserX86ATT(BaseParser):
         # Check from right to left
         # Check third operand
         if 'operand3' in result:
-            operands['destination'] = self.process_operand(result['operand3'])
+            operands['destination'] = self._process_operand(result['operand3'])
         # Check second operand
         if 'operand2' in result:
             if 'destination' in operands:
-                operands['sources'].insert(0, self.process_operand(result['operand2']))
+                operands['sources'].insert(0, self._process_operand(result['operand2']))
             else:
-                operands['destination'] = self.process_operand(result['operand2'])
+                operands['destination'] = self._process_operand(result['operand2'])
         # Check first operand
         if 'operand1' in result:
             if 'destination' in operands:
-                operands['sources'].insert(0, self.process_operand(result['operand1']))
+                operands['sources'].insert(0, self._process_operand(result['operand1']))
             else:
-                operands['destination'] = self.process_operand(result['operand1'])
+                operands['destination'] = self._process_operand(result['operand1'])
         return_dict = {
             'instruction': result['mnemonic'],
             'operands': operands,
@@ -173,7 +181,7 @@ class ParserX86ATT(BaseParser):
         }
         return return_dict
 
-    def process_operand(self, operand):
+    def _process_operand(self, operand):
         # For the moment, only used to structure memory addresses
         if 'memory' in operand:
             return self.substitute_memory_address(operand['memory'])
@@ -185,10 +193,5 @@ class ParserX86ATT(BaseParser):
         base = None if 'base' not in memory_address else memory_address['base']
         index = None if 'index' not in memory_address else memory_address['index']
         scale = '1' if 'scale' not in memory_address else memory_address['scale']
-        new_dict = {
-            'offset': offset,
-            'base': base,
-            'index': index,
-            'scale': scale,
-        }
+        new_dict = {'offset': offset, 'base': base, 'index': index, 'scale': scale}
         return {'memory': new_dict}
