@@ -3,6 +3,7 @@
 Unit tests for x86 AT&T assembly parser
 """
 
+import os
 import unittest
 
 from pyparsing import ParseException
@@ -13,48 +14,56 @@ from osaca.parser import ParserX86ATT
 class TestParserX86ATT(unittest.TestCase):
     def setUp(self):
         self.parser = ParserX86ATT()
+        with open(self._find_file('triad-iaca.s')) as f:
+            self.triad_code = f.read()
 
     ##################
     # Test
     ##################
 
     def test_comment_parser(self):
-        self.assertEqual(get_comment(self.parser, '# some comments'), 'some comments')
-        self.assertEqual(get_comment(self.parser, '\t\t#AA BB CC \t end \t'), 'AA BB CC end')
+        self.assertEqual(self._get_comment(self.parser, '# some comments'), 'some comments')
+        self.assertEqual(self._get_comment(self.parser, '\t\t#AA BB CC \t end \t'), 'AA BB CC end')
         self.assertEqual(
-            get_comment(self.parser, '\t## comment ## comment'), '# comment ## comment'
+            self._get_comment(self.parser, '\t## comment ## comment'), '# comment ## comment'
         )
 
     def test_label_parser(self):
-        self.assertEqual(get_label(self.parser, 'main:')['name'], 'main')
-        self.assertEqual(get_label(self.parser, '..B1.10:')['name'], '..B1.10')
-        self.assertEqual(get_label(self.parser, '.2.3_2_pack.3:')['name'], '.2.3_2_pack.3')
-        self.assertEqual(get_label(self.parser, '.L1:\t\t\t#label1')['name'], '.L1')
+        self.assertEqual(self._get_label(self.parser, 'main:')['name'], 'main')
+        self.assertEqual(self._get_label(self.parser, '..B1.10:')['name'], '..B1.10')
+        self.assertEqual(self._get_label(self.parser, '.2.3_2_pack.3:')['name'], '.2.3_2_pack.3')
+        self.assertEqual(self._get_label(self.parser, '.L1:\t\t\t#label1')['name'], '.L1')
         self.assertEqual(
-            ' '.join(get_label(self.parser, '.L1:\t\t\t#label1')['comment']), 'label1'
+            ' '.join(self._get_label(self.parser, '.L1:\t\t\t#label1')['comment']), 'label1'
         )
         with self.assertRaises(ParseException):
-            get_label(self.parser, '\t.cfi_startproc')
+            self._get_label(self.parser, '\t.cfi_startproc')
 
     def test_directive_parser(self):
-        self.assertEqual(get_directive(self.parser, '\t.text')['name'], 'text')
-        self.assertEqual(len(get_directive(self.parser, '\t.text')['parameters']), 0)
-        self.assertEqual(get_directive(self.parser, '\t.align\t16,0x90')['name'], 'align')
-        self.assertEqual(len(get_directive(self.parser, '\t.align\t16,0x90')['parameters']), 2)
-        self.assertEqual(get_directive(self.parser, '\t.align\t16,0x90')['parameters'][1], '0x90')
+        self.assertEqual(self._get_directive(self.parser, '\t.text')['name'], 'text')
+        self.assertEqual(len(self._get_directive(self.parser, '\t.text')['parameters']), 0)
+        self.assertEqual(self._get_directive(self.parser, '\t.align\t16,0x90')['name'], 'align')
         self.assertEqual(
-            get_directive(self.parser, '        .byte 100,103,144       #IACA START')['name'],
+            len(self._get_directive(self.parser, '\t.align\t16,0x90')['parameters']), 2
+        )
+        self.assertEqual(
+            self._get_directive(self.parser, '\t.align\t16,0x90')['parameters'][1], '0x90'
+        )
+        self.assertEqual(
+            self._get_directive(self.parser, '        .byte 100,103,144       #IACA START')[
+                'name'
+            ],
             'byte',
         )
         self.assertEqual(
-            get_directive(self.parser, '        .byte 100,103,144       #IACA START')[
+            self._get_directive(self.parser, '        .byte 100,103,144       #IACA START')[
                 'parameters'
             ][2],
             '144',
         )
         self.assertEqual(
             ' '.join(
-                get_directive(self.parser, '        .byte 100,103,144       #IACA START')[
+                self._get_directive(self.parser, '        .byte 100,103,144       #IACA START')[
                     'comment'
                 ]
             ),
@@ -67,12 +76,14 @@ class TestParserX86ATT(unittest.TestCase):
         instr3 = '        movl $222,%ebx          #IACA END'
         instr4 = 'vmovss    %xmm4, -4(%rsp,%rax,8) #12.9'
         instr5 = 'mov %ebx, var(,1)'
+        instr6 = 'lea (,%rax,8), %rbx'
 
         parsed_1 = self.parser.parse_instruction(instr1)
         parsed_2 = self.parser.parse_instruction(instr2)
         parsed_3 = self.parser.parse_instruction(instr3)
         parsed_4 = self.parser.parse_instruction(instr4)
         parsed_5 = self.parser.parse_instruction(instr5)
+        parsed_6 = self.parser.parse_instruction(instr6)
 
         self.assertEqual(parsed_1['instruction'], 'vcvtsi2ss')
         self.assertEqual(parsed_1['operands']['destination']['register']['name'], 'xmm2')
@@ -103,6 +114,13 @@ class TestParserX86ATT(unittest.TestCase):
         self.assertIsNone(parsed_5['operands']['destination']['memory']['index'])
         self.assertEqual(parsed_5['operands']['destination']['memory']['scale'], '1')
         self.assertEqual(parsed_5['operands']['sources'][0]['register']['name'], 'ebx')
+
+        self.assertEqual(parsed_6['instruction'], 'lea')
+        self.assertIsNone(parsed_6['operands']['sources'][0]['memory']['offset'])
+        self.assertIsNone(parsed_6['operands']['sources'][0]['memory']['base'])
+        self.assertEqual(parsed_6['operands']['sources'][0]['memory']['index']['name'], 'rax')
+        self.assertEqual(parsed_6['operands']['sources'][0]['memory']['scale'], '8')
+        self.assertEqual(parsed_6['operands']['destination']['register']['name'], 'rbx')
 
     def test_parse_line(self):
         line_comment = '# -- Begin  main'
@@ -165,17 +183,26 @@ class TestParserX86ATT(unittest.TestCase):
         self.assertEqual(parsed_3, instruction_form_3)
         self.assertEqual(parsed_4['operands'], instruction_form_4['operands'])
 
+    def test_parse_file(self):
+        parsed = self.parser.parse_file(self.triad_code)
+        self.assertEqual(parsed[0]['line_number'], 1)
+        self.assertEqual(len(parsed), 353)
 
-##################
-# Helper functions
-##################
-def get_comment(parser, comment):
-    return ' '.join(parser.comment.parseString(comment, parseAll=True).asDict()['comment'])
+    ##################
+    # Helper functions
+    ##################
+    def _get_comment(self, parser, comment):
+        return ' '.join(parser.comment.parseString(comment, parseAll=True).asDict()['comment'])
 
+    def _get_label(self, parser, label):
+        return parser.label.parseString(label, parseAll=True).asDict()['label']
 
-def get_label(parser, label):
-    return parser.label.parseString(label, parseAll=True).asDict()['label']
+    def _get_directive(self, parser, directive):
+        return parser.directive.parseString(directive, parseAll=True).asDict()['directive']
 
-
-def get_directive(parser, directive):
-    return parser.directive.parseString(directive, parseAll=True).asDict()['directive']
+    @staticmethod
+    def _find_file(name):
+        testdir = os.path.dirname(__file__)
+        name = os.path.join(testdir, 'test_files', name)
+        assert os.path.exists(name)
+        return name
