@@ -99,6 +99,8 @@ class Scheduler(object):
                 # Instruction form not in CSV
                 if instrForm[0][:3] == 'nop':
                     sched += self.format_port_occupation_line(occ_ports[i], '* ' + instrForm[-1])
+                elif instrForm[0] == 'DIRECTIVE':
+                    sched += self.format_port_occupation_line(occ_ports[i], '* ' + instrForm[-1])
                 else:
                     sched += self.format_port_occupation_line(occ_ports[i], 'X ' + instrForm[-1])
                 continue
@@ -324,7 +326,7 @@ class Scheduler(object):
         annotations = (
             'P - Load operation can be hidden behind a past or future store instruction\n'
             'X - No information for this instruction in data file\n'
-            '* - Instruction micro-ops not bound to a port\n\n')
+            '* - Not bound to a port, therefore ignored\n\n')
         return analysis + annotations
 
     def get_head(self):
