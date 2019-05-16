@@ -18,6 +18,11 @@ from osaca.param import Register, MemAddr, Parameter
 from osaca.eu_sched import Scheduler
 from osaca.testcase import Testcase
 
+#from param import Register, MemAddr, Parameter
+#from eu_sched import Scheduler
+#from testcase import Testcase
+
+
 DATA_DIR = os.path.expanduser('~') + '/.osaca/'
 MODULE_DATA_DIR = os.path.join((os.path.split(__file__)[0]), 'data')
 
@@ -445,6 +450,10 @@ class OSACA(object):
         # Check if line is not only a byte
         empty_byte = re.compile(r'[0-9a-f]{2}')
         if re.match(empty_byte, mnemonic) and len(mnemonic) == 2:
+            return
+        # Check if line contains a directive
+        directive = re.compile(r'^\.[a-zA-Z0-9]+$')
+        if re.match(directive, mnemonic):
             return
         # Check if there's one or more operands and store all in a list
         param_list = flatten(self._separate_params(params))
