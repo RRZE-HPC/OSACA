@@ -233,7 +233,7 @@ def include_ibench(arch, ibench_output):
     new_data = []
     added_vals = 0
     with open(ibench_output) as f:
-        source = f.readline()
+        source = f.readlines()
     for line in source:
         if 'Using frequency' in line or len(line) == 0:
             continue
@@ -811,7 +811,7 @@ def main():
 
     # --include-ibench acts stand alone, ignoring everything else
     if args.include_ibench:
-        added_values = include_ibench()
+        added_values = include_ibench(args.arch, args.filepath)
         print("Sucessfully adde {} value(s)".format(added_values))
         return
 
