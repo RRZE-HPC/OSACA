@@ -451,13 +451,17 @@ class OSACA(object):
         empty_byte = re.compile(r'[0-9a-f]{2}')
         if re.match(empty_byte, mnemonic) and len(mnemonic) == 2:
             return
-        # Check if line contains a directive
-        directive = re.compile(r'^\.[a-zA-Z0-9]+$')
-        if re.match(directive, mnemonic):
-            return
         # Check if there's one or more operands and store all in a list
         param_list = flatten(self._separate_params(params))
         param_list_types = list(param_list)
+        # Check if line contains a directive and if so, add as a workaround with
+        # marker in mnemonic
+        directive = re.compile(r'^\.[a-zA-Z0-9]+$')
+        if re.match(directive, mnemonic):
+            instr = instr.rstrip()
+            instr_form = ['DIRECTIVE'] + list() + [instr]
+            self.instr_forms.append(instr_form)
+            return
         # Check operands and separate them by IMMEDIATE (IMD), REGISTER (REG),
         # MEMORY (MEM) or LABEL(LBL)
         for i, op in enumerate(param_list):
