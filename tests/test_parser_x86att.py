@@ -14,7 +14,7 @@ from osaca.parser import ParserX86ATT
 class TestParserX86ATT(unittest.TestCase):
     def setUp(self):
         self.parser = ParserX86ATT()
-        with open(self._find_file('triad-iaca.s')) as f:
+        with open(self._find_file('triad-x86-iaca.s')) as f:
             self.triad_code = f.read()
 
     ##################
@@ -75,8 +75,8 @@ class TestParserX86ATT(unittest.TestCase):
         instr2 = 'jb        ..B1.4 \t'
         instr3 = '        movl $222,%ebx          #IACA END'
         instr4 = 'vmovss    %xmm4, -4(%rsp,%rax,8) #12.9'
-        instr5 = 'mov %ebx, var(,1)'
-        instr6 = 'lea (,%rax,8), %rbx'
+        instr5 = 'mov %ebx,var(,1)'
+        instr6 = 'lea (,%rax,8),%rbx'
 
         parsed_1 = self.parser.parse_instruction(instr1)
         parsed_2 = self.parser.parse_instruction(instr2)
@@ -86,41 +86,43 @@ class TestParserX86ATT(unittest.TestCase):
         parsed_6 = self.parser.parse_instruction(instr6)
 
         self.assertEqual(parsed_1['instruction'], 'vcvtsi2ss')
-        self.assertEqual(parsed_1['operands']['destination']['register']['name'], 'xmm2')
-        self.assertEqual(parsed_1['operands']['sources'][0]['register']['name'], 'edx')
+        self.assertEqual(parsed_1['operands']['destination'][0]['register']['name'], 'xmm2')
+        self.assertEqual(parsed_1['operands']['source'][0]['register']['name'], 'edx')
         self.assertEqual(parsed_1['comment'], '12.27')
 
         self.assertEqual(parsed_2['instruction'], 'jb')
-        self.assertEqual(parsed_2['operands']['destination']['identifier'], '..B1.4')
-        self.assertEqual(len(parsed_2['operands']['sources']), 0)
+        self.assertEqual(parsed_2['operands']['destination'][0]['identifier']['name'], '..B1.4')
+        self.assertEqual(len(parsed_2['operands']['source']), 0)
         self.assertIsNone(parsed_2['comment'])
 
         self.assertEqual(parsed_3['instruction'], 'movl')
-        self.assertEqual(parsed_3['operands']['destination']['register']['name'], 'ebx')
-        self.assertEqual(parsed_3['operands']['sources'][0]['immediate']['value'], '222')
+        self.assertEqual(parsed_3['operands']['destination'][0]['register']['name'], 'ebx')
+        self.assertEqual(parsed_3['operands']['source'][0]['immediate']['value'], '222')
         self.assertEqual(parsed_3['comment'], 'IACA END')
 
         self.assertEqual(parsed_4['instruction'], 'vmovss')
-        self.assertEqual(parsed_4['operands']['destination']['memory']['offset'], '-4')
-        self.assertEqual(parsed_4['operands']['destination']['memory']['base']['name'], 'rsp')
-        self.assertEqual(parsed_4['operands']['destination']['memory']['index']['name'], 'rax')
-        self.assertEqual(parsed_4['operands']['destination']['memory']['scale'], '8')
-        self.assertEqual(parsed_4['operands']['sources'][0]['register']['name'], 'xmm4')
+        self.assertEqual(parsed_4['operands']['destination'][0]['memory']['offset']['value'], '-4')
+        self.assertEqual(parsed_4['operands']['destination'][0]['memory']['base']['name'], 'rsp')
+        self.assertEqual(parsed_4['operands']['destination'][0]['memory']['index']['name'], 'rax')
+        self.assertEqual(parsed_4['operands']['destination'][0]['memory']['scale'], '8')
+        self.assertEqual(parsed_4['operands']['source'][0]['register']['name'], 'xmm4')
         self.assertEqual(parsed_4['comment'], '12.9')
 
         self.assertEqual(parsed_5['instruction'], 'mov')
-        self.assertEqual(parsed_5['operands']['destination']['memory']['offset'], 'var')
-        self.assertIsNone(parsed_5['operands']['destination']['memory']['base'])
-        self.assertIsNone(parsed_5['operands']['destination']['memory']['index'])
-        self.assertEqual(parsed_5['operands']['destination']['memory']['scale'], '1')
-        self.assertEqual(parsed_5['operands']['sources'][0]['register']['name'], 'ebx')
+        self.assertEqual(
+            parsed_5['operands']['destination'][0]['memory']['offset']['identifier']['name'], 'var'
+        )
+        self.assertIsNone(parsed_5['operands']['destination'][0]['memory']['base'])
+        self.assertIsNone(parsed_5['operands']['destination'][0]['memory']['index'])
+        self.assertEqual(parsed_5['operands']['destination'][0]['memory']['scale'], '1')
+        self.assertEqual(parsed_5['operands']['source'][0]['register']['name'], 'ebx')
 
         self.assertEqual(parsed_6['instruction'], 'lea')
-        self.assertIsNone(parsed_6['operands']['sources'][0]['memory']['offset'])
-        self.assertIsNone(parsed_6['operands']['sources'][0]['memory']['base'])
-        self.assertEqual(parsed_6['operands']['sources'][0]['memory']['index']['name'], 'rax')
-        self.assertEqual(parsed_6['operands']['sources'][0]['memory']['scale'], '8')
-        self.assertEqual(parsed_6['operands']['destination']['register']['name'], 'rbx')
+        self.assertIsNone(parsed_6['operands']['source'][0]['memory']['offset'])
+        self.assertIsNone(parsed_6['operands']['source'][0]['memory']['base'])
+        self.assertEqual(parsed_6['operands']['source'][0]['memory']['index']['name'], 'rax')
+        self.assertEqual(parsed_6['operands']['source'][0]['memory']['scale'], '8')
+        self.assertEqual(parsed_6['operands']['destination'][0]['register']['name'], 'rbx')
 
     def test_parse_line(self):
         line_comment = '# -- Begin  main'
@@ -155,22 +157,22 @@ class TestParserX86ATT(unittest.TestCase):
         instruction_form_4 = {
             'instruction': 'lea',
             'operands': {
-                'sources': [
+                'source': [
                     {
                         'memory': {
-                            'offset': '2',
+                            'offset': {'value': '2'},
                             'base': {'name': 'rax'},
                             'index': {'name': 'rax'},
                             'scale': '1',
                         }
                     }
                 ],
-                'destination': {'register': {'name': 'ecx'}},
+                'destination': [{'register': {'name': 'ecx'}}],
             },
             'directive': None,
-            'comment': '-- Begin main',
+            'comment': '12.9',
             'label': None,
-            'line_number': 1,
+            'line_number': 4,
         }
 
         parsed_1 = self.parser.parse_line(line_comment, 1)
@@ -181,7 +183,7 @@ class TestParserX86ATT(unittest.TestCase):
         self.assertEqual(parsed_1, instruction_form_1)
         self.assertEqual(parsed_2, instruction_form_2)
         self.assertEqual(parsed_3, instruction_form_3)
-        self.assertEqual(parsed_4['operands'], instruction_form_4['operands'])
+        self.assertEqual(parsed_4, instruction_form_4)
 
     def test_parse_file(self):
         parsed = self.parser.parse_file(self.triad_code)
@@ -192,13 +194,21 @@ class TestParserX86ATT(unittest.TestCase):
     # Helper functions
     ##################
     def _get_comment(self, parser, comment):
-        return ' '.join(parser.comment.parseString(comment, parseAll=True).asDict()['comment'])
+        return ' '.join(
+            parser._process_operand(parser.comment.parseString(comment, parseAll=True).asDict())[
+                'comment'
+            ]
+        )
 
     def _get_label(self, parser, label):
-        return parser.label.parseString(label, parseAll=True).asDict()['label']
+        return parser._process_operand(parser.label.parseString(label, parseAll=True).asDict())[
+            'label'
+        ]
 
     def _get_directive(self, parser, directive):
-        return parser.directive.parseString(directive, parseAll=True).asDict()['directive']
+        return parser._process_operand(
+            parser.directive.parseString(directive, parseAll=True).asDict()
+        )['directive']
 
     @staticmethod
     def _find_file(name):
@@ -206,3 +216,8 @@ class TestParserX86ATT(unittest.TestCase):
         name = os.path.join(testdir, 'test_files', name)
         assert os.path.exists(name)
         return name
+
+
+if __name__ == '__main__':
+    suite = unittest.TestLoader().loadTestsFromTestCase(TestParserX86ATT)
+    unittest.TextTestRunner(verbosity=2).run(suite)

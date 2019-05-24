@@ -18,7 +18,9 @@ class ParserX86ATT(BaseParser):
         # Define x86 assembly identifier
         first = pp.Word(pp.alphas + '_.', exact=1)
         rest = pp.Word(pp.alphanums + '_.')
-        identifier = pp.Combine(first + pp.Optional(rest)).setResultsName('identifier')
+        identifier = pp.Group(
+            pp.Combine(first + pp.Optional(rest)).setResultsName('name')
+        ).setResultsName('identifier')
         # Label
         self.label = pp.Group(
             identifier.setResultsName('name') + pp.Literal(':') + pp.Optional(self.comment)
@@ -28,7 +30,9 @@ class ParserX86ATT(BaseParser):
             pp.Optional(pp.Literal('-')) + pp.Word(pp.nums)
         ).setResultsName('value')
         hex_number = pp.Combine(pp.Literal('0x') + pp.Word(pp.hexnums)).setResultsName('value')
-        directive_option = pp.Combine(pp.Word('#@.', exact=1) + pp.Word(pp.printables))
+        directive_option = pp.Combine(
+            pp.Word('#@.', exact=1) + pp.Word(pp.printables, excludeChars=',')
+        )
         directive_parameter = (
             pp.quotedString | directive_option | identifier | hex_number | decimal_number
         )
@@ -63,7 +67,9 @@ class ParserX86ATT(BaseParser):
             pp.Literal(symbol_immediate) + (hex_number | decimal_number | identifier)
         ).setResultsName(self.IMMEDIATE_ID)
         # Memory: offset(base, index, scale)
-        offset = identifier | hex_number | decimal_number
+        offset = pp.Group(identifier | hex_number | decimal_number).setResultsName(
+            self.IMMEDIATE_ID
+        )
         scale = pp.Word('1248', exact=1)
         memory = pp.Group(
             pp.Optional(offset.setResultsName('offset'))
@@ -76,16 +82,15 @@ class ParserX86ATT(BaseParser):
             + pp.Literal(')')
         ).setResultsName(self.MEMORY_ID)
         # Combine to instruction form
-        operand1 = pp.Group(register ^ immediate ^ memory ^ identifier).setResultsName('operand1')
-        operand2 = pp.Group(register ^ immediate ^ memory).setResultsName('operand2')
-        operand3 = pp.Group(register ^ immediate ^ memory).setResultsName('operand3')
+        operand_first = pp.Group(register ^ immediate ^ memory ^ identifier)
+        operand_rest = pp.Group(register ^ immediate ^ memory)
         self.instruction_parser = (
             mnemonic
-            + pp.Optional(operand1)
+            + pp.Optional(operand_first).setResultsName('operand1')
             + pp.Optional(pp.Suppress(pp.Literal(',')))
-            + pp.Optional(operand2)
+            + pp.Optional(operand_rest).setResultsName('operand2')
             + pp.Optional(pp.Suppress(pp.Literal(',')))
-            + pp.Optional(operand3)
+            + pp.Optional(operand_rest).setResultsName('operand3')
             + pp.Optional(self.comment)
         )
 
@@ -109,7 +114,7 @@ class ParserX86ATT(BaseParser):
 
         # 1. Parse comment
         try:
-            result = self.comment.parseString(line, parseAll=True).asDict()
+            result = self._process_operand(self.comment.parseString(line, parseAll=True).asDict())
             instruction_form['comment'] = ' '.join(result[self.COMMENT_ID])
         except pp.ParseException:
             pass
@@ -117,7 +122,9 @@ class ParserX86ATT(BaseParser):
         # 2. Parse label
         if result is None:
             try:
-                result = self.label.parseString(line, parseAll=True).asDict()
+                result = self._process_operand(
+                    self.label.parseString(line, parseAll=True).asDict()
+                )
                 instruction_form['label'] = result[self.LABEL_ID]['name']
                 if self.COMMENT_ID in result[self.LABEL_ID]:
                     instruction_form['comment'] = ' '.join(result[self.LABEL_ID][self.COMMENT_ID])
@@ -127,7 +134,9 @@ class ParserX86ATT(BaseParser):
         # 3. Parse directive
         if result is None:
             try:
-                result = self.directive.parseString(line, parseAll=True).asDict()
+                result = self._process_operand(
+                    self.directive.parseString(line, parseAll=True).asDict()
+                )
                 instruction_form['directive'] = {
                     'name': result[self.DIRECTIVE_ID]['name'],
                     'parameters': result[self.DIRECTIVE_ID]['parameters'],
@@ -157,23 +166,23 @@ class ParserX86ATT(BaseParser):
 
     def parse_instruction(self, instruction):
         result = self.instruction_parser.parseString(instruction, parseAll=True).asDict()
-        operands = {'sources': []}
+        operands = {'source': [], 'destination': []}
         # Check from right to left
         # Check third operand
         if 'operand3' in result:
-            operands['destination'] = self._process_operand(result['operand3'])
+            operands['destination'].append(self._process_operand(result['operand3']))
         # Check second operand
         if 'operand2' in result:
-            if 'destination' in operands:
-                operands['sources'].insert(0, self._process_operand(result['operand2']))
+            if len(operands['destination']) != 0:
+                operands['source'].insert(0, self._process_operand(result['operand2']))
             else:
-                operands['destination'] = self._process_operand(result['operand2'])
+                operands['destination'].append(self._process_operand(result['operand2']))
         # Check first operand
         if 'operand1' in result:
-            if 'destination' in operands:
-                operands['sources'].insert(0, self._process_operand(result['operand1']))
+            if len(operands['destination']) != 0:
+                operands['source'].insert(0, self._process_operand(result['operand1']))
             else:
-                operands['destination'] = self._process_operand(result['operand1'])
+                operands['destination'].append(self._process_operand(result['operand1']))
         return_dict = {
             'instruction': result['mnemonic'],
             'operands': operands,
@@ -185,6 +194,10 @@ class ParserX86ATT(BaseParser):
         # For the moment, only used to structure memory addresses
         if 'memory' in operand:
             return self.substitute_memory_address(operand['memory'])
+        if 'immediate' in operand:
+            return self.substitue_immediate(operand['immediate'])
+        if 'label' in operand:
+            return self.substitute_label(operand['label'])
         return operand
 
     def substitute_memory_address(self, memory_address):
@@ -195,3 +208,15 @@ class ParserX86ATT(BaseParser):
         scale = '1' if 'scale' not in memory_address else memory_address['scale']
         new_dict = {'offset': offset, 'base': base, 'index': index, 'scale': scale}
         return {'memory': new_dict}
+
+    def substitute_label(self, label):
+        # remove duplicated 'name' level due to identifier
+        label['name'] = label['name']['name']
+        return {'label': label}
+
+    def substitue_immediate(self, immediate):
+        if 'identifier' in immediate:
+            # actually an identifier, change declaration
+            return immediate
+        # otherwise nothing to do
+        return {'immediate': immediate}
