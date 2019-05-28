@@ -156,13 +156,13 @@ class ParserAArch64v81(BaseParser):
         operand_rest = pp.Group((register ^ immediate ^ memory ^ arith_immediate) | identifier)
         self.instruction_parser = (
             mnemonic
-            + pp.Optional(operand_first).setResultsName('operand1')
+            + pp.Optional(operand_first.setResultsName('operand1'))
             + pp.Optional(pp.Suppress(pp.Literal(',')))
-            + pp.Optional(operand_rest).setResultsName('operand2')
+            + pp.Optional(operand_rest.setResultsName('operand2'))
             + pp.Optional(pp.Suppress(pp.Literal(',')))
-            + pp.Optional(operand_rest).setResultsName('operand3')
+            + pp.Optional(operand_rest.setResultsName('operand3'))
             + pp.Optional(pp.Suppress(pp.Literal(',')))
-            + pp.Optional(operand_rest).setResultsName('operand4')
+            + pp.Optional(operand_rest.setResultsName('operand4'))
             + pp.Optional(self.comment)
         )
         self.opf = operand_first
