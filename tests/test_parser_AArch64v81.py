@@ -143,7 +143,9 @@ class TestParserAArch64v81(unittest.TestCase):
         line_label = '.LBB0_1:              // =>This Inner Loop Header: Depth=1'
         line_directive = '\t.cfi_def_cfa w29, -16'
         line_instruction = '\tldr s0, [x11, w10, sxtw #2]\t\t// = <<2'
-        # STREXD/STREX/STRD?
+        line_prefetch = 'prfm    pldl1keep, [x26, #2048] //HPL'
+        line_preindexed = 'stp x29, x30, [sp, #-16]!'
+        line_postindexed = 'ldp q2, q3, [x11], #64'
 
         instruction_form_1 = {
             'instruction': None,
@@ -195,15 +197,91 @@ class TestParserAArch64v81(unittest.TestCase):
             'label': None,
             'line_number': 4,
         }
+        instruction_form_5 = {
+            'instruction': 'prfm',
+            'operands': {
+                'source': [
+                    {
+                        'memory': {
+                            'offset': {'value': '2048'},
+                            'base': {'prefix': 'x', 'name': '26'},
+                            'index': None,
+                            'scale': '1',
+                        }
+                    }
+                ],
+                'destination': [
+                    {'prfop': {'type': ['PLD'], 'target': ['L1'], 'policy': ['KEEP']}}
+                ],
+            },
+            'directive': None,
+            'comment': 'HPL',
+            'label': None,
+            'line_number': 5,
+        }
+        instruction_form_6 = {
+            'instruction': 'stp',
+            'operands': {
+                'source': [
+                    {'register': {'prefix': 'x', 'name': '29'}},
+                    {'register': {'prefix': 'x', 'name': '30'}}
+                ],
+                'destination': [
+                    {
+                        'memory': {
+                            'offset': {'value': '-16'},
+                            'base': {'name': 'sp', 'prefix': None},
+                            'index': None,
+                            'scale': '1',
+                            'pre-indexed': True
+                        }
+                    }
+                ],
+            },
+            'directive': None,
+            'comment': None,
+            'label': None,
+            'line_number': 6
+        }
+        instruction_form_7 = {
+            'instruction': 'ldp',
+            'operands': {
+                'source': [
+                    {
+                        'memory': {
+                            'offset': None,
+                            'base': {'prefix': 'x', 'name': '11'},
+                            'index': None,
+                            'scale': '1',
+                            'post-indexed': {'value': '64'},
+                        }
+                    }
+                ],
+                'destination': [
+                    {'register': {'prefix': 'q', 'name': '2'}},
+                    {'register': {'prefix': 'q', 'name': '3'}},
+                ],
+            },
+            'directive': None,
+            'comment': None,
+            'label': None,
+            'line_number': 7,
+        }
         parsed_1 = self.parser.parse_line(line_comment, 1)
         parsed_2 = self.parser.parse_line(line_label, 2)
         parsed_3 = self.parser.parse_line(line_directive, 3)
         parsed_4 = self.parser.parse_line(line_instruction, 4)
+        parsed_5 = self.parser.parse_line(line_prefetch, 5)
+        parsed_6 = self.parser.parse_line(line_preindexed, 6)
+        parsed_7 = self.parser.parse_line(line_postindexed, 7)
 
         self.assertEqual(parsed_1, instruction_form_1)
         self.assertEqual(parsed_2, instruction_form_2)
         self.assertEqual(parsed_3, instruction_form_3)
-        self.assertEqual(parsed_4['operands'], instruction_form_4['operands'])
+        self.assertEqual(parsed_4, instruction_form_4)
+        self.assertEqual(parsed_5, instruction_form_5)
+        self.assertEqual(parsed_6, instruction_form_6)
+        self.assertEqual(parsed_7, instruction_form_7)
 
     def test_parse_file(self):
         parsed = self.parser.parse_file(self.triad_code)

@@ -151,7 +151,7 @@ class ParserAArch64v81(BaseParser):
         ).setResultsName('prfop')
         # Combine to instruction form
         operand_first = pp.Group(
-            register ^ immediate ^ memory ^ arith_immediate ^ (prefetch_op | identifier)
+            register ^ (prefetch_op | immediate) ^ memory ^ arith_immediate ^ identifier
         )
         operand_rest = pp.Group((register ^ immediate ^ memory ^ arith_immediate) | identifier)
         self.instruction_parser = (
@@ -165,14 +165,6 @@ class ParserAArch64v81(BaseParser):
             + pp.Optional(operand_rest.setResultsName('operand4'))
             + pp.Optional(self.comment)
         )
-        self.opf = operand_first
-        self.opr = operand_rest
-        self.mem = memory
-        self.reg = register
-        self.idf = identifier
-        self.prfop = prefetch_op
-        self.imd = immediate
-        self.aimd = arith_immediate
 
     def parse_line(self, line, line_number=None):
         """
@@ -247,33 +239,33 @@ class ParserAArch64v81(BaseParser):
     def parse_instruction(self, instruction):
         result = self.instruction_parser.parseString(instruction, parseAll=True).asDict()
         operands = {'source': [], 'destination': []}
-        # ARM specific store flags
+        # ARM specific load store flags
         is_store = False
-        store_ex = False
+        is_load = False
         if result['mnemonic'].lower().startswith('st'):
             # Store instruction --> swap source and destination
             is_store = True
-            if result['mnemonic'].lower().startswith('strex'):
-                # Store exclusive --> first reg ist used for return state
-                store_ex = True
+        if result['mnemonic'].lower().startswith('ld'):
+            # Load instruction --> keep in mind for possible multiple loads
+            is_load = True
 
         # Check from left to right
         # Check first operand
         if 'operand1' in result:
-            if is_store and not store_ex:
+            if is_store:
                 operands['source'].append(self._process_operand(result['operand1']))
             else:
                 operands['destination'].append(self._process_operand(result['operand1']))
         # Check second operand
         if 'operand2' in result:
-            if is_store and 'operand3' not in result:
+            if is_store and 'operand3' not in result or is_load and 'operand3' in result:
                 # destination
                 operands['destination'].append(self._process_operand(result['operand2']))
             else:
                 operands['source'].append(self._process_operand(result['operand2']))
         # Check third operand
         if 'operand3' in result:
-            if is_store and 'operand4' not in result:
+            if is_store and 'operand4' not in result or is_load and 'operand4' in result:
                 operands['destination'].append(self._process_operand(result['operand3']))
             else:
                 operands['source'].append(self._process_operand(result['operand3']))
@@ -320,6 +312,10 @@ class ParserAArch64v81(BaseParser):
                 if memory_address['index']['shift_op'].lower() in valid_shift_ops:
                     scale = str(2 ** int(memory_address['index']['shift']['value']))
         new_dict = {'offset': offset, 'base': base, 'index': index, 'scale': scale}
+        if 'pre-indexed' in memory_address:
+            new_dict['pre-indexed'] = True
+        if 'post-indexed' in memory_address:
+            new_dict['post-indexed'] = memory_address['post-indexed']
         return {'memory': new_dict}
 
     def substitute_register_list(self, register_list):
