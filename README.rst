@@ -158,6 +158,7 @@ The output is:
 
     Throughput Analysis Report
     --------------------------
+    P - Load operation can be hidden behind a past or future store instruction
     X - No information for this instruction in database
     * - Instruction micro-ops not bound to a port
     
@@ -241,6 +242,7 @@ Another thorughput analysis with OSACA now returns all information for the kerne
 
     Throughput Analysis Report
     --------------------------
+    P - Load operation can be hidden behind a past or future store instruction
     X - No information for this instruction in database
     * - Instruction micro-ops not bound to a port
     
