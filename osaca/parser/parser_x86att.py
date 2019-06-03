@@ -220,3 +220,16 @@ class ParserX86ATT(BaseParser):
             return immediate
         # otherwise nothing to do
         return {'immediate': immediate}
+
+    def get_full_reg_name(self, register):
+        # nothing to do
+        return register['name']
+
+    def normalize_imd(self, imd):
+        if 'value' in imd:
+            if imd['value'].lower().startswith('0x'):
+                # hex, return decimal
+                return int(imd['value'], 16)
+            return int(imd['value'], 10)
+        # identifier
+        return imd
