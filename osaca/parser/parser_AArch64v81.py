@@ -358,3 +358,29 @@ class ParserAArch64v81(BaseParser):
         # remove duplicated 'name' level due to identifier
         label['name'] = label['name']['name']
         return {'label': label}
+
+    def get_full_reg_name(self, register):
+        if 'lanes' in 'register':
+            return (
+                register['prefix'] + register['name'] + '.' + register['lanes'] + register['shape']
+            )
+        return register['prefix'] + register['name']
+
+    def normalize_imd(self, imd):
+        if 'value' in imd:
+            if imd['value'].lower().startswith('0x'):
+                # hex, return decimal
+                return int(imd['value'], 16)
+            return int(imd['value'], 10)
+        elif 'float' in imd:
+            return self.ieee_val_to_int(imd['float'])
+        elif 'double' in imd:
+            return self.ieee_val_to_int(imd['double'])
+        # identifier
+        return imd
+
+    def ieee_to_int(self, ieee_val):
+        exponent = int(ieee_val['exponent'], 10)
+        if ieee_val['e_sign'] == '-':
+            exponent *= -1
+        return float(ieee_val['mantissa']) * (10 ** exponent)
