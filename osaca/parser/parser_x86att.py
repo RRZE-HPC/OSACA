@@ -3,6 +3,7 @@
 import pyparsing as pp
 
 from .base_parser import BaseParser
+from .attr_dict import AttrDict
 
 
 class ParserX86ATT(BaseParser):
@@ -102,20 +103,21 @@ class ParserX86ATT(BaseParser):
         :param int line_id: default None, identifier of instruction form
         :return: parsed instruction form
         """
-        instruction_form = {
-            'instruction': None,
-            'operands': None,
-            'directive': None,
-            'comment': None,
-            'label': None,
+        instruction_form = AttrDict({
+            self.INSTRUCTION_ID: None,
+            self.OPERANDS_ID: None,
+            self.DIRECTIVE_ID: None,
+            self.COMMENT_ID: None,
+            self.LABEL_ID: None,
             'line_number': line_number,
-        }
+        })
         result = None
 
         # 1. Parse comment
         try:
             result = self._process_operand(self.comment.parseString(line, parseAll=True).asDict())
-            instruction_form['comment'] = ' '.join(result[self.COMMENT_ID])
+            result = AttrDict.convert_dict(result)
+            instruction_form[self.COMMENT_ID] = ' '.join(result[self.COMMENT_ID])
         except pp.ParseException:
             pass
 
@@ -125,9 +127,12 @@ class ParserX86ATT(BaseParser):
                 result = self._process_operand(
                     self.label.parseString(line, parseAll=True).asDict()
                 )
-                instruction_form['label'] = result[self.LABEL_ID]['name']
+                result = AttrDict.convert_dict(result)
+                instruction_form[self.LABEL_ID] = result[self.LABEL_ID]['name']
                 if self.COMMENT_ID in result[self.LABEL_ID]:
-                    instruction_form['comment'] = ' '.join(result[self.LABEL_ID][self.COMMENT_ID])
+                    instruction_form[self.COMMENT_ID] = ' '.join(
+                        result[self.LABEL_ID][self.COMMENT_ID]
+                    )
             except pp.ParseException:
                 pass
 
@@ -137,12 +142,13 @@ class ParserX86ATT(BaseParser):
                 result = self._process_operand(
                     self.directive.parseString(line, parseAll=True).asDict()
                 )
-                instruction_form['directive'] = {
+                result = AttrDict.convert_dict(result)
+                instruction_form[self.DIRECTIVE_ID] = {
                     'name': result[self.DIRECTIVE_ID]['name'],
                     'parameters': result[self.DIRECTIVE_ID]['parameters'],
                 }
                 if self.COMMENT_ID in result[self.DIRECTIVE_ID]:
-                    instruction_form['comment'] = ' '.join(
+                    instruction_form[self.COMMENT_ID] = ' '.join(
                         result[self.DIRECTIVE_ID][self.COMMENT_ID]
                     )
             except pp.ParseException:
@@ -158,15 +164,16 @@ class ParserX86ATT(BaseParser):
                         line_number, line
                     )
                 )
-            instruction_form['instruction'] = result['instruction']
-            instruction_form['operands'] = result['operands']
-            instruction_form['comment'] = result['comment']
+            instruction_form[self.INSTRUCTION_ID] = result[self.INSTRUCTION_ID]
+            instruction_form[self.OPERANDS_ID] = result[self.OPERANDS_ID]
+            instruction_form[self.COMMENT_ID] = result[self.COMMENT_ID]
 
         return instruction_form
 
     def parse_instruction(self, instruction):
         result = self.instruction_parser.parseString(instruction, parseAll=True).asDict()
-        operands = {'source': [], 'destination': []}
+        result = AttrDict.convert_dict(result)
+        operands = AttrDict({'source': [], 'destination': []})
         # Check from right to left
         # Check third operand
         if 'operand3' in result:
@@ -183,21 +190,23 @@ class ParserX86ATT(BaseParser):
                 operands['source'].insert(0, self._process_operand(result['operand1']))
             else:
                 operands['destination'].append(self._process_operand(result['operand1']))
-        return_dict = {
-            'instruction': result['mnemonic'],
-            'operands': operands,
-            'comment': ' '.join(result['comment']) if 'comment' in result else None,
-        }
+        return_dict = AttrDict({
+            self.INSTRUCTION_ID: result['mnemonic'],
+            self.OPERANDS_ID: operands,
+            self.COMMENT_ID: ' '.join(result[self.COMMENT_ID])
+            if self.COMMENT_ID in result
+            else None,
+        })
         return return_dict
 
     def _process_operand(self, operand):
         # For the moment, only used to structure memory addresses
-        if 'memory' in operand:
-            return self.substitute_memory_address(operand['memory'])
-        if 'immediate' in operand:
-            return self.substitue_immediate(operand['immediate'])
-        if 'label' in operand:
-            return self.substitute_label(operand['label'])
+        if self.MEMORY_ID in operand:
+            return self.substitute_memory_address(operand[self.MEMORY_ID])
+        if self.IMMEDIATE_ID in operand:
+            return self.substitue_immediate(operand[self.IMMEDIATE_ID])
+        if self.LABEL_ID in operand:
+            return self.substitute_label(operand[self.LABEL_ID])
         return operand
 
     def substitute_memory_address(self, memory_address):
@@ -206,20 +215,20 @@ class ParserX86ATT(BaseParser):
         base = None if 'base' not in memory_address else memory_address['base']
         index = None if 'index' not in memory_address else memory_address['index']
         scale = '1' if 'scale' not in memory_address else memory_address['scale']
-        new_dict = {'offset': offset, 'base': base, 'index': index, 'scale': scale}
-        return {'memory': new_dict}
+        new_dict = AttrDict({'offset': offset, 'base': base, 'index': index, 'scale': scale})
+        return AttrDict({self.MEMORY_ID: new_dict})
 
     def substitute_label(self, label):
         # remove duplicated 'name' level due to identifier
         label['name'] = label['name']['name']
-        return {'label': label}
+        return AttrDict({self.LABEL_ID: label})
 
     def substitue_immediate(self, immediate):
         if 'identifier' in immediate:
             # actually an identifier, change declaration
             return immediate
         # otherwise nothing to do
-        return {'immediate': immediate}
+        return AttrDict({self.IMMEDIATE_ID: immediate})
 
     def get_full_reg_name(self, register):
         # nothing to do

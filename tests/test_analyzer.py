@@ -27,14 +27,14 @@ class TestAnalyzer(unittest.TestCase):
     def test_marker_detection_AArch64(self):
         analyzer = Analyzer(self.parsed_AArch, 'AArch64')
         self.assertEquals(len(analyzer.kernel), 138)
-        self.assertEquals(analyzer.kernel[0]['line_number'], 307)
-        self.assertEquals(analyzer.kernel[-1]['line_number'], 444)
+        self.assertEquals(analyzer.kernel[0].line_number, 307)
+        self.assertEquals(analyzer.kernel[-1].line_number, 444)
 
     def test_marker_detection_x86(self):
         analyzer = Analyzer(self.parsed_x86, 'x86')
         self.assertEquals(len(analyzer.kernel), 9)
-        self.assertEquals(analyzer.kernel[0]['line_number'], 146)
-        self.assertEquals(analyzer.kernel[-1]['line_number'], 154)
+        self.assertEquals(analyzer.kernel[0].line_number, 146)
+        self.assertEquals(analyzer.kernel[-1].line_number, 154)
 
     def test_marker_matching_x86(self):
         # preparation

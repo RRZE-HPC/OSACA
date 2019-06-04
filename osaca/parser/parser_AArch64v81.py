@@ -3,6 +3,7 @@
 
 import pyparsing as pp
 
+from .attr_dict import AttrDict
 from .base_parser import BaseParser
 
 
@@ -136,8 +137,8 @@ class ParserAArch64v81(BaseParser):
             + pp.Optional(register_index ^ immediate.setResultsName('offset'))
             + pp.Literal(']')
             + pp.Optional(
-                pp.Literal('!').setResultsName('pre-indexed')
-                | (pp.Suppress(pp.Literal(',')) + immediate.setResultsName('post-indexed'))
+                pp.Literal('!').setResultsName('pre_indexed')
+                | (pp.Suppress(pp.Literal(',')) + immediate.setResultsName('post_indexed'))
             )
         ).setResultsName(self.MEMORY_ID)
         prefetch_op = pp.Group(
@@ -174,20 +175,23 @@ class ParserAArch64v81(BaseParser):
         :param int line_id: default None, identifier of instruction form
         :return: parsed instruction form
         """
-        instruction_form = {
-            'instruction': None,
-            'operands': None,
-            'directive': None,
-            'comment': None,
-            'label': None,
-            'line_number': line_number,
-        }
+        instruction_form = AttrDict(
+            {
+                self.INSTRUCTION_ID: None,
+                self.OPERANDS_ID: None,
+                self.DIRECTIVE_ID: None,
+                self.COMMENT_ID: None,
+                self.LABEL_ID: None,
+                'line_number': line_number,
+            }
+        )
         result = None
 
         # 1. Parse comment
         try:
             result = self._process_operand(self.comment.parseString(line, parseAll=True).asDict())
-            instruction_form['comment'] = ' '.join(result[self.COMMENT_ID])
+            result = AttrDict.convert_dict(result)
+            instruction_form[self.COMMENT_ID] = ' '.join(result[self.COMMENT_ID])
         except pp.ParseException:
             pass
 
@@ -197,9 +201,12 @@ class ParserAArch64v81(BaseParser):
                 result = self._process_operand(
                     self.label.parseString(line, parseAll=True).asDict()
                 )
-                instruction_form['label'] = result[self.LABEL_ID]['name']
+                result = AttrDict.convert_dict(result)
+                instruction_form[self.LABEL_ID] = result[self.LABEL_ID].name
                 if self.COMMENT_ID in result[self.LABEL_ID]:
-                    instruction_form['comment'] = ' '.join(result[self.LABEL_ID][self.COMMENT_ID])
+                    instruction_form[self.COMMENT_ID] = ' '.join(
+                        result[self.LABEL_ID][self.COMMENT_ID]
+                    )
             except pp.ParseException:
                 pass
 
@@ -209,12 +216,13 @@ class ParserAArch64v81(BaseParser):
                 result = self._process_operand(
                     self.directive.parseString(line, parseAll=True).asDict()
                 )
-                instruction_form['directive'] = {
-                    'name': result[self.DIRECTIVE_ID]['name'],
-                    'parameters': result[self.DIRECTIVE_ID]['parameters'],
+                result = AttrDict.convert_dict(result)
+                instruction_form[self.DIRECTIVE_ID] = {
+                    'name': result[self.DIRECTIVE_ID].name,
+                    'parameters': result[self.DIRECTIVE_ID].parameters,
                 }
                 if self.COMMENT_ID in result[self.DIRECTIVE_ID]:
-                    instruction_form['comment'] = ' '.join(
+                    instruction_form[self.COMMENT_ID] = ' '.join(
                         result[self.DIRECTIVE_ID][self.COMMENT_ID]
                     )
             except pp.ParseException:
@@ -230,22 +238,23 @@ class ParserAArch64v81(BaseParser):
                         line_number, line
                     )
                 )
-            instruction_form['instruction'] = result['instruction']
-            instruction_form['operands'] = result['operands']
-            instruction_form['comment'] = result['comment']
+            instruction_form[self.INSTRUCTION_ID] = result[self.INSTRUCTION_ID]
+            instruction_form[self.OPERANDS_ID] = result[self.OPERANDS_ID]
+            instruction_form[self.COMMENT_ID] = result[self.COMMENT_ID]
 
         return instruction_form
 
     def parse_instruction(self, instruction):
         result = self.instruction_parser.parseString(instruction, parseAll=True).asDict()
-        operands = {'source': [], 'destination': []}
+        result = AttrDict.convert_dict(result)
+        operands = AttrDict({'source': [], 'destination': []})
         # ARM specific load store flags
         is_store = False
         is_load = False
-        if result['mnemonic'].lower().startswith('st'):
+        if result.mnemonic.lower().startswith('st'):
             # Store instruction --> swap source and destination
             is_store = True
-        if result['mnemonic'].lower().startswith('ld'):
+        if result.mnemonic.lower().startswith('ld'):
             # Load instruction --> keep in mind for possible multiple loads
             is_load = True
 
@@ -253,51 +262,55 @@ class ParserAArch64v81(BaseParser):
         # Check first operand
         if 'operand1' in result:
             if is_store:
-                operands['source'].append(self._process_operand(result['operand1']))
+                operands.source.append(self._process_operand(result['operand1']))
             else:
-                operands['destination'].append(self._process_operand(result['operand1']))
+                operands.destination.append(self._process_operand(result['operand1']))
         # Check second operand
         if 'operand2' in result:
             if is_store and 'operand3' not in result or is_load and 'operand3' in result:
                 # destination
-                operands['destination'].append(self._process_operand(result['operand2']))
+                operands.destination.append(self._process_operand(result['operand2']))
             else:
-                operands['source'].append(self._process_operand(result['operand2']))
+                operands.source.append(self._process_operand(result['operand2']))
         # Check third operand
         if 'operand3' in result:
             if is_store and 'operand4' not in result or is_load and 'operand4' in result:
-                operands['destination'].append(self._process_operand(result['operand3']))
+                operands.destination.append(self._process_operand(result['operand3']))
             else:
-                operands['source'].append(self._process_operand(result['operand3']))
+                operands.source.append(self._process_operand(result['operand3']))
         # Check fourth operand
         if 'operand4' in result:
             if is_store:
-                operands['destination'].append(self._process_operand(result['operand4']))
+                operands.destination.append(self._process_operand(result['operand4']))
             else:
-                operands['source'].append(self._process_operand(result['operand4']))
+                operands.source.append(self._process_operand(result['operand4']))
 
-        return_dict = {
-            'instruction': result['mnemonic'],
-            'operands': operands,
-            'comment': ' '.join(result['comment']) if 'comment' in result else None,
-        }
+        return_dict = AttrDict(
+            {
+                self.INSTRUCTION_ID: result.mnemonic,
+                self.OPERANDS_ID: operands,
+                self.COMMENT_ID: ' '.join(result[self.COMMENT_ID])
+                if self.COMMENT_ID in result
+                else None,
+            }
+        )
         return return_dict
 
     def _process_operand(self, operand):
         # structure memory addresses
-        if 'memory' in operand:
-            return self.substitute_memory_address(operand['memory'])
+        if self.MEMORY_ID in operand:
+            return self.substitute_memory_address(operand[self.MEMORY_ID])
         # structure register lists
-        if 'register' in operand and (
-            'list' in operand['register'] or 'range' in operand['register']
+        if self.REGISTER_ID in operand and (
+            'list' in operand[self.REGISTER_ID] or 'range' in operand[self.REGISTER_ID]
         ):
             # TODO: discuss if ranges should be converted to lists
-            return self.substitute_register_list(operand['register'])
+            return self.substitute_register_list(operand[self.REGISTER_ID])
         # add value attribute to floating point immediates without exponent
-        if 'immediate' in operand:
-            return self.substitute_immediate(operand['immediate'])
-        if 'label' in operand:
-            return self.substitute_label(operand['label'])
+        if self.IMMEDIATE_ID in operand:
+            return self.substitute_immediate(operand[self.IMMEDIATE_ID])
+        if self.LABEL_ID in operand:
+            return self.substitute_label(operand[self.LABEL_ID])
         return operand
 
     def substitute_memory_address(self, memory_address):
@@ -311,12 +324,12 @@ class ParserAArch64v81(BaseParser):
             if 'shift' in memory_address['index']:
                 if memory_address['index']['shift_op'].lower() in valid_shift_ops:
                     scale = str(2 ** int(memory_address['index']['shift']['value']))
-        new_dict = {'offset': offset, 'base': base, 'index': index, 'scale': scale}
-        if 'pre-indexed' in memory_address:
-            new_dict['pre-indexed'] = True
-        if 'post-indexed' in memory_address:
-            new_dict['post-indexed'] = memory_address['post-indexed']
-        return {'memory': new_dict}
+        new_dict = AttrDict({'offset': offset, 'base': base, 'index': index, 'scale': scale})
+        if 'pre_indexed' in memory_address:
+            new_dict['pre_indexed'] = True
+        if 'post_indexed' in memory_address:
+            new_dict['post_indexed'] = memory_address['post_indexed']
+        return AttrDict({self.MEMORY_ID: new_dict})
 
     def substitute_register_list(self, register_list):
         # Remove unnecessarily created dictionary entries during parsing
@@ -327,10 +340,12 @@ class ParserAArch64v81(BaseParser):
         if 'range' in register_list:
             dict_name = 'range'
         for v in register_list[dict_name]:
-            vlist.append(self.list_element.parseString(v, parseAll=True).asDict())
+            vlist.append(
+                AttrDict.convert_dict(self.list_element.parseString(v, parseAll=True).asDict())
+            )
         index = None if 'index' not in register_list else register_list['index']
-        new_dict = {dict_name: vlist, 'index': index}
-        return {'register': new_dict}
+        new_dict = AttrDict({dict_name: vlist, 'index': index})
+        return AttrDict({self.REGISTER_ID: new_dict})
 
     def substitute_immediate(self, immediate):
         dict_name = ''
@@ -339,28 +354,30 @@ class ParserAArch64v81(BaseParser):
             return immediate
         if 'value' in immediate:
             # normal integer value, nothing to do
-            return {'immediate': immediate}
+            return AttrDict({self.IMMEDIATE_ID: immediate})
         if 'base_immediate' in immediate:
             # arithmetic immediate, nothing to do
-            return {'immediate': immediate}
+            return AttrDict({self.IMMEDIATE_ID: immediate})
         if 'float' in immediate:
             dict_name = 'float'
         if 'double' in immediate:
             dict_name = 'double'
         if 'exponent' in immediate[dict_name]:
             # nothing to do
-            return {'immediate': immediate}
+            return AttrDict({self.IMMEDIATE_ID: immediate})
         else:
             # change 'mantissa' key to 'value'
-            return {'immediate': {'value': immediate[dict_name]['mantissa']}}
+            return AttrDict(
+                {self.IMMEDIATE_ID: AttrDict({'value': immediate[dict_name]['mantissa']})}
+            )
 
     def substitute_label(self, label):
         # remove duplicated 'name' level due to identifier
         label['name'] = label['name']['name']
-        return {'label': label}
+        return AttrDict({self.LABEL_ID: label})
 
     def get_full_reg_name(self, register):
-        if 'lanes' in 'register':
+        if 'lanes' in register:
             return (
                 register['prefix'] + register['name'] + '.' + register['lanes'] + register['shape']
             )
@@ -381,6 +398,6 @@ class ParserAArch64v81(BaseParser):
 
     def ieee_to_int(self, ieee_val):
         exponent = int(ieee_val['exponent'], 10)
-        if ieee_val['e_sign'] == '-':
+        if ieee_val.e_sign == '-':
             exponent *= -1
         return float(ieee_val['mantissa']) * (10 ** exponent)

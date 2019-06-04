@@ -9,6 +9,8 @@ class BaseParser(object):
     LABEL_ID = 'label'
     MEMORY_ID = 'memory'
     REGISTER_ID = 'register'
+    INSTRUCTION_ID = 'instruction'
+    OPERANDS_ID = 'operands'
 
     def __init__(self):
         self.construct_parser()
