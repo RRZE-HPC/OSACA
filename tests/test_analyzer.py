@@ -36,10 +36,86 @@ class TestAnalyzer(unittest.TestCase):
         self.assertEquals(analyzer.kernel[0].line_number, 146)
         self.assertEquals(analyzer.kernel[-1].line_number, 154)
 
+    def test_marker_matching_AArch64(self):
+        # preparation
+        bytes_1_line = '.byte     213,3,32,31\n'
+        bytes_2_lines_1 = '.byte     213,3,32\n' + '.byte 31\n'
+        bytes_2_lines_2 = '.byte     213,3\n' + '.byte 32,31\n'
+        bytes_2_lines_3 = '.byte     213\n' + '.byte 3,32,31\n'
+        bytes_3_lines_1 = '.byte     213,3\n' + '.byte     32\n' + '.byte     31\n'
+        bytes_3_lines_2 = '.byte     213\n' + '.byte     3,32\n' + '.byte     31\n'
+        bytes_3_lines_3 = '.byte     213\n' + '.byte     3\n' + '.byte     32,31\n'
+        bytes_4_lines = '.byte     213\n' + '.byte     3\n' + '.byte     32\n' + '.byte     31\n'
+        mov_start_1 = 'mov      x1, #111\n'
+        mov_start_2 = 'mov      x1, 111  // should work as well\n'
+        mov_end_1 = 'mov      x1, #222 // preferred way\n'
+        mov_end_2 = 'mov      x1, 222\n'
+        prologue = (
+            'mov x12, xzr\n'
+            + '\tldp x9, x10, [sp, #16]      // 8-byte Folded Reload\n'
+            + '     .p2align    6\n'
+        )
+        kernel = (
+            '.LBB0_28:\n'
+            + 'fmul    v7.2d, v7.2d, v19.2d\n'
+            + 'stp q0, q1, [x10, #-32]\n'
+            + 'b.ne    .LBB0_28\n'
+        )
+        epilogue = '.LBB0_29:   //   Parent Loop BB0_20 Depth=1\n' + 'bl    dummy\n'
+        kernel_length = len(list(filter(None, kernel.split('\n'))))
+
+        bytes_variations = [
+            bytes_1_line,
+            bytes_2_lines_1,
+            bytes_2_lines_2,
+            bytes_2_lines_3,
+            bytes_3_lines_1,
+            bytes_3_lines_2,
+            bytes_3_lines_3,
+            bytes_4_lines,
+        ]
+        mov_start_variations = [mov_start_1, mov_start_2]
+        mov_end_variations = [mov_end_1, mov_end_2]
+        # actual tests
+        for mov_start_var in mov_start_variations:
+            for bytes_var_1 in bytes_variations:
+                for mov_end_var in mov_end_variations:
+                    for bytes_var_2 in bytes_variations:
+                        sample_code = (
+                            prologue
+                            + mov_start_var
+                            + bytes_var_1
+                            + kernel
+                            + mov_end_var
+                            + bytes_var_2
+                            + epilogue
+                        )
+                        with self.subTest(
+                            mov_start=mov_start_var,
+                            bytes_start=bytes_var_1,
+                            mov_end=mov_end_var,
+                            bytes_end=bytes_var_2,
+                        ):
+                            sample_parsed = self.parser_AArch.parse_file(sample_code)
+                            analyzer = Analyzer(sample_parsed, 'AArch64')
+                            self.assertEquals(len(analyzer.kernel), kernel_length)
+                            kernel_start = len(
+                                list(
+                                    filter(
+                                        None, (prologue + mov_start_var + bytes_var_1).split('\n')
+                                    )
+                                )
+                            )
+                            parsed_kernel = self.parser_AArch.parse_file(
+                                kernel, start_line=kernel_start
+                            )
+                            self.assertEquals(analyzer.kernel, parsed_kernel)
+
     def test_marker_matching_x86(self):
         # preparation
         bytes_1_line = '.byte     100,103,144\n'
-        bytes_2_lines = '.byte     100,103\n' + '.byte 144\n'
+        bytes_2_lines_1 = '.byte     100,103\n' + '.byte 144\n'
+        bytes_2_lines_2 = '.byte     100\n' + '.byte 103,144\n'
         bytes_3_lines = (
             '.byte     100 # IACA MARKER UTILITY\n'
             + '.byte     103 # IACA MARKER UTILITY\n'
@@ -59,7 +135,7 @@ class TestAnalyzer(unittest.TestCase):
         epilogue = '.LE9:\t\t#12.2\n' 'call    dummy\n'
         kernel_length = len(list(filter(None, kernel.split('\n'))))
 
-        bytes_variations = [bytes_1_line, bytes_2_lines, bytes_3_lines]
+        bytes_variations = [bytes_1_line, bytes_2_lines_1, bytes_2_lines_2, bytes_3_lines]
         mov_start_variations = [mov_start_1, mov_start_2]
         mov_end_variations = [mov_end_1, mov_end_2]
         # actual tests
