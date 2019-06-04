@@ -25,32 +25,35 @@ class Analyzer(object):
         index_start = -1
         index_end = -1
         for i, line in enumerate(lines):
-            if line['instruction'] in mov_instr and lines[i + 1]['directive'] is not None:
-                source = line['operands']['source']
-                destination = line['operands']['destination']
-                # instruction pair matches, check for operands
-                if (
-                    'immediate' in source[0]
-                    and self.parser.normalize_imd(source[0]['immediate']) == mov_vals[0]
-                    and 'register' in destination[0]
-                    and self.parser.get_full_reg_name(destination[0]['register']) == mov_reg
-                ):
-                    # operands of first instruction match start, check for second one
-                    match, line_count = self.match_bytes(lines, i + 1, nop_bytes)
-                    if(match):
-                        # return first line after the marker
-                        index_start = i + 1 + line_count
-                elif (
-                    'immediate' in source[0]
-                    and self.parser.normalize_imd(source[0]['immediate']) == mov_vals[1]
-                    and 'register' in destination[0]
-                    and self.parser.get_full_reg_name(destination[0]['register']) == mov_reg
-                ):
-                    # operand of first instruction match end, check for second one
-                    match, line_count = self.match_bytes(lines, i + 1, nop_bytes)
-                    if(match):
-                        # return line of the marker
-                        index_end = i
+            try:
+                if line['instruction'] in mov_instr and lines[i + 1]['directive'] is not None:
+                    source = line['operands']['source']
+                    destination = line['operands']['destination']
+                    # instruction pair matches, check for operands
+                    if (
+                        'immediate' in source[0]
+                        and self.parser.normalize_imd(source[0]['immediate']) == mov_vals[0]
+                        and 'register' in destination[0]
+                        and self.parser.get_full_reg_name(destination[0]['register']) == mov_reg
+                    ):
+                        # operands of first instruction match start, check for second one
+                        match, line_count = self.match_bytes(lines, i + 1, nop_bytes)
+                        if(match):
+                            # return first line after the marker
+                            index_start = i + 1 + line_count
+                    elif (
+                        'immediate' in source[0]
+                        and self.parser.normalize_imd(source[0]['immediate']) == mov_vals[1]
+                        and 'register' in destination[0]
+                        and self.parser.get_full_reg_name(destination[0]['register']) == mov_reg
+                    ):
+                        # operand of first instruction match end, check for second one
+                        match, line_count = self.match_bytes(lines, i + 1, nop_bytes)
+                        if(match):
+                            # return line of the marker
+                            index_end = i
+            except TypeError:
+                print(i, line)
             if index_start != -1 and index_end != -1:
                 break
         return index_start, index_end
