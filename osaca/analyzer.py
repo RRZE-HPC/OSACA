@@ -11,6 +11,10 @@ class Analyzer(object):
         elif isa == 'AArch64':
             self.parser = ParserAArch64v81()
             start, end = self.find_marked_kernel_AArch64(parser_result)
+        if start == -1:
+            raise LookupError('Could not find START MARKER. Make sure it is inserted!')
+        if end == -1:
+            raise LookupError('Could not find END MARKER. Make sure it is inserted!')
         self.kernel = parser_result[start:end]
 
     def find_marked_kernel_AArch64(self, lines):
