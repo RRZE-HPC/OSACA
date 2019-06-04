@@ -173,6 +173,127 @@ class TestAnalyzer(unittest.TestCase):
                             )
                             self.assertEquals(analyzer.kernel, parsed_kernel)
 
+    def test_marker_special_cases_AArch(self):
+        bytes_line = '.byte     213,3,32,31\n'
+        mov_start = 'mov      x1, #111\n'
+        mov_end = 'mov      x1, #222\n'
+        prologue = 'dup v0.2d, x14\n' + '    neg x9, x9\n' + '    .p2align    6\n'
+        kernel = (
+            '.LBB0_28:\n'
+            + 'fmul    v7.2d, v7.2d, v19.2d\n'
+            + 'stp q0, q1, [x10, #-32]\n'
+            + 'b.ne    .LBB0_28\n'
+        )
+        epilogue = '.LBB0_29:   //   Parent Loop BB0_20 Depth=1\n' + 'bl    dummy\n'
+        kernel_length = len(list(filter(None, kernel.split('\n'))))
+
+        # marker directly at the beginning
+        code_beginning = mov_start + bytes_line + kernel + mov_end + bytes_line + epilogue
+        beginning_parsed = self.parser_AArch.parse_file(code_beginning)
+        analyzer = Analyzer(beginning_parsed, 'AArch64')
+        self.assertEquals(len(analyzer.kernel), kernel_length)
+        kernel_start = len(list(filter(None, (mov_start + bytes_line).split('\n'))))
+        parsed_kernel = self.parser_AArch.parse_file(kernel, start_line=kernel_start)
+        self.assertEquals(analyzer.kernel, parsed_kernel)
+
+        # marker at the end
+        code_end = prologue + mov_start + bytes_line + kernel + mov_end + bytes_line + epilogue
+        end_parsed = self.parser_AArch.parse_file(code_end)
+        analyzer = Analyzer(end_parsed, 'AArch64')
+        self.assertEquals(len(analyzer.kernel), kernel_length)
+        kernel_start = len(list(filter(None, (prologue + mov_start + bytes_line).split('\n'))))
+        parsed_kernel = self.parser_AArch.parse_file(kernel, start_line=kernel_start)
+        self.assertEquals(analyzer.kernel, parsed_kernel)
+
+        # no kernel
+        code_empty = prologue + mov_start + bytes_line + mov_end + bytes_line + epilogue
+        empty_parsed = self.parser_AArch.parse_file(code_empty)
+        analyzer = Analyzer(empty_parsed, 'AArch64')
+        self.assertEquals(len(analyzer.kernel), 0)
+        kernel_start = len(list(filter(None, (prologue + mov_start + bytes_line).split('\n'))))
+        self.assertEquals(analyzer.kernel, [])
+
+        # no start marker
+        code_no_start = prologue + bytes_line + kernel + mov_end + bytes_line + epilogue
+        no_start_parsed = self.parser_AArch.parse_file(code_no_start)
+        with self.assertRaises(LookupError):
+            analyzer = Analyzer(no_start_parsed, 'AArch64')
+
+        # no end marker
+        code_no_end = prologue + mov_start + bytes_line + kernel + mov_end + epilogue
+        no_end_parsed = self.parser_AArch.parse_file(code_no_end)
+        with self.assertRaises(LookupError):
+            analyzer = Analyzer(no_end_parsed, 'AArch64')
+
+        # no marker at all
+        code_no_marker = prologue + kernel + epilogue
+        no_marker_parsed = self.parser_AArch.parse_file(code_no_marker)
+        with self.assertRaises(LookupError):
+            analyzer = Analyzer(no_marker_parsed, 'AArch64')
+
+    def test_marker_special_cases_x86(self):
+        bytes_line = '.byte     100\n.byte     103\n.byte     144\n'
+        mov_start = 'movl     $111, %ebx\n'
+        mov_end = 'movl     $222, %ebx\n'
+        prologue = 'movl    -88(%rbp), %r10d\n' + 'xorl    %r11d, %r11d\n' + '.p2align 4,,10\n'
+        kernel = (
+            '.L3: #L3\n'
+            + 'vmovsd  .LC1(%rip), %xmm0\n'
+            + 'vmovsd  %xmm0, (%r15,%rcx,8)\n'
+            + 'cmpl    %ecx, %ebx\n'
+            + 'jle .L3\n'
+        )
+        epilogue = 'leaq    -56(%rbp), %rsi\n' + 'movl    %r10d, -88(%rbp)\n' + 'call    timing\n'
+        kernel_length = len(list(filter(None, kernel.split('\n'))))
+
+        # marker directly at the beginning
+        code_beginning = mov_start + bytes_line + kernel + mov_end + bytes_line + epilogue
+        beginning_parsed = self.parser_x86.parse_file(code_beginning)
+        analyzer = Analyzer(beginning_parsed, 'x86')
+        self.assertEquals(len(analyzer.kernel), kernel_length)
+        kernel_start = len(list(filter(None, (mov_start + bytes_line).split('\n'))))
+        parsed_kernel = self.parser_x86.parse_file(kernel, start_line=kernel_start)
+        self.assertEquals(analyzer.kernel, parsed_kernel)
+
+        # marker at the end
+        code_end = prologue + mov_start + bytes_line + kernel + mov_end + bytes_line + epilogue
+        end_parsed = self.parser_x86.parse_file(code_end)
+        analyzer = Analyzer(end_parsed, 'x86')
+        self.assertEquals(len(analyzer.kernel), kernel_length)
+        kernel_start = len(list(filter(None, (prologue + mov_start + bytes_line).split('\n'))))
+        parsed_kernel = self.parser_x86.parse_file(kernel, start_line=kernel_start)
+        self.assertEquals(analyzer.kernel, parsed_kernel)
+
+        # no kernel
+        code_empty = prologue + mov_start + bytes_line + mov_end + bytes_line + epilogue
+        empty_parsed = self.parser_x86.parse_file(code_empty)
+        analyzer = Analyzer(empty_parsed, 'x86')
+        self.assertEquals(len(analyzer.kernel), 0)
+        kernel_start = len(list(filter(None, (prologue + mov_start + bytes_line).split('\n'))))
+        self.assertEquals(analyzer.kernel, [])
+
+        # no start marker
+        code_no_start = prologue + bytes_line + kernel + mov_end + bytes_line + epilogue
+        no_start_parsed = self.parser_x86.parse_file(code_no_start)
+        with self.assertRaises(LookupError):
+            analyzer = Analyzer(no_start_parsed, 'x86')
+
+        # no end marker
+        code_no_end = prologue + mov_start + bytes_line + kernel + mov_end + epilogue
+        no_end_parsed = self.parser_x86.parse_file(code_no_end)
+        with self.assertRaises(LookupError):
+            analyzer = Analyzer(no_end_parsed, 'x86')
+
+        # no marker at all
+        code_no_marker = prologue + kernel + epilogue
+        no_marker_parsed = self.parser_x86.parse_file(code_no_marker)
+        with self.assertRaises(LookupError):
+            analyzer = Analyzer(no_marker_parsed, 'x86')
+
+    ##################
+    # Helper functions
+    ##################
+
     @staticmethod
     def _find_file(name):
         testdir = os.path.dirname(__file__)
