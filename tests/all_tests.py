@@ -7,7 +7,8 @@ sys.path[0:0] = ['.', '..']
 suite = unittest.TestLoader().loadTestsFromNames(
     [
         'test_parser_x86att',
-        'test_parser_AArch64v81'
+        'test_parser_AArch64v81',
+        'test_analyzer'
     ]
 )
 

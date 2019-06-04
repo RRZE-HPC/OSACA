@@ -13,15 +13,14 @@ class BaseParser(object):
     def __init__(self):
         self.construct_parser()
 
-    def parse_file(self, file_content):
+    def parse_file(self, file_content, start_line=0):
         '''
-        Parse assembly file. This includes extracting of the marked kernel and
+        Parse assembly file. This includes *not* extracting of the marked kernel and
         the parsing of the instruction forms.
 
         :param str file_content: assembly code
+        :param int start_line: offset, if first line in file_content is meant to be not 1
         :return: list of instruction forms
-        :raises ValueError: if the marker_type attribute is unknown by the
-        function
         '''
         # Create instruction form list
         asm_instructions = []
@@ -29,7 +28,7 @@ class BaseParser(object):
         for i, line in enumerate(lines):
             if line == '':
                 continue
-            asm_instructions.append(self.parse_line(line, i + 1))
+            asm_instructions.append(self.parse_line(line, i + 1 + start_line))
         return asm_instructions
 
     def parse_line(self, line, line_number):
