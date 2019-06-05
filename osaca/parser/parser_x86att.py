@@ -143,10 +143,10 @@ class ParserX86ATT(BaseParser):
                     self.directive.parseString(line, parseAll=True).asDict()
                 )
                 result = AttrDict.convert_dict(result)
-                instruction_form[self.DIRECTIVE_ID] = {
+                instruction_form[self.DIRECTIVE_ID] = AttrDict({
                     'name': result[self.DIRECTIVE_ID]['name'],
                     'parameters': result[self.DIRECTIVE_ID]['parameters'],
-                }
+                })
                 if self.COMMENT_ID in result[self.DIRECTIVE_ID]:
                     instruction_form[self.COMMENT_ID] = ' '.join(
                         result[self.DIRECTIVE_ID][self.COMMENT_ID]
