@@ -186,28 +186,82 @@ class TestParserX86ATT(unittest.TestCase):
         self.assertEqual(parsed[0].line_number, 1)
         self.assertEqual(len(parsed), 353)
 
+    def test_normalize_imd(self):
+        imd_decimal_1 = {'value': '79'}
+        imd_hex_1 = {'value': '0x4f'}
+        imd_decimal_2 = {'value': '8'}
+        imd_hex_2 = {'value': '0x8'}
+        self.assertEqual(
+            self.parser.normalize_imd(imd_decimal_1), self.parser.normalize_imd(imd_hex_1)
+        )
+        self.assertEqual(
+            self.parser.normalize_imd(imd_decimal_2), self.parser.normalize_imd(imd_hex_2)
+        )
+
+    def test_reg_dependency(self):
+        reg_a1 = AttrDict({'name': 'rax'})
+        reg_a2 = AttrDict({'name': 'eax'})
+        reg_a3 = AttrDict({'name': 'ax'})
+        reg_a4 = AttrDict({'name': 'al'})
+        reg_r11 = AttrDict({'name': 'r11'})
+        reg_r11b = AttrDict({'name': 'r11b'})
+        reg_r11d = AttrDict({'name': 'r11d'})
+        reg_r11w = AttrDict({'name': 'r11w'})
+        reg_xmm1 = AttrDict({'name': 'xmm1'})
+        reg_ymm1 = AttrDict({'name': 'ymm1'})
+        reg_zmm1 = AttrDict({'name': 'zmm1'})
+
+        reg_b1 = AttrDict({'name': 'rbx'})
+        reg_r15 = AttrDict({'name': 'r15'})
+        reg_xmm2 = AttrDict({'name': 'xmm2'})
+        reg_ymm3 = AttrDict({'name': 'ymm3'})
+
+        reg_a = [reg_a1, reg_a2, reg_a3, reg_a4]
+        reg_r = [reg_r11, reg_r11b, reg_r11d, reg_r11w]
+        reg_vec_1 = [reg_xmm1, reg_ymm1, reg_zmm1]
+        reg_others = [reg_b1, reg_r15, reg_xmm2, reg_ymm3]
+        regs = reg_a + reg_r + reg_vec_1 + reg_others
+
+        # test each register against each other
+        for ri in reg_a:
+            for rj in regs:
+                assert_value = True if rj in reg_a else False
+                with self.subTest(reg_a=ri, reg_b=rj, assert_val=assert_value):
+                    self.assertEqual(self.parser.is_reg_dependend_of(ri, rj), assert_value)
+        for ri in reg_r:
+            for rj in regs:
+                assert_value = True if rj in reg_r else False
+                with self.subTest(reg_a=ri, reg_b=rj, assert_val=assert_value):
+                    self.assertEqual(self.parser.is_reg_dependend_of(ri, rj), assert_value)
+        for ri in reg_vec_1:
+            for rj in regs:
+                assert_value = True if rj in reg_vec_1 else False
+                with self.subTest(reg_a=ri, reg_b=rj, assert_val=assert_value):
+                    self.assertEqual(self.parser.is_reg_dependend_of(ri, rj), assert_value)
+        for ri in reg_others:
+            for rj in regs:
+                assert_value = True if rj == ri else False
+                with self.subTest(reg_a=ri, reg_b=rj, assert_val=assert_value):
+                    self.assertEqual(self.parser.is_reg_dependend_of(ri, rj), assert_value)
+
     ##################
     # Helper functions
     ##################
     def _get_comment(self, parser, comment):
         return ' '.join(
             AttrDict.convert_dict(
-                parser._process_operand(
-                    parser.comment.parseString(comment, parseAll=True).asDict()
-                )
+                parser.process_operand(parser.comment.parseString(comment, parseAll=True).asDict())
             ).comment
         )
 
     def _get_label(self, parser, label):
         return AttrDict.convert_dict(
-            parser._process_operand(parser.label.parseString(label, parseAll=True).asDict())
+            parser.process_operand(parser.label.parseString(label, parseAll=True).asDict())
         ).label
 
     def _get_directive(self, parser, directive):
         return AttrDict.convert_dict(
-            parser._process_operand(
-                parser.directive.parseString(directive, parseAll=True).asDict()
-            )
+            parser.process_operand(parser.directive.parseString(directive, parseAll=True).asDict())
         ).directive
 
     @staticmethod
