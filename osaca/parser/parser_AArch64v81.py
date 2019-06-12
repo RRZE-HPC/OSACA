@@ -189,7 +189,7 @@ class ParserAArch64v81(BaseParser):
 
         # 1. Parse comment
         try:
-            result = self._process_operand(self.comment.parseString(line, parseAll=True).asDict())
+            result = self.process_operand(self.comment.parseString(line, parseAll=True).asDict())
             result = AttrDict.convert_dict(result)
             instruction_form[self.COMMENT_ID] = ' '.join(result[self.COMMENT_ID])
         except pp.ParseException:
@@ -198,7 +198,7 @@ class ParserAArch64v81(BaseParser):
         # 2. Parse label
         if result is None:
             try:
-                result = self._process_operand(
+                result = self.process_operand(
                     self.label.parseString(line, parseAll=True).asDict()
                 )
                 result = AttrDict.convert_dict(result)
@@ -213,7 +213,7 @@ class ParserAArch64v81(BaseParser):
         # 3. Parse directive
         if result is None:
             try:
-                result = self._process_operand(
+                result = self.process_operand(
                     self.directive.parseString(line, parseAll=True).asDict()
                 )
                 result = AttrDict.convert_dict(result)
@@ -262,28 +262,28 @@ class ParserAArch64v81(BaseParser):
         # Check first operand
         if 'operand1' in result:
             if is_store:
-                operands.source.append(self._process_operand(result['operand1']))
+                operands.source.append(self.process_operand(result['operand1']))
             else:
-                operands.destination.append(self._process_operand(result['operand1']))
+                operands.destination.append(self.process_operand(result['operand1']))
         # Check second operand
         if 'operand2' in result:
             if is_store and 'operand3' not in result or is_load and 'operand3' in result:
                 # destination
-                operands.destination.append(self._process_operand(result['operand2']))
+                operands.destination.append(self.process_operand(result['operand2']))
             else:
-                operands.source.append(self._process_operand(result['operand2']))
+                operands.source.append(self.process_operand(result['operand2']))
         # Check third operand
         if 'operand3' in result:
             if is_store and 'operand4' not in result or is_load and 'operand4' in result:
-                operands.destination.append(self._process_operand(result['operand3']))
+                operands.destination.append(self.process_operand(result['operand3']))
             else:
-                operands.source.append(self._process_operand(result['operand3']))
+                operands.source.append(self.process_operand(result['operand3']))
         # Check fourth operand
         if 'operand4' in result:
             if is_store:
-                operands.destination.append(self._process_operand(result['operand4']))
+                operands.destination.append(self.process_operand(result['operand4']))
             else:
-                operands.source.append(self._process_operand(result['operand4']))
+                operands.source.append(self.process_operand(result['operand4']))
 
         return_dict = AttrDict(
             {
@@ -296,7 +296,7 @@ class ParserAArch64v81(BaseParser):
         )
         return return_dict
 
-    def _process_operand(self, operand):
+    def process_operand(self, operand):
         # structure memory addresses
         if self.MEMORY_ID in operand:
             return self.substitute_memory_address(operand[self.MEMORY_ID])
@@ -390,14 +390,19 @@ class ParserAArch64v81(BaseParser):
                 return int(imd['value'], 16)
             return int(imd['value'], 10)
         elif 'float' in imd:
-            return self.ieee_val_to_int(imd['float'])
+            return self.ieee_to_int(imd['float'])
         elif 'double' in imd:
-            return self.ieee_val_to_int(imd['double'])
+            return self.ieee_to_int(imd['double'])
         # identifier
         return imd
 
     def ieee_to_int(self, ieee_val):
         exponent = int(ieee_val['exponent'], 10)
-        if ieee_val.e_sign == '-':
+        if ieee_val['e_sign'] == '-':
             exponent *= -1
         return float(ieee_val['mantissa']) * (10 ** exponent)
+
+    def is_reg_dependend_of(self, reg_a, reg_b):
+        if reg_a['name'] == reg_b['name']:
+            return True
+        return False

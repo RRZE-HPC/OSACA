@@ -283,28 +283,90 @@ class TestParserAArch64v81(unittest.TestCase):
         self.assertEqual(parsed[0].line_number, 1)
         self.assertEqual(len(parsed), 645)
 
+    def test_normalize_imd(self):
+        imd_decimal_1 = {'value': '79'}
+        imd_hex_1 = {'value': '0x4f'}
+        imd_decimal_2 = {'value': '8'}
+        imd_hex_2 = {'value': '0x8'}
+        imd_float_11 = {'float': {'mantissa': '0.79', 'e_sign': '+', 'exponent': '2'}}
+        imd_float_12 = {'float': {'mantissa': '790.0', 'e_sign': '-', 'exponent': '1'}}
+        imd_double_11 = {'double': {'mantissa': '0.79', 'e_sign': '+', 'exponent': '2'}}
+        imd_double_12 = {'double': {'mantissa': '790.0', 'e_sign': '-', 'exponent': '1'}}
+
+        value1 = self.parser.normalize_imd(imd_decimal_1)
+        self.assertEqual(value1, self.parser.normalize_imd(imd_hex_1))
+        self.assertEqual(
+            self.parser.normalize_imd(imd_decimal_2), self.parser.normalize_imd(imd_hex_2)
+        )
+        self.assertEqual(self.parser.normalize_imd(imd_float_11), value1)
+        self.assertEqual(self.parser.normalize_imd(imd_float_12), value1)
+        self.assertEqual(self.parser.normalize_imd(imd_double_11), value1)
+        self.assertEqual(self.parser.normalize_imd(imd_double_12), value1)
+
+    def test_reg_dependency(self):
+        reg_1_1 = AttrDict({'prefix': 'b', 'name': '1'})
+        reg_1_2 = AttrDict({'prefix': 'h', 'name': '1'})
+        reg_1_3 = AttrDict({'prefix': 's', 'name': '1'})
+        reg_1_4 = AttrDict({'prefix': 'd', 'name': '1'})
+        reg_1_4 = AttrDict({'prefix': 'q', 'name': '1'})
+        reg_2_1 = AttrDict({'prefix': 'w', 'name': '2'})
+        reg_2_2 = AttrDict({'prefix': 'x', 'name': '2'})
+        reg_v1_1 = AttrDict({'prefix': 'v', 'name': '11', 'lanes': '16', 'shape': 'b'})
+        reg_v1_2 = AttrDict({'prefix': 'v', 'name': '11', 'lanes': '8', 'shape': 'h'})
+        reg_v1_3 = AttrDict({'prefix': 'v', 'name': '11', 'lanes': '4', 'shape': 's'})
+        reg_v1_4 = AttrDict({'prefix': 'v', 'name': '11', 'lanes': '2', 'shape': 'd'})
+
+        reg_b5 = AttrDict({'prefix': 'b', 'name': '5'})
+        reg_q15 = AttrDict({'prefix': 'q', 'name': '15'})
+        reg_v10 = AttrDict({'prefix': 'v', 'name': '10', 'lanes': '2', 'shape': 's'})
+        reg_v20 = AttrDict({'prefix': 'v', 'name': '20', 'lanes': '2', 'shape': 'd'})
+
+        reg_1 = [reg_1_1, reg_1_2, reg_1_3, reg_1_4]
+        reg_2 = [reg_2_1, reg_2_2]
+        reg_v = [reg_v1_1, reg_v1_2, reg_v1_3, reg_v1_4]
+        reg_others = [reg_b5, reg_q15, reg_v10, reg_v20]
+        regs = reg_1 + reg_2 + reg_v + reg_others
+
+        # test each register against each other
+        for ri in reg_1:
+            for rj in regs:
+                assert_value = True if rj in reg_1 else False
+                with self.subTest(reg_a=ri, reg_b=rj, assert_val=assert_value):
+                    self.assertEqual(self.parser.is_reg_dependend_of(ri, rj), assert_value)
+        for ri in reg_2:
+            for rj in regs:
+                assert_value = True if rj in reg_2 else False
+                with self.subTest(reg_a=ri, reg_b=rj, assert_val=assert_value):
+                    self.assertEqual(self.parser.is_reg_dependend_of(ri, rj), assert_value)
+        for ri in reg_v:
+            for rj in regs:
+                assert_value = True if rj in reg_v else False
+                with self.subTest(reg_a=ri, reg_b=rj, assert_val=assert_value):
+                    self.assertEqual(self.parser.is_reg_dependend_of(ri, rj), assert_value)
+        for ri in reg_others:
+            for rj in regs:
+                assert_value = True if rj == ri else False
+                with self.subTest(reg_a=ri, reg_b=rj, assert_val=assert_value):
+                    self.assertEqual(self.parser.is_reg_dependend_of(ri, rj), assert_value)
+
     ##################
     # Helper functions
     ##################
     def _get_comment(self, parser, comment):
         return ' '.join(
             AttrDict.convert_dict(
-                parser._process_operand(
-                    parser.comment.parseString(comment, parseAll=True).asDict()
-                )
+                parser.process_operand(parser.comment.parseString(comment, parseAll=True).asDict())
             ).comment
         )
 
     def _get_label(self, parser, label):
         return AttrDict.convert_dict(
-            parser._process_operand(parser.label.parseString(label, parseAll=True).asDict())
+            parser.process_operand(parser.label.parseString(label, parseAll=True).asDict())
         ).label
 
     def _get_directive(self, parser, directive):
         return AttrDict.convert_dict(
-            parser._process_operand(
-                parser.directive.parseString(directive, parseAll=True).asDict()
-            )
+            parser.process_operand(parser.directive.parseString(directive, parseAll=True).asDict())
         ).directive
 
     @staticmethod

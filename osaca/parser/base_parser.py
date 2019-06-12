@@ -1,4 +1,4 @@
-#!usr/bin/env python3
+#!/usr/bin/env python3
 
 
 class BaseParser(object):
@@ -43,3 +43,19 @@ class BaseParser(object):
 
     def construct_parser(self):
         raise NotImplementedError()
+
+    ##################
+    # Helper functions
+    ##################
+
+    def process_operand(self, operand):
+        raise NotImplementedError
+
+    def get_full_reg_name(self, register):
+        raise NotImplementedError
+
+    def normalize_imd(self, imd):
+        raise NotImplementedError
+
+    def is_reg_dependend_of(self, reg_a, reg_b):
+        raise NotImplementedError

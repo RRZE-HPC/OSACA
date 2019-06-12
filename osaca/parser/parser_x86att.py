@@ -2,8 +2,8 @@
 
 import pyparsing as pp
 
-from .base_parser import BaseParser
 from .attr_dict import AttrDict
+from .base_parser import BaseParser
 
 
 class ParserX86ATT(BaseParser):
@@ -103,19 +103,21 @@ class ParserX86ATT(BaseParser):
         :param int line_id: default None, identifier of instruction form
         :return: parsed instruction form
         """
-        instruction_form = AttrDict({
-            self.INSTRUCTION_ID: None,
-            self.OPERANDS_ID: None,
-            self.DIRECTIVE_ID: None,
-            self.COMMENT_ID: None,
-            self.LABEL_ID: None,
-            'line_number': line_number,
-        })
+        instruction_form = AttrDict(
+            {
+                self.INSTRUCTION_ID: None,
+                self.OPERANDS_ID: None,
+                self.DIRECTIVE_ID: None,
+                self.COMMENT_ID: None,
+                self.LABEL_ID: None,
+                'line_number': line_number,
+            }
+        )
         result = None
 
         # 1. Parse comment
         try:
-            result = self._process_operand(self.comment.parseString(line, parseAll=True).asDict())
+            result = self.process_operand(self.comment.parseString(line, parseAll=True).asDict())
             result = AttrDict.convert_dict(result)
             instruction_form[self.COMMENT_ID] = ' '.join(result[self.COMMENT_ID])
         except pp.ParseException:
@@ -124,7 +126,7 @@ class ParserX86ATT(BaseParser):
         # 2. Parse label
         if result is None:
             try:
-                result = self._process_operand(
+                result = self.process_operand(
                     self.label.parseString(line, parseAll=True).asDict()
                 )
                 result = AttrDict.convert_dict(result)
@@ -139,14 +141,16 @@ class ParserX86ATT(BaseParser):
         # 3. Parse directive
         if result is None:
             try:
-                result = self._process_operand(
+                result = self.process_operand(
                     self.directive.parseString(line, parseAll=True).asDict()
                 )
                 result = AttrDict.convert_dict(result)
-                instruction_form[self.DIRECTIVE_ID] = AttrDict({
-                    'name': result[self.DIRECTIVE_ID]['name'],
-                    'parameters': result[self.DIRECTIVE_ID]['parameters'],
-                })
+                instruction_form[self.DIRECTIVE_ID] = AttrDict(
+                    {
+                        'name': result[self.DIRECTIVE_ID]['name'],
+                        'parameters': result[self.DIRECTIVE_ID]['parameters'],
+                    }
+                )
                 if self.COMMENT_ID in result[self.DIRECTIVE_ID]:
                     instruction_form[self.COMMENT_ID] = ' '.join(
                         result[self.DIRECTIVE_ID][self.COMMENT_ID]
@@ -177,29 +181,31 @@ class ParserX86ATT(BaseParser):
         # Check from right to left
         # Check third operand
         if 'operand3' in result:
-            operands['destination'].append(self._process_operand(result['operand3']))
+            operands['destination'].append(self.process_operand(result['operand3']))
         # Check second operand
         if 'operand2' in result:
             if len(operands['destination']) != 0:
-                operands['source'].insert(0, self._process_operand(result['operand2']))
+                operands['source'].insert(0, self.process_operand(result['operand2']))
             else:
-                operands['destination'].append(self._process_operand(result['operand2']))
+                operands['destination'].append(self.process_operand(result['operand2']))
         # Check first operand
         if 'operand1' in result:
             if len(operands['destination']) != 0:
-                operands['source'].insert(0, self._process_operand(result['operand1']))
+                operands['source'].insert(0, self.process_operand(result['operand1']))
             else:
-                operands['destination'].append(self._process_operand(result['operand1']))
-        return_dict = AttrDict({
-            self.INSTRUCTION_ID: result['mnemonic'],
-            self.OPERANDS_ID: operands,
-            self.COMMENT_ID: ' '.join(result[self.COMMENT_ID])
-            if self.COMMENT_ID in result
-            else None,
-        })
+                operands['destination'].append(self.process_operand(result['operand1']))
+        return_dict = AttrDict(
+            {
+                self.INSTRUCTION_ID: result['mnemonic'],
+                self.OPERANDS_ID: operands,
+                self.COMMENT_ID: ' '.join(result[self.COMMENT_ID])
+                if self.COMMENT_ID in result
+                else None,
+            }
+        )
         return return_dict
 
-    def _process_operand(self, operand):
+    def process_operand(self, operand):
         # For the moment, only used to structure memory addresses
         if self.MEMORY_ID in operand:
             return self.substitute_memory_address(operand[self.MEMORY_ID])
@@ -242,3 +248,56 @@ class ParserX86ATT(BaseParser):
             return int(imd['value'], 10)
         # identifier
         return imd
+
+    def is_reg_dependend_of(self, reg_a, reg_b):
+        # Check if they are the same registers
+        if reg_a.name == reg_b.name:
+            return True
+        # Check vector registers first
+        if self.is_vector_register(reg_a):
+            if self.is_vector_register(reg_b):
+                if reg_a.name[1:] == reg_b.name[1:]:
+                    # Registers in the same vector space
+                    return True
+            return False
+        # Check basic GPRs
+        a_dep = ['RAX', 'EAX', 'AX', 'AH', 'AL']
+        b_dep = ['RBX', 'EBX', 'BX', 'BH', 'BL']
+        c_dep = ['RCX', 'ECX', 'CX', 'CH', 'CL']
+        d_dep = ['RDX', 'EDX', 'DX', 'DH', 'DL']
+        sp_dep = ['RSP', 'ESP', 'SP', 'SPL']
+        src_dep = ['RSI', 'ESI', 'SI', 'SIL']
+        dst_dep = ['RDI', 'EDI', 'DI', 'DIL']
+        basic_gprs = [a_dep, b_dep, c_dep, d_dep, sp_dep, src_dep, dst_dep]
+        if self.is_basic_gpr(reg_a):
+            if self.is_basic_gpr(reg_b):
+                for dep_group in basic_gprs:
+                    if reg_a['name'].upper() in dep_group:
+                        if reg_b['name'].upper() in dep_group:
+                            return True
+            return False
+        # Check other GPRs
+        gpr_parser = (
+            pp.CaselessLiteral('R')
+            + pp.Word(pp.nums).setResultsName('id')
+            + pp.Optional(pp.Word('dwbDWB', exact=1))
+        )
+        try:
+            id_a = gpr_parser.parseString(reg_a['name'], parseAll=True).asDict()['id']
+            id_b = gpr_parser.parseString(reg_b['name'], parseAll=True).asDict()['id']
+            if id_a == id_b:
+                return True
+        except pp.ParseException:
+            return False
+        # No dependencies
+        return False
+
+    def is_basic_gpr(self, register):
+        if any(char.isdigit() for char in register['name']):
+            return False
+        return True
+
+    def is_vector_register(self, register):
+        if len(register['name']) > 2 and register['name'][1:3] == 'mm':
+            return True
+        return False
