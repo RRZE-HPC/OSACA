@@ -75,6 +75,7 @@ class TestParserX86ATT(unittest.TestCase):
         instr4 = 'vmovss    %xmm4, -4(%rsp,%rax,8) #12.9'
         instr5 = 'mov %ebx,var(,1)'
         instr6 = 'lea (,%rax,8),%rbx'
+        instr7 = 'vinsertf128 $0x1, %xmm0, %ymm1, %ymm1'
 
         parsed_1 = self.parser.parse_instruction(instr1)
         parsed_2 = self.parser.parse_instruction(instr2)
@@ -82,6 +83,7 @@ class TestParserX86ATT(unittest.TestCase):
         parsed_4 = self.parser.parse_instruction(instr4)
         parsed_5 = self.parser.parse_instruction(instr5)
         parsed_6 = self.parser.parse_instruction(instr6)
+        parsed_7 = self.parser.parse_instruction(instr7)
 
         self.assertEqual(parsed_1.instruction, 'vcvtsi2ss')
         self.assertEqual(parsed_1.operands.destination[0].register.name, 'xmm2')
@@ -119,6 +121,11 @@ class TestParserX86ATT(unittest.TestCase):
         self.assertEqual(parsed_6.operands.source[0].memory.index.name, 'rax')
         self.assertEqual(parsed_6.operands.source[0].memory.scale, '8')
         self.assertEqual(parsed_6.operands.destination[0].register.name, 'rbx')
+
+        self.assertEqual(parsed_7.operands.source[0].immediate.value, '0x1')
+        self.assertEqual(parsed_7.operands.source[1].register.name, 'xmm0')
+        self.assertEqual(parsed_7.operands.source[2].register.name, 'ymm1')
+        self.assertEqual(parsed_7.operands.destination[0].register.name, 'ymm1')
 
     def test_parse_line(self):
         line_comment = '# -- Begin  main'

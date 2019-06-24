@@ -92,6 +92,8 @@ class ParserX86ATT(BaseParser):
             + pp.Optional(operand_rest.setResultsName('operand2'))
             + pp.Optional(pp.Suppress(pp.Literal(',')))
             + pp.Optional(operand_rest.setResultsName('operand3'))
+            + pp.Optional(pp.Suppress(pp.Literal(',')))
+            + pp.Optional(operand_rest.setResultsName('operand4'))
             + pp.Optional(self.comment)
         )
 
@@ -179,9 +181,15 @@ class ParserX86ATT(BaseParser):
         result = AttrDict.convert_dict(result)
         operands = AttrDict({'source': [], 'destination': []})
         # Check from right to left
+        # Check fourth operand
+        if 'operand4' in result:
+            operands['destination'].append(self.process_operand(result['operand4']))
         # Check third operand
         if 'operand3' in result:
-            operands['destination'].append(self.process_operand(result['operand3']))
+            if len(operands['destination']) != 0:
+                operands['source'].insert(0, self.process_operand(result['operand3']))
+            else:
+                operands['destination'].append(self.process_operand(result['operand3']))
         # Check second operand
         if 'operand2' in result:
             if len(operands['destination']) != 0:
