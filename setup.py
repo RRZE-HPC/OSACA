@@ -89,10 +89,11 @@ setup(
     # requirements files see:
     # https://packaging.python.org/en/latest/requirements.html
     install_requires=[
+        'kerncraft',
+        'networkx',
         'numpy',
         'pandas',
         'pyparsing',
-        'kerncraft',
     ],
     python_requires='>=3.5',
 
