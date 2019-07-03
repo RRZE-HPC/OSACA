@@ -107,10 +107,10 @@ class TestParserAArch64v81(unittest.TestCase):
         self.assertEqual(parsed_4.instruction, 'str')
         self.assertIsNone(parsed_4.operands.destination[0].memory.offset)
         self.assertEqual(parsed_4.operands.destination[0].memory.base.name, 'sp')
-        self.assertIsNone(parsed_4.operands.destination[0].memory.base.prefix)
+        self.assertEqual(parsed_4.operands.destination[0].memory.base.prefix, 'x')
         self.assertEqual(parsed_4.operands.destination[0].memory.index.name, '1')
         self.assertEqual(parsed_4.operands.destination[0].memory.index.prefix, 'x')
-        self.assertEqual(parsed_4.operands.destination[0].memory.scale, '16')
+        self.assertEqual(parsed_4.operands.destination[0].memory.scale, 16)
         self.assertEqual(parsed_4.operands.source[0].register.name, '28')
         self.assertEqual(parsed_4.operands.source[0].register.prefix, 'x')
         self.assertEqual(parsed_4.comment, '12.9')
@@ -125,7 +125,7 @@ class TestParserAArch64v81(unittest.TestCase):
         self.assertEqual(parsed_5.operands.source[0].memory.base.name, '0')
         self.assertEqual(parsed_5.operands.source[0].memory.base.prefix, 'x')
         self.assertIsNone(parsed_5.operands.source[0].memory.index)
-        self.assertEqual(parsed_5.operands.source[0].memory.scale, '1')
+        self.assertEqual(parsed_5.operands.source[0].memory.scale, 1)
 
         self.assertEqual(parsed_6.instruction, 'adrp')
         self.assertEqual(parsed_6.operands.destination[0].register.name, '0')
@@ -181,7 +181,7 @@ class TestParserAArch64v81(unittest.TestCase):
                                 'shift_op': 'sxtw',
                                 'shift': {'value': '2'},
                             },
-                            'scale': '4',
+                            'scale': 4,
                         }
                     }
                 ],
@@ -201,7 +201,7 @@ class TestParserAArch64v81(unittest.TestCase):
                             'offset': {'value': '2048'},
                             'base': {'prefix': 'x', 'name': '26'},
                             'index': None,
-                            'scale': '1',
+                            'scale': 1,
                         }
                     }
                 ],
@@ -225,9 +225,9 @@ class TestParserAArch64v81(unittest.TestCase):
                     {
                         'memory': {
                             'offset': {'value': '-16'},
-                            'base': {'name': 'sp', 'prefix': None},
+                            'base': {'name': 'sp', 'prefix': 'x'},
                             'index': None,
-                            'scale': '1',
+                            'scale': 1,
                             'pre_indexed': True,
                         }
                     }
@@ -247,7 +247,7 @@ class TestParserAArch64v81(unittest.TestCase):
                             'offset': None,
                             'base': {'prefix': 'x', 'name': '11'},
                             'index': None,
-                            'scale': '1',
+                            'scale': 1,
                             'post_indexed': {'value': '64'},
                         }
                     }

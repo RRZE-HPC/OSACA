@@ -228,7 +228,7 @@ class ParserX86ATT(BaseParser):
         offset = None if 'offset' not in memory_address else memory_address['offset']
         base = None if 'base' not in memory_address else memory_address['base']
         index = None if 'index' not in memory_address else memory_address['index']
-        scale = '1' if 'scale' not in memory_address else memory_address['scale']
+        scale = 1 if 'scale' not in memory_address else int(memory_address['scale'])
         new_dict = AttrDict({'offset': offset, 'base': base, 'index': index, 'scale': scale})
         return AttrDict({self.MEMORY_ID: new_dict})
 

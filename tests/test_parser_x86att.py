@@ -104,7 +104,7 @@ class TestParserX86ATT(unittest.TestCase):
         self.assertEqual(parsed_4.operands.destination[0].memory.offset.value, '-4')
         self.assertEqual(parsed_4.operands.destination[0].memory.base.name, 'rsp')
         self.assertEqual(parsed_4.operands.destination[0].memory.index.name, 'rax')
-        self.assertEqual(parsed_4.operands.destination[0].memory.scale, '8')
+        self.assertEqual(parsed_4.operands.destination[0].memory.scale, 8)
         self.assertEqual(parsed_4.operands.source[0].register.name, 'xmm4')
         self.assertEqual(parsed_4.comment, '12.9')
 
@@ -112,14 +112,14 @@ class TestParserX86ATT(unittest.TestCase):
         self.assertEqual(parsed_5.operands.destination[0].memory.offset.identifier.name, 'var')
         self.assertIsNone(parsed_5.operands.destination[0].memory.base)
         self.assertIsNone(parsed_5.operands.destination[0].memory.index)
-        self.assertEqual(parsed_5.operands.destination[0].memory.scale, '1')
+        self.assertEqual(parsed_5.operands.destination[0].memory.scale, 1)
         self.assertEqual(parsed_5.operands.source[0].register.name, 'ebx')
 
         self.assertEqual(parsed_6.instruction, 'lea')
         self.assertIsNone(parsed_6.operands.source[0].memory.offset)
         self.assertIsNone(parsed_6.operands.source[0].memory.base)
         self.assertEqual(parsed_6.operands.source[0].memory.index.name, 'rax')
-        self.assertEqual(parsed_6.operands.source[0].memory.scale, '8')
+        self.assertEqual(parsed_6.operands.source[0].memory.scale, 8)
         self.assertEqual(parsed_6.operands.destination[0].register.name, 'rbx')
 
         self.assertEqual(parsed_7.operands.source[0].immediate.value, '0x1')
@@ -166,7 +166,7 @@ class TestParserX86ATT(unittest.TestCase):
                             'offset': {'value': '2'},
                             'base': {'name': 'rax'},
                             'index': {'name': 'rax'},
-                            'scale': '1',
+                            'scale': 1,
                         }
                     }
                 ],
