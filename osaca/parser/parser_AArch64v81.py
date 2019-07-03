@@ -306,6 +306,8 @@ class ParserAArch64v81(BaseParser):
         ):
             # TODO: discuss if ranges should be converted to lists
             return self.substitute_register_list(operand[self.REGISTER_ID])
+        if self.REGISTER_ID in operand and operand[self.REGISTER_ID]['name'] == 'sp':
+            return self.substitute_sp_register(operand[self.REGISTER_ID])
         # add value attribute to floating point immediates without exponent
         if self.IMMEDIATE_ID in operand:
             return self.substitute_immediate(operand[self.IMMEDIATE_ID])
@@ -318,18 +320,27 @@ class ParserAArch64v81(BaseParser):
         offset = None if 'offset' not in memory_address else memory_address['offset']
         base = None if 'base' not in memory_address else memory_address['base']
         index = None if 'index' not in memory_address else memory_address['index']
-        scale = '1'
+        scale = 1
+        if base is not None and 'name' in base and base['name'] == 'sp':
+            base['prefix'] = 'x'
+        if index is not None and 'name' in index and index['name'] == 'sp':
+            index['prefix'] = 'x'
         valid_shift_ops = ['lsl', 'uxtw', 'sxtw']
         if 'index' in memory_address:
             if 'shift' in memory_address['index']:
                 if memory_address['index']['shift_op'].lower() in valid_shift_ops:
-                    scale = str(2 ** int(memory_address['index']['shift']['value']))
+                    scale = 2 ** int(memory_address['index']['shift']['value'])
         new_dict = AttrDict({'offset': offset, 'base': base, 'index': index, 'scale': scale})
         if 'pre_indexed' in memory_address:
             new_dict['pre_indexed'] = True
         if 'post_indexed' in memory_address:
             new_dict['post_indexed'] = memory_address['post_indexed']
         return AttrDict({self.MEMORY_ID: new_dict})
+
+    def substitute_sp_register(self, register):
+        reg = register
+        reg['prefix'] = 'x'
+        return AttrDict({self.REGISTER_ID: reg})
 
     def substitute_register_list(self, register_list):
         # Remove unnecessarily created dictionary entries during parsing
