@@ -1,0 +1,194 @@
+osaca_version: 0.3.0
+micro_architecture: "Cascade Lake SP"
+isa: "x86"
+port_model_scheme: |
+    ┌------------------------------------------------------------------------┐
+    |                         97 entry unified scheduler                     |
+    └------------------------------------------------------------------------┘
+       0 |       1 |      2 |     3 |     4 |      5 |        6 |       7 |
+         ▼         ▼        ▼       ▼       ▼        ▼          ▼         ▼
+     ┌-------┐ ┌-------┐ ┌-----┐ ┌-----┐ ┌-----┐ ┌-------┐ ┌--------┐  ┌-----┐
+     |  ALU  | |  ALU  | |  LD | |  LD | |  ST | |  ALU  | |  ALU & |  | AGU |
+     └-------┘ └-------┘ └-----┘ └-----┘ └-----┘ └-------┘ |  Shift |  └-----┘
+     ┌-------┐ ┌-------┐ ┌-----┐ ┌-----┐         ┌-------┐ └--------┘
+     |  2ND  | |  Fast | | AGU | | AGU |         |  Fast |
+     | BRANCH| |  LEA  | └-----┘ └-----┘         |  LEA  |
+     └-------┘ └-------┘                         └-------┘
+     ┌-------┐ ┌-------┐                         ┌-------┐
+     |AVX DIV| |AVX FMA|                         |  AVX  |
+     └-------┘ └-------┘                         |  SHUF |
+     ┌-------┐ ┌-------┐                         └-------┘
+     |AVX FMA| |AVX MUL|                         ┌-------┐
+     └-------┘ └-------┘                         |AVX-512|
+     ┌-------┐ ┌-------┐                         |  FMA  |
+     |AVX MUL| |AVX ADD|                         └-------┘
+     └-------┘ └-------┘                         ┌-------┐
+     ┌-------┐ ┌-------┐                         |AVX-512|
+     |AVX ADD| |AVX ALU|                         |  ADD  |
+     └-------┘ └-------┘                         └-------┘
+     ┌-------┐ ┌-------┐                         ┌-------┐
+     |AVX ALU| |  AVX  |                         |AVX-512|
+     └-------┘ | Shift |                         |  MUL  |
+     ┌-------┐ └-------┘                         └-------┘
+     |  AVX  | ┌-------┐                         ┌-------┐
+     | Shift | |  Slow |                         |AVX-512|
+     └-------┘ |  LEA  |                         |  ALU  |
+     ┌-------┐ └-------┘                         └-------┘
+     |  VNNI | ┌-------┐
+     └-------┘ |  VNNI |
+               └-------┘
+ports: ["0", "0DV", "1", "2", "3", "4", "5", "6", "7"]
+instruction_forms:
+    - name: addsd
+      operands:
+        - class: "register"
+          name: "xmm"
+        - class: "register"
+          name: "xmm"
+      throughput: 0.5
+      latency: 4.0    #  0   0DV   1    2    3    4    5    6    7
+      port_occupation: [0.5, 0.0, 0.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+    - name: addss
+      operands:
+        - class: "register"
+          name: "xmm"
+        - class: "register"
+          name: "xmm"
+      throughput: 0.5
+      latency: 4.0    #  0   0DV   1    2    3    4    5    6    7
+      port_occupation: [0.5, 0.0, 0.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+    - name: mulsd
+      operands:
+        - class: "register"
+          name: "xmm"
+        - class: "register"
+          name: "xmm"
+      throughput: 0.5
+      latency: 4.0    #  0   0DV   1    2    3    4    5    6    7
+      port_occupation: [0.5, 0.0, 0.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+    - name: mulss
+      operands:
+        - class: "register"
+          name: "xmm"
+        - class: "register"
+          name: "xmm"
+      throughput: 0.5
+      latency: 4.0    #  0   0DV   1    2    3    4    5    6    7
+      port_occupation: [0.5, 0.0, 0.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+    - name: rcpss
+      operands:
+        - class: "register"
+          name: "xmm"
+        - class: "register"
+          name: "xmm"
+      throughput: 1.0
+      latency: 4.0    #  0   0DV   1    2    3    4    5    6    7
+      port_occupation: [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+    - name: sqrtsd
+      operands:
+        - class: "register"
+          name: "xmm"
+        - class: "register"
+          name: "xmm"
+      throughput: 6.0
+      latency: 22.0   #  0   0DV   1    2    3    4    5    6    7
+      port_occupation: [1.0, 6.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+    - name: sqrtss
+      operands:
+        - class: "register"
+          name: "xmm"
+        - class: "register"
+          name: "xmm"
+      throughput: 3.0
+      latency: 16.0   #  0   0DV   1    2    3    4    5    6    7
+      port_occupation: [1.0, 3.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+    - name: vaddsd
+      operands:
+        - class: "register"
+          name: "xmm"
+        - class: "register"
+          name: "xmm"
+        - class: "register"
+          name: "xmm"
+      throughput: 0.5
+      latency: 4.0    #  0   0DV   1    2    3    4    5    6    7
+      port_occupation: [0.5, 0.0, 0.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+    - name: vaddss
+      operands:
+        - class: "register"
+          name: "xmm"
+        - class: "register"
+          name: "xmm"
+        - class: "register"
+          name: "xmm"
+      throughput: 0.5
+      latency: 4.0    #  0   0DV   1    2    3    4    5    6    7
+      port_occupation: [0.5, 0.0, 0.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+    - name: vdivsd
+      operands:
+        - class: "register"
+          name: "xmm"
+        - class: "register"
+          name: "xmm"
+        - class: "register"
+          name: "xmm"
+      throughput: 4.0
+      latency: 14.0   #  0   0DV   1    2    3    4    5    6    7
+      port_occupation: [1.0, 4.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+    - name: vdivss
+      operands:
+        - class: "register"
+          name: "xmm"
+        - class: "register"
+          name: "xmm"
+        - class: "register"
+          name: "xmm"
+      throughput: 3.0
+      latency: 11.0   #  0   0DV   1    2    3    4    5    6    7
+      port_occupation: [1.0, 3.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+    - name: vmulsd
+      operands:
+        - class: "register"
+          name: "xmm"
+        - class: "register"
+          name: "xmm"
+        - class: "register"
+          name: "xmm"
+      throughput: 0.5
+      latency: 4.0    #  0   0DV   1    2    3    4    5    6    7
+      port_occupation: [0.5, 0.0, 0.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+    - name: vmulss
+      operands:
+        - class: "register"
+          name: "xmm"
+        - class: "register"
+          name: "xmm"
+        - class: "register"
+          name: "xmm"
+      throughput: 0.5
+      latency: 4.0    #  0   0DV   1    2    3    4    5    6    7
+      port_occupation: [0.5, 0.0, 0.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+    - name: vmovapd
+      operands:
+        - class: "memory"
+          base: "gpr"
+          offset: ~
+          index: "gpr"
+          scale: 1
+        - class: "register"
+          name: "xmm"
+      throughput: 0.5
+      latency: ~      #  0   0DV   1    2    3    4    5    6    7
+      port_occupation: [0.0, 0.0, 0.0, 0.5, 0.5, 0.0, 0.0, 0.0, 0.0]
+    - name: vmovapd
+      operands:
+        - class: "register"
+          name: "xmm"
+        - class: "memory"
+          base: "gpr"
+          offset: ~
+          index: "gpr"
+          scale: 1
+      throughput: 1.0
+      latency: ~      #  0   0DV   1    2    3    4    5    6    7
+      port_occupation: [0.0, 0.0, 0.0, 0.5, 0.5, 1.0, 0.0, 0.0, 0.0]
