@@ -87,51 +87,49 @@ class TestParserAArch64v81(unittest.TestCase):
         parsed_6 = self.parser.parse_instruction(instr6)
 
         self.assertEqual(parsed_1.instruction, 'vcvt.F32.S32')
-        self.assertEqual(parsed_1.operands.destination[0].register.name, '1')
-        self.assertEqual(parsed_1.operands.destination[0].register.prefix, 'w')
-        self.assertEqual(parsed_1.operands.source[0].register.name, '2')
-        self.assertEqual(parsed_1.operands.source[0].register.prefix, 'w')
+        self.assertEqual(parsed_1.operands[0].register.name, '1')
+        self.assertEqual(parsed_1.operands[0].register.prefix, 'w')
+        self.assertEqual(parsed_1.operands[1].register.name, '2')
+        self.assertEqual(parsed_1.operands[1].register.prefix, 'w')
         self.assertEqual(parsed_1.comment, '12.27')
 
         self.assertEqual(parsed_2.instruction, 'b.lo')
-        self.assertEqual(parsed_2.operands.destination[0].identifier.name, '..B1.4')
-        self.assertEqual(len(parsed_2.operands.source), 0)
+        self.assertEqual(parsed_2.operands[0].identifier.name, '..B1.4')
+        self.assertEqual(len(parsed_2.operands), 1)
         self.assertIsNone(parsed_2.comment)
 
         self.assertEqual(parsed_3.instruction, 'mov')
-        self.assertEqual(parsed_3.operands.destination[0].register.name, '2')
-        self.assertEqual(parsed_3.operands.destination[0].register.prefix, 'x')
-        self.assertEqual(parsed_3.operands.source[0].immediate.value, '0x222')
+        self.assertEqual(parsed_3.operands[0].register.name, '2')
+        self.assertEqual(parsed_3.operands[0].register.prefix, 'x')
+        self.assertEqual(parsed_3.operands[1].immediate.value, '0x222')
         self.assertEqual(parsed_3.comment, 'NOT IACA END')
 
         self.assertEqual(parsed_4.instruction, 'str')
-        self.assertIsNone(parsed_4.operands.destination[0].memory.offset)
-        self.assertEqual(parsed_4.operands.destination[0].memory.base.name, 'sp')
-        self.assertEqual(parsed_4.operands.destination[0].memory.base.prefix, 'x')
-        self.assertEqual(parsed_4.operands.destination[0].memory.index.name, '1')
-        self.assertEqual(parsed_4.operands.destination[0].memory.index.prefix, 'x')
-        self.assertEqual(parsed_4.operands.destination[0].memory.scale, 16)
-        self.assertEqual(parsed_4.operands.source[0].register.name, '28')
-        self.assertEqual(parsed_4.operands.source[0].register.prefix, 'x')
+        self.assertIsNone(parsed_4.operands[1].memory.offset)
+        self.assertEqual(parsed_4.operands[1].memory.base.name, 'sp')
+        self.assertEqual(parsed_4.operands[1].memory.base.prefix, 'x')
+        self.assertEqual(parsed_4.operands[1].memory.index.name, '1')
+        self.assertEqual(parsed_4.operands[1].memory.index.prefix, 'x')
+        self.assertEqual(parsed_4.operands[1].memory.scale, 16)
+        self.assertEqual(parsed_4.operands[0].register.name, '28')
+        self.assertEqual(parsed_4.operands[0].register.prefix, 'x')
         self.assertEqual(parsed_4.comment, '12.9')
 
         self.assertEqual(parsed_5.instruction, 'ldr')
-        self.assertEqual(parsed_5.operands.destination[0].register.name, '0')
-        self.assertEqual(parsed_5.operands.destination[0].register.prefix, 'x')
-        self.assertEqual(parsed_5.operands.source[0].memory.offset.identifier.name, 'q2c')
-        self.assertEqual(
-            parsed_5.operands.source[0].memory.offset.identifier.relocation, ':got_lo12:'
-        )
-        self.assertEqual(parsed_5.operands.source[0].memory.base.name, '0')
-        self.assertEqual(parsed_5.operands.source[0].memory.base.prefix, 'x')
-        self.assertIsNone(parsed_5.operands.source[0].memory.index)
-        self.assertEqual(parsed_5.operands.source[0].memory.scale, 1)
+        self.assertEqual(parsed_5.operands[0].register.name, '0')
+        self.assertEqual(parsed_5.operands[0].register.prefix, 'x')
+        self.assertEqual(parsed_5.operands[1].memory.offset.identifier.name, 'q2c')
+        self.assertEqual(parsed_5.operands[1].memory.offset.identifier.relocation, ':got_lo12:')
+        self.assertEqual(parsed_5.operands[1].memory.base.name, '0')
+        self.assertEqual(parsed_5.operands[1].memory.base.prefix, 'x')
+        self.assertIsNone(parsed_5.operands[1].memory.index)
+        self.assertEqual(parsed_5.operands[1].memory.scale, 1)
 
         self.assertEqual(parsed_6.instruction, 'adrp')
-        self.assertEqual(parsed_6.operands.destination[0].register.name, '0')
-        self.assertEqual(parsed_6.operands.destination[0].register.prefix, 'x')
-        self.assertEqual(parsed_6.operands.source[0].identifier.relocation, ':got:')
-        self.assertEqual(parsed_6.operands.source[0].identifier.name, 'visited')
+        self.assertEqual(parsed_6.operands[0].register.name, '0')
+        self.assertEqual(parsed_6.operands[0].register.prefix, 'x')
+        self.assertEqual(parsed_6.operands[1].identifier.relocation, ':got:')
+        self.assertEqual(parsed_6.operands[1].identifier.name, 'visited')
 
     def test_parse_line(self):
         line_comment = '// -- Begin  main'
@@ -169,24 +167,22 @@ class TestParserAArch64v81(unittest.TestCase):
         }
         instruction_form_4 = {
             'instruction': 'ldr',
-            'operands': {
-                'source': [
-                    {
-                        'memory': {
-                            'offset': None,
-                            'base': {'prefix': 'x', 'name': '11'},
-                            'index': {
-                                'prefix': 'w',
-                                'name': '10',
-                                'shift_op': 'sxtw',
-                                'shift': {'value': '2'},
-                            },
-                            'scale': 4,
-                        }
+            'operands': [
+                {'register': {'prefix': 's', 'name': '0'}},
+                {
+                    'memory': {
+                        'offset': None,
+                        'base': {'prefix': 'x', 'name': '11'},
+                        'index': {
+                            'prefix': 'w',
+                            'name': '10',
+                            'shift_op': 'sxtw',
+                            'shift': {'value': '2'},
+                        },
+                        'scale': 4,
                     }
-                ],
-                'destination': [{'register': {'prefix': 's', 'name': '0'}}],
-            },
+                },
+            ],
             'directive': None,
             'comment': '= <<2',
             'label': None,
@@ -194,21 +190,17 @@ class TestParserAArch64v81(unittest.TestCase):
         }
         instruction_form_5 = {
             'instruction': 'prfm',
-            'operands': {
-                'source': [
-                    {
-                        'memory': {
-                            'offset': {'value': '2048'},
-                            'base': {'prefix': 'x', 'name': '26'},
-                            'index': None,
-                            'scale': 1,
-                        }
+            'operands': [
+                {'prfop': {'type': ['PLD'], 'target': ['L1'], 'policy': ['KEEP']}},
+                {
+                    'memory': {
+                        'offset': {'value': '2048'},
+                        'base': {'prefix': 'x', 'name': '26'},
+                        'index': None,
+                        'scale': 1,
                     }
-                ],
-                'destination': [
-                    {'prfop': {'type': ['PLD'], 'target': ['L1'], 'policy': ['KEEP']}}
-                ],
-            },
+                },
+            ],
             'directive': None,
             'comment': 'HPL',
             'label': None,
@@ -216,23 +208,19 @@ class TestParserAArch64v81(unittest.TestCase):
         }
         instruction_form_6 = {
             'instruction': 'stp',
-            'operands': {
-                'source': [
-                    {'register': {'prefix': 'x', 'name': '29'}},
-                    {'register': {'prefix': 'x', 'name': '30'}},
-                ],
-                'destination': [
-                    {
-                        'memory': {
-                            'offset': {'value': '-16'},
-                            'base': {'name': 'sp', 'prefix': 'x'},
-                            'index': None,
-                            'scale': 1,
-                            'pre_indexed': True,
-                        }
+            'operands': [
+                {'register': {'prefix': 'x', 'name': '29'}},
+                {'register': {'prefix': 'x', 'name': '30'}},
+                {
+                    'memory': {
+                        'offset': {'value': '-16'},
+                        'base': {'name': 'sp', 'prefix': 'x'},
+                        'index': None,
+                        'scale': 1,
+                        'pre_indexed': True,
                     }
-                ],
-            },
+                },
+            ],
             'directive': None,
             'comment': None,
             'label': None,
@@ -240,23 +228,19 @@ class TestParserAArch64v81(unittest.TestCase):
         }
         instruction_form_7 = {
             'instruction': 'ldp',
-            'operands': {
-                'source': [
-                    {
-                        'memory': {
-                            'offset': None,
-                            'base': {'prefix': 'x', 'name': '11'},
-                            'index': None,
-                            'scale': 1,
-                            'post_indexed': {'value': '64'},
-                        }
+            'operands': [
+                {'register': {'prefix': 'q', 'name': '2'}},
+                {'register': {'prefix': 'q', 'name': '3'}},
+                {
+                    'memory': {
+                        'offset': None,
+                        'base': {'prefix': 'x', 'name': '11'},
+                        'index': None,
+                        'scale': 1,
+                        'post_indexed': {'value': '64'},
                     }
-                ],
-                'destination': [
-                    {'register': {'prefix': 'q', 'name': '2'}},
-                    {'register': {'prefix': 'q', 'name': '3'}},
-                ],
-            },
+                },
+            ],
             'directive': None,
             'comment': None,
             'label': None,

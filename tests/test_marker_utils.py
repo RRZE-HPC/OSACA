@@ -5,7 +5,7 @@ Unit tests for IACA/OSACA marker utilities
 import os
 import unittest
 
-from osaca.marker_utils import reduce_to_section
+from osaca.semantics import reduce_to_section
 from osaca.parser import ParserAArch64v81, ParserX86ATT
 
 

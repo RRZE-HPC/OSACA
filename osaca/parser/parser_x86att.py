@@ -179,29 +179,20 @@ class ParserX86ATT(BaseParser):
     def parse_instruction(self, instruction):
         result = self.instruction_parser.parseString(instruction, parseAll=True).asDict()
         result = AttrDict.convert_dict(result)
-        operands = AttrDict({'source': [], 'destination': []})
-        # Check from right to left
-        # Check fourth operand
-        if 'operand4' in result:
-            operands['destination'].append(self.process_operand(result['operand4']))
-        # Check third operand
-        if 'operand3' in result:
-            if len(operands['destination']) != 0:
-                operands['source'].insert(0, self.process_operand(result['operand3']))
-            else:
-                operands['destination'].append(self.process_operand(result['operand3']))
-        # Check second operand
-        if 'operand2' in result:
-            if len(operands['destination']) != 0:
-                operands['source'].insert(0, self.process_operand(result['operand2']))
-            else:
-                operands['destination'].append(self.process_operand(result['operand2']))
+        operands = []
+        # Add operands to list
         # Check first operand
         if 'operand1' in result:
-            if len(operands['destination']) != 0:
-                operands['source'].insert(0, self.process_operand(result['operand1']))
-            else:
-                operands['destination'].append(self.process_operand(result['operand1']))
+            operands.append(self.process_operand(result['operand1']))
+        # Check second operand
+        if 'operand2' in result:
+            operands.append(self.process_operand(result['operand2']))
+        # Check third operand
+        if 'operand3' in result:
+            operands.append(self.process_operand(result['operand3']))
+        # Check fourth operand
+        if 'operand4' in result:
+            operands.append(self.process_operand(result['operand4']))
         return_dict = AttrDict(
             {
                 self.INSTRUCTION_ID: result['mnemonic'],

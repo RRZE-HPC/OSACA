@@ -247,43 +247,20 @@ class ParserAArch64v81(BaseParser):
     def parse_instruction(self, instruction):
         result = self.instruction_parser.parseString(instruction, parseAll=True).asDict()
         result = AttrDict.convert_dict(result)
-        operands = AttrDict({'source': [], 'destination': []})
-        # ARM specific load store flags
-        is_store = False
-        is_load = False
-        if result.mnemonic.lower().startswith('st'):
-            # Store instruction --> swap source and destination
-            is_store = True
-        if result.mnemonic.lower().startswith('ld'):
-            # Load instruction --> keep in mind for possible multiple loads
-            is_load = True
-
-        # Check from left to right
+        operands = []
+        # Add operands to list
         # Check first operand
         if 'operand1' in result:
-            if is_store:
-                operands.source.append(self.process_operand(result['operand1']))
-            else:
-                operands.destination.append(self.process_operand(result['operand1']))
+            operands.append(self.process_operand(result['operand1']))
         # Check second operand
         if 'operand2' in result:
-            if is_store and 'operand3' not in result or is_load and 'operand3' in result:
-                # destination
-                operands.destination.append(self.process_operand(result['operand2']))
-            else:
-                operands.source.append(self.process_operand(result['operand2']))
+            operands.append(self.process_operand(result['operand2']))
         # Check third operand
         if 'operand3' in result:
-            if is_store and 'operand4' not in result or is_load and 'operand4' in result:
-                operands.destination.append(self.process_operand(result['operand3']))
-            else:
-                operands.source.append(self.process_operand(result['operand3']))
+            operands.append(self.process_operand(result['operand3']))
         # Check fourth operand
         if 'operand4' in result:
-            if is_store:
-                operands.destination.append(self.process_operand(result['operand4']))
-            else:
-                operands.source.append(self.process_operand(result['operand4']))
+            operands.append(self.process_operand(result['operand4']))
 
         return_dict = AttrDict(
             {
