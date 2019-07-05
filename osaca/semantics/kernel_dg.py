@@ -3,18 +3,18 @@
 import networkx as nx
 
 
-class KernelDAG(nx.DiGraph):
+class KernelDG(nx.DiGraph):
     def __init__(self, parsed_kernel, parser, hw_model):
         self.kernel = parsed_kernel
         self.parser = parser
         self.model = hw_model
 
-        # self.dag = self.create_DAG()
+        # self.dag = self.create_DG()
 
     def check_for_loop(self, kernel):
         raise NotImplementedError
 
-    def create_DAG(self):
+    def create_DG(self):
         # 1. go through kernel instruction forms (as vertices)
         # 2. find edges (to dependend further instruction)
         # 3. get LT/TP value and set as edge weight

@@ -86,46 +86,46 @@ class TestParserX86ATT(unittest.TestCase):
         parsed_7 = self.parser.parse_instruction(instr7)
 
         self.assertEqual(parsed_1.instruction, 'vcvtsi2ss')
-        self.assertEqual(parsed_1.operands.destination[0].register.name, 'xmm2')
-        self.assertEqual(parsed_1.operands.source[0].register.name, 'edx')
+        self.assertEqual(parsed_1.operands[0].register.name, 'edx')
+        self.assertEqual(parsed_1.operands[1].register.name, 'xmm2')
         self.assertEqual(parsed_1.comment, '12.27')
 
         self.assertEqual(parsed_2.instruction, 'jb')
-        self.assertEqual(parsed_2.operands.destination[0].identifier.name, '..B1.4')
-        self.assertEqual(len(parsed_2.operands.source), 0)
+        self.assertEqual(parsed_2.operands[0].identifier.name, '..B1.4')
+        self.assertEqual(len(parsed_2.operands), 1)
         self.assertIsNone(parsed_2.comment)
 
         self.assertEqual(parsed_3.instruction, 'movl')
-        self.assertEqual(parsed_3.operands.destination[0].register.name, 'ebx')
-        self.assertEqual(parsed_3.operands.source[0].immediate.value, '222')
+        self.assertEqual(parsed_3.operands[0].immediate.value, '222')
+        self.assertEqual(parsed_3.operands[1].register.name, 'ebx')
         self.assertEqual(parsed_3.comment, 'IACA END')
 
         self.assertEqual(parsed_4.instruction, 'vmovss')
-        self.assertEqual(parsed_4.operands.destination[0].memory.offset.value, '-4')
-        self.assertEqual(parsed_4.operands.destination[0].memory.base.name, 'rsp')
-        self.assertEqual(parsed_4.operands.destination[0].memory.index.name, 'rax')
-        self.assertEqual(parsed_4.operands.destination[0].memory.scale, 8)
-        self.assertEqual(parsed_4.operands.source[0].register.name, 'xmm4')
+        self.assertEqual(parsed_4.operands[1].memory.offset.value, '-4')
+        self.assertEqual(parsed_4.operands[1].memory.base.name, 'rsp')
+        self.assertEqual(parsed_4.operands[1].memory.index.name, 'rax')
+        self.assertEqual(parsed_4.operands[1].memory.scale, 8)
+        self.assertEqual(parsed_4.operands[0].register.name, 'xmm4')
         self.assertEqual(parsed_4.comment, '12.9')
 
         self.assertEqual(parsed_5.instruction, 'mov')
-        self.assertEqual(parsed_5.operands.destination[0].memory.offset.identifier.name, 'var')
-        self.assertIsNone(parsed_5.operands.destination[0].memory.base)
-        self.assertIsNone(parsed_5.operands.destination[0].memory.index)
-        self.assertEqual(parsed_5.operands.destination[0].memory.scale, 1)
-        self.assertEqual(parsed_5.operands.source[0].register.name, 'ebx')
+        self.assertEqual(parsed_5.operands[1].memory.offset.identifier.name, 'var')
+        self.assertIsNone(parsed_5.operands[1].memory.base)
+        self.assertIsNone(parsed_5.operands[1].memory.index)
+        self.assertEqual(parsed_5.operands[1].memory.scale, 1)
+        self.assertEqual(parsed_5.operands[0].register.name, 'ebx')
 
         self.assertEqual(parsed_6.instruction, 'lea')
-        self.assertIsNone(parsed_6.operands.source[0].memory.offset)
-        self.assertIsNone(parsed_6.operands.source[0].memory.base)
-        self.assertEqual(parsed_6.operands.source[0].memory.index.name, 'rax')
-        self.assertEqual(parsed_6.operands.source[0].memory.scale, 8)
-        self.assertEqual(parsed_6.operands.destination[0].register.name, 'rbx')
+        self.assertIsNone(parsed_6.operands[0].memory.offset)
+        self.assertIsNone(parsed_6.operands[0].memory.base)
+        self.assertEqual(parsed_6.operands[0].memory.index.name, 'rax')
+        self.assertEqual(parsed_6.operands[0].memory.scale, 8)
+        self.assertEqual(parsed_6.operands[1].register.name, 'rbx')
 
-        self.assertEqual(parsed_7.operands.source[0].immediate.value, '0x1')
-        self.assertEqual(parsed_7.operands.source[1].register.name, 'xmm0')
-        self.assertEqual(parsed_7.operands.source[2].register.name, 'ymm1')
-        self.assertEqual(parsed_7.operands.destination[0].register.name, 'ymm1')
+        self.assertEqual(parsed_7.operands[0].immediate.value, '0x1')
+        self.assertEqual(parsed_7.operands[1].register.name, 'xmm0')
+        self.assertEqual(parsed_7.operands[2].register.name, 'ymm1')
+        self.assertEqual(parsed_7.operands[3].register.name, 'ymm1')
 
     def test_parse_line(self):
         line_comment = '# -- Begin  main'
@@ -159,19 +159,19 @@ class TestParserX86ATT(unittest.TestCase):
         }
         instruction_form_4 = {
             'instruction': 'lea',
-            'operands': {
-                'source': [
-                    {
-                        'memory': {
-                            'offset': {'value': '2'},
-                            'base': {'name': 'rax'},
-                            'index': {'name': 'rax'},
-                            'scale': 1,
-                        }
+            'operands': [
+                {
+                    'memory': {
+                        'offset': {'value': '2'},
+                        'base': {'name': 'rax'},
+                        'index': {'name': 'rax'},
+                        'scale': 1,
                     }
-                ],
-                'destination': [{'register': {'name': 'ecx'}}],
-            },
+                },
+                {
+                    'register': {'name': 'ecx'}
+                }
+            ],
             'directive': None,
             'comment': '12.9',
             'label': None,
