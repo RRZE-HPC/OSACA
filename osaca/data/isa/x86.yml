@@ -1,0 +1,57 @@
+osaca_version: 0.3.0
+isa: "x86 AT&T"
+# Contains all operand-irregular instruction forms OSACA supports for x86.
+# Operand-regular for a x86 AT&T instruction form with N operands in the shape of
+#   mnemonic op1 ... opN
+# means that opN is the only destination operand and op1 to op(N-1) are source operands.
+instruction_forms:
+    - name: addsd
+      operands:
+        - class: "register"
+          name: "xmm"
+          source: true
+          destination: true
+        - class: "register"
+          name: "xmm"
+          source: true
+          destination: false
+    - name: addss
+      operands:
+        - class: "register"
+          name: "xmm"
+          source: true
+          destination: true
+        - class: "register"
+          name: "xmm"
+          source: true
+          destination: false
+    - name: mulsd
+      operands:
+        - class: "register"
+          name: "xmm"
+          source: true
+          destination: true
+        - class: "register"
+          name: "xmm"
+          source: true
+          destination: false
+    - name: mulss
+      operands:
+        - class: "register"
+          name: "xmm"
+          source: true
+          destination: true
+        - class: "register"
+          name: "xmm"
+          source: true
+          destination: false
+    - name: vaddsd
+      operands:
+        - class: "register"
+         name: "xmm"
+         source: true
+         destination: true
+       - class: "register"
+         name: "xmm"
+         source: true
+         destination: false

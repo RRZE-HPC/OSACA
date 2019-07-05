@@ -1,0 +1,252 @@
+osaca_version: 0.3.0
+micro_architecture: "Vulcan"
+isa: "AArch64"
+port_model_scheme: |
+    ┌---------------------------------------------------------------┐
+    |                  60 entry unified scheduler                   |
+    └---------------------------------------------------------------┘
+      0 |       1 |       2 |        3 |        4 |         5 |
+        ▼         ▼         ▼          ▼          ▼           ▼
+     ┌------┐  ┌------┐  ┌------┐  ┌-------┐  ┌-------┐  ┌---------┐
+     | ALU  |  | ALU  |  | ALU/ |  | LD/ST |  | LD/ST |  | ST Data |
+     └------┘  └------┘  |  BR  |  └-------┘  └-------┘  └---------┘
+     ┌------┐  ┌------┐  └------┘
+     |  FP/ |  |  FP/ |
+     | NEON |  | NEON |
+     └------┘  └------┘
+               ┌------┐
+               | INT  |
+               | MUL/ |
+               |  DIV |
+               └------┘
+               ┌------┐
+               |CRYPTO|
+               └------┘
+ports: ["0", "0DV", "1", "1DV", "2", "3", "4", "5"]
+instruction_forms:
+    - name: "add"
+      operands:
+        - class: "register"
+          prefix: "x"
+        - class: "register"
+          prefix: "x"
+        - class: "register"
+          prefix: "x"
+      throughput: 0.33333333
+      latency: 1.0    #  0          0DV   1          1DV   2           3    4    5
+      port_occupation: [0.33333333, 0.0, 0.33333333, 0.0, 0.33333333, 0.0, 0.0, 0.0]
+    - name: "add"
+      operands:
+        - class: "register"
+          prefix: "x"
+        - class: "register"
+          prefix: "x"
+        - class: "immediate"
+          imd: "int"
+      throughput: 0.33333333
+      latency: 1.0    #  0          0DV   1          1DV   2           3    4    5
+      port_occupation: [0.33333333, 0.0, 0.33333333, 0.0, 0.33333333, 0.0, 0.0, 0.0]
+    - name: "fadd"
+      operands:
+        - class: "register"
+          prefix: "v"
+          shape: "s"
+        - class: "register"
+          prefix: "v"
+          shape: "s"
+        - class: "register"
+          prefix: "v"
+          shape: "s"
+      throughput: 0.5
+      latency: 6.0    #  0   0DV   1   1DV   2    3    4    5
+      port_occupation: [0.5, 0.0, 0.5, 0.0, 0.0, 0.0, 0.0, 0.0]
+    - name: "fadd"
+      operands:
+        - class: "register"
+          prefix: "v"
+          shape: "d"
+        - class: "register"
+          prefix: "v"
+          shape: "d"
+        - class: "register"
+          prefix: "v"
+          shape: "d"
+      throughput: 0.5
+      latency: 6.0    #  0   0DV   1   1DV   2    3    4    5
+      port_occupation: [0.5, 0.0, 0.5, 0.0, 0.0, 0.0, 0.0, 0.0]
+    - name: "fdiv"
+      operands:
+        - class: "register"
+          prefix: "v"
+          shape: "s"
+        - class: "register"
+          prefix: "v"
+          shape: "s"
+        - class: "register"
+          prefix: "v"
+          shape: "s"
+      throughput: 8.5
+      latency: 16.0   #  0   0DV   1   1DV   2    3    4    5
+      port_occupation: [1.0, 8.5, 1.0, 8.5, 0.0, 0.0, 0.0, 0.0]
+    - name: "fdiv"
+      operands:
+        - class: "register"
+          prefix: "v"
+          shape: "d"
+        - class: "register"
+          prefix: "v"
+          shape: "d"
+        - class: "register"
+          prefix: "v"
+          shape: "d"
+      throughput: 12.0
+      latency: 23.0   #  0   0DV    1   1DV   2    3    4    5
+      port_occupation: [1.0, 12.5, 1.0, 12.0, 0.0, 0.0, 0.0, 0.0]
+    - name: "fmla"
+      operands:
+        - class: "register"
+          prefix: "v"
+          shape: "s"
+        - class: "register"
+          prefix: "v"
+          shape: "s"
+        - class: "register"
+          prefix: "v"
+          shape: "s"
+      throughput: 0.5
+      latency: 6.0    #  0   0DV   1   1DV   2    3    4    5
+      port_occupation: [0.5, 0.0, 0.5, 0.0, 0.0, 0.0, 0.0, 0.0]
+    - name: "fmla"
+      operands:
+        - class: "register"
+          prefix: "v"
+          shape: "d"
+        - class: "register"
+          prefix: "v"
+          shape: "d"
+        - class: "register"
+          prefix: "v"
+          shape: "d"
+      throughput: 0.5
+      latency: 6.0    #  0   0DV    1   1DV   2    3    4    5
+      port_occupation: [0.5, 0.0, 0.5, 0.0, 0.0, 0.0, 0.0, 0.0]
+    - name: "fmul"
+      operands:
+        - class: "register"
+          prefix: "v"
+          shape: "s"
+        - class: "register"
+          prefix: "v"
+          shape: "s"
+        - class: "register"
+          prefix: "v"
+          shape: "s"
+      throughput: 0.5
+      latency: 6.0    #  0   0DV   1   1DV   2    3    4    5
+      port_occupation: [0.5, 0.0, 0.5, 0.0, 0.0, 0.0, 0.0, 0.0]
+    - name: "fmul"
+      operands:
+        - class: "register"
+          prefix: "v"
+          shape: "d"
+        - class: "register"
+          prefix: "v"
+          shape: "d"
+        - class: "register"
+          prefix: "v"
+          shape: "d"
+      throughput: 0.5
+      latency: 6.0    #  0   0DV    1   1DV   2    3    4    5
+      port_occupation: [0.5, 0.0, 0.5, 0.0, 0.0, 0.0, 0.0, 0.0]
+    - name: "fsub"
+      operands:
+        - class: "register"
+          prefix: "v"
+          shape: "s"
+        - class: "register"
+          prefix: "v"
+          shape: "s"
+        - class: "register"
+          prefix: "v"
+          shape: "s"
+      throughput: 0.5
+      latency: 6.0    #  0   0DV   1   1DV   2    3    4    5
+      port_occupation: [0.5, 0.0, 0.5, 0.0, 0.0, 0.0, 0.0, 0.0]
+    - name: "fsub"
+      operands:
+        - class: "register"
+          prefix: "v"
+          shape: "d"
+        - class: "register"
+          prefix: "v"
+          shape: "d"
+        - class: "register"
+          prefix: "v"
+          shape: "d"
+      throughput: 0.5
+      latency: 6.0    #  0   0DV    1   1DV   2    3    4    5
+      port_occupation: [0.5, 0.0, 0.5, 0.0, 0.0, 0.0, 0.0, 0.0]
+    - name: "ldp"
+      operands:
+        - class: "register"
+          prefix: "d"
+        - class: "register"
+          prefix: "d"
+        - class: "memory"
+          base: "x"
+          offset: "imd"
+          index: ~
+          scale: 1
+          pre-indexed: false
+          post-indexed: false
+      throughput: 1.0
+      latency: ~      #  0   0DV   1   1DV   2    3    4    5
+      port_occupation: [0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0]
+    - name: "ldp"
+      operands:
+        - class: "register"
+          prefix: "q"
+        - class: "register"
+          prefix: "q"
+        - class: "memory"
+          base: "x"
+          offset: "imd"
+          index: ~
+          scale: 1
+          pre-indexed: false
+          post-indexed: false
+      throughput: 1.0
+      latency: ~      #  0   0DV   1   1DV   2    3    4    5
+      port_occupation: [0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0]
+    - name: "stp"
+      operands:
+        - class: "register"
+          prefix: "d"
+        - class: "register"
+          prefix: "d"
+        - class: "memory"
+          base: "x"
+          offset: "imd"
+          index: ~
+          scale: 1
+          pre-indexed: false
+          post-indexed: false
+      throughput: 2.0
+      latency: ~      #  0   0DV   1   1DV   2    3    4    5
+      port_occupation: [0.0, 0.0, 0.0, 0.0, 0.0, 2.0, 2.0, 0.0]
+    - name: "stp"
+      operands:
+        - class: "register"
+          prefix: "q"
+        - class: "register"
+          prefix: "q"
+        - class: "memory"
+          base: "x"
+          offset: "imd"
+          index: ~
+          scale: 1
+          pre-indexed: false
+          post-indexed: false
+      throughput: 2.0
+      latency: ~      #  0   0DV   1   1DV   2    3    4    5
+      port_occupation: [0.0, 0.0, 0.0, 0.0, 0.0, 2.0, 2.0, 0.0]
