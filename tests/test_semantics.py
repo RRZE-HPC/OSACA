@@ -7,13 +7,18 @@ import os
 import unittest
 
 from osaca.parser import AttrDict, ParserAArch64v81, ParserX86ATT
-from osaca.semantics.kernel_dg import KernelDG
 from osaca.semantics.hw_model import MachineModel
+from osaca.semantics.kernel_dg import KernelDG
 from osaca.semantics.semanticsAppender import SemanticsAppender
 
 
 class TestSemanticTools(unittest.TestCase):
+    MODULE_DATA_DIR = os.path.join(
+        os.path.dirname(os.path.split(os.path.abspath(__file__))[0]), 'osaca/data/'
+    )
+
     def setUp(self):
+        # set up parser and kernels
         self.parser_x86 = ParserX86ATT()
         self.parser_AArch64 = ParserAArch64v81()
         with open(self._find_file('kernel-x86.s')) as f:
@@ -23,10 +28,20 @@ class TestSemanticTools(unittest.TestCase):
         self.kernel_x86 = self.parser_x86.parse_file(code_x86)
         self.kernel_AArch64 = self.parser_AArch64.parse_file(code_AArch64)
 
-        self.machine_model_csl = MachineModel('csl')
-        self.machine_model_tx2 = MachineModel('vulcan')
-        self.semantics_csl = SemanticsAppender(self.machine_model_csl)
-        self.semantics_tx2 = SemanticsAppender(self.machine_model_tx2)
+        # set up machine models
+        self.machine_model_csl = MachineModel(
+            path_to_yaml=os.path.join(self.MODULE_DATA_DIR, 'csl.yml')
+        )
+        self.machine_model_tx2 = MachineModel(
+            path_to_yaml=os.path.join(self.MODULE_DATA_DIR, 'vulcan.yml')
+        )
+        self.semantics_csl = SemanticsAppender(
+            self.machine_model_csl, path_to_yaml=os.path.join(self.MODULE_DATA_DIR, 'isa/x86.yml')
+        )
+        self.semantics_tx2 = SemanticsAppender(
+            self.machine_model_tx2,
+            path_to_yaml=os.path.join(self.MODULE_DATA_DIR, 'isa/AArch64.yml'),
+        )
         for i in range(len(self.kernel_x86)):
             self.semantics_csl.assign_src_dst(self.kernel_x86[i])
         for i in range(len(self.kernel_AArch64)):
