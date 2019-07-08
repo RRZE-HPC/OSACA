@@ -48,10 +48,10 @@ instruction_forms:
     - name: vaddsd
       operands:
         - class: "register"
-         name: "xmm"
-         source: true
-         destination: true
-       - class: "register"
-         name: "xmm"
-         source: true
-         destination: false
+          name: "xmm"
+          source: true
+          destination: true
+        - class: "register"
+          name: "xmm"
+          source: true
+          destination: false
