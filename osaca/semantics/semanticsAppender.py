@@ -7,10 +7,14 @@ from .hw_model import MachineModel
 
 
 class SemanticsAppender(object):
-    def __init__(self, machine_model: MachineModel):
+    def __init__(self, machine_model: MachineModel, path_to_yaml=None):
         self.machine_model = machine_model
         self._isa = machine_model.get_ISA()
-        self._isa_model = MachineModel(path_to_yaml=self._find_file(self._isa))
+        if path_to_yaml:
+            path = path_to_yaml
+        else:
+            path = self._find_file(self._isa)
+        self._isa_model = MachineModel(path_to_yaml=path)
 
     def _find_file(self, isa):
         data_dir = os.path.expanduser('~/.osaca/data/isa')
