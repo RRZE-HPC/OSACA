@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 import os
-from osaca.parser.parser_x86att import ParserX86ATT
+from osaca.parser import ParserX86ATT
 
 from ruamel import yaml
 
@@ -34,7 +34,7 @@ class MachineModel(object):
 
     def _find_file(self, name):
         data_dir = os.path.expanduser('~/.osaca/data')
-        name = os.path.join(data_dir, name)
+        name = os.path.join(data_dir, name + '.yml')
         assert os.path.exists(name)
         return name
 
@@ -92,7 +92,7 @@ class MachineModel(object):
         if 'memory' in operand:
             if i_operand['class'] != 'memory':
                 return False
-            return self._is_AArch64_mem_type(i_operand['memory'], operand['memory'])
+            return self._is_AArch64_mem_type(i_operand, operand['memory'])
         # immediate
         if 'value' in operand:
             return i_operand['class'] == 'immediate' and i_operand['imd'] == 'int'
@@ -116,7 +116,7 @@ class MachineModel(object):
         if 'memory' in operand:
             if i_operand['class'] != 'memory':
                 return False
-            return self._is_x86_mem_type(i_operand['memory'], operand['memory'])
+            return self._is_x86_mem_type(i_operand, operand['memory'])
         # immediate
         if 'value' in operand:
             return i_operand['class'] == 'immediate' and i_operand['imd'] == 'int'

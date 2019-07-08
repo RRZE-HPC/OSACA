@@ -45,11 +45,11 @@ instruction_forms:
           prefix: "d"
           source: false
           destination: true
-		- class: "register"
+        - class: "register"
           prefix: "d"
           source: false
           destination: true
-		- class: "memory"
+        - class: "memory"
           base: "x"
           offset: "imd"
           index: ~
@@ -64,11 +64,11 @@ instruction_forms:
           prefix: "q"
           source: false
           destination: true
-		- class: "register"
+        - class: "register"
           prefix: "q"
           source: false
           destination: true
-		- class: "memory"
+        - class: "memory"
           base: "x"
           offset: "imd"
           index: ~
@@ -83,11 +83,11 @@ instruction_forms:
           prefix: "d"
           source: true
           destination: false
-		- class: "register"
+        - class: "register"
           prefix: "d"
           source: true
           destination: false
-		- class: "memory"
+        - class: "memory"
           base: "x"
           offset: "imd"
           index: ~
@@ -102,11 +102,11 @@ instruction_forms:
           prefix: "q"
           source: true
           destination: false
-		- class: "register"
+        - class: "register"
           prefix: "q"
           source: true
           destination: false
-		- class: "memory"
+        - class: "memory"
           base: "x"
           offset: "imd"
           index: ~
