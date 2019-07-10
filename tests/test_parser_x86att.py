@@ -139,6 +139,7 @@ class TestParserX86ATT(unittest.TestCase):
             'directive': None,
             'comment': '-- Begin main',
             'label': None,
+            'line': '# -- Begin  main',
             'line_number': 1,
         }
         instruction_form_2 = {
@@ -147,6 +148,7 @@ class TestParserX86ATT(unittest.TestCase):
             'directive': None,
             'comment': 'Preds ..B1.6',
             'label': '..B1.7',
+            'line': '..B1.7:                         # Preds ..B1.6',
             'line_number': 2,
         }
         instruction_form_3 = {
@@ -155,6 +157,7 @@ class TestParserX86ATT(unittest.TestCase):
             'directive': {'name': 'quad', 'parameters': ['.2.3_2__kmpc_loc_pack.2']},
             'comment': 'qed',
             'label': None,
+            'line': '.quad   .2.3_2__kmpc_loc_pack.2 #qed',
             'line_number': 3,
         }
         instruction_form_4 = {
@@ -175,6 +178,7 @@ class TestParserX86ATT(unittest.TestCase):
             'directive': None,
             'comment': '12.9',
             'label': None,
+            'line': 'lea       2(%rax,%rax), %ecx #12.9',
             'line_number': 4,
         }
 

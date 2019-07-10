@@ -57,6 +57,25 @@ instruction_forms:
           pre-indexed: false
           post-indexed: false
           source: true
+          destination: false   
+    - name: "ldp"
+      operands:
+        - class: "register"
+          prefix: "d"
+          source: false
+          destination: true
+        - class: "register"
+          prefix: "d"
+          source: false
+          destination: true
+        - class: "memory"
+          base: "x"
+          offset: ~
+          index: ~
+          scale: 1
+          pre-indexed: false
+          post-indexed: true
+          source: true
           destination: false
     - name: "ldp"
       operands:
@@ -77,6 +96,44 @@ instruction_forms:
           post-indexed: false
           source: true
           destination: false
+    - name: "ldp"
+      operands:
+        - class: "register"
+          prefix: "q"
+          source: false
+          destination: true
+        - class: "register"
+          prefix: "q"
+          source: false
+          destination: true
+        - class: "memory"
+          base: "x"
+          offset: ~ 
+          index: ~
+          scale: 1
+          pre-indexed: false
+          post-indexed: true 
+          source: true
+          destination: false
+    - name: "stp"
+      operands:
+        - class: "register"
+          prefix: "d"
+          source: true
+          destination: false
+        - class: "register"
+          prefix: "d"
+          source: true
+          destination: false
+        - class: "memory"
+          base: "x"
+          offset: ~
+          index: ~
+          scale: 1
+          pre-indexed: false
+          post-indexed: false
+          source: false
+          destination: true   
     - name: "stp"
       operands:
         - class: "register"
@@ -90,6 +147,25 @@ instruction_forms:
         - class: "memory"
           base: "x"
           offset: "imd"
+          index: ~
+          scale: 1
+          pre-indexed: false
+          post-indexed: false
+          source: false
+          destination: true
+    - name: "stp"
+      operands:
+        - class: "register"
+          prefix: "q"
+          source: true
+          destination: false
+        - class: "register"
+          prefix: "q"
+          source: true
+          destination: false
+        - class: "memory"
+          base: "x"
+          offset: ~
           index: ~
           scale: 1
           pre-indexed: false

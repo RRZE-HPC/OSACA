@@ -3,6 +3,7 @@
 Unit tests for Semantic Analysis
 """
 
+import networkx as nx
 import os
 import unittest
 
@@ -44,8 +45,10 @@ class TestSemanticTools(unittest.TestCase):
         )
         for i in range(len(self.kernel_x86)):
             self.semantics_csl.assign_src_dst(self.kernel_x86[i])
+            self.semantics_csl.assign_tp_lt(self.kernel_x86[i])
         for i in range(len(self.kernel_AArch64)):
             self.semantics_tx2.assign_src_dst(self.kernel_AArch64[i])
+            self.semantics_tx2.assign_tp_lt(self.kernel_AArch64[i])
 
     ###########
     # Tests
@@ -66,6 +69,67 @@ class TestSemanticTools(unittest.TestCase):
                     self.assertTrue('source' in instruction_form['operands'])
                     self.assertTrue('destination' in instruction_form['operands'])
                     self.assertTrue('src_dst' in instruction_form['operands'])
+
+    def test_tp_lt_assignment_x86(self):
+        port_num = len(self.machine_model_csl['ports'])
+        for instruction_form in self.kernel_x86:
+            with self.subTest(instruction_form=instruction_form):
+                self.assertTrue('throughput' in instruction_form)
+                self.assertTrue('latency' in instruction_form)
+                self.assertIsInstance(instruction_form['port_pressure'], list)
+                self.assertEqual(len(instruction_form['port_pressure']), port_num)
+
+    def test_tp_lt_assignment_AArch64(self):
+        port_num = len(self.machine_model_tx2['ports'])
+        for instruction_form in self.kernel_AArch64:
+            with self.subTest(instruction_form=instruction_form):
+                self.assertTrue('throughput' in instruction_form)
+                self.assertTrue('latency' in instruction_form)
+                self.assertIsInstance(instruction_form['port_pressure'], list)
+                self.assertEqual(len(instruction_form['port_pressure']), port_num)
+
+    def test_kernelDG_x86(self):
+        #
+        #  3
+        #   \___>5__>6
+        #   /
+        #  2
+        #     4_______>8
+        #
+        dg = KernelDG(self.kernel_x86, self.parser_x86, self.machine_model_csl)
+        self.assertTrue(nx.algorithms.dag.is_directed_acyclic_graph(dg.dg))
+        self.assertEqual(len(list(dg.get_dependent_instruction_forms(line_number=2))), 1)
+        self.assertEqual(next(dg.get_dependent_instruction_forms(line_number=2)), 5)
+        self.assertEqual(len(list(dg.get_dependent_instruction_forms(line_number=3))), 1)
+        self.assertEqual(next(dg.get_dependent_instruction_forms(line_number=3)), 5)
+        self.assertEqual(len(list(dg.get_dependent_instruction_forms(line_number=4))), 1)
+        self.assertEqual(next(dg.get_dependent_instruction_forms(line_number=4)), 8)
+        self.assertEqual(len(list(dg.get_dependent_instruction_forms(line_number=5))), 1)
+        self.assertEqual(next(dg.get_dependent_instruction_forms(line_number=5)), 6)
+        self.assertEqual(len(list(dg.get_dependent_instruction_forms(line_number=6))), 0)
+        self.assertEqual(len(list(dg.get_dependent_instruction_forms(line_number=7))), 0)
+
+    def test_kernelDG_AArch64(self):
+        dg = KernelDG(self.kernel_AArch64, self.parser_AArch64, self.machine_model_tx2)
+        self.assertTrue(nx.algorithms.dag.is_directed_acyclic_graph(dg.dg))
+        self.assertEqual(list(dg.get_dependent_instruction_forms(line_number=2)), [6, 7])
+        self.assertEqual(list(dg.get_dependent_instruction_forms(line_number=3)), [8, 9])
+        self.assertEqual(list(dg.get_dependent_instruction_forms(line_number=4)), [6, 7])
+        self.assertEqual(list(dg.get_dependent_instruction_forms(line_number=5)), [8, 9])
+        self.assertEqual(next(dg.get_dependent_instruction_forms(line_number=6)), 12)
+        self.assertEqual(next(dg.get_dependent_instruction_forms(line_number=7)), 13)
+        self.assertEqual(next(dg.get_dependent_instruction_forms(line_number=8)), 15)
+        self.assertEqual(next(dg.get_dependent_instruction_forms(line_number=9)), 16)
+        self.assertEqual(list(dg.get_dependent_instruction_forms(line_number=10)), [12, 13])
+        self.assertEqual(list(dg.get_dependent_instruction_forms(line_number=11)), [15, 16])
+        self.assertEqual(next(dg.get_dependent_instruction_forms(line_number=12)), 14)
+        self.assertEqual(next(dg.get_dependent_instruction_forms(line_number=13)), 14)
+        self.assertEqual(len(list(dg.get_dependent_instruction_forms(line_number=14))), 0)
+        self.assertEqual(next(dg.get_dependent_instruction_forms(line_number=15)), 17)
+        self.assertEqual(next(dg.get_dependent_instruction_forms(line_number=16)), 17)
+        self.assertEqual(len(list(dg.get_dependent_instruction_forms(line_number=17))), 0)
+        self.assertEqual(len(list(dg.get_dependent_instruction_forms(line_number=18))), 0)
+        self.assertEqual(len(list(dg.get_dependent_instruction_forms(line_number=19))), 0)
 
     def test_is_read_is_written_x86(self):
         # independent form HW model
