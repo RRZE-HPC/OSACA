@@ -146,6 +146,7 @@ class TestParserAArch64v81(unittest.TestCase):
             'directive': None,
             'comment': '-- Begin main',
             'label': None,
+            'line': '// -- Begin  main',
             'line_number': 1,
         }
 
@@ -155,6 +156,7 @@ class TestParserAArch64v81(unittest.TestCase):
             'directive': None,
             'comment': '=>This Inner Loop Header: Depth=1',
             'label': '.LBB0_1',
+            'line': '.LBB0_1:              // =>This Inner Loop Header: Depth=1',
             'line_number': 2,
         }
         instruction_form_3 = {
@@ -163,6 +165,7 @@ class TestParserAArch64v81(unittest.TestCase):
             'directive': {'name': 'cfi_def_cfa', 'parameters': ['w29', '-16']},
             'comment': None,
             'label': None,
+            'line': '.cfi_def_cfa w29, -16',
             'line_number': 3,
         }
         instruction_form_4 = {
@@ -186,6 +189,7 @@ class TestParserAArch64v81(unittest.TestCase):
             'directive': None,
             'comment': '= <<2',
             'label': None,
+            'line': 'ldr s0, [x11, w10, sxtw #2]\t\t// = <<2',
             'line_number': 4,
         }
         instruction_form_5 = {
@@ -204,6 +208,7 @@ class TestParserAArch64v81(unittest.TestCase):
             'directive': None,
             'comment': 'HPL',
             'label': None,
+            'line': 'prfm    pldl1keep, [x26, #2048] //HPL',
             'line_number': 5,
         }
         instruction_form_6 = {
@@ -224,6 +229,7 @@ class TestParserAArch64v81(unittest.TestCase):
             'directive': None,
             'comment': None,
             'label': None,
+            'line': 'stp x29, x30, [sp, #-16]!',
             'line_number': 6,
         }
         instruction_form_7 = {
@@ -244,6 +250,7 @@ class TestParserAArch64v81(unittest.TestCase):
             'directive': None,
             'comment': None,
             'label': None,
+            'line': 'ldp q2, q3, [x11], #64',
             'line_number': 7,
         }
         parsed_1 = self.parser.parse_line(line_comment, 1)

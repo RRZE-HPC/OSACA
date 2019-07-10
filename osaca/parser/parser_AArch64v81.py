@@ -182,6 +182,7 @@ class ParserAArch64v81(BaseParser):
                 self.DIRECTIVE_ID: None,
                 self.COMMENT_ID: None,
                 self.LABEL_ID: None,
+                'line': line.strip(),
                 'line_number': line_number,
             }
         )

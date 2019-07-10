@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 
 import os
-from osaca.parser import ParserX86ATT
 
 from ruamel import yaml
+
+from osaca.parser import ParserX86ATT
 
 
 class MachineModel(object):
@@ -58,6 +59,9 @@ class MachineModel(object):
             )
         except StopIteration:
             return None
+        except TypeError:
+            print('\nname: {}\noperands: {}'.format(name, operands))
+            raise TypeError
 
     def get_ISA(self):
         return self._data['isa']
@@ -100,6 +104,8 @@ class MachineModel(object):
             return i_operand['class'] == 'immediate' and i_operand['imd'] == 'float'
         if 'double' in operand:
             return i_operand['class'] == 'immediate' and i_operand['imd'] == 'double'
+        if 'identifier' in operand:
+            return i_operand['class'] == 'identifier'
         # prefetch option
         if 'prfop' in operand:
             return i_operand['class'] == 'prfop'
@@ -120,6 +126,9 @@ class MachineModel(object):
         # immediate
         if 'value' in operand:
             return i_operand['class'] == 'immediate' and i_operand['imd'] == 'int'
+        # identifier (e.g., labels)
+        if 'identifier' in operand:
+            return i_operand['class'] == 'identifier'
 
     def _is_AArch64_reg_type(self, i_reg, reg):
         if reg['prefix'] != i_reg['prefix']:
@@ -190,7 +199,10 @@ class MachineModel(object):
                 or (
                     mem['offset'] is not None
                     and 'value' in mem['offset']
-                    and i_mem['offset'] == 'imd'
+                    and (
+                        i_mem['offset'] == 'imd'
+                        or (i_mem['offset'] is None and mem['offset']['value'] == '0')
+                    )
                 )
             )
             # check index
