@@ -191,3 +191,78 @@ instruction_forms:
           post-indexed: false
           source: false
           destination: true
+    - name: "str"
+      operands:
+        - class: "register"
+          prefix: "x"
+          source: true
+          destination: false
+        - class: "memory"
+          base: "x"
+          offset: ~
+          index: ~
+          scale: 1
+          pre-indexed: false
+          post-indexed: false
+          source: false
+          destination: true
+    - name: "str"
+      operands:
+        - class: "register"
+          prefix: "q"
+          source: true
+          destination: false
+        - class: "memory"
+          base: "x"
+          offset: ~
+          index: "x"
+          scale: 1
+          pre-indexed: false
+          post-indexed: false
+          source: false
+          destination: true
+    - name: "str"
+      operands:
+        - class: "register"
+          prefix: "q"
+          source: true
+          destination: false
+        - class: "memory"
+          base: "x"
+          offset: ~
+          index: ~
+          scale: 1
+          pre-indexed: false
+          post-indexed: false
+          source: false
+          destination: true
+    - name: "str"
+      operands:
+        - class: "register"
+          prefix: "x"
+          source: true
+          destination: false
+        - class: "memory"
+          base: "x"
+          offset: ~
+          index: "x"
+          scale: 1
+          pre-indexed: false
+          post-indexed: true
+          source: false
+          destination: true
+    - name: "str"
+      operands:
+        - class: "register"
+          prefix: "x"
+          source: true
+          destination: false
+        - class: "memory"
+          base: "x"
+          offset: ~
+          index: "x"
+          scale: 1
+          pre-indexed: false
+          post-indexed: false
+          source: false
+          destination: true

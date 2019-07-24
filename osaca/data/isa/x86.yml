@@ -35,6 +35,29 @@ instruction_forms:
           name: "gpr"
           source: true
           destination: false
+    - name: cmpq
+      operands:
+        - class: "register"
+          name: "gpr"
+          source: true
+          destination: false
+        - class: "register"
+          name: "gpr"
+          source: true
+          destination: false
+    - name: cmpq
+      operands:
+        - class: "register"
+          name: "gpr"
+          source: true
+          destination: false
+        - class: "memory"
+          base: "gpr"
+          offset: "imd"
+          index: ~
+          scale: 1
+          source: true
+          destination: false
     - name: ja
       operands:
         - class: "identifier"
@@ -71,6 +94,57 @@ instruction_forms:
           source: true
           destination: false
     - name: vfmadd132pd
+      operands:
+        - class: "memory"
+          base: "gpr"
+          offset: ~
+          index: "gpr"
+          scale: 1
+          source: true
+          destination: false
+        - class: "register"
+          name: "ymm"
+          source: true
+          destination: false
+        - class: "register"
+          name: "ymm"
+          source: true
+          destination: true
+    - name: vfmadd213pd
+      operands:
+        - class: "memory"
+          base: "gpr"
+          offset: ~
+          index: "gpr"
+          scale: 1
+          source: true
+          destination: false
+        - class: "register"
+          name: "ymm"
+          source: true
+          destination: false
+        - class: "register"
+          name: "ymm"
+          source: true
+          destination: true
+    - name: vfmadd231pd
+      operands:
+        - class: "memory"
+          base: "gpr"
+          offset: "imd"
+          index: "gpr"
+          scale: 1
+          source: true
+          destination: false
+        - class: "register"
+          name: "ymm"
+          source: true
+          destination: false
+        - class: "register"
+          name: "ymm"
+          source: true
+          destination: true
+    - name: vfmadd231pd
       operands:
         - class: "memory"
           base: "gpr"
