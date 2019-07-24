@@ -26,7 +26,7 @@ class Frontend(object):
                 )
         elif path_to_yaml:
             try:
-                with open(self._path, 'r') as f:
+                with open(path_to_yaml, 'r') as f:
                     self._data = yaml.load(f, Loader=yaml.Loader)
             except AssertionError:
                 raise ValueError(
