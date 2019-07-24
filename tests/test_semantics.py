@@ -7,6 +7,7 @@ import networkx as nx
 import os
 import unittest
 
+from osaca.frontend import Frontend
 from osaca.parser import AttrDict, ParserAArch64v81, ParserX86ATT
 from osaca.semantics.hw_model import MachineModel
 from osaca.semantics.kernel_dg import KernelDG
@@ -109,6 +110,10 @@ class TestSemanticTools(unittest.TestCase):
         self.assertEqual(len(list(dg.get_dependent_instruction_forms(line_number=6))), 0)
         self.assertEqual(len(list(dg.get_dependent_instruction_forms(line_number=7))), 0)
 
+        fe = Frontend(arch='CSL')
+        fe.print_throughput_analysis(self.kernel_x86)
+        fe.print_latency_analysis(dg.get_critical_path())
+
     def test_kernelDG_AArch64(self):
         dg = KernelDG(self.kernel_AArch64, self.parser_AArch64, self.machine_model_tx2)
         self.assertTrue(nx.algorithms.dag.is_directed_acyclic_graph(dg.dg))
@@ -130,6 +135,10 @@ class TestSemanticTools(unittest.TestCase):
         self.assertEqual(len(list(dg.get_dependent_instruction_forms(line_number=17))), 0)
         self.assertEqual(len(list(dg.get_dependent_instruction_forms(line_number=18))), 0)
         self.assertEqual(len(list(dg.get_dependent_instruction_forms(line_number=19))), 0)
+
+        fe = Frontend(arch='vulcan')
+        fe.print_throughput_analysis(self.kernel_AArch64)
+        fe.print_latency_analysis(dg.get_critical_path())
 
     def test_is_read_is_written_x86(self):
         # independent form HW model

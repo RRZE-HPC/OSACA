@@ -8,18 +8,20 @@ from osaca.parser import AttrDict
 from .hw_model import MachineModel
 
 
-class SemanticsAppender(object):
-    class INSTR_FLAGS:
-        """
-        Flags used for unknown or special instructions
-        """
-        TP_UNKWN = 'tp_unkown'
-        LT_UNKWN = 'lt_unkown'
-        NOT_BOUND = 'not_bound'
-        HIDDEN_LD = 'hidden_load'
+class INSTR_FLAGS:
+    """
+    Flags used for unknown or special instructions
+    """
 
+    TP_UNKWN = 'tp_unkown'
+    LT_UNKWN = 'lt_unkown'
+    NOT_BOUND = 'not_bound'
+    HIDDEN_LD = 'hidden_load'
+
+
+class SemanticsAppender(object):
     def __init__(self, machine_model: MachineModel, path_to_yaml=None):
-        self.machine_model = machine_model
+        self._machine_model = machine_model
         self._isa = machine_model.get_ISA()
         if path_to_yaml:
             path = path_to_yaml
@@ -37,8 +39,8 @@ class SemanticsAppender(object):
     # mark instruction form with semantic flags
     def assign_tp_lt(self, instruction_form):
         flags = []
-        port_number = len(self.machine_model['ports'])
-        instruction_data = self.machine_model.get_instruction(
+        port_number = len(self._machine_model['ports'])
+        instruction_data = self._machine_model.get_instruction(
             instruction_form['instruction'], instruction_form['operands']
         )
         if instruction_data:
@@ -49,6 +51,9 @@ class SemanticsAppender(object):
                 assert isinstance(port_pressure, list)
                 assert len(port_pressure) == port_number
                 instruction_form['port_pressure'] = port_pressure
+                if sum(port_pressure) == 0:
+                    # port pressure on all ports 0 --> not bound to a port
+                    flags.append(INSTR_FLAGS.NOT_BOUND)
             except AssertionError:
                 warnings.warn(
                     'Port pressure could not be imported correctly from database. '
@@ -64,14 +69,14 @@ class SemanticsAppender(object):
             if latency is None:
                 # assume 0 cy and mark as unknown
                 latency = 0.0
-                flags.append(self.INSTR_FLAGS.LT_UNKWN)
+                flags.append(INSTR_FLAGS.LT_UNKWN)
         else:
             # instruction could not be found in DB
             # --> mark as unknown and assume 0 cy for latency/throughput
             throughput = 0.0
             latency = 0.0
             instruction_form['port_pressure'] = [0.0 for i in range(port_number)]
-            flags += [self.INSTR_FLAGS.TP_UNKWN, self.INSTR_FLAGS.LT_UNKWN]
+            flags += [INSTR_FLAGS.TP_UNKWN, INSTR_FLAGS.LT_UNKWN]
         # flatten flag list
         flags = list(set(flags))
         if 'flags' not in instruction_form:
