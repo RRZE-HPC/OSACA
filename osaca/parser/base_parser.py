@@ -28,7 +28,7 @@ class BaseParser(object):
         asm_instructions = []
         lines = file_content.split('\n')
         for i, line in enumerate(lines):
-            if line == '':
+            if line.strip() == '':
                 continue
             asm_instructions.append(self.parse_line(line, i + 1 + start_line))
         return asm_instructions

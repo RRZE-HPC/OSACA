@@ -69,6 +69,8 @@ class MachineModel(object):
     ######################################################
 
     def _match_operands(self, i_operands, operands):
+        if isinstance(operands, dict):
+            operands = operands['operand_list']
         operands_ok = True
         if len(operands) != len(i_operands):
             return False
@@ -98,13 +100,15 @@ class MachineModel(object):
                 return False
             return self._is_AArch64_mem_type(i_operand, operand['memory'])
         # immediate
-        if 'value' in operand:
+        if 'value' in operand or ('immediate' in operand and 'value' in operand['immediate']):
             return i_operand['class'] == 'immediate' and i_operand['imd'] == 'int'
-        if 'float' in operand:
+        if 'float' in operand or ('immediate' in operand and 'float' in operand['immediate']):
             return i_operand['class'] == 'immediate' and i_operand['imd'] == 'float'
-        if 'double' in operand:
+        if 'double' in operand or ('immediate' in operand and 'double' in operand['immediate']):
             return i_operand['class'] == 'immediate' and i_operand['imd'] == 'double'
-        if 'identifier' in operand:
+        if 'identifier' in operand or (
+            'immediate' in operand and 'identifier' in operand['immediate']
+        ):
             return i_operand['class'] == 'identifier'
         # prefetch option
         if 'prfop' in operand:
@@ -124,7 +128,7 @@ class MachineModel(object):
                 return False
             return self._is_x86_mem_type(i_operand, operand['memory'])
         # immediate
-        if 'value' in operand:
+        if 'immediate' in operand or 'value' in operand:
             return i_operand['class'] == 'immediate' and i_operand['imd'] == 'int'
         # identifier (e.g., labels)
         if 'identifier' in operand:

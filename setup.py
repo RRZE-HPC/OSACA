@@ -92,7 +92,6 @@ setup(
         'kerncraft',
         'networkx',
         'numpy',
-        'pandas',
         'pyparsing',
     ],
     python_requires='>=3.5',

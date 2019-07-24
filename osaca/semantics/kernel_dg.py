@@ -32,6 +32,14 @@ class KernelDG(nx.DiGraph):
                 dg.nodes[dep['line_number']]['instruction_form'] = dep
         return dg
 
+    def get_critical_path(self):
+        if nx.algorithms.dag.is_directed_acyclic_graph(self.dg):
+            longest_path = nx.algorithms.dag.dag_longest_path(self.dg, weight='latency')
+            return [x for x in self.kernel if x['line_number'] in longest_path]
+        else:
+            # split to DAG
+            raise NotImplementedError
+
     def find_depending(self, instruction_form, kernel):
         if instruction_form.operands is None:
             return
@@ -72,6 +80,8 @@ class KernelDG(nx.DiGraph):
 
     def is_read(self, register, instruction_form):
         is_read = False
+        if instruction_form.operands is None:
+            return is_read
         for src in instruction_form.operands.source + instruction_form.operands.src_dst:
             if 'register' in src:
                 is_read = self.parser.is_reg_dependend_of(register, src.register) or is_read
@@ -95,6 +105,8 @@ class KernelDG(nx.DiGraph):
 
     def is_written(self, register, instruction_form):
         is_written = False
+        if instruction_form.operands is None:
+            return is_written
         for dst in instruction_form.operands.destination + instruction_form.operands.src_dst:
             if 'register' in dst:
                 is_written = self.parser.is_reg_dependend_of(register, dst.register) or is_written
