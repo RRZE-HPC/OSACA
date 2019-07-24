@@ -9,7 +9,8 @@ suite = unittest.TestLoader().loadTestsFromNames(
         'test_parser_x86att',
         'test_parser_AArch64v81',
         'test_marker_utils',
-        'test_semantics'
+        'test_semantics',
+        'test_frontend'
     ]
 )
 
