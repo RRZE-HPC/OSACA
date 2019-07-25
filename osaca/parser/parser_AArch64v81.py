@@ -392,6 +392,11 @@ class ParserAArch64v81(BaseParser):
         return float(ieee_val['mantissa']) * (10 ** exponent)
 
     def is_reg_dependend_of(self, reg_a, reg_b):
+        prefixes_gpr = 'wx'
+        prefixes_vec = 'bhsdqv'
         if reg_a['name'] == reg_b['name']:
-            return True
+            if reg_a['prefix'].lower() in prefixes_gpr and reg_b['prefix'].lower() in prefixes_gpr:
+                return True
+            if reg_a['prefix'].lower() in prefixes_vec and reg_b['prefix'].lower() in prefixes_vec:
+                return True
         return False
