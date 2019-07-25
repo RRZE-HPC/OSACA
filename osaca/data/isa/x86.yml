@@ -110,6 +110,23 @@ instruction_forms:
           name: "ymm"
           source: true
           destination: true
+    - name: vfmadd132pd
+      operands:
+        - class: "memory"
+          base: "gpr"
+          offset: "imd"
+          index: "gpr"
+          scale: 1
+          source: true
+          destination: false
+        - class: "register"
+          name: "ymm"
+          source: true
+          destination: false
+        - class: "register"
+          name: "ymm"
+          source: true
+          destination: true
     - name: vfmadd213pd
       operands:
         - class: "memory"
@@ -127,6 +144,24 @@ instruction_forms:
           name: "ymm"
           source: true
           destination: true
+    - name: vfmadd213pd
+      operands:
+        - class: "memory"
+          base: "gpr"
+          offset: "imd"
+          index: "gpr"
+          scale: 1
+          source: true
+          destination: false
+        - class: "register"
+          name: "ymm"
+          source: true
+          destination: false
+        - class: "register"
+          name: "ymm"
+          source: true
+          destination: true
+
     - name: vfmadd231pd
       operands:
         - class: "memory"
