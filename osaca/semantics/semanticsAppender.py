@@ -51,7 +51,7 @@ class SemanticsAppender(object):
                 assert isinstance(port_pressure, list)
                 assert len(port_pressure) == port_number
                 instruction_form['port_pressure'] = port_pressure
-                if sum(port_pressure) == 0:
+                if sum(port_pressure) == 0 and throughput is not None:
                     # port pressure on all ports 0 --> not bound to a port
                     flags.append(INSTR_FLAGS.NOT_BOUND)
             except AssertionError:
@@ -60,11 +60,11 @@ class SemanticsAppender(object):
                     + 'Please check entry for:\n {}'.format(instruction_form)
                 )
                 instruction_form['port_pressure'] = [0.0 for i in range(port_number)]
-                flags.append(self.INSTR_FLAGS.TP_UNKWN)
+                flags.append(INSTR_FLAGS.TP_UNKWN)
             if throughput is None:
                 # assume 0 cy and mark as unknown
                 throughput = 0.0
-                flags.append(self.INSTR_FLAGS.TP_UNKWN)
+                flags.append(INSTR_FLAGS.TP_UNKWN)
             latency = instruction_data['latency']
             if latency is None:
                 # assume 0 cy and mark as unknown

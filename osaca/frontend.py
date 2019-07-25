@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import os
+import re
 from functools import reduce
 
 from ruamel import yaml
@@ -48,28 +49,47 @@ class Frontend(object):
         port_len = self._get_max_port_len(kernel)
         separator = '-' * sum([x + 3 for x in port_len]) + '-'
         separator += '--' + len(str(kernel[-1]['line_number'])) * '-' if show_lineno else ''
+        col_sep = '|'
+        sep_list = self._get_separator_list(col_sep)
         print(lineno_filler + self._get_port_number_line(port_len))
         print(separator)
         for instruction_form in kernel:
             line = '{:4d} {} {} {}'.format(
                 instruction_form['line_number'],
-                self._get_port_pressure(instruction_form['port_pressure'], port_len),
+                self._get_port_pressure(instruction_form['port_pressure'], port_len, sep_list),
                 self._get_flag_symbols(instruction_form['flags'])
                 if instruction_form['instruction'] is not None
                 else ' ',
                 instruction_form['line'].strip(),
             )
-            line = line if show_lineno else '|' + '|'.join(line.split('|')[1:])
+            line = line if show_lineno else col_sep + col_sep.join(line.split(col_sep)[1:])
             if show_cmnts is False and self._is_comment(instruction_form):
                 continue
             print(line)
         print()
+        tp_sum = self._get_throughput_sum(kernel)
+        print(lineno_filler + self._get_port_pressure(tp_sum, port_len, ' '))
+
+    def _get_throughput_sum(self, kernel):
         tp_sum = reduce(
             (lambda x, y: [sum(z) for z in zip(x, y)]),
             [instr['port_pressure'] for instr in kernel],
         )
         tp_sum = [round(x, 2) for x in tp_sum]
-        print(lineno_filler + self._get_port_pressure(tp_sum, port_len, ' '))
+        return tp_sum
+
+    def _get_separator_list(self, separator, separator_2=' '):
+        separator_list = []
+        for i in range(len(self._data['ports']) - 1):
+            if (
+                re.search(r'\d+', self._data['ports'][i]).group()
+                == re.search(r'\d+', self._data['ports'][i + 1]).group()
+            ):
+                separator_list.append(separator_2)
+            else:
+                separator_list.append(separator)
+        separator_list.append(separator)
+        return separator_list
 
     def _get_flag_symbols(self, flag_obj):
         string_result = ''
@@ -80,14 +100,16 @@ class Frontend(object):
         return string_result
 
     def _get_port_pressure(self, ports, port_len, separator='|'):
-        string_result = '{} '.format(separator)
+        if not isinstance(separator, list):
+            separator = [separator for x in ports]
+        string_result = '{} '.format(separator[-1])
         for i in range(len(ports)):
             if float(ports[i]) == 0.0:
-                string_result += port_len[i] * ' ' + ' {} '.format(separator)
+                string_result += port_len[i] * ' ' + ' {} '.format(separator[i])
                 continue
             left_len = len(str(float(ports[i])).split('.')[0])
             substr = '{:' + str(left_len) + '.' + str(max(port_len[i] - left_len - 1, 0)) + 'f}'
-            string_result += substr.format(ports[i]) + ' {} '.format(separator)
+            string_result += substr.format(ports[i]) + ' {} '.format(separator[i])
         return string_result[:-1]
 
     def _get_max_port_len(self, kernel):
@@ -98,21 +120,25 @@ class Frontend(object):
                     port_len[i] = len('{:.2f}'.format(port))
         return port_len
 
-    def _get_port_number_line(self, port_len):
-        string_result = '|'
+    def _get_port_number_line(self, port_len, separator='|'):
+        string_result = separator
+        separator_list = self._get_separator_list(separator, '-')
         for i, length in enumerate(port_len):
             substr = '{:^' + str(length + 2) + 's}'
-            string_result += substr.format(self._data['ports'][i]) + '|'
+            string_result += substr.format(self._data['ports'][i]) + separator_list[i]
         return string_result
 
-    def print_latency_analysis(self, cp_kernel):
+    def print_latency_analysis(self, cp_kernel, separator='|'):
         print('\n\n------------------------')
         for instruction_form in cp_kernel:
             print(
-                '{} | {} |{}| {}'.format(
+                '{} {} {} {}{}{} {}'.format(
                     instruction_form['line_number'],
+                    separator,
                     instruction_form['latency'],
+                    separator,
                     'X' if INSTR_FLAGS.LT_UNKWN in instruction_form['flags'] else ' ',
+                    separator,
                     instruction_form['line'],
                 )
             )
