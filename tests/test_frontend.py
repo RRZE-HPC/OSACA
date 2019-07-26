@@ -30,22 +30,22 @@ class TestFrontend(unittest.TestCase):
         self.kernel_AArch64 = self.parser_AArch64.parse_file(code_AArch64)
 
         # set up machine models
-        self.machine_model_csl = MachineModel(
-            path_to_yaml=os.path.join(self.MODULE_DATA_DIR, 'csl.yml')
+        self.machine_model_csx = MachineModel(
+            path_to_yaml=os.path.join(self.MODULE_DATA_DIR, 'csx.yml')
         )
         self.machine_model_tx2 = MachineModel(
             path_to_yaml=os.path.join(self.MODULE_DATA_DIR, 'vulcan.yml')
         )
-        self.semantics_csl = SemanticsAppender(
-            self.machine_model_csl, path_to_yaml=os.path.join(self.MODULE_DATA_DIR, 'isa/x86.yml')
+        self.semantics_csx = SemanticsAppender(
+            self.machine_model_csx, path_to_yaml=os.path.join(self.MODULE_DATA_DIR, 'isa/x86.yml')
         )
         self.semantics_tx2 = SemanticsAppender(
             self.machine_model_tx2,
             path_to_yaml=os.path.join(self.MODULE_DATA_DIR, 'isa/AArch64.yml'),
         )
         for i in range(len(self.kernel_x86)):
-            self.semantics_csl.assign_src_dst(self.kernel_x86[i])
-            self.semantics_csl.assign_tp_lt(self.kernel_x86[i])
+            self.semantics_csx.assign_src_dst(self.kernel_x86[i])
+            self.semantics_csx.assign_tp_lt(self.kernel_x86[i])
         for i in range(len(self.kernel_AArch64)):
             self.semantics_tx2.assign_src_dst(self.kernel_AArch64[i])
             self.semantics_tx2.assign_tp_lt(self.kernel_AArch64[i])
@@ -55,8 +55,8 @@ class TestFrontend(unittest.TestCase):
     ###########
 
     def test_frontend_x86(self):
-        dg = KernelDG(self.kernel_x86, self.parser_x86, self.machine_model_csl)
-        fe = Frontend(path_to_yaml=os.path.join(self.MODULE_DATA_DIR, 'csl.yml'))
+        dg = KernelDG(self.kernel_x86, self.parser_x86, self.machine_model_csx)
+        fe = Frontend(path_to_yaml=os.path.join(self.MODULE_DATA_DIR, 'csx.yml'))
         fe.print_throughput_analysis(self.kernel_x86)
         fe.print_latency_analysis(dg.get_critical_path())
 

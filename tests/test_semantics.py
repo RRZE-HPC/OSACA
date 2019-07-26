@@ -31,22 +31,22 @@ class TestSemanticTools(unittest.TestCase):
         self.kernel_AArch64 = self.parser_AArch64.parse_file(code_AArch64)
 
         # set up machine models
-        self.machine_model_csl = MachineModel(
-            path_to_yaml=os.path.join(self.MODULE_DATA_DIR, 'csl.yml')
+        self.machine_model_csx = MachineModel(
+            path_to_yaml=os.path.join(self.MODULE_DATA_DIR, 'csx.yml')
         )
         self.machine_model_tx2 = MachineModel(
             path_to_yaml=os.path.join(self.MODULE_DATA_DIR, 'vulcan.yml')
         )
-        self.semantics_csl = SemanticsAppender(
-            self.machine_model_csl, path_to_yaml=os.path.join(self.MODULE_DATA_DIR, 'isa/x86.yml')
+        self.semantics_csx = SemanticsAppender(
+            self.machine_model_csx, path_to_yaml=os.path.join(self.MODULE_DATA_DIR, 'isa/x86.yml')
         )
         self.semantics_tx2 = SemanticsAppender(
             self.machine_model_tx2,
             path_to_yaml=os.path.join(self.MODULE_DATA_DIR, 'isa/AArch64.yml'),
         )
         for i in range(len(self.kernel_x86)):
-            self.semantics_csl.assign_src_dst(self.kernel_x86[i])
-            self.semantics_csl.assign_tp_lt(self.kernel_x86[i])
+            self.semantics_csx.assign_src_dst(self.kernel_x86[i])
+            self.semantics_csx.assign_tp_lt(self.kernel_x86[i])
         for i in range(len(self.kernel_AArch64)):
             self.semantics_tx2.assign_src_dst(self.kernel_AArch64[i])
             self.semantics_tx2.assign_tp_lt(self.kernel_AArch64[i])
@@ -72,7 +72,7 @@ class TestSemanticTools(unittest.TestCase):
                     self.assertTrue('src_dst' in instruction_form['operands'])
 
     def test_tp_lt_assignment_x86(self):
-        port_num = len(self.machine_model_csl['ports'])
+        port_num = len(self.machine_model_csx['ports'])
         for instruction_form in self.kernel_x86:
             with self.subTest(instruction_form=instruction_form):
                 self.assertTrue('throughput' in instruction_form)
@@ -97,7 +97,7 @@ class TestSemanticTools(unittest.TestCase):
         #  2
         #     4_______>8
         #
-        dg = KernelDG(self.kernel_x86, self.parser_x86, self.machine_model_csl)
+        dg = KernelDG(self.kernel_x86, self.parser_x86, self.machine_model_csx)
         self.assertTrue(nx.algorithms.dag.is_directed_acyclic_graph(dg.dg))
         self.assertEqual(len(list(dg.get_dependent_instruction_forms(line_number=2))), 1)
         self.assertEqual(next(dg.get_dependent_instruction_forms(line_number=2)), 5)
@@ -139,18 +139,18 @@ class TestSemanticTools(unittest.TestCase):
         reg_ymm1 = AttrDict({'name': 'ymm1'})
 
         instr_form_r_c = self.parser_x86.parse_line('vmovsd  %xmm0, (%r15,%rcx,8)')
-        self.semantics_csl.assign_src_dst(instr_form_r_c)
+        self.semantics_csx.assign_src_dst(instr_form_r_c)
         instr_form_non_r_c = self.parser_x86.parse_line('movl  %xmm0, (%r15,%rax,8)')
-        self.semantics_csl.assign_src_dst(instr_form_non_r_c)
+        self.semantics_csx.assign_src_dst(instr_form_non_r_c)
         instr_form_w_c = self.parser_x86.parse_line('movi $0x05ACA, %rcx')
-        self.semantics_csl.assign_src_dst(instr_form_w_c)
+        self.semantics_csx.assign_src_dst(instr_form_w_c)
 
         instr_form_rw_ymm_1 = self.parser_x86.parse_line('vinsertf128 $0x1, %xmm1, %ymm0, %ymm1')
-        self.semantics_csl.assign_src_dst(instr_form_rw_ymm_1)
+        self.semantics_csx.assign_src_dst(instr_form_rw_ymm_1)
         instr_form_rw_ymm_2 = self.parser_x86.parse_line('vinsertf128 $0x1, %xmm0, %ymm1, %ymm1')
-        self.semantics_csl.assign_src_dst(instr_form_rw_ymm_2)
+        self.semantics_csx.assign_src_dst(instr_form_rw_ymm_2)
         instr_form_r_ymm = self.parser_x86.parse_line('vmovapd %ymm1, %ymm0')
-        self.semantics_csl.assign_src_dst(instr_form_r_ymm)
+        self.semantics_csx.assign_src_dst(instr_form_r_ymm)
 
         self.assertTrue(dag.is_read(reg_rcx, instr_form_r_c))
         self.assertFalse(dag.is_read(reg_rcx, instr_form_non_r_c))
