@@ -3,11 +3,11 @@
 Unit tests for Semantic Analysis
 """
 
-import networkx as nx
 import os
 import unittest
 
-from osaca.frontend import Frontend
+import networkx as nx
+
 from osaca.parser import AttrDict, ParserAArch64v81, ParserX86ATT
 from osaca.semantics.hw_model import MachineModel
 from osaca.semantics.kernel_dg import KernelDG
@@ -169,23 +169,28 @@ class TestSemanticTools(unittest.TestCase):
         # independent form HW model
         dag = KernelDG(self.kernel_AArch64, self.parser_AArch64, None)
         reg_x1 = AttrDict({'prefix': 'x', 'name': '1'})
+        reg_w1 = AttrDict({'prefix': 'w', 'name': '1'})
+        reg_d1 = AttrDict({'prefix': 'd', 'name': '1'})
         reg_q1 = AttrDict({'prefix': 'q', 'name': '1'})
         reg_v1 = AttrDict({'prefix': 'v', 'name': '1', 'lanes': '2', 'shape': 'd'})
-        regs = [reg_x1, reg_q1, reg_v1]
+        regs = [reg_d1, reg_q1, reg_v1]
+        regs_gp = [reg_w1, reg_x1]
 
         instr_form_r_1 = self.parser_AArch64.parse_line('stp q1, q3, [x12, #192]')
         self.semantics_tx2.assign_src_dst(instr_form_r_1)
         instr_form_r_2 = self.parser_AArch64.parse_line('fadd v2.2d, v1.2d, v0.2d')
         self.semantics_tx2.assign_src_dst(instr_form_r_2)
-        instr_form_w_1 = self.parser_AArch64.parse_line('ldr x0, [x0, #:got_lo12:q2c]')
+        instr_form_w_1 = self.parser_AArch64.parse_line('ldr d1, [x1, #:got_lo12:q2c]')
         self.semantics_tx2.assign_src_dst(instr_form_w_1)
+        instr_form_non_w_1 = self.parser_AArch64.parse_line('ldr x1, [x1, #:got_lo12:q2c]')
+        self.semantics_tx2.assign_src_dst(instr_form_non_w_1)
         instr_form_rw_1 = self.parser_AArch64.parse_line('fmul v1.2d, v1.2d, v0.2d')
         self.semantics_tx2.assign_src_dst(instr_form_rw_1)
         instr_form_rw_2 = self.parser_AArch64.parse_line('ldp q2, q4, [x1, #64]!')
         self.semantics_tx2.assign_src_dst(instr_form_rw_2)
         instr_form_rw_3 = self.parser_AArch64.parse_line('str x4, [x1], #64')
         self.semantics_tx2.assign_src_dst(instr_form_rw_3)
-        instr_form_non_rw_1 = self.parser_AArch64.parse_line('adds x0, x11')
+        instr_form_non_rw_1 = self.parser_AArch64.parse_line('adds x1, x11')
         self.semantics_tx2.assign_src_dst(instr_form_non_rw_1)
 
         for reg in regs:
@@ -193,14 +198,31 @@ class TestSemanticTools(unittest.TestCase):
                 self.assertTrue(dag.is_read(reg, instr_form_r_1))
                 self.assertTrue(dag.is_read(reg, instr_form_r_2))
                 self.assertTrue(dag.is_read(reg, instr_form_rw_1))
+                self.assertFalse(dag.is_read(reg, instr_form_rw_2))
+                self.assertFalse(dag.is_read(reg, instr_form_rw_3))
+                self.assertFalse(dag.is_read(reg, instr_form_w_1))
+                self.assertTrue(dag.is_written(reg, instr_form_w_1))
+                self.assertTrue(dag.is_written(reg, instr_form_rw_1))
+                self.assertFalse(dag.is_written(reg, instr_form_non_w_1))
+                self.assertFalse(dag.is_written(reg, instr_form_rw_2))
+                self.assertFalse(dag.is_written(reg, instr_form_rw_3))
+                self.assertFalse(dag.is_written(reg, instr_form_non_rw_1))
+                self.assertFalse(dag.is_written(reg, instr_form_non_rw_1))
+        for reg in regs_gp:
+            with self.subTest(reg=reg):
+                self.assertFalse(dag.is_read(reg, instr_form_r_1))
+                self.assertFalse(dag.is_read(reg, instr_form_r_2))
+                self.assertFalse(dag.is_read(reg, instr_form_rw_1))
                 self.assertTrue(dag.is_read(reg, instr_form_rw_2))
                 self.assertTrue(dag.is_read(reg, instr_form_rw_3))
-                self.assertFalse(dag.is_read(reg, instr_form_w_1))
-                self.assertTrue(dag.is_written(reg, instr_form_rw_1))
+                self.assertTrue(dag.is_read(reg, instr_form_w_1))
+                self.assertFalse(dag.is_written(reg, instr_form_w_1))
+                self.assertFalse(dag.is_written(reg, instr_form_rw_1))
+                self.assertTrue(dag.is_written(reg, instr_form_non_w_1))
                 self.assertTrue(dag.is_written(reg, instr_form_rw_2))
                 self.assertTrue(dag.is_written(reg, instr_form_rw_3))
-                self.assertFalse(dag.is_written(reg, instr_form_non_rw_1))
-                self.assertFalse(dag.is_written(reg, instr_form_non_rw_1))
+                self.assertTrue(dag.is_written(reg, instr_form_non_rw_1))
+                self.assertTrue(dag.is_written(reg, instr_form_non_rw_1))
 
     ##################
     # Helper functions
