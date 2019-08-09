@@ -8,9 +8,12 @@ python:
 before_install: 
 #  - pip install tox-travis
   - pip install codecov
+install:
+  - pip install -e .
+cache: pip
 script: 
 #  - tox
-  - coverage run tests/all_tests.py
+  - coverage run -p tests/all_tests.py
 after_success:
   - coverage combine
   - codecov
