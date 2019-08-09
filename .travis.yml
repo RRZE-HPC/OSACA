@@ -5,5 +5,12 @@ python:
     - "3.6"
 # Python 3.7 not working yet
 #    - "3.7"
-install: pip install tox-travis
-script: tox
+before_install: 
+#  - pip install tox-travis
+  - pip install codecov
+script: 
+#  - tox
+  - coverage run tests/all_tests.py
+after_success:
+  - coverage combine
+  - codecov
