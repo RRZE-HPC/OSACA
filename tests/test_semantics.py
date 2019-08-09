@@ -5,6 +5,7 @@ Unit tests for Semantic Analysis
 
 import os
 import unittest
+from subprocess import call
 
 import networkx as nx
 
@@ -18,8 +19,13 @@ class TestSemanticTools(unittest.TestCase):
     MODULE_DATA_DIR = os.path.join(
         os.path.dirname(os.path.split(os.path.abspath(__file__))[0]), 'osaca/data/'
     )
+    USER_DATA_DIR = os.path.join(os.path.expanduser('~'), '.osaca/')
 
     def setUp(self):
+        # copy db files in user directory
+        if not os.path.isdir(os.path.join(self.USER_DATA_DIR, 'data')):
+            os.makedirs(os.path.join(self.USER_DATA_DIR, 'data'))
+            call(['cp', '-r', self.MODULE_DATA_DIR, self.USER_DATA_DIR])
         # set up parser and kernels
         self.parser_x86 = ParserX86ATT()
         self.parser_AArch64 = ParserAArch64v81()
