@@ -78,6 +78,7 @@ class TestParserAArch64v81(unittest.TestCase):
         instr4 = 'str x28, [sp, x1, lsl #4] //12.9'
         instr5 = 'ldr x0, [x0, #:got_lo12:q2c]'
         instr6 = 'adrp    x0, :got:visited'
+        instr7 = 'fadd    v17.2d, v16.2d, v1.2d'
 
         parsed_1 = self.parser.parse_instruction(instr1)
         parsed_2 = self.parser.parse_instruction(instr2)
@@ -85,6 +86,7 @@ class TestParserAArch64v81(unittest.TestCase):
         parsed_4 = self.parser.parse_instruction(instr4)
         parsed_5 = self.parser.parse_instruction(instr5)
         parsed_6 = self.parser.parse_instruction(instr6)
+        parsed_7 = self.parser.parse_instruction(instr7)
 
         self.assertEqual(parsed_1.instruction, 'vcvt.F32.S32')
         self.assertEqual(parsed_1.operands[0].register.name, '1')
@@ -130,6 +132,13 @@ class TestParserAArch64v81(unittest.TestCase):
         self.assertEqual(parsed_6.operands[0].register.prefix, 'x')
         self.assertEqual(parsed_6.operands[1].identifier.relocation, ':got:')
         self.assertEqual(parsed_6.operands[1].identifier.name, 'visited')
+
+        self.assertEqual(parsed_7.instruction, 'fadd')
+        self.assertEqual(parsed_7.operands[0].register.name, '17')
+        self.assertEqual(parsed_7.operands[0].register.prefix, 'v')
+        self.assertEqual(parsed_7.operands[0].register.lanes, '2')
+        self.assertEqual(parsed_7.operands[0].register.shape, 'd')
+        self.assertEqual(self.parser.get_full_reg_name(parsed_7.operands[2].register), 'v1.2d')
 
     def test_parse_line(self):
         line_comment = '// -- Begin  main'
@@ -283,6 +292,7 @@ class TestParserAArch64v81(unittest.TestCase):
         imd_float_12 = {'float': {'mantissa': '790.0', 'e_sign': '-', 'exponent': '1'}}
         imd_double_11 = {'double': {'mantissa': '0.79', 'e_sign': '+', 'exponent': '2'}}
         imd_double_12 = {'double': {'mantissa': '790.0', 'e_sign': '-', 'exponent': '1'}}
+        identifier = {'identifier': {'name': '..B1.4'}}
 
         value1 = self.parser.normalize_imd(imd_decimal_1)
         self.assertEqual(value1, self.parser.normalize_imd(imd_hex_1))
@@ -293,6 +303,35 @@ class TestParserAArch64v81(unittest.TestCase):
         self.assertEqual(self.parser.normalize_imd(imd_float_12), value1)
         self.assertEqual(self.parser.normalize_imd(imd_double_11), value1)
         self.assertEqual(self.parser.normalize_imd(imd_double_12), value1)
+        self.assertEqual(self.parser.normalize_imd(identifier), identifier)
+
+    def test_multiple_regs(self):
+        instr_range = 'PUSH {r5-r7}'
+        reg_range = AttrDict({
+            'register': {
+                'range': [
+                    {'prefix': 'r', 'name': '5'},
+                    {'prefix': 'r', 'name': '7'}
+                ],
+                'index': None
+            }
+        })
+        instr_list = 'POP {r5, r7, r9}'
+        reg_list = AttrDict({
+            'register': {
+                'list': [
+                    {'prefix': 'r', 'name': '5'},
+                    {'prefix': 'r', 'name': '7'},
+                    {'prefix': 'r', 'name': '9'}
+                ],
+                'index': None
+            }
+        })
+        prange = self.parser.parse_line(instr_range)
+        plist = self.parser.parse_line(instr_list)
+
+        self.assertEqual(prange.operands[0], reg_range)
+        self.assertEqual(plist.operands[0], reg_list)
 
     def test_reg_dependency(self):
         reg_1_1 = AttrDict({'prefix': 'b', 'name': '1'})
