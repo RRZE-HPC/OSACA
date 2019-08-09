@@ -66,6 +66,9 @@ class MachineModel(object):
     def get_ISA(self):
         return self._data['isa']
 
+    def get_arch(self):
+        return self._data['arch_code']
+
     ######################################################
 
     def _match_operands(self, i_operands, operands):

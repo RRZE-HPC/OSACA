@@ -2,6 +2,7 @@
 
 import os
 import warnings
+from functools import reduce
 
 from osaca.parser import AttrDict
 
@@ -158,3 +159,12 @@ class SemanticsAppender(object):
     def _get_regular_destination_AArch64(self, instruction_form):
         # return first operand
         return instruction_form['operands'][:1]
+
+    @staticmethod
+    def get_throughput_sum(kernel):
+        tp_sum = reduce(
+            (lambda x, y: [sum(z) for z in zip(x, y)]),
+            [instr['port_pressure'] for instr in kernel],
+        )
+        tp_sum = [round(x, 2) for x in tp_sum]
+        return tp_sum

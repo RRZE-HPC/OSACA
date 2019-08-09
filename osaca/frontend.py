@@ -2,11 +2,10 @@
 
 import os
 import re
-from functools import reduce
 
 from ruamel import yaml
 
-from osaca.semantics import INSTR_FLAGS
+from osaca.semantics import INSTR_FLAGS, SemanticsAppender
 
 
 class Frontend(object):
@@ -67,16 +66,8 @@ class Frontend(object):
                 continue
             print(line)
         print()
-        tp_sum = self._get_throughput_sum(kernel)
+        tp_sum = SemanticsAppender.get_throughput_sum(kernel)
         print(lineno_filler + self._get_port_pressure(tp_sum, port_len, ' '))
-
-    def _get_throughput_sum(self, kernel):
-        tp_sum = reduce(
-            (lambda x, y: [sum(z) for z in zip(x, y)]),
-            [instr['port_pressure'] for instr in kernel],
-        )
-        tp_sum = [round(x, 2) for x in tp_sum]
-        return tp_sum
 
     def _get_separator_list(self, separator, separator_2=' '):
         separator_list = []
