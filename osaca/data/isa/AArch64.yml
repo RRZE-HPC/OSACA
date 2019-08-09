@@ -115,6 +115,25 @@ instruction_forms:
           post-indexed: true 
           source: true
           destination: false
+    - name: "ldp"
+      operands:
+        - class: "register"
+          prefix: "q"
+          source: false
+          destination: true
+        - class: "register"
+          prefix: "q"
+          source: false
+          destination: true
+        - class: "memory"
+          base: "x"
+          offset: "imd" 
+          index: ~
+          scale: 1
+          pre-indexed: true
+          post-indexed: false 
+          source: true
+          destination: true
     - name: "stp"
       operands:
         - class: "register"

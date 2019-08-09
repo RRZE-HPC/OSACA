@@ -55,6 +55,13 @@ class TestSemanticTools(unittest.TestCase):
     # Tests
     ###########
 
+    def test_creation_by_name(self):
+        try:
+            tmp_mm = MachineModel(arch='CSX')
+            SemanticsAppender(tmp_mm)
+        except ValueError:
+            self.fail()
+
     def test_src_dst_assignment_x86(self):
         for instruction_form in self.kernel_x86:
             with self.subTest(instruction_form=instruction_form):
@@ -115,7 +122,7 @@ class TestSemanticTools(unittest.TestCase):
         self.assertTrue(nx.algorithms.dag.is_directed_acyclic_graph(dg.dg))
         self.assertEqual(set(dg.get_dependent_instruction_forms(line_number=2)), {6, 7})
         self.assertEqual(set(dg.get_dependent_instruction_forms(line_number=3)), {8, 9})
-        self.assertEqual(set(dg.get_dependent_instruction_forms(line_number=4)), {6, 7})
+        self.assertEqual(set(dg.get_dependent_instruction_forms(line_number=4)), {5, 6, 7})
         self.assertEqual(set(dg.get_dependent_instruction_forms(line_number=5)), {8, 9})
         self.assertEqual(next(dg.get_dependent_instruction_forms(line_number=6)), 12)
         self.assertEqual(next(dg.get_dependent_instruction_forms(line_number=7)), 13)

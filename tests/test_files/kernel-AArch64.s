@@ -1,7 +1,7 @@
 .LBB0_32:
     ldp q4, q5, [x9, #-32]
     ldp q6, q7, [x9], #64
-    ldp q16, q17, [x11, #-32]
+    ldp q16, q17, [x11, #-32]!
     ldp q18, q19, [x11], #64
     fmul    v4.2d, v4.2d, v16.2d
     fmul    v5.2d, v5.2d, v17.2d
