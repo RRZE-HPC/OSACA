@@ -71,6 +71,17 @@ class MachineModel(object):
 
     ######################################################
 
+    def _check_for_duplicate(self, name, operands):
+        matches = [
+            instruction_form
+            for instruction_form in self._data['instruction_forms']
+            if instruction_form['name'] == name
+            and self._match_operands(instruction_form['operands'], operands)
+        ]
+        if len(matches) > 1:
+            return True
+        return False
+
     def _match_operands(self, i_operands, operands):
         if isinstance(operands, dict):
             operands = operands['operand_list']
@@ -86,12 +97,15 @@ class MachineModel(object):
             return False
 
     def _check_operands(self, i_operands, operands):
-        if self._data['isa'] == 'AArch64':
+        if self._data['isa'].lower() == 'aarch64':
             return self._check_AArch64_operands(i_operands, operands)
-        if self._data['isa'] == 'x86':
+        if self._data['isa'].lower() == 'x86':
             return self._check_x86_operands(i_operands, operands)
 
     def _check_AArch64_operands(self, i_operand, operand):
+        if 'class' in operand:
+            # compare two DB entries
+            return self._compare_db_entries(i_operand, operand)
         # register
         if 'register' in operand:
             if i_operand['class'] != 'register':
@@ -120,6 +134,9 @@ class MachineModel(object):
         return False
 
     def _check_x86_operands(self, i_operand, operand):
+        if 'class' in operand:
+            # compare two DB entries
+            return self._compare_db_entries(i_operand, operand)
         # register
         if 'register' in operand:
             if i_operand['class'] != 'register':
@@ -136,6 +153,18 @@ class MachineModel(object):
         # identifier (e.g., labels)
         if 'identifier' in operand:
             return i_operand['class'] == 'identifier'
+
+    def _compare_db_entries(self, operand_1, operand_2):
+        operand_attributes = list(
+            filter(lambda x: True if x != 'source' and x != 'destination' else False, operand_1)
+        )
+        for key in operand_attributes:
+            try:
+                if operand_1[key] != operand_2[key]:
+                    return False
+            except KeyError:
+                return False
+        return True
 
     def _is_AArch64_reg_type(self, i_reg, reg):
         if reg['prefix'] != i_reg['prefix']:

@@ -1,5 +1,6 @@
 osaca_version: 0.3.0
 micro_architecture: "Cascade Lake SP"
+arch_code: "CSX"
 isa: "x86"
 port_model_scheme: |
     ┌------------------------------------------------------------------------┐

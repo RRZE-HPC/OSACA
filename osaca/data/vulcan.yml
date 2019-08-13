@@ -293,6 +293,22 @@ instruction_forms:
       throughput: 1.0
       latency: ~    #  0   0DV   1   1DV   2    3    4    5
       port_pressure: [0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0]
+    - name: "ldp"
+      operands:
+        - class: "register"
+          prefix: "d"
+        - class: "register"
+          prefix: "d"
+        - class: "memory"
+          base: "x"
+          offset: ~
+          index: ~
+          scale: 1
+          pre-indexed: false
+          post-indexed: true
+      throughput: 1.0
+      latency: ~    #  0   0DV   1   1DV   2    3    4    5
+      port_pressure: [0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0]
     - name: "ldr"
       operands:
         - class: "register"
