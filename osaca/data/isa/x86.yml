@@ -83,16 +83,6 @@ instruction_forms:
           name: "xmm"
           source: true
           destination: false
-    - name: vaddsd
-      operands:
-        - class: "register"
-          name: "xmm"
-          source: true
-          destination: true
-        - class: "register"
-          name: "xmm"
-          source: true
-          destination: false
     - name: vfmadd132pd
       operands:
         - class: "memory"

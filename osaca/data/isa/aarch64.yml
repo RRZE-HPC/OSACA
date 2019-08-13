@@ -57,6 +57,25 @@ instruction_forms:
           pre-indexed: false
           post-indexed: false
           source: true
+          destination: false
+    - name: "ldp"
+      operands:
+        - class: "register"
+          prefix: "d"
+          source: false
+          destination: true
+        - class: "register"
+          prefix: "d"
+          source: false
+          destination: true
+        - class: "memory"
+          base: "x"
+          offset: "imd"
+          index: ~
+          scale: 1
+          pre-indexed: false
+          post-indexed: true
+          source: true
           destination: false   
     - name: "ldp"
       operands:
@@ -113,6 +132,25 @@ instruction_forms:
           scale: 1
           pre-indexed: false
           post-indexed: true 
+          source: true
+          destination: false
+    - name: "ldp"
+      operands:
+        - class: "register"
+          prefix: "q"
+          source: false
+          destination: true
+        - class: "register"
+          prefix: "q"
+          source: false
+          destination: true
+        - class: "memory"
+          base: "x"
+          offset: ~ 
+          index: ~
+          scale: 1
+          pre-indexed: false
+          post-indexed: false
           source: true
           destination: false
     - name: "ldp"
@@ -203,6 +241,25 @@ instruction_forms:
           destination: false
         - class: "memory"
           base: "x"
+          offset: ~
+          index: ~
+          scale: 1
+          pre-indexed: false
+          post-indexed: True
+          source: false
+          destination: true
+    - name: "stp"
+      operands:
+        - class: "register"
+          prefix: "q"
+          source: true
+          destination: false
+        - class: "register"
+          prefix: "q"
+          source: true
+          destination: false
+        - class: "memory"
+          base: "x"
           offset: "imd"
           index: ~
           scale: 1
@@ -252,7 +309,7 @@ instruction_forms:
           index: ~
           scale: 1
           pre-indexed: false
-          post-indexed: false
+          post-indexed: true
           source: false
           destination: true
     - name: "str"
@@ -264,7 +321,7 @@ instruction_forms:
         - class: "memory"
           base: "x"
           offset: ~
-          index: "x"
+          index: ~
           scale: 1
           pre-indexed: false
           post-indexed: true
