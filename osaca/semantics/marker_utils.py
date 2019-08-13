@@ -4,9 +4,10 @@ from osaca.parser import ParserAArch64v81, ParserX86ATT
 
 
 def reduce_to_section(kernel, isa):
+    isa = isa.lower()
     if isa == 'x86':
         start, end = find_marked_kernel_x86ATT(kernel)
-    elif isa == 'AArch64':
+    elif isa == 'aarch64':
         start, end = find_marked_kernel_AArch64(kernel)
     else:
         raise ValueError('ISA not supported.')

@@ -41,7 +41,7 @@ class TestFrontend(unittest.TestCase):
         )
         self.semantics_tx2 = SemanticsAppender(
             self.machine_model_tx2,
-            path_to_yaml=os.path.join(self.MODULE_DATA_DIR, 'isa/AArch64.yml'),
+            path_to_yaml=os.path.join(self.MODULE_DATA_DIR, 'isa/aarch64.yml'),
         )
         for i in range(len(self.kernel_x86)):
             self.semantics_csx.assign_src_dst(self.kernel_x86[i])
