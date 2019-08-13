@@ -76,9 +76,9 @@ def sanity_check(arch: str, verbose=False):
 def _check_sanity_arch_db(arch_mm, isa_mm):
     suspicious_prefixes_x86 = ['vfm', 'fm']
     suspicious_prefixes_arm = ['fml', 'ldp', 'stp', 'str']
-    if arch_mm.get_ISA() == 'AArch64':
+    if arch_mm.get_ISA().lower() == 'aarch64':
         suspicious_prefixes = suspicious_prefixes_arm
-    if arch_mm.get_ISA() == 'x86':
+    if arch_mm.get_ISA().lower() == 'x86':
         suspicious_prefixes = suspicious_prefixes_x86
     port_num = len(arch_mm['ports'])
 

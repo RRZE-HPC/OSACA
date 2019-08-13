@@ -12,8 +12,8 @@ class KerncraftAPI(object):
     def __init__(self, arch):
         self.machine_model = MachineModel(arch=arch)
         self.semantics = SemanticsAppender(self.machine_model)
-        isa = self.machine_model.get_ISA()
-        if isa == 'AArch64':
+        isa = self.machine_model.get_ISA().lower()
+        if isa == 'aarch64':
             self.parser = ParserAArch64v81()
         elif isa == 'x86':
             self.parser = ParserX86ATT()

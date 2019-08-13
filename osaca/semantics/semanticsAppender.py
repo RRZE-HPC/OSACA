@@ -23,7 +23,7 @@ class INSTR_FLAGS:
 class SemanticsAppender(object):
     def __init__(self, machine_model: MachineModel, path_to_yaml=None):
         self._machine_model = machine_model
-        self._isa = machine_model.get_ISA()
+        self._isa = machine_model.get_ISA().lower()
         if path_to_yaml:
             path = path_to_yaml
         else:
@@ -129,13 +129,13 @@ class SemanticsAppender(object):
     def _get_regular_source_operands(self, instruction_form):
         if self._isa == 'x86':
             return self._get_regular_source_x86ATT(instruction_form)
-        if self._isa == 'AArch64':
+        if self._isa == 'aarch64':
             return self._get_regular_source_AArch64(instruction_form)
 
     def _get_regular_destination_operands(self, instruction_form):
         if self._isa == 'x86':
             return self._get_regular_destination_x86ATT(instruction_form)
-        if self._isa == 'AArch64':
+        if self._isa == 'aarch64':
             return self._get_regular_destination_AArch64(instruction_form)
 
     def _get_regular_source_x86ATT(self, instruction_form):
