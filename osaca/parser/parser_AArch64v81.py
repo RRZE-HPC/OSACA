@@ -391,6 +391,15 @@ class ParserAArch64v81(BaseParser):
             exponent *= -1
         return float(ieee_val['mantissa']) * (10 ** exponent)
 
+    def parse_register(self, register_string):
+        raise NotImplementedError
+
+    def is_gpr(self, register):
+        raise NotImplementedError
+
+    def is_vector_register(self, register):
+        raise NotImplementedError
+
     def is_reg_dependend_of(self, reg_a, reg_b):
         prefixes_gpr = 'wx'
         prefixes_vec = 'bhsdqv'
