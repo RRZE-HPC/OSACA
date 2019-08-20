@@ -2,7 +2,7 @@
 
 import collections
 
-from osaca import Frontend
+from osaca.frontend import Frontend
 from osaca.parser import ParserAArch64v81, ParserX86ATT
 from osaca.semantics import (INSTR_FLAGS, KernelDG, MachineModel, SemanticsAppender,
                              reduce_to_section)

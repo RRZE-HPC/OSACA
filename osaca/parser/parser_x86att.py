@@ -97,6 +97,24 @@ class ParserX86ATT(BaseParser):
             + pp.Optional(self.comment)
         )
 
+    def parse_register(self, register_string):
+        register = pp.Group(
+            pp.Literal('%')
+            + pp.Word(pp.alphanums).setResultsName('name')
+            + pp.Optional(
+                pp.Literal('{')
+                + pp.Literal('%')
+                + pp.Word(pp.alphanums).setResultsName('mask')
+                + pp.Literal('}')
+            )
+        ).setResultsName(self.REGISTER_ID)
+        try:
+            return self.process_operand(
+                register.parseString(register_string, parseAll=True).asDict()
+            )
+        except pp.ParseException:
+            return None
+
     def parse_line(self, line, line_number=None):
         """
         Parse line and return instruction form.
@@ -129,9 +147,7 @@ class ParserX86ATT(BaseParser):
         # 2. Parse label
         if result is None:
             try:
-                result = self.process_operand(
-                    self.label.parseString(line, parseAll=True).asDict()
-                )
+                result = self.process_operand(self.label.parseString(line, parseAll=True).asDict())
                 result = AttrDict.convert_dict(result)
                 instruction_form[self.LABEL_ID] = result[self.LABEL_ID]['name']
                 if self.COMMENT_ID in result[self.LABEL_ID]:
@@ -297,7 +313,22 @@ class ParserX86ATT(BaseParser):
             return False
         return True
 
+    def is_gpr(self, register):
+        gpr_parser = (
+            pp.CaselessLiteral('R')
+            + pp.Word(pp.nums).setResultsName('id')
+            + pp.Optional(pp.Word('dwbDWB', exact=1))
+        )
+        if self.is_basic_gpr(register):
+            return True
+        else:
+            try:
+                gpr_parser.parseString(register['name'], parseAll=True)
+                return True
+            except pp.ParseException:
+                return False
+
     def is_vector_register(self, register):
-        if len(register['name']) > 2 and register['name'][1:3] == 'mm':
+        if len(register['name']) > 2 and register['name'][1:3].lower() == 'mm':
             return True
         return False
