@@ -1,6 +1,10 @@
 #!/usr/bin/env python3
 
+import copy
+
 import networkx as nx
+
+from osaca.parser import AttrDict
 
 from .hw_model import MachineModel
 
@@ -10,19 +14,63 @@ class KernelDG(nx.DiGraph):
         self.kernel = parsed_kernel
         self.parser = parser
         self.model = hw_model
-        self.dg = self.create_DG()
+        self.dg = self.create_DG(self.kernel)
+        self.loopcarried_deps = self.check_for_loopcarried_dep(self.kernel)
 
-    def check_for_loop(self, kernel):
-        raise NotImplementedError
+    def check_for_loopcarried_dep(self, kernel):
+        # increase line number for second kernel loop
+        kernel_length = len(kernel)
+        first_line_no = kernel[0].line_number
+        kernel_copy = [AttrDict.convert_dict(d) for d in copy.deepcopy(kernel)]
+        tmp_kernel = kernel + kernel_copy
+        for i, instruction_form in enumerate(tmp_kernel[kernel_length:]):
+            tmp_kernel[i + kernel_length].line_number = instruction_form.line_number * 10
+        # get dependency graph
+        dg = self.create_DG(tmp_kernel)
+        descendants = [
+            (x, sorted([x for x in nx.algorithms.dag.descendants(dg, x)]))
+            for x in range(first_line_no, first_line_no + kernel_length)
+            if x in dg
+        ]
+        loopcarried_deps = [
+            x for x in descendants if len(x[1]) > 0 and x[1][-1] >= first_line_no * 10
+        ]
 
-    def create_DG(self):
+        # adjust line numbers
+        # and add reference to kernel again
+        for i, dep in enumerate(loopcarried_deps):
+            nodes = [int(n / 10) for n in dep[1] if n >= first_line_no * 10]
+            nodes = [self._get_node_by_lineno(x) for x in nodes]
+            loopcarried_deps[i] = (self._get_node_by_lineno(dep[0]), nodes)
+        # check if dependency is cyclic
+        cyclic_lc_deps = []
+        for dep in loopcarried_deps:
+            write_back = list(
+                self.find_depending(
+                    dep[0],
+                    tmp_kernel[dep[0].line_number - first_line_no + 1:],
+                    include_write=True,
+                )
+            )
+            if (
+                write_back is not None
+                and len(write_back) > 0
+                and int(write_back[-1].line_number / 10) == dep[0].line_number
+            ):
+                cyclic_lc_deps.append(dep)
+        return cyclic_lc_deps
+
+    def _get_node_by_lineno(self, lineno):
+        return [instr for instr in self.kernel if instr.line_number == lineno][0]
+
+    def create_DG(self, kernel):
         # 1. go through kernel instruction forms (as vertices)
         # 2. find edges (to dependend further instruction)
         # 3. get LT value and set as edge weight
         # 4. add instr forms as node attribute
         dg = nx.DiGraph()
-        for i, instruction_form in enumerate(self.kernel):
-            for dep in self.find_depending(instruction_form, self.kernel[i + 1:]):
+        for i, instruction_form in enumerate(kernel):
+            for dep in self.find_depending(instruction_form, kernel[i + 1:]):
                 dg.add_edge(
                     instruction_form['line_number'],
                     dep['line_number'],
@@ -38,9 +86,16 @@ class KernelDG(nx.DiGraph):
             return [x for x in self.kernel if x['line_number'] in longest_path]
         else:
             # split to DAG
-            raise NotImplementedError
+            raise NotImplementedError('Kernel is cyclic.')
 
-    def find_depending(self, instruction_form, kernel):
+    def get_loopcarried_dependencies(self):
+        if nx.algorithms.dag.is_directed_acyclic_graph(self.dg):
+            return self.loopcarried_deps
+        else:
+            # split to DAG
+            raise NotImplementedError('Kernel is cyclic.')
+
+    def find_depending(self, instruction_form, kernel, include_write=False):
         if instruction_form.operands is None:
             return
         for dst in instruction_form.operands.destination + instruction_form.operands.src_dst:
@@ -51,8 +106,12 @@ class KernelDG(nx.DiGraph):
                         yield instr_form
                         if self.is_written(dst.register, instr_form):
                             # operand in src_dst list
+                            if include_write:
+                                yield instr_form
                             break
                     elif self.is_written(dst.register, instr_form):
+                        if include_write:
+                            yield instr_form
                         break
             elif 'memory' in dst:
                 # Check if base register is altered during memory access
@@ -63,8 +122,12 @@ class KernelDG(nx.DiGraph):
                             yield instr_form
                             if self.is_written(dst.memory.base, instr_form):
                                 # operand in src_dst list
+                                if include_write:
+                                    yield instr_form
                                 break
                         elif self.is_written(dst.memory.base, instr_form):
+                            if include_write:
+                                yield instr_form
                             break
 
     def get_dependent_instruction_forms(self, instr_form=None, line_number=None):

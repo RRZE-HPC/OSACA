@@ -134,6 +134,18 @@ class Frontend(object):
                 )
             )
 
+    def print_loopcarried_dependencies(self, dep_tuplelist, separator='|'):
+        print('\n\n------------------------')
+        for tup in dep_tuplelist:
+            print(
+                '{}: {} {} {}'.format(
+                    tup[0]['line_number'],
+                    tup[0]['line'],
+                    separator,
+                    [node['line_number'] for node in tup[1]],
+                )
+            )
+
     def print_list_summary(self):
         raise NotImplementedError
 

@@ -35,14 +35,23 @@ class BaseParser(object):
 
     def parse_line(self, line, line_number):
         # Done in derived classes
-        raise NotImplementedError()
+        raise NotImplementedError
 
     def parse_instruction(self, instruction):
         # Done in derived classes
-        raise NotImplementedError()
+        raise NotImplementedError
+
+    def parse_register(self, register_string):
+        raise NotImplementedError
+
+    def is_gpr(self, register):
+        raise NotImplementedError
+
+    def is_vector_register(self, register):
+        raise NotImplementedError
 
     def construct_parser(self):
-        raise NotImplementedError()
+        raise NotImplementedError
 
     ##################
     # Helper functions
