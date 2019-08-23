@@ -50,11 +50,13 @@ class MachineModel(object):
     ######################################################
 
     def get_instruction(self, name, operands):
+        if name is None:
+            return None
         try:
             return next(
                 instruction_form
                 for instruction_form in self._data['instruction_forms']
-                if instruction_form['name'] == name
+                if instruction_form['name'].lower() == name.lower()
                 and self._match_operands(instruction_form['operands'], operands)
             )
         except StopIteration:
@@ -75,7 +77,7 @@ class MachineModel(object):
         matches = [
             instruction_form
             for instruction_form in self._data['instruction_forms']
-            if instruction_form['name'] == name
+            if instruction_form['name'].lower() == name.lower()
             and self._match_operands(instruction_form['operands'], operands)
         ]
         if len(matches) > 1:
