@@ -123,7 +123,7 @@ class Frontend(object):
         print('\n\n------------------------')
         for instruction_form in cp_kernel:
             print(
-                '{} {} {} {}{}{} {}'.format(
+                '{:4d} {} {:4.1f} {}{}{} {}'.format(
                     instruction_form['line_number'],
                     separator,
                     instruction_form['latency'],
@@ -133,13 +133,28 @@ class Frontend(object):
                     instruction_form['line'],
                 )
             )
+        print(
+            '\n{:4} {} {:4.1f}'.format(
+                ' ' * max([len(str(instr_form['line_number'])) for instr_form in cp_kernel]),
+                ' ' * len(separator),
+                sum([instr_form['latency'] for instr_form in cp_kernel]),
+            )
+        )
 
     def print_loopcarried_dependencies(self, dep_tuplelist, separator='|'):
         print('\n\n------------------------')
         for tup in dep_tuplelist:
             print(
-                '{}: {} {} {}'.format(
+                '{:4d} {} {:4.1f} {} {:36}{} {}'.format(
                     tup[0]['line_number'],
+                    separator,
+                    sum(
+                        [
+                            instr_form['latency'] if instr_form['latency'] is not None else 0
+                            for instr_form in tup[1]
+                        ]
+                    ),
+                    separator,
                     tup[0]['line'],
                     separator,
                     [node['line_number'] for node in tup[1]],
