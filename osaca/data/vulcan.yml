@@ -2,6 +2,10 @@ osaca_version: 0.3.0
 micro_architecture: "Cavium Vulcan"
 arch_code: "Vulcan"
 isa: "AArch64"
+ROB_size: 180
+retired_uOps_per_cycle: 4
+scheduler_size: 60
+ports: ["0", "0DV", "1", "1DV", "2", "3", "4", "5"]
 port_model_scheme: |
     ┌-----------------------------------------------------------┐
     |                  60 entry unified scheduler               |
@@ -23,7 +27,6 @@ port_model_scheme: |
                ┌------┐
                |CRYPTO|
                └------┘
-ports: ["0", "0DV", "1", "1DV", "2", "3", "4", "5"]
 instruction_forms:
     - name: "add"
       operands:

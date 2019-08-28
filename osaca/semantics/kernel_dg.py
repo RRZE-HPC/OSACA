@@ -3,10 +3,10 @@
 import copy
 
 import networkx as nx
+from itertools import chain, product
 
 from osaca.parser import AttrDict
-
-from .hw_model import MachineModel
+from osaca.semantics import MachineModel
 
 
 class KernelDG(nx.DiGraph):
@@ -18,47 +18,37 @@ class KernelDG(nx.DiGraph):
         self.loopcarried_deps = self.check_for_loopcarried_dep(self.kernel)
 
     def check_for_loopcarried_dep(self, kernel):
+        multiplier = len(kernel) + 1
         # increase line number for second kernel loop
         kernel_length = len(kernel)
         first_line_no = kernel[0].line_number
         kernel_copy = [AttrDict.convert_dict(d) for d in copy.deepcopy(kernel)]
         tmp_kernel = kernel + kernel_copy
         for i, instruction_form in enumerate(tmp_kernel[kernel_length:]):
-            tmp_kernel[i + kernel_length].line_number = instruction_form.line_number * 10
+            tmp_kernel[i + kernel_length].line_number = instruction_form.line_number * multiplier
         # get dependency graph
         dg = self.create_DG(tmp_kernel)
-        descendants = [
-            (x, sorted([x for x in nx.algorithms.dag.descendants(dg, x)]))
-            for x in range(first_line_no, first_line_no + kernel_length)
-            if x in dg
-        ]
-        loopcarried_deps = [
-            x for x in descendants if len(x[1]) > 0 and x[1][-1] >= first_line_no * 10
-        ]
 
+        # build cyclic loop-carried dependencies
+        loopcarried_deps = [
+            (node, list(nx.algorithms.simple_paths.all_simple_paths(dg, node, node * multiplier)))
+            for node in dg.nodes
+            if node < first_line_no * multiplier
+        ]
+        # filter others and create graph
+        loopcarried_deps = list(
+            chain.from_iterable(
+                [list(product([dep_chain[0]], dep_chain[1])) for dep_chain in loopcarried_deps]
+            )
+        )
         # adjust line numbers
         # and add reference to kernel again
         for i, dep in enumerate(loopcarried_deps):
-            nodes = [int(n / 10) for n in dep[1] if n >= first_line_no * 10]
+            nodes = [int(n / multiplier) for n in dep[1] if n >= first_line_no * multiplier]
             nodes = [self._get_node_by_lineno(x) for x in nodes]
             loopcarried_deps[i] = (self._get_node_by_lineno(dep[0]), nodes)
-        # check if dependency is cyclic
-        cyclic_lc_deps = []
-        for dep in loopcarried_deps:
-            write_back = list(
-                self.find_depending(
-                    dep[0],
-                    tmp_kernel[dep[0].line_number - first_line_no + 1:],
-                    include_write=True,
-                )
-            )
-            if (
-                write_back is not None
-                and len(write_back) > 0
-                and int(write_back[-1].line_number / 10) == dep[0].line_number
-            ):
-                cyclic_lc_deps.append(dep)
-        return cyclic_lc_deps
+
+        return loopcarried_deps
 
     def _get_node_by_lineno(self, lineno):
         return [instr for instr in self.kernel if instr.line_number == lineno][0]
@@ -70,6 +60,7 @@ class KernelDG(nx.DiGraph):
         # 4. add instr forms as node attribute
         dg = nx.DiGraph()
         for i, instruction_form in enumerate(kernel):
+            dg.add_node(instruction_form['line_number'])
             for dep in self.find_depending(instruction_form, kernel[i + 1:]):
                 dg.add_edge(
                     instruction_form['line_number'],
