@@ -30,6 +30,7 @@ class IbenchAPI(object):
         # TODO
         raise NotImplementedError
 
+
 # TODO
 # template_x86 = Template()
 template_aarch64 = Template(

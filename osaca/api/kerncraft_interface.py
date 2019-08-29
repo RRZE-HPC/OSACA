@@ -4,8 +4,8 @@ import collections
 
 from osaca.frontend import Frontend
 from osaca.parser import ParserAArch64v81, ParserX86ATT
-from osaca.semantics import (INSTR_FLAGS, KernelDG, MachineModel, SemanticsAppender,
-                             reduce_to_section)
+from osaca.semantics import (INSTR_FLAGS, KernelDG, MachineModel,
+                             SemanticsAppender, reduce_to_section)
 
 
 class KerncraftAPI(object):
@@ -21,16 +21,13 @@ class KerncraftAPI(object):
     def analyze_code(self, code):
         parsed_code = self.parser.parse_file(code)
         kernel = reduce_to_section(parsed_code, self.machine_model.get_ISA())
-        for i in range(len(kernel)):
-            self.semantics.assign_src_dst(kernel[i])
-            self.semantics.assign_tp_lt(kernel[i])
+        self.semantics.add_semantics(kernel)
         return kernel
 
-    def create_output(self, kernel, show_lineno=False):
+    def create_output(self, kernel, verbose=False):
         kernel_graph = KernelDG(kernel, self.parser, self.machine_model)
         frontend = Frontend(arch=self.machine_model.get_arch())
-        frontend.print_throughput_analysis(kernel, show_lineno=show_lineno)
-        frontend.print_latency_analysis(kernel_graph.get_critical_path())
+        frontend.print_full_analysis(kernel, kernel_graph, verbose=verbose)
 
     def get_unmatched_instruction_ratio(self, kernel):
         unmatched_counter = 0

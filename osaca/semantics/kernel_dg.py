@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 
 import copy
+from itertools import chain, product
 
 import networkx as nx
-from itertools import chain, product
 
 from osaca.parser import AttrDict
 from osaca.semantics import MachineModel

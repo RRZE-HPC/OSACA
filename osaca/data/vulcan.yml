@@ -5,6 +5,7 @@ isa: "AArch64"
 ROB_size: 180
 retired_uOps_per_cycle: 4
 scheduler_size: 60
+hidden_loads: false
 ports: ["0", "0DV", "1", "1DV", "2", "3", "4", "5"]
 port_model_scheme: |
     ┌-----------------------------------------------------------┐
