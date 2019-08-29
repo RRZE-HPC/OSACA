@@ -17,4 +17,8 @@
     stp q2, q3, [x10]
     add x10, x10, #64           // =64
     adds    x12, x12, #1            // =1
+    fmov    s0, -1.0e+0
+    fmov    s1, #2.0f
+    prfm    pldl1keep, [x26, #2112]
+
     b.ne    .LBB0_32
