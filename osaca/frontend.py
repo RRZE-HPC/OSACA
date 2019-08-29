@@ -6,12 +6,12 @@ from datetime import datetime as dt
 
 from ruamel import yaml
 
-import osaca
 from osaca.semantics import INSTR_FLAGS, KernelDG, SemanticsAppender
+import osaca
 
 
 class Frontend(object):
-    def __init__(self, filename, arch=None, path_to_yaml=None):
+    def __init__(self, filename='', arch=None, path_to_yaml=None):
         self._filename = filename
         if not arch and not path_to_yaml:
             raise ValueError('Either arch or path_to_yaml required.')
@@ -55,10 +55,7 @@ class Frontend(object):
         headline = 'Port pressure in cycles'
         headline_str = '{{:^{}}}'.format(len(separator))
 
-        print(
-            '\n\nThroughput Analysis Report\n'
-            + '--------------------------'
-        )
+        print('\n\nThroughput Analysis Report\n' + '--------------------------')
         print(headline_str.format(headline))
         print(lineno_filler + self._get_port_number_line(port_len))
         print(separator)
@@ -131,10 +128,7 @@ class Frontend(object):
         return string_result
 
     def print_latency_analysis(self, cp_kernel, separator='|'):
-        print(
-            '\n\nLatency Analysis Report\n'
-            + '-----------------------'
-        )
+        print('\n\nLatency Analysis Report\n' + '-----------------------')
         for instruction_form in cp_kernel:
             print(
                 '{:4d} {} {:4.1f} {}{}{} {}'.format(
