@@ -12,7 +12,8 @@ from osaca.parser import AttrDict, ParserAArch64v81
 
 
 class TestParserAArch64v81(unittest.TestCase):
-    def setUp(self):
+    @classmethod
+    def setUpClass(self):
         self.parser = ParserAArch64v81()
         with open(self._find_file('triad-arm-iaca.s')) as f:
             self.triad_code = f.read()

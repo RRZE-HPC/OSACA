@@ -10,7 +10,8 @@ from osaca.parser import ParserAArch64v81, ParserX86ATT
 
 
 class TestMarkerUtils(unittest.TestCase):
-    def setUp(self):
+    @classmethod
+    def setUpClass(self):
         self.parser_AArch = ParserAArch64v81()
         self.parser_x86 = ParserX86ATT()
         with open(self._find_file('triad-arm-iaca.s')) as f:

@@ -21,7 +21,8 @@ class TestSemanticTools(unittest.TestCase):
     )
     USER_DATA_DIR = os.path.join(os.path.expanduser('~'), '.osaca/')
 
-    def setUp(self):
+    @classmethod
+    def setUpClass(self):
         # copy db files in user directory
         if not os.path.isdir(os.path.join(self.USER_DATA_DIR, 'data')):
             os.makedirs(os.path.join(self.USER_DATA_DIR, 'data'))
@@ -50,6 +51,8 @@ class TestSemanticTools(unittest.TestCase):
             self.machine_model_tx2,
             path_to_yaml=os.path.join(self.MODULE_DATA_DIR, 'isa/aarch64.yml'),
         )
+        self.machine_model_zen = MachineModel(arch='zen1')
+
         for i in range(len(self.kernel_x86)):
             self.semantics_csx.assign_src_dst(self.kernel_x86[i])
             self.semantics_csx.assign_tp_lt(self.kernel_x86[i])
@@ -85,6 +88,7 @@ class TestSemanticTools(unittest.TestCase):
                     self.assertTrue('src_dst' in instruction_form['operands'])
 
     def test_tp_lt_assignment_x86(self):
+        self.assertTrue('ports' in self.machine_model_csx)
         port_num = len(self.machine_model_csx['ports'])
         for instruction_form in self.kernel_x86:
             with self.subTest(instruction_form=instruction_form):
@@ -94,6 +98,7 @@ class TestSemanticTools(unittest.TestCase):
                 self.assertEqual(len(instruction_form['port_pressure']), port_num)
 
     def test_tp_lt_assignment_AArch64(self):
+        self.assertTrue('ports' in self.machine_model_tx2)
         port_num = len(self.machine_model_tx2['ports'])
         for instruction_form in self.kernel_AArch64:
             with self.subTest(instruction_form=instruction_form):
@@ -236,6 +241,48 @@ class TestSemanticTools(unittest.TestCase):
                 self.assertTrue(dag.is_written(reg, instr_form_rw_3))
                 self.assertTrue(dag.is_written(reg, instr_form_non_rw_1))
                 self.assertTrue(dag.is_written(reg, instr_form_non_rw_1))
+
+    def test_invalid_MachineModel(self):
+        with self.assertRaises(ValueError):
+            MachineModel()
+        with self.assertRaises(ValueError):
+            MachineModel(arch='CSX', path_to_yaml=os.path.join(self.MODULE_DATA_DIR, 'csx.yml'))
+        with self.assertRaises(ValueError):
+            MachineModel(arch='THE_MACHINE')
+        with self.assertRaises(ValueError):
+            MachineModel(path_to_yaml=os.path.join(self.MODULE_DATA_DIR, 'THE_MACHINE.yml'))
+
+    def test_MachineModel_getter(self):
+        sample_operands = [
+            {
+                'memory': {
+                    'offset': None,
+                    'base': {'name': 'r12'},
+                    'index': {'name': 'rcx'},
+                    'scale': 8,
+                }
+            }
+        ]
+        self.assertIsNone(self.machine_model_csx.get_instruction('GETRESULT', sample_operands))
+        self.assertIsNone(self.machine_model_tx2.get_instruction('GETRESULT', sample_operands))
+
+        self.assertEqual(self.machine_model_csx.get_arch(), 'CSX')
+        self.assertEqual(self.machine_model_tx2.get_arch(), 'Vulcan')
+
+        self.assertEqual(self.machine_model_csx.get_ISA(), 'x86')
+        self.assertEqual(self.machine_model_tx2.get_ISA(), 'AArch64')
+
+        ports_csx = ['0', '0DV', '1', '2', '2D', '3', '3D', '4', '5', '6', '7']
+        data_ports_csx = ['2D', '3D']
+        self.assertEqual(self.machine_model_csx.get_ports(), ports_csx)
+        self.assertEqual(self.machine_model_csx.get_data_ports(), data_ports_csx)
+
+        self.assertFalse(self.machine_model_tx2.has_hidden_loads())
+        self.assertTrue(self.machine_model_zen.has_hidden_loads())
+
+        self.assertEqual(MachineModel.get_isa_for_arch('CSX'), 'x86')
+        self.assertEqual(MachineModel.get_isa_for_arch('VuLcAn'), 'aarch64')
+        self.assertIsNone(MachineModel.get_isa_for_arch('THE_MACHINE'))
 
     ##################
     # Helper functions

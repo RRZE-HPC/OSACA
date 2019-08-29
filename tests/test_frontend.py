@@ -18,7 +18,8 @@ class TestFrontend(unittest.TestCase):
         os.path.dirname(os.path.split(os.path.abspath(__file__))[0]), 'osaca/data/'
     )
 
-    def setUp(self):
+    @classmethod
+    def setUpClass(self):
         # set up parser and kernels
         self.parser_x86 = ParserX86ATT()
         self.parser_AArch64 = ParserAArch64v81()
