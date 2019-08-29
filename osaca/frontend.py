@@ -2,14 +2,17 @@
 
 import os
 import re
+from datetime import datetime as dt
 
 from ruamel import yaml
 
-from osaca.semantics import INSTR_FLAGS, SemanticsAppender
+import osaca
+from osaca.semantics import INSTR_FLAGS, KernelDG, SemanticsAppender
 
 
 class Frontend(object):
-    def __init__(self, arch=None, path_to_yaml=None):
+    def __init__(self, filename, arch=None, path_to_yaml=None):
+        self._filename = filename
         if not arch and not path_to_yaml:
             raise ValueError('Either arch or path_to_yaml required.')
         if arch and path_to_yaml:
@@ -43,13 +46,20 @@ class Frontend(object):
         return instruction_form['comment'] is not None and instruction_form['instruction'] is None
 
     def print_throughput_analysis(self, kernel, show_lineno=False, show_cmnts=True):
-        print()
         lineno_filler = '     ' if show_lineno else ''
         port_len = self._get_max_port_len(kernel)
         separator = '-' * sum([x + 3 for x in port_len]) + '-'
         separator += '--' + len(str(kernel[-1]['line_number'])) * '-' if show_lineno else ''
         col_sep = '|'
         sep_list = self._get_separator_list(col_sep)
+        headline = 'Port pressure in cycles'
+        headline_str = '{{:^{}}}'.format(len(separator))
+
+        print(
+            '\n\nThroughput Analysis Report\n'
+            + '--------------------------'
+        )
+        print(headline_str.format(headline))
         print(lineno_filler + self._get_port_number_line(port_len))
         print(separator)
         for instruction_form in kernel:
@@ -86,6 +96,7 @@ class Frontend(object):
         string_result = ''
         string_result += '*' if INSTR_FLAGS.NOT_BOUND in flag_obj else ''
         string_result += 'X' if INSTR_FLAGS.TP_UNKWN in flag_obj else ''
+        string_result += 'P' if INSTR_FLAGS.HIDDEN_LD in flag_obj else ''
         # TODO add other flags
         string_result += ' ' if len(string_result) == 0 else ''
         return string_result
@@ -120,7 +131,10 @@ class Frontend(object):
         return string_result
 
     def print_latency_analysis(self, cp_kernel, separator='|'):
-        print('\n\n------------------------')
+        print(
+            '\n\nLatency Analysis Report\n'
+            + '-----------------------'
+        )
         for instruction_form in cp_kernel:
             print(
                 '{:4d} {} {:4.1f} {}{}{} {}'.format(
@@ -142,7 +156,10 @@ class Frontend(object):
         )
 
     def print_loopcarried_dependencies(self, dep_tuplelist, separator='|'):
-        print('\n\n------------------------')
+        print(
+            '\n\nLoop-Carried Dependencies Analysis Report\n'
+            + '-----------------------------------------'
+        )
         for tup in dep_tuplelist:
             print(
                 '{:4d} {} {:4.1f} {} {:36}{} {}'.format(
@@ -161,11 +178,38 @@ class Frontend(object):
                 )
             )
 
-    def print_list_summary(self):
-        raise NotImplementedError
+    def _print_header_report(self):
+        version = osaca.osaca.get_version()
+        adjust = 20
+        header = ''
+        header += 'Open Source Architecture Code Analyzer (OSACA) - {}\n'.format(version)
+        header += 'Analyzed file:'.ljust(adjust) + '{}\n'.format(self._filename)
+        header += 'Architecture:'.ljust(adjust) + '{}\n'.format(self._arch)
+        header += 'Timestamp:'.ljust(adjust) + '{}\n'.format(
+            dt.utcnow().strftime('%Y-%m-%d %H:%M:%S')
+        )
+        print(header)
 
-    def _print_header_throughput_report(self):
-        raise NotImplementedError
+    def _print_symbol_map(self):
+        symbol_dict = {
+            INSTR_FLAGS.NOT_BOUND: 'Instruction micro-ops not bound to a port',
+            INSTR_FLAGS.TP_UNKWN: 'No throughput/latency information for this instruction in '
+            + 'data file',
+            INSTR_FLAGS.HIDDEN_LD: 'Throughput of LOAD operation can be hidden behind a past '
+            + 'or future STORE instruction',
+        }
+        symbol_map = ''
+        for flag in sorted(symbol_dict.keys()):
+            symbol_map += ' {} - {}\n'.format(self._get_flag_symbols([flag]), symbol_dict[flag])
+
+        print(symbol_map, end='')
 
     def _print_port_binding_summary(self):
         raise NotImplementedError
+
+    def print_full_analysis(self, kernel, kernel_dg: KernelDG, verbose=False):
+        self._print_header_report()
+        self._print_symbol_map()
+        self.print_throughput_analysis(kernel, show_lineno=True)
+        self.print_latency_analysis(kernel_dg.get_critical_path())
+        self.print_loopcarried_dependencies(kernel_dg.get_loopcarried_dependencies())

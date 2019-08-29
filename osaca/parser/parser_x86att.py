@@ -2,8 +2,7 @@
 
 import pyparsing as pp
 
-from .attr_dict import AttrDict
-from .base_parser import BaseParser
+from osaca.parser import AttrDict, BaseParser
 
 
 class ParserX86ATT(BaseParser):

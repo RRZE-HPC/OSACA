@@ -5,8 +5,7 @@ import warnings
 from functools import reduce
 
 from osaca.parser import AttrDict
-
-from .hw_model import MachineModel
+from osaca.semantics import MachineModel
 
 
 class INSTR_FLAGS:
@@ -18,6 +17,8 @@ class INSTR_FLAGS:
     LT_UNKWN = 'lt_unkown'
     NOT_BOUND = 'not_bound'
     HIDDEN_LD = 'hidden_load'
+    HAS_LD = 'performs_load'
+    HAS_ST = 'performs_store'
 
 
 class SemanticsAppender(object):
@@ -35,6 +36,50 @@ class SemanticsAppender(object):
         name = os.path.join(data_dir, isa + '.yml')
         assert os.path.exists(name)
         return name
+
+    # SUMMARY FUNCTION
+    def add_semantics(self, kernel):
+        for instruction_form in kernel:
+            self.assign_src_dst(instruction_form)
+            self.assign_tp_lt(instruction_form)
+        if self._machine_model.has_hidden_loads():
+            self.set_hidden_loads(kernel)
+
+    def set_hidden_loads(self, kernel):
+        loads = [instr for instr in kernel if INSTR_FLAGS.HAS_LD in instr['flags']]
+        stores = [instr for instr in kernel if INSTR_FLAGS.HAS_ST in instr['flags']]
+        # Filter instructions including load and store
+        load_ids = [instr['line_number'] for instr in loads]
+        store_ids = [instr['line_number'] for instr in stores]
+        shared_ldst = list(set(load_ids).intersection(set(store_ids)))
+        loads = [instr for instr in loads if instr['line_number'] not in shared_ldst]
+        stores = [instr for instr in stores if instr['line_number'] not in shared_ldst]
+
+        if len(stores) == 0 or len(loads) == 0:
+            # nothing to do
+            return
+        if len(loads) < len(stores):
+            # Hide all loads
+            for load in loads:
+                load['flags'] += [INSTR_FLAGS.HIDDEN_LD]
+                load['port_pressure'] = self._nullify_data_ports(load['port_pressure'])
+        else:
+            for store in stores:
+                # Get 'closest' load instruction
+                min_distance_load = min(
+                    [
+                        (
+                            abs(load_instr['line_number'] - store['line_number']),
+                            load_instr['line_number'],
+                        )
+                        for load_instr in loads
+                        if INSTR_FLAGS.HIDDEN_LD not in load_instr['flags']
+                    ]
+                )
+                load = [instr for instr in kernel if instr['line_number'] == min_distance_load[1]][0]
+                # Hide load
+                load['flags'] += [INSTR_FLAGS.HIDDEN_LD]
+                load['port_pressure'] = self._nullify_data_ports(load['port_pressure'])
 
     # get parser result and assign throughput and latency value to instruction form
     # mark instruction form with semantic flags
@@ -125,6 +170,37 @@ class SemanticsAppender(object):
         # store operand list in dict and reassign operand key/value pair
         op_dict['operand_list'] = operands
         instruction_form['operands'] = AttrDict.convert_dict(op_dict)
+        # assign LD/ST flags
+        instruction_form['flags'] = (
+            instruction_form['flags'] if 'flags' in instruction_form else []
+        )
+        if self._has_load(instruction_form):
+            instruction_form['flags'] += [INSTR_FLAGS.HAS_LD]
+        if self._has_store(instruction_form):
+            instruction_form['flags'] += [INSTR_FLAGS.HAS_ST]
+
+    def _nullify_data_ports(self, port_pressure):
+        data_ports = self._machine_model.get_data_ports()
+        for port in data_ports:
+            index = self._machine_model.get_ports().index(port)
+            port_pressure[index] = 0.0
+        return port_pressure
+
+    def _has_load(self, instruction_form):
+        for operand in (
+            instruction_form['operands']['source'] + instruction_form['operands']['src_dst']
+        ):
+            if 'memory' in operand:
+                return True
+        return False
+
+    def _has_store(self, instruction_form):
+        for operand in (
+            instruction_form['operands']['destination'] + instruction_form['operands']['src_dst']
+        ):
+            if 'memory' in operand:
+                return True
+        return False
 
     def _get_regular_source_operands(self, instruction_form):
         if self._isa == 'x86':

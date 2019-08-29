@@ -2,6 +2,11 @@ osaca_version: 0.3.0
 micro_architecture: "Cascade Lake SP"
 arch_code: "CSX"
 isa: "x86"
+ROB_size: 224
+retired_uOps_per_cycle: 4
+scheduler_size: 97
+hidden_loads: false
+ports: ["0", "0DV", "1", "2", "2D", "3", "3D", "4", "5", "6", "7"]
 port_model_scheme: |
     ┌------------------------------------------------------------------------┐
     |                         97 entry unified scheduler                     |
@@ -38,7 +43,6 @@ port_model_scheme: |
      |  VNNI | ┌-------┐
      └-------┘ |  VNNI |
                └-------┘
-ports: ["0", "0DV", "1", "2", "2D", "3", "3D", "4", "5", "6", "7"]
 instruction_forms:
     - name: addsd
       operands:

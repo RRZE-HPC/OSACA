@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import os
+import re
 
 from ruamel import yaml
 
@@ -70,6 +71,37 @@ class MachineModel(object):
 
     def get_arch(self):
         return self._data['arch_code']
+
+    def get_ports(self):
+        return self._data['ports']
+
+    def has_hidden_loads(self):
+        if 'hidden_loads' in self._data:
+            return self._data['hidden_loads']
+        return False
+
+    def get_data_ports(self):
+        data_port = re.compile(r'^[0-9]+D$')
+        data_ports = [x for x in filter(data_port.match, self._data['ports'])]
+        return data_ports
+
+    @staticmethod
+    def get_isa_for_arch(arch):
+        arch_dict = {
+            'vulcan': 'aarch64',
+            'zen1': 'x86',
+            'snb': 'x86',
+            'ivb': 'x86',
+            'hsw': 'x86',
+            'bdw': 'x86',
+            'skl': 'x86',
+            'skx': 'x86',
+            'csx': 'x86',
+        }
+        arch = arch.lower()
+        if arch in arch_dict:
+            return arch_dict[arch].lower()
+        return None
 
     ######################################################
 

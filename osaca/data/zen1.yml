@@ -2,6 +2,8 @@ osaca_version: 0.3.0
 micro_architecture: "AMD Zen (family 17h)"
 arch_code: "ZEN1"
 isa: "x86"
+hidden_loads: true
+ports: ["0", "1", "2", "3", "3DV", "4", "5", "6", "7", "8", "8D", "9", "9D"]
 port_model_scheme: |
     ┌--------------------------------------┐  ┌-----------------------------------------------┐
     |       96 entries OoO scheduler       |  |           84 entries OoO scheduler            |
@@ -22,7 +24,6 @@ port_model_scheme: |
                |  SHUF |                                                        ┌-------------┐
                └-------┘                                                        |    STORE    |
                                                                                 └-------------┘
-ports: ["0", "1", "2", "3", "3DV", "4", "5", "6", "7", "8", "8D", "9", "9D"]
 instruction_forms:
     - name: add
       operands:
@@ -102,6 +103,18 @@ instruction_forms:
       throughput: 0.0
       latency: ~    #  0    1    2    3   3DV   4    5    6    7    8   8D    9   9D
       port_pressure: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+    - name: movl
+      operands:
+        - class: "memory"
+          base: "gpr"
+          offset: "imd"
+          index: ~
+          scale: 1
+        - class: "register"
+          name: "gpr"
+      throughput: 0.5
+      latency: 3.0
+      port_pressure: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.5, 0.5, 0.5, 0.5]
     - name: mulsd
       operands:
         - class: "register"
