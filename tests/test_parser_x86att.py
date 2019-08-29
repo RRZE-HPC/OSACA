@@ -12,7 +12,8 @@ from osaca.parser import AttrDict, ParserX86ATT
 
 
 class TestParserX86ATT(unittest.TestCase):
-    def setUp(self):
+    @classmethod
+    def setUpClass(self):
         self.parser = ParserX86ATT()
         with open(self._find_file('triad-x86-iaca.s')) as f:
             self.triad_code = f.read()

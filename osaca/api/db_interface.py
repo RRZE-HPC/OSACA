@@ -21,7 +21,7 @@ def add_entry_to_db(arch: str, entry):
     """
     # load yaml
     arch = arch.lower()
-    filepath = os.path.join(os.path.expanduser('~/.osaca/data/', arch + '.yml'))
+    filepath = os.path.join(os.path.expanduser('~/.osaca/data/' + arch + '.yml'))
     assert os.path.exists(filepath)
     with open(filepath, 'r') as f:
         data = yaml.load(f, Loader=yaml.Loader)
@@ -52,7 +52,7 @@ def add_entries_to_db(arch: str, entries: list) -> None:
     """
     # load yaml
     arch = arch.lower()
-    filepath = os.path.join(os.path.expanduser('~/.osaca/data/', arch + '.yml'))
+    filepath = os.path.join(os.path.expanduser('~/.osaca/data/' + arch + '.yml'))
     assert os.path.exists(filepath)
     with open(filepath, 'r') as f:
         data = yaml.load(f, Loader=yaml.Loader)
