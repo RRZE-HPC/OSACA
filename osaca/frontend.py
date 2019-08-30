@@ -149,26 +149,26 @@ class Frontend(object):
             )
         )
 
-    def print_loopcarried_dependencies(self, dep_tuplelist, separator='|'):
+    def print_loopcarried_dependencies(self, dep_dict, separator='|'):
         print(
             '\n\nLoop-Carried Dependencies Analysis Report\n'
             + '-----------------------------------------'
         )
-        for tup in dep_tuplelist:
+        for dep in dep_dict:
             print(
                 '{:4d} {} {:4.1f} {} {:36}{} {}'.format(
-                    tup[0]['line_number'],
+                    dep,
                     separator,
                     sum(
                         [
                             instr_form['latency'] if instr_form['latency'] is not None else 0
-                            for instr_form in tup[1]
+                            for instr_form in dep_dict[dep]['dependencies']
                         ]
                     ),
                     separator,
-                    tup[0]['line'],
+                    dep_dict[dep]['root']['line'],
                     separator,
-                    [node['line_number'] for node in tup[1]],
+                    [node['line_number'] for node in dep_dict[dep]['dependencies']],
                 )
             )
 
