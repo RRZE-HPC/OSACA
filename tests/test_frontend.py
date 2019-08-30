@@ -55,17 +55,25 @@ class TestFrontend(unittest.TestCase):
     # Tests
     ###########
 
+    def test_frontend_creation(self):
+        with self.assertRaises(ValueError):
+            Frontend()
+        with self.assertRaises(ValueError):
+            Frontend(arch='csx', path_to_yaml=os.path.join(self.MODULE_DATA_DIR, 'csx.yml'))
+        with self.assertRaises(ValueError):
+            Frontend(arch='THE_MACHINE')
+        Frontend(arch='zen1')
+
     def test_frontend_x86(self):
         dg = KernelDG(self.kernel_x86, self.parser_x86, self.machine_model_csx)
         fe = Frontend(path_to_yaml=os.path.join(self.MODULE_DATA_DIR, 'csx.yml'))
-        fe.print_throughput_analysis(self.kernel_x86)
+        fe.print_throughput_analysis(self.kernel_x86, show_cmnts=False)
         fe.print_latency_analysis(dg.get_critical_path())
 
     def test_frontend_AArch64(self):
         dg = KernelDG(self.kernel_AArch64, self.parser_AArch64, self.machine_model_tx2)
         fe = Frontend(path_to_yaml=os.path.join(self.MODULE_DATA_DIR, 'vulcan.yml'))
-        fe.print_throughput_analysis(self.kernel_AArch64)
-        fe.print_latency_analysis(dg.get_critical_path())
+        fe.print_full_analysis(self.kernel_AArch64, dg, verbose=True)
 
     ##################
     # Helper functions
