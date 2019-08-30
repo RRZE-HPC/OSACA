@@ -13,6 +13,7 @@ suite = unittest.TestLoader().loadTestsFromNames(
         'test_semantics',
         'test_frontend',
         'test_db_interface',
+        'test_kerncraftAPI',
     ]
 )
 
