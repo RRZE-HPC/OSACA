@@ -213,6 +213,7 @@ class TestParserX86ATT(unittest.TestCase):
         self.assertEqual(self.parser.parse_register(register_str_2), parsed_reg_2)
         self.assertEqual(self.parser.parse_register(register_str_3), parsed_reg_3)
         self.assertEqual(self.parser.parse_register(register_str_4), parsed_reg_4)
+        self.assertIsNone(self.parser.parse_register('rax'))
 
     def test_normalize_imd(self):
         imd_decimal_1 = {'value': '79'}
