@@ -198,6 +198,22 @@ class TestParserX86ATT(unittest.TestCase):
         self.assertEqual(parsed[0].line_number, 1)
         self.assertEqual(len(parsed), 353)
 
+    def test_parse_register(self):
+        register_str_1 = '%rax'
+        register_str_2 = '%r9'
+        register_str_3 = '%xmm1'
+        register_str_4 = '%rip'
+
+        parsed_reg_1 = {'register': {'name': 'rax'}}
+        parsed_reg_2 = {'register': {'name': 'r9'}}
+        parsed_reg_3 = {'register': {'name': 'xmm1'}}
+        parsed_reg_4 = {'register': {'name': 'rip'}}
+
+        self.assertEqual(self.parser.parse_register(register_str_1), parsed_reg_1)
+        self.assertEqual(self.parser.parse_register(register_str_2), parsed_reg_2)
+        self.assertEqual(self.parser.parse_register(register_str_3), parsed_reg_3)
+        self.assertEqual(self.parser.parse_register(register_str_4), parsed_reg_4)
+
     def test_normalize_imd(self):
         imd_decimal_1 = {'value': '79'}
         imd_hex_1 = {'value': '0x4f'}
