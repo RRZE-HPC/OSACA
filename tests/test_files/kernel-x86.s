@@ -1,3 +1,5 @@
+#movl    $111,%ebx
+#.byte   100,103,144
 .L10:	
     vmovapd	(%r15,%rax), %ymm0
 	vmovapd	(%r12,%rax), %ymm3
@@ -7,3 +9,5 @@
 	addq	$32, %rax
 	cmpl	%ecx, %r10d
 	ja	.L10
+#movl    $222,%ebx
+#.byte   100,103,144

@@ -10,9 +10,8 @@ from subprocess import call
 import networkx as nx
 
 from osaca.parser import AttrDict, ParserAArch64v81, ParserX86ATT
-from osaca.semantics.hw_model import MachineModel
-from osaca.semantics.kernel_dg import KernelDG
-from osaca.semantics.semanticsAppender import SemanticsAppender
+from osaca.semantics import (INSTR_FLAGS, KernelDG, MachineModel,
+                             SemanticsAppender)
 
 
 class TestSemanticTools(unittest.TestCase):
@@ -31,11 +30,11 @@ class TestSemanticTools(unittest.TestCase):
         self.parser_x86 = ParserX86ATT()
         self.parser_AArch64 = ParserAArch64v81()
         with open(self._find_file('kernel-x86.s')) as f:
-            code_x86 = f.read()
+            self.code_x86 = f.read()
         with open(self._find_file('kernel-AArch64.s')) as f:
-            code_AArch64 = f.read()
-        self.kernel_x86 = self.parser_x86.parse_file(code_x86)
-        self.kernel_AArch64 = self.parser_AArch64.parse_file(code_AArch64)
+            self.code_AArch64 = f.read()
+        self.kernel_x86 = self.parser_x86.parse_file(self.code_x86)
+        self.kernel_AArch64 = self.parser_AArch64.parse_file(self.code_AArch64)
 
         # set up machine models
         self.machine_model_csx = MachineModel(
@@ -117,16 +116,18 @@ class TestSemanticTools(unittest.TestCase):
         #
         dg = KernelDG(self.kernel_x86, self.parser_x86, self.machine_model_csx)
         self.assertTrue(nx.algorithms.dag.is_directed_acyclic_graph(dg.dg))
-        self.assertEqual(len(list(dg.get_dependent_instruction_forms(line_number=2))), 1)
-        self.assertEqual(next(dg.get_dependent_instruction_forms(line_number=2)), 5)
-        self.assertEqual(len(list(dg.get_dependent_instruction_forms(line_number=3))), 1)
-        self.assertEqual(next(dg.get_dependent_instruction_forms(line_number=3)), 5)
         self.assertEqual(len(list(dg.get_dependent_instruction_forms(line_number=4))), 1)
-        self.assertEqual(next(dg.get_dependent_instruction_forms(line_number=4)), 8)
+        self.assertEqual(next(dg.get_dependent_instruction_forms(line_number=4)), 7)
         self.assertEqual(len(list(dg.get_dependent_instruction_forms(line_number=5))), 1)
-        self.assertEqual(next(dg.get_dependent_instruction_forms(line_number=5)), 6)
-        self.assertEqual(len(list(dg.get_dependent_instruction_forms(line_number=6))), 0)
-        self.assertEqual(len(list(dg.get_dependent_instruction_forms(line_number=7))), 0)
+        self.assertEqual(next(dg.get_dependent_instruction_forms(line_number=5)), 7)
+        self.assertEqual(len(list(dg.get_dependent_instruction_forms(line_number=6))), 1)
+        self.assertEqual(next(dg.get_dependent_instruction_forms(line_number=6)), 10)
+        self.assertEqual(len(list(dg.get_dependent_instruction_forms(line_number=7))), 1)
+        self.assertEqual(next(dg.get_dependent_instruction_forms(line_number=7)), 8)
+        self.assertEqual(len(list(dg.get_dependent_instruction_forms(line_number=8))), 0)
+        self.assertEqual(len(list(dg.get_dependent_instruction_forms(line_number=9))), 0)
+        with self.assertRaises(ValueError):
+            dg.get_dependent_instruction_forms()
 
     def test_kernelDG_AArch64(self):
         dg = KernelDG(self.kernel_AArch64, self.parser_AArch64, self.machine_model_tx2)
@@ -149,6 +150,21 @@ class TestSemanticTools(unittest.TestCase):
         self.assertEqual(len(list(dg.get_dependent_instruction_forms(line_number=19))), 0)
         self.assertEqual(len(list(dg.get_dependent_instruction_forms(line_number=20))), 0)
         self.assertEqual(len(list(dg.get_dependent_instruction_forms(line_number=21))), 0)
+        with self.assertRaises(ValueError):
+            dg.get_dependent_instruction_forms()
+
+    def test_hidden_load(self):
+        machine_model_zen = MachineModel(arch='ZEN1')
+        semantics_zen = SemanticsAppender(machine_model_zen)
+        kernel_zen = self.parser_x86.parse_file(self.code_x86)
+        kernel_zen_2 = self.parser_x86.parse_file(self.code_x86)[-3:]
+        semantics_zen.add_semantics(kernel_zen)
+        semantics_zen.add_semantics(kernel_zen_2)
+
+        num_hidden_loads = len([x for x in kernel_zen if INSTR_FLAGS.HIDDEN_LD in x['flags']])
+        num_hidden_loads_2 = len([x for x in kernel_zen_2 if INSTR_FLAGS.HIDDEN_LD in x['flags']])
+        self.assertEqual(num_hidden_loads, 1)
+        self.assertEqual(num_hidden_loads_2, 0)
 
     def test_cyclic_dag(self):
         dg = KernelDG(self.kernel_x86, self.parser_x86, self.machine_model_csx)
@@ -161,13 +177,16 @@ class TestSemanticTools(unittest.TestCase):
             dg.get_loopcarried_dependencies()
 
     def test_loop_carried_dependency_x86(self):
+        lcd_id = 9
         dg = KernelDG(self.kernel_x86, self.parser_x86, self.machine_model_csx)
         lc_deps = dg.get_loopcarried_dependencies()
         self.assertEqual(len(lc_deps), 1)
-        self.assertEqual(lc_deps[7]['root'], dg.dg.nodes(data=True)[7]['instruction_form'])
-        self.assertEqual(len(lc_deps[7]['dependencies']), 1)
         self.assertEqual(
-            lc_deps[7]['dependencies'][0], dg.dg.nodes(data=True)[7]['instruction_form']
+            lc_deps[lcd_id]['root'], dg.dg.nodes(data=True)[lcd_id]['instruction_form']
+        )
+        self.assertEqual(len(lc_deps[lcd_id]['dependencies']), 1)
+        self.assertEqual(
+            lc_deps[lcd_id]['dependencies'][0], dg.dg.nodes(data=True)[lcd_id]['instruction_form']
         )
 
     def test_is_read_is_written_x86(self):
