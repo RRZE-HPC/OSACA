@@ -28,9 +28,10 @@ class Frontend(object):
                 )
         elif path_to_yaml:
             try:
+                assert os.path.exists(self._path)
                 with open(path_to_yaml, 'r') as f:
                     self._data = yaml.load(f, Loader=yaml.Loader)
-            except AssertionError:
+            except (AssertionError, FileNotFoundError):
                 raise ValueError(
                     'Cannot find specified path to YAML file. Make sure the machine file exists.'
                 )
