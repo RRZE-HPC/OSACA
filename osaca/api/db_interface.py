@@ -29,13 +29,15 @@ def add_entry_to_db(arch: str, entry):
     if 'name' not in entry:
         raise ValueError('No name for instruction specified. No import possible')
     if 'operands' not in entry:
-        entry['operands'] = None
+        entry['operands'] = []
     if 'throughput' not in entry:
         entry['throughput'] = None
     if 'latency' not in entry:
         entry['latency'] = None
     if 'port_pressure' not in entry:
         entry['port_pressure'] = None
+    if 'uops' not in entry:
+        entry['uops'] = None
     data['instruction_forms'].append(entry)
     __dump_data_to_yaml(filepath, data)
 
@@ -67,13 +69,15 @@ def add_entries_to_db(arch: str, entries: list) -> None:
             entries.remove(entry)
             continue
         if 'operands' not in entry:
-            entry['operands'] = None
+            entry['operands'] = []
         if 'throughput' not in entry:
             entry['throughput'] = None
         if 'latency' not in entry:
             entry['latency'] = None
         if 'port_pressure' not in entry:
             entry['port_pressure'] = None
+        if 'uops' not in entry:
+            entry['uops'] = None
         data['instruction_forms'].append(entry)
     __dump_data_to_yaml(filepath, data)
 
