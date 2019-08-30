@@ -7,7 +7,6 @@ from datetime import datetime as dt
 from ruamel import yaml
 
 from osaca.semantics import INSTR_FLAGS, KernelDG, SemanticsAppender
-import osaca
 
 
 class Frontend(object):
@@ -173,7 +172,7 @@ class Frontend(object):
             )
 
     def _print_header_report(self):
-        version = osaca.osaca.get_version()
+        version = 'v0.3.0'
         adjust = 20
         header = ''
         header += 'Open Source Architecture Code Analyzer (OSACA) - {}\n'.format(version)
