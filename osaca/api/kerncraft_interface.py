@@ -49,4 +49,9 @@ class KerncraftAPI(object):
 
     def get_latency(self, kernel):
         kernel_graph = KernelDG(kernel, self.parser, self.machine_model)
-        return sum([x if x['latency'] is not None else 0 for x in kernel_graph])
+        return sum(
+            [
+                x['latency'] if x['latency'] is not None else 0
+                for x in kernel_graph.get_critical_path()
+            ]
+        )

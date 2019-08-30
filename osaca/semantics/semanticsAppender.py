@@ -13,8 +13,8 @@ class INSTR_FLAGS:
     Flags used for unknown or special instructions
     """
 
-    TP_UNKWN = 'tp_unkown'
-    LT_UNKWN = 'lt_unkown'
+    TP_UNKWN = 'tp_unknown'
+    LT_UNKWN = 'lt_unknown'
     NOT_BOUND = 'not_bound'
     HIDDEN_LD = 'hidden_load'
     HAS_LD = 'performs_load'
@@ -76,7 +76,9 @@ class SemanticsAppender(object):
                         if INSTR_FLAGS.HIDDEN_LD not in load_instr['flags']
                     ]
                 )
-                load = [instr for instr in kernel if instr['line_number'] == min_distance_load[1]][0]
+                load = [instr for instr in kernel if instr['line_number'] == min_distance_load[1]][
+                    0
+                ]
                 # Hide load
                 load['flags'] += [INSTR_FLAGS.HIDDEN_LD]
                 load['port_pressure'] = self._nullify_data_ports(load['port_pressure'])
@@ -86,43 +88,49 @@ class SemanticsAppender(object):
     def assign_tp_lt(self, instruction_form):
         flags = []
         port_number = len(self._machine_model['ports'])
-        instruction_data = self._machine_model.get_instruction(
-            instruction_form['instruction'], instruction_form['operands']
-        )
-        if instruction_data:
-            # instruction form in DB
-            throughput = instruction_data['throughput']
-            port_pressure = instruction_data['port_pressure']
-            try:
-                assert isinstance(port_pressure, list)
-                assert len(port_pressure) == port_number
-                instruction_form['port_pressure'] = port_pressure
-                if sum(port_pressure) == 0 and throughput is not None:
-                    # port pressure on all ports 0 --> not bound to a port
-                    flags.append(INSTR_FLAGS.NOT_BOUND)
-            except AssertionError:
-                warnings.warn(
-                    'Port pressure could not be imported correctly from database. '
-                    + 'Please check entry for:\n {}'.format(instruction_form)
-                )
-                instruction_form['port_pressure'] = [0.0 for i in range(port_number)]
-                flags.append(INSTR_FLAGS.TP_UNKWN)
-            if throughput is None:
-                # assume 0 cy and mark as unknown
-                throughput = 0.0
-                flags.append(INSTR_FLAGS.TP_UNKWN)
-            latency = instruction_data['latency']
-            if latency is None:
-                # assume 0 cy and mark as unknown
-                latency = 0.0
-                flags.append(INSTR_FLAGS.LT_UNKWN)
-        else:
-            # instruction could not be found in DB
-            # --> mark as unknown and assume 0 cy for latency/throughput
+        if instruction_form['instruction'] is None:
+            # No instruction (label, comment, ...) --> ignore
             throughput = 0.0
             latency = 0.0
             instruction_form['port_pressure'] = [0.0 for i in range(port_number)]
-            flags += [INSTR_FLAGS.TP_UNKWN, INSTR_FLAGS.LT_UNKWN]
+        else:
+            instruction_data = self._machine_model.get_instruction(
+                instruction_form['instruction'], instruction_form['operands']
+            )
+            if instruction_data:
+                # instruction form in DB
+                throughput = instruction_data['throughput']
+                port_pressure = instruction_data['port_pressure']
+                try:
+                    assert isinstance(port_pressure, list)
+                    assert len(port_pressure) == port_number
+                    instruction_form['port_pressure'] = port_pressure
+                    if sum(port_pressure) == 0 and throughput is not None:
+                        # port pressure on all ports 0 --> not bound to a port
+                        flags.append(INSTR_FLAGS.NOT_BOUND)
+                except AssertionError:
+                    warnings.warn(
+                        'Port pressure could not be imported correctly from database. '
+                        + 'Please check entry for:\n {}'.format(instruction_form)
+                    )
+                    instruction_form['port_pressure'] = [0.0 for i in range(port_number)]
+                    flags.append(INSTR_FLAGS.TP_UNKWN)
+                if throughput is None:
+                    # assume 0 cy and mark as unknown
+                    throughput = 0.0
+                    flags.append(INSTR_FLAGS.TP_UNKWN)
+                latency = instruction_data['latency']
+                if latency is None:
+                    # assume 0 cy and mark as unknown
+                    latency = 0.0
+                    flags.append(INSTR_FLAGS.LT_UNKWN)
+            else:
+                # instruction could not be found in DB
+                # --> mark as unknown and assume 0 cy for latency/throughput
+                throughput = 0.0
+                latency = 0.0
+                instruction_form['port_pressure'] = [0.0 for i in range(port_number)]
+                flags += [INSTR_FLAGS.TP_UNKWN, INSTR_FLAGS.LT_UNKWN]
         # flatten flag list
         flags = list(set(flags))
         if 'flags' not in instruction_form:
