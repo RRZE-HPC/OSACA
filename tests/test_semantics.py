@@ -157,14 +157,19 @@ class TestSemanticTools(unittest.TestCase):
         machine_model_zen = MachineModel(arch='ZEN1')
         semantics_zen = SemanticsAppender(machine_model_zen)
         kernel_zen = self.parser_x86.parse_file(self.code_x86)
+        kernel_zen_2 = self.parser_x86.parse_file(self.code_x86)
         kernel_zen_2 = self.parser_x86.parse_file(self.code_x86)[-3:]
+        kernel_zen_3 = self.parser_x86.parse_file(self.code_x86)[5:8]
         semantics_zen.add_semantics(kernel_zen)
         semantics_zen.add_semantics(kernel_zen_2)
+        semantics_zen.add_semantics(kernel_zen_3)
 
         num_hidden_loads = len([x for x in kernel_zen if INSTR_FLAGS.HIDDEN_LD in x['flags']])
         num_hidden_loads_2 = len([x for x in kernel_zen_2 if INSTR_FLAGS.HIDDEN_LD in x['flags']])
+        num_hidden_loads_3 = len([x for x in kernel_zen_3 if INSTR_FLAGS.HIDDEN_LD in x['flags']])
         self.assertEqual(num_hidden_loads, 1)
         self.assertEqual(num_hidden_loads_2, 0)
+        self.assertEqual(num_hidden_loads_3, 1)
 
     def test_cyclic_dag(self):
         dg = KernelDG(self.kernel_x86, self.parser_x86, self.machine_model_csx)
