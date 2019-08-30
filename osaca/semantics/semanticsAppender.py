@@ -58,7 +58,7 @@ class SemanticsAppender(object):
         if len(stores) == 0 or len(loads) == 0:
             # nothing to do
             return
-        if len(loads) < len(stores):
+        if len(loads) <= len(stores):
             # Hide all loads
             for load in loads:
                 load['flags'] += [INSTR_FLAGS.HIDDEN_LD]

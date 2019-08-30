@@ -33,7 +33,7 @@ class BaseParser(object):
             asm_instructions.append(self.parse_line(line, i + 1 + start_line))
         return asm_instructions
 
-    def parse_line(self, line, line_number):
+    def parse_line(self, line, line_number=None):
         # Done in derived classes
         raise NotImplementedError
 
@@ -51,7 +51,8 @@ class BaseParser(object):
         raise NotImplementedError
 
     def construct_parser(self):
-        raise NotImplementedError
+        return
+        # raise NotImplementedError
 
     ##################
     # Helper functions
