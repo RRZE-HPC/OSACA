@@ -31,7 +31,7 @@ class TestDBInterface(unittest.TestCase):
 
         self.entry_csx['port_pressure'] = [1.25, 0, 1.25, 0.5, 0.5, 0.5, 0.5, 0, 1.25, 1.25, 0]
         self.entry_vulcan['port_pressure'] = [2.5, 2.5, 0, 0, 0.5, 0.5]
-        del(self.entry_vulcan['operands'][1]['name'])
+        del self.entry_vulcan['operands'][1]['name']
         self.entry_vulcan['operands'][1]['prefix'] = 'x'
         self.entry_zen1['port_pressure'] = [1, 1, 1, 1, 0, 1, 0, 0, 0, 0.5, 1, 0.5, 1]
 
@@ -39,12 +39,13 @@ class TestDBInterface(unittest.TestCase):
     def tearDownClass(self):
         if sys.exc_info() == (None, None, None):
             # Test successful, remove DB entries
-            for arch in ['csx', 'vulcan', 'zen1']:
+            test_archs = {'csx': 22, 'vulcan': 24, 'zen1': 22}
+            for arch in test_archs:
                 lines = []
                 with open(os.path.expanduser('~/.osaca/data/' + arch + '.yml'), 'r') as f:
                     lines = f.readlines()
                 with open(os.path.expanduser('~/.osaca/data/' + arch + '.yml'), 'w') as f:
-                    f.writelines([line for line in lines[:-24]])
+                    f.writelines([line for line in lines[:-1 * test_archs[arch]]])
 
     ###########
     # Tests
@@ -57,7 +58,7 @@ class TestDBInterface(unittest.TestCase):
 
         add_entry_to_db('csx', self.entry_csx)
         add_entry_to_db('vulcan', self.entry_vulcan)
-        add_entry_to_db('zen1', self.entry_zen1)
+        add_entry_to_db('zen1', {'name': 'empty_operation'})
 
         num_entries_csx = len(MachineModel('csx')['instruction_forms']) - num_entries_csx
         num_entries_vulcan = len(MachineModel('vulcan')['instruction_forms']) - num_entries_vulcan
@@ -66,6 +67,12 @@ class TestDBInterface(unittest.TestCase):
         self.assertEqual(num_entries_csx, 1)
         self.assertEqual(num_entries_vulcan, 1)
         self.assertEqual(num_entries_zen1, 1)
+
+    def test_invalid_add(self):
+        entry = {}
+        with self.assertRaises(ValueError):
+            add_entry_to_db('csx', entry)
+        add_entries_to_db('csx', [entry])
 
     def test_add_multiple_entries(self):
         num_entries_csx = len(MachineModel('csx')['instruction_forms'])
@@ -80,6 +87,8 @@ class TestDBInterface(unittest.TestCase):
             entries_csx.append(copy.deepcopy(self.entry_csx))
             entries_vulcan.append(copy.deepcopy(self.entry_vulcan))
             entries_zen1.append(copy.deepcopy(self.entry_zen1))
+
+        entries_csx[1] = {'name': entries_csx[1]['name']}
 
         add_entries_to_db('csx', entries_csx)
         add_entries_to_db('vulcan', entries_vulcan)

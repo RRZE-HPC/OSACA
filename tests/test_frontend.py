@@ -61,6 +61,8 @@ class TestFrontend(unittest.TestCase):
         with self.assertRaises(ValueError):
             Frontend(arch='csx', path_to_yaml=os.path.join(self.MODULE_DATA_DIR, 'csx.yml'))
         with self.assertRaises(ValueError):
+            Frontend(path_to_yaml=os.path.join(self.MODULE_DATA_DIR, 'THE_MACHINE.yml'))
+        with self.assertRaises(ValueError):
             Frontend(arch='THE_MACHINE')
         Frontend(arch='zen1')
 
