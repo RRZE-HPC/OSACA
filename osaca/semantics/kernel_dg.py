@@ -17,6 +17,24 @@ class KernelDG(nx.DiGraph):
         self.dg = self.create_DG(self.kernel)
         self.loopcarried_deps = self.check_for_loopcarried_dep(self.kernel)
 
+    def create_DG(self, kernel):
+        # 1. go through kernel instruction forms (as vertices)
+        # 2. find edges (to dependend further instruction)
+        # 3. get LT value and set as edge weight
+        # 4. add instr forms as node attribute
+        dg = nx.DiGraph()
+        for i, instruction_form in enumerate(kernel):
+            dg.add_node(instruction_form['line_number'])
+            dg.nodes[instruction_form['line_number']]['instruction_form'] = instruction_form
+            for dep in self.find_depending(instruction_form, kernel[i + 1:]):
+                dg.add_edge(
+                    instruction_form['line_number'],
+                    dep['line_number'],
+                    latency=instruction_form['latency'],
+                )
+                dg.nodes[dep['line_number']]['instruction_form'] = dep
+        return dg
+
     def check_for_loopcarried_dep(self, kernel):
         multiplier = len(kernel) + 1
         # increase line number for second kernel loop
@@ -43,33 +61,19 @@ class KernelDG(nx.DiGraph):
         )
         # adjust line numbers
         # and add reference to kernel again
-        for i, dep in enumerate(loopcarried_deps):
+        loopcarried_deps_dict = {}
+        for dep in loopcarried_deps:
             nodes = [int(n / multiplier) for n in dep[1] if n >= first_line_no * multiplier]
             nodes = [self._get_node_by_lineno(x) for x in nodes]
-            loopcarried_deps[i] = (self._get_node_by_lineno(dep[0]), nodes)
+            loopcarried_deps_dict[dep[0]] = {
+                'root': self._get_node_by_lineno(dep[0]),
+                'dependencies': nodes,
+            }
 
-        return loopcarried_deps
+        return loopcarried_deps_dict
 
     def _get_node_by_lineno(self, lineno):
         return [instr for instr in self.kernel if instr.line_number == lineno][0]
-
-    def create_DG(self, kernel):
-        # 1. go through kernel instruction forms (as vertices)
-        # 2. find edges (to dependend further instruction)
-        # 3. get LT value and set as edge weight
-        # 4. add instr forms as node attribute
-        dg = nx.DiGraph()
-        for i, instruction_form in enumerate(kernel):
-            dg.add_node(instruction_form['line_number'])
-            for dep in self.find_depending(instruction_form, kernel[i + 1:]):
-                dg.add_edge(
-                    instruction_form['line_number'],
-                    dep['line_number'],
-                    latency=instruction_form['latency'],
-                )
-                dg.nodes[instruction_form['line_number']]['instruction_form'] = instruction_form
-                dg.nodes[dep['line_number']]['instruction_form'] = dep
-        return dg
 
     def get_critical_path(self):
         if nx.algorithms.dag.is_directed_acyclic_graph(self.dg):

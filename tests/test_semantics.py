@@ -150,6 +150,26 @@ class TestSemanticTools(unittest.TestCase):
         self.assertEqual(len(list(dg.get_dependent_instruction_forms(line_number=20))), 0)
         self.assertEqual(len(list(dg.get_dependent_instruction_forms(line_number=21))), 0)
 
+    def test_cyclic_dag(self):
+        dg = KernelDG(self.kernel_x86, self.parser_x86, self.machine_model_csx)
+        dg.dg.add_edge(100, 101, latency=1.0)
+        dg.dg.add_edge(101, 102, latency=2.0)
+        dg.dg.add_edge(102, 100, latency=3.0)
+        with self.assertRaises(NotImplementedError):
+            dg.get_critical_path()
+        with self.assertRaises(NotImplementedError):
+            dg.get_loopcarried_dependencies()
+
+    def test_loop_carried_dependency_x86(self):
+        dg = KernelDG(self.kernel_x86, self.parser_x86, self.machine_model_csx)
+        lc_deps = dg.get_loopcarried_dependencies()
+        self.assertEqual(len(lc_deps), 1)
+        self.assertEqual(lc_deps[7]['root'], dg.dg.nodes(data=True)[7]['instruction_form'])
+        self.assertEqual(len(lc_deps[7]['dependencies']), 1)
+        self.assertEqual(
+            lc_deps[7]['dependencies'][0], dg.dg.nodes(data=True)[7]['instruction_form']
+        )
+
     def test_is_read_is_written_x86(self):
         # independent form HW model
         dag = KernelDG(self.kernel_x86, self.parser_x86, None)
