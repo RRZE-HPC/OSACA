@@ -62,6 +62,12 @@ instruction_forms:
       throughput: 0.33333333
       latency: 1.0  #  0          0DV   1          1DV   2           3    4    5
       port_pressure: [0.33333333, 0.0, 0.33333333, 0.0, 0.33333333, 0.0, 0.0, 0.0]
+    - name: "b.ne"
+      operands:
+        - class: 'identifier'
+      throughput: 0.0
+      latency: 0.0  # 0 0DV 1 1DV 2  3  4  5
+      port_pressure: [0, 0, 0, 0, 0, 0, 0, 0]
     - name: "bne"
       operands:
         - class: 'identifier'
