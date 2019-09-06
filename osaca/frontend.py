@@ -79,10 +79,9 @@ class Frontend(object):
     def _get_separator_list(self, separator, separator_2=' '):
         separator_list = []
         for i in range(len(self._data['ports']) - 1):
-            if (
-                re.search(r'\d+', self._data['ports'][i]).group()
-                == re.search(r'\d+', self._data['ports'][i + 1]).group()
-            ):
+            match_1 = re.search(r'\d+', self._data['ports'][i])
+            match_2 = re.search(r'\d+', self._data['ports'][i + 1])
+            if match_1 is not None and match_2 is not None and match_1.group() == match_2.group():
                 separator_list.append(separator_2)
             else:
                 separator_list.append(separator)
