@@ -154,19 +154,22 @@ class TestSemanticTools(unittest.TestCase):
             dg.get_dependent_instruction_forms()
 
     def test_hidden_load(self):
-        machine_model_zen = MachineModel(arch='ZEN1')
-        semantics_zen = SemanticsAppender(machine_model_zen)
-        kernel_zen = self.parser_x86.parse_file(self.code_x86)
-        kernel_zen_2 = self.parser_x86.parse_file(self.code_x86)
-        kernel_zen_2 = self.parser_x86.parse_file(self.code_x86)[-3:]
-        kernel_zen_3 = self.parser_x86.parse_file(self.code_x86)[5:8]
-        semantics_zen.add_semantics(kernel_zen)
-        semantics_zen.add_semantics(kernel_zen_2)
-        semantics_zen.add_semantics(kernel_zen_3)
+        machine_model_hld = MachineModel(
+            path_to_yaml=self._find_file('hidden_load_machine_model.yml')
+        )
+        self.assertTrue(machine_model_hld.has_hidden_loads())
+        semantics_hld = SemanticsAppender(machine_model_hld)
+        kernel_hld = self.parser_x86.parse_file(self.code_x86)
+        kernel_hld_2 = self.parser_x86.parse_file(self.code_x86)
+        kernel_hld_2 = self.parser_x86.parse_file(self.code_x86)[-3:]
+        kernel_hld_3 = self.parser_x86.parse_file(self.code_x86)[5:8]
+        semantics_hld.add_semantics(kernel_hld)
+        semantics_hld.add_semantics(kernel_hld_2)
+        semantics_hld.add_semantics(kernel_hld_3)
 
-        num_hidden_loads = len([x for x in kernel_zen if INSTR_FLAGS.HIDDEN_LD in x['flags']])
-        num_hidden_loads_2 = len([x for x in kernel_zen_2 if INSTR_FLAGS.HIDDEN_LD in x['flags']])
-        num_hidden_loads_3 = len([x for x in kernel_zen_3 if INSTR_FLAGS.HIDDEN_LD in x['flags']])
+        num_hidden_loads = len([x for x in kernel_hld if INSTR_FLAGS.HIDDEN_LD in x['flags']])
+        num_hidden_loads_2 = len([x for x in kernel_hld_2 if INSTR_FLAGS.HIDDEN_LD in x['flags']])
+        num_hidden_loads_3 = len([x for x in kernel_hld_3 if INSTR_FLAGS.HIDDEN_LD in x['flags']])
         self.assertEqual(num_hidden_loads, 1)
         self.assertEqual(num_hidden_loads_2, 0)
         self.assertEqual(num_hidden_loads_3, 1)
@@ -322,7 +325,6 @@ class TestSemanticTools(unittest.TestCase):
         self.assertEqual(self.machine_model_csx.get_data_ports(), data_ports_csx)
 
         self.assertFalse(self.machine_model_tx2.has_hidden_loads())
-        self.assertTrue(self.machine_model_zen.has_hidden_loads())
 
         self.assertEqual(MachineModel.get_isa_for_arch('CSX'), 'x86')
         self.assertEqual(MachineModel.get_isa_for_arch('VuLcAn'), 'aarch64')
