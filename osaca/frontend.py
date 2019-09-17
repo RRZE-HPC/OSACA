@@ -153,6 +153,7 @@ class Frontend(object):
             '\n\nLoop-Carried Dependencies Analysis Report\n'
             + '-----------------------------------------'
         )
+        # TODO find a way to overcome padding for different tab-lengths
         for dep in dep_dict:
             print(
                 '{:4d} {} {:4.1f} {} {:36}{} {}'.format(

@@ -18,10 +18,9 @@ class KernelDG(nx.DiGraph):
         self.loopcarried_deps = self.check_for_loopcarried_dep(self.kernel)
 
     def create_DG(self, kernel):
-        # 1. go through kernel instruction forms (as vertices)
+        # 1. go through kernel instruction forms and add them as node attribute
         # 2. find edges (to dependend further instruction)
         # 3. get LT value and set as edge weight
-        # 4. add instr forms as node attribute
         dg = nx.DiGraph()
         for i, instruction_form in enumerate(kernel):
             dg.add_node(instruction_form['line_number'])
@@ -59,12 +58,23 @@ class KernelDG(nx.DiGraph):
                 [list(product([dep_chain[0]], dep_chain[1])) for dep_chain in loopcarried_deps]
             )
         )
-        # adjust line numbers
+        # adjust line numbers, filter duplicates
         # and add reference to kernel again
         loopcarried_deps_dict = {}
-        for dep in loopcarried_deps:
+        tmp_list = []
+        for i, dep in enumerate(loopcarried_deps):
             nodes = [int(n / multiplier) for n in dep[1] if n >= first_line_no * multiplier]
-            nodes = [self._get_node_by_lineno(x) for x in nodes]
+            loopcarried_deps[i] = (dep[0], nodes)
+        for dep in loopcarried_deps:
+            is_subset = False
+            for other_dep in [x for x in loopcarried_deps if x[0] != dep[0]]:
+                if set(dep[1]).issubset(set(other_dep[1])) and dep[0] in other_dep[1]:
+                    is_subset = True
+            if not is_subset:
+                tmp_list.append(dep)            
+        loopcarried_deps = tmp_list
+        for dep in loopcarried_deps:
+            nodes = [self._get_node_by_lineno(n) for n in dep[1]]
             loopcarried_deps_dict[dep[0]] = {
                 'root': self._get_node_by_lineno(dep[0]),
                 'dependencies': nodes,
