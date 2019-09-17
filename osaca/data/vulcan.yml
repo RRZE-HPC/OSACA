@@ -68,6 +68,12 @@ instruction_forms:
       throughput: 0.0
       latency: 0.0  # 0 0DV 1 1DV 2  3  4  5
       port_pressure: [0, 0, 0, 0, 0, 0, 0, 0]
+    - name: "b.gt"
+      operands:
+        - class: 'identifier'
+      throughput: 0.0
+      latency: 0.0  # 0 0DV 1 1DV 2  3  4  5
+      port_pressure: [0, 0, 0, 0, 0, 0, 0, 0]
     - name: "bne"
       operands:
         - class: 'identifier'
@@ -77,11 +83,20 @@ instruction_forms:
     - name: "cmp"
       operands:
         - class: "register"
+          prefix: "w"
+        - class: "immediate"
+          imd: "int"
+      throughput: 0.33333333
+      latency: 1.0  #  0          0DV   1          1DV   2           3    4    5
+      port_pressure: [0.33333333, 0.0, 0.33333333, 0.0, 0.33333333, 0.0, 0.0, 0.0]
+    - name: "cmp"
+      operands:
+        - class: "register"
           prefix: "x"
         - class: "register"
           prefix: "x"
       throughput: 0.33333333
-      latency: 0.0  #  0          0DV   1          1DV   2           3    4    5
+      latency: 1.0  #  0          0DV   1          1DV   2           3    4    5
       port_pressure: [0.33333333, 0.0, 0.33333333, 0.0, 0.33333333, 0.0, 0.0, 0.0]
     - name: "fadd"
       operands:
@@ -94,6 +109,17 @@ instruction_forms:
         - class: "register"
           prefix: "v"
           shape: "s"
+      throughput: 0.5
+      latency: 6.0  #  0   0DV   1   1DV   2    3    4    5
+      port_pressure: [0.5, 0.0, 0.5, 0.0, 0.0, 0.0, 0.0, 0.0]
+    - name: "fadd"
+      operands:
+        - class: "register"
+          prefix: "d"
+        - class: "register"
+          prefix: "d"
+        - class: "register"
+          prefix: "d"
       throughput: 0.5
       latency: 6.0  #  0   0DV   1   1DV   2    3    4    5
       port_pressure: [0.5, 0.0, 0.5, 0.0, 0.0, 0.0, 0.0, 0.0]
@@ -199,6 +225,17 @@ instruction_forms:
         - class: "register"
           prefix: "v"
           shape: "d"
+      throughput: 0.5
+      latency: 6.0  #  0   0DV    1   1DV   2    3    4    5
+      port_pressure: [0.5, 0.0, 0.5, 0.0, 0.0, 0.0, 0.0, 0.0]
+    - name: "fmul"
+      operands:
+        - class: "register"
+          prefix: "d"
+        - class: "register"
+          prefix: "d"
+        - class: "register"
+          prefix: "d"
       throughput: 0.5
       latency: 6.0  #  0   0DV    1   1DV   2    3    4    5
       port_pressure: [0.5, 0.0, 0.5, 0.0, 0.0, 0.0, 0.0, 0.0]
@@ -357,6 +394,76 @@ instruction_forms:
     - name: "ldr"
       operands:
         - class: "register"
+          prefix: "d"
+        - class: "memory"
+          base: "x"
+          offset: "imd"
+          index: ~ 
+          scale: 1
+          pre-indexed: false
+          post-indexed: false
+      throughput: 0.5
+      latency: 4.0  #  0   0DV   1   1DV   2    3    4    5
+      port_pressure: [0.0, 0.0, 0.0, 0.0, 0.0, 0.5, 0.5, 0.0]
+    - name: "ldr"
+      operands:
+        - class: "register"
+          prefix: "d"
+        - class: "memory"
+          base: "x"
+          offset: ~
+          index: "x"
+          scale: 1
+          pre-indexed: false
+          post-indexed: false
+      throughput: 0.5
+      latency: 4.0  #  0   0DV   1   1DV   2    3    4    5
+      port_pressure: [0.0, 0.0, 0.0, 0.0, 0.0, 0.5, 0.5, 0.0]
+    - name: "ldr"
+      operands:
+        - class: "register"
+          prefix: "d"
+        - class: "memory"
+          base: "x"
+          offset: ~
+          index: ~
+          scale: 1
+          pre-indexed: false
+          post-indexed: true
+      throughput: 0.5
+      latency: 4.0  #  0   0DV   1   1DV   2    3    4    5
+      port_pressure: [0.0, 0.0, 0.0, 0.0, 0.0, 0.5, 0.5, 0.0]
+    - name: "ldr"
+      operands:
+        - class: "register"
+          prefix: "d"
+        - class: "memory"
+          base: "x"
+          offset: ~
+          index: "x"
+          scale: 8
+          pre-indexed: false
+          post-indexed: false
+      throughput: 0.5
+      latency: 4.0  #  0   0DV   1   1DV   2    3    4    5
+      port_pressure: [0.0, 0.0, 0.0, 0.0, 0.0, 0.5, 0.5, 0.0]
+    - name: "ldr"
+      operands:
+        - class: "register"
+          prefix: "d"
+        - class: "memory"
+          base: "x"
+          offset: ~
+          index: ~
+          scale: 1
+          pre-indexed: false
+          post-indexed: false
+      throughput: 0.5
+      latency: 4.0  #  0   0DV   1   1DV   2    3    4    5
+      port_pressure: [0.0, 0.0, 0.0, 0.0, 0.0, 0.5, 0.5, 0.0]
+    - name: "ldr"
+      operands:
+        - class: "register"
           prefix: "x"
         - class: "memory"
           base: "x"
@@ -368,6 +475,15 @@ instruction_forms:
       throughput: 0.5
       latency: 4.0  #  0   0DV   1   1DV   2    3    4    5
       port_pressure: [0.0, 0.0, 0.0, 0.0, 0.0, 0.5, 0.5, 0.0]
+    - name: "mov"
+      operands:
+        - class: "register"
+          prefix: "x"
+        - class: "register"
+          prefix: "x"
+      throughput: 0.5
+      latency: 1.0  #  0   0DV   1   1DV   2    3    4    5
+      port_pressure: [0.5, 0.0, 0.5, 0.0, 0.0, 0.0, 0.0, 0.0]
     - name: "mov"
       operands:
         - class: "register"
@@ -503,11 +619,39 @@ instruction_forms:
           pre-indexed: false
           post-indexed: false
       throughput: 1.0
-      latency: ~    #  0   0DV   1   1DV   2    3    4    5
+      latency: 4.0    #  0   0DV   1   1DV   2    3    4    5
       port_pressure: [0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0]
     - name: "str"
       operands:
         - class: "register"
+          prefix: "d"
+        - class: "memory"
+          base: "x"
+          offset: "imd" 
+          index: ~ 
+          scale: 1
+          pre-indexed: false
+          post-indexed: false
+      throughput: 1.0
+      latency: 4.0    #  0   0DV   1   1DV   2    3    4    5
+      port_pressure: [0.0, 0.0, 0.0, 0.0, 0.0, 0.5, 0.5, 1.0]
+    - name: "str"
+      operands:
+        - class: "register"
+          prefix: "d"
+        - class: "memory"
+          base: "x"
+          offset: ~ 
+          index: ~ 
+          scale: 1
+          pre-indexed: false
+          post-indexed: true
+      throughput: 1.0
+      latency: 4.0    #  0   0DV   1   1DV   2    3    4    5
+      port_pressure: [0.0, 0.0, 0.0, 0.0, 0.0, 0.5, 0.5, 1.0]
+    - name: "str"
+      operands:
+        - class: "register"
           prefix: "q"
         - class: "memory"
           base: "x"
@@ -517,7 +661,7 @@ instruction_forms:
           pre-indexed: false
           post-indexed: false
       throughput: 1.0
-      latency: ~    #  0   0DV   1   1DV   2    3    4    5
+      latency: 4.0    #  0   0DV   1   1DV   2    3    4    5
       port_pressure: [0.0, 0.0, 0.0, 0.0, 0.0, 0.5, 0.5, 1.0]
     - name: "str"
       operands:
@@ -531,7 +675,7 @@ instruction_forms:
           pre-indexed: false
           post-indexed: true
       throughput: 1.0
-      latency: ~    #  0   0DV   1   1DV   2    3    4    5
+      latency: 4.0    #  0   0DV   1   1DV   2    3    4    5
       port_pressure: [0.0, 0.0, 0.0, 0.0, 0.0, 0.5, 0.5, 1.0]
     - name: "str"
       operands:
@@ -545,7 +689,7 @@ instruction_forms:
           pre-indexed: false
           post-indexed: true
       throughput: 1.0
-      latency: ~    #  0   0DV   1   1DV   2    3    4    5
+      latency: 4.0    #  0   0DV   1   1DV   2    3    4    5
       port_pressure: [0.0, 0.0, 0.0, 0.0, 0.0, 0.5, 0.5, 1.0]
     - name: "str"
       operands:
@@ -559,5 +703,5 @@ instruction_forms:
           pre-indexed: false
           post-indexed: false
       throughput: 1.0
-      latency: ~    #  0   0DV   1   1DV   2    3    4    5
+      latency: 4.0    #  0   0DV   1   1DV   2    3    4    5
       port_pressure: [0.0, 0.0, 0.0, 0.0, 0.0, 0.5, 0.5, 1.0]

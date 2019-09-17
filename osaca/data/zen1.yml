@@ -91,7 +91,20 @@ instruction_forms:
       throughput: 0.25
       latency: ~    #  0    1    2    3   3DV   4     5     6     7     8    9   8D   9D   ST
       port_pressure: [0.0, 0.0, 0.0, 0.0, 0.0, 0.25, 0.25, 0.25, 0.25, 0.0, 0.0, 0.0, 0.0, 0.0]
+    - name: incq
+      operands:
+        - class: "register"
+          name: "gpr"
+      throughput: 0.25
+      latency: 1.0  #  0    1    2    3   3DV   4     5     6     7     8    9   8D   9D   ST
+      port_pressure: [0.0, 0.0, 0.0, 0.0, 0.0, 0.25, 0.52, 0.52, 0.25, 0.0, 0.0, 0.0, 0.0, 0.0]
     - name: ja
+      operands:
+        - class: 'identifier'
+      throughput: 0.0
+      latency: ~    #  0    1    2    3   3DV   4    5    6    7    8    9   8D   9D   ST
+      port_pressure: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+    - name: jb
       operands:
         - class: 'identifier'
       throughput: 0.0
@@ -103,6 +116,18 @@ instruction_forms:
       throughput: 0.0
       latency: ~    #  0    1    2    3   3DV   4    5    6    7    8    9   8D   9D   ST
       port_pressure: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+    - name: leaq
+      operands:
+        - class: "memory"
+          base: "gpr"
+          offset: "imd"
+          index: ~
+          scale: 1
+        - class: "register"
+          name: "gpr"
+      throughput: 0.5
+      latency: ~    #  0    1    2    3   3DV   4    5    6    7    8    9   8D   9D   ST
+      port_pressure: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.5, 0.5, 0.0, 0.0, 0.0]
     - name: movl
       operands:
         - class: "memory"
@@ -228,6 +253,62 @@ instruction_forms:
       throughput: 0.5
       latency: 3.0  #  0    1    2    3   3DV   4    5    6    7    8    9   8D   9D   ST
       port_pressure: [0.0, 0.0, 0.5, 0.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+    - name: vaddsd
+      operands:
+        - class: "memory"
+          base: "gpr"
+          offset: ~
+          index: ~
+          scale: 1
+        - class: "register"
+          name: "xmm"
+        - class: "register"
+          name: "xmm"
+      throughput: 0.5
+      latency: 7.0    #  0    1    2    3   3DV   4    5    6    7    8    9   8D   9D   ST
+      port_pressure: [0.0, 0.0, 0.5, 0.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.5, 0.5, 0.5, 0.5, 0.0]
+    - name: vaddsd
+      operands:
+        - class: "memory"
+          base: "gpr"
+          offset: "imd"
+          index: ~
+          scale: 1
+        - class: "register"
+          name: "xmm"
+        - class: "register"
+          name: "xmm"
+      throughput: 0.5
+      latency: 7.0    #  0    1    2    3   3DV   4    5    6    7    8    9   8D   9D   ST
+      port_pressure: [0.0, 0.0, 0.5, 0.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.5, 0.5, 0.5, 0.5, 0.0]
+    - name: vaddsd
+      operands:
+        - class: "memory"
+          base: "gpr"
+          offset: "imd"
+          index: "gpr"
+          scale: 1
+        - class: "register"
+          name: "xmm"
+        - class: "register"
+          name: "xmm"
+      throughput: 0.5
+      latency: 7.0    #  0    1    2    3   3DV   4    5    6    7    8    9   8D   9D   ST
+      port_pressure: [0.0, 0.0, 0.5, 0.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.5, 0.5, 0.5, 0.5, 0.0]
+    - name: vaddsd
+      operands:
+        - class: "memory"
+          base: "gpr"
+          offset: ~
+          index: "gpr"
+          scale: 8
+        - class: "register"
+          name: "xmm"
+        - class: "register"
+          name: "xmm"
+      throughput: 0.5
+      latency: 7.0    #  0    1    2    3   3DV   4    5    6    7    8    9   8D   9D   ST
+      port_pressure: [0.0, 0.0, 0.5, 0.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.5, 0.5, 0.5, 0.5, 0.0]
     - name: vaddss
       operands:
         - class: "register"
@@ -578,3 +659,75 @@ instruction_forms:
       throughput: 2.0
       latency: 5.0  #  0    1    2    3   3DV   4    5    6    7    8    9   8D   9D   ST
       port_pressure: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 1.0]
+    - name: vmovsd
+      operands:
+        - class: "memory"
+          base: "gpr"
+          offset: ~
+          index: "gpr"
+          scale: 8
+        - class: "register"
+          name: "xmm"
+      throughput: 0.5
+      latency: 4.0  #  0    1    2    3   3DV   4    5    6    7    8    9   8D   9D   ST
+      port_pressure: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.5, 0.5, 0.5, 0.5, 0.0]
+    - name: vmovsd
+      operands:
+        - class: "memory"
+          base: "gpr"
+          offset: "imd"
+          index: "gpr"
+          scale: 1
+        - class: "register"
+          name: "xmm"
+      throughput: 0.5
+      latency: 4.0  #  0    1    2    3   3DV   4    5    6    7    8    9   8D   9D   ST
+      port_pressure: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.5, 0.5, 0.5, 0.5, 0.0]
+    - name: vmovsd
+      operands:
+        - class: "register"
+          name: "xmm"
+        - class: "memory"
+          base: "gpr"
+          offset: ~
+          index: ~
+          scale: 1
+      throughput: 1.0
+      latency: 4.0  #  0    1    2    3   3DV   4    5    6    7    8    9   8D   9D   ST
+      port_pressure: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.5, 0.5, 0.0, 0.0, 1.0]
+    - name: vmovsd
+      operands:
+        - class: "register"
+          name: "xmm"
+        - class: "memory"
+          base: "gpr"
+          offset: "imd"
+          index: ~
+          scale: 1
+      throughput: 1.0
+      latency: 4.0  #  0    1    2    3   3DV   4    5    6    7    8    9   8D   9D   ST
+      port_pressure: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.5, 0.5, 0.0, 0.0, 1.0]
+    - name: vmovsd
+      operands:
+        - class: "register"
+          name: "xmm"
+        - class: "memory"
+          base: "gpr"
+          offset: ~
+          index: "gpr"
+          scale: 1
+      throughput: 1.0
+      latency: 4.0  #  0    1    2    3   3DV   4    5    6    7    8    9   8D   9D   ST
+      port_pressure: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.5, 0.5, 0.0, 0.0, 1.0]
+    - name: vmovsd
+      operands:
+        - class: "register"
+          name: "xmm"
+        - class: "memory"
+          base: "gpr"
+          offset: "imd"
+          index: "gpr"
+          scale: 1
+      throughput: 1.0
+      latency: 4.0  #  0    1    2    3   3DV   4    5    6    7    8    9   8D   9D   ST
+      port_pressure: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.5, 0.5, 0.0, 0.0, 1.0]
