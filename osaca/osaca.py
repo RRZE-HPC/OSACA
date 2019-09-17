@@ -157,6 +157,8 @@ def insert_byte_marker(args):
 
     marked_assembly.seek(0)
     assembly = marked_assembly.read()
+    with open(args.file.name, 'w') as f:
+        f.write(assembly)
 
 
 def inspect(args):
