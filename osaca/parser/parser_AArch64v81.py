@@ -408,3 +408,6 @@ class ParserAArch64v81(BaseParser):
             if reg_a['prefix'].lower() in prefixes_vec and reg_b['prefix'].lower() in prefixes_vec:
                 return True
         return False
+
+    def get_reg_type(self, register):
+        return register['prefix']

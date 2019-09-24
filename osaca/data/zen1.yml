@@ -2,6 +2,7 @@ osaca_version: 0.3.0
 micro_architecture: "AMD Zen (family 17h)"
 arch_code: "ZEN1"
 isa: "x86"
+load_latency: {gpr: 4.0, xmm: 4.0, ymm: '5.0'}
 hidden_loads: false
 ports: ["0", "1", "2", "3", "3DV", "4", "5", "6", "7", "8", "9", "8D", "9D", "ST"]
 port_model_scheme: |
@@ -138,7 +139,7 @@ instruction_forms:
         - class: "register"
           name: "gpr"
       throughput: 0.5
-      latency: 3.0   # 0    1    2    3   3DV   4     5    6   7   8     9   8LD  9LD  ST
+      latency: 0.0   # 0    1    2    3   3DV   4     5    6   7   8     9   8LD  9LD  ST
       port_pressure: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.5, 0.5, 0.5, 0.5, 0.0]
     - name: mulsd
       operands:
@@ -265,7 +266,7 @@ instruction_forms:
         - class: "register"
           name: "xmm"
       throughput: 0.5
-      latency: 7.0    #  0    1    2    3   3DV   4    5    6    7    8    9   8D   9D   ST
+      latency: 3.0    #  0    1    2    3   3DV   4    5    6    7    8    9   8D   9D   ST
       port_pressure: [0.0, 0.0, 0.5, 0.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.5, 0.5, 0.5, 0.5, 0.0]
     - name: vaddsd
       operands:
@@ -279,7 +280,7 @@ instruction_forms:
         - class: "register"
           name: "xmm"
       throughput: 0.5
-      latency: 7.0    #  0    1    2    3   3DV   4    5    6    7    8    9   8D   9D   ST
+      latency: 3.0    #  0    1    2    3   3DV   4    5    6    7    8    9   8D   9D   ST
       port_pressure: [0.0, 0.0, 0.5, 0.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.5, 0.5, 0.5, 0.5, 0.0]
     - name: vaddsd
       operands:
@@ -293,7 +294,7 @@ instruction_forms:
         - class: "register"
           name: "xmm"
       throughput: 0.5
-      latency: 7.0    #  0    1    2    3   3DV   4    5    6    7    8    9   8D   9D   ST
+      latency: 3.0    #  0    1    2    3   3DV   4    5    6    7    8    9   8D   9D   ST
       port_pressure: [0.0, 0.0, 0.5, 0.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.5, 0.5, 0.5, 0.5, 0.0]
     - name: vaddsd
       operands:
@@ -307,7 +308,7 @@ instruction_forms:
         - class: "register"
           name: "xmm"
       throughput: 0.5
-      latency: 7.0    #  0    1    2    3   3DV   4    5    6    7    8    9   8D   9D   ST
+      latency: 3.0    #  0    1    2    3   3DV   4    5    6    7    8    9   8D   9D   ST
       port_pressure: [0.0, 0.0, 0.5, 0.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.5, 0.5, 0.5, 0.5, 0.0]
     - name: vaddss
       operands:
@@ -460,7 +461,7 @@ instruction_forms:
         - class: "register"
           name: "xmm"
       throughput: 0.5
-      latency: 8.0  #  0    1    2    3   3DV   4    5    6    7    8    9   8D   9D   ST
+      latency: 4.0  #  0    1    2    3   3DV   4    5    6    7    8    9   8D   9D   ST
       port_pressure: [0.5, 0.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.5, 0.5, 0.5, 0.5, 0.0]
     - name: vmulpd
       operands:
@@ -474,7 +475,7 @@ instruction_forms:
         - class: "register"
           name: "xmm"
       throughput: 0.5
-      latency: 8.0  #  0    1    2    3   3DV   4    5    6    7    8    9   8D   9D   ST
+      latency: 4.0  #  0    1    2    3   3DV   4    5    6    7    8    9   8D   9D   ST
       port_pressure: [0.5, 0.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.5, 0.5, 0.5, 0.5, 0.0]
     - name: vmulpd
       operands:
@@ -499,7 +500,7 @@ instruction_forms:
         - class: "register"
           name: "ymm"
       throughput: 1.0
-      latency: 9.0  #  0    1    2    3   3DV   4    5    6    7    8    9   8D   9D   ST
+      latency: 4.0  #  0    1    2    3   3DV   4    5    6    7    8    9   8D   9D   ST
       port_pressure: [1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 1.0, 0.0]
     - name: vmulpd
       operands:
@@ -513,7 +514,7 @@ instruction_forms:
         - class: "register"
           name: "ymm"
       throughput: 1.0
-      latency: 9.0  #  0    1    2    3   3DV   4    5    6    7    8    9   8D   9D   ST
+      latency: 4.0  #  0    1    2    3   3DV   4    5    6    7    8    9   8D   9D   ST
       port_pressure: [1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 1.0, 0.0]
     - name: vmovapd
       operands:
@@ -525,7 +526,7 @@ instruction_forms:
         - class: "register"
           name: "xmm"
       throughput: 0.5
-      latency: 3.0  #  0    1    2    3   3DV   4    5    6    7    8    9   8D   9D   ST
+      latency: 0.0  #  0    1    2    3   3DV   4    5    6    7    8    9   8D   9D   ST
       port_pressure: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.5, 0.5, 0.5, 0.5, 0.0]
     - name: vmovapd
       operands:
@@ -549,7 +550,7 @@ instruction_forms:
         - class: "register"
           name: "ymm"
       throughput: 1.0
-      latency: 5.0  #  0    1    2    3   3DV   4    5    6    7    8    9   8D   9D   ST
+      latency: 0.0  #  0    1    2    3   3DV   4    5    6    7    8    9   8D   9D   ST
       port_pressure: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 1.0, 0.0]
     - name: vmovapd
       operands:
@@ -561,7 +562,7 @@ instruction_forms:
         - class: "register"
           name: "ymm"
       throughput: 1.0
-      latency: 5.0  #  0    1    2    3   3DV   4    5    6    7    8    9   8D   9D   ST
+      latency: 0.0  #  0    1    2    3   3DV   4    5    6    7    8    9   8D   9D   ST
       port_pressure: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 1.0, 0.0]
     - name: vmovapd
       operands:
@@ -645,7 +646,7 @@ instruction_forms:
         - class: "register"
           name: "ymm"
       throughput: 2.0
-      latency: 5.0  #  0    1    2    3   3DV   4    5    6    7    8    9   8D   9D   ST
+      latency: 0.0  #  0    1    2    3   3DV   4    5    6    7    8    9   8D   9D   ST
       port_pressure: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 2.0]
     - name: vmovupd
       operands:
@@ -657,7 +658,7 @@ instruction_forms:
         - class: "register"
           name: "ymm"
       throughput: 2.0
-      latency: 5.0  #  0    1    2    3   3DV   4    5    6    7    8    9   8D   9D   ST
+      latency: 0.0  #  0    1    2    3   3DV   4    5    6    7    8    9   8D   9D   ST
       port_pressure: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 1.0]
     - name: vmovsd
       operands:
@@ -669,7 +670,7 @@ instruction_forms:
         - class: "register"
           name: "xmm"
       throughput: 0.5
-      latency: 4.0  #  0    1    2    3   3DV   4    5    6    7    8    9   8D   9D   ST
+      latency: 0.0  #  0    1    2    3   3DV   4    5    6    7    8    9   8D   9D   ST
       port_pressure: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.5, 0.5, 0.5, 0.5, 0.0]
     - name: vmovsd
       operands:
@@ -681,7 +682,7 @@ instruction_forms:
         - class: "register"
           name: "xmm"
       throughput: 0.5
-      latency: 4.0  #  0    1    2    3   3DV   4    5    6    7    8    9   8D   9D   ST
+      latency: 0.0  #  0    1    2    3   3DV   4    5    6    7    8    9   8D   9D   ST
       port_pressure: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.5, 0.5, 0.5, 0.5, 0.0]
     - name: vmovsd
       operands:

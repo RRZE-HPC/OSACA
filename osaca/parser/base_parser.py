@@ -50,6 +50,9 @@ class BaseParser(object):
     def is_vector_register(self, register):
         raise NotImplementedError
 
+    def get_reg_type(self, register):
+        raise NotImplementedError
+
     def construct_parser(self):
         return
         # raise NotImplementedError

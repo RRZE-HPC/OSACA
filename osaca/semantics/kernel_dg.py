@@ -16,6 +16,9 @@ class KernelDG(nx.DiGraph):
         self.model = hw_model
         self.dg = self.create_DG(self.kernel)
         self.loopcarried_deps = self.check_for_loopcarried_dep(self.kernel)
+        import pdb
+
+        pdb.set_trace()
 
     def create_DG(self, kernel):
         # 1. go through kernel instruction forms and add them as node attribute
@@ -25,7 +28,32 @@ class KernelDG(nx.DiGraph):
         for i, instruction_form in enumerate(kernel):
             dg.add_node(instruction_form['line_number'])
             dg.nodes[instruction_form['line_number']]['instruction_form'] = instruction_form
-            for dep in self.find_depending(instruction_form, kernel[i + 1:]):
+            # add load as separate node if existent
+            if 'performs_load' in instruction_form['flags']:
+                regs = [
+                    op for op in instruction_form['operands']['destination'] if 'register' in op
+                ]
+                if (
+                    len(regs) > 1
+                    and len(set([self.parser.get_reg_type(x['register']) for x in regs])) != 1
+                ):
+                    load_lat = max(self.model['load_latency'].values())
+                else:
+                    load_lat = self.model['load_latency'][
+                        self.parser.get_reg_type(regs[0]['register'])
+                    ]
+                # add new node
+                dg.add_node(instruction_form['line_number'] + 0.1)
+                dg.nodes[instruction_form['line_number'] + 0.1][
+                    'instruction_form'
+                ] = instruction_form
+                # and set LD latency as edge weight
+                dg.add_edge(
+                    instruction_form['line_number'] + 0.1,
+                    instruction_form['line_number'],
+                    latency=load_lat,
+                )
+            for dep in self.find_depending(instruction_form, kernel[i + 1 :]):
                 dg.add_edge(
                     instruction_form['line_number'],
                     dep['line_number'],
@@ -50,7 +78,7 @@ class KernelDG(nx.DiGraph):
         loopcarried_deps = [
             (node, list(nx.algorithms.simple_paths.all_simple_paths(dg, node, node * multiplier)))
             for node in dg.nodes
-            if node < first_line_no * multiplier
+            if node < first_line_no * multiplier and node == int(node)
         ]
         # filter others and create graph
         loopcarried_deps = list(
@@ -71,7 +99,7 @@ class KernelDG(nx.DiGraph):
                 if set(dep[1]).issubset(set(other_dep[1])) and dep[0] in other_dep[1]:
                     is_subset = True
             if not is_subset:
-                tmp_list.append(dep)            
+                tmp_list.append(dep)
         loopcarried_deps = tmp_list
         for dep in loopcarried_deps:
             nodes = [self._get_node_by_lineno(n) for n in dep[1]]
@@ -88,6 +116,12 @@ class KernelDG(nx.DiGraph):
     def get_critical_path(self):
         if nx.algorithms.dag.is_directed_acyclic_graph(self.dg):
             longest_path = nx.algorithms.dag.dag_longest_path(self.dg, weight='latency')
+            # add LD latency to instruction
+            for line_number in longest_path:
+                if line_number != int(line_number) and int(line_number) in longest_path:
+                    self._get_node_by_lineno(int(line_number))['latency'] += self.dg.edges[
+                        (line_number, int(line_number))
+                    ]['latency']
             return [x for x in self.kernel if x['line_number'] in longest_path]
         else:
             # split to DAG
