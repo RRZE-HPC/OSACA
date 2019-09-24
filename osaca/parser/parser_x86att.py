@@ -331,3 +331,10 @@ class ParserX86ATT(BaseParser):
         if len(register['name']) > 2 and register['name'][1:3].lower() == 'mm':
             return True
         return False
+
+    def get_reg_type(self, register):
+        if self.is_gpr(register):
+            return 'gpr'
+        elif self.is_vector_register(register):
+            return register['name'][:3].lower()
+        raise ValueError
