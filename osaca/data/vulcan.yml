@@ -6,6 +6,7 @@ ROB_size: 180
 retired_uOps_per_cycle: 4
 scheduler_size: 60
 hidden_loads: false
+load_latency: {w: 4.0, x: 4.0, b: 4.0, h: 4.0, s: 4.0, d: 4.0, q: 4.0, v: 4.0}
 ports: ["0", "0DV", "1", "1DV", "2", "3", "4", "5"]
 port_model_scheme: |
     ┌-----------------------------------------------------------┐
@@ -389,7 +390,7 @@ instruction_forms:
           pre-indexed: false
           post-indexed: false
       throughput: 0.5
-      latency: 4.0  #  0   0DV   1   1DV   2    3    4    5
+      latency: 0.0  #  0   0DV   1   1DV   2    3    4    5
       port_pressure: [0.0, 0.0, 0.0, 0.0, 0.0, 0.5, 0.5, 0.0]
     - name: "ldr"
       operands:
@@ -403,7 +404,7 @@ instruction_forms:
           pre-indexed: false
           post-indexed: false
       throughput: 0.5
-      latency: 4.0  #  0   0DV   1   1DV   2    3    4    5
+      latency: 0.0  #  0   0DV   1   1DV   2    3    4    5
       port_pressure: [0.0, 0.0, 0.0, 0.0, 0.0, 0.5, 0.5, 0.0]
     - name: "ldr"
       operands:
@@ -417,7 +418,7 @@ instruction_forms:
           pre-indexed: false
           post-indexed: false
       throughput: 0.5
-      latency: 4.0  #  0   0DV   1   1DV   2    3    4    5
+      latency: 0.0  #  0   0DV   1   1DV   2    3    4    5
       port_pressure: [0.0, 0.0, 0.0, 0.0, 0.0, 0.5, 0.5, 0.0]
     - name: "ldr"
       operands:
@@ -431,7 +432,7 @@ instruction_forms:
           pre-indexed: false
           post-indexed: true
       throughput: 0.5
-      latency: 4.0  #  0   0DV   1   1DV   2    3    4    5
+      latency: 0.0  #  0   0DV   1   1DV   2    3    4    5
       port_pressure: [0.0, 0.0, 0.0, 0.0, 0.0, 0.5, 0.5, 0.0]
     - name: "ldr"
       operands:
@@ -445,7 +446,7 @@ instruction_forms:
           pre-indexed: false
           post-indexed: false
       throughput: 0.5
-      latency: 4.0  #  0   0DV   1   1DV   2    3    4    5
+      latency: 0.0  #  0   0DV   1   1DV   2    3    4    5
       port_pressure: [0.0, 0.0, 0.0, 0.0, 0.0, 0.5, 0.5, 0.0]
     - name: "ldr"
       operands:
@@ -459,7 +460,7 @@ instruction_forms:
           pre-indexed: false
           post-indexed: false
       throughput: 0.5
-      latency: 4.0  #  0   0DV   1   1DV   2    3    4    5
+      latency: 0.0  #  0   0DV   1   1DV   2    3    4    5
       port_pressure: [0.0, 0.0, 0.0, 0.0, 0.0, 0.5, 0.5, 0.0]
     - name: "ldr"
       operands:
@@ -473,7 +474,7 @@ instruction_forms:
           pre-indexed: false
           post-indexed: false
       throughput: 0.5
-      latency: 4.0  #  0   0DV   1   1DV   2    3    4    5
+      latency: 0.0  #  0   0DV   1   1DV   2    3    4    5
       port_pressure: [0.0, 0.0, 0.0, 0.0, 0.0, 0.5, 0.5, 0.0]
     - name: "mov"
       operands:
