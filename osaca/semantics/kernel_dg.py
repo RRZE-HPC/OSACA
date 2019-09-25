@@ -16,9 +16,6 @@ class KernelDG(nx.DiGraph):
         self.model = hw_model
         self.dg = self.create_DG(self.kernel)
         self.loopcarried_deps = self.check_for_loopcarried_dep(self.kernel)
-        import pdb
-
-        pdb.set_trace()
 
     def create_DG(self, kernel):
         # 1. go through kernel instruction forms and add them as node attribute
@@ -53,7 +50,7 @@ class KernelDG(nx.DiGraph):
                     instruction_form['line_number'],
                     latency=load_lat,
                 )
-            for dep in self.find_depending(instruction_form, kernel[i + 1 :]):
+            for dep in self.find_depending(instruction_form, kernel[i + 1:]):
                 dg.add_edge(
                     instruction_form['line_number'],
                     dep['line_number'],
