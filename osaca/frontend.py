@@ -133,7 +133,7 @@ class Frontend(object):
                 '{:4d} {} {:4.1f} {}{}{} {}'.format(
                     instruction_form['line_number'],
                     separator,
-                    instruction_form['latency'],
+                    instruction_form['latency_cp'],
                     separator,
                     'X' if INSTR_FLAGS.LT_UNKWN in instruction_form['flags'] else ' ',
                     separator,
@@ -144,7 +144,7 @@ class Frontend(object):
             '\n{:4} {} {:4.1f}'.format(
                 ' ' * max([len(str(instr_form['line_number'])) for instr_form in cp_kernel]),
                 ' ' * len(separator),
-                sum([instr_form['latency'] for instr_form in cp_kernel]),
+                sum([instr_form['latency_cp'] for instr_form in cp_kernel]),
             )
         )
 
@@ -161,7 +161,7 @@ class Frontend(object):
                     separator,
                     sum(
                         [
-                            instr_form['latency'] if instr_form['latency'] is not None else 0
+                            instr_form['latency_lcd']
                             for instr_form in dep_dict[dep]['dependencies']
                         ]
                     ),

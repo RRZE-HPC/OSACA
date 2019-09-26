@@ -81,6 +81,21 @@ class MachineModel(object):
             return self._data['hidden_loads']
         return False
 
+    def get_load_latency(self, reg_type):
+        return self._data['load_latency'][reg_type]
+
+    def get_load_throughput(self, memory):
+        ld_tp = [m for m in self._data['load_throughput'] if self._match_mem_entries(memory, m)]
+        if len(ld_tp) > 0:
+            return ld_tp[0]['port_pressure']
+        return None
+
+    def _match_mem_entries(self, mem, i_mem):
+        if self._data['isa'].lower() == 'aarch64':
+            return self._is_AArch64_mem_type(i_mem, mem)
+        if self._data['isa'].lower() == 'x86':
+            return self._is_x86_mem_type(i_mem, mem)
+
     def get_data_ports(self):
         data_port = re.compile(r'^[0-9]+D$')
         data_ports = [x for x in filter(data_port.match, self._data['ports'])]
@@ -248,7 +263,7 @@ class MachineModel(object):
                     and mem['index']['prefix'] == i_mem['index']
                 )
             )
-            and mem['scale'] == i_mem['scale']
+            and (mem['scale'] == i_mem['scale'] or (mem['scale'] != 1 and i_mem['scale'] != 1))
             and (('pre_indexed' in mem) == (i_mem['pre-indexed']))
             and (('post_indexed' in mem) == (i_mem['post-indexed']))
         ):
@@ -285,7 +300,7 @@ class MachineModel(object):
                     and self._is_x86_reg_type(i_mem['index'], mem['index'])
                 )
             )
-            and mem['scale'] == i_mem['scale']
+            and (mem['scale'] == i_mem['scale'] or (mem['scale'] != 1 and i_mem['scale'] != 1))
         ):
             return True
         return False

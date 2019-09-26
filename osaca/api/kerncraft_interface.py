@@ -48,10 +48,18 @@ class KerncraftAPI(object):
         return max(self.semantics.get_throughput_sum(kernel))
 
     def get_latency(self, kernel):
+        return (self.get_lcd(kernel), self.get_cp(kernel))
+
+    def get_cp(self, kernel):
         kernel_graph = KernelDG(kernel, self.parser, self.machine_model)
-        return sum(
-            [
-                x['latency'] if x['latency'] is not None else 0
-                for x in kernel_graph.get_critical_path()
-            ]
-        )
+        kernel_cp = kernel_graph.get_critical_path()
+        return sum([x['latency_cp'] for x in kernel_cp])
+
+    def get_lcd(self, kernel):
+        kernel_graph = KernelDG(kernel, self.parser, self.machine_model)
+        lcd_dict = kernel_graph.get_loopcarried_dependencies()
+        lcd = 0.0
+        for dep in lcd_dict:
+            lcd_tmp = sum([x['latency_lcd'] for x in lcd_dict[dep]['dependencies']])
+            lcd = lcd_tmp if lcd_tmp > lcd else lcd
+        return lcd
