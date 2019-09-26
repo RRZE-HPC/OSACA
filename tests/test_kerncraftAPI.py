@@ -50,7 +50,7 @@ class TestKerncraftAPI(unittest.TestCase):
         )
         self.assertEqual(kapi.get_port_occupation_cycles(kernel), port_occupation)
         self.assertEqual(kapi.get_total_throughput(kernel), 2.0)
-        self.assertEqual(kapi.get_latency(kernel), 10.0)
+        self.assertEqual(kapi.get_latency(kernel), (1.0, 13.0))
 
     def test_kerncraft_API_AArch64(self):
         kapi = KerncraftAPI('vulcan')

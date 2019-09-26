@@ -4,7 +4,7 @@ import os
 import warnings
 from functools import reduce
 
-from osaca.parser import AttrDict
+from osaca.parser import AttrDict, ParserAArch64v81, ParserX86ATT
 from osaca.semantics import MachineModel
 
 
@@ -25,11 +25,12 @@ class SemanticsAppender(object):
     def __init__(self, machine_model: MachineModel, path_to_yaml=None):
         self._machine_model = machine_model
         self._isa = machine_model.get_ISA().lower()
-        if path_to_yaml:
-            path = path_to_yaml
-        else:
-            path = self._find_file(self._isa)
+        path = self._find_file(self._isa)
         self._isa_model = MachineModel(path_to_yaml=path)
+        if self._isa == 'x86':
+            self._parser = ParserX86ATT()
+        elif self._isa == 'aarch64':
+            self._parser = ParserAArch64v81()
 
     def _find_file(self, isa):
         data_dir = os.path.expanduser('~/.osaca/data/isa')
@@ -92,6 +93,7 @@ class SemanticsAppender(object):
             # No instruction (label, comment, ...) --> ignore
             throughput = 0.0
             latency = 0.0
+            latency_wo_load = latency
             instruction_form['port_pressure'] = [0.0 for i in range(port_number)]
         else:
             instruction_data = self._machine_model.get_instruction(
@@ -120,17 +122,58 @@ class SemanticsAppender(object):
                     throughput = 0.0
                     flags.append(INSTR_FLAGS.TP_UNKWN)
                 latency = instruction_data['latency']
+                latency_wo_load = latency
                 if latency is None:
                     # assume 0 cy and mark as unknown
                     latency = 0.0
+                    latency_wo_load = latency
                     flags.append(INSTR_FLAGS.LT_UNKWN)
             else:
                 # instruction could not be found in DB
-                # --> mark as unknown and assume 0 cy for latency/throughput
-                throughput = 0.0
-                latency = 0.0
-                instruction_form['port_pressure'] = [0.0 for i in range(port_number)]
-                flags += [INSTR_FLAGS.TP_UNKWN, INSTR_FLAGS.LT_UNKWN]
+                assign_unknown = True
+                # check for equivalent register-operands DB entry if LD
+                if INSTR_FLAGS.HAS_LD in instruction_form['flags']:
+                    # --> combine LD and reg form of instruction form
+                    operands = self.substitute_mem_address(instruction_form['operands'])
+                    instruction_data_reg = self._machine_model.get_instruction(
+                        instruction_form['instruction'], operands
+                    )
+                    if instruction_data_reg:
+                        assign_unknown = False
+                        load_port_pressure = self._machine_model.get_load_throughput(
+                            [
+                                x['memory']
+                                for x in instruction_form['operands']['source']
+                                if 'memory' in x
+                            ][0]
+                        )
+                        if load_port_pressure is None:
+                            import pdb; pdb.set_trace()
+                        throughput = max(
+                            max(load_port_pressure), instruction_data_reg['throughput']
+                        )
+                        latency = (
+                            self._machine_model.get_load_latency(
+                                [
+                                    self._parser.get_reg_type(op['register'])
+                                    for op in operands['operand_list']
+                                    if 'register' in op
+                                ][0]
+                            )
+                            + instruction_data_reg['latency']
+                        )
+                        latency_wo_load = instruction_data_reg['latency']
+                        instruction_form['port_pressure'] = [
+                            sum(x)
+                            for x in zip(load_port_pressure, instruction_data_reg['port_pressure'])
+                        ]
+                if assign_unknown:
+                    # --> mark as unknown and assume 0 cy for latency/throughput
+                    throughput = 0.0
+                    latency = 0.0
+                    latency_wo_load = latency
+                    instruction_form['port_pressure'] = [0.0 for i in range(port_number)]
+                    flags += [INSTR_FLAGS.TP_UNKWN, INSTR_FLAGS.LT_UNKWN]
         # flatten flag list
         flags = list(set(flags))
         if 'flags' not in instruction_form:
@@ -139,8 +182,51 @@ class SemanticsAppender(object):
             instruction_form['flags'] += flags
         instruction_form['throughput'] = throughput
         instruction_form['latency'] = latency
+        instruction_form['latency_wo_load'] = latency_wo_load
+        # for later CP and loop-carried dependency analysis
+        instruction_form['latency_cp'] = 0
+        instruction_form['latency_lcd'] = 0
 
-    # get parser result and assign operands to
+    def substitute_mem_address(self, operands):
+        regs = [op for op in operands['operand_list'] if 'register' in op]
+        if (
+            len(regs) > 1
+            and len(set([self._parser.get_reg_type(x['register']) for x in regs])) != 1
+        ):
+            warnings.warn('Load type could not be identified clearly.')
+        reg_type = self._parser.get_reg_type(regs[0]['register'])
+
+        source = [
+            operand if 'memory' not in operand else self.convert_mem_to_reg(operand, reg_type)
+            for operand in operands['source']
+        ]
+        destination = [
+            operand if 'memory' not in operand else self.convert_mem_to_reg(operand, reg_type)
+            for operand in operands['destination']
+        ]
+        src_dst = [
+            operand if 'memory' not in operand else self.convert_mem_to_reg(operand, reg_type)
+            for operand in operands['destination']
+        ]
+        operand_list = [
+            operand if 'memory' not in operand else self.convert_mem_to_reg(operand, reg_type)
+            for operand in operands['operand_list']
+        ]
+        return {
+            'source': source,
+            'destination': destination,
+            'src_dst': src_dst,
+            'operand_list': operand_list,
+        }
+
+    def convert_mem_to_reg(self, memory, reg_type, reg_id='0'):
+        if self._isa == 'x86':
+            register = {'register': {'name': reg_type + reg_id}}
+        elif self._isa == 'aarch64':
+            register = {'register': {'prefix': reg_type, 'name': reg_id}}
+        return register
+
+    # get ;parser result and assign operands to
     # - source
     # - destination
     # - source/destination
@@ -225,14 +311,14 @@ class SemanticsAppender(object):
     def _get_regular_source_x86ATT(self, instruction_form):
         # return all but last operand
         sources = [
-            op for op in instruction_form['operands'][0:len(instruction_form['operands']) - 1]
+            op for op in instruction_form['operands'][0 : len(instruction_form['operands']) - 1]
         ]
         return sources
 
     def _get_regular_source_AArch64(self, instruction_form):
         # return all but first operand
         sources = [
-            op for op in instruction_form['operands'][1:len(instruction_form['operands'])]
+            op for op in instruction_form['operands'][1 : len(instruction_form['operands'])]
         ]
         return sources
 
