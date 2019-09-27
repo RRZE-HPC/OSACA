@@ -3,7 +3,7 @@ micro_architecture: "AMD Zen (family 17h)"
 arch_code: "ZEN1"
 isa: "x86"
 load_latency: {gpr: 4.0, xmm: 4.0, ymm: 4.0}
-# TODO ADD YMM latencies [0,0,0,0,0,0,0,0,0,1,1,1,1,0]
+load_throughput_multiplier: {gpr: 1.0, xmm: 1.0, ymm: 2.0}
 load_throughput:
   - {base: gpr, index: ~,   offset: ~,   scale: 1, port_pressure: [0,0,0,0,0,0,0,0,0,0.5,0.5,0.5,0.5,0]}
   - {base: gpr, index: ~,   offset: ~,   scale: 8, port_pressure: [0,0,0,0,0,0,0,0,0,0.5,0.5,0.5,0.5,0]}
@@ -347,6 +347,18 @@ instruction_forms:
       port_pressure: [1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
     - name: vmovapd
       operands:
+        - class: "memory"
+          base: "gpr"
+          offset: ~
+          index: "gpr"
+          scale: 1
+        - class: "register"
+          name: "ymm"
+      throughput: 0.5
+      latency: 4.0  #  0   0DV   1    2   2D    3   3D    4    5    6    7
+      port_pressure: [0.0, 0.0, 0.0, 0.5, 0.5, 0.5, 0.5, 0.0, 0.0, 0.0, 0.0]
+    - name: vmovapd
+      operands:
         - class: "register"
           name: "xmm"
         - class: "register"
@@ -425,6 +437,30 @@ instruction_forms:
       port_pressure: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.5, 0.5, 0.0, 0.0, 1.0]
     - name: vmovupd
       operands:
+        - class: "memory"
+          base: "gpr"
+          offset: ~
+          index: "gpr"
+          scale: 1
+        - class: "register"
+          name: "ymm"
+      throughput: 0.5
+      latency: 4.0  #  0   0DV   1    2   2D    3   3D    4    5    6    7
+      port_pressure: [0.0, 0.0, 0.0, 0.5, 0.5, 0.5, 0.5, 0.0, 0.0, 0.0, 0.0]
+    - name: vmovupd
+      operands:
+        - class: "memory"
+          base: "gpr"
+          offset: "imd"
+          index: "gpr"
+          scale: 1
+        - class: "register"
+          name: "ymm"
+      throughput: 0.5
+      latency: 4.0  #  0   0DV   1    2   2D    3   3D    4    5    6    7
+      port_pressure: [0.0, 0.0, 0.0, 0.5, 0.5, 0.5, 0.5, 0.0, 0.0, 0.0, 0.0]
+    - name: vmovupd
+      operands:
         - class: "register"
           name: "ymm"
         - class: "memory"
@@ -468,6 +504,18 @@ instruction_forms:
       throughput: 0.0
       latency: 0.0  #  0    1    2    3   3DV   4    5    6    7    8    9   8D   9D   ST
       port_pressure: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+    - name: vmovsd
+      operands:
+        - class: "memory"
+          base: "gpr"
+          offset: "imd"
+          index: "gpr"
+          scale: 1
+        - class: "register"
+          name: "xmm"
+      throughput: 0.5
+      latency: 4.0  #  0    1    2    3   3DV   4    5    6    7    8    9   8D   9D   ST
+      port_pressure: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.5, 0.5, 0.5, 0.5, 0.0]
     - name: vmovsd
       operands:
         - class: "register"

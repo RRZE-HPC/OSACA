@@ -441,6 +441,18 @@ instruction_forms:
       port_pressure: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
     - name: vmovsd
       operands:
+        - class: "memory"
+          base: "gpr"
+          offset: "imd"
+          index: "gpr"
+          scale: 1
+        - class: "register"
+          name: "xmm"
+      throughput: 0.5
+      latency: 4.0  #  0   0DV   1    2   2D    3   3D    4    5    6    7
+      port_pressure: [0.0, 0.0, 0.0, 0.5, 0.5, 0.5, 0.5, 0.0, 0.0, 0.0, 0.0]
+    - name: vmovsd
+      operands:
         - class: "register"
           name: "xmm"
         - class: "register"
