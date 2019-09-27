@@ -11,7 +11,8 @@ from subprocess import call
 from osaca.api import sanity_check
 from osaca.frontend import Frontend
 from osaca.parser import BaseParser, ParserAArch64v81, ParserX86ATT
-from osaca.semantics import KernelDG, MachineModel, reduce_to_section, SemanticsAppender
+from osaca.semantics import (KernelDG, MachineModel, SemanticsAppender,
+                             reduce_to_section)
 
 MODULE_DATA_DIR = os.path.join(
     os.path.dirname(os.path.split(os.path.abspath(__file__))[0]), 'osaca/data/'
@@ -56,7 +57,6 @@ def create_parser():
     parser.add_argument(
         '--arch',
         type=str,
-        required=True,
         help='Define architecture (SNB, IVB, HSW, BDW, SKX, CSX, ZEN1, VULCAN).',
     )
     parser.add_argument(
@@ -84,6 +84,15 @@ def create_parser():
         'marker by using Kerncraft.',
     )
     parser.add_argument(
+        '--export-graph',
+        metavar='EXPORT_PATH',
+        dest='dotpath',
+        default=None,
+        type=str,
+        help='Output path for .dot file export. If "." is given, the file will be stored as '
+        '"./osaca_dg.dot"',
+    )
+    parser.add_argument(
         '--verbose', '-v', action='count', default=0, help='Increases verbosity level.'
     )
     parser.add_argument(
@@ -98,7 +107,7 @@ def check_arguments(args, parser):
     supported_archs = ['SNB', 'IVB', 'HSW', 'BDW', 'SKX', 'CSX', 'ZEN1', 'VULCAN']
     supported_import_files = ['ibench', 'asmbench', 'uopsinfo']
 
-    if args.arch.upper() not in supported_archs:
+    if 'arch' in args and args.arch.upper() not in supported_archs:
         parser.error(
             'Microarchitecture not supported. Please see --help for all valid architecture codes.'
         )
@@ -180,6 +189,8 @@ def inspect(args):
 
     # Create DiGrahps
     kernel_graph = KernelDG(kernel, parser, machine_model)
+    if args.dotpath is not None:
+        kernel_graph.export_graph(args.dotpath if args.dotpath != '.' else None)
     # Print analysis
     frontend = Frontend(args.file.name, arch=arch)
     frontend.print_full_analysis(kernel, kernel_graph, verbose=verbose)
@@ -208,6 +219,7 @@ def _create_parser(arch) -> BaseParser:
         return ParserX86ATT()
     elif isa == 'aarch64':
         return ParserAArch64v81()
+
 
 # ---------------------------------------------------
 

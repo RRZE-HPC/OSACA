@@ -13,6 +13,7 @@ class INSTR_FLAGS:
     Flags used for unknown or special instructions
     """
 
+    LD = 'is_load_instruction'
     TP_UNKWN = 'tp_unknown'
     LT_UNKWN = 'lt_unknown'
     NOT_BOUND = 'not_bound'
@@ -128,6 +129,8 @@ class SemanticsAppender(object):
                     latency = 0.0
                     latency_wo_load = latency
                     flags.append(INSTR_FLAGS.LT_UNKWN)
+                if INSTR_FLAGS.HAS_LD in instruction_form['flags']:
+                    flags.append(INSTR_FLAGS.LD)
             else:
                 # instruction could not be found in DB
                 assign_unknown = True
@@ -140,6 +143,11 @@ class SemanticsAppender(object):
                     )
                     if instruction_data_reg:
                         assign_unknown = False
+                        reg_types = [
+                            self._parser.get_reg_type(op['register'])
+                            for op in operands['operand_list']
+                            if 'register' in op
+                        ]
                         load_port_pressure = self._machine_model.get_load_throughput(
                             [
                                 x['memory']
@@ -147,19 +155,16 @@ class SemanticsAppender(object):
                                 if 'memory' in x
                             ][0]
                         )
-                        if load_port_pressure is None:
-                            import pdb; pdb.set_trace()
+                        if 'load_throughput_multiplier' in self._machine_model:
+                            multiplier = self._machine_model['load_throughput_multiplier'][
+                                reg_types[0]
+                            ]
+                            load_port_pressure = [pp * multiplier for pp in load_port_pressure]
                         throughput = max(
                             max(load_port_pressure), instruction_data_reg['throughput']
                         )
                         latency = (
-                            self._machine_model.get_load_latency(
-                                [
-                                    self._parser.get_reg_type(op['register'])
-                                    for op in operands['operand_list']
-                                    if 'register' in op
-                                ][0]
-                            )
+                            self._machine_model.get_load_latency(reg_types[0])
                             + instruction_data_reg['latency']
                         )
                         latency_wo_load = instruction_data_reg['latency']
@@ -311,14 +316,14 @@ class SemanticsAppender(object):
     def _get_regular_source_x86ATT(self, instruction_form):
         # return all but last operand
         sources = [
-            op for op in instruction_form['operands'][0 : len(instruction_form['operands']) - 1]
+            op for op in instruction_form['operands'][0: len(instruction_form['operands']) - 1]
         ]
         return sources
 
     def _get_regular_source_AArch64(self, instruction_form):
         # return all but first operand
         sources = [
-            op for op in instruction_form['operands'][1 : len(instruction_form['operands'])]
+            op for op in instruction_form['operands'][1: len(instruction_form['operands'])]
         ]
         return sources
 

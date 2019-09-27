@@ -26,7 +26,11 @@ class KernelDG(nx.DiGraph):
             dg.add_node(instruction_form['line_number'])
             dg.nodes[instruction_form['line_number']]['instruction_form'] = instruction_form
             # add load as separate node if existent
-            if 'performs_load' in instruction_form['flags']:
+            # TODO use INSTR_FLAGS here
+            if (
+                'performs_load' in instruction_form['flags']
+                and 'is_load_instruction' not in instruction_form['flags']
+            ):
                 # add new node
                 dg.add_node(instruction_form['line_number'] + 0.1)
                 dg.nodes[instruction_form['line_number'] + 0.1][
@@ -38,7 +42,7 @@ class KernelDG(nx.DiGraph):
                     instruction_form['line_number'],
                     latency=instruction_form['latency'] - instruction_form['latency_wo_load'],
                 )
-            for dep in self.find_depending(instruction_form, kernel[i + 1 :]):
+            for dep in self.find_depending(instruction_form, kernel[i + 1:]):
                 edge_weight = (
                     instruction_form['latency']
                     if 'latency_wo_load' not in instruction_form
@@ -238,3 +242,94 @@ class KernelDG(nx.DiGraph):
                         self.parser.is_reg_dependend_of(register, src.memory.base) or is_written
                     )
         return is_written
+
+    def export_graph(self, filepath=None):
+        graph = copy.deepcopy(self.dg)
+        cp = self.get_critical_path()
+        cp_line_numbers = [x['line_number'] for x in cp]
+        lcd = self.get_loopcarried_dependencies()
+        lcd_line_numbers = {}
+        for dep in lcd:
+            lcd_line_numbers[dep] = [x['line_number'] for x in lcd[dep]['dependencies']]
+        # add color scheme
+        graph.graph['node'] = {'colorscheme': 'accent8'}
+        graph.graph['edge'] = {'colorscheme': 'accent8'}
+
+        # create LCD edges
+        for dep in lcd_line_numbers:
+            min_line_number = min(lcd_line_numbers[dep])
+            max_line_number = max(lcd_line_numbers[dep])
+            graph.add_edge(max_line_number, min_line_number)
+            graph.edges[max_line_number, min_line_number]['latency'] = [
+                x for x in lcd[dep]['dependencies'] if x['line_number'] == max_line_number
+            ][0]['latency_lcd']
+
+        # add label to edges
+        for e in graph.edges:
+            graph.edges[e]['label'] = graph.edges[e]['latency']
+
+        # add CP values to graph
+        for n in cp:
+            graph.nodes[n['line_number']]['instruction_form']['latency_cp'] = n['latency_cp']
+
+        # color CP and LCD
+        for n in graph.nodes:
+            if n in cp_line_numbers:
+                # graph.nodes[n]['color'] = 1
+                graph.nodes[n]['style'] = 'bold'
+                graph.nodes[n]['penwidth'] = 4
+            for col, dep in enumerate(lcd):
+                if n in lcd_line_numbers[dep]:
+                    if 'style' not in graph.nodes[n]:
+                        graph.nodes[n]['style'] = 'filled'
+                    else:
+                        graph.nodes[n]['style'] += ',filled'
+                    graph.nodes[n]['fillcolor'] = 2 + col
+
+        # color edges
+        for e in graph.edges:
+            if (
+                graph.nodes[e[0]]['instruction_form']['line_number'] in cp_line_numbers
+                and graph.nodes[e[1]]['instruction_form']['line_number'] in cp_line_numbers
+                and e[0] < e[1]
+            ):
+                bold_edge = True
+                for i in range(e[0] + 1, e[1]):
+                    if i in cp_line_numbers:
+                        bold_edge = False
+                if bold_edge:
+                    graph.edges[e]['style'] = 'bold'
+                    graph.edges[e]['penwidth'] = 3
+            for dep in lcd_line_numbers:
+                if (
+                    graph.nodes[e[0]]['instruction_form']['line_number'] in lcd_line_numbers[dep]
+                    and graph.nodes[e[1]]['instruction_form']['line_number']
+                    in lcd_line_numbers[dep]
+                ):
+                    graph.edges[e]['color'] = graph.nodes[e[1]]['fillcolor']
+
+        # rename node from [idx] to [idx mnemonic] and add shape
+        mapping = {}
+        for n in graph.nodes:
+            if int(n) != n:
+                mapping[n] = '{}: LOAD'.format(int(n))
+                graph.nodes[n]['fontname'] = 'italic'
+                graph.nodes[n]['fontsize'] = 11.0
+            else:
+                node = graph.nodes[n]['instruction_form']
+                if node['instruction'] is not None:
+                    mapping[n] = '{}: {}'.format(n, node['instruction'])
+                else:
+                    label = 'label' if node['label'] else None
+                    label = 'directive' if node['directive'] else label
+                    label = 'comment' if node['comment'] and label is None else label
+                    mapping[n] = '{}: {}'.format(n, label)
+                    graph.nodes[n]['fontname'] = 'italic'
+                    graph.nodes[n]['fontsize'] = 11.0
+                graph.nodes[n]['shape'] = 'rectangle'
+
+        nx.relabel.relabel_nodes(graph, mapping, copy=False)
+        if filepath:
+            nx.drawing.nx_agraph.write_dot(graph, filepath)
+        else:
+            nx.drawing.nx_agraph.write_dot(graph, 'osaca_dg.dot')

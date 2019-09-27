@@ -8,38 +8,38 @@ scheduler_size: 60
 hidden_loads: false
 load_latency: {w: 4.0, x: 4.0, b: 4.0, h: 4.0, s: 4.0, d: 4.0, q: 4.0, v: 4.0}
 load_throughput:
-  - {base: x, index: ~, offset: ~,   scale: 1, pre-indexed: false, post-indexed: true,  port_pressure: [0,0,0,0,0.5,0.5,0]}
-  - {base: x, index: ~, offset: ~,   scale: 1, pre-indexed: false, post-indexed: false, port_pressure: [0,0,0,0,0.5,0.5,0]}
-  - {base: x, index: ~, offset: ~,   scale: 1, pre-indexed: true,  post-indexed: true,  port_pressure: [0,0,0,0,0.5,0.5,0]}
-  - {base: x, index: ~, offset: ~,   scale: 1, pre-indexed: true,  post-indexed: false, port_pressure: [0,0,0,0,0.5,0.5,0]}
-  - {base: x, index: ~, offset: ~,   scale: 8, pre-indexed: false, post-indexed: true,  port_pressure: [0,0,0,0,0.5,0.5,0]}
-  - {base: x, index: ~, offset: ~,   scale: 8, pre-indexed: false, post-indexed: false, port_pressure: [0,0,0,0,0.5,0.5,0]}
-  - {base: x, index: ~, offset: ~,   scale: 8, pre-indexed: true,  post-indexed: true,  port_pressure: [0,0,0,0,0.5,0.5,0]}
-  - {base: x, index: ~, offset: ~,   scale: 8, pre-indexed: true,  post-indexed: false, port_pressure: [0,0,0,0,0.5,0.5,0]}
-  - {base: x, index: ~, offset: imd, scale: 1, pre-indexed: false, post-indexed: true,  port_pressure: [0,0,0,0,0.5,0.5,0]}
-  - {base: x, index: ~, offset: imd, scale: 1, pre-indexed: false, post-indexed: false, port_pressure: [0,0,0,0,0.5,0.5,0]}
-  - {base: x, index: ~, offset: imd, scale: 1, pre-indexed: true,  post-indexed: true,  port_pressure: [0,0,0,0,0.5,0.5,0]}
-  - {base: x, index: ~, offset: imd, scale: 1, pre-indexed: true,  post-indexed: false, port_pressure: [0,0,0,0,0.5,0.5,0]}
-  - {base: x, index: ~, offset: imd, scale: 8, pre-indexed: false, post-indexed: true,  port_pressure: [0,0,0,0,0.5,0.5,0]}
-  - {base: x, index: ~, offset: imd, scale: 8, pre-indexed: false, post-indexed: false, port_pressure: [0,0,0,0,0.5,0.5,0]}
-  - {base: x, index: ~, offset: imd, scale: 8, pre-indexed: true,  post-indexed: true,  port_pressure: [0,0,0,0,0.5,0.5,0]}
-  - {base: x, index: ~, offset: imd, scale: 8, pre-indexed: true,  post-indexed: false, port_pressure: [0,0,0,0,0.5,0.5,0]}
-  - {base: x, index: x, offset: ~,   scale: 1, pre-indexed: false, post-indexed: true,  port_pressure: [0,0,0,0,0.5,0.5,0]}
-  - {base: x, index: x, offset: ~,   scale: 1, pre-indexed: false, post-indexed: false, port_pressure: [0,0,0,0,0.5,0.5,0]}
-  - {base: x, index: x, offset: ~,   scale: 1, pre-indexed: true,  post-indexed: true,  port_pressure: [0,0,0,0,0.5,0.5,0]}
-  - {base: x, index: x, offset: ~,   scale: 1, pre-indexed: true,  post-indexed: false, port_pressure: [0,0,0,0,0.5,0.5,0]}
-  - {base: x, index: x, offset: ~,   scale: 8, pre-indexed: false, post-indexed: true,  port_pressure: [0,0,0,0,0.5,0.5,0]}
-  - {base: x, index: x, offset: ~,   scale: 8, pre-indexed: false, post-indexed: false, port_pressure: [0,0,0,0,0.5,0.5,0]}
-  - {base: x, index: x, offset: ~,   scale: 8, pre-indexed: true,  post-indexed: true,  port_pressure: [0,0,0,0,0.5,0.5,0]}
-  - {base: x, index: x, offset: ~,   scale: 8, pre-indexed: true,  post-indexed: false, port_pressure: [0,0,0,0,0.5,0.5,0]}
-  - {base: x, index: x, offset: imd, scale: 1, pre-indexed: false, post-indexed: true,  port_pressure: [0,0,0,0,0.5,0.5,0]}
-  - {base: x, index: x, offset: imd, scale: 1, pre-indexed: false, post-indexed: false, port_pressure: [0,0,0,0,0.5,0.5,0]}
-  - {base: x, index: x, offset: imd, scale: 1, pre-indexed: true,  post-indexed: true,  port_pressure: [0,0,0,0,0.5,0.5,0]}
-  - {base: x, index: x, offset: imd, scale: 1, pre-indexed: true,  post-indexed: false, port_pressure: [0,0,0,0,0.5,0.5,0]}
-  - {base: x, index: x, offset: imd, scale: 8, pre-indexed: false, post-indexed: true,  port_pressure: [0,0,0,0,0.5,0.5,0]}
-  - {base: x, index: x, offset: imd, scale: 8, pre-indexed: false, post-indexed: false, port_pressure: [0,0,0,0,0.5,0.5,0]}
-  - {base: x, index: x, offset: imd, scale: 8, pre-indexed: true,  post-indexed: true,  port_pressure: [0,0,0,0,0.5,0.5,0]}
-  - {base: x, index: x, offset: imd, scale: 8, pre-indexed: true,  post-indexed: false, port_pressure: [0,0,0,0,0.5,0.5,0]}
+  - {base: x, index: ~, offset: ~,   scale: 1, pre-indexed: false, post-indexed: true,  port_pressure: [0,0,0,0,0,0.5,0.5,0]}
+  - {base: x, index: ~, offset: ~,   scale: 1, pre-indexed: false, post-indexed: false, port_pressure: [0,0,0,0,0,0.5,0.5,0]}
+  - {base: x, index: ~, offset: ~,   scale: 1, pre-indexed: true,  post-indexed: true,  port_pressure: [0,0,0,0,0,0.5,0.5,0]}
+  - {base: x, index: ~, offset: ~,   scale: 1, pre-indexed: true,  post-indexed: false, port_pressure: [0,0,0,0,0,0.5,0.5,0]}
+  - {base: x, index: ~, offset: ~,   scale: 8, pre-indexed: false, post-indexed: true,  port_pressure: [0,0,0,0,0,0.5,0.5,0]}
+  - {base: x, index: ~, offset: ~,   scale: 8, pre-indexed: false, post-indexed: false, port_pressure: [0,0,0,0,0,0.5,0.5,0]}
+  - {base: x, index: ~, offset: ~,   scale: 8, pre-indexed: true,  post-indexed: true,  port_pressure: [0,0,0,0,0,0.5,0.5,0]}
+  - {base: x, index: ~, offset: ~,   scale: 8, pre-indexed: true,  post-indexed: false, port_pressure: [0,0,0,0,0,0.5,0.5,0]}
+  - {base: x, index: ~, offset: imd, scale: 1, pre-indexed: false, post-indexed: true,  port_pressure: [0,0,0,0,0,0.5,0.5,0]}
+  - {base: x, index: ~, offset: imd, scale: 1, pre-indexed: false, post-indexed: false, port_pressure: [0,0,0,0,0,0.5,0.5,0]}
+  - {base: x, index: ~, offset: imd, scale: 1, pre-indexed: true,  post-indexed: true,  port_pressure: [0,0,0,0,0,0.5,0.5,0]}
+  - {base: x, index: ~, offset: imd, scale: 1, pre-indexed: true,  post-indexed: false, port_pressure: [0,0,0,0,0,0.5,0.5,0]}
+  - {base: x, index: ~, offset: imd, scale: 8, pre-indexed: false, post-indexed: true,  port_pressure: [0,0,0,0,0,0.5,0.5,0]}
+  - {base: x, index: ~, offset: imd, scale: 8, pre-indexed: false, post-indexed: false, port_pressure: [0,0,0,0,0,0.5,0.5,0]}
+  - {base: x, index: ~, offset: imd, scale: 8, pre-indexed: true,  post-indexed: true,  port_pressure: [0,0,0,0,0,0.5,0.5,0]}
+  - {base: x, index: ~, offset: imd, scale: 8, pre-indexed: true,  post-indexed: false, port_pressure: [0,0,0,0,0,0.5,0.5,0]}
+  - {base: x, index: x, offset: ~,   scale: 1, pre-indexed: false, post-indexed: true,  port_pressure: [0,0,0,0,0,0.5,0.5,0]}
+  - {base: x, index: x, offset: ~,   scale: 1, pre-indexed: false, post-indexed: false, port_pressure: [0,0,0,0,0,0.5,0.5,0]}
+  - {base: x, index: x, offset: ~,   scale: 1, pre-indexed: true,  post-indexed: true,  port_pressure: [0,0,0,0,0,0.5,0.5,0]}
+  - {base: x, index: x, offset: ~,   scale: 1, pre-indexed: true,  post-indexed: false, port_pressure: [0,0,0,0,0,0.5,0.5,0]}
+  - {base: x, index: x, offset: ~,   scale: 8, pre-indexed: false, post-indexed: true,  port_pressure: [0,0,0,0,0,0.5,0.5,0]}
+  - {base: x, index: x, offset: ~,   scale: 8, pre-indexed: false, post-indexed: false, port_pressure: [0,0,0,0,0,0.5,0.5,0]}
+  - {base: x, index: x, offset: ~,   scale: 8, pre-indexed: true,  post-indexed: true,  port_pressure: [0,0,0,0,0,0.5,0.5,0]}
+  - {base: x, index: x, offset: ~,   scale: 8, pre-indexed: true,  post-indexed: false, port_pressure: [0,0,0,0,0,0.5,0.5,0]}
+  - {base: x, index: x, offset: imd, scale: 1, pre-indexed: false, post-indexed: true,  port_pressure: [0,0,0,0,0,0.5,0.5,0]}
+  - {base: x, index: x, offset: imd, scale: 1, pre-indexed: false, post-indexed: false, port_pressure: [0,0,0,0,0,0.5,0.5,0]}
+  - {base: x, index: x, offset: imd, scale: 1, pre-indexed: true,  post-indexed: true,  port_pressure: [0,0,0,0,0,0.5,0.5,0]}
+  - {base: x, index: x, offset: imd, scale: 1, pre-indexed: true,  post-indexed: false, port_pressure: [0,0,0,0,0,0.5,0.5,0]}
+  - {base: x, index: x, offset: imd, scale: 8, pre-indexed: false, post-indexed: true,  port_pressure: [0,0,0,0,0,0.5,0.5,0]}
+  - {base: x, index: x, offset: imd, scale: 8, pre-indexed: false, post-indexed: false, port_pressure: [0,0,0,0,0,0.5,0.5,0]}
+  - {base: x, index: x, offset: imd, scale: 8, pre-indexed: true,  post-indexed: true,  port_pressure: [0,0,0,0,0,0.5,0.5,0]}
+  - {base: x, index: x, offset: imd, scale: 8, pre-indexed: true,  post-indexed: false, port_pressure: [0,0,0,0,0,0.5,0.5,0]}
 ports: ["0", "0DV", "1", "1DV", "2", "3", "4", "5"]
 port_model_scheme: |
     ┌-----------------------------------------------------------┐
@@ -413,6 +413,48 @@ instruction_forms:
       throughput: 1.0
       latency: ~    #  0   0DV   1   1DV   2    3    4    5
       port_pressure: [0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0]
+    - name: ldr
+      operands:
+        - class: "register"
+          prefix: "d"
+        - class: "memory"
+          base: "x"
+          offset: ~
+          index: ~
+          scale: 1
+          post-indexed: false
+          pre-indexed: false
+      throughput: 0.5
+      latency: 4.0
+      port_pressure: [0.0, 0.0, 0.0, 0.0, 0.0, 0.5, 0.5, 0.0]
+    - name: ldr
+      operands:
+        - class: "register"
+          prefix: "d"
+        - class: "memory"
+          base: "x"
+          offset: "imd"
+          index: ~
+          scale: 1
+          post-indexed: false
+          pre-indexed: false
+      throughput: 0.5
+      latency: 4.0
+      port_pressure: [0.0, 0.0, 0.0, 0.0, 0.0, 0.5, 0.5, 0.0]
+      - name: ldr
+        operands:
+        - class: "register"
+          prefix: "d"
+        - class: "memory"
+          base: "x"
+          offset: ~
+          index: "x"
+          scale: 8
+          post-indexed: false
+          pre-indexed: false
+      throughput: 0.5
+      latency: 4.0
+      port_pressure: [0.0, 0.0, 0.0, 0.0, 0.0, 0.5, 0.5, 0.0]
     - name: "ldr"
       operands:
         - class: "register"
