@@ -173,7 +173,7 @@ class Frontend(object):
             )
 
     def _print_header_report(self):
-        version = 'v0.3.0'
+        version = 'v0.3'
         adjust = 20
         header = ''
         header += 'Open Source Architecture Code Analyzer (OSACA) - {}\n'.format(version)
