@@ -93,6 +93,7 @@ setup(
         'networkx',
         'numpy',
         'pyparsing',
+        'pygraphviz'
     ],
     python_requires='>=3.5',
 
