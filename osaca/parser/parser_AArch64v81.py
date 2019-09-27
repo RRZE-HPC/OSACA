@@ -35,7 +35,7 @@ class ParserAArch64v81(BaseParser):
         hex_number = pp.Combine(pp.Literal('0x') + pp.Word(pp.hexnums)).setResultsName('value')
         directive_option = pp.Combine(
             pp.Word(pp.alphas + '#@.%', exact=1)
-            + pp.Optional(pp.Word(pp.printables, excludeChars=','))
+            + pp.Optional(pp.Word(pp.printables + ' ', excludeChars=','))
         )
         directive_parameter = (
             pp.quotedString | directive_option | identifier | hex_number | decimal_number
