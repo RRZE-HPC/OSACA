@@ -17,7 +17,8 @@ from osaca.semantics import (KernelDG, MachineModel, SemanticsAppender,
 MODULE_DATA_DIR = os.path.join(
     os.path.dirname(os.path.split(os.path.abspath(__file__))[0]), 'osaca/data/'
 )
-DATA_DIR = os.path.expanduser('~') + '/.osaca/data/'
+LOCAL_OSACA_DIR = os.path.join(os.path.expanduser('~') + '/.osaca/')
+DATA_DIR = os.path.join(LOCAL_OSACA_DIR, 'data/')
 
 
 # Stolen from pip
@@ -122,7 +123,9 @@ def check_user_dir():
     # Check if data files are already in usr dir, otherwise create them
     if not os.path.isdir(DATA_DIR):
         os.makedirs(DATA_DIR)
-        call(['cp', '-r', MODULE_DATA_DIR, DATA_DIR])
+    for f in os.listdir(MODULE_DATA_DIR):
+        if not os.path.exists(os.path.join(DATA_DIR, f)):
+            call(['cp', '-r', os.path.join(MODULE_DATA_DIR, f), DATA_DIR])
     else:
         # Compare and warn if files in DATA_DIR are different
         dir_comp = dircmp(DATA_DIR, MODULE_DATA_DIR)
