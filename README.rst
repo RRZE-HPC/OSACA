@@ -52,7 +52,7 @@ Dependencies:
 Additional requirements are:
 
 -  `Python3 <https://www.python.org/>`_
-- `Graphviz <https://www.graphviz.org/>` for dependency graph creation (minimal dependency is `libgraphviz-dev` on Ubuntu)
+-  `Graphviz <https://www.graphviz.org/>`_ for dependency graph creation (minimal dependency is `libgraphviz-dev` on Ubuntu)
 -  `Kerncraft <https://github.com/RRZE-HPC/kerncraft>`_ for marker insertion
 -   `ibench <https://github.com/hofm/ibench>`_ for throughput/latency measurements
 
