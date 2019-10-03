@@ -198,9 +198,7 @@ class ParserAArch64v81(BaseParser):
         # 2. Parse label
         if result is None:
             try:
-                result = self.process_operand(
-                    self.label.parseString(line, parseAll=True).asDict()
-                )
+                result = self.process_operand(self.label.parseString(line, parseAll=True).asDict())
                 result = AttrDict.convert_dict(result)
                 instruction_form[self.LABEL_ID] = result[self.LABEL_ID].name
                 if self.COMMENT_ID in result[self.LABEL_ID]:
@@ -217,10 +215,12 @@ class ParserAArch64v81(BaseParser):
                     self.directive.parseString(line, parseAll=True).asDict()
                 )
                 result = AttrDict.convert_dict(result)
-                instruction_form[self.DIRECTIVE_ID] = AttrDict({
-                    'name': result[self.DIRECTIVE_ID].name,
-                    'parameters': result[self.DIRECTIVE_ID].parameters,
-                })
+                instruction_form[self.DIRECTIVE_ID] = AttrDict(
+                    {
+                        'name': result[self.DIRECTIVE_ID].name,
+                        'parameters': result[self.DIRECTIVE_ID].parameters,
+                    }
+                )
                 if self.COMMENT_ID in result[self.DIRECTIVE_ID]:
                     instruction_form[self.COMMENT_ID] = ' '.join(
                         result[self.DIRECTIVE_ID][self.COMMENT_ID]
@@ -367,9 +367,13 @@ class ParserAArch64v81(BaseParser):
     def get_full_reg_name(self, register):
         if 'lanes' in register:
             return (
-                register['prefix'] + register['name'] + '.' + register['lanes'] + register['shape']
+                register['prefix']
+                + str(register['name'])
+                + '.'
+                + str(register['lanes'])
+                + register['shape']
             )
-        return register['prefix'] + register['name']
+        return register['prefix'] + str(register['name'])
 
     def normalize_imd(self, imd):
         if 'value' in imd:
@@ -394,10 +398,14 @@ class ParserAArch64v81(BaseParser):
         raise NotImplementedError
 
     def is_gpr(self, register):
-        raise NotImplementedError
+        if register['prefix'] in 'wx':
+            return True
+        return False
 
     def is_vector_register(self, register):
-        raise NotImplementedError
+        if register['prefix'] in 'bhsdqv':
+            return True
+        return False
 
     def is_reg_dependend_of(self, reg_a, reg_b):
         prefixes_gpr = 'wx'
