@@ -91,15 +91,15 @@ The usage of OSACA can be listed as:
 --export-graph EXPORT_PATH
   Output path for .dot file export. If "." is given, the file will be stored as "./osaca_dg.dot".
   After the file was created, you can convert it to a PDF file using dot: `dot -Tpdf osaca_dg.dot -o osaca_dependency_graph.pdf`
-FILEPATH
-  describes the filepath to the file to work with and is always necessary
+
+The **FILEPATH** describes the filepath to the file to work with and is always necessary
 
 ______________________
 
 Hereinafter OSACA's scope of function will be described.
 
 Throughput & Latency analysis
-~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 As main functionality of OSACA this process starts by default. It is always necessary to specify the core architecture by the flag ``--arch ARCH``, where ``ARCH`` can stand for ``SNB``, ``IVB``, ``HSW``, ``BDW``, ``SKX``, ``CSX``, ``ZEN`` or ``VULCAN``.
 
 For extracting the right kernel, one has to mark it beforehand.
