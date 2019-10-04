@@ -151,6 +151,15 @@ instruction_forms:
       throughput: 0.5
       latency: 4.0  #  0   0DV   1    2   2D    3   3D    4    5    6    7
       port_pressure: [0.5, 0.0, 0.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+    - name: movl
+      operands:
+        - class: "register"
+          name: "gpr"
+        - class: "register"
+          name: "gpr"
+      throughput: 0.0
+      latency: 1.0  #  0   0DV   1    2   2D    3   3D    4    5    6    7
+      port_pressure: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
     - name: rcpss
       operands:
         - class: "register"
@@ -361,6 +370,18 @@ instruction_forms:
       throughput: 0.0
       latency: 0.0  #  0   0DV   1    2   2D    3   3D    4    5    6    7
       port_pressure: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+    - name: vmovapd
+      operands:
+        - class: "memory"
+          base: "gpr"
+          offset: "imd"
+          index: "gpr"
+          scale: 1
+        - class: "register"
+          name: "ymm"
+      throughput: 1.0
+      latency: 4.0  #  0   0DV   1    2   2D    3   3D    4    5    6    7
+      port_pressure: [0.0, 0.0, 0.0, 0.5, 0.5, 0.5, 0.5, 0.0, 0.0, 0.0, 0.0]
     - name: vmovapd
       operands:
         - class: "register"
