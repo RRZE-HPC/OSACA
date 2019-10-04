@@ -5,6 +5,16 @@ isa: "x86"
 #   mnemonic op1 ... opN
 # means that opN is the only destination operand and op1 to op(N-1) are source operands.
 instruction_forms:
+    - name: addl
+      operands:
+        - class: "immediate"
+          imd: "int"
+          source: true
+          destination: false
+        - class: "register"
+          name: "gpr"
+          source: true
+          destination: true
     - name: addq
       operands:
         - class: "immediate"
