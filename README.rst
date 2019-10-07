@@ -236,7 +236,7 @@ We know that the inserted instruction form must be assigned always to Port 2, 3 
 
     addl-mem_imd,1.0,6.0,"(0.33,0.33,1.00,1.00,1.00,0.33)"
     
-Another thorughput analysis with OSACA now returns all information for the kernel:
+Another throughput analysis with OSACA now returns all information for the kernel:
 
 .. code-block::
 
