@@ -103,15 +103,15 @@ Throughput & Latency analysis
 As main functionality of OSACA this process starts by default. It is always necessary to specify the core architecture by the flag ``--arch ARCH``, where ``ARCH`` can stand for ``SNB``, ``IVB``, ``HSW``, ``BDW``, ``SKX``, ``CSX``, ``ZEN`` or ``VULCAN``.
 
 For extracting the right kernel, one has to mark it beforehand.
-Currently, only markers in the assembly code are supported by OSACA.
+Currently, only the detechtion of markers in the assembly code and therefore the analysis of assemly files is supported by OSACA.
 
-| **Assembly code**
+**Assembly code**
 
 Marking a kernel means to insert the byte markers in the assembly file in before and after the loop.
 For this, the start marker has to be inserted right in front of the loop label and the end marker directly after the jump instruction.
 For the convience of the user, in x86 assembly IACA byte markers are used.
 
-**x86 Byte Markers**
+  **x86 Byte Markers**
 
 .. code-block:: gas
 
@@ -122,7 +122,7 @@ For the convience of the user, in x86 assembly IACA byte markers are used.
     movl    $222,%ebx       #IACA/OSACA END MARKER
     .byte   100,103,144     #IACA/OSACA END MARKER
 
-**AArch64 Byte Markers**
+  **AArch64 Byte Markers**
 
 .. code-block:: asm
 
@@ -150,7 +150,7 @@ For clarifying the functionality of OSACA a sample kernel is analyzed for an Int
     double a[N], double b[N];
     double s;
     
-    //STARTLOOP
+    // loop
     for(int i = 0; i < N; ++i)
         a[i] = s * b[i];
         
