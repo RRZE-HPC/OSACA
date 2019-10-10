@@ -8,7 +8,7 @@ from itertools import groupby, product
 
 from ruamel import yaml
 
-from osaca.api import add_entries_to_db
+from osaca.db_interface import add_entries_to_db
 from osaca.parser import ParserAArch64v81, ParserX86ATT
 from osaca.semantics import MachineModel
 
@@ -136,9 +136,7 @@ def extract_paramters(instruction_tag, arch):
             parameters.append(parameter)
         elif p_type == 'reg':
             parameter['class'] = 'register'
-            possible_regs = [
-                parser.parse_register('%' + r) for r in parameter_tag.text.split(',')
-            ]
+            possible_regs = [parser.parse_register('%' + r) for r in parameter_tag.text.split(',')]
             if possible_regs[0] is None:
                 raise ValueError(
                     'Unknown register type for {} with {}.'.format(
@@ -147,7 +145,9 @@ def extract_paramters(instruction_tag, arch):
                 )
             if isa == 'x86':
                 if parser.is_vector_register(possible_regs[0]['register']):
-                    possible_regs[0]['register']['name'] = possible_regs[0]['register']['name'].lower()[:3]
+                    possible_regs[0]['register']['name'] = possible_regs[0]['register'][
+                        'name'
+                    ].lower()[:3]
                     if 'mask' in possible_regs[0]['register']:
                         possible_regs[0]['register']['mask'] = True
                 else:

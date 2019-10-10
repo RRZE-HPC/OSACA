@@ -8,7 +8,7 @@ import sys
 from filecmp import dircmp
 from subprocess import call
 
-from osaca.api import sanity_check
+from osaca.db_interface import sanity_check, import_benchmark_output
 from osaca.frontend import Frontend
 from osaca.parser import BaseParser, ParserAArch64v81, ParserX86ATT
 from osaca.semantics import (KernelDG, MachineModel, SemanticsAppender,
@@ -138,8 +138,11 @@ def check_user_dir():
             )
 
 
-def import_data(benchmark_type, filepath):
-    raise NotImplementedError
+def import_data(benchmark_type, arch, filepath):
+    if benchmark_type.lower() == 'ibench':
+        import_benchmark_output(arch, 'ibench', filepath)
+    else:
+        raise NotImplementedError('This benchmark input variant is not implemented yet.')
 
 
 def insert_byte_marker(args):
@@ -206,7 +209,7 @@ def run(args, output_file=sys.stdout):
         sanity_check(args.arch, verbose=verbose)
     if 'import_data' in args:
         # Import microbench output file into DB
-        import_data(args.import_data, args.file)
+        import_data(args.import_data, args.arch, args.file)
     if args.insert_marker:
         # Try to add IACA marker
         insert_byte_marker(args)
