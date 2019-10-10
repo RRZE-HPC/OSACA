@@ -111,26 +111,26 @@ Marking a kernel means to insert the byte markers in the assembly file in before
 For this, the start marker has to be inserted right in front of the loop label and the end marker directly after the jump instruction.
 For the convience of the user, in x86 assembly IACA byte markers are used.
 
-  **x86 Byte Markers**
+**x86 Byte Markers**
 
 .. code-block:: gas
 
     movl    $111,%ebx       #IACA/OSACA START MARKER
     .byte   100,103,144     #IACA/OSACA START MARKER
     Loop:
-        # ...
+      # ...
     movl    $222,%ebx       #IACA/OSACA END MARKER
     .byte   100,103,144     #IACA/OSACA END MARKER
 
-  **AArch64 Byte Markers**
+**AArch64 Byte Markers**
 
 .. code-block:: asm
 
-   mov x1, #111            // OSACA START
-   .byte 213,3,32,31       // OSACA START
-     ...
-   mov x1, #222            // OSACA END
-   .byte 213,3,32,31       // OSACA END
+    mov x1, #111            // OSACA START
+    .byte 213,3,32,31       // OSACA START
+      \\ ...
+    mov x1, #222            // OSACA END
+    .byte 213,3,32,31       // OSACA END
 
 .. Include new measurements into the data file
 .. ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
