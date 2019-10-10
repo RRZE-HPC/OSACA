@@ -441,8 +441,8 @@ instruction_forms:
       throughput: 0.5
       latency: 4.0
       port_pressure: [0.0, 0.0, 0.0, 0.0, 0.0, 0.5, 0.5, 0.0]
-      - name: ldr
-        operands:
+    - name: ldr
+      operands:
         - class: "register"
           prefix: "d"
         - class: "memory"
