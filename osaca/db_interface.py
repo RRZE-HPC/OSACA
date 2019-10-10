@@ -43,7 +43,7 @@ def add_entry_to_db(arch: str, entry):
     data['instruction_forms'].append(entry)
     # __dump_data_to_yaml(filepath, data)
     with open(filepath, 'w') as f:
-        yaml.dump(data)
+        yaml.dump(data, f)
 
 
 def add_entries_to_db(arch: str, entries: list) -> None:
@@ -86,7 +86,7 @@ def add_entries_to_db(arch: str, entries: list) -> None:
         data['instruction_forms'].append(entry)
     # __dump_data_to_yaml(filepath, data)
     with open(filepath, 'w') as f:
-        yaml.dump(data)
+        yaml.dump(data, f)
 
 
 def sanity_check(arch: str, verbose=False):

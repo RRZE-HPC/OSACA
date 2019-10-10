@@ -8,7 +8,7 @@ import os
 import sys
 import unittest
 
-from osaca.api import add_entries_to_db, add_entry_to_db, sanity_check
+from osaca.db_interface import add_entries_to_db, add_entry_to_db, sanity_check
 from osaca.semantics import MachineModel
 
 
@@ -39,7 +39,7 @@ class TestDBInterface(unittest.TestCase):
     def tearDownClass(self):
         if sys.exc_info() == (None, None, None):
             # Test successful, remove DB entries
-            test_archs = {'csx': 22, 'vulcan': 24, 'zen1': 22}
+            test_archs = {'csx': 54, 'vulcan': 57, 'zen1': 58}
             for arch in test_archs:
                 lines = []
                 with open(os.path.expanduser('~/.osaca/data/' + arch + '.yml'), 'r') as f:
