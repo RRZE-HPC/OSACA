@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
 
+import math
 import os
 import sys
 import warnings
 
-from ruamel import yaml
+import ruamel.yaml
 
 from osaca.semantics import MachineModel
 
@@ -23,8 +24,9 @@ def add_entry_to_db(arch: str, entry):
     arch = arch.lower()
     filepath = os.path.join(os.path.expanduser('~/.osaca/data/' + arch + '.yml'))
     assert os.path.exists(filepath)
+    yaml = _create_yaml_object()
     with open(filepath, 'r') as f:
-        data = yaml.load(f, Loader=yaml.Loader)
+        data = yaml.load(f)
     # check parameter of entry
     if 'name' not in entry:
         raise ValueError('No name for instruction specified. No import possible')
@@ -39,7 +41,9 @@ def add_entry_to_db(arch: str, entry):
     if 'uops' not in entry:
         entry['uops'] = None
     data['instruction_forms'].append(entry)
-    __dump_data_to_yaml(filepath, data)
+    # __dump_data_to_yaml(filepath, data)
+    with open(filepath, 'w') as f:
+        yaml.dump(data)
 
 
 def add_entries_to_db(arch: str, entries: list) -> None:
@@ -56,8 +60,9 @@ def add_entries_to_db(arch: str, entries: list) -> None:
     arch = arch.lower()
     filepath = os.path.join(os.path.expanduser('~/.osaca/data/' + arch + '.yml'))
     assert os.path.exists(filepath)
+    yaml = _create_yaml_object()
     with open(filepath, 'r') as f:
-        data = yaml.load(f, Loader=yaml.Loader)
+        data = yaml.load(f)
     # check parameter of entry and append it to list
     for entry in entries:
         if 'name' not in entry:
@@ -79,7 +84,9 @@ def add_entries_to_db(arch: str, entries: list) -> None:
         if 'uops' not in entry:
             entry['uops'] = None
         data['instruction_forms'].append(entry)
-    __dump_data_to_yaml(filepath, data)
+    # __dump_data_to_yaml(filepath, data)
+    with open(filepath, 'w') as f:
+        yaml.dump(data)
 
 
 def sanity_check(arch: str, verbose=False):
@@ -113,6 +120,137 @@ def sanity_check(arch: str, verbose=False):
         only_in_isa,
         verbose=verbose,
     )
+
+
+def import_benchmark_output(arch, bench_type, filepath):
+    supported_bench_outputs = ['ibench', 'asmbench']
+    assert os.path.exists(filepath)
+    if bench_type not in supported_bench_outputs:
+        raise ValueError('Benchmark type is not supported.')
+    with open(filepath, 'r') as f:
+        input_data = f.readlines()
+    db_entries = None
+    if bench_type == 'ibench':
+        db_entries = _get_ibench_output(input_data)
+    elif bench_type == 'asmbench':
+        raise NotImplementedError
+    # write entries to DB
+    add_entries_to_db(arch, list(db_entries.values()))
+
+
+##################
+# HELPERS IBENCH #
+##################
+
+
+def _get_ibench_output(input_data):
+    db_entries = {}
+    for line in input_data:
+        if 'Using frequency' in line or len(line) == 0:
+            continue
+        instruction = line.split(':')[0]
+        key = '-'.join(instruction.split('-')[:2])
+        if key in db_entries:
+            # add only TP/LT value
+            entry = db_entries[key]
+        else:
+            mnemonic = instruction.split('-')[0]
+            operands = instruction.split('-')[1].split('_')
+            operands = [_create_db_operand(op) for op in operands]
+            entry = {
+                'name': mnemonic,
+                'operands': operands,
+                'throughput': None,
+                'latency': None,
+                'port_pressure': None,
+            }
+        if 'TP' in instruction:
+            entry['throughput'] = _validate_measurement(float(line.split()[1]), True)
+            if not entry['throughput']:
+                warnings.warn(
+                    'Your THROUGHPUT measurement for {} looks suspicious'.format(key)
+                    + ' and was not added. Please inspect your benchmark.'
+                )
+        elif 'LT' in instruction:
+            entry['latency'] = _validate_measurement(float(line.split()[1]), False)
+            if not entry['latency']:
+                warnings.warn(
+                    'Your LATENCY measurement for {} looks suspicious'.format(key)
+                    + ' and was not added. Please inspect your benchmark.'
+                )
+        db_entries[key] = entry
+
+
+def _validate_measurement(self, measurement, is_tp):
+    if not is_tp:
+        if (
+            math.floor(measurement) * 1.05 >= measurement
+            or math.ceil(measurement) * 0.95 <= measurement
+        ):
+            # Value is probably correct, so round it to the estimated value
+            return float(round(measurement))
+        # Check reciprocal only if it is a throughput value
+    else:
+        reciprocals = [1 / x for x in range(1, 11)]
+        for reci in reciprocals:
+            if reci * 0.95 <= measurement <= reci * 1.05:
+                # Value is probably correct, so round it to the estimated value
+                return round(reci, 5)
+    # No value close to an integer or its reciprocal found, we assume the
+    # measurement is incorrect
+    return None
+
+
+def _create_db_operand(self, operand):
+    if self.isa == 'aarch64':
+        return self._create_db_operand_aarch64(operand)
+    elif self.isa == 'x86':
+        return self._create_db_operand_x86(operand)
+
+
+def _create_db_operand_aarch64(self, operand):
+    if operand == 'i':
+        return {'class': 'immediate', 'imd': 'int'}
+    elif operand in 'wxbhsdq':
+        return {'class': 'register', 'prefix': operand}
+    elif operand.startswith('v'):
+        return {'class': 'register', 'prefix': 'v', 'shape': operand[1:2]}
+    elif operand.startswith('m'):
+        return {
+            'class': 'memory',
+            'base': 'gpr' if 'b' in operand else None,
+            'offset': 'imd' if 'o' in operand else None,
+            'index': 'gpr' if 'i' in operand else None,
+            'scale': 8 if 's' in operand else 1,
+            'pre-indexed': True if 'r' in operand else False,
+            'post-indexed': True if 'p' in operand else False,
+        }
+    else:
+        raise ValueError('Parameter {} is not a valid operand code'.format(operand))
+
+
+def _create_db_operand_x86(self, operand):
+    if operand == 'r':
+        return {'class': 'register', 'name': 'gpr'}
+    elif operand in 'xyz':
+        return {'class': 'register', 'name': operand + 'mm'}
+    elif operand == 'i':
+        return {'class': 'immediate', 'imd': 'int'}
+    elif operand.startswith('m'):
+        return {
+            'class': 'memory',
+            'base': 'gpr' if 'b' in operand else None,
+            'offset': 'imd' if 'o' in operand else None,
+            'index': 'gpr' if 'i' in operand else None,
+            'scale': 8 if 's' in operand else 1,
+        }
+    else:
+        raise ValueError('Parameter {} is not a valid operand code'.format(operand))
+
+
+########################
+# HELPERS SANITY CHECK #
+########################
 
 
 def _check_sanity_arch_db(arch_mm, isa_mm):
@@ -276,6 +414,11 @@ def _print_sanity_report_verbose(
         print('{}{}{}'.format(CYAN, _get_full_instruction_name(instr_form), WHITE))
 
 
+###################
+# GENERIC HELPERS #
+###################
+
+
 def _get_full_instruction_name(instruction_form):
     operands = []
     for op in instruction_form['operands']:
@@ -287,20 +430,30 @@ def _get_full_instruction_name(instruction_form):
     return '{}  {}'.format(instruction_form['name'], ','.join(operands))
 
 
+def __represent_none(self, data):
+    return self.represent_scalar(u'tag:yaml.org,2002:null', u'~')
+
+
+def _create_yaml_object():
+    yaml_obj = ruamel.yaml.YAML()
+    yaml_obj.representer.add_representer(type(None), __represent_none)
+    return yaml_obj
+
+
 def __dump_data_to_yaml(filepath, data):
     # first add 'normal' meta data in the right order (no ordered dict yet)
     meta_data = dict(data)
     del meta_data['instruction_forms']
     del meta_data['port_model_scheme']
     with open(filepath, 'w') as f:
-        yaml.dump(meta_data, f, allow_unicode=True)
+        ruamel.yaml.dump(meta_data, f, allow_unicode=True)
     with open(filepath, 'a') as f:
         # now add port model scheme in |-scheme for better readability
-        yaml.dump(
+        ruamel.yaml.dump(
             {'port_model_scheme': data['port_model_scheme']},
             f,
             allow_unicode=True,
             default_style='|',
         )
         # finally, add instruction forms
-        yaml.dump({'instruction_forms': data['instruction_forms']}, f, allow_unicode=True)
+        ruamel.yaml.dump({'instruction_forms': data['instruction_forms']}, f, allow_unicode=True)
