@@ -10,6 +10,10 @@ class ParserX86ATT(BaseParser):
         super().__init__()
 
     def construct_parser(self):
+        decimal_number = pp.Combine(
+            pp.Optional(pp.Literal('-')) + pp.Word(pp.nums)
+        ).setResultsName('value')
+        hex_number = pp.Combine(pp.Literal('0x') + pp.Word(pp.hexnums)).setResultsName('value')
         # Comment
         symbol_comment = '#'
         self.comment = pp.Literal(symbol_comment) + pp.Group(
@@ -27,31 +31,6 @@ class ParserX86ATT(BaseParser):
         self.label = pp.Group(
             identifier.setResultsName('name') + pp.Literal(':') + pp.Optional(self.comment)
         ).setResultsName(self.LABEL_ID)
-        # Directive
-        decimal_number = pp.Combine(
-            pp.Optional(pp.Literal('-')) + pp.Word(pp.nums)
-        ).setResultsName('value')
-        hex_number = pp.Combine(pp.Literal('0x') + pp.Word(pp.hexnums)).setResultsName('value')
-        directive_option = pp.Combine(
-            pp.Word('#@.', exact=1) + pp.Word(pp.printables, excludeChars=',')
-        )
-        directive_parameter = (
-            pp.quotedString | directive_option | identifier | hex_number | decimal_number
-        )
-        commaSeparatedList = pp.delimitedList(pp.Optional(directive_parameter), delim=',')
-        self.directive = pp.Group(
-            pp.Literal('.')
-            + pp.Word(pp.alphanums + '_').setResultsName('name')
-            + commaSeparatedList.setResultsName('parameters')
-            + pp.Optional(self.comment)
-        ).setResultsName(self.DIRECTIVE_ID)
-
-        ##############################
-        # Instructions
-        # Mnemonic
-        mnemonic = pp.ZeroOrMore(pp.Literal('data16') | pp.Literal('data32')) + pp.Word(
-            pp.alphanums
-        ).setResultsName('mnemonic')
         # Register: pp.Regex('^%[0-9a-zA-Z]+,?')
         register = pp.Group(
             pp.Literal('%')
@@ -83,6 +62,27 @@ class ParserX86ATT(BaseParser):
             + pp.Optional(scale.setResultsName('scale'))
             + pp.Literal(')')
         ).setResultsName(self.MEMORY_ID)
+
+        # Directive
+        directive_option = pp.Combine(
+            pp.Word('#@.', exact=1) + pp.Word(pp.printables, excludeChars=',')
+        )
+        directive_parameter = (
+            pp.quotedString | directive_option | identifier | hex_number | decimal_number | register
+        )
+        commaSeparatedList = pp.delimitedList(pp.Optional(directive_parameter), delim=',')
+        self.directive = pp.Group(
+            pp.Literal('.')
+            + pp.Word(pp.alphanums + '_').setResultsName('name')
+            + commaSeparatedList.setResultsName('parameters')
+            + pp.Optional(self.comment)
+        ).setResultsName(self.DIRECTIVE_ID)
+
+        # Instructions
+        # Mnemonic
+        mnemonic = pp.ZeroOrMore(pp.Literal('data16') | pp.Literal('data32')) + pp.Word(
+            pp.alphanums
+        ).setResultsName('mnemonic')
         # Combine to instruction form
         operand_first = pp.Group(register ^ immediate ^ memory ^ identifier)
         operand_rest = pp.Group(register ^ immediate ^ memory)
@@ -182,8 +182,9 @@ class ParserX86ATT(BaseParser):
         if result is None:
             try:
                 result = self.parse_instruction(line)
-            except pp.ParseException:
-                raise ValueError('Could not parse line {}: {!r}'.format(line_number, line))
+            except pp.ParseException as e:
+                raise ValueError('Could not parse instruction on line {}: {!r}'.format(
+                    line_number, line))
             instruction_form[self.INSTRUCTION_ID] = result[self.INSTRUCTION_ID]
             instruction_form[self.OPERANDS_ID] = result[self.OPERANDS_ID]
             instruction_form[self.COMMENT_ID] = result[self.COMMENT_ID]
