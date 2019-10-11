@@ -28,11 +28,10 @@ class TestKerncraftAPI(unittest.TestCase):
     ###########
 
     def test_kerncraft_API_x86(self):
-        kapi = KerncraftAPI('csx')
-        kernel = kapi.analyze_code(self.code_x86)
+        kapi = KerncraftAPI('csx', self.code_x86)
 
-        kapi.create_output(kernel)
-        self.assertEqual(kapi.get_unmatched_instruction_ratio(kernel), 0.0)
+        kapi.create_output()
+        self.assertEqual(kapi.get_unmatched_instruction_ratio(), 0.0)
         port_occupation = OrderedDict(
             [
                 ('0', 1.25),
@@ -48,16 +47,15 @@ class TestKerncraftAPI(unittest.TestCase):
                 ('7', 0.0),
             ]
         )
-        self.assertEqual(kapi.get_port_occupation_cycles(kernel), port_occupation)
-        self.assertEqual(kapi.get_total_throughput(kernel), 2.0)
-        self.assertEqual(kapi.get_latency(kernel), (1.0, 13.0))
+        self.assertEqual(kapi.get_port_occupation_cycles(), port_occupation)
+        self.assertEqual(kapi.get_total_throughput(), 2.0)
+        self.assertEqual(kapi.get_latency(), (1.0, 13.0))
 
     def test_kerncraft_API_AArch64(self):
-        kapi = KerncraftAPI('vulcan')
-        kernel = kapi.analyze_code(self.code_AArch64)
+        kapi = KerncraftAPI('vulcan', self.code_AArch64)
 
-        kapi.create_output(kernel)
-        self.assertEqual(kapi.get_unmatched_instruction_ratio(kernel), 0.0)
+        kapi.create_output()
+        self.assertEqual(kapi.get_unmatched_instruction_ratio(), 0.0)
         port_occupation = OrderedDict(
             [
                 ('0', 34.0),
@@ -70,8 +68,8 @@ class TestKerncraftAPI(unittest.TestCase):
                 ('5', 32.0),
             ]
         )
-        self.assertEqual(kapi.get_port_occupation_cycles(kernel), port_occupation)
-        self.assertEqual(kapi.get_total_throughput(kernel), 64.0)
+        self.assertEqual(kapi.get_port_occupation_cycles(), port_occupation)
+        self.assertEqual(kapi.get_total_throughput(), 64.0)
         # TODO add missing latency values
         # self.assertEqual(kapi.get_latency(kernel), 20.0)
 

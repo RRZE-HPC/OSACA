@@ -63,7 +63,7 @@ class KerncraftAPI(object):
         return max(self.semantics.get_throughput_sum(self.kernel))
 
     def get_latency(self):
-        return (self.get_lcd(self.kernel), self.get_cp(self.kernel))
+        return (self.get_lcd(), self.get_cp())
 
     def get_cp(self):
         kernel_graph = KernelDG(self.kernel, self.parser, self.machine_model)
