@@ -1,11 +1,26 @@
 #!/usr/bin/env python3
 
 import collections
+import sys
+from io import StringIO
 
 from osaca.frontend import Frontend
 from osaca.parser import ParserAArch64v81, ParserX86ATT
 from osaca.semantics import (INSTR_FLAGS, KernelDG, MachineModel,
                              SemanticsAppender, reduce_to_section)
+
+
+# Stolen from https://stackoverflow.com/a/16571630
+class Capturing(list):
+    def __enter__(self):
+        self._stdout = sys.stdout
+        sys.stdout = self._stringio = StringIO()
+        return self
+
+    def __exit__(self, *args):
+        self.extend(self._stringio.getvalue().splitlines())
+        del self._stringio    # free up some memory
+        sys.stdout = self._stdout
 
 
 class KerncraftAPI(object):
@@ -25,7 +40,9 @@ class KerncraftAPI(object):
     def create_output(self, verbose=False):
         kernel_graph = KernelDG(self.kernel, self.parser, self.machine_model)
         frontend = Frontend(arch=self.machine_model.get_arch())
-        frontend.print_full_analysis(self.kernel, kernel_graph, verbose=verbose)
+        with Capturing() as output:
+            frontend.print_full_analysis(self.kernel, kernel_graph, verbose=verbose)
+        return '\n'.join(output)
 
     def get_unmatched_instruction_ratio(self):
         unmatched_counter = 0

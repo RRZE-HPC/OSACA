@@ -212,9 +212,8 @@ class ParserX86ATT(BaseParser):
             {
                 self.INSTRUCTION_ID: result['mnemonic'],
                 self.OPERANDS_ID: operands,
-                self.COMMENT_ID: ' '.join(result[self.COMMENT_ID])
-                if self.COMMENT_ID in result
-                else None,
+                self.COMMENT_ID:
+                    ' '.join(result[self.COMMENT_ID]) if self.COMMENT_ID in result else None,
             }
         )
         return return_dict
