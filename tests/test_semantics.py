@@ -200,7 +200,7 @@ class TestSemanticTools(unittest.TestCase):
         )
         # ID 6
         self.assertEqual(
-            lc_deps[lcd_id]['root'], dg.dg.nodes(data=True)[lcd_id2]['instruction_form']
+            lc_deps[lcd_id2]['root'], dg.dg.nodes(data=True)[lcd_id2]['instruction_form']
         )
         self.assertEqual(len(lc_deps[lcd_id2]['dependencies']), 1)
         self.assertEqual(
