@@ -6,6 +6,7 @@ from datetime import datetime as dt
 
 from ruamel import yaml
 
+from osaca import utils
 from osaca.semantics import INSTR_FLAGS, KernelDG, SemanticsAppender
 
 
@@ -19,28 +20,11 @@ class Frontend(object):
         self._arch = arch
         if arch:
             self._arch = arch.lower()
-            try:
-                with open(self._find_file(self._arch), 'r') as f:
-                    self._data = yaml.load(f, Loader=yaml.Loader)
-            except AssertionError:
-                raise ValueError(
-                    'Cannot find specified architecture. Make sure the machine file exists.'
-                )
+            with open(utils.find_file(self._arch+'.yml'), 'r') as f:
+                self._data = yaml.load(f, Loader=yaml.Loader)
         elif path_to_yaml:
-            try:
-                assert os.path.exists(path_to_yaml)
-                with open(path_to_yaml, 'r') as f:
-                    self._data = yaml.load(f, Loader=yaml.Loader)
-            except (AssertionError, FileNotFoundError):
-                raise ValueError(
-                    'Cannot find specified path to YAML file. Make sure the machine file exists.'
-                )
-
-    def _find_file(self, name):
-        data_dir = os.path.expanduser('~/.osaca/data')
-        name = os.path.join(data_dir, name + '.yml')
-        assert os.path.exists(name)
-        return name
+            with open(path_to_yaml, 'r') as f:
+                self._data = yaml.load(f, Loader=yaml.Loader)
 
     def _is_comment(self, instruction_form):
         return instruction_form['comment'] is not None and instruction_form['instruction'] is None

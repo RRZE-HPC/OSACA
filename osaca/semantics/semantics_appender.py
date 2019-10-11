@@ -4,6 +4,7 @@ import os
 import warnings
 from functools import reduce
 
+from osaca import utils
 from osaca.parser import AttrDict, ParserAArch64v81, ParserX86ATT
 from osaca.semantics import MachineModel
 
@@ -26,18 +27,12 @@ class SemanticsAppender(object):
     def __init__(self, machine_model: MachineModel, path_to_yaml=None):
         self._machine_model = machine_model
         self._isa = machine_model.get_ISA().lower()
-        path = self._find_file(self._isa)
+        path = utils.find_file('isa/'+self._isa+'.yml')
         self._isa_model = MachineModel(path_to_yaml=path)
         if self._isa == 'x86':
             self._parser = ParserX86ATT()
         elif self._isa == 'aarch64':
             self._parser = ParserAArch64v81()
-
-    def _find_file(self, isa):
-        data_dir = os.path.expanduser('~/.osaca/data/isa')
-        name = os.path.join(data_dir, isa + '.yml')
-        assert os.path.exists(name)
-        return name
 
     # SUMMARY FUNCTION
     def add_semantics(self, kernel):

@@ -10,7 +10,7 @@ from osaca.frontend import Frontend
 from osaca.parser import ParserAArch64v81, ParserX86ATT
 from osaca.semantics.hw_model import MachineModel
 from osaca.semantics.kernel_dg import KernelDG
-from osaca.semantics.semanticsAppender import SemanticsAppender
+from osaca.semantics.semantics_appender import SemanticsAppender
 
 
 class TestFrontend(unittest.TestCase):
@@ -60,9 +60,9 @@ class TestFrontend(unittest.TestCase):
             Frontend()
         with self.assertRaises(ValueError):
             Frontend(arch='csx', path_to_yaml=os.path.join(self.MODULE_DATA_DIR, 'csx.yml'))
-        with self.assertRaises(ValueError):
+        with self.assertRaises(FileNotFoundError):
             Frontend(path_to_yaml=os.path.join(self.MODULE_DATA_DIR, 'THE_MACHINE.yml'))
-        with self.assertRaises(ValueError):
+        with self.assertRaises(FileNotFoundError):
             Frontend(arch='THE_MACHINE')
         Frontend(arch='zen1')
 
