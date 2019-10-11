@@ -304,9 +304,9 @@ class TestSemanticTools(unittest.TestCase):
             MachineModel()
         with self.assertRaises(ValueError):
             MachineModel(arch='CSX', path_to_yaml=os.path.join(self.MODULE_DATA_DIR, 'csx.yml'))
-        with self.assertRaises(ValueError):
+        with self.assertRaises(FileNotFoundError):
             MachineModel(arch='THE_MACHINE')
-        with self.assertRaises(ValueError):
+        with self.assertRaises(FileNotFoundError):
             MachineModel(path_to_yaml=os.path.join(self.MODULE_DATA_DIR, 'THE_MACHINE.yml'))
 
     def test_MachineModel_getter(self):

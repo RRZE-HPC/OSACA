@@ -5,6 +5,7 @@ import re
 
 from ruamel import yaml
 
+from osaca import utils
 from osaca.parser import ParserX86ATT
 
 
@@ -18,28 +19,11 @@ class MachineModel(object):
         self._arch = arch
         if arch:
             self._arch = arch.lower()
-            try:
-                with open(self._find_file(self._arch), 'r') as f:
-                    self._data = yaml.load(f, Loader=yaml.Loader)
-            except AssertionError:
-                raise ValueError(
-                    'Cannot find specified architecture. Make sure the machine file exists.'
-                )
+            with open(utils.find_file(self._arch+'.yml'), 'r') as f:
+                self._data = yaml.load(f, Loader=yaml.Loader)
         elif path_to_yaml:
-            try:
-                assert os.path.exists(self._path)
-                with open(self._path, 'r') as f:
-                    self._data = yaml.load(f, Loader=yaml.Loader)
-            except (AssertionError, FileNotFoundError):
-                raise ValueError(
-                    'Cannot find specified path to YAML file. Make sure the machine file exists.'
-                )
-
-    def _find_file(self, name):
-        data_dir = os.path.expanduser('~/.osaca/data')
-        name = os.path.join(data_dir, name + '.yml')
-        assert os.path.exists(name)
-        return name
+            with open(self._path, 'r') as f:
+                self._data = yaml.load(f, Loader=yaml.Loader)
 
     def __getitem__(self, key):
         """Return configuration entry."""
