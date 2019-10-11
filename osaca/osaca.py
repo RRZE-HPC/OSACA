@@ -184,7 +184,7 @@ def inspect(args):
     # Read file
     code = args.file.read()
     # Parse file
-    parser = _create_parser(arch)
+    parser = get_asm_parser(arch)
     parsed_code = parser.parse_file(code)
 
     # Reduce to marked kernel and add semantics
@@ -219,7 +219,7 @@ def run(args, output_file=sys.stdout):
 
 
 # ---------------------------------------------------
-def _create_parser(arch) -> BaseParser:
+def get_asm_parser(arch) -> BaseParser:
     isa = MachineModel.get_isa_for_arch(arch)
     if isa == 'x86':
         return ParserX86ATT()
