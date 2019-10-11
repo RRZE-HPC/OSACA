@@ -186,15 +186,25 @@ class TestSemanticTools(unittest.TestCase):
 
     def test_loop_carried_dependency_x86(self):
         lcd_id = 9
+        lcd_id2 = 6
         dg = KernelDG(self.kernel_x86, self.parser_x86, self.machine_model_csx)
         lc_deps = dg.get_loopcarried_dependencies()
-        self.assertEqual(len(lc_deps), 1)
+        self.assertEqual(len(lc_deps), 2)
+        # ID 9
         self.assertEqual(
             lc_deps[lcd_id]['root'], dg.dg.nodes(data=True)[lcd_id]['instruction_form']
         )
         self.assertEqual(len(lc_deps[lcd_id]['dependencies']), 1)
         self.assertEqual(
             lc_deps[lcd_id]['dependencies'][0], dg.dg.nodes(data=True)[lcd_id]['instruction_form']
+        )
+        # ID 6
+        self.assertEqual(
+            lc_deps[lcd_id]['root'], dg.dg.nodes(data=True)[lcd_id2]['instruction_form']
+        )
+        self.assertEqual(len(lc_deps[lcd_id2]['dependencies']), 1)
+        self.assertEqual(
+            lc_deps[lcd_id2]['dependencies'][0], dg.dg.nodes(data=True)[lcd_id2]['instruction_form']
         )
 
     def test_is_read_is_written_x86(self):
