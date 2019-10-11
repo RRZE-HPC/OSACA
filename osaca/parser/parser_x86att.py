@@ -183,11 +183,7 @@ class ParserX86ATT(BaseParser):
             try:
                 result = self.parse_instruction(line)
             except pp.ParseException:
-                print(
-                    '\n\n*-*-*-*-*-*-*-*-*-*-\n{}: {}\n*-*-*-*-*-*-*-*-*-*-\n\n'.format(
-                        line_number, line
-                    )
-                )
+                raise ValueError('Could not parse line {}: {!r}'.format(line_number, line))
             instruction_form[self.INSTRUCTION_ID] = result[self.INSTRUCTION_ID]
             instruction_form[self.OPERANDS_ID] = result[self.OPERANDS_ID]
             instruction_form[self.COMMENT_ID] = result[self.COMMENT_ID]
