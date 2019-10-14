@@ -2,28 +2,46 @@
 
 import os
 import re
+from itertools import product
 
 from ruamel import yaml
 
-from osaca import utils
+from osaca import utils, __version__
 from osaca.parser import ParserX86ATT
 
 
 class MachineModel(object):
     def __init__(self, arch=None, path_to_yaml=None):
         if not arch and not path_to_yaml:
-            raise ValueError('Either arch or path_to_yaml required.')
-        if arch and path_to_yaml:
-            raise ValueError('Only one of arch and path_to_yaml is allowed.')
-        self._path = path_to_yaml
-        self._arch = arch
-        if arch:
-            self._arch = arch.lower()
-            with open(utils.find_file(self._arch+'.yml'), 'r') as f:
-                self._data = yaml.load(f, Loader=yaml.Loader)
-        elif path_to_yaml:
-            with open(self._path, 'r') as f:
-                self._data = yaml.load(f, Loader=yaml.Loader)
+            self._data = {
+                'osaca_version': str(__version__),
+                'micro_architecture': None,
+                'arch_code': None,
+                'isa': None,
+                'ROB_size': None,
+                'retired_uOps_per_cycle': None,
+                'scheduler_size': None,
+                'hidden_loads': None,
+                'load_latency': {},
+                'load_throughput': [
+                    {'base': b, 'index': i, 'offset': o, 'scale': s, 'port_pressure': []}
+                    for b, i, o, s in product(['gpr'], ['gpr', None], ['imd', None], [1, 8])],
+                'ports': [],
+                'port_model_scheme': None,
+                'instruction_forms': [],
+            }
+        else:
+            if arch and path_to_yaml:
+                raise ValueError('Only one of arch and path_to_yaml is allowed.')
+            self._path = path_to_yaml
+            self._arch = arch
+            if arch:
+                self._arch = arch.lower()
+                with open(utils.find_file(self._arch+'.yml'), 'r') as f:
+                    self._data = yaml.load(f, Loader=yaml.Loader)
+            elif path_to_yaml:
+                with open(self._path, 'r') as f:
+                    self._data = yaml.load(f, Loader=yaml.Loader)
 
     def __getitem__(self, key):
         """Return configuration entry."""
@@ -36,20 +54,51 @@ class MachineModel(object):
     ######################################################
 
     def get_instruction(self, name, operands):
+        """Find and return instruction data from name and operands."""
         if name is None:
             return None
         try:
             return next(
                 instruction_form
                 for instruction_form in self._data['instruction_forms']
-                if instruction_form['name'].lower() == name.lower()
+                if instruction_form['name'].upper() == name.upper()
                 and self._match_operands(instruction_form['operands'], operands)
             )
         except StopIteration:
             return None
-        except TypeError:
+        except TypeError as e:
             print('\nname: {}\noperands: {}'.format(name, operands))
-            raise TypeError
+            raise TypeError from e
+
+    def average_port_pressure(self, port_pressure):
+        """Construct average port pressure list from instruction data."""
+        port_list = self._data['ports']
+        average_pressure = [0.0]*len(port_list)
+        for cycles, ports in port_pressure:
+            for p in ports:
+                average_pressure[port_list.index(p)] += cycles/len(ports)
+
+        return average_pressure
+
+    def set_instruction(self, name, operands,
+                        latency=None, port_pressure=None, throughput=None, uops=None):
+        """Import instruction form information."""
+        # If it already exists. Overwrite information.
+        instr_data = self.get_instruction(name, operands)
+        if instr_data is None:
+            instr_data = {}
+            self._data['instruction_forms'].append(instr_data)
+
+        instr_data['name'] = name
+        instr_data['operands'] = operands
+        instr_data['latency'] = latency
+        instr_data['port_pressure'] = port_pressure
+        instr_data['throughput'] = throughput
+        instr_data['uops'] = uops
+
+    def add_port(self, port):
+        if port not in self._data['ports']:
+            self._data['ports'].append(port)
 
     def get_ISA(self):
         return self._data['isa']
@@ -102,6 +151,9 @@ class MachineModel(object):
         if arch in arch_dict:
             return arch_dict[arch].lower()
         return None
+
+    def dump(self):
+        return yaml.dump(self._data, Dumper=yaml.Dumper, allow_unicode=True)
 
     ######################################################
 
