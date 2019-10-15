@@ -32,7 +32,7 @@ class ParserX86ATT(BaseParser):
             identifier.setResultsName('name') + pp.Literal(':') + pp.Optional(self.comment)
         ).setResultsName(self.LABEL_ID)
         # Register: pp.Regex('^%[0-9a-zA-Z]+,?')
-        register = pp.Group(
+        self.register = pp.Group(
             pp.Literal('%')
             + pp.Word(pp.alphanums).setResultsName('name')
             + pp.Optional(
@@ -55,9 +55,9 @@ class ParserX86ATT(BaseParser):
         memory = pp.Group(
             pp.Optional(offset.setResultsName('offset'))
             + pp.Literal('(')
-            + pp.Optional(register.setResultsName('base'))
+            + pp.Optional(self.register.setResultsName('base'))
             + pp.Optional(pp.Suppress(pp.Literal(',')))
-            + pp.Optional(register.setResultsName('index'))
+            + pp.Optional(self.register.setResultsName('index'))
             + pp.Optional(pp.Suppress(pp.Literal(',')))
             + pp.Optional(scale.setResultsName('scale'))
             + pp.Literal(')')
@@ -67,8 +67,8 @@ class ParserX86ATT(BaseParser):
         directive_option = pp.Combine(
             pp.Word('#@.', exact=1) + pp.Word(pp.printables, excludeChars=',')
         )
-        directive_parameter = (
-            pp.quotedString | directive_option | identifier | hex_number | decimal_number | register
+        directive_parameter = (pp.quotedString | directive_option | identifier | hex_number |
+                               decimal_number | self.register
         )
         commaSeparatedList = pp.delimitedList(pp.Optional(directive_parameter), delim=',')
         self.directive = pp.Group(
@@ -84,8 +84,8 @@ class ParserX86ATT(BaseParser):
             pp.alphanums
         ).setResultsName('mnemonic')
         # Combine to instruction form
-        operand_first = pp.Group(register ^ immediate ^ memory ^ identifier)
-        operand_rest = pp.Group(register ^ immediate ^ memory)
+        operand_first = pp.Group(self.register ^ immediate ^ memory ^ identifier)
+        operand_rest = pp.Group(self.register ^ immediate ^ memory)
         self.instruction_parser = (
             mnemonic
             + pp.Optional(operand_first.setResultsName('operand1'))
@@ -99,19 +99,9 @@ class ParserX86ATT(BaseParser):
         )
 
     def parse_register(self, register_string):
-        register = pp.Group(
-            pp.Literal('%')
-            + pp.Word(pp.alphanums).setResultsName('name')
-            + pp.Optional(
-                pp.Literal('{')
-                + pp.Literal('%')
-                + pp.Word(pp.alphanums).setResultsName('mask')
-                + pp.Literal('}')
-            )
-        ).setResultsName(self.REGISTER_ID)
         try:
             return self.process_operand(
-                register.parseString(register_string, parseAll=True).asDict()
+                self.register.parseString(register_string, parseAll=True).asDict()
             )
         except pp.ParseException:
             return None
