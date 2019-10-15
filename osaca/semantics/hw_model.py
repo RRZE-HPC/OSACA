@@ -3,6 +3,7 @@
 import os
 import re
 from itertools import product
+from copy import deepcopy
 
 from ruamel import yaml
 
@@ -11,13 +12,13 @@ from osaca.parser import ParserX86ATT
 
 
 class MachineModel(object):
-    def __init__(self, arch=None, path_to_yaml=None):
+    def __init__(self, arch=None, path_to_yaml=None, isa=None):
         if not arch and not path_to_yaml:
             self._data = {
                 'osaca_version': str(__version__),
                 'micro_architecture': None,
                 'arch_code': None,
-                'isa': None,
+                'isa': isa,
                 'ROB_size': None,
                 'retired_uOps_per_cycle': None,
                 'scheduler_size': None,
@@ -146,14 +147,31 @@ class MachineModel(object):
             'skl': 'x86',
             'skx': 'x86',
             'csx': 'x86',
+            'wsm': 'x86',
+            'nhm': 'x86',
+            'kbl': 'x86',
+            'cnl': 'x86',
+            'cfl': 'x86',
+            'zen+': 'x86',
         }
         arch = arch.lower()
         if arch in arch_dict:
             return arch_dict[arch].lower()
-        return None
+        else:
+            raise ValueError("Unknown architecture {!r}.".format(arch))
 
     def dump(self):
-        return yaml.dump(self._data, Dumper=yaml.Dumper, allow_unicode=True)
+        # Replace instruction form's port_pressure with styled version for RoundtripDumper
+        formatted_instruction_forms = deepcopy(self._data['instruction_forms'])
+        for instruction_form in formatted_instruction_forms:
+            cs = yaml.comments.CommentedSeq(instruction_form['port_pressure'])
+            cs.fa.set_flow_style()
+            instruction_form['port_pressure'] = cs
+
+        return (yaml.dump({k: v for k,v in self._data.items() if k != 'instruction_forms'},
+                          Dumper=yaml.Dumper, allow_unicode=True) +
+                yaml.dump({'instruction_forms': formatted_instruction_forms},
+                          Dumper=yaml.RoundTripDumper, allow_unicode=True, width=100))
 
     ######################################################
 
