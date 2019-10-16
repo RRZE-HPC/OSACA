@@ -1,19 +1,21 @@
 #!/usr/bin/env python3
 
-import os
 import re
-from itertools import product
 from copy import deepcopy
+from itertools import product
 
-from ruamel import yaml
+import ruamel.yaml
+from ruamel.yaml.compat import StringIO
 
-from osaca import utils, __version__
+from osaca import __version__, utils
 from osaca.parser import ParserX86ATT
 
 
 class MachineModel(object):
     def __init__(self, arch=None, path_to_yaml=None, isa=None):
         if not arch and not path_to_yaml:
+            if not isa:
+                raise ValueError('One of arch, path_to_yaml and isa must be specified')
             self._data = {
                 'osaca_version': str(__version__),
                 'micro_architecture': None,
@@ -26,7 +28,8 @@ class MachineModel(object):
                 'load_latency': {},
                 'load_throughput': [
                     {'base': b, 'index': i, 'offset': o, 'scale': s, 'port_pressure': []}
-                    for b, i, o, s in product(['gpr'], ['gpr', None], ['imd', None], [1, 8])],
+                    for b, i, o, s in product(['gpr'], ['gpr', None], ['imd', None], [1, 8])
+                ],
                 'ports': [],
                 'port_model_scheme': None,
                 'instruction_forms': [],
@@ -36,13 +39,14 @@ class MachineModel(object):
                 raise ValueError('Only one of arch and path_to_yaml is allowed.')
             self._path = path_to_yaml
             self._arch = arch
+            yaml = self._create_yaml_object()
             if arch:
                 self._arch = arch.lower()
-                with open(utils.find_file(self._arch+'.yml'), 'r') as f:
-                    self._data = yaml.load(f, Loader=yaml.Loader)
+                with open(utils.find_file(self._arch + '.yml'), 'r') as f:
+                    self._data = yaml.load(f)
             elif path_to_yaml:
                 with open(self._path, 'r') as f:
-                    self._data = yaml.load(f, Loader=yaml.Loader)
+                    self._data = yaml.load(f)
 
     def __getitem__(self, key):
         """Return configuration entry."""
@@ -74,15 +78,15 @@ class MachineModel(object):
     def average_port_pressure(self, port_pressure):
         """Construct average port pressure list from instruction data."""
         port_list = self._data['ports']
-        average_pressure = [0.0]*len(port_list)
+        average_pressure = [0.0] * len(port_list)
         for cycles, ports in port_pressure:
             for p in ports:
-                average_pressure[port_list.index(p)] += cycles/len(ports)
-
+                average_pressure[port_list.index(p)] += cycles / len(ports)
         return average_pressure
 
-    def set_instruction(self, name, operands,
-                        latency=None, port_pressure=None, throughput=None, uops=None):
+    def set_instruction(
+        self, name, operands=None, latency=None, port_pressure=None, throughput=None, uops=None
+    ):
         """Import instruction form information."""
         # If it already exists. Overwrite information.
         instr_data = self.get_instruction(name, operands)
@@ -97,15 +101,25 @@ class MachineModel(object):
         instr_data['throughput'] = throughput
         instr_data['uops'] = uops
 
+    def set_instruction_entry(self, entry):
+        self.set_instruction(
+            entry['name'],
+            entry['operands'] if 'operands' in entry else None,
+            entry['latency'] if 'latency' in entry else None,
+            entry['port_pressure'] if 'port_pressure' in entry else None,
+            entry['throughput'] if 'throughput' in entry else None,
+            entry['uops'] if 'uops' in entry else None,
+        )
+
     def add_port(self, port):
         if port not in self._data['ports']:
             self._data['ports'].append(port)
 
     def get_ISA(self):
-        return self._data['isa']
+        return self._data['isa'].lower()
 
     def get_arch(self):
-        return self._data['arch_code']
+        return self._data['arch_code'].lower()
 
     def get_ports(self):
         return self._data['ports']
@@ -136,9 +150,20 @@ class MachineModel(object):
         return data_ports
 
     @staticmethod
+    def get_full_instruction_name(instruction_form):
+        operands = []
+        for op in instruction_form['operands']:
+            op_attrs = [
+                y + ':' + str(op[y])
+                for y in list(filter(lambda x: True if x != 'class' else False, op))
+            ]
+            operands.append('{}({})'.format(op['class'], ','.join(op_attrs)))
+        return '{}  {}'.format(instruction_form['name'], ','.join(operands))
+
+    @staticmethod
     def get_isa_for_arch(arch):
         arch_dict = {
-            'vulcan': 'aarch64',
+            'tx2': 'aarch64',
             'zen1': 'x86',
             'snb': 'x86',
             'ivb': 'x86',
@@ -160,18 +185,26 @@ class MachineModel(object):
         else:
             raise ValueError("Unknown architecture {!r}.".format(arch))
 
-    def dump(self):
+    def dump(self, stream=None):
         # Replace instruction form's port_pressure with styled version for RoundtripDumper
         formatted_instruction_forms = deepcopy(self._data['instruction_forms'])
         for instruction_form in formatted_instruction_forms:
-            cs = yaml.comments.CommentedSeq(instruction_form['port_pressure'])
+            cs = ruamel.yaml.comments.CommentedSeq(instruction_form['port_pressure'])
             cs.fa.set_flow_style()
             instruction_form['port_pressure'] = cs
 
-        return (yaml.dump({k: v for k,v in self._data.items() if k != 'instruction_forms'},
-                          Dumper=yaml.Dumper, allow_unicode=True) +
-                yaml.dump({'instruction_forms': formatted_instruction_forms},
-                          Dumper=yaml.RoundTripDumper, allow_unicode=True, width=100))
+        # Create YAML object
+        yaml = self._create_yaml_object()
+        if not stream:
+            # Create stream object to output string
+            stream = StringIO()
+            yaml.dump({k: v for k, v in self._data.items() if k != 'instruction_forms'}, stream)
+            yaml.dump({'instruction_forms': formatted_instruction_forms}, stream)
+            return stream.getvalue()
+        else:
+            # Write in given stream
+            yaml.dump({k: v for k, v in self._data.items() if k != 'instruction_forms'}, stream)
+            yaml.dump({'instruction_forms': formatted_instruction_forms}, stream)
 
     ######################################################
 
@@ -358,3 +391,14 @@ class MachineModel(object):
         ):
             return True
         return False
+
+    def _create_yaml_object(self):
+        yaml_obj = ruamel.yaml.YAML()
+        yaml_obj.representer.add_representer(type(None), self.__represent_none)
+        yaml_obj.default_flow_style = None
+        yaml_obj.width = 120
+        yaml_obj.representer.ignore_aliases = lambda *args: True
+        return yaml_obj
+
+    def __represent_none(self, yaml_obj, data):
+        return yaml_obj.represent_scalar(u'tag:yaml.org,2002:null', u'~')

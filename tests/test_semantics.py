@@ -41,7 +41,7 @@ class TestSemanticTools(unittest.TestCase):
             path_to_yaml=os.path.join(self.MODULE_DATA_DIR, 'csx.yml')
         )
         self.machine_model_tx2 = MachineModel(
-            path_to_yaml=os.path.join(self.MODULE_DATA_DIR, 'vulcan.yml')
+            path_to_yaml=os.path.join(self.MODULE_DATA_DIR, 'tx2.yml')
         )
         self.semantics_csx = SemanticsAppender(
             self.machine_model_csx, path_to_yaml=os.path.join(self.MODULE_DATA_DIR, 'isa/x86.yml')
@@ -204,7 +204,8 @@ class TestSemanticTools(unittest.TestCase):
         )
         self.assertEqual(len(lc_deps[lcd_id2]['dependencies']), 1)
         self.assertEqual(
-            lc_deps[lcd_id2]['dependencies'][0], dg.dg.nodes(data=True)[lcd_id2]['instruction_form']
+            lc_deps[lcd_id2]['dependencies'][0],
+            dg.dg.nodes(data=True)[lcd_id2]['instruction_form'],
         )
 
     def test_is_read_is_written_x86(self):
@@ -323,11 +324,11 @@ class TestSemanticTools(unittest.TestCase):
         self.assertIsNone(self.machine_model_csx.get_instruction('GETRESULT', sample_operands))
         self.assertIsNone(self.machine_model_tx2.get_instruction('GETRESULT', sample_operands))
 
-        self.assertEqual(self.machine_model_csx.get_arch(), 'CSX')
-        self.assertEqual(self.machine_model_tx2.get_arch(), 'Vulcan')
+        self.assertEqual(self.machine_model_csx.get_arch(), 'csx')
+        self.assertEqual(self.machine_model_tx2.get_arch(), 'tx2')
 
         self.assertEqual(self.machine_model_csx.get_ISA(), 'x86')
-        self.assertEqual(self.machine_model_tx2.get_ISA(), 'AArch64')
+        self.assertEqual(self.machine_model_tx2.get_ISA(), 'aarch64')
 
         ports_csx = ['0', '0DV', '1', '2', '2D', '3', '3D', '4', '5', '6', '7']
         data_ports_csx = ['2D', '3D']
@@ -337,8 +338,9 @@ class TestSemanticTools(unittest.TestCase):
         self.assertFalse(self.machine_model_tx2.has_hidden_loads())
 
         self.assertEqual(MachineModel.get_isa_for_arch('CSX'), 'x86')
-        self.assertEqual(MachineModel.get_isa_for_arch('VuLcAn'), 'aarch64')
-        self.assertIsNone(MachineModel.get_isa_for_arch('THE_MACHINE'))
+        self.assertEqual(MachineModel.get_isa_for_arch('tX2'), 'aarch64')
+        with self.assertRaises(ValueError):
+            self.assertIsNone(MachineModel.get_isa_for_arch('THE_MACHINE'))
 
     ##################
     # Helper functions

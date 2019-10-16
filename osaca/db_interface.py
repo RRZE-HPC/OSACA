@@ -2,91 +2,11 @@
 
 import math
 import os
-import sys
 import warnings
 
 import ruamel.yaml
 
 from osaca.semantics import MachineModel
-
-
-def add_entry_to_db(arch: str, entry):
-    """Adds entry to the user database in ~/.osaca/data
-
-    Args:
-        arch: string representation of the architecture as abbreviation.
-            Database for this architecture must already exist.
-        entry: DB entry which will be added. Should consist at best out of
-            'name', 'operand(s)' ('register', 'memory', 'immediate', 'identifier', ...),
-            'throughput', 'latency', 'port_pressure'.
-    """
-    # load yaml
-    arch = arch.lower()
-    filepath = os.path.join(os.path.expanduser('~/.osaca/data/' + arch + '.yml'))
-    assert os.path.exists(filepath)
-    yaml = _create_yaml_object()
-    with open(filepath, 'r') as f:
-        data = yaml.load(f)
-    # check parameter of entry
-    if 'name' not in entry:
-        raise ValueError('No name for instruction specified. No import possible')
-    if 'operands' not in entry:
-        entry['operands'] = []
-    if 'throughput' not in entry:
-        entry['throughput'] = None
-    if 'latency' not in entry:
-        entry['latency'] = None
-    if 'port_pressure' not in entry:
-        entry['port_pressure'] = None
-    if 'uops' not in entry:
-        entry['uops'] = None
-    data['instruction_forms'].append(entry)
-    # __dump_data_to_yaml(filepath, data)
-    with open(filepath, 'w') as f:
-        yaml.dump(data, f)
-
-
-def add_entries_to_db(arch: str, entries: list) -> None:
-    """Adds entries to the user database in ~/.osaca/data
-
-    Args:
-        arch: string representation of the architecture as abbreviation.
-            Database for this architecture must already exist.
-        entries: :class:`list` of DB entries which will be added. Should consist at best out of
-            'name', 'operand(s)' ('register', 'memory', 'immediate', 'identifier', ...),
-            'throughput', 'latency', 'port_pressure', 'uops'.
-    """
-    # load yaml
-    arch = arch.lower()
-    filepath = os.path.join(os.path.expanduser('~/.osaca/data/' + arch + '.yml'))
-    assert os.path.exists(filepath)
-    yaml = _create_yaml_object()
-    with open(filepath, 'r') as f:
-        data = yaml.load(f)
-    # check parameter of entry and append it to list
-    for entry in entries:
-        if 'name' not in entry:
-            print(
-                'No name for instruction \n\t{}\nspecified. No import possible'.format(entry),
-                file=sys.stderr,
-            )
-            # remove entry from list
-            entries.remove(entry)
-            continue
-        if 'operands' not in entry:
-            entry['operands'] = []
-        if 'throughput' not in entry:
-            entry['throughput'] = None
-        if 'latency' not in entry:
-            entry['latency'] = None
-        if 'port_pressure' not in entry:
-            entry['port_pressure'] = None
-        if 'uops' not in entry:
-            entry['uops'] = None
-        data['instruction_forms'].append(entry)
-    # __dump_data_to_yaml(filepath, data)
-    with open(filepath, 'w') as f:
-        yaml.dump(data, f)
 
 
 def sanity_check(arch: str, verbose=False):
@@ -103,6 +23,7 @@ def sanity_check(arch: str, verbose=False):
         missing_throughput,
         missing_latency,
         missing_port_pressure,
+        wrong_port,
         suspicious_instructions,
         duplicate_instr_arch,
     ) = _check_sanity_arch_db(arch_mm, isa_mm)
@@ -114,6 +35,7 @@ def sanity_check(arch: str, verbose=False):
         missing_throughput,
         missing_latency,
         missing_port_pressure,
+        wrong_port,
         suspicious_instructions,
         duplicate_instr_arch,
         duplicate_instr_isa,
@@ -135,8 +57,11 @@ def import_benchmark_output(arch, bench_type, filepath):
     elif bench_type == 'asmbench':
         raise NotImplementedError
     # write entries to DB
-    add_entries_to_db(arch, list(db_entries.values()))
-
+    mm = MachineModel(arch)
+    for entry in db_entries:
+        mm.set_instruction_entry(entry)
+    with open(filepath, 'w') as f:
+        mm.dump(f)
 
 ##################
 # HELPERS IBENCH #
@@ -179,6 +104,7 @@ def _get_ibench_output(input_data):
                     + ' and was not added. Please inspect your benchmark.'
                 )
         db_entries[key] = entry
+    return db_entries
 
 
 def _validate_measurement(self, measurement, is_tp):
@@ -260,12 +186,12 @@ def _check_sanity_arch_db(arch_mm, isa_mm):
         suspicious_prefixes = suspicious_prefixes_arm
     if arch_mm.get_ISA().lower() == 'x86':
         suspicious_prefixes = suspicious_prefixes_x86
-    port_num = len(arch_mm['ports'])
 
     # returned lists
     missing_throughput = []
     missing_latency = []
     missing_port_pressure = []
+    wrong_port = []
     suspicious_instructions = []
     duplicate_instr_arch = []
 
@@ -277,10 +203,9 @@ def _check_sanity_arch_db(arch_mm, isa_mm):
             missing_latency.append(instr_form)
         if instr_form['port_pressure'] is None:
             missing_port_pressure.append(instr_form)
-        elif len(instr_form['port_pressure']) != port_num:
-            warnings.warn(
-                'Invalid number of ports:\n  {}'.format(_get_full_instruction_name(instr_form))
-            )
+        else:
+            if _check_for_wrong_port(arch_mm['ports'], instr_form):
+                wrong_port.append(instr_form)
         # check entry against ISA DB
         for prefix in suspicious_prefixes:
             if instr_form['name'].startswith(prefix):
@@ -302,9 +227,18 @@ def _check_sanity_arch_db(arch_mm, isa_mm):
         missing_throughput,
         missing_latency,
         missing_port_pressure,
+        wrong_port,
         suspicious_instructions,
         duplicate_instr_arch,
     )
+
+
+def _check_for_wrong_port(port_list, instr_form):
+    for cycles, ports in instr_form['port_pressure']:
+        for p in ports:
+            if p not in port_list:
+                return False
+    return True
 
 
 def _check_sanity_isa_db(arch_mm, isa_mm):
@@ -331,7 +265,7 @@ def _check_sanity_isa_db(arch_mm, isa_mm):
 
 
 def _print_sanity_report(
-    total, m_tp, m_l, m_pp, suspic_instr, dup_arch, dup_isa, only_isa, verbose=False
+    total, m_tp, m_l, m_pp, wrong_pp, suspic_instr, dup_arch, dup_isa, only_isa, verbose=False
 ):
     # non-verbose summary
     print('SUMMARY\n----------------------')
@@ -351,6 +285,11 @@ def _print_sanity_report(
         )
     )
     print(
+        '{}% ({}/{}) of instruction forms have an invalid port identifier.'.format(
+            round(100 * len(wrong_pp) / total), len(wrong_pp), total
+        )
+    )
+    print(
         '{}% ({}/{}) of instruction forms might miss an ISA DB entry.'.format(
             round(100 * len(suspic_instr) / total), len(suspic_instr), total
         )
@@ -365,12 +304,12 @@ def _print_sanity_report(
     # verbose version
     if verbose:
         _print_sanity_report_verbose(
-            total, m_tp, m_l, m_pp, suspic_instr, dup_arch, dup_isa, only_isa
+            total, m_tp, m_l, m_pp, wrong_pp, suspic_instr, dup_arch, dup_isa, only_isa
         )
 
 
 def _print_sanity_report_verbose(
-    total, m_tp, m_l, m_pp, suspic_instr, dup_arch, dup_isa, only_isa
+    total, m_tp, m_l, m_pp, wrong_pp, suspic_instr, dup_arch, dup_isa, only_isa
 ):
     BRIGHT_CYAN = '\033[1;36;1m'
     BRIGHT_BLUE = '\033[1;34;1m'
@@ -391,6 +330,14 @@ def _print_sanity_report_verbose(
         'Instruction forms without port pressure assignment:\n' if len(m_pp) != 0 else '', end=''
     )
     for instr_form in m_pp:
+        print('{}{}{}'.format(BRIGHT_MAGENTA, _get_full_instruction_name(instr_form), WHITE))
+    print(
+        'Instruction forms with invalid port identifiers in port pressure:\n'
+        if len(wrong_pp) != 0
+        else '',
+        end='',
+    )
+    for instr_form in wrong_pp:
         print('{}{}{}'.format(BRIGHT_MAGENTA, _get_full_instruction_name(instr_form), WHITE))
     print(
         'Instruction forms which might miss an ISA DB entry:\n' if len(suspic_instr) != 0 else '',

@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 
-import os
 import warnings
 from functools import reduce
 
@@ -27,7 +26,7 @@ class SemanticsAppender(object):
     def __init__(self, machine_model: MachineModel, path_to_yaml=None):
         self._machine_model = machine_model
         self._isa = machine_model.get_ISA().lower()
-        path = utils.find_file('isa/'+self._isa+'.yml')
+        path = utils.find_file('isa/' + self._isa + '.yml')
         self._isa_model = MachineModel(path_to_yaml=path)
         if self._isa == 'x86':
             self._parser = ParserX86ATT()
@@ -98,7 +97,9 @@ class SemanticsAppender(object):
             if instruction_data:
                 # instruction form in DB
                 throughput = instruction_data['throughput']
-                port_pressure = instruction_data['port_pressure']
+                port_pressure = self._machine_model.average_port_pressure(
+                    instruction_data['port_pressure']
+                )
                 try:
                     assert isinstance(port_pressure, list)
                     assert len(port_pressure) == port_number
@@ -143,12 +144,14 @@ class SemanticsAppender(object):
                             for op in operands['operand_list']
                             if 'register' in op
                         ]
-                        load_port_pressure = self._machine_model.get_load_throughput(
-                            [
-                                x['memory']
-                                for x in instruction_form['operands']['source']
-                                if 'memory' in x
-                            ][0]
+                        load_port_pressure = self._machine_model.average_port_pressure(
+                            self._machine_model.get_load_throughput(
+                                [
+                                    x['memory']
+                                    for x in instruction_form['operands']['source']
+                                    if 'memory' in x
+                                ][0]
+                            )
                         )
                         if 'load_throughput_multiplier' in self._machine_model:
                             multiplier = self._machine_model['load_throughput_multiplier'][
@@ -165,7 +168,12 @@ class SemanticsAppender(object):
                         latency_wo_load = instruction_data_reg['latency']
                         instruction_form['port_pressure'] = [
                             sum(x)
-                            for x in zip(load_port_pressure, instruction_data_reg['port_pressure'])
+                            for x in zip(
+                                load_port_pressure,
+                                self._machine_model.average_port_pressure(
+                                    instruction_data_reg['port_pressure']
+                                ),
+                            )
                         ]
                 if assign_unknown:
                     # --> mark as unknown and assume 0 cy for latency/throughput
@@ -311,14 +319,14 @@ class SemanticsAppender(object):
     def _get_regular_source_x86ATT(self, instruction_form):
         # return all but last operand
         sources = [
-            op for op in instruction_form['operands'][0:len(instruction_form['operands']) - 1]
+            op for op in instruction_form['operands'][0 : len(instruction_form['operands']) - 1]
         ]
         return sources
 
     def _get_regular_source_AArch64(self, instruction_form):
         # return all but first operand
         sources = [
-            op for op in instruction_form['operands'][1:len(instruction_form['operands'])]
+            op for op in instruction_form['operands'][1 : len(instruction_form['operands'])]
         ]
         return sources
 
