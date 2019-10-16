@@ -75,6 +75,7 @@ setup(
         # that you indicate wheter you support Python2, Python 3 or both.
         'Programming Language :: Python :: 3',
         'Programming Language :: Python :: 3.5',
+        'Programming Language :: Python :: 3.6',
     ],
 
     # What doesd your project relate to?
@@ -89,9 +90,10 @@ setup(
     # requirements files see:
     # https://packaging.python.org/en/latest/requirements.html
     install_requires=[
-        'numpy',
-        'pandas',
         'kerncraft',
+        'networkx',
+        'pyparsing',
+        'pygraphviz',
     ],
     python_requires='>=3.5',
 

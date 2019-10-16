@@ -1,0 +1,374 @@
+osaca_version: 0.3.0
+isa: "AArch64"
+# Contains all operand-irregular instruction forms OSACA supports for AArch64.
+# Operand-regular for a AArch64 instruction form with N operands in the shape of
+#   mnemonic op1 ... opN
+# means that op1 is the only destination operand and op2 to op(N) are source operands.
+instruction_forms:
+    - name: "fmla"
+      operands:
+        - class: "register"
+          prefix: "v"
+          shape: "s"
+          source: true
+          destination: true
+        - class: "register"
+          prefix: "v"
+          shape: "s"
+          source: true
+          destination: false
+        - class: "register"
+          prefix: "v"
+          shape: "s"
+          source: true
+          destination: false
+    - name: "fmla"
+      operands:
+        - class: "register"
+          prefix: "v"
+          shape: "d"
+          source: true
+          destination: true
+        - class: "register"
+          prefix: "v"
+          shape: "d"
+          source: true
+          destination: false
+        - class: "register"
+          prefix: "v"
+          shape: "d"
+          source: true
+          destination: false
+    - name: "ldp"
+      operands:
+        - class: "register"
+          prefix: "d"
+          source: false
+          destination: true
+        - class: "register"
+          prefix: "d"
+          source: false
+          destination: true
+        - class: "memory"
+          base: "x"
+          offset: "imd"
+          index: ~
+          scale: 1
+          pre-indexed: false
+          post-indexed: false
+          source: true
+          destination: false
+    - name: "ldp"
+      operands:
+        - class: "register"
+          prefix: "d"
+          source: false
+          destination: true
+        - class: "register"
+          prefix: "d"
+          source: false
+          destination: true
+        - class: "memory"
+          base: "x"
+          offset: "imd"
+          index: ~
+          scale: 1
+          pre-indexed: false
+          post-indexed: true
+          source: true
+          destination: false   
+    - name: "ldp"
+      operands:
+        - class: "register"
+          prefix: "d"
+          source: false
+          destination: true
+        - class: "register"
+          prefix: "d"
+          source: false
+          destination: true
+        - class: "memory"
+          base: "x"
+          offset: ~
+          index: ~
+          scale: 1
+          pre-indexed: false
+          post-indexed: true
+          source: true
+          destination: false
+    - name: "ldp"
+      operands:
+        - class: "register"
+          prefix: "q"
+          source: false
+          destination: true
+        - class: "register"
+          prefix: "q"
+          source: false
+          destination: true
+        - class: "memory"
+          base: "x"
+          offset: "imd"
+          index: ~
+          scale: 1
+          pre-indexed: false
+          post-indexed: false
+          source: true
+          destination: false
+    - name: "ldp"
+      operands:
+        - class: "register"
+          prefix: "q"
+          source: false
+          destination: true
+        - class: "register"
+          prefix: "q"
+          source: false
+          destination: true
+        - class: "memory"
+          base: "x"
+          offset: ~ 
+          index: ~
+          scale: 1
+          pre-indexed: false
+          post-indexed: true 
+          source: true
+          destination: false
+    - name: "ldp"
+      operands:
+        - class: "register"
+          prefix: "q"
+          source: false
+          destination: true
+        - class: "register"
+          prefix: "q"
+          source: false
+          destination: true
+        - class: "memory"
+          base: "x"
+          offset: ~ 
+          index: ~
+          scale: 1
+          pre-indexed: false
+          post-indexed: false
+          source: true
+          destination: false
+    - name: "ldp"
+      operands:
+        - class: "register"
+          prefix: "q"
+          source: false
+          destination: true
+        - class: "register"
+          prefix: "q"
+          source: false
+          destination: true
+        - class: "memory"
+          base: "x"
+          offset: "imd" 
+          index: ~
+          scale: 1
+          pre-indexed: true
+          post-indexed: false 
+          source: true
+          destination: true
+    - name: "stp"
+      operands:
+        - class: "register"
+          prefix: "d"
+          source: true
+          destination: false
+        - class: "register"
+          prefix: "d"
+          source: true
+          destination: false
+        - class: "memory"
+          base: "x"
+          offset: ~
+          index: ~
+          scale: 1
+          pre-indexed: false
+          post-indexed: false
+          source: false
+          destination: true   
+    - name: "stp"
+      operands:
+        - class: "register"
+          prefix: "d"
+          source: true
+          destination: false
+        - class: "register"
+          prefix: "d"
+          source: true
+          destination: false
+        - class: "memory"
+          base: "x"
+          offset: "imd"
+          index: ~
+          scale: 1
+          pre-indexed: false
+          post-indexed: false
+          source: false
+          destination: true
+    - name: "stp"
+      operands:
+        - class: "register"
+          prefix: "q"
+          source: true
+          destination: false
+        - class: "register"
+          prefix: "q"
+          source: true
+          destination: false
+        - class: "memory"
+          base: "x"
+          offset: ~
+          index: ~
+          scale: 1
+          pre-indexed: false
+          post-indexed: false
+          source: false
+          destination: true
+    - name: "stp"
+      operands:
+        - class: "register"
+          prefix: "q"
+          source: true
+          destination: false
+        - class: "register"
+          prefix: "q"
+          source: true
+          destination: false
+        - class: "memory"
+          base: "x"
+          offset: ~
+          index: ~
+          scale: 1
+          pre-indexed: false
+          post-indexed: True
+          source: false
+          destination: true
+    - name: "stp"
+      operands:
+        - class: "register"
+          prefix: "q"
+          source: true
+          destination: false
+        - class: "register"
+          prefix: "q"
+          source: true
+          destination: false
+        - class: "memory"
+          base: "x"
+          offset: "imd"
+          index: ~
+          scale: 1
+          pre-indexed: false
+          post-indexed: false
+          source: false
+          destination: true
+    - name: "str"
+      operands:
+        - class: "register"
+          prefix: "x"
+          source: true
+          destination: false
+        - class: "memory"
+          base: "x"
+          offset: ~
+          index: ~
+          scale: 1
+          pre-indexed: false
+          post-indexed: false
+          source: false
+          destination: true
+    - name: "str"
+      operands:
+        - class: "register"
+          prefix: "d"
+          source: true
+          destination: false
+        - class: "memory"
+          base: "x"
+          offset: "imd"
+          index: ~
+          scale: 1
+          pre-indexed: false
+          post-indexed: false
+          source: false
+          destination: true
+    - name: "str"
+      operands:
+        - class: "register"
+          prefix: "d"
+          source: true
+          destination: false
+        - class: "memory"
+          base: "x"
+          offset: ~
+          index: ~
+          scale: 1
+          pre-indexed: false
+          post-indexed: true
+          source: false
+          destination: true
+    - name: "str"
+      operands:
+        - class: "register"
+          prefix: "q"
+          source: true
+          destination: false
+        - class: "memory"
+          base: "x"
+          offset: ~
+          index: "x"
+          scale: 1
+          pre-indexed: false
+          post-indexed: false
+          source: false
+          destination: true
+    - name: "str"
+      operands:
+        - class: "register"
+          prefix: "q"
+          source: true
+          destination: false
+        - class: "memory"
+          base: "x"
+          offset: ~
+          index: ~
+          scale: 1
+          pre-indexed: false
+          post-indexed: true
+          source: false
+          destination: true
+    - name: "str"
+      operands:
+        - class: "register"
+          prefix: "x"
+          source: true
+          destination: false
+        - class: "memory"
+          base: "x"
+          offset: ~
+          index: ~
+          scale: 1
+          pre-indexed: false
+          post-indexed: true
+          source: false
+          destination: true
+    - name: "str"
+      operands:
+        - class: "register"
+          prefix: "x"
+          source: true
+          destination: false
+        - class: "memory"
+          base: "x"
+          offset: ~
+          index: "x"
+          scale: 1
+          pre-indexed: false
+          post-indexed: false
+          source: false
+          destination: true
