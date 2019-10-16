@@ -20,7 +20,7 @@ class Frontend(object):
         self._arch = arch
         if arch:
             self._arch = arch.lower()
-            with open(utils.find_file(self._arch+'.yml'), 'r') as f:
+            with open(utils.find_file(self._arch + '.yml'), 'r') as f:
                 self._data = yaml.load(f, Loader=yaml.Loader)
         elif path_to_yaml:
             with open(path_to_yaml, 'r') as f:

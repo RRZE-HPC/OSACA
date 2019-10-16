@@ -35,7 +35,7 @@ class TestFrontend(unittest.TestCase):
             path_to_yaml=os.path.join(self.MODULE_DATA_DIR, 'csx.yml')
         )
         self.machine_model_tx2 = MachineModel(
-            path_to_yaml=os.path.join(self.MODULE_DATA_DIR, 'vulcan.yml')
+            path_to_yaml=os.path.join(self.MODULE_DATA_DIR, 'tx2.yml')
         )
         self.semantics_csx = SemanticsAppender(
             self.machine_model_csx, path_to_yaml=os.path.join(self.MODULE_DATA_DIR, 'isa/x86.yml')
@@ -74,7 +74,7 @@ class TestFrontend(unittest.TestCase):
 
     def test_frontend_AArch64(self):
         dg = KernelDG(self.kernel_AArch64, self.parser_AArch64, self.machine_model_tx2)
-        fe = Frontend(path_to_yaml=os.path.join(self.MODULE_DATA_DIR, 'vulcan.yml'))
+        fe = Frontend(path_to_yaml=os.path.join(self.MODULE_DATA_DIR, 'tx2.yml'))
         fe.print_full_analysis(self.kernel_AArch64, dg, verbose=True)
 
     ##################
