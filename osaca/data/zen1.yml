@@ -1,0 +1,539 @@
+osaca_version: 0.3.2
+micro_architecture: AMD Zen (family 17h)
+arch_code: ZEN1
+isa: x86
+load_latency: {gpr: 4.0, xmm: 4.0, ymm: 4.0}
+load_throughput_multiplier: {gpr: 1.0, xmm: 1.0, ymm: 2.0}
+load_throughput:
+- {base: gpr, index: ~, offset: ~, scale: 1, port_pressure:     [[1, '89'], [1, ['8D','9D']]]}
+- {base: gpr, index: ~, offset: ~, scale: 8, port_pressure:     [[1, '89'], [1, ['8D','9D']]]}
+- {base: gpr, index: ~, offset: imd, scale: 1, port_pressure:   [[1, '89'], [1, ['8D','9D']]]}
+- {base: gpr, index: ~, offset: imd, scale: 8, port_pressure:   [[1, '89'], [1, ['8D','9D']]]}
+- {base: gpr, index: gpr, offset: ~, scale: 1, port_pressure:   [[1, '89'], [1, ['8D','9D']]]}
+- {base: gpr, index: gpr, offset: ~, scale: 8, port_pressure:   [[1, '89'], [1, ['8D','9D']]]}
+- {base: gpr, index: gpr, offset: imd, scale: 1, port_pressure: [[1, '89'], [1, ['8D','9D']]]}
+- {base: gpr, index: gpr, offset: imd, scale: 8, port_pressure: [[1, '89'], [1, ['8D','9D']]]}
+hidden_loads: false
+ports: ['0', '1', '2', '3', 3DV, '4', '5', '6', '7', '8', '9', 8D, 9D, ST]
+port_model_scheme: |
+  ┌--------------------------------------┐  ┌-----------------------------------------------┐
+  |       96 entries OoO scheduler       |  |           84 entries OoO scheduler            |
+  └--------------------------------------┘  └-----------------------------------------------┘
+     0 |        1 |       2 |       3 |        4 |     5 |     6 |     7 |      8 |     9 |
+       ▼         ▼         ▼         ▼          ▼       ▼       ▼       ▼        ▼       ▼
+   ┌-------┐ ┌-------┐ ┌-------┐ ┌-------┐  ┌------┐ ┌-----┐ ┌-----┐ ┌------┐ ┌-----┐ ┌-----┐
+   |SSE ALU| |SSE ALU| |SSE ALU| |SSE ALU|  | ALU  | | ALU | | ALU | | ALU  | | AGU | | AGU |
+   └-------┘ └-------┘ └-------┘ └-------┘  └------┘ └-----┘ └-----┘ └------┘ └-----┘ └-----┘
+   ┌-------┐ ┌-------┐ ┌-------┐ ┌-------┐  ┌------┐ ┌-----┐ ┌-----┐ ┌------┐    |       |
+   |SSE MUL| |SSE MUL| |SSE ADD| |SSE ADD|  |BRANCH| | MUL | | MUL | |BRANCH|    ▼       ▼
+   └-------┘ └-------┘ └-------┘ └-------┘  └------┘ └-----┘ └-----┘ └------┘ ┌-------------┐ 
+   ┌-------┐ ┌-------┐ ┌-------┐ ┌-------┐                                    |    LOAD     |
+   |SSE FMA| |SSE FMA| |  SSE  | |SSE DIV|                                    └-------------┘
+   └-------┘ └-------┘ |  SHUF | └-------┘                                    ┌-------------┐ 
+             ┌-------┐ └-------┘                                              |    LOAD     |
+             |  SSE  |                                                        └-------------┘
+             |  SHUF |                                                        ┌-------------┐
+             └-------┘                                                        |    STORE    |
+                                                                              └-------------┘
+instruction_forms:
+- name: add
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: gpr
+  throughput: 0.25
+  latency: 1.0  # 	1*p4567
+  port_pressure: [[1, '4567']]
+- name: add
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  throughput: 0.25
+  latency: 1  # 	1*p4567
+  port_pressure: [[1, '4567']]
+- name: addl
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: gpr
+  throughput: 0.25
+  latency: 1.0  # 	1*p4567
+  port_pressure: [[1, '4567']]
+- name: addq
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: gpr
+  throughput: 0.25
+  latency: 1.0  # 	1*p4567
+  port_pressure: [[1, '4567']]
+- name: cmpl
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  throughput: 0.25
+  latency: ~  # 	1*p4567
+  port_pressure: [[1, '4567']]
+- name: cmpq
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  throughput: 0.25
+  latency: ~  # 	1*p4567
+  port_pressure: [[1, '4567']]
+- name: incq
+  operands:
+  - class: register
+    name: gpr
+  throughput: 0.25
+  latency: 1.0  # 	1*p4567     
+  port_pressure: [[1, '4567']]
+- name: ja
+  operands:
+  - class: identifier
+  throughput: 0.0
+  latency: ~
+  port_pressure: []
+- name: jb
+  operands:
+  - class: identifier
+  throughput: 0.0
+  latency: ~
+  port_pressure: []
+- name: jne
+  operands:
+  - class: identifier
+  throughput: 0.0
+  latency: ~
+  port_pressure: []
+- name: leaq
+  operands:
+  - class: memory
+    base: gpr
+    offset: imd
+    index: ~
+    scale: 1
+  - class: register
+    name: gpr
+  throughput: 0.5
+  latency: ~  # 	1*p89
+  port_pressure: [[1, '89']]
+- name: movl
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  throughput: 0.0
+  latency: 0.0
+  port_pressure: []
+- name: mulsd
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  throughput: 0.5
+  latency: 4.0  # 	1*p01
+  port_pressure: [[1, '01']]
+- name: mulss
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  throughput: 0.5
+  latency: 3.0  # 	1*p01
+  port_pressure: [[1, '01']]
+- name: rcpss
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  throughput: ~     #1.0
+  latency: 5.0
+  port_pressure: []
+- name: sqrtsd
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  throughput: ~     #8.0
+  latency: 23.0
+  port_pressure: []
+- name: sqrtss
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  throughput: ~     #5.0
+  latency: 17.0
+  port_pressure: []
+- name: subq
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  throughput: 0.25
+  latency: 1.0  # 	1*p4567
+  port_pressure: [[1, '4567']]
+- name: subq
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: gpr
+  throughput: 0.25
+  latency: 1.0  # 	1*p4567
+  port_pressure: [[1, '4567']]
+- name: vaddpd
+  operands:
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  throughput: 1.0
+  latency: 3.0  # 	2*p23
+  port_pressure: [[2, '23']]
+- name: vaddsd
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  throughput: 0.5
+  latency: 3.0  # 	1*p23
+  port_pressure: [[1, '23']]
+- name: vaddss
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  throughput: 0.5
+  latency: 3.0  # 	1*p23
+  port_pressure: [[1, '23']]
+- name: vdivsd
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  throughput: 4.0
+  latency: 13.0  # 	1*p3+4*p3DV
+  port_pressure: [[1, '3'], [4.0, [3DV]]]
+- name: vdivss
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  throughput: 3.0
+  latency: 10.0
+  port_pressure: [[1, '3'], [3.0, [3DV]]]
+- name: vfmadd213pd
+  operands:
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  throughput: 1.0
+  latency: 4.0  # 	2*p01
+  port_pressure: [[2, '01']]
+- name: vfmadd231pd
+  operands:
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  throughput: 1.0
+  latency: 4.0  # 	2*p01
+  port_pressure: [[2, '01']]
+- name: vfmadd132pd
+  operands:
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  throughput: 1.0
+  latency: 4.0  # 	2*p01
+  port_pressure: [[2, '01']]
+- name: vmulsd
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  throughput: 0.5
+  latency: 4.0  # 	1*p01
+  port_pressure: [[1, '01']]
+- name: vmulss
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  throughput: 0.5
+  latency: 3.0  # 	1*p01
+  port_pressure: [[1, '01']]
+- name: vmulpd
+  operands:
+  - class: memory
+    base: gpr
+    offset: ~
+    index: gpr
+    scale: 1
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  throughput: 0.5
+  latency: 4.0  # 	1*p01+1*p89+1*p8D9D
+  port_pressure: [[1, '01'], [1, '89'], [1, [8D, 9D]]]
+- name: vmulpd
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  throughput: 0.5
+  latency: 4.0  # 	1*p01
+  port_pressure: [[1, '01']]
+- name: vmulpd
+  operands:
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  throughput: 1.0
+  latency: 4.0  # 	2*p01
+  port_pressure: [[2, '01']]
+- name: vmovapd
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  throughput: 0.0
+  latency: 0.0
+  port_pressure: []
+- name: vmovapd
+  operands:
+  - class: register
+    name: xmm
+  - class: memory
+    base: gpr
+    offset: ~
+    index: gpr
+    scale: 1
+  throughput: 1.0
+  latency: 4.0  # 	1*p89+1*pST
+  port_pressure: [[1, '89'], [1, [ST]]]
+- name: vmovapd
+  operands:
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  throughput: 0.0
+  latency: 0.0
+  port_pressure: []
+- name: vmovapd
+  operands:
+  - class: register
+    name: ymm
+  - class: memory
+    base: gpr
+    offset: ~
+    index: gpr
+    scale: 1
+  throughput: 2.0
+  latency: 3.0  # 	2*p89+2*pST
+  port_pressure: [[2, '89'], [2, [ST]]]
+- name: vmovapd
+  operands:
+  - class: register
+    name: ymm
+  - class: memory
+    base: gpr
+    offset: imd
+    index: gpr
+    scale: 1
+  throughput: 2.0
+  latency: 3.0  # 	2*p89+2*pST
+  port_pressure: [[2, '89'], [2, [ST]]]
+- name: vmovaps
+  operands:
+  - class: register
+    name: xmm
+  - class: memory
+    base: gpr
+    offset: ~
+    index: gpr
+    scale: 1
+  throughput: 1.0
+  latency: 4.0  # 	1*p89+1*pST
+  port_pressure: [[1, '89'], [1, [ST]]]
+- name: vmovaps
+  operands:
+  - class: register
+    name: xmm
+  - class: memory
+    base: gpr
+    offset: imd
+    index: gpr
+    scale: 1
+  throughput: 1.0
+  latency: 4.0  # 	1*p89+1*pST
+  port_pressure: [[1, '89'], [1, [ST]]]
+- name: vmovupd
+  operands:
+  - class: register
+    name: ymm
+  - class: memory
+    base: gpr
+    offset: ~
+    index: gpr
+    scale: 1
+  throughput: 2.0
+  latency: 3.0  # 	2*p89+2*pST
+  port_pressure: [[2, '89'], [2, [ST]]]
+- name: vmovupd
+  operands:
+  - class: register
+    name: ymm
+  - class: memory
+    base: gpr
+    offset: imd
+    index: gpr
+    scale: 1
+  throughput: 2.0
+  latency: 3.0  # 	2*p89+2*pST
+  port_pressure: [[2, '89'], [2, [ST]]]
+- name: vmovupd
+  operands:
+  - class: register
+    name: ymm
+  - class: memory
+    base: gpr
+    offset: ~
+    index: gpr
+    scale: 1
+  throughput: 2.0
+  latency: 3.0  # 	2*p89+2*pST
+  port_pressure: [[2, '89'], [2, [ST]]]
+- name: vmovupd
+  operands:
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  throughput: 0.0
+  latency: 0.0
+  port_pressure: []
+- name: vmovsd
+  operands:
+  - class: memory
+    base: gpr
+    offset: imd
+    index: gpr
+    scale: 1
+  - class: register
+    name: xmm
+  throughput: 0.5
+  latency: 4.0  # 	1*p89+1*p8D9D
+  port_pressure: [[1, '89'], [1, [8D, 9D]]]
+- name: vmovsd
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  throughput: 0.0
+  latency: 0.0
+  port_pressure: []
+- name: vmovsd
+  operands:
+  - class: register
+    name: xmm
+  - class: memory
+    base: gpr
+    offset: ~
+    index: ~
+    scale: 1
+  throughput: 1.0
+  latency: 4.0  # 	1*p89+1*pST
+  port_pressure: [[1, '89'], [1, [ST]]]
+- name: vmovsd
+  operands:
+  - class: register
+    name: xmm
+  - class: memory
+    base: gpr
+    offset: imd
+    index: ~
+    scale: 1
+  throughput: 1.0
+  latency: 4.0  # 	1*p89+1*pST
+  port_pressure: [[1, '89'], [1, [ST]]]
+- name: vmovsd
+  operands:
+  - class: register
+    name: xmm
+  - class: memory
+    base: gpr
+    offset: ~
+    index: gpr
+    scale: 1
+  throughput: 1.0
+  latency: 4.0  # 	1*p89+1*pST
+  port_pressure: [[1, '89'], [1, [ST]]]
+- name: vmovsd
+  operands:
+  - class: register
+    name: xmm
+  - class: memory
+    base: gpr
+    offset: imd
+    index: gpr
+    scale: 1
+  throughput: 1.0
+  latency: 4.0  # 	1*p89+1*pST
+  port_pressure: [[1, '89'], [1, [ST]]]

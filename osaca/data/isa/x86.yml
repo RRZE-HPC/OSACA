@@ -1,0 +1,218 @@
+osaca_version: 0.3.0
+isa: "x86"
+# Contains all operand-irregular instruction forms OSACA supports for x86.
+# Operand-regular for a x86 AT&T instruction form with N operands in the shape of
+#   mnemonic op1 ... opN
+# means that opN is the only destination operand and op1 to op(N-1) are source operands.
+instruction_forms:
+    - name: addl
+      operands:
+        - class: "immediate"
+          imd: "int"
+          source: true
+          destination: false
+        - class: "register"
+          name: "gpr"
+          source: true
+          destination: true
+    - name: addq
+      operands:
+        - class: "immediate"
+          imd: "int"
+          source: true
+          destination: false
+        - class: "register"
+          name: "gpr"
+          source: true
+          destination: true
+    - name: addsd
+      operands:
+        - class: "register"
+          name: "xmm"
+          source: true
+          destination: true
+        - class: "register"
+          name: "xmm"
+          source: true
+          destination: false
+    - name: addss
+      operands:
+        - class: "register"
+          name: "xmm"
+          source: true
+          destination: true
+        - class: "register"
+          name: "xmm"
+          source: true
+          destination: false
+    - name: cmpl
+      operands:
+        - class: "register"
+          name: "gpr"
+          source: true
+          destination: false
+        - class: "register"
+          name: "gpr"
+          source: true
+          destination: false
+    - name: cmpq
+      operands:
+        - class: "register"
+          name: "gpr"
+          source: true
+          destination: false
+        - class: "register"
+          name: "gpr"
+          source: true
+          destination: false
+    - name: cmpq
+      operands:
+        - class: "register"
+          name: "gpr"
+          source: true
+          destination: false
+        - class: "memory"
+          base: "gpr"
+          offset: "imd"
+          index: ~
+          scale: 1
+          source: true
+          destination: false
+    - name: ja
+      operands:
+        - class: "identifier"
+          source: true
+          destination: false
+    - name: mulsd
+      operands:
+        - class: "register"
+          name: "xmm"
+          source: true
+          destination: true
+        - class: "register"
+          name: "xmm"
+          source: true
+          destination: false
+    - name: mulss
+      operands:
+        - class: "register"
+          name: "xmm"
+          source: true
+          destination: true
+        - class: "register"
+          name: "xmm"
+          source: true
+          destination: false
+    - name: subq
+      operands:
+        - class: "immediate"
+          imd: "int"
+          source: true
+          destination: false
+        - class: "register"
+          name: "gpr"
+          source: true
+          destination: true
+    - name: vfmadd132pd
+      operands:
+        - class: "memory"
+          base: "gpr"
+          offset: ~
+          index: "gpr"
+          scale: 1
+          source: true
+          destination: false
+        - class: "register"
+          name: "ymm"
+          source: true
+          destination: false
+        - class: "register"
+          name: "ymm"
+          source: true
+          destination: true
+    - name: vfmadd132pd
+      operands:
+        - class: "memory"
+          base: "gpr"
+          offset: "imd"
+          index: "gpr"
+          scale: 1
+          source: true
+          destination: false
+        - class: "register"
+          name: "ymm"
+          source: true
+          destination: false
+        - class: "register"
+          name: "ymm"
+          source: true
+          destination: true
+    - name: vfmadd213pd
+      operands:
+        - class: "memory"
+          base: "gpr"
+          offset: ~
+          index: "gpr"
+          scale: 1
+          source: true
+          destination: false
+        - class: "register"
+          name: "ymm"
+          source: true
+          destination: false
+        - class: "register"
+          name: "ymm"
+          source: true
+          destination: true
+    - name: vfmadd213pd
+      operands:
+        - class: "memory"
+          base: "gpr"
+          offset: "imd"
+          index: "gpr"
+          scale: 1
+          source: true
+          destination: false
+        - class: "register"
+          name: "ymm"
+          source: true
+          destination: false
+        - class: "register"
+          name: "ymm"
+          source: true
+          destination: true
+    - name: vfmadd231pd
+      operands:
+        - class: "memory"
+          base: "gpr"
+          offset: "imd"
+          index: "gpr"
+          scale: 1
+          source: true
+          destination: false
+        - class: "register"
+          name: "ymm"
+          source: true
+          destination: false
+        - class: "register"
+          name: "ymm"
+          source: true
+          destination: true
+    - name: vfmadd231pd
+      operands:
+        - class: "memory"
+          base: "gpr"
+          offset: ~
+          index: "gpr"
+          scale: 1
+          source: true
+          destination: false
+        - class: "register"
+          name: "ymm"
+          source: true
+          destination: false
+        - class: "register"
+          name: "ymm"
+          source: true
+          destination: true
+
