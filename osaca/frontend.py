@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 
-import os
 import re
 from datetime import datetime as dt
 
@@ -60,56 +59,6 @@ class Frontend(object):
         tp_sum = SemanticsAppender.get_throughput_sum(kernel)
         print(lineno_filler + self._get_port_pressure(tp_sum, port_len, ' '))
 
-    def _get_separator_list(self, separator, separator_2=' '):
-        separator_list = []
-        for i in range(len(self._data['ports']) - 1):
-            match_1 = re.search(r'\d+', self._data['ports'][i])
-            match_2 = re.search(r'\d+', self._data['ports'][i + 1])
-            if match_1 is not None and match_2 is not None and match_1.group() == match_2.group():
-                separator_list.append(separator_2)
-            else:
-                separator_list.append(separator)
-        separator_list.append(separator)
-        return separator_list
-
-    def _get_flag_symbols(self, flag_obj):
-        string_result = ''
-        string_result += '*' if INSTR_FLAGS.NOT_BOUND in flag_obj else ''
-        string_result += 'X' if INSTR_FLAGS.TP_UNKWN in flag_obj else ''
-        string_result += 'P' if INSTR_FLAGS.HIDDEN_LD in flag_obj else ''
-        # TODO add other flags
-        string_result += ' ' if len(string_result) == 0 else ''
-        return string_result
-
-    def _get_port_pressure(self, ports, port_len, separator='|'):
-        if not isinstance(separator, list):
-            separator = [separator for x in ports]
-        string_result = '{} '.format(separator[-1])
-        for i in range(len(ports)):
-            if float(ports[i]) == 0.0:
-                string_result += port_len[i] * ' ' + ' {} '.format(separator[i])
-                continue
-            left_len = len(str(float(ports[i])).split('.')[0])
-            substr = '{:' + str(left_len) + '.' + str(max(port_len[i] - left_len - 1, 0)) + 'f}'
-            string_result += substr.format(ports[i]) + ' {} '.format(separator[i])
-        return string_result[:-1]
-
-    def _get_max_port_len(self, kernel):
-        port_len = [4 for x in self._data['ports']]
-        for instruction_form in kernel:
-            for i, port in enumerate(instruction_form['port_pressure']):
-                if len('{:.2f}'.format(port)) > port_len[i]:
-                    port_len[i] = len('{:.2f}'.format(port))
-        return port_len
-
-    def _get_port_number_line(self, port_len, separator='|'):
-        string_result = separator
-        separator_list = self._get_separator_list(separator, '-')
-        for i, length in enumerate(port_len):
-            substr = '{:^' + str(length + 2) + 's}'
-            string_result += substr.format(self._data['ports'][i]) + separator_list[i]
-        return string_result
-
     def print_latency_analysis(self, cp_kernel, separator='|'):
         print('\n\nLatency Analysis Report\n' + '-----------------------')
         for instruction_form in cp_kernel:
@@ -144,10 +93,7 @@ class Frontend(object):
                     dep,
                     separator,
                     sum(
-                        [
-                            instr_form['latency_lcd']
-                            for instr_form in dep_dict[dep]['dependencies']
-                        ]
+                        [instr_form['latency_lcd'] for instr_form in dep_dict[dep]['dependencies']]
                     ),
                     separator,
                     dep_dict[dep]['root']['line'],
@@ -155,6 +101,144 @@ class Frontend(object):
                     [node['line_number'] for node in dep_dict[dep]['dependencies']],
                 )
             )
+
+    def print_full_analysis(self, kernel, kernel_dg: KernelDG, verbose=False):
+        self._print_header_report()
+        self._print_symbol_map()
+        self.print_combined_view(
+            kernel, kernel_dg.get_critical_path(), kernel_dg.get_loopcarried_dependencies()
+        )
+        self.print_loopcarried_dependencies(kernel_dg.get_loopcarried_dependencies())
+
+    def print_combined_view(self, kernel, cp_kernel: KernelDG, dep_dict, show_cmnts=True):
+        self._print_header_report()
+        self._print_symbol_map()
+        lineno_filler = '     '
+        port_len = self._get_max_port_len(kernel)
+        # Separator for ports
+        separator = '-' * sum([x + 3 for x in port_len]) + '-'
+        # ... for line numbers
+        separator += '--' + len(str(kernel[-1]['line_number'])) * '-'
+        col_sep = '|'
+        # for LCD/CP column
+        separator += '-' * (2 * 6 + len(col_sep)) + '-' * len(col_sep)
+        sep_list = self._get_separator_list(col_sep)
+        headline = 'Ports'
+        headline_str = '{{:^{}}}'.format(len(separator))
+        # Prepare CP/LCD variable
+        cp_lines = [x['line_number'] for x in cp_kernel]
+        sums = {}
+        for dep in dep_dict:
+            sums[dep] = sum(
+                [instr_form['latency_lcd'] for instr_form in dep_dict[dep]['dependencies']]
+            )
+        lcd_sum = max(sums.values())
+        lcd_lines = []
+        longest_lcd = [line_no for line_no in sums if sums[line_no] == lcd_sum][0]
+        lcd_lines = [d['line_number'] for d in dep_dict[longest_lcd]['dependencies']]
+
+        print(headline_str.format(headline))
+        print(
+            lineno_filler
+            + self._get_port_number_line(port_len, separator=col_sep)
+            + '{}{:^6}{}{:^6}{}'.format(col_sep, 'CP', col_sep, 'LCD', col_sep)
+        )
+        print(separator)
+        for instruction_form in kernel:
+            if show_cmnts is False and self._is_comment(instruction_form):
+                continue
+            line_number = instruction_form['line_number']
+            line = '{:4d} {}{} {} {}'.format(
+                line_number,
+                self._get_port_pressure(instruction_form['port_pressure'], port_len, sep_list),
+                self._get_lcd_cp_ports(
+                    instruction_form['line_number'],
+                    cp_kernel if line_number in cp_lines else None,
+                    dep_dict[longest_lcd] if line_number in lcd_lines else None,
+                ),
+                self._get_flag_symbols(instruction_form['flags'])
+                if instruction_form['instruction'] is not None
+                else ' ',
+                instruction_form['line'].strip(),
+            )
+            print(line)
+        print()
+        # lcd_sum already calculated before
+        tp_sum = SemanticsAppender.get_throughput_sum(kernel)
+        cp_sum = sum([x['latency_cp'] for x in cp_kernel])
+        print(
+            lineno_filler
+            + self._get_port_pressure(tp_sum, port_len, ' ')
+            + ' {:^6} {:^6}'.format(cp_sum, lcd_sum)
+        )
+
+    ####################
+    # HELPER FUNCTIONS
+    ####################
+
+    def _get_separator_list(self, separator, separator_2=' '):
+        separator_list = []
+        for i in range(len(self._data['ports']) - 1):
+            match_1 = re.search(r'\d+', self._data['ports'][i])
+            match_2 = re.search(r'\d+', self._data['ports'][i + 1])
+            if match_1 is not None and match_2 is not None and match_1.group() == match_2.group():
+                separator_list.append(separator_2)
+            else:
+                separator_list.append(separator)
+        separator_list.append(separator)
+        return separator_list
+
+    def _get_flag_symbols(self, flag_obj):
+        string_result = ''
+        string_result += '*' if INSTR_FLAGS.NOT_BOUND in flag_obj else ''
+        string_result += 'X' if INSTR_FLAGS.TP_UNKWN in flag_obj else ''
+        string_result += 'P' if INSTR_FLAGS.HIDDEN_LD in flag_obj else ''
+        # TODO add other flags
+        string_result += ' ' if len(string_result) == 0 else ''
+        return string_result
+
+    def _get_port_pressure(self, ports, port_len, separator='|'):
+        if not isinstance(separator, list):
+            separator = [separator for x in ports]
+        string_result = '{} '.format(separator[-1])
+        for i in range(len(ports)):
+            if float(ports[i]) == 0.0:
+                string_result += port_len[i] * ' ' + ' {} '.format(separator[i])
+                continue
+            left_len = len(str(float(ports[i])).split('.')[0])
+            substr = '{:' + str(left_len) + '.' + str(max(port_len[i] - left_len - 1, 0)) + 'f}'
+            string_result += substr.format(ports[i]) + ' {} '.format(separator[i])
+        return string_result[:-1]
+
+    def _get_node_by_lineno(self, lineno, kernel):
+        nodes = [instr for instr in kernel if instr['line_number'] == lineno]
+        return nodes[0] if len(nodes) > 0 else None
+
+    def _get_lcd_cp_ports(self, line_number, cp_dg, dependency, separator='|'):
+        lat_cp = lat_lcd = ''
+        if cp_dg:
+            lat_cp = self._get_node_by_lineno(line_number, cp_dg)['latency_cp']
+        if dependency:
+            lat_lcd = self._get_node_by_lineno(line_number, dependency['dependencies'])[
+                'latency_lcd'
+            ]
+        return '{} {:>4} {} {:>4} {}'.format(separator, lat_cp, separator, lat_lcd, separator)
+
+    def _get_max_port_len(self, kernel):
+        port_len = [4 for x in self._data['ports']]
+        for instruction_form in kernel:
+            for i, port in enumerate(instruction_form['port_pressure']):
+                if len('{:.2f}'.format(port)) > port_len[i]:
+                    port_len[i] = len('{:.2f}'.format(port))
+        return port_len
+
+    def _get_port_number_line(self, port_len, separator='|'):
+        string_result = separator
+        separator_list = self._get_separator_list(separator, '-')
+        for i, length in enumerate(port_len):
+            substr = '{:^' + str(length + 2) + 's}'
+            string_result += substr.format(self._data['ports'][i]) + separator_list[i]
+        return string_result
 
     def _print_header_report(self):
         version = 'v0.3'
@@ -184,10 +268,3 @@ class Frontend(object):
 
     def _print_port_binding_summary(self):
         raise NotImplementedError
-
-    def print_full_analysis(self, kernel, kernel_dg: KernelDG, verbose=False):
-        self._print_header_report()
-        self._print_symbol_map()
-        self.print_throughput_analysis(kernel, show_lineno=True)
-        self.print_latency_analysis(kernel_dg.get_critical_path())
-        self.print_loopcarried_dependencies(kernel_dg.get_loopcarried_dependencies())
