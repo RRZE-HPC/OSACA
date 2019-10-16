@@ -1,11 +1,9 @@
 #!/usr/bin/env python3
 import argparse
-import re
 import sys
 import xml.etree.ElementTree as ET
 from distutils.version import StrictVersion
 
-from osaca.db_interface import add_entries_to_db
 from osaca.parser import get_parser
 from osaca.semantics import MachineModel
 
@@ -20,7 +18,7 @@ def port_pressure_from_tag_attributes(attrib):
 
     # Also
     if 'div_cycles' in attrib:
-        port_occupation.append([int(attrib['div_cycles']), ['DIV',]])
+        port_occupation.append([int(attrib['div_cycles']), ['DIV']])
 
     return port_occupation
 
@@ -51,12 +49,16 @@ def extract_paramters(instruction_tag, parser, isa):
             parameter['class'] = 'register'
             possible_regs = [parser.parse_register('%' + r) for r in parameter_tag.text.split(',')]
             if possible_regs[0] is None:
-                raise ValueError('Unknown register type for {} with {}.'.format(
-                    parameter_tag.attrib, parameter_tag.text))
+                raise ValueError(
+                    'Unknown register type for {} with {}.'.format(
+                        parameter_tag.attrib, parameter_tag.text
+                    )
+                )
             if isa == 'x86':
                 if parser.is_vector_register(possible_regs[0]['register']):
-                    possible_regs[0]['register']['name'] = \
-                        possible_regs[0]['register']['name'].lower()[:3]
+                    possible_regs[0]['register']['name'] = possible_regs[0]['register'][
+                        'name'
+                    ].lower()[:3]
                     if 'mask' in possible_regs[0]['register']:
                         possible_regs[0]['register']['mask'] = True
                 else:
@@ -111,10 +113,12 @@ def extract_model(tree, arch):
             if 'TP_ports' in measurement_tag.attrib:
                 throughput = measurement_tag.attrib['TP_ports']
             else:
-                throughput = (measurement_tag.attrib['TP']
-                              if 'TP' in measurement_tag.attrib else None)
-            uops = (int(measurement_tag.attrib['uops'])
-                    if 'uops' in measurement_tag.attrib else None)
+                throughput = (
+                    measurement_tag.attrib['TP'] if 'TP' in measurement_tag.attrib else None
+                )
+            uops = (
+                int(measurement_tag.attrib['uops']) if 'uops' in measurement_tag.attrib else None
+            )
             if 'ports' in measurement_tag.attrib:
                 port_pressure.append(port_pressure_from_tag_attributes(measurement_tag.attrib))
             latencies = [
@@ -136,7 +140,8 @@ def extract_model(tree, arch):
 
         # Ordered by IACA version (newest last)
         for iaca_tag in sorted(
-                arch_tag.iter('IACA'), key=lambda i: StrictVersion(i.attrib['version'])):
+            arch_tag.iter('IACA'), key=lambda i: StrictVersion(i.attrib['version'])
+        ):
             if 'ports' in iaca_tag.attrib:
                 port_pressure.append(port_pressure_from_tag_attributes(iaca_tag.attrib))
         if ignore:
@@ -145,8 +150,9 @@ def extract_model(tree, arch):
         # Check if all are equal
         if port_pressure:
             if port_pressure[1:] != port_pressure[:-1]:
-                print("Contradicting port occupancies, using latest IACA:", mnemonic,
-                      file=sys.stderr)
+                print(
+                    "Contradicting port occupancies, using latest IACA:", mnemonic, file=sys.stderr
+                )
             port_pressure = port_pressure[-1]
 
             # Add missing ports:
@@ -171,9 +177,12 @@ def architectures(tree):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('xml', help='path of instructions.xml from http://uops.info')
-    parser.add_argument('arch', nargs='?',
-                        help='architecture to extract, use IACA abbreviations (e.g., SNB). '
-                             'if not given, all will be extracted and saved to file in CWD.')
+    parser.add_argument(
+        'arch',
+        nargs='?',
+        help='architecture to extract, use IACA abbreviations (e.g., SNB). '
+        'if not given, all will be extracted and saved to file in CWD.',
+    )
     args = parser.parse_args()
 
     tree = ET.parse(args.xml)
@@ -186,8 +195,9 @@ def main():
             print(arch, end='')
             model = extract_model(tree, arch.lower())
             with open('{}.yml'.format(arch.lower()), 'w') as f:
-                f.write(model.dump())
+                model.dump(f)
             print('.')
+
 
 if __name__ == '__main__':
     main()
