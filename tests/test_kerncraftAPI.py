@@ -52,7 +52,7 @@ class TestKerncraftAPI(unittest.TestCase):
         self.assertEqual(kapi.get_latency(), (1.0, 13.0))
 
     def test_kerncraft_API_AArch64(self):
-        kapi = KerncraftAPI('vulcan', self.code_AArch64)
+        kapi = KerncraftAPI('tx2', self.code_AArch64)
 
         kapi.create_output()
         self.assertEqual(kapi.get_unmatched_instruction_ratio(), 0.0)

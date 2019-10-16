@@ -7,6 +7,7 @@ import re
 import sys
 from filecmp import dircmp
 from subprocess import call
+import warnings
 
 from osaca.db_interface import sanity_check, import_benchmark_output
 from osaca.frontend import Frontend
@@ -58,7 +59,7 @@ def create_parser():
     parser.add_argument(
         '--arch',
         type=str,
-        help='Define architecture (SNB, IVB, HSW, BDW, SKX, CSX, ZEN1, VULCAN).',
+        help='Define architecture (SNB, IVB, HSW, BDW, SKX, CSX, ZEN1, TX2).',
     )
     parser.add_argument(
         '--db-check',
@@ -105,7 +106,7 @@ def create_parser():
 
 def check_arguments(args, parser):
     """Check arguments passed by user that are not checked by argparse itself."""
-    supported_archs = ['SNB', 'IVB', 'HSW', 'BDW', 'SKX', 'CSX', 'ZEN1', 'VULCAN']
+    supported_archs = ['SNB', 'IVB', 'HSW', 'BDW', 'SKX', 'CSX', 'ZEN1', 'TX2']
     supported_import_files = ['ibench', 'asmbench', 'uopsinfo']
 
     if 'arch' in args and args.arch.upper() not in supported_archs:
@@ -124,18 +125,8 @@ def check_user_dir():
     if not os.path.isdir(DATA_DIR):
         os.makedirs(DATA_DIR)
     for f in os.listdir(MODULE_DATA_DIR):
-        if not os.path.exists(os.path.join(DATA_DIR, f)):
+        if f.endswith('yml') and not os.path.exists(os.path.join(DATA_DIR, f)):
             call(['cp', '-r', os.path.join(MODULE_DATA_DIR, f), DATA_DIR])
-    else:
-        # Compare and warn if files in DATA_DIR are different
-        dir_comp = dircmp(DATA_DIR, MODULE_DATA_DIR)
-        if dir_comp.left_list != dir_comp.same_files:
-            print(
-                "WARNING: Files in {} differs from {}. Check or delete {}.".format(
-                    MODULE_DATA_DIR, DATA_DIR, DATA_DIR
-                ),
-                file=sys.stderr,
-            )
 
 
 def import_data(benchmark_type, arch, filepath):

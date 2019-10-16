@@ -1,118 +1,29 @@
 #!/usr/bin/env python3
 import argparse
-import re
 import sys
 import xml.etree.ElementTree as ET
 from distutils.version import StrictVersion
-from itertools import groupby, product
 
-from ruamel import yaml
-
-from osaca.db_interface import add_entries_to_db
-from osaca.parser import ParserAArch64v81, ParserX86ATT
+from osaca.parser import get_parser
 from osaca.semantics import MachineModel
 
-ARCH_DICT = {
-    'vulcan': 'aarch64',
-    'snb': 'x86',
-    'ivb': 'x86',
-    'hsw': 'x86',
-    'bdw': 'x86',
-    'skl': 'x86',
-    'skx': 'x86',
-    'csx': 'x86',
-}
 
+def port_pressure_from_tag_attributes(attrib):
+    # '1*p015+1*p1+1*p23+1*p4+3*p5' ->
+    # [[1, '015'], [1, '1'], [1, '23'], [1, '4'], [3, '5']]
+    port_occupation = []
+    for p in attrib['ports'].split('+'):
+        cycles, ports = p.split('*p')
+        port_occupation.append([int(cycles), ports])
 
-def port_pressure_from_tag_attributes(attrib, arch, ports):
-    # apply cycles for D ports
-    data_port = re.compile(r'[0-9]D$')
-    data_ports = [x[:-1] for x in filter(data_port.match, ports)]
-
-    # format attributes
-    cycles = attrib['ports'].split('+')
-    cycles = [c.split('*') for c in cycles]
-    for i, c in enumerate(cycles):
-        cycles[i][0] = int(c[0])
-        if str(c[1]).startswith('p'):
-            cycles[i][1] = [p for p in c[1][1:]]
-        if data_ports and data_ports == cycles[i][1]:
-            # uops for data ports
-            cycles.append([c[0], [x + 'D' for x in data_ports]])
-        cycles[i][0] = [
-            cycles[i][0] / num for num in range(1, len(cycles[i][1]) + 1) for _ in range(num)
-        ]
-    cycles = [list(product(c[0], c[1])) for c in cycles]
-    all_options = []
-
-    # iterate over all combinations of all uop options
-    for cycles_combs in cycles:
-        options = []
-        tmp_opt = []
-        total = cycles_combs[0][0]
-        # iterate over all combinations of each uop option
-        for comb in cycles_combs:
-            # add options until they reach the total num of uops
-            tmp_opt.append(comb)
-            if sum([c[0] for c in tmp_opt]) == total:
-                # copy this option as one of several to the cycle option list
-                options.append(tmp_opt.copy())
-                tmp_opt = []
-        if len(tmp_opt) != 0:
-            raise ValueError('Cannot compute port pressure')
-        options = [x for x, _ in groupby(options)]
-        all_options.append(options)
-    all_options = list(product(*all_options))
-
-    # find best scheduling
-    port_pressure = {}
-    for p in ports:
-        port_pressure[p] = 0.0
-    first = calculate_port_pressure(all_options[0])
-    for key in first:
-        port_pressure[key] = first[key]
-    for option in all_options[1:]:
-        tmp = calculate_port_pressure(option)
-        if (max(list(tmp.values())) <= max(list(port_pressure.values()))) and (
-            len(tmp) > len([x for x in port_pressure.values() if x != 0.0])
-        ):
-            for k in port_pressure:
-                port_pressure[k] = tmp[k] if k in tmp else 0.0
-
-    # check if calculation equals given throughput
-    if abs(max(list(port_pressure.values())) - float(attrib['TP_ports'])) > 0.01:
-        print('Contradicting TP value compared to port_pressure. Ignore port pressure.')
-        for p in port_pressure:
-            port_pressure[p] = 0.0
-        return port_pressure
-
-    # Also consider DIV pipeline
+    # Also
     if 'div_cycles' in attrib:
-        div_port = re.compile(r'[0-9]DV$')
-        div_ports = [x for x in filter(div_port.match, ports)]
-        for dp in div_ports:
-            port_pressure[dp] += int(attrib['div_cycles']) / len(div_ports)
-    return port_pressure
+        port_occupation.append([int(attrib['div_cycles']), ['DIV']])
+
+    return port_occupation
 
 
-def calculate_port_pressure(pp_option):
-    ports = {}
-    for option in pp_option:
-        for port in option:
-            if port[1] in ports:
-                ports[port[1]] += port[0]
-            else:
-                ports[port[1]] = port[0]
-    return ports
-
-
-def extract_paramters(instruction_tag, arch):
-    isa = ARCH_DICT[arch.lower()]
-    parser = ParserX86ATT()
-    if isa == 'aarch64':
-        parser = ParserAArch64v81()
-    elif isa == 'x86':
-        parser = ParserX86ATT()
+def extract_paramters(instruction_tag, parser, isa):
     # Extract parameter components
     parameters = []  # used to store string representations
     parameter_tags = sorted(instruction_tag.findall("operand"), key=lambda p: int(p.attrib['idx']))
@@ -175,9 +86,10 @@ def extract_paramters(instruction_tag, arch):
 
 
 def extract_model(tree, arch):
-    mm = MachineModel(arch.lower())
-    ports = mm._data['ports']
-    model_data = []
+    isa = MachineModel.get_isa_for_arch(arch)
+    mm = MachineModel(isa=isa)
+    parser = get_parser(isa)
+
     for instruction_tag in tree.findall('.//instruction'):
         ignore = False
 
@@ -185,8 +97,8 @@ def extract_model(tree, arch):
 
         # Extract parameter components
         try:
-            parameters = extract_paramters(instruction_tag, arch)
-            if ARCH_DICT[arch.lower()] == 'x86':
+            parameters = extract_paramters(instruction_tag, parser, isa)
+            if isa == 'x86':
                 parameters.reverse()
         except ValueError as e:
             print(e, file=sys.stderr)
@@ -208,9 +120,7 @@ def extract_model(tree, arch):
                 int(measurement_tag.attrib['uops']) if 'uops' in measurement_tag.attrib else None
             )
             if 'ports' in measurement_tag.attrib:
-                port_pressure.append(
-                    port_pressure_from_tag_attributes(measurement_tag.attrib, arch, ports)
-                )
+                port_pressure.append(port_pressure_from_tag_attributes(measurement_tag.attrib))
             latencies = [
                 int(l_tag.attrib['cycles'])
                 for l_tag in measurement_tag.iter('latency')
@@ -233,9 +143,7 @@ def extract_model(tree, arch):
             arch_tag.iter('IACA'), key=lambda i: StrictVersion(i.attrib['version'])
         ):
             if 'ports' in iaca_tag.attrib:
-                port_pressure.append(
-                    port_pressure_from_tag_attributes(iaca_tag.attrib, arch, ports)
-                )
+                port_pressure.append(port_pressure_from_tag_attributes(iaca_tag.attrib))
         if ignore:
             continue
 
@@ -246,23 +154,20 @@ def extract_model(tree, arch):
                     "Contradicting port occupancies, using latest IACA:", mnemonic, file=sys.stderr
                 )
             port_pressure = port_pressure[-1]
-            throughput = max(list(port_pressure.values()) + [0.0])
+
+            # Add missing ports:
+            for ports in [pp[1] for pp in port_pressure]:
+                for p in ports:
+                    mm.add_port(p)
+
+            throughput = max(mm.average_port_pressure(port_pressure))
         else:
             # print("No data available for this architecture:", mnemonic, file=sys.stderr)
             continue
         # ---------------------------------------------
-        model_data.append(
-            {
-                'name': mnemonic,
-                'operands': parameters,
-                'uops': uops,
-                'throughput': throughput,
-                'latency': latency,
-                'port_pressure': port_pressure,
-            }
-        )
+        mm.set_instruction(mnemonic, parameters, latency, port_pressure, throughput, uops)
 
-    return model_data
+    return mm
 
 
 def architectures(tree):
@@ -281,13 +186,17 @@ def main():
     args = parser.parse_args()
 
     tree = ET.parse(args.xml)
+    print('Available architectures:', ', '.join(architectures(tree)))
     if args.arch:
-        model_data = extract_model(tree, args.arch)
-        print(yaml.dump(model_data, allow_unicode=True))
+        model = extract_model(tree, args.arch)
+        print(model.dump())
     else:
         for arch in architectures(tree):
-            model_data = extract_model(tree, arch)
-            add_entries_to_db(arch, model_data)
+            print(arch, end='')
+            model = extract_model(tree, arch.lower())
+            with open('{}.yml'.format(arch.lower()), 'w') as f:
+                model.dump(f)
+            print('.')
 
 
 if __name__ == '__main__':
