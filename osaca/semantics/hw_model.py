@@ -193,18 +193,25 @@ class MachineModel(object):
             cs.fa.set_flow_style()
             instruction_form['port_pressure'] = cs
 
+        # Replace load_throughput with styled version for RoundtripDumper
+        formatted_load_throughput = []
+        for lt in self._data['load_throughput']:
+            cm = ruamel.yaml.comments.CommentedMap(lt)
+            cm.fa.set_flow_style()
+            formatted_load_throughput.append(cm)
+
         # Create YAML object
         yaml = self._create_yaml_object()
         if not stream:
-            # Create stream object to output string
             stream = StringIO()
-            yaml.dump({k: v for k, v in self._data.items() if k != 'instruction_forms'}, stream)
-            yaml.dump({'instruction_forms': formatted_instruction_forms}, stream)
+
+        yaml.dump({k: v for k, v in self._data.items()
+                   if k not in ['instruction_forms', 'load_throughput']}, stream)
+        yaml.dump({'load_throughput': formatted_load_throughput}, stream)
+        yaml.dump({'instruction_forms': formatted_instruction_forms}, stream)
+
+        if isinstance(stream, StringIO):
             return stream.getvalue()
-        else:
-            # Write in given stream
-            yaml.dump({k: v for k, v in self._data.items() if k != 'instruction_forms'}, stream)
-            yaml.dump({'instruction_forms': formatted_instruction_forms}, stream)
 
     ######################################################
 
