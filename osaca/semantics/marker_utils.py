@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+from collections import OrderedDict
 
 from osaca.parser import ParserAArch64v81, ParserX86ATT
 
@@ -20,17 +21,17 @@ def reduce_to_section(kernel, isa):
 
 def find_marked_kernel_AArch64(lines):
     nop_bytes = ['213', '3', '32', '31']
-    return find_marked_kernel(
+    return find_marked_section(
         lines, ParserAArch64v81(), ['mov'], 'x1', [111, 222], nop_bytes, reverse=True
     )
 
 
 def find_marked_kernel_x86ATT(lines):
     nop_bytes = ['100', '103', '144']
-    return find_marked_kernel(lines, ParserX86ATT(), ['mov', 'movl'], 'ebx', [111, 222], nop_bytes)
+    return find_marked_section(lines, ParserX86ATT(), ['mov', 'movl'], 'ebx', [111, 222], nop_bytes)
 
 
-def find_marked_kernel(lines, parser, mov_instr, mov_reg, mov_vals, nop_bytes, reverse=False):
+def find_marked_section(lines, parser, mov_instr, mov_reg, mov_vals, nop_bytes, reverse=False):
     index_start = -1
     index_end = -1
     for i, line in enumerate(lines):
@@ -83,3 +84,100 @@ def match_bytes(lines, index, byte_list):
     if extracted_bytes[0:len(byte_list)] == byte_list:
         return True, line_count
     return False, -1
+
+
+def find_jump_labels(lines):
+    """
+    Find and return all labels which are followed by instructions
+
+    :return: OrderedDict of mapping from label name to associated line
+    """
+    # 1. Identify labels and instructions until next label
+    labels = OrderedDict()
+    current_label = None
+    for i, line in enumerate(lines):
+        if line['label'] is not None:
+            # When a new label is found, add to blocks dict
+            labels[line['label']] = (i, )
+            # End previous block at previous line
+            if current_label is not None:
+                labels[current_label] = (labels[current_label][0], i)
+            # Update current block name
+            current_label = line['label']
+        elif current_label is None:
+            # If no block has been started, skip end detection
+            continue
+    # Set to last line if no end was for last label found
+    if current_label is not None and len(labels[current_label]) == 1:
+        labels[current_label] = (labels[current_label][0], i+1)
+
+    # 2. Identify and remove labels which contain only dot-instructions (e.g., .text)
+    for label in list(labels):
+        if all([l['instruction'].startswith('.')
+                for l in lines[labels[label][0]:labels[label][1]] if l['instruction'] is not None]):
+            del labels[label]
+
+    return OrderedDict([(l, lines[v[0]]) for l, v in labels.items()])
+
+
+def find_basic_blocks(lines):
+    """
+    Find and return basic blocks (asm sections which can only be executed as complete block).
+
+    Blocks always start at a label and end at the next jump/break possibility.
+
+    :return: OrderedDict with labels as keys and list of lines as value
+    """
+    valid_jump_labels = find_jump_labels(lines)
+
+    # Identify blocks, as they are started with a valid jump label and terminated by a label or
+    # an instruction referencing a valid jump label
+    blocks = OrderedDict()
+    for label, label_line in valid_jump_labels.items():
+        blocks[label] = []
+        for i in range(lines.index(label_line)):
+            terminate = False
+            line = lines[i]
+            blocks[label].append(line)
+            # Find end of block by searching for references to valid jump labels
+            if line['instruction'] and line['operands']:
+                for operand in [o for o in line['operands'] if 'identifier' in o]:
+                    if operand['identifier']['name'] in valid_jump_labels:
+                        terminate = True
+            elif line['label'] is not None:
+                terminate = True
+            if terminate:
+                break
+
+    return blocks
+
+
+def find_basic_loop_bodies(lines):
+    """
+    Find and return basic loop bodies (asm section which loop back on itself with no other egress).
+
+    :return: OrderedDict with labels as keys and list of lines as value
+    """
+    valid_jump_labels = find_jump_labels(lines)
+
+    # Identify blocks, as they are started with a valid jump label and terminated by
+    # an instruction referencing a valid jump label
+    loop_bodies = OrderedDict()
+    for label, label_line in valid_jump_labels.items():
+        current_block = []
+        for i in range(lines.index(label_line), len(lines)):
+            terminate = False
+            line = lines[i]
+            current_block.append(line)
+            # Find end of block by searching for references to valid jump labels
+            if line['instruction'] and line['operands']:
+                for operand in [o for o in line['operands'] if 'identifier' in o]:
+                    if operand['identifier']['name'] in valid_jump_labels:
+                        if operand['identifier']['name'] == label:
+                            loop_bodies[label] = current_block
+                        terminate = True
+                        break
+            if terminate:
+                break
+
+    return loop_bodies
