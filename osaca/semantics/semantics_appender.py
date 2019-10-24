@@ -319,14 +319,14 @@ class SemanticsAppender(object):
     def _get_regular_source_x86ATT(self, instruction_form):
         # return all but last operand
         sources = [
-            op for op in instruction_form['operands'][0 : len(instruction_form['operands']) - 1]
+            op for op in instruction_form['operands'][0:len(instruction_form['operands']) - 1]
         ]
         return sources
 
     def _get_regular_source_AArch64(self, instruction_form):
         # return all but first operand
         sources = [
-            op for op in instruction_form['operands'][1 : len(instruction_form['operands'])]
+            op for op in instruction_form['operands'][1:len(instruction_form['operands'])]
         ]
         return sources
 

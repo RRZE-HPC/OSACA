@@ -2,6 +2,7 @@
 
 import math
 import os
+import sys
 import warnings
 
 import ruamel.yaml
@@ -52,23 +53,73 @@ def import_benchmark_output(arch, bench_type, filepath):
     with open(filepath, 'r') as f:
         input_data = f.readlines()
     db_entries = None
-    if bench_type == 'ibench':
-        db_entries = _get_ibench_output(input_data)
-    elif bench_type == 'asmbench':
-        raise NotImplementedError
-    # write entries to DB
     mm = MachineModel(arch)
+    if bench_type == 'ibench':
+        db_entries = _get_ibench_output(input_data, mm.get_ISA())
+    elif bench_type == 'asmbench':
+        db_entries = _get_asmbench_output(input_data, mm.get_ISA())
+    # write entries to DB
     for entry in db_entries:
-        mm.set_instruction_entry(entry)
-    with open(filepath, 'w') as f:
-        mm.dump(f)
+        mm.set_instruction_entry(db_entries[entry])
+    sys.stdout.write(mm.dump())
+
 
 ##################
 # HELPERS IBENCH #
 ##################
 
 
-def _get_ibench_output(input_data):
+def _get_asmbench_output(input_data, isa):
+    """
+    Parse asmbench output in the format
+
+    1 MNEMONIC[-OP1[_OP2][...]]
+    2 Latency: X cycles
+    3 Throughput: Y cycles
+    4
+
+    and creates per 4 lines in the input_data one entry in the database.
+
+    :param str input_data: content of asmbench output file
+    :param str isa: ISA of target architecture (x86, AArch64, ...)
+    : return: dictionary with all new db_entries
+    """
+    db_entries = {}
+    for i in range(0, len(input_data), 4):
+        if input_data[i + 3].strip() != '':
+            print('asmbench output not in the correct format! Format must be: ', file=sys.stderr)
+            print(
+                '-------------\nMNEMONIC[-OP1[_OP2][...]]\nLatency: X cycles\n'
+                'Throughput: Y cycles\n\n-------------',
+                file=sys.stderr,
+            )
+            print(
+                'Entry {} and all further entries won\'t be added.'.format((i / 4) + 1),
+                file=sys.stderr,
+            )
+            break
+        else:
+            i_form = input_data[i].strip()
+            mnemonic = i_form.split('-')[0]
+            operands = i_form.split('-')[1].split('_')
+            operands = [_create_db_operand(op, isa) for op in operands]
+            entry = {
+                'name': mnemonic,
+                'operands': operands,
+                'throughput': _validate_measurement(float(input_data[i + 2].split()[1]), 'tp'),
+                'latency': _validate_measurement(float(input_data[i + 1].split()[1]), 'lt'),
+                'port_pressure': None,
+            }
+            if not entry['throughput'] or not entry['latency']:
+                warnings.warn(
+                    'Your measurement for {} looks suspicious'.format(i_form)
+                    + ' and was not added. Please inspect your benchmark.'
+                )
+            db_entries[i_form] = entry
+    return db_entries
+
+
+def _get_ibench_output(input_data, isa):
     db_entries = {}
     for line in input_data:
         if 'Using frequency' in line or len(line) == 0:
@@ -81,7 +132,7 @@ def _get_ibench_output(input_data):
         else:
             mnemonic = instruction.split('-')[0]
             operands = instruction.split('-')[1].split('_')
-            operands = [_create_db_operand(op) for op in operands]
+            operands = [_create_db_operand(op, isa) for op in operands]
             entry = {
                 'name': mnemonic,
                 'operands': operands,
@@ -90,14 +141,14 @@ def _get_ibench_output(input_data):
                 'port_pressure': None,
             }
         if 'TP' in instruction:
-            entry['throughput'] = _validate_measurement(float(line.split()[1]), True)
+            entry['throughput'] = _validate_measurement(float(line.split()[1]), 'tp')
             if not entry['throughput']:
                 warnings.warn(
                     'Your THROUGHPUT measurement for {} looks suspicious'.format(key)
                     + ' and was not added. Please inspect your benchmark.'
                 )
         elif 'LT' in instruction:
-            entry['latency'] = _validate_measurement(float(line.split()[1]), False)
+            entry['latency'] = _validate_measurement(float(line.split()[1]), 'lt')
             if not entry['latency']:
                 warnings.warn(
                     'Your LATENCY measurement for {} looks suspicious'.format(key)
@@ -107,8 +158,8 @@ def _get_ibench_output(input_data):
     return db_entries
 
 
-def _validate_measurement(self, measurement, is_tp):
-    if not is_tp:
+def _validate_measurement(measurement, mode):
+    if mode == 'lt':
         if (
             math.floor(measurement) * 1.05 >= measurement
             or math.ceil(measurement) * 0.95 <= measurement
@@ -116,7 +167,7 @@ def _validate_measurement(self, measurement, is_tp):
             # Value is probably correct, so round it to the estimated value
             return float(round(measurement))
         # Check reciprocal only if it is a throughput value
-    else:
+    elif mode == 'tp':
         reciprocals = [1 / x for x in range(1, 11)]
         for reci in reciprocals:
             if reci * 0.95 <= measurement <= reci * 1.05:
@@ -127,14 +178,14 @@ def _validate_measurement(self, measurement, is_tp):
     return None
 
 
-def _create_db_operand(self, operand):
-    if self.isa == 'aarch64':
-        return self._create_db_operand_aarch64(operand)
-    elif self.isa == 'x86':
-        return self._create_db_operand_x86(operand)
+def _create_db_operand(operand, isa):
+    if isa == 'aarch64':
+        return _create_db_operand_aarch64(operand)
+    elif isa == 'x86':
+        return _create_db_operand_x86(operand)
 
 
-def _create_db_operand_aarch64(self, operand):
+def _create_db_operand_aarch64(operand):
     if operand == 'i':
         return {'class': 'immediate', 'imd': 'int'}
     elif operand in 'wxbhsdq':
@@ -155,7 +206,7 @@ def _create_db_operand_aarch64(self, operand):
         raise ValueError('Parameter {} is not a valid operand code'.format(operand))
 
 
-def _create_db_operand_x86(self, operand):
+def _create_db_operand_x86(operand):
     if operand == 'r':
         return {'class': 'register', 'name': 'gpr'}
     elif operand in 'xyz':
