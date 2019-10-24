@@ -130,6 +130,8 @@ def check_user_dir():
 def import_data(benchmark_type, arch, filepath):
     if benchmark_type.lower() == 'ibench':
         import_benchmark_output(arch, 'ibench', filepath)
+    elif benchmark_type.lower() == 'asmbench':
+        import_benchmark_output(arch, 'asmbench', filepath)
     else:
         raise NotImplementedError('This benchmark input variant is not implemented yet.')
 
@@ -196,10 +198,10 @@ def run(args, output_file=sys.stdout):
         # Sanity check on DB
         verbose = True if args.verbose > 0 else False
         sanity_check(args.arch, verbose=verbose)
-    if 'import_data' in args:
+    elif 'import_data' in args:
         # Import microbench output file into DB
-        import_data(args.import_data, args.arch, args.file)
-    if args.insert_marker:
+        import_data(args.import_data, args.arch, args.file.name)
+    elif args.insert_marker:
         # Try to add IACA marker
         insert_byte_marker(args)
     else:

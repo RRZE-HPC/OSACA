@@ -189,9 +189,10 @@ class MachineModel(object):
         # Replace instruction form's port_pressure with styled version for RoundtripDumper
         formatted_instruction_forms = deepcopy(self._data['instruction_forms'])
         for instruction_form in formatted_instruction_forms:
-            cs = ruamel.yaml.comments.CommentedSeq(instruction_form['port_pressure'])
-            cs.fa.set_flow_style()
-            instruction_form['port_pressure'] = cs
+            if instruction_form['port_pressure'] is not None:
+                cs = ruamel.yaml.comments.CommentedSeq(instruction_form['port_pressure'])
+                cs.fa.set_flow_style()
+                instruction_form['port_pressure'] = cs
 
         # Replace load_throughput with styled version for RoundtripDumper
         formatted_load_throughput = []

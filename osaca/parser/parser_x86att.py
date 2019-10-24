@@ -8,6 +8,7 @@ from osaca.parser import AttrDict, BaseParser
 class ParserX86ATT(BaseParser):
     def __init__(self):
         super().__init__()
+        self.isa = 'x86'
 
     def construct_parser(self):
         decimal_number = pp.Combine(
@@ -67,8 +68,13 @@ class ParserX86ATT(BaseParser):
         directive_option = pp.Combine(
             pp.Word('#@.', exact=1) + pp.Word(pp.printables, excludeChars=',')
         )
-        directive_parameter = (pp.quotedString | directive_option | identifier | hex_number |
-                               decimal_number | self.register
+        directive_parameter = (
+            pp.quotedString
+            | directive_option
+            | identifier
+            | hex_number
+            | decimal_number
+            | self.register
         )
         commaSeparatedList = pp.delimitedList(pp.Optional(directive_parameter), delim=',')
         self.directive = pp.Group(
@@ -172,9 +178,10 @@ class ParserX86ATT(BaseParser):
         if result is None:
             try:
                 result = self.parse_instruction(line)
-            except pp.ParseException as e:
-                raise ValueError('Could not parse instruction on line {}: {!r}'.format(
-                    line_number, line))
+            except pp.ParseException:
+                raise ValueError(
+                    'Could not parse instruction on line {}: {!r}'.format(line_number, line)
+                )
             instruction_form[self.INSTRUCTION_ID] = result[self.INSTRUCTION_ID]
             instruction_form[self.OPERANDS_ID] = result[self.OPERANDS_ID]
             instruction_form[self.COMMENT_ID] = result[self.COMMENT_ID]
@@ -202,8 +209,9 @@ class ParserX86ATT(BaseParser):
             {
                 self.INSTRUCTION_ID: result['mnemonic'],
                 self.OPERANDS_ID: operands,
-                self.COMMENT_ID:
-                    ' '.join(result[self.COMMENT_ID]) if self.COMMENT_ID in result else None,
+                self.COMMENT_ID: ' '.join(result[self.COMMENT_ID])
+                if self.COMMENT_ID in result
+                else None,
             }
         )
         return return_dict
