@@ -130,6 +130,8 @@ def check_user_dir():
 def import_data(benchmark_type, arch, filepath):
     if benchmark_type.lower() == 'ibench':
         import_benchmark_output(arch, 'ibench', filepath)
+    elif benchmark_type.lower() == 'asmbench':
+        import_benchmark_output(arch, 'asmbench', filepath)
     else:
         raise NotImplementedError('This benchmark input variant is not implemented yet.')
 
