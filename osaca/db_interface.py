@@ -52,23 +52,22 @@ def import_benchmark_output(arch, bench_type, filepath):
     with open(filepath, 'r') as f:
         input_data = f.readlines()
     db_entries = None
+    mm = MachineModel(arch)
     if bench_type == 'ibench':
-        db_entries = _get_ibench_output(input_data)
+        db_entries = _get_ibench_output(input_data, mm.get_ISA())
     elif bench_type == 'asmbench':
         raise NotImplementedError
     # write entries to DB
-    mm = MachineModel(arch)
     for entry in db_entries:
-        mm.set_instruction_entry(entry)
-    with open(filepath, 'w') as f:
-        mm.dump(f)
+        mm.set_instruction_entry(db_entries[entry])
+    print(mm.dump())
 
 ##################
 # HELPERS IBENCH #
 ##################
 
 
-def _get_ibench_output(input_data):
+def _get_ibench_output(input_data, isa):
     db_entries = {}
     for line in input_data:
         if 'Using frequency' in line or len(line) == 0:
@@ -81,7 +80,7 @@ def _get_ibench_output(input_data):
         else:
             mnemonic = instruction.split('-')[0]
             operands = instruction.split('-')[1].split('_')
-            operands = [_create_db_operand(op) for op in operands]
+            operands = [_create_db_operand(op, isa) for op in operands]
             entry = {
                 'name': mnemonic,
                 'operands': operands,
@@ -107,7 +106,7 @@ def _get_ibench_output(input_data):
     return db_entries
 
 
-def _validate_measurement(self, measurement, is_tp):
+def _validate_measurement(measurement, is_tp):
     if not is_tp:
         if (
             math.floor(measurement) * 1.05 >= measurement
@@ -127,14 +126,14 @@ def _validate_measurement(self, measurement, is_tp):
     return None
 
 
-def _create_db_operand(self, operand):
-    if self.isa == 'aarch64':
-        return self._create_db_operand_aarch64(operand)
-    elif self.isa == 'x86':
-        return self._create_db_operand_x86(operand)
+def _create_db_operand(operand, isa):
+    if isa == 'aarch64':
+        return _create_db_operand_aarch64(operand)
+    elif isa == 'x86':
+        return _create_db_operand_x86(operand)
 
 
-def _create_db_operand_aarch64(self, operand):
+def _create_db_operand_aarch64(operand):
     if operand == 'i':
         return {'class': 'immediate', 'imd': 'int'}
     elif operand in 'wxbhsdq':
@@ -155,7 +154,7 @@ def _create_db_operand_aarch64(self, operand):
         raise ValueError('Parameter {} is not a valid operand code'.format(operand))
 
 
-def _create_db_operand_x86(self, operand):
+def _create_db_operand_x86(operand):
     if operand == 'r':
         return {'class': 'register', 'name': 'gpr'}
     elif operand in 'xyz':

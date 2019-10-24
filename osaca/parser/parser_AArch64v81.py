@@ -9,6 +9,7 @@ from osaca.parser import AttrDict, BaseParser
 class ParserAArch64v81(BaseParser):
     def __init__(self):
         super().__init__()
+        self.isa = 'aarch64'
 
     def construct_parser(self):
         # Comment

@@ -113,6 +113,7 @@ class Frontend(object):
     def print_combined_view(self, kernel, cp_kernel: KernelDG, dep_dict, show_cmnts=True):
         self._print_header_report()
         self._print_symbol_map()
+        print('\n\nCombined Analysis Report\n' + '-----------------------')
         lineno_filler = '     '
         port_len = self._get_max_port_len(kernel)
         # Separator for ports
@@ -123,7 +124,7 @@ class Frontend(object):
         # for LCD/CP column
         separator += '-' * (2 * 6 + len(col_sep)) + '-' * len(col_sep)
         sep_list = self._get_separator_list(col_sep)
-        headline = 'Ports'
+        headline = 'Port pressure in cycles'
         headline_str = '{{:^{}}}'.format(len(separator))
         # Prepare CP/LCD variable
         cp_lines = [x['line_number'] for x in cp_kernel]
