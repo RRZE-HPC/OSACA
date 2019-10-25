@@ -306,37 +306,23 @@ class SemanticsAppender(object):
 
     def _get_regular_source_operands(self, instruction_form):
         if self._isa == 'x86':
-            return self._get_regular_source_x86ATT(instruction_form)
-        if self._isa == 'aarch64':
-            return self._get_regular_source_AArch64(instruction_form)
+            # return all but last operand
+            return [op
+                    or op in instruction_form['operands'][0:len(instruction_form['operands']) - 1]]
+        elif self._isa == 'aarch64':
+            return [op for op in instruction_form['operands'][1:len(instruction_form['operands'])]]
+        else:
+            raise ValueError("Unsupported ISA {}.".format(self._isa))
 
     def _get_regular_destination_operands(self, instruction_form):
         if self._isa == 'x86':
-            return self._get_regular_destination_x86ATT(instruction_form)
+            # return last operand
+            return instruction_form['operands'][-1:]
         if self._isa == 'aarch64':
-            return self._get_regular_destination_AArch64(instruction_form)
-
-    def _get_regular_source_x86ATT(self, instruction_form):
-        # return all but last operand
-        sources = [
-            op for op in instruction_form['operands'][0:len(instruction_form['operands']) - 1]
-        ]
-        return sources
-
-    def _get_regular_source_AArch64(self, instruction_form):
-        # return all but first operand
-        sources = [
-            op for op in instruction_form['operands'][1:len(instruction_form['operands'])]
-        ]
-        return sources
-
-    def _get_regular_destination_x86ATT(self, instruction_form):
-        # return last operand
-        return instruction_form['operands'][-1:]
-
-    def _get_regular_destination_AArch64(self, instruction_form):
-        # return first operand
-        return instruction_form['operands'][:1]
+            # return first operand
+            return instruction_form['operands'][:1]
+        else:
+            raise ValueError("Unsupported ISA {}.".format(self._isa))
 
     @staticmethod
     def get_throughput_sum(kernel):
