@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 from collections import OrderedDict
 
-from osaca.parser import ParserAArch64v81, ParserX86ATT
+from osaca.parser import get_parser, ParserAArch64v81, ParserX86ATT
 
 
 def reduce_to_section(kernel, isa):
@@ -29,6 +29,35 @@ def find_marked_kernel_AArch64(lines):
 def find_marked_kernel_x86ATT(lines):
     nop_bytes = ['100', '103', '144']
     return find_marked_section(lines, ParserX86ATT(), ['mov', 'movl'], 'ebx', [111, 222], nop_bytes)
+
+
+def get_marker(isa):
+    """Return tuple of start and end marker lines."""
+    if isa == 'x86':
+        start_marker_raw = (
+            'movl      $111, %ebx # OSACA START MARKER\n'
+            '.byte     100        # OSACA START MARKER\n'
+            '.byte     103        # OSACA START MARKER\n'
+            '.byte     144        # OSACA START MARKER\n')
+        end_marker_raw = (
+            'movl      $222, %ebx # OSACA END MARKER\n'
+            '.byte     100        # OSACA END MARKER\n'
+            '.byte     103        # OSACA END MARKER\n'
+            '.byte     144        # OSACA END MARKER\n')
+    elif isa == 'AArch64':
+        start_marker_raw = (
+            'mov       x1, #111    // OSACA START MARKER\n'
+            '.byte     213,3,32,31 // OSACA START MARKER\n')
+        # After loop
+        end_marker_raw = (
+            'mov       x1, #222    // OSACA END MARKER\n'
+            '.byte     213,3,32,31 // OSACA END MARKER\n')
+
+    parser = get_parser(isa)
+    start_marker = parser.parse_file(start_marker_raw)
+    end_marker = parser.parse_file(end_marker_raw)
+
+    return start_marker, end_marker
 
 
 def find_marked_section(lines, parser, mov_instr, mov_reg, mov_vals, nop_bytes, reverse=False):
