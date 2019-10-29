@@ -3,10 +3,7 @@
 import re
 from datetime import datetime as dt
 
-from ruamel import yaml
-
-from osaca import utils
-from osaca.semantics import INSTR_FLAGS, KernelDG, ArchSemantics
+from osaca.semantics import INSTR_FLAGS, ArchSemantics, KernelDG, MachineModel
 
 
 class Frontend(object):
@@ -19,11 +16,10 @@ class Frontend(object):
         self._arch = arch
         if arch:
             self._arch = arch.lower()
-            with open(utils.find_file(self._arch + '.yml'), 'r') as f:
-                self._data = yaml.load(f, Loader=yaml.Loader)
+            self._machine_model = MachineModel(arch=arch)
         elif path_to_yaml:
-            with open(path_to_yaml, 'r') as f:
-                self._data = yaml.load(f, Loader=yaml.Loader)
+            self._machine_model = MachineModel(path_to_yaml=path_to_yaml)
+            self._arch = self._machine_model.get_arch()
 
     def _is_comment(self, instruction_form):
         return instruction_form['comment'] is not None and instruction_form['instruction'] is None
@@ -45,7 +41,9 @@ class Frontend(object):
         for instruction_form in kernel:
             line = '{:4d} {} {} {}'.format(
                 instruction_form['line_number'],
-                self._get_port_pressure(instruction_form['port_pressure'], port_len, sep_list),
+                self._get_port_pressure(
+                    instruction_form['port_pressure'], port_len, separator=sep_list
+                ),
                 self._get_flag_symbols(instruction_form['flags'])
                 if instruction_form['instruction'] is not None
                 else ' ',
@@ -57,7 +55,7 @@ class Frontend(object):
             print(line)
         print()
         tp_sum = ArchSemantics.get_throughput_sum(kernel)
-        print(lineno_filler + self._get_port_pressure(tp_sum, port_len, ' '))
+        print(lineno_filler + self._get_port_pressure(tp_sum, port_len, separator=' '))
 
     def print_latency_analysis(self, cp_kernel, separator='|'):
         print('\n\nLatency Analysis Report\n' + '-----------------------')
@@ -149,9 +147,13 @@ class Frontend(object):
             if show_cmnts is False and self._is_comment(instruction_form):
                 continue
             line_number = instruction_form['line_number']
+            used_ports = [list(uops[1]) for uops in instruction_form['port_uops']]
+            used_ports = list(set([p for uops_ports in used_ports for p in uops_ports]))
             line = '{:4d} {}{} {} {}'.format(
                 line_number,
-                self._get_port_pressure(instruction_form['port_pressure'], port_len, sep_list),
+                self._get_port_pressure(
+                    instruction_form['port_pressure'], port_len, used_ports, sep_list
+                ),
                 self._get_lcd_cp_ports(
                     instruction_form['line_number'],
                     cp_kernel if line_number in cp_lines else None,
@@ -169,7 +171,7 @@ class Frontend(object):
         cp_sum = sum([x['latency_cp'] for x in cp_kernel])
         print(
             lineno_filler
-            + self._get_port_pressure(tp_sum, port_len, ' ')
+            + self._get_port_pressure(tp_sum, port_len, separator=' ')
             + ' {:^6} {:^6}'.format(cp_sum, lcd_sum)
         )
 
@@ -179,9 +181,9 @@ class Frontend(object):
 
     def _get_separator_list(self, separator, separator_2=' '):
         separator_list = []
-        for i in range(len(self._data['ports']) - 1):
-            match_1 = re.search(r'\d+', self._data['ports'][i])
-            match_2 = re.search(r'\d+', self._data['ports'][i + 1])
+        for i in range(len(self._machine_model.get_ports()) - 1):
+            match_1 = re.search(r'\d+', self._machine_model.get_ports()[i])
+            match_2 = re.search(r'\d+', self._machine_model.get_ports()[i + 1])
             if match_1 is not None and match_2 is not None and match_1.group() == match_2.group():
                 separator_list.append(separator_2)
             else:
@@ -198,12 +200,12 @@ class Frontend(object):
         string_result += ' ' if len(string_result) == 0 else ''
         return string_result
 
-    def _get_port_pressure(self, ports, port_len, separator='|'):
+    def _get_port_pressure(self, ports, port_len, used_ports=[], separator='|'):
         if not isinstance(separator, list):
             separator = [separator for x in ports]
         string_result = '{} '.format(separator[-1])
         for i in range(len(ports)):
-            if float(ports[i]) == 0.0:
+            if float(ports[i]) == 0.0 and self._machine_model.get_ports()[i] not in used_ports:
                 string_result += port_len[i] * ' ' + ' {} '.format(separator[i])
                 continue
             left_len = len(str(float(ports[i])).split('.')[0])
@@ -226,7 +228,7 @@ class Frontend(object):
         return '{} {:>4} {} {:>4} {}'.format(separator, lat_cp, separator, lat_lcd, separator)
 
     def _get_max_port_len(self, kernel):
-        port_len = [4 for x in self._data['ports']]
+        port_len = [4 for x in self._machine_model.get_ports()]
         for instruction_form in kernel:
             for i, port in enumerate(instruction_form['port_pressure']):
                 if len('{:.2f}'.format(port)) > port_len[i]:
@@ -238,7 +240,7 @@ class Frontend(object):
         separator_list = self._get_separator_list(separator, '-')
         for i, length in enumerate(port_len):
             substr = '{:^' + str(length + 2) + 's}'
-            string_result += substr.format(self._data['ports'][i]) + separator_list[i]
+            string_result += substr.format(self._machine_model.get_ports()[i]) + separator_list[i]
         return string_result
 
     def _print_header_report(self):

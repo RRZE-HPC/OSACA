@@ -60,6 +60,12 @@ def create_parser():
         help='Define architecture (SNB, IVB, HSW, BDW, SKX, CSX, ZEN1, TX2).',
     )
     parser.add_argument(
+        '--fixed',
+        action='store_true',
+        help='Run the throughput analysis with fixed probabilities for all suitable ports per '
+        'instruction. Otherwise, OSACA will print out the optimal port utilization for the kernel.'
+    )
+    parser.add_argument(
         '--db-check',
         dest='check_db',
         action='store_true',
@@ -183,6 +189,9 @@ def inspect(args):
     machine_model = MachineModel(arch=arch)
     semantics = ArchSemantics(machine_model)
     semantics.add_semantics(kernel)
+    # Do optimal schedule for kernel throughput if wished
+    if not args.fixed:
+        semantics.assign_optimal_throughput(kernel)
 
     # Create DiGrahps
     kernel_graph = KernelDG(kernel, parser, machine_model)

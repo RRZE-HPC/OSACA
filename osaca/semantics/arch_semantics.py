@@ -2,9 +2,10 @@
 
 import warnings
 from functools import reduce
+from operator import itemgetter
 
-from .isa_semantics import INSTR_FLAGS, ISASemantics
 from .hw_model import MachineModel
+from .isa_semantics import INSTR_FLAGS, ISASemantics
 
 
 class ArchSemantics(ISASemantics):
@@ -20,6 +21,54 @@ class ArchSemantics(ISASemantics):
             self.assign_tp_lt(instruction_form)
         if self._machine_model.has_hidden_loads():
             self.set_hidden_loads(kernel)
+
+    def assign_optimal_throughput(self, kernel):
+        INC = 0.01
+        kernel.reverse()
+        port_list = self._machine_model.get_ports()
+        for instruction_form in kernel:
+            for uop in instruction_form['port_uops']:
+                cycles = uop[0]
+                ports = list(uop[1])
+                indices = [port_list.index(p) for p in ports]
+                # check if port sum of used ports for uop are unbalanced
+                port_sums = self._to_list(itemgetter(*indices)(self.get_throughput_sum(kernel)))
+                instr_ports = self._to_list(
+                    itemgetter(*indices)(instruction_form['port_pressure'])
+                )
+                if len(set(port_sums)) > 1:
+                    # balance ports
+                    for _ in range(cycles * 100):
+                        instr_ports[port_sums.index(max(port_sums))] -= INC
+                        instr_ports[port_sums.index(min(port_sums))] += INC
+                        # instr_ports = [round(p, 2) for p in instr_ports]
+                        self._itemsetter(*indices)(instruction_form['port_pressure'], *instr_ports)
+                        # check if min port is zero
+                        if round(min(instr_ports), 2) <= 0:
+                            # if port_pressure is not exactly 0.00, add the residual to
+                            # the former port
+                            if min(instr_ports) != 0.0:
+                                instr_ports[port_sums.index(min(port_sums))] += min(instr_ports)
+                                self._itemsetter(*indices)(
+                                    instruction_form['port_pressure'], *instr_ports
+                                )
+                                zero_index = [
+                                    p
+                                    for p in indices
+                                    if round(instruction_form['port_pressure'][p], 2) == 0
+                                ][0]
+                                instruction_form['port_pressure'][zero_index] = 0.0
+                            # Remove from further balancing
+                            indices = [
+                                p for p in indices if instruction_form['port_pressure'][p] > 0
+                            ]
+                            instr_ports = self._to_list(
+                                itemgetter(*indices)(instruction_form['port_pressure'])
+                            )
+                        port_sums = self._to_list(
+                            itemgetter(*indices)(self.get_throughput_sum(kernel))
+                        )
+        kernel.reverse()
 
     def set_hidden_loads(self, kernel):
         loads = [instr for instr in kernel if INSTR_FLAGS.HAS_LD in instr['flags']]
@@ -70,6 +119,7 @@ class ArchSemantics(ISASemantics):
             latency = 0.0
             latency_wo_load = latency
             instruction_form['port_pressure'] = [0.0 for i in range(port_number)]
+            instruction_form['port_uops'] = []
         else:
             instruction_data = self._machine_model.get_instruction(
                 instruction_form['instruction'], instruction_form['operands']
@@ -80,6 +130,7 @@ class ArchSemantics(ISASemantics):
                 port_pressure = self._machine_model.average_port_pressure(
                     instruction_data['port_pressure']
                 )
+                instruction_form['port_uops'] = instruction_data['port_pressure']
                 try:
                     assert isinstance(port_pressure, list)
                     assert len(port_pressure) == port_number
@@ -93,6 +144,7 @@ class ArchSemantics(ISASemantics):
                         + 'Please check entry for:\n {}'.format(instruction_form)
                     )
                     instruction_form['port_pressure'] = [0.0 for i in range(port_number)]
+                    instruction_form['port_uops'] = []
                     flags.append(INSTR_FLAGS.TP_UNKWN)
                 if throughput is None:
                     # assume 0 cy and mark as unknown
@@ -124,14 +176,15 @@ class ArchSemantics(ISASemantics):
                             for op in operands['operand_list']
                             if 'register' in op
                         ]
+                        load_port_uops = self._machine_model.get_load_throughput(
+                            [
+                                x['memory']
+                                for x in instruction_form['operands']['source']
+                                if 'memory' in x
+                            ][0]
+                        )
                         load_port_pressure = self._machine_model.average_port_pressure(
-                            self._machine_model.get_load_throughput(
-                                [
-                                    x['memory']
-                                    for x in instruction_form['operands']['source']
-                                    if 'memory' in x
-                                ][0]
-                            )
+                            load_port_uops
                         )
                         if 'load_throughput_multiplier' in self._machine_model:
                             multiplier = self._machine_model['load_throughput_multiplier'][
@@ -155,12 +208,17 @@ class ArchSemantics(ISASemantics):
                                 ),
                             )
                         ]
+                        instruction_form['port_uops'] = (
+                            instruction_data_reg['port_pressure'] + load_port_uops
+                        )
+
                 if assign_unknown:
                     # --> mark as unknown and assume 0 cy for latency/throughput
                     throughput = 0.0
                     latency = 0.0
                     latency_wo_load = latency
                     instruction_form['port_pressure'] = [0.0 for i in range(port_number)]
+                    instruction_form['port_uops'] = []
                     flags += [INSTR_FLAGS.TP_UNKWN, INSTR_FLAGS.LT_UNKWN]
         # flatten flag list
         flags = list(set(flags))
@@ -220,6 +278,27 @@ class ArchSemantics(ISASemantics):
             index = self._machine_model.get_ports().index(port)
             port_pressure[index] = 0.0
         return port_pressure
+
+    def _itemsetter(self, *items):
+        if len(items) == 1:
+            item = items[0]
+
+            def g(obj, value):
+                obj[item] = value
+
+        else:
+
+            def g(obj, *values):
+                for item, value in zip(items, values):
+                    obj[item] = value
+
+        return g
+
+    def _to_list(self, obj):
+        if isinstance(obj, tuple):
+            return list(obj)
+        else:
+            return [obj]
 
     @staticmethod
     def get_throughput_sum(kernel):
