@@ -2,7 +2,7 @@
 
 from osaca import utils
 from osaca.parser import AttrDict, ParserAArch64v81, ParserX86ATT
-from osaca.semantics.hw_model import MachineModel
+from .hw_model import MachineModel
 
 
 class INSTR_FLAGS:
