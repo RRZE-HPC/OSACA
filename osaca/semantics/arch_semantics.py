@@ -3,9 +3,8 @@
 import warnings
 from functools import reduce
 
-from osaca.semantics.isa_semantics import ISASemantics
-from osaca.semantics.hw_model import MachineModel
-from osaca.semantics.instr_flags import INSTR_FLAGS
+from .isa_semantics import INSTR_FLAGS, ISASemantics
+from .hw_model import MachineModel
 
 
 class ArchSemantics(ISASemantics):
