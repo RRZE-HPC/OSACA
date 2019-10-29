@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 from collections import OrderedDict
 
-from osaca.parser import get_parser, ParserAArch64v81, ParserX86ATT
+from osaca.parser import ParserAArch64v81, ParserX86ATT, get_parser
 
 
 def reduce_to_section(kernel, isa):
@@ -28,7 +28,9 @@ def find_marked_kernel_AArch64(lines):
 
 def find_marked_kernel_x86ATT(lines):
     nop_bytes = ['100', '103', '144']
-    return find_marked_section(lines, ParserX86ATT(), ['mov', 'movl'], 'ebx', [111, 222], nop_bytes)
+    return find_marked_section(
+        lines, ParserX86ATT(), ['mov', 'movl'], 'ebx', [111, 222], nop_bytes
+    )
 
 
 def get_marker(isa):
@@ -38,20 +40,24 @@ def get_marker(isa):
             'movl      $111, %ebx # OSACA START MARKER\n'
             '.byte     100        # OSACA START MARKER\n'
             '.byte     103        # OSACA START MARKER\n'
-            '.byte     144        # OSACA START MARKER\n')
+            '.byte     144        # OSACA START MARKER\n'
+        )
         end_marker_raw = (
             'movl      $222, %ebx # OSACA END MARKER\n'
             '.byte     100        # OSACA END MARKER\n'
             '.byte     103        # OSACA END MARKER\n'
-            '.byte     144        # OSACA END MARKER\n')
+            '.byte     144        # OSACA END MARKER\n'
+        )
     elif isa == 'AArch64':
         start_marker_raw = (
             'mov       x1, #111    // OSACA START MARKER\n'
-            '.byte     213,3,32,31 // OSACA START MARKER\n')
+            '.byte     213,3,32,31 // OSACA START MARKER\n'
+        )
         # After loop
         end_marker_raw = (
             'mov       x1, #222    // OSACA END MARKER\n'
-            '.byte     213,3,32,31 // OSACA END MARKER\n')
+            '.byte     213,3,32,31 // OSACA END MARKER\n'
+        )
 
     parser = get_parser(isa)
     start_marker = parser.parse_file(start_marker_raw)
@@ -127,7 +133,7 @@ def find_jump_labels(lines):
     for i, line in enumerate(lines):
         if line['label'] is not None:
             # When a new label is found, add to blocks dict
-            labels[line['label']] = (i, )
+            labels[line['label']] = (i,)
             # End previous block at previous line
             if current_label is not None:
                 labels[current_label] = (labels[current_label][0], i)
@@ -138,12 +144,17 @@ def find_jump_labels(lines):
             continue
     # Set to last line if no end was for last label found
     if current_label is not None and len(labels[current_label]) == 1:
-        labels[current_label] = (labels[current_label][0], i+1)
+        labels[current_label] = (labels[current_label][0], i + 1)
 
     # 2. Identify and remove labels which contain only dot-instructions (e.g., .text)
     for label in list(labels):
-        if all([l['instruction'].startswith('.')
-                for l in lines[labels[label][0]:labels[label][1]] if l['instruction'] is not None]):
+        if all(
+            [
+                l['instruction'].startswith('.')
+                for l in lines[labels[label][0]:labels[label][1]]
+                if l['instruction'] is not None
+            ]
+        ):
             del labels[label]
 
     return OrderedDict([(l, lines[v[0]]) for l, v in labels.items()])

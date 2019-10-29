@@ -11,7 +11,7 @@ import networkx as nx
 
 from osaca.parser import AttrDict, ParserAArch64v81, ParserX86ATT
 from osaca.semantics import (INSTR_FLAGS, KernelDG, MachineModel,
-                             SemanticsAppender)
+                             ArchSemantics)
 
 
 class TestSemanticTools(unittest.TestCase):
@@ -43,10 +43,10 @@ class TestSemanticTools(unittest.TestCase):
         self.machine_model_tx2 = MachineModel(
             path_to_yaml=os.path.join(self.MODULE_DATA_DIR, 'tx2.yml')
         )
-        self.semantics_csx = SemanticsAppender(
+        self.semantics_csx = ArchSemantics(
             self.machine_model_csx, path_to_yaml=os.path.join(self.MODULE_DATA_DIR, 'isa/x86.yml')
         )
-        self.semantics_tx2 = SemanticsAppender(
+        self.semantics_tx2 = ArchSemantics(
             self.machine_model_tx2,
             path_to_yaml=os.path.join(self.MODULE_DATA_DIR, 'isa/aarch64.yml'),
         )
@@ -66,7 +66,7 @@ class TestSemanticTools(unittest.TestCase):
     def test_creation_by_name(self):
         try:
             tmp_mm = MachineModel(arch='CSX')
-            SemanticsAppender(tmp_mm)
+            ArchSemantics(tmp_mm)
         except ValueError:
             self.fail()
 
@@ -158,7 +158,7 @@ class TestSemanticTools(unittest.TestCase):
             path_to_yaml=self._find_file('hidden_load_machine_model.yml')
         )
         self.assertTrue(machine_model_hld.has_hidden_loads())
-        semantics_hld = SemanticsAppender(machine_model_hld)
+        semantics_hld = ArchSemantics(machine_model_hld)
         kernel_hld = self.parser_x86.parse_file(self.code_x86)
         kernel_hld_2 = self.parser_x86.parse_file(self.code_x86)
         kernel_hld_2 = self.parser_x86.parse_file(self.code_x86)[-3:]
