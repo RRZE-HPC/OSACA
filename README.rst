@@ -54,7 +54,7 @@ Additional requirements are:
 -  `Python3 <https://www.python.org/>`_
 -  `Graphviz <https://www.graphviz.org/>`_ for dependency graph creation (minimal dependency is `libgraphviz-dev` on Ubuntu)
 -  `Kerncraft <https://github.com/RRZE-HPC/kerncraft>`_ for marker insertion
--   `ibench <https://github.com/hofm/ibench>`_ for throughput/latency measurements
+-   `ibench <https://github.com/RRZE-HPC/ibench>`_ or `asmbench <https://github.com/RRZE-HPC/asmbench/>`_ for throughput/latency measurements
 
 Design
 ======
@@ -71,7 +71,7 @@ The usage of OSACA can be listed as:
 
 .. code:: bash
 
-    osaca [-h] [-V] [--arch ARCH] [--export-graph GRAPHNAME] FILEPATH
+    osaca [-h] [-V] [--arch ARCH] [--fixed] [--db-check] [--import MICROBENCH] [--insert-marker] [--export-graph GRAPHNAME] FILEPATH
 
 -h, --help
   prints out the help message.
@@ -81,13 +81,19 @@ The usage of OSACA can be listed as:
   needs to be replaced with the wished architecture abbreviation.
   This flag is necessary for the throughput analysis (default function) and the inclusion of an ibench output (``-i``).
   Possible options are ``SNB``, ``IVB``, ``HSW``, ``BDW``, ``SKX`` and ``CSX`` for the latest Intel micro architectures starting from Intel Sandy Bridge and ``ZEN1`` for AMD Zen (17h family) architecture.
-  Furthermore, `VULCAN` for Marvell`s ARM-based ThunderX2 architecture is available.
---insert-marker
-  OSACA calls the Kerncraft module for the interactively insertion of `IACA <https://software.intel.com/en-us/articles/intel-architecture-code-analyzer>`_ marker in suggested assembly blocks.
+  Furthermore, ``TX2`` for Marvell`s ARM-based ThunderX2 architecture is available.
+--fixed
+  Run the throughput analysis with fixed probabilities for all suitable ports per instruction.
+  Otherwise, OSACA will print out the optimal port utilization for the kernel.
 --db-check
   Run a sanity check on the by "--arch" specified database.
   The output depends on the verbosity level.
   Keep in mind you have to provide a (dummy) filename in anyway.
+--import MICROBENCH
+  Import a given microbenchmark output file into the corresponding architecture instruction database.
+  Define the type of microbenchmark either as "ibench", "asmbench" or "uopsinfo".
+--insert-marker
+  OSACA calls the Kerncraft module for the interactively insertion of `IACA <https://software.intel.com/en-us/articles/intel-architecture-code-analyzer>`_ marker in suggested assembly blocks.
 --export-graph EXPORT_PATH
   Output path for .dot file export. If "." is given, the file will be stored as "./osaca_dg.dot".
   After the file was created, you can convert it to a PDF file using dot: `dot -Tpdf osaca_dg.dot -o osaca_dependency_graph.pdf`
@@ -100,7 +106,7 @@ Hereinafter OSACA's scope of function will be described.
 
 Throughput & Latency analysis
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-As main functionality of OSACA this process starts by default. It is always necessary to specify the core architecture by the flag ``--arch ARCH``, where ``ARCH`` can stand for ``SNB``, ``IVB``, ``HSW``, ``BDW``, ``SKX``, ``CSX``, ``ZEN`` or ``VULCAN``.
+As main functionality of OSACA this process starts by default. It is always necessary to specify the core architecture by the flag ``--arch ARCH``, where ``ARCH`` can stand for ``SNB``, ``IVB``, ``HSW``, ``BDW``, ``SKX``, ``CSX``, ``ZEN`` or ``TX2``.
 
 For extracting the right kernel, one has to mark it beforehand.
 Currently, only the detechtion of markers in the assembly code and therefore the analysis of assemly files is supported by OSACA.
@@ -178,37 +184,31 @@ The output is:
      X - No throughput/latency information for this instruction in data file
 
 
-    Throughput Analysis Report
-    --------------------------
-                                  Port pressure in cycles                              
-         |  0   - 0DV  |  1   |  2   -  2D  |  3   -  3D  |  4   |  5   |  6   |  7   |
-    -----------------------------------------------------------------------------------
-     170 |             |      |             |             |      |      |      |      |   .L22:
-     171 | 0.50        | 0.50 | 0.50   0.50 | 0.50   0.50 |      |      |      |      |   vmulpd	(%r12,%rax), %ymm1, %ymm0
-     172 |             |      | 0.50        | 0.50        | 1.00 |      |      |      |   vmovapd	%ymm0, 0(%r13,%rax)
-     173 | 0.25        | 0.25 |             |             |      | 0.25 | 0.25 |      |   addq	$32, %rax
-     174 | 0.25        | 0.25 |             |             |      | 0.25 | 0.25 |      |   cmpq	%rax, %r14
-     175 |             |      |             |             |      |      |      |      | * jne	.L22
+	Combined Analysis Report
+	-----------------------
+	                                     Port pressure in cycles
+	     |  0   - 0DV  |  1   |  2   -  2D  |  3   -  3D  |  4   |  5   |  6   |  7   ||  CP  | LCD  |
+	-------------------------------------------------------------------------------------------------
+	 170 |             |      |             |             |      |      |      |      ||      |      |   .L22:
+	 171 | 0.50        | 0.50 | 0.50   0.50 | 0.50   0.50 |      |      |      |      ||  8.0 |      |   vmulpd    (%r12,%rax), %ymm1, %ymm0
+	 172 |             |      | 0.50        | 0.50        | 1.00 |      |      |      ||  5.0 |      |   vmovapd   %ymm0, 0(%r13,%rax)
+	 173 | 0.25        | 0.25 |             |             |      | 0.25 | 0.25 |      ||      |  1.0 |   addq      $32, %rax
+	 174 | 0.00        | 0.00 |             |             |      | 0.50 | 0.50 |      ||      |      |   cmpq      %rax, %r14
+	 175 |             |      |             |             |      |      |      |      ||      |      | * jne       .L22
 
-           1.00          1.00   1.00   0.50   1.00   0.50   1.00   0.50   0.50         
-
-
-    Latency Analysis Report
-    -----------------------
-     171 |  8.0 | | vmulpd	(%r12,%rax), %ymm1, %ymm0
-     172 |  5.0 | | vmovapd	%ymm0, 0(%r13,%rax)
-
-           13.0
+	       0.75          0.75   1.00   0.50   1.00   0.50   1.00   0.75   0.75           13.0   1.0
 
 
-    Loop-Carried Dependencies Analysis Report
-    -----------------------------------------
-    173 |  1.0 | addq	$32, %rax                      | [173]
+	Loop-Carried Dependencies Analysis Report
+	-----------------------------------------
+	 173 |  1.0 | addq      $32, %rax                      | [173]
 
-It shows the whole kernel together with the average port pressure of each instruction form and the overall port binding.
-Furthermore, the critical path of the loop kernel and all loop-carried dependencies, each with a list of line numbers being part of this dependency chain on the right.
 
-.. For measuring the instruction forms with ibench we highly recommend to use an exclusively allocated node, so there is no other workload falsifying the results. For the correct function of ibench the benchmark files from OSACA need to be placed in a subdirectory of src in root so ibench can create the a folder with the subdirectory’s name and the shared objects. For running the tests the frequencies of all cores must set to a constant value and this has to be given as an argument together with the directory of the shared objects to ibench, e.g.:
+It shows the whole kernel together with the optimized port pressure of each instruction form and the overall port binding.
+Furthermore, in the two columns on the right, the critical path (CP) and the longest loop-carried dependency (LCD) of the loop kernel.
+In the bottom, all loop-carried dependencies are shown, each with a list of line numbers being part of this dependency chain on the right.
+
+.. For measuring the instruction forms with ibench or asmbench we highly recommend to use an exclusively allocated node, so there is no other workload falsifying the results. For the correct function of ibench the benchmark files from OSACA need to be placed in a subdirectory of src in root so ibench can create the a folder with the subdirectory’s name and the shared objects. For running the tests the frequencies of all cores must set to a constant value and this has to be given as an argument together with the directory of the shared objects to ibench, e.g.:
 
 .. .. code:: bash
 
@@ -222,17 +222,17 @@ Furthermore, the critical path of the loop kernel and all loop-carried dependenc
     add-mem_imd-TP: 1.023 (clock cycles) [DEBUG - result: 1.000000]
     add-mem_imd: 6.050 (clock cycles) [DEBUG - result: 1.000000]
     
-.. The debug output as resulting value of register ``xmm0`` is additional validation information depending on the executed instruction form meant for the user and is not considered by OSACA. The ibench output information can be included by OSACA running the program with the flag ``--include-ibench`` or just ``-i`` and the specify micro architecture:
+.. The debug output as resulting value of register ``xmm0`` is additional validation information depending on the executed instruction form meant for the user and is not considered by OSACA. The ibench output information can be included by OSACA running the program with the flag ``--import ibench`` and the specify micro architecture:
 
 .. .. code-block:: bash
 
-    osaca --arch IVB -i PATH/TO/IBENCH-OUTPUTFILE
+    osaca --arch IVB --import ibench PATH/TO/IBENCH-OUTPUTFILE
 
 .. For now no automatic allocation of ports for a instruction form is implemented, so for getting an output in the Ports Pressure table, one must add the port occupation by hand. We know that the inserted instruction form must be assigned always to Port 2, 3 and 4 and additionally to either 0, 1 or 5, a valid data file therefore would look like this:
 
-.. .. code:: bash
+.. .. code:: yaml
 
-    addl-mem_imd,1.0,6.0,"(0.33,0.33,1.00,1.00,1.00,0.33)"
+    name: addl-mem_imd,1.0,6.0,"(0.33,0.33,1.00,1.00,1.00,0.33)"
     
 
 Credits
