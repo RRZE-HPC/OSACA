@@ -6,7 +6,7 @@ from datetime import datetime as dt
 from ruamel import yaml
 
 from osaca import utils
-from osaca.semantics import INSTR_FLAGS, KernelDG, SemanticsAppender
+from osaca.semantics import INSTR_FLAGS, KernelDG, ArchSemantics
 
 
 class Frontend(object):
@@ -56,7 +56,7 @@ class Frontend(object):
                 continue
             print(line)
         print()
-        tp_sum = SemanticsAppender.get_throughput_sum(kernel)
+        tp_sum = ArchSemantics.get_throughput_sum(kernel)
         print(lineno_filler + self._get_port_pressure(tp_sum, port_len, ' '))
 
     def print_latency_analysis(self, cp_kernel, separator='|'):
@@ -165,7 +165,7 @@ class Frontend(object):
             print(line)
         print()
         # lcd_sum already calculated before
-        tp_sum = SemanticsAppender.get_throughput_sum(kernel)
+        tp_sum = ArchSemantics.get_throughput_sum(kernel)
         cp_sum = sum([x['latency_cp'] for x in cp_kernel])
         print(
             lineno_filler

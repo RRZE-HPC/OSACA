@@ -10,7 +10,7 @@ from subprocess import call
 from osaca.db_interface import sanity_check, import_benchmark_output
 from osaca.frontend import Frontend
 from osaca.parser import BaseParser, ParserAArch64v81, ParserX86ATT
-from osaca.semantics import (KernelDG, MachineModel, SemanticsAppender,
+from osaca.semantics import (KernelDG, MachineModel, ArchSemantics,
                              reduce_to_section)
 
 MODULE_DATA_DIR = os.path.join(
@@ -181,7 +181,7 @@ def inspect(args):
     # Reduce to marked kernel and add semantics
     kernel = reduce_to_section(parsed_code, isa)
     machine_model = MachineModel(arch=arch)
-    semantics = SemanticsAppender(machine_model)
+    semantics = ArchSemantics(machine_model)
     semantics.add_semantics(kernel)
 
     # Create DiGrahps

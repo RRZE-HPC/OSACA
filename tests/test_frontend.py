@@ -8,9 +8,7 @@ import unittest
 
 from osaca.frontend import Frontend
 from osaca.parser import ParserAArch64v81, ParserX86ATT
-from osaca.semantics.hw_model import MachineModel
-from osaca.semantics.kernel_dg import KernelDG
-from osaca.semantics.semantics_appender import SemanticsAppender
+from osaca.semantics import ArchSemantics, KernelDG, MachineModel
 
 
 class TestFrontend(unittest.TestCase):
@@ -37,10 +35,10 @@ class TestFrontend(unittest.TestCase):
         self.machine_model_tx2 = MachineModel(
             path_to_yaml=os.path.join(self.MODULE_DATA_DIR, 'tx2.yml')
         )
-        self.semantics_csx = SemanticsAppender(
+        self.semantics_csx = ArchSemantics(
             self.machine_model_csx, path_to_yaml=os.path.join(self.MODULE_DATA_DIR, 'isa/x86.yml')
         )
-        self.semantics_tx2 = SemanticsAppender(
+        self.semantics_tx2 = ArchSemantics(
             self.machine_model_tx2,
             path_to_yaml=os.path.join(self.MODULE_DATA_DIR, 'isa/aarch64.yml'),
         )

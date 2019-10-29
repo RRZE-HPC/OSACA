@@ -3,35 +3,16 @@
 import warnings
 from functools import reduce
 
-from osaca import utils
-from osaca.parser import AttrDict, ParserAArch64v81, ParserX86ATT
-from osaca.semantics import MachineModel
+from osaca.semantics.isa_semantics import ISASemantics
+from osaca.semantics.hw_model import MachineModel
+from osaca.semantics.instr_flags import INSTR_FLAGS
 
 
-class INSTR_FLAGS:
-    """
-    Flags used for unknown or special instructions
-    """
-
-    LD = 'is_load_instruction'
-    TP_UNKWN = 'tp_unknown'
-    LT_UNKWN = 'lt_unknown'
-    NOT_BOUND = 'not_bound'
-    HIDDEN_LD = 'hidden_load'
-    HAS_LD = 'performs_load'
-    HAS_ST = 'performs_store'
-
-
-class SemanticsAppender(object):
+class ArchSemantics(ISASemantics):
     def __init__(self, machine_model: MachineModel, path_to_yaml=None):
+        super().__init__(machine_model.get_ISA().lower(), path_to_yaml=path_to_yaml)
         self._machine_model = machine_model
         self._isa = machine_model.get_ISA().lower()
-        path = utils.find_file('isa/' + self._isa + '.yml')
-        self._isa_model = MachineModel(path_to_yaml=path)
-        if self._isa == 'x86':
-            self._parser = ParserX86ATT()
-        elif self._isa == 'aarch64':
-            self._parser = ParserAArch64v81()
 
     # SUMMARY FUNCTION
     def add_semantics(self, kernel):
@@ -234,95 +215,12 @@ class SemanticsAppender(object):
             register = {'register': {'prefix': reg_type, 'name': reg_id}}
         return register
 
-    # get ;parser result and assign operands to
-    # - source
-    # - destination
-    # - source/destination
-    def assign_src_dst(self, instruction_form):
-        # if the instruction form doesn't have operands, there's nothing to do
-        if instruction_form['operands'] is None:
-            return
-        # check if instruction form is in ISA yaml, otherwise apply standard operand assignment
-        # (one dest, others source)
-        isa_data = self._isa_model.get_instruction(
-            instruction_form['instruction'], instruction_form['operands']
-        )
-        operands = instruction_form['operands']
-        op_dict = {}
-        if isa_data is None:
-            # no irregular operand structure, apply default
-            op_dict['source'] = self._get_regular_source_operands(instruction_form)
-            op_dict['destination'] = self._get_regular_destination_operands(instruction_form)
-            op_dict['src_dst'] = []
-        else:
-            # load src/dst structure from isa_data
-            op_dict['source'] = []
-            op_dict['destination'] = []
-            op_dict['src_dst'] = []
-            for i, op in enumerate(isa_data['operands']):
-                if op['source'] and op['destination']:
-                    op_dict['src_dst'].append(operands[i])
-                    continue
-                if op['source']:
-                    op_dict['source'].append(operands[i])
-                    continue
-                if op['destination']:
-                    op_dict['destination'].append(operands[i])
-                    continue
-        # store operand list in dict and reassign operand key/value pair
-        op_dict['operand_list'] = operands
-        instruction_form['operands'] = AttrDict.convert_dict(op_dict)
-        # assign LD/ST flags
-        instruction_form['flags'] = (
-            instruction_form['flags'] if 'flags' in instruction_form else []
-        )
-        if self._has_load(instruction_form):
-            instruction_form['flags'] += [INSTR_FLAGS.HAS_LD]
-        if self._has_store(instruction_form):
-            instruction_form['flags'] += [INSTR_FLAGS.HAS_ST]
-
     def _nullify_data_ports(self, port_pressure):
         data_ports = self._machine_model.get_data_ports()
         for port in data_ports:
             index = self._machine_model.get_ports().index(port)
             port_pressure[index] = 0.0
         return port_pressure
-
-    def _has_load(self, instruction_form):
-        for operand in (
-            instruction_form['operands']['source'] + instruction_form['operands']['src_dst']
-        ):
-            if 'memory' in operand:
-                return True
-        return False
-
-    def _has_store(self, instruction_form):
-        for operand in (
-            instruction_form['operands']['destination'] + instruction_form['operands']['src_dst']
-        ):
-            if 'memory' in operand:
-                return True
-        return False
-
-    def _get_regular_source_operands(self, instruction_form):
-        if self._isa == 'x86':
-            # return all but last operand
-            return [op
-                    or op in instruction_form['operands'][0:len(instruction_form['operands']) - 1]]
-        elif self._isa == 'aarch64':
-            return [op for op in instruction_form['operands'][1:len(instruction_form['operands'])]]
-        else:
-            raise ValueError("Unsupported ISA {}.".format(self._isa))
-
-    def _get_regular_destination_operands(self, instruction_form):
-        if self._isa == 'x86':
-            # return last operand
-            return instruction_form['operands'][-1:]
-        if self._isa == 'aarch64':
-            # return first operand
-            return instruction_form['operands'][:1]
-        else:
-            raise ValueError("Unsupported ISA {}.".format(self._isa))
 
     @staticmethod
     def get_throughput_sum(kernel):

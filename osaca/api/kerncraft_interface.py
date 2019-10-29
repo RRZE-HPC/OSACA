@@ -7,7 +7,7 @@ from io import StringIO
 from osaca.frontend import Frontend
 from osaca.parser import ParserAArch64v81, ParserX86ATT
 from osaca.semantics import (INSTR_FLAGS, KernelDG, MachineModel,
-                             SemanticsAppender, reduce_to_section)
+                             ArchSemantics, reduce_to_section)
 
 
 # Stolen from https://stackoverflow.com/a/16571630
@@ -26,7 +26,7 @@ class Capturing(list):
 class KerncraftAPI(object):
     def __init__(self, arch, code):
         self.machine_model = MachineModel(arch=arch)
-        self.semantics = SemanticsAppender(self.machine_model)
+        self.semantics = ArchSemantics(self.machine_model)
         isa = self.machine_model.get_ISA().lower()
         if isa == 'aarch64':
             self.parser = ParserAArch64v81()
