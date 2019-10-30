@@ -29,11 +29,17 @@ class ISASemantics(object):
         elif self._isa == 'aarch64':
             self._parser = ParserAArch64v81()
 
+    def process(self, instruction_forms):
+        """Process a list of instruction forms."""
+        for i in instruction_forms:
+            self.assign_src_dst(i)
+
     # get ;parser result and assign operands to
     # - source
     # - destination
     # - source/destination
     def assign_src_dst(self, instruction_form):
+        """Update instruction form dictionary with source and destination information."""
         # if the instruction form doesn't have operands, there's nothing to do
         if instruction_form['operands'] is None:
             return
