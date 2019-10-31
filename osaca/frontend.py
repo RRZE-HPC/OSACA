@@ -220,11 +220,11 @@ class Frontend(object):
     def _get_lcd_cp_ports(self, line_number, cp_dg, dependency, separator='|'):
         lat_cp = lat_lcd = ''
         if cp_dg:
-            lat_cp = self._get_node_by_lineno(line_number, cp_dg)['latency_cp']
+            lat_cp = float(self._get_node_by_lineno(line_number, cp_dg)['latency_cp'])
         if dependency:
-            lat_lcd = self._get_node_by_lineno(line_number, dependency['dependencies'])[
+            lat_lcd = float(self._get_node_by_lineno(line_number, dependency['dependencies'])[
                 'latency_lcd'
-            ]
+            ])
         return '{} {:>4} {} {:>4} {}'.format(separator, lat_cp, separator, lat_lcd, separator)
 
     def _get_max_port_len(self, kernel):
