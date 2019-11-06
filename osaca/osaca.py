@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-
+"""CLI for OSACA"""
 import argparse
 import io
 import os
@@ -22,6 +22,7 @@ DATA_DIR = os.path.join(LOCAL_OSACA_DIR, 'data/')
 
 # Stolen from pip
 def __read(*names, **kwargs):
+    """Reads in file"""
     with io.open(
         os.path.join(os.path.dirname(__file__), *names), encoding=kwargs.get("encoding", "utf8")
     ) as fp:
@@ -30,6 +31,7 @@ def __read(*names, **kwargs):
 
 # Stolen from pip
 def __find_version(*file_paths):
+    """Searches for a version attribute in the given file(s)"""
     version_file = __read(*file_paths)
     version_match = re.search(r"^__version__ = ['\"]([^'\"]*)['\"]", version_file, re.M)
     if version_match:
@@ -38,11 +40,20 @@ def __find_version(*file_paths):
 
 
 def get_version():
+    """
+    Gets the current OSACA version stated in the __init__ file
+
+    :returns: str -- the version string.
+    """
     return __find_version('__init__.py')
 
 
 def create_parser():
-    """Return argparse parser."""
+    """
+    Return argparse parser.
+
+    :returns: The newly created :class:`~Argparse.ArgumentParser` object.
+    """
     # Create parser
     parser = argparse.ArgumentParser(
         description='Analyzes a marked innermost loop snippet for a given architecture type.',
@@ -109,7 +120,12 @@ def create_parser():
 
 
 def check_arguments(args, parser):
-    """Check arguments passed by user that are not checked by argparse itself."""
+    """
+    Check arguments passed by user that are not checked by argparse itself.
+
+    :param args: arguments given from :class:`~argparse.ArgumentParser` after parsing
+    :param parser: :class:`~argparse.ArgumentParser` object
+    """
     supported_archs = ['SNB', 'IVB', 'HSW', 'BDW', 'SKX', 'CSX', 'ZEN1', 'TX2']
     supported_import_files = ['ibench', 'asmbench']
 
@@ -125,6 +141,10 @@ def check_arguments(args, parser):
 
 
 def check_user_dir():
+    """
+    Creates user directory if it does not exist and copies all not already existing YAML files
+    into it.
+    """
     # Check if data files are already in usr dir, otherwise create them
     if not os.path.isdir(DATA_DIR):
         os.makedirs(DATA_DIR)
@@ -134,6 +154,15 @@ def check_user_dir():
 
 
 def import_data(benchmark_type, arch, filepath):
+    """
+    Imports benchmark results from micro-benchmarks.
+
+    :param benchmark_type: key for defining type of benchmark output
+    :type benchmark_type: str
+    :param arch: target architecture to put the data into the right database
+    :type arch: str
+    :param filepath: filepath of the output file"
+    """
     if benchmark_type.lower() == 'ibench':
         import_benchmark_output(arch, 'ibench', filepath)
     elif benchmark_type.lower() == 'asmbench':
@@ -143,6 +172,11 @@ def import_data(benchmark_type, arch, filepath):
 
 
 def insert_byte_marker(args):
+    """
+    Inserts byte markers into an assembly file using kerncraft.
+
+    :param args: arguments given from :class:`~argparse.ArgumentParser` after parsing
+    """
     if MachineModel.get_isa_for_arch(args.arch) != 'x86':
         print('Marker insertion for non-x86 is not yet supported by Kerncraft.', file=sys.stderr)
         sys.exit(1)
@@ -174,6 +208,12 @@ def insert_byte_marker(args):
 
 
 def inspect(args):
+    """
+    Does the actual throughput and critical path analysis of OSACA and prints it to the
+    terminal.
+
+    :param args: arguments given from :class:`~argparse.ArgumentParser` after parsing
+    """
     arch = args.arch
     isa = MachineModel.get_isa_for_arch(arch)
     verbose = args.verbose
@@ -203,6 +243,12 @@ def inspect(args):
 
 
 def run(args, output_file=sys.stdout):
+    """
+    Main entry point for OSACAs workflow. Decides whether to run an analysis or other things.
+
+    :param args: arguments given from :class:`~argparse.ArgumentParser` after parsing
+    :param output_file: Define the stream for output, defaults to :class:`sys.stdout`
+    """
     if args.check_db:
         # Sanity check on DB
         verbose = True if args.verbose > 0 else False
@@ -220,6 +266,13 @@ def run(args, output_file=sys.stdout):
 
 # ---------------------------------------------------
 def get_asm_parser(arch) -> BaseParser:
+    """
+    Helper function to create the right parser for a specific architecture.
+
+    :param arch: architecture code
+    :type arch: str
+    :returns: :class:`~osaca.parser.BaseParser` object
+    """
     isa = MachineModel.get_isa_for_arch(arch)
     if isa == 'x86':
         return ParserX86ATT()
