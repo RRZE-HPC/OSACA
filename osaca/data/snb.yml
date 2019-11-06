@@ -1,6 +1,6 @@
 osaca_version: 0.3.1.dev1
-micro_architecture: Intel Ivy Bridge
-arch_code: IVB
+micro_architecture: Intel Sandy Bridge
+arch_code: SNB
 isa: x86
 ROB_size: 168
 retired_uOps_per_cycle: 4
@@ -21,8 +21,8 @@ port_model_scheme: |
   ┌-----------------------------------------------------┐
   |                  54 entry scheduler                 |
   └-----------------------------------------------------┘
-     0 |       1 |      2 |     3 |     4 |      5 |    
-       ▼         ▼        ▼       ▼       ▼        ▼    
+     0 |       1 |      2 |     3 |     4 |      5 |
+       ▼         ▼        ▼       ▼       ▼        ▼
    ┌-------┐ ┌-------┐ ┌-----┐ ┌-----┐ ┌-----┐ ┌-------┐
    |  ALU  | |  ALU  | |  LD | |  LD | |  ST | |  ALU  |
    └-------┘ └-------┘ └-----┘ └-----┘ └-----┘ └-------┘
@@ -2616,20 +2616,20 @@ instruction_forms:
 - name: OUTSW
   operands: []
   latency: ~
-  port_pressure: [[12, '0'], [4, '01'], [3, '015'], [1, '05'], [11, '1'], [1, '15'], [2, '23'], [1, '4'], [23, '5']]
-  throughput: 25.0
+  port_pressure: [[10, '0'], [4, '01'], [2, '015'], [2, '05'], [11, '1'], [2, '15'], [2, '23'], [1, '4'], [24, '5']]
+  throughput: 26.666666666666668
   uops: 58
 - name: OUTSB
   operands: []
   latency: ~
-  port_pressure: [[12, '0'], [4, '01'], [4, '015'], [11, '1'], [2, '23'], [1, '4'], [24, '5']]
-  throughput: 25.333333333333332
+  port_pressure: [[10, '0'], [3, '01'], [4, '015'], [1, '05'], [12, '1'], [2, '23'], [1, '4'], [25, '5']]
+  throughput: 26.833333333333332
   uops: 58
 - name: OUTSD
   operands: []
   latency: ~
-  port_pressure: [[12, '0'], [4, '01'], [4, '015'], [11, '1'], [2, '23'], [1, '4'], [24, '5']]
-  throughput: 25.333333333333332
+  port_pressure: [[10, '0'], [4, '01'], [3, '015'], [1, '05'], [11, '1'], [1, '15'], [2, '23'], [1, '4'], [25, '5']]
+  throughput: 27.0
   uops: 58
 - name: JNE
   operands:
@@ -2648,9 +2648,9 @@ instruction_forms:
 - name: WRMSR
   operands: []
   latency: ~
-  port_pressure: [[18, '0'], [7, '05'], [17, '1'], [13, '15'], [1, '4'], [52, '5']]
-  throughput: 62.0
-  uops: 108
+  port_pressure: [[19, '0'], [11, '05'], [18, '1'], [11, '15'], [1, '4'], [50, '5']]
+  throughput: 61.0
+  uops: 110
 - name: REPE SCASW
   operands: []
   latency: ~
@@ -3040,9 +3040,9 @@ instruction_forms:
 - name: RDMSR
   operands: []
   latency: ~
-  port_pressure: [[2, '0'], [10, '01'], [14, '05'], [5, '1'], [6, '15'], [39, '5']]
-  throughput: 49.0
-  uops: 76
+  port_pressure: [[2, '0'], [13, '01'], [15, '05'], [5, '1'], [6, '15'], [36, '5']]
+  throughput: 46.5
+  uops: 77
 - name: REPE LODSB
   operands: []
   latency: ~
@@ -3084,16 +3084,16 @@ instruction_forms:
   - class: register
     name: gpr
   latency: 23
-  port_pressure: [[2, '0'], [2, '015'], [2, '05'], [2, '1'], [2, '5'], [8, [0DV]]]
-  throughput: 8.0
+  port_pressure: [[2, '0'], [2, '015'], [2, '05'], [2, '1'], [2, '5'], [3, [0DV]]]
+  throughput: 3.6666666666666665
   uops: 10
 - name: REX IDIV
   operands:
   - class: register
     name: gpr
   latency: 22
-  port_pressure: [[2, '0'], [3, '015'], [2, '1'], [2, '5'], [8, [0DV]]]
-  throughput: 8.0
+  port_pressure: [[2, '0'], [3, '015'], [2, '1'], [2, '5'], [3, [0DV]]]
+  throughput: 3.0
   uops: 9
 - name: REPNE CMPSB
   operands: []
@@ -3239,9 +3239,9 @@ instruction_forms:
 - name: WBINVD
   operands: []
   latency: ~
-  port_pressure: [[184089, '0'], [135442, '4'], [294987, '5'], [1, [0DV]]]
-  throughput: 294987.0
-  uops: 614518
+  port_pressure: [[237594, '0'], [188428, '4'], [393278, '5']]
+  throughput: 393278.0
+  uops: 819300
 - name: JBE
   operands:
   - class: identifier
@@ -3519,7 +3519,7 @@ instruction_forms:
   operands:
   - class: register
     name: gpr
-  latency: 58
+  latency: 62
   port_pressure: [[4, '0'], [1, '1'], [8, '5']]
   throughput: 8.0
   uops: 13
@@ -3528,25 +3528,25 @@ instruction_forms:
   latency: ~
   port_pressure: [[1, '015'], [1, '23'], [1, '4']]
   throughput: 1.0
-  uops: 75
+  uops: 19
 - name: REX64 REPE STOSB
   operands: []
   latency: ~
   port_pressure: [[1, '015'], [1, '23'], [1, '4']]
   throughput: 1.0
-  uops: 75
+  uops: 19
 - name: REPNE STOSB
   operands: []
   latency: ~
   port_pressure: [[1, '015'], [1, '23'], [1, '4']]
   throughput: 1.0
-  uops: 75
+  uops: 19
 - name: REX64 REPNE STOSB
   operands: []
   latency: ~
   port_pressure: [[1, '015'], [1, '23'], [1, '4']]
   throughput: 1.0
-  uops: 75
+  uops: 19
 - name: REPE STOSW
   operands: []
   latency: ~
@@ -3661,8 +3661,8 @@ instruction_forms:
 - name: RDPMC
   operands: []
   latency: ~
-  port_pressure: [[14, '01'], [9, '05'], [2, '1'], [1, '15'], [9, '5']]
-  throughput: 14.0
+  port_pressure: [[1, '0'], [14, '01'], [8, '05'], [2, '1'], [1, '15'], [9, '5']]
+  throughput: 13.5
   uops: 35
 - name: ENTERW
   operands:
@@ -3723,14 +3723,14 @@ instruction_forms:
 - name: REPE OUTSW
   operands: []
   latency: ~
-  port_pressure: [[7, '0'], [5, '01'], [2, '015'], [1, '05'], [10, '1'], [1, '15'], [16, '5']]
-  throughput: 17.666666666666668
+  port_pressure: [[7, '0'], [4, '01'], [3, '015'], [1, '05'], [11, '1'], [16, '5']]
+  throughput: 17.5
   uops: 42
 - name: REPNE OUTSW
   operands: []
   latency: ~
-  port_pressure: [[7, '0'], [5, '01'], [2, '015'], [1, '05'], [10, '1'], [1, '15'], [16, '5']]
-  throughput: 17.666666666666668
+  port_pressure: [[7, '0'], [4, '01'], [3, '015'], [1, '05'], [11, '1'], [16, '5']]
+  throughput: 17.5
   uops: 42
 - name: REPE OUTSB
   operands: []
@@ -3819,14 +3819,14 @@ instruction_forms:
   - class: identifier
   latency: 0
   port_pressure: []
-  throughput: 0.0
+  throughput: 0.0 
   uops: 1
 - name: CPUID
   operands: []
   latency: ~
-  port_pressure: [[13, '0'], [42, '5']]
-  throughput: 42.0
-  uops: 55
+  port_pressure: [[10, '0'], [38, '5']]
+  throughput: 38.0
+  uops: 48
 - name: RDTSC
   operands: []
   latency: ~
@@ -3842,14 +3842,14 @@ instruction_forms:
 - name: INSB
   operands: []
   latency: ~
-  port_pressure: [[11, '0'], [2, '01'], [5, '015'], [12, '1'], [3, '23'], [1, '4'], [25, '5']]
-  throughput: 26.666666666666668
+  port_pressure: [[11, '0'], [4, '01'], [3, '015'], [1, '05'], [10, '1'], [1, '15'], [3, '23'], [1, '4'], [25, '5']]
+  throughput: 27.0
   uops: 60
 - name: INSD
   operands: []
   latency: ~
-  port_pressure: [[11, '0'], [2, '01'], [5, '015'], [12, '1'], [3, '23'], [1, '4'], [25, '5']]
-  throughput: 26.666666666666668
+  port_pressure: [[11, '0'], [4, '01'], [3, '015'], [1, '05'], [10, '1'], [1, '15'], [3, '23'], [1, '4'], [25, '5']]
+  throughput: 27.0
   uops: 60
 - name: IMUL
   operands:
@@ -3920,17 +3920,9 @@ instruction_forms:
 - name: INSW
   operands: []
   latency: ~
-  port_pressure: [[11, '0'], [2, '01'], [5, '015'], [12, '1'], [3, '23'], [1, '4'], [25, '5']]
-  throughput: 26.666666666666668
+  port_pressure: [[11, '0'], [4, '01'], [3, '015'], [1, '05'], [10, '1'], [1, '15'], [3, '23'], [1, '4'], [25, '5']]
+  throughput: 27.0
   uops: 60
-- name: DIV
-  operands:
-  - class: register
-    name: gpr
-  latency: 23
-  port_pressure: [[2, '0'], [1, '01'], [1, '015'], [2, '05'], [2, '1'], [3, '5'], [9, [0DV]]]
-  throughput: 9.0
-  uops: 11
 - name: STOSW
   operands: []
   latency: 0
@@ -3944,8 +3936,8 @@ instruction_forms:
   - class: register
     name: gpr
   latency: ~
-  port_pressure: [[14, '0'], [5, '015'], [13, '1'], [1, '23'], [28, '5']]
-  throughput: 29.666666666666668
+  port_pressure: [[14, '0'], [2, '01'], [4, '015'], [11, '1'], [1, '15'], [1, '23'], [28, '5']]
+  throughput: 29.833333333333332
   uops: 61
 - name: IN
   operands:
@@ -4086,7 +4078,7 @@ instruction_forms:
   operands:
   - class: register
     name: gpr
-  latency: 60
+  latency: 62
   port_pressure: [[4, '0'], [1, '1'], [8, '5']]
   throughput: 8.0
   uops: 13
@@ -4301,9 +4293,9 @@ instruction_forms:
     name: xmm
   - class: register
     name: xmm
-  latency: 13
-  port_pressure: [[1, '0'], [7, [0DV]]]
-  throughput: 7.0
+  latency: 14
+  port_pressure: [[1, '0'], [3, [0DV]]]
+  throughput: 3.0
   uops: 1
 - name: ADDSS
   operands:
@@ -4373,9 +4365,9 @@ instruction_forms:
     name: xmm
   - class: register
     name: xmm
-  latency: 13
-  port_pressure: [[1, '0'], [7, [0DV]]]
-  throughput: 7.0
+  latency: 14
+  port_pressure: [[1, '0'], [3, [0DV]]]
+  throughput: 3.0
   uops: 1
 - name: RCPSS
   operands:
@@ -4393,9 +4385,9 @@ instruction_forms:
     name: xmm
   - class: register
     name: xmm
-  latency: 13
-  port_pressure: [[1, '0'], [7, [0DV]]]
-  throughput: 7.0
+  latency: 14
+  port_pressure: [[1, '0'], [14, [0DV]]]
+  throughput: 14.0
   uops: 1
 - name: SUBSS
   operands:
@@ -4523,9 +4515,9 @@ instruction_forms:
     name: xmm
   - class: register
     name: xmm
-  latency: 13
-  port_pressure: [[1, '0'], [7, [0DV]]]
-  throughput: 7.0
+  latency: 14
+  port_pressure: [[1, '0'], [14, [0DV]]]
+  throughput: 14.0
   uops: 1
 - name: CVTTPS2PI
   operands:
@@ -4693,9 +4685,9 @@ instruction_forms:
     name: xmm
   - class: register
     name: xmm
-  latency: 20
-  port_pressure: [[1, '0'], [14, [0DV]]]
-  throughput: 14.0
+  latency: 22
+  port_pressure: [[1, '0'], [15, [0DV]]]
+  throughput: 15.0
   uops: 1
 - name: PCMPGTW
   operands:
@@ -4853,9 +4845,9 @@ instruction_forms:
     name: xmm
   - class: register
     name: xmm
-  latency: 20
-  port_pressure: [[1, '0'], [14, [0DV]]]
-  throughput: 14.0
+  latency: 22
+  port_pressure: [[1, '0'], [15, [0DV]]]
+  throughput: 15.0
   uops: 1
 - name: PCMPEQW
   operands:
@@ -5157,9 +5149,9 @@ instruction_forms:
     name: xmm
   - class: register
     name: xmm
-  latency: 20
-  port_pressure: [[1, '0'], [14, [0DV]]]
-  throughput: 14.0
+  latency: 21
+  port_pressure: [[1, '0'], [21, [0DV]]]
+  throughput: 21.0
   uops: 1
 - name: PSLLW
   operands:
@@ -5259,9 +5251,9 @@ instruction_forms:
     name: xmm
   - class: register
     name: xmm
-  latency: 20
-  port_pressure: [[1, '0'], [14, [0DV]]]
-  throughput: 14.0
+  latency: 21
+  port_pressure: [[1, '0'], [21, [0DV]]]
+  throughput: 21.0
   uops: 1
 - name: ANDPD
   operands:
@@ -7425,14 +7417,18 @@ instruction_forms:
   port_pressure: [[1, '1']]
   throughput: 1.0
   uops: 1
-- name: RDRAND
+- name: PCLMULQDQ
   operands:
+  - class: immediate
+    imd: int
   - class: register
-    name: gpr
-  latency: ~
-  port_pressure: [[7, '015'], [1, '05'], [2, '1'], [1, '23'], [2, '5']]
-  throughput: 4.833333333333334
-  uops: 13
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 13
+  port_pressure: [[2, '0'], [4, '015'], [3, '05'], [4, '1'], [2, '15'], [3, '5']]
+  throughput: 6.833333333333333
+  uops: 18
 - name: PAUSE
   operands: []
   latency: ~
@@ -7973,9 +7969,9 @@ instruction_forms:
     name: xmm
   - class: register
     name: xmm
-  latency: 20
-  port_pressure: [[1, '0'], [14, [0DV]]]
-  throughput: 14.0
+  latency: 21
+  port_pressure: [[1, '0'], [21, [0DV]]]
+  throughput: 21.0
   uops: 1
 - name: VEXTRACTPS
   operands:
@@ -7997,9 +7993,9 @@ instruction_forms:
     name: xmm
   - class: register
     name: xmm
-  latency: 13
-  port_pressure: [[1, '0'], [7, [0DV]]]
-  throughput: 7.0
+  latency: 14
+  port_pressure: [[1, '0'], [14, [0DV]]]
+  throughput: 14.0
   uops: 1
 - name: VUNPCKHPD
   operands:
@@ -8119,9 +8115,9 @@ instruction_forms:
     name: xmm
   - class: register
     name: xmm
-  latency: 20
-  port_pressure: [[1, '0'], [14, [0DV]]]
-  throughput: 14.0
+  latency: 22
+  port_pressure: [[1, '0'], [21, [0DV]]]
+  throughput: 21.0
   uops: 1
 - name: VDIVPD
   operands:
@@ -8131,9 +8127,9 @@ instruction_forms:
     name: ymm
   - class: register
     name: ymm
-  latency: 35
-  port_pressure: [[2, '0'], [1, '05'], [28, [0DV]]]
-  throughput: 28.0
+  latency: 45
+  port_pressure: [[2, '0'], [1, '05'], [42, [0DV]]]
+  throughput: 42.0
   uops: 3
 - name: VDIVPS
   operands:
@@ -8143,9 +8139,9 @@ instruction_forms:
     name: xmm
   - class: register
     name: xmm
-  latency: 13
-  port_pressure: [[1, '0'], [7, [0DV]]]
-  throughput: 7.0
+  latency: 14
+  port_pressure: [[1, '0'], [14, [0DV]]]
+  throughput: 14.0
   uops: 1
 - name: VDIVPS
   operands:
@@ -8155,9 +8151,9 @@ instruction_forms:
     name: ymm
   - class: register
     name: ymm
-  latency: 21
-  port_pressure: [[2, '0'], [14, [0DV]]]
-  throughput: 14.0
+  latency: 29
+  port_pressure: [[2, '0'], [1, '05'], [28, [0DV]]]
+  throughput: 28.0
   uops: 3
 - name: VCMPSS
   operands:
@@ -8317,9 +8313,9 @@ instruction_forms:
     name: xmm
   - class: register
     name: xmm
-  latency: 13
-  port_pressure: [[1, '0'], [7, [0DV]]]
-  throughput: 7.0
+  latency: 14
+  port_pressure: [[1, '0'], [14, [0DV]]]
+  throughput: 14.0
   uops: 1
 - name: VSQRTPS
   operands:
@@ -8327,9 +8323,9 @@ instruction_forms:
     name: ymm
   - class: register
     name: ymm
-  latency: 21
-  port_pressure: [[2, '0'], [14, [0DV]]]
-  throughput: 14.0
+  latency: 29
+  port_pressure: [[2, '0'], [1, '05'], [28, [0DV]]]
+  throughput: 28.0
   uops: 3
 - name: VCVTPS2DQ
   operands:
@@ -8369,9 +8365,9 @@ instruction_forms:
     name: xmm
   - class: register
     name: xmm
-  latency: 20
-  port_pressure: [[1, '0'], [14, [0DV]]]
-  throughput: 14.0
+  latency: 21
+  port_pressure: [[1, '0'], [21, [0DV]]]
+  throughput: 21.0
   uops: 1
 - name: VSQRTPD
   operands:
@@ -8379,9 +8375,9 @@ instruction_forms:
     name: ymm
   - class: register
     name: ymm
-  latency: 35
-  port_pressure: [[2, '0'], [1, '05'], [28, [0DV]]]
-  throughput: 28.0
+  latency: 43
+  port_pressure: [[2, '0'], [1, '05'], [42, [0DV]]]
+  throughput: 42.0
   uops: 3
 - name: VSUBSS
   operands:
@@ -8997,9 +8993,9 @@ instruction_forms:
     name: xmm
   - class: register
     name: xmm
-  latency: 13
-  port_pressure: [[1, '0'], [7, [0DV]]]
-  throughput: 7.0
+  latency: 14
+  port_pressure: [[1, '0'], [14, [0DV]]]
+  throughput: 14.0
   uops: 1
 - name: VDIVSD
   operands:
@@ -9009,9 +9005,9 @@ instruction_forms:
     name: xmm
   - class: register
     name: xmm
-  latency: 20
-  port_pressure: [[1, '0'], [14, [0DV]]]
-  throughput: 14.0
+  latency: 22
+  port_pressure: [[1, '0'], [21, [0DV]]]
+  throughput: 21.0
   uops: 1
 - name: VTESTPS
   operands:
@@ -10413,50 +10409,6 @@ instruction_forms:
   port_pressure: [[1, '0'], [1, '5']]
   throughput: 1.0
   uops: 2
-- name: VCVTPH2PS
-  operands:
-  - class: register
-    name: xmm
-  - class: register
-    name: xmm
-  latency: 6
-  port_pressure: [[1, '0'], [1, '5']]
-  throughput: 1.0
-  uops: 2
-- name: VCVTPH2PS
-  operands:
-  - class: register
-    name: xmm
-  - class: register
-    name: ymm
-  latency: 7
-  port_pressure: [[1, '0'], [1, '5']]
-  throughput: 1.0
-  uops: 2
-- name: VCVTPS2PH
-  operands:
-  - class: immediate
-    imd: int
-  - class: register
-    name: xmm
-  - class: register
-    name: xmm
-  latency: 10
-  port_pressure: [[1, '0'], [1, '1'], [1, '5']]
-  throughput: 1.0
-  uops: 3
-- name: VCVTPS2PH
-  operands:
-  - class: immediate
-    imd: int
-  - class: register
-    name: ymm
-  - class: register
-    name: xmm
-  latency: 10
-  port_pressure: [[1, '0'], [1, '1'], [1, '5']]
-  throughput: 1.0
-  uops: 3
 - name: VAESIMC
   operands:
   - class: register
@@ -10479,4 +10431,3 @@ instruction_forms:
   port_pressure: [[2, '0'], [1, '015'], [1, '1'], [7, '5']]
   throughput: 7.333333333333333
   uops: 11
-
