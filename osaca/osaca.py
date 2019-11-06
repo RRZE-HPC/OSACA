@@ -79,8 +79,8 @@ def create_parser():
         type=str,
         default=argparse.SUPPRESS,
         help='Import a given microbenchmark output file into the corresponding architecture '
-        'instruction database. Define the type of microbenchmark either as "ibench", '
-        '"asmbench" or "uopsinfo".',
+        'instruction database. Define the type of microbenchmark either as "ibench" or '
+        '"asmbench".',
     )
     parser.add_argument(
         '--insert-marker',
@@ -111,7 +111,7 @@ def create_parser():
 def check_arguments(args, parser):
     """Check arguments passed by user that are not checked by argparse itself."""
     supported_archs = ['SNB', 'IVB', 'HSW', 'BDW', 'SKX', 'CSX', 'ZEN1', 'TX2']
-    supported_import_files = ['ibench', 'asmbench', 'uopsinfo']
+    supported_import_files = ['ibench', 'asmbench']
 
     if 'arch' in args and args.arch.upper() not in supported_archs:
         parser.error(
@@ -139,7 +139,7 @@ def import_data(benchmark_type, arch, filepath):
     elif benchmark_type.lower() == 'asmbench':
         import_benchmark_output(arch, 'asmbench', filepath)
     else:
-        raise NotImplementedError('This benchmark input variant is not implemented yet.')
+        raise NotImplementedError('This benchmark input variant is not supported.')
 
 
 def insert_byte_marker(args):
