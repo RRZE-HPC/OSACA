@@ -109,9 +109,7 @@ class Frontend(object):
         self.print_loopcarried_dependencies(kernel_dg.get_loopcarried_dependencies())
 
     def print_combined_view(self, kernel, cp_kernel: KernelDG, dep_dict, show_cmnts=True):
-        self._print_header_report()
-        self._print_symbol_map()
-        print('\n\nCombined Analysis Report\n' + '-----------------------')
+        print('\n\nCombined Analysis Report\n' + '------------------------')
         lineno_filler = '     '
         port_len = self._get_max_port_len(kernel)
         # Separator for ports
