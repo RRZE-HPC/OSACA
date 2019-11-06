@@ -1094,7 +1094,7 @@ instruction_forms:
   port_pressure: [[1, '23'], [1, '4']]
   throughput: 1.0
   uops: 2
-- name: vmovapds
+- name: vmovaps
   operands:
   - class: register
     name: xmm
@@ -1104,7 +1104,7 @@ instruction_forms:
   port_pressure: []
   throughput: 0.0
   uops: 0
-- name: vmovapds
+- name: vmovaps
   operands:
   - class: memory
     base: gpr
@@ -1117,7 +1117,7 @@ instruction_forms:
   port_pressure: [[1, '23'], [1, [2D, 3D]]]
   throughput: 0.5
   uops: 2
-- name: vmovapds
+- name: vmovaps
   operands:
   - class: memory
     base: gpr
@@ -1130,7 +1130,7 @@ instruction_forms:
   port_pressure: [[1, '23'], [1, [2D, 3D]]]
   throughput: 0.5
   uops: 2
-- name: vmovapds
+- name: vmovaps
   operands:
   - class: memory
     base: gpr
@@ -1143,7 +1143,7 @@ instruction_forms:
   port_pressure: [[1, '23'], [1, [2D, 3D]]]
   throughput: 0.5
   uops: 2
-- name: vmovapds
+- name: vmovaps
   operands:
   - class: register
     name: xmm
@@ -1156,7 +1156,7 @@ instruction_forms:
   port_pressure: [[1, '23'], [1, '4']]
   throughput: 1.0
   uops: 2
-- name: vmovapds
+- name: vmovaps
   operands:
   - class: register
     name: xmm
@@ -1169,7 +1169,7 @@ instruction_forms:
   port_pressure: [[1, '23'], [1, '4']]
   throughput: 1.0
   uops: 2
-- name: vmovapds
+- name: vmovaps
   operands:
   - class: register
     name: xmm
@@ -1886,7 +1886,7 @@ instruction_forms:
   port_pressure: [[1, '23'], [1, '4']]
   throughput: 1.0
   uops: 2
-- name: vmovapds
+- name: vmovaps
   operands:
   - class: register
     name: ymm
@@ -1896,7 +1896,7 @@ instruction_forms:
   port_pressure: []
   throughput: 0.0
   uops: 0
-- name: vmovapds
+- name: vmovaps
   operands:
   - class: memory
     base: gpr
@@ -1909,7 +1909,7 @@ instruction_forms:
   port_pressure: [[1, '23'], [1, [2D, 3D]]]
   throughput: 0.5
   uops: 2
-- name: vmovapds
+- name: vmovaps
   operands:
   - class: memory
     base: gpr
@@ -1922,7 +1922,7 @@ instruction_forms:
   port_pressure: [[1, '23'], [1, [2D, 3D]]]
   throughput: 0.5
   uops: 2
-- name: vmovapds
+- name: vmovaps
   operands:
   - class: memory
     base: gpr
@@ -1935,7 +1935,7 @@ instruction_forms:
   port_pressure: [[1, '23'], [1, [2D, 3D]]]
   throughput: 0.5
   uops: 2
-- name: vmovapds
+- name: vmovaps
   operands:
   - class: register
     name: ymm
@@ -1948,7 +1948,7 @@ instruction_forms:
   port_pressure: [[1, '23'], [1, '4']]
   throughput: 1.0
   uops: 2
-- name: vmovapds
+- name: vmovaps
   operands:
   - class: register
     name: ymm
@@ -1961,7 +1961,7 @@ instruction_forms:
   port_pressure: [[1, '23'], [1, '4']]
   throughput: 1.0
   uops: 2
-- name: vmovapds
+- name: vmovaps
   operands:
   - class: register
     name: ymm
