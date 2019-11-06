@@ -24,7 +24,6 @@ def sanity_check(arch: str, verbose=False):
         missing_throughput,
         missing_latency,
         missing_port_pressure,
-        wrong_port,
         suspicious_instructions,
         duplicate_instr_arch,
     ) = _check_sanity_arch_db(arch_mm, isa_mm)
@@ -36,7 +35,6 @@ def sanity_check(arch: str, verbose=False):
         missing_throughput,
         missing_latency,
         missing_port_pressure,
-        wrong_port,
         suspicious_instructions,
         duplicate_instr_arch,
         duplicate_instr_isa,
@@ -242,7 +240,6 @@ def _check_sanity_arch_db(arch_mm, isa_mm):
     missing_throughput = []
     missing_latency = []
     missing_port_pressure = []
-    wrong_port = []
     suspicious_instructions = []
     duplicate_instr_arch = []
 
@@ -254,12 +251,9 @@ def _check_sanity_arch_db(arch_mm, isa_mm):
             missing_latency.append(instr_form)
         if instr_form['port_pressure'] is None:
             missing_port_pressure.append(instr_form)
-        else:
-            if _check_for_wrong_port(arch_mm['ports'], instr_form):
-                wrong_port.append(instr_form)
         # check entry against ISA DB
         for prefix in suspicious_prefixes:
-            if instr_form['name'].startswith(prefix):
+            if instr_form['name'].lower().startswith(prefix):
                 # check if instruction in ISA DB
                 if isa_mm.get_instruction(instr_form['name'], instr_form['operands']) is None:
                     # if not, mark them as suspicious and print it on the screen
@@ -278,18 +272,9 @@ def _check_sanity_arch_db(arch_mm, isa_mm):
         missing_throughput,
         missing_latency,
         missing_port_pressure,
-        wrong_port,
         suspicious_instructions,
         duplicate_instr_arch,
     )
-
-
-def _check_for_wrong_port(port_list, instr_form):
-    for cycles, ports in instr_form['port_pressure']:
-        for p in ports:
-            if p not in port_list:
-                return False
-    return True
 
 
 def _check_sanity_isa_db(arch_mm, isa_mm):
@@ -316,7 +301,7 @@ def _check_sanity_isa_db(arch_mm, isa_mm):
 
 
 def _print_sanity_report(
-    total, m_tp, m_l, m_pp, wrong_pp, suspic_instr, dup_arch, dup_isa, only_isa, verbose=False
+    total, m_tp, m_l, m_pp, suspic_instr, dup_arch, dup_isa, only_isa, verbose=False
 ):
     # non-verbose summary
     print('SUMMARY\n----------------------')
@@ -336,11 +321,6 @@ def _print_sanity_report(
         )
     )
     print(
-        '{}% ({}/{}) of instruction forms have an invalid port identifier.'.format(
-            round(100 * len(wrong_pp) / total), len(wrong_pp), total
-        )
-    )
-    print(
         '{}% ({}/{}) of instruction forms might miss an ISA DB entry.'.format(
             round(100 * len(suspic_instr) / total), len(suspic_instr), total
         )
@@ -355,12 +335,12 @@ def _print_sanity_report(
     # verbose version
     if verbose:
         _print_sanity_report_verbose(
-            total, m_tp, m_l, m_pp, wrong_pp, suspic_instr, dup_arch, dup_isa, only_isa
+            total, m_tp, m_l, m_pp, suspic_instr, dup_arch, dup_isa, only_isa
         )
 
 
 def _print_sanity_report_verbose(
-    total, m_tp, m_l, m_pp, wrong_pp, suspic_instr, dup_arch, dup_isa, only_isa
+    total, m_tp, m_l, m_pp, suspic_instr, dup_arch, dup_isa, only_isa
 ):
     BRIGHT_CYAN = '\033[1;36;1m'
     BRIGHT_BLUE = '\033[1;34;1m'
@@ -381,14 +361,6 @@ def _print_sanity_report_verbose(
         'Instruction forms without port pressure assignment:\n' if len(m_pp) != 0 else '', end=''
     )
     for instr_form in m_pp:
-        print('{}{}{}'.format(BRIGHT_MAGENTA, _get_full_instruction_name(instr_form), WHITE))
-    print(
-        'Instruction forms with invalid port identifiers in port pressure:\n'
-        if len(wrong_pp) != 0
-        else '',
-        end='',
-    )
-    for instr_form in wrong_pp:
         print('{}{}{}'.format(BRIGHT_MAGENTA, _get_full_instruction_name(instr_form), WHITE))
     print(
         'Instruction forms which might miss an ISA DB entry:\n' if len(suspic_instr) != 0 else '',
