@@ -162,6 +162,7 @@ def import_data(benchmark_type, arch, filepath):
     :param arch: target architecture to put the data into the right database
     :type arch: str
     :param filepath: filepath of the output file"
+    :type filepath: str
     """
     if benchmark_type.lower() == 'ibench':
         import_benchmark_output(arch, 'ibench', filepath)
