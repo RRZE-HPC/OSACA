@@ -11,6 +11,15 @@ from osaca.semantics import MachineModel
 
 
 def sanity_check(arch: str, verbose=False):
+    """
+    Checks the database for missing TP/LT values, instructions might missing int the ISA DB and
+    duplicate instructions.
+
+    :param arch: micro-arch key to define DB to check
+    :type arch: str
+    :param verbose: verbose output flag, defaults to `False`
+    :type verbose: bool, optional
+    """
     # load arch machine model
     arch_mm = MachineModel(arch=arch)
     data = arch_mm['instruction_forms']
@@ -44,6 +53,16 @@ def sanity_check(arch: str, verbose=False):
 
 
 def import_benchmark_output(arch, bench_type, filepath):
+    """
+    Import benchmark results from micro-benchmarks.
+
+    :param arch: target architecture key
+    :type arch: str
+    :param bench_type: key for defining type of benchmark output
+    :type bench_type: str
+    :param filepath: filepath to the output file
+    :type filepath: str
+    """
     supported_bench_outputs = ['ibench', 'asmbench']
     assert os.path.exists(filepath)
     if bench_type not in supported_bench_outputs:
@@ -118,6 +137,7 @@ def _get_asmbench_output(input_data, isa):
 
 
 def _get_ibench_output(input_data, isa):
+    """Parse the standard output of ibench and add instructions to DB."""
     db_entries = {}
     for line in input_data:
         if 'Using frequency' in line or len(line) == 0:
