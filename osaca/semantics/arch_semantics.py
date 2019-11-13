@@ -2,6 +2,7 @@
 
 import warnings
 from functools import reduce
+from itertools import chain
 from operator import itemgetter
 
 from .hw_model import MachineModel
@@ -208,9 +209,9 @@ class ArchSemantics(ISASemantics):
                                 ),
                             )
                         ]
-                        instruction_form['port_uops'] = (
-                            instruction_data_reg['port_pressure'] + load_port_uops
-                        )
+                        instruction_form['port_uops'] = list(chain(
+                            instruction_data_reg['port_pressure'], load_port_uops
+                        ))
 
                 if assign_unknown:
                     # --> mark as unknown and assume 0 cy for latency/throughput
