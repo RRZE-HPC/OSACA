@@ -140,19 +140,6 @@ def check_arguments(args, parser):
         )
 
 
-def check_user_dir():
-    """
-    Creates user directory if it does not exist and copies all not already existing YAML files
-    into it.
-    """
-    # Check if data files are already in usr dir, otherwise create them
-    if not os.path.isdir(DATA_DIR):
-        os.makedirs(DATA_DIR)
-    for f in os.listdir(MODULE_DATA_DIR):
-        if f.endswith('yml') and not os.path.exists(os.path.join(DATA_DIR, f)):
-            call(['cp', '-r', os.path.join(MODULE_DATA_DIR, f), DATA_DIR])
-
-
 def import_data(benchmark_type, arch, filepath):
     """
     Imports benchmark results from micro-benchmarks.
@@ -289,7 +276,6 @@ def main():
     parser = create_parser()
     args = parser.parse_args()
     check_arguments(args, parser)
-    check_user_dir()
     run(args)
 
 
