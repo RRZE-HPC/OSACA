@@ -92,7 +92,7 @@ The usage of OSACA can be listed as:
   Keep in mind you have to provide a (dummy) filename in anyway.
 --import MICROBENCH
   Import a given microbenchmark output file into the corresponding architecture instruction database.
-  Define the type of microbenchmark either as "ibench", "asmbench" or "uopsinfo".
+  Define the type of microbenchmark either as "ibench" or "asmbench".
 --insert-marker
   OSACA calls the Kerncraft module for the interactively insertion of `IACA <https://software.intel.com/en-us/articles/intel-architecture-code-analyzer>`_ marker in suggested assembly blocks.
 --export-graph EXPORT_PATH

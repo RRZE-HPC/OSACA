@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
-
+"""
+Frontend interface for OSACA. Does everything necessary for printing analysis to the terminal.
+"""
 import re
 from datetime import datetime as dt
 
@@ -8,6 +10,16 @@ from osaca.semantics import INSTR_FLAGS, ArchSemantics, KernelDG, MachineModel
 
 class Frontend(object):
     def __init__(self, filename='', arch=None, path_to_yaml=None):
+        """
+        Constructor method.
+
+        :param filename: path to the analyzed kernel file for documentation, defaults to ''
+        :type filename: str, optional
+        :param arch: micro-arch code for getting the machine model, defaults to None
+        :type arch: str, optional
+        :param path_to_yaml: path to the YAML file for getting the machine model, defaults to None
+        :type path_to_yaml: str, optional
+        """
         self._filename = filename
         if not arch and not path_to_yaml:
             raise ValueError('Either arch or path_to_yaml required.')
@@ -22,9 +34,25 @@ class Frontend(object):
             self._arch = self._machine_model.get_arch()
 
     def _is_comment(self, instruction_form):
+        """
+        Checks if instruction form is a comment-only line.
+
+        :param instruction_form: instruction form as dict
+        :returns: `True` if comment line, `False` otherwise
+        """
         return instruction_form['comment'] is not None and instruction_form['instruction'] is None
 
     def print_throughput_analysis(self, kernel, show_lineno=False, show_cmnts=True):
+        """
+        Print throughput analysis only.
+
+        :param kernel: Kernel to print throughput analysis for.
+        :type kernel: list
+        :param show_lineno: flag for showing the line number of instructions, defaults to `False`
+        :type show_lineno: bool, optional
+        :param show_cmnts: flag for showing comment-only lines in kernel, defaults to `True`
+        :type show_cmnts: bool, optional
+        """
         lineno_filler = '     ' if show_lineno else ''
         port_len = self._get_max_port_len(kernel)
         separator = '-' * sum([x + 3 for x in port_len]) + '-'
@@ -58,6 +86,14 @@ class Frontend(object):
         print(lineno_filler + self._get_port_pressure(tp_sum, port_len, separator=' '))
 
     def print_latency_analysis(self, cp_kernel, separator='|'):
+        """
+        Print a list-based CP analysis to the terminal.
+
+        :param cp_kernel: loop kernel containing the CP information for each instruction form
+        :type cp_kernel: list
+        :separator: separator symbol for the columns, defaults to '|'
+        :type separator: str, optional
+        """
         print('\n\nLatency Analysis Report\n' + '-----------------------')
         for instruction_form in cp_kernel:
             print(
@@ -80,6 +116,14 @@ class Frontend(object):
         )
 
     def print_loopcarried_dependencies(self, dep_dict, separator='|'):
+        """
+        Print a list-based LCD analysis to the terminal.
+
+        :param dep_dict: dictionary with first instruction in LCD as key and the deps as value
+        :type dep_dict: dict
+        :separator: separator symbol for the columns, defaults to '|'
+        :type separator: str, optional
+        """
         print(
             '\n\nLoop-Carried Dependencies Analysis Report\n'
             + '-----------------------------------------'
@@ -101,6 +145,17 @@ class Frontend(object):
             )
 
     def print_full_analysis(self, kernel, kernel_dg: KernelDG, verbose=False):
+        """
+        Prints the full analysis report including header, the symbol map, the combined TP/CP/LCD
+        view and the list based LCD view.
+
+        :param kernel: kernel to print
+        :type kernel: list
+        :param kernel_dg: directed graph containing CP and LCD
+        :type kernel_dg: :class:`~osaca.semantics.KernelDG`
+        :param verbose: verbose output flag, defaults to `False`
+        :type verbose: bool, optional
+        """
         self._print_header_report()
         self._print_symbol_map()
         self.print_combined_view(
@@ -109,9 +164,20 @@ class Frontend(object):
         self.print_loopcarried_dependencies(kernel_dg.get_loopcarried_dependencies())
 
     def print_combined_view(self, kernel, cp_kernel: KernelDG, dep_dict, show_cmnts=True):
-        self._print_header_report()
-        self._print_symbol_map()
-        print('\n\nCombined Analysis Report\n' + '-----------------------')
+        """
+        Prints the combined view of the kernel including the port pressure (TP), a CP column and a
+        LCD column.
+
+        :param kernel: kernel to print
+        :type kernel: list
+        :param kernel_dg: directed graph containing CP and LCD
+        :type kernel_dg: :class:`~osaca.semantics.KernelDG`
+        :param dep_dict: dictionary with first instruction in LCD as key and the deps as value
+        :type dep_dict: dict
+        :param show_cmnts: flag for showing comment-only lines in kernel, defaults to `True`
+        :type show_cmnts: bool, optional
+        """
+        print('\n\nCombined Analysis Report\n' + '------------------------')
         lineno_filler = '     '
         port_len = self._get_max_port_len(kernel)
         # Separator for ports
@@ -180,6 +246,7 @@ class Frontend(object):
     ####################
 
     def _get_separator_list(self, separator, separator_2=' '):
+        """Creates column view for seperators in the TP/combined view."""
         separator_list = []
         for i in range(len(self._machine_model.get_ports()) - 1):
             match_1 = re.search(r'\d+', self._machine_model.get_ports()[i])
@@ -192,6 +259,7 @@ class Frontend(object):
         return separator_list
 
     def _get_flag_symbols(self, flag_obj):
+        """Returns flags for a flag object of an instruction"""
         string_result = ''
         string_result += '*' if INSTR_FLAGS.NOT_BOUND in flag_obj else ''
         string_result += 'X' if INSTR_FLAGS.TP_UNKWN in flag_obj else ''
@@ -201,6 +269,7 @@ class Frontend(object):
         return string_result
 
     def _get_port_pressure(self, ports, port_len, used_ports=[], separator='|'):
+        """Returns line of port pressure for an instruction."""
         if not isinstance(separator, list):
             separator = [separator for x in ports]
         string_result = '{} '.format(separator[-1])
@@ -214,20 +283,23 @@ class Frontend(object):
         return string_result[:-1]
 
     def _get_node_by_lineno(self, lineno, kernel):
+        """Returns instruction form from kernel by its line number."""
         nodes = [instr for instr in kernel if instr['line_number'] == lineno]
         return nodes[0] if len(nodes) > 0 else None
 
     def _get_lcd_cp_ports(self, line_number, cp_dg, dependency, separator='|'):
+        """Returns the CP and LCD line for one instruction."""
         lat_cp = lat_lcd = ''
         if cp_dg:
-            lat_cp = self._get_node_by_lineno(line_number, cp_dg)['latency_cp']
+            lat_cp = float(self._get_node_by_lineno(line_number, cp_dg)['latency_cp'])
         if dependency:
-            lat_lcd = self._get_node_by_lineno(line_number, dependency['dependencies'])[
-                'latency_lcd'
-            ]
+            lat_lcd = float(
+                self._get_node_by_lineno(line_number, dependency['dependencies'])['latency_lcd']
+            )
         return '{} {:>4} {} {:>4} {}'.format(separator, lat_cp, separator, lat_lcd, separator)
 
     def _get_max_port_len(self, kernel):
+        """Returns the maximal length needed to print all throughputs of the kernel."""
         port_len = [4 for x in self._machine_model.get_ports()]
         for instruction_form in kernel:
             for i, port in enumerate(instruction_form['port_pressure']):
@@ -236,6 +308,7 @@ class Frontend(object):
         return port_len
 
     def _get_port_number_line(self, port_len, separator='|'):
+        """Returns column view of port identificators of machine_model."""
         string_result = separator
         separator_list = self._get_separator_list(separator, '-')
         for i, length in enumerate(port_len):
@@ -244,6 +317,7 @@ class Frontend(object):
         return string_result
 
     def _print_header_report(self):
+        """Prints header information"""
         version = 'v0.3'
         adjust = 20
         header = ''
@@ -256,6 +330,7 @@ class Frontend(object):
         print(header)
 
     def _print_symbol_map(self):
+        """Prints instruction flag map."""
         symbol_dict = {
             INSTR_FLAGS.NOT_BOUND: 'Instruction micro-ops not bound to a port',
             INSTR_FLAGS.TP_UNKWN: 'No throughput/latency information for this instruction in '
