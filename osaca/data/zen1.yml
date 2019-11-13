@@ -1,4 +1,4 @@
-osaca_version: 0.3.2
+osaca_version: 0.3.1.dev1
 micro_architecture: AMD Zen (family 17h)
 arch_code: ZEN1
 isa: x86

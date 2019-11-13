@@ -1,4 +1,4 @@
-osaca_version: 0.3.2
+osaca_version: 0.3.1.dev1
 micro_architecture: Thunder X2
 arch_code: tx2
 isa: AArch64

@@ -1,4 +1,4 @@
-osaca_version: 0.3.2
+osaca_version: 0.3.1.dev1
 micro_architecture: Cascade Lake SP
 arch_code: CSX
 isa: x86
