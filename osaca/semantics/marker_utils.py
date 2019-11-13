@@ -123,9 +123,9 @@ def match_bytes(lines, index, byte_list):
 
 def find_jump_labels(lines):
     """
-    Find and return all labels which are followed by instructions
+    Find and return all labels which are followed by instructions until the next label
 
-    :return: OrderedDict of mapping from label name to associated line
+    :return: OrderedDict of mapping from label name to associated line index
     """
     # 1. Identify labels and instructions until next label
     labels = OrderedDict()
@@ -144,7 +144,7 @@ def find_jump_labels(lines):
             continue
     # Set to last line if no end was for last label found
     if current_label is not None and len(labels[current_label]) == 1:
-        labels[current_label] = (labels[current_label][0], i + 1)
+        labels[current_label] = (labels[current_label][0], len(lines))
 
     # 2. Identify and remove labels which contain only dot-instructions (e.g., .text)
     for label in list(labels):
@@ -157,7 +157,7 @@ def find_jump_labels(lines):
         ):
             del labels[label]
 
-    return OrderedDict([(l, lines[v[0]]) for l, v in labels.items()])
+    return OrderedDict([(l, v[0]) for l, v in labels.items()])
 
 
 def find_basic_blocks(lines):
@@ -173,11 +173,10 @@ def find_basic_blocks(lines):
     # Identify blocks, as they are started with a valid jump label and terminated by a label or
     # an instruction referencing a valid jump label
     blocks = OrderedDict()
-    for label, label_line in valid_jump_labels.items():
+    for label, label_line_idx in valid_jump_labels.items():
         blocks[label] = []
-        for i in range(lines.index(label_line)):
+        for line in lines[label_line_idx + 1:]:
             terminate = False
-            line = lines[i]
             blocks[label].append(line)
             # Find end of block by searching for references to valid jump labels
             if line['instruction'] and line['operands']:
@@ -203,11 +202,10 @@ def find_basic_loop_bodies(lines):
     # Identify blocks, as they are started with a valid jump label and terminated by
     # an instruction referencing a valid jump label
     loop_bodies = OrderedDict()
-    for label, label_line in valid_jump_labels.items():
+    for label, label_line_idx in valid_jump_labels.items():
         current_block = []
-        for i in range(lines.index(label_line), len(lines)):
+        for line in lines[label_line_idx + 1:]:
             terminate = False
-            line = lines[i]
             current_block.append(line)
             # Find end of block by searching for references to valid jump labels
             if line['instruction'] and line['operands']:
