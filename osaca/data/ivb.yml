@@ -1,0 +1,10482 @@
+osaca_version: 0.3.1.dev1
+micro_architecture: Intel Ivy Bridge
+arch_code: IVB
+isa: x86
+ROB_size: 168
+retired_uOps_per_cycle: 4
+scheduler_size: 54
+hidden_loads: false
+load_latency: {gpr: 4.0, xmm: 4.0, ymm: 4.0}
+load_throughput:
+- {base: gpr, index: gpr, offset: imd, scale: 1, port_pressure: [[1, '23'], [1, [2D, 3D]]]}
+- {base: gpr, index: gpr, offset: imd, scale: 8, port_pressure: [[1, '23'], [1, [2D, 3D]]]}
+- {base: gpr, index: gpr, offset: ~, scale: 1, port_pressure: [[1, '23'], [1, [2D, 3D]]]}
+- {base: gpr, index: gpr, offset: ~, scale: 8, port_pressure: [[1, '23'], [1, [2D, 3D]]]}
+- {base: gpr, index: ~, offset: imd, scale: 1, port_pressure: [[1, '23'], [1, [2D, 3D]]]}
+- {base: gpr, index: ~, offset: imd, scale: 8, port_pressure: [[1, '23'], [1, [2D, 3D]]]}
+- {base: gpr, index: ~, offset: ~, scale: 1, port_pressure: [[1, '23'], [1, [2D, 3D]]]}
+- {base: gpr, index: ~, offset: ~, scale: 8, port_pressure: [[1, '23'], [1, [2D, 3D]]]}
+ports: ['0', '0DV', '1', '2', '2D', '3', '3D', '4', '5']
+port_model_scheme: |
+  ┌-----------------------------------------------------┐
+  |                  54 entry scheduler                 |
+  └-----------------------------------------------------┘
+     0 |       1 |      2 |     3 |     4 |      5 |    
+       ▼         ▼        ▼       ▼       ▼        ▼    
+   ┌-------┐ ┌-------┐ ┌-----┐ ┌-----┐ ┌-----┐ ┌-------┐
+   |  ALU  | |  ALU  | |  LD | |  LD | |  ST | |  ALU  |
+   └-------┘ └-------┘ └-----┘ └-----┘ └-----┘ └-------┘
+   ┌-------┐ ┌-------┐ ┌-----┐ ┌-----┐         ┌-------┐
+   |AVX DIV| |  Fast | | AGU | | AGU |         | BRANCH|
+   └-------┘ |  LEA  | └-----┘ └-----┘         └-------┘
+   ┌-------┐ └-------┘                         ┌-------┐
+   |AVX MUL| ┌-------┐┌-------┐                |  Fast |
+   └-------┘ |AVX ADD||AVX FMA|                |  LEA  |
+   ┌-------┐ └-------┘└-------┘                └-------┘
+   |  AVX  |┌-------┐ ┌-------┐                ┌-------┐
+   | Shift ||AVX FMA| |AVX MUL|                |  AVX  |
+   └-------┘└-------┘ └-------┘                |  SHUF |
+                                               └-------┘
+instruction_forms:
+- name: mov
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: 0.0
+  port_pressure: []
+  throughput: 0.0
+  uops: 0
+- name: mov
+  operands:
+  - class: memory
+    base: gpr
+    offset: ~
+    index: ~
+    scale: 1
+  - class: register
+    name: gpr
+  latency: 4.0
+  port_pressure: [[1, '23'], [1, [2D, 3D]]]
+  throughput: 0.5
+  uops: 2
+- name: mov
+  operands:
+  - class: memory
+    base: gpr
+    offset: ~
+    index: gpr
+    scale: 1
+  - class: register
+    name: gpr
+  latency: 4.0
+  port_pressure: [[1, '23'], [1, [2D, 3D]]]
+  throughput: 0.5
+  uops: 2
+- name: mov
+  operands:
+  - class: memory
+    base: gpr
+    offset: imd
+    index: gpr
+    scale: 1
+  - class: register
+    name: gpr
+  latency: 4.0
+  port_pressure: [[1, '23'], [1, [2D, 3D]]]
+  throughput: 0.5
+  uops: 2
+- name: mov
+  operands:
+  - class: register
+    name: gpr
+  - class: memory
+    base: gpr
+    offset: ~
+    index: ~
+    scale: 1
+  latency: 0
+  port_pressure: [[1, '23'], [1, '4']]
+  throughput: 1.0
+  uops: 2
+- name: mov
+  operands:
+  - class: register
+    name: gpr
+  - class: memory
+    base: gpr
+    offset: ~
+    index: gpr
+    scale: 1
+  latency: 0
+  port_pressure: [[1, '23'], [1, '4']]
+  throughput: 1.0
+  uops: 2
+- name: mov
+  operands:
+  - class: register
+    name: gpr
+  - class: memory
+    base: gpr
+    offset: imd
+    index: gpr
+    scale: 1
+  latency: 0
+  port_pressure: [[1, '23'], [1, '4']]
+  throughput: 1.0
+  uops: 2
+- name: movq
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: 0.0
+  port_pressure: []
+  throughput: 0.0
+  uops: 0
+- name: movq
+  operands:
+  - class: memory
+    base: gpr
+    offset: ~
+    index: ~
+    scale: 1
+  - class: register
+    name: gpr
+  latency: 4.0
+  port_pressure: [[1, '23'], [1, [2D, 3D]]]
+  throughput: 0.5
+  uops: 2
+- name: movq
+  operands:
+  - class: memory
+    base: gpr
+    offset: ~
+    index: gpr
+    scale: 1
+  - class: register
+    name: gpr
+  latency: 4.0
+  port_pressure: [[1, '23'], [1, [2D, 3D]]]
+  throughput: 0.5
+  uops: 2
+- name: movq
+  operands:
+  - class: memory
+    base: gpr
+    offset: imd
+    index: gpr
+    scale: 1
+  - class: register
+    name: gpr
+  latency: 4.0
+  port_pressure: [[1, '23'], [1, [2D, 3D]]]
+  throughput: 0.5
+  uops: 2
+- name: movq
+  operands:
+  - class: register
+    name: gpr
+  - class: memory
+    base: gpr
+    offset: ~
+    index: ~
+    scale: 1
+  latency: 0
+  port_pressure: [[1, '23'], [1, '4']]
+  throughput: 1.0
+  uops: 2
+- name: movq
+  operands:
+  - class: register
+    name: gpr
+  - class: memory
+    base: gpr
+    offset: ~
+    index: gpr
+    scale: 1
+  latency: 0
+  port_pressure: [[1, '23'], [1, '4']]
+  throughput: 1.0
+  uops: 2
+- name: movq
+  operands:
+  - class: register
+    name: gpr
+  - class: memory
+    base: gpr
+    offset: imd
+    index: gpr
+    scale: 1
+  latency: 0
+  port_pressure: [[1, '23'], [1, '4']]
+  throughput: 1.0
+  uops: 2
+- name: movapd
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 0.0
+  port_pressure: []
+  throughput: 0.0
+  uops: 0
+- name: movapd
+  operands:
+  - class: memory
+    base: gpr
+    offset: ~
+    index: ~
+    scale: 1
+  - class: register
+    name: xmm
+  latency: 4.0
+  port_pressure: [[1, '23'], [1, [2D, 3D]]]
+  throughput: 0.5
+  uops: 2
+- name: movapd
+  operands:
+  - class: memory
+    base: gpr
+    offset: ~
+    index: gpr
+    scale: 1
+  - class: register
+    name: xmm
+  latency: 4.0
+  port_pressure: [[1, '23'], [1, [2D, 3D]]]
+  throughput: 0.5
+  uops: 2
+- name: movapd
+  operands:
+  - class: memory
+    base: gpr
+    offset: imd
+    index: gpr
+    scale: 1
+  - class: register
+    name: xmm
+  latency: 4.0
+  port_pressure: [[1, '23'], [1, [2D, 3D]]]
+  throughput: 0.5
+  uops: 2
+- name: movapd
+  operands:
+  - class: register
+    name: xmm
+  - class: memory
+    base: gpr
+    offset: ~
+    index: ~
+    scale: 1
+  latency: 0
+  port_pressure: [[1, '23'], [1, '4']]
+  throughput: 1.0
+  uops: 2
+- name: movapd
+  operands:
+  - class: register
+    name: xmm
+  - class: memory
+    base: gpr
+    offset: ~
+    index: gpr
+    scale: 1
+  latency: 0
+  port_pressure: [[1, '23'], [1, '4']]
+  throughput: 1.0
+  uops: 2
+- name: movapd
+  operands:
+  - class: register
+    name: xmm
+  - class: memory
+    base: gpr
+    offset: imd
+    index: gpr
+    scale: 1
+  latency: 0
+  port_pressure: [[1, '23'], [1, '4']]
+  throughput: 1.0
+  uops: 2
+- name: movaps
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 0.0
+  port_pressure: []
+  throughput: 0.0
+  uops: 0
+- name: movaps
+  operands:
+  - class: memory
+    base: gpr
+    offset: ~
+    index: ~
+    scale: 1
+  - class: register
+    name: xmm
+  latency: 4.0
+  port_pressure: [[1, '23'], [1, [2D, 3D]]]
+  throughput: 0.5
+  uops: 2
+- name: movaps
+  operands:
+  - class: memory
+    base: gpr
+    offset: ~
+    index: gpr
+    scale: 1
+  - class: register
+    name: xmm
+  latency: 4.0
+  port_pressure: [[1, '23'], [1, [2D, 3D]]]
+  throughput: 0.5
+  uops: 2
+- name: movaps
+  operands:
+  - class: memory
+    base: gpr
+    offset: imd
+    index: gpr
+    scale: 1
+  - class: register
+    name: xmm
+  latency: 4.0
+  port_pressure: [[1, '23'], [1, [2D, 3D]]]
+  throughput: 0.5
+  uops: 2
+- name: movaps
+  operands:
+  - class: register
+    name: xmm
+  - class: memory
+    base: gpr
+    offset: ~
+    index: ~
+    scale: 1
+  latency: 0
+  port_pressure: [[1, '23'], [1, '4']]
+  throughput: 1.0
+  uops: 2
+- name: movaps
+  operands:
+  - class: register
+    name: xmm
+  - class: memory
+    base: gpr
+    offset: ~
+    index: gpr
+    scale: 1
+  latency: 0
+  port_pressure: [[1, '23'], [1, '4']]
+  throughput: 1.0
+  uops: 2
+- name: movaps
+  operands:
+  - class: register
+    name: xmm
+  - class: memory
+    base: gpr
+    offset: imd
+    index: gpr
+    scale: 1
+  latency: 0
+  port_pressure: [[1, '23'], [1, '4']]
+  throughput: 1.0
+  uops: 2
+- name: movdqa
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 0.0
+  port_pressure: []
+  throughput: 0.0
+  uops: 0
+- name: movdqa
+  operands:
+  - class: memory
+    base: gpr
+    offset: ~
+    index: ~
+    scale: 1
+  - class: register
+    name: xmm
+  latency: 4.0
+  port_pressure: [[1, '23'], [1, [2D, 3D]]]
+  throughput: 0.5
+  uops: 2
+- name: movdqa
+  operands:
+  - class: memory
+    base: gpr
+    offset: ~
+    index: gpr
+    scale: 1
+  - class: register
+    name: xmm
+  latency: 4.0
+  port_pressure: [[1, '23'], [1, [2D, 3D]]]
+  throughput: 0.5
+  uops: 2
+- name: movdqa
+  operands:
+  - class: memory
+    base: gpr
+    offset: imd
+    index: gpr
+    scale: 1
+  - class: register
+    name: xmm
+  latency: 4.0
+  port_pressure: [[1, '23'], [1, [2D, 3D]]]
+  throughput: 0.5
+  uops: 2
+- name: movdqa
+  operands:
+  - class: register
+    name: xmm
+  - class: memory
+    base: gpr
+    offset: ~
+    index: ~
+    scale: 1
+  latency: 0
+  port_pressure: [[1, '23'], [1, '4']]
+  throughput: 1.0
+  uops: 2
+- name: movdqa
+  operands:
+  - class: register
+    name: xmm
+  - class: memory
+    base: gpr
+    offset: ~
+    index: gpr
+    scale: 1
+  latency: 0
+  port_pressure: [[1, '23'], [1, '4']]
+  throughput: 1.0
+  uops: 2
+- name: movdqa
+  operands:
+  - class: register
+    name: xmm
+  - class: memory
+    base: gpr
+    offset: imd
+    index: gpr
+    scale: 1
+  latency: 0
+  port_pressure: [[1, '23'], [1, '4']]
+  throughput: 1.0
+  uops: 2
+- name: movdqu
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 0.0
+  port_pressure: []
+  throughput: 0.0
+  uops: 0
+- name: movdqu
+  operands:
+  - class: memory
+    base: gpr
+    offset: ~
+    index: ~
+    scale: 1
+  - class: register
+    name: xmm
+  latency: 4.0
+  port_pressure: [[1, '23'], [1, [2D, 3D]]]
+  throughput: 0.5
+  uops: 2
+- name: movdqu
+  operands:
+  - class: memory
+    base: gpr
+    offset: ~
+    index: gpr
+    scale: 1
+  - class: register
+    name: xmm
+  latency: 4.0
+  port_pressure: [[1, '23'], [1, [2D, 3D]]]
+  throughput: 0.5
+  uops: 2
+- name: movdqu
+  operands:
+  - class: memory
+    base: gpr
+    offset: imd
+    index: gpr
+    scale: 1
+  - class: register
+    name: xmm
+  latency: 4.0
+  port_pressure: [[1, '23'], [1, [2D, 3D]]]
+  throughput: 0.5
+  uops: 2
+- name: movdqu
+  operands:
+  - class: register
+    name: xmm
+  - class: memory
+    base: gpr
+    offset: ~
+    index: ~
+    scale: 1
+  latency: 0
+  port_pressure: [[1, '23'], [1, '4']]
+  throughput: 1.0
+  uops: 2
+- name: movdqu
+  operands:
+  - class: register
+    name: xmm
+  - class: memory
+    base: gpr
+    offset: ~
+    index: gpr
+    scale: 1
+  latency: 0
+  port_pressure: [[1, '23'], [1, '4']]
+  throughput: 1.0
+  uops: 2
+- name: movdqu
+  operands:
+  - class: register
+    name: xmm
+  - class: memory
+    base: gpr
+    offset: imd
+    index: gpr
+    scale: 1
+  latency: 0
+  port_pressure: [[1, '23'], [1, '4']]
+  throughput: 1.0
+  uops: 2
+- name: movq
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 0.0
+  port_pressure: []
+  throughput: 0.0
+  uops: 0
+- name: movq
+  operands:
+  - class: memory
+    base: gpr
+    offset: ~
+    index: ~
+    scale: 1
+  - class: register
+    name: xmm
+  latency: 4.0
+  port_pressure: [[1, '23'], [1, [2D, 3D]]]
+  throughput: 0.5
+  uops: 2
+- name: movq
+  operands:
+  - class: memory
+    base: gpr
+    offset: ~
+    index: gpr
+    scale: 1
+  - class: register
+    name: xmm
+  latency: 4.0
+  port_pressure: [[1, '23'], [1, [2D, 3D]]]
+  throughput: 0.5
+  uops: 2
+- name: movq
+  operands:
+  - class: memory
+    base: gpr
+    offset: imd
+    index: gpr
+    scale: 1
+  - class: register
+    name: xmm
+  latency: 4.0
+  port_pressure: [[1, '23'], [1, [2D, 3D]]]
+  throughput: 0.5
+  uops: 2
+- name: movq
+  operands:
+  - class: register
+    name: xmm
+  - class: memory
+    base: gpr
+    offset: ~
+    index: ~
+    scale: 1
+  latency: 0
+  port_pressure: [[1, '23'], [1, '4']]
+  throughput: 1.0
+  uops: 2
+- name: movq
+  operands:
+  - class: register
+    name: xmm
+  - class: memory
+    base: gpr
+    offset: ~
+    index: gpr
+    scale: 1
+  latency: 0
+  port_pressure: [[1, '23'], [1, '4']]
+  throughput: 1.0
+  uops: 2
+- name: movq
+  operands:
+  - class: register
+    name: xmm
+  - class: memory
+    base: gpr
+    offset: imd
+    index: gpr
+    scale: 1
+  latency: 0
+  port_pressure: [[1, '23'], [1, '4']]
+  throughput: 1.0
+  uops: 2
+- name: movsd
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 0.0
+  port_pressure: []
+  throughput: 0.0
+  uops: 0
+- name: movsd
+  operands:
+  - class: memory
+    base: gpr
+    offset: ~
+    index: ~
+    scale: 1
+  - class: register
+    name: xmm
+  latency: 4.0
+  port_pressure: [[1, '23'], [1, [2D, 3D]]]
+  throughput: 0.5
+  uops: 2
+- name: movsd
+  operands:
+  - class: memory
+    base: gpr
+    offset: ~
+    index: gpr
+    scale: 1
+  - class: register
+    name: xmm
+  latency: 4.0
+  port_pressure: [[1, '23'], [1, [2D, 3D]]]
+  throughput: 0.5
+  uops: 2
+- name: movsd
+  operands:
+  - class: memory
+    base: gpr
+    offset: imd
+    index: gpr
+    scale: 1
+  - class: register
+    name: xmm
+  latency: 4.0
+  port_pressure: [[1, '23'], [1, [2D, 3D]]]
+  throughput: 0.5
+  uops: 2
+- name: movsd
+  operands:
+  - class: register
+    name: xmm
+  - class: memory
+    base: gpr
+    offset: ~
+    index: ~
+    scale: 1
+  latency: 0
+  port_pressure: [[1, '23'], [1, '4']]
+  throughput: 1.0
+  uops: 2
+- name: movsd
+  operands:
+  - class: register
+    name: xmm
+  - class: memory
+    base: gpr
+    offset: ~
+    index: gpr
+    scale: 1
+  latency: 0
+  port_pressure: [[1, '23'], [1, '4']]
+  throughput: 1.0
+  uops: 2
+- name: movsd
+  operands:
+  - class: register
+    name: xmm
+  - class: memory
+    base: gpr
+    offset: imd
+    index: gpr
+    scale: 1
+  latency: 0
+  port_pressure: [[1, '23'], [1, '4']]
+  throughput: 1.0
+  uops: 2
+- name: movss
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 0.0
+  port_pressure: []
+  throughput: 0.0
+  uops: 0
+- name: movss
+  operands:
+  - class: memory
+    base: gpr
+    offset: ~
+    index: ~
+    scale: 1
+  - class: register
+    name: xmm
+  latency: 4.0
+  port_pressure: [[1, '23'], [1, [2D, 3D]]]
+  throughput: 0.5
+  uops: 2
+- name: movss
+  operands:
+  - class: memory
+    base: gpr
+    offset: ~
+    index: gpr
+    scale: 1
+  - class: register
+    name: xmm
+  latency: 4.0
+  port_pressure: [[1, '23'], [1, [2D, 3D]]]
+  throughput: 0.5
+  uops: 2
+- name: movss
+  operands:
+  - class: memory
+    base: gpr
+    offset: imd
+    index: gpr
+    scale: 1
+  - class: register
+    name: xmm
+  latency: 4.0
+  port_pressure: [[1, '23'], [1, [2D, 3D]]]
+  throughput: 0.5
+  uops: 2
+- name: movss
+  operands:
+  - class: register
+    name: xmm
+  - class: memory
+    base: gpr
+    offset: ~
+    index: ~
+    scale: 1
+  latency: 0
+  port_pressure: [[1, '23'], [1, '4']]
+  throughput: 1.0
+  uops: 2
+- name: movss
+  operands:
+  - class: register
+    name: xmm
+  - class: memory
+    base: gpr
+    offset: ~
+    index: gpr
+    scale: 1
+  latency: 0
+  port_pressure: [[1, '23'], [1, '4']]
+  throughput: 1.0
+  uops: 2
+- name: movss
+  operands:
+  - class: register
+    name: xmm
+  - class: memory
+    base: gpr
+    offset: imd
+    index: gpr
+    scale: 1
+  latency: 0
+  port_pressure: [[1, '23'], [1, '4']]
+  throughput: 1.0
+  uops: 2
+- name: movupd
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 0.0
+  port_pressure: []
+  throughput: 0.0
+  uops: 0
+- name: movupd
+  operands:
+  - class: memory
+    base: gpr
+    offset: ~
+    index: ~
+    scale: 1
+  - class: register
+    name: xmm
+  latency: 4.0
+  port_pressure: [[1, '23'], [1, [2D, 3D]]]
+  throughput: 0.5
+  uops: 2
+- name: movupd
+  operands:
+  - class: memory
+    base: gpr
+    offset: ~
+    index: gpr
+    scale: 1
+  - class: register
+    name: xmm
+  latency: 4.0
+  port_pressure: [[1, '23'], [1, [2D, 3D]]]
+  throughput: 0.5
+  uops: 2
+- name: movupd
+  operands:
+  - class: memory
+    base: gpr
+    offset: imd
+    index: gpr
+    scale: 1
+  - class: register
+    name: xmm
+  latency: 4.0
+  port_pressure: [[1, '23'], [1, [2D, 3D]]]
+  throughput: 0.5
+  uops: 2
+- name: movupd
+  operands:
+  - class: register
+    name: xmm
+  - class: memory
+    base: gpr
+    offset: ~
+    index: ~
+    scale: 1
+  latency: 0
+  port_pressure: [[1, '23'], [1, '4']]
+  throughput: 1.0
+  uops: 2
+- name: movupd
+  operands:
+  - class: register
+    name: xmm
+  - class: memory
+    base: gpr
+    offset: ~
+    index: gpr
+    scale: 1
+  latency: 0
+  port_pressure: [[1, '23'], [1, '4']]
+  throughput: 1.0
+  uops: 2
+- name: movupd
+  operands:
+  - class: register
+    name: xmm
+  - class: memory
+    base: gpr
+    offset: imd
+    index: gpr
+    scale: 1
+  latency: 0
+  port_pressure: [[1, '23'], [1, '4']]
+  throughput: 1.0
+  uops: 2
+- name: movups
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 0.0
+  port_pressure: []
+  throughput: 0.0
+  uops: 0
+- name: movups
+  operands:
+  - class: memory
+    base: gpr
+    offset: ~
+    index: ~
+    scale: 1
+  - class: register
+    name: xmm
+  latency: 4.0
+  port_pressure: [[1, '23'], [1, [2D, 3D]]]
+  throughput: 0.5
+  uops: 2
+- name: movups
+  operands:
+  - class: memory
+    base: gpr
+    offset: ~
+    index: gpr
+    scale: 1
+  - class: register
+    name: xmm
+  latency: 4.0
+  port_pressure: [[1, '23'], [1, [2D, 3D]]]
+  throughput: 0.5
+  uops: 2
+- name: movups
+  operands:
+  - class: memory
+    base: gpr
+    offset: imd
+    index: gpr
+    scale: 1
+  - class: register
+    name: xmm
+  latency: 4.0
+  port_pressure: [[1, '23'], [1, [2D, 3D]]]
+  throughput: 0.5
+  uops: 2
+- name: movups
+  operands:
+  - class: register
+    name: xmm
+  - class: memory
+    base: gpr
+    offset: ~
+    index: ~
+    scale: 1
+  latency: 0
+  port_pressure: [[1, '23'], [1, '4']]
+  throughput: 1.0
+  uops: 2
+- name: movups
+  operands:
+  - class: register
+    name: xmm
+  - class: memory
+    base: gpr
+    offset: ~
+    index: gpr
+    scale: 1
+  latency: 0
+  port_pressure: [[1, '23'], [1, '4']]
+  throughput: 1.0
+  uops: 2
+- name: movups
+  operands:
+  - class: register
+    name: xmm
+  - class: memory
+    base: gpr
+    offset: imd
+    index: gpr
+    scale: 1
+  latency: 0
+  port_pressure: [[1, '23'], [1, '4']]
+  throughput: 1.0
+  uops: 2
+- name: vmovapd
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 0.0
+  port_pressure: []
+  throughput: 0.0
+  uops: 0
+- name: vmovapd
+  operands:
+  - class: memory
+    base: gpr
+    offset: ~
+    index: ~
+    scale: 1
+  - class: register
+    name: xmm
+  latency: 4.0
+  port_pressure: [[1, '23'], [1, [2D, 3D]]]
+  throughput: 0.5
+  uops: 2
+- name: vmovapd
+  operands:
+  - class: memory
+    base: gpr
+    offset: ~
+    index: gpr
+    scale: 1
+  - class: register
+    name: xmm
+  latency: 4.0
+  port_pressure: [[1, '23'], [1, [2D, 3D]]]
+  throughput: 0.5
+  uops: 2
+- name: vmovapd
+  operands:
+  - class: memory
+    base: gpr
+    offset: imd
+    index: gpr
+    scale: 1
+  - class: register
+    name: xmm
+  latency: 4.0
+  port_pressure: [[1, '23'], [1, [2D, 3D]]]
+  throughput: 0.5
+  uops: 2
+- name: vmovapd
+  operands:
+  - class: register
+    name: xmm
+  - class: memory
+    base: gpr
+    offset: ~
+    index: ~
+    scale: 1
+  latency: 0
+  port_pressure: [[1, '23'], [1, '4']]
+  throughput: 1.0
+  uops: 2
+- name: vmovapd
+  operands:
+  - class: register
+    name: xmm
+  - class: memory
+    base: gpr
+    offset: ~
+    index: gpr
+    scale: 1
+  latency: 0
+  port_pressure: [[1, '23'], [1, '4']]
+  throughput: 1.0
+  uops: 2
+- name: vmovapd
+  operands:
+  - class: register
+    name: xmm
+  - class: memory
+    base: gpr
+    offset: imd
+    index: gpr
+    scale: 1
+  latency: 0
+  port_pressure: [[1, '23'], [1, '4']]
+  throughput: 1.0
+  uops: 2
+- name: vmovaps
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 0.0
+  port_pressure: []
+  throughput: 0.0
+  uops: 0
+- name: vmovaps
+  operands:
+  - class: memory
+    base: gpr
+    offset: ~
+    index: ~
+    scale: 1
+  - class: register
+    name: xmm
+  latency: 4.0
+  port_pressure: [[1, '23'], [1, [2D, 3D]]]
+  throughput: 0.5
+  uops: 2
+- name: vmovaps
+  operands:
+  - class: memory
+    base: gpr
+    offset: ~
+    index: gpr
+    scale: 1
+  - class: register
+    name: xmm
+  latency: 4.0
+  port_pressure: [[1, '23'], [1, [2D, 3D]]]
+  throughput: 0.5
+  uops: 2
+- name: vmovaps
+  operands:
+  - class: memory
+    base: gpr
+    offset: imd
+    index: gpr
+    scale: 1
+  - class: register
+    name: xmm
+  latency: 4.0
+  port_pressure: [[1, '23'], [1, [2D, 3D]]]
+  throughput: 0.5
+  uops: 2
+- name: vmovaps
+  operands:
+  - class: register
+    name: xmm
+  - class: memory
+    base: gpr
+    offset: ~
+    index: ~
+    scale: 1
+  latency: 0
+  port_pressure: [[1, '23'], [1, '4']]
+  throughput: 1.0
+  uops: 2
+- name: vmovaps
+  operands:
+  - class: register
+    name: xmm
+  - class: memory
+    base: gpr
+    offset: ~
+    index: gpr
+    scale: 1
+  latency: 0
+  port_pressure: [[1, '23'], [1, '4']]
+  throughput: 1.0
+  uops: 2
+- name: vmovaps
+  operands:
+  - class: register
+    name: xmm
+  - class: memory
+    base: gpr
+    offset: imd
+    index: gpr
+    scale: 1
+  latency: 0
+  port_pressure: [[1, '23'], [1, '4']]
+  throughput: 1.0
+  uops: 2
+- name: vmovdqa
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 0.0
+  port_pressure: []
+  throughput: 0.0
+  uops: 0
+- name: vmovdqa
+  operands:
+  - class: memory
+    base: gpr
+    offset: ~
+    index: ~
+    scale: 1
+  - class: register
+    name: xmm
+  latency: 4.0
+  port_pressure: [[1, '23'], [1, [2D, 3D]]]
+  throughput: 0.5
+  uops: 2
+- name: vmovdqa
+  operands:
+  - class: memory
+    base: gpr
+    offset: ~
+    index: gpr
+    scale: 1
+  - class: register
+    name: xmm
+  latency: 4.0
+  port_pressure: [[1, '23'], [1, [2D, 3D]]]
+  throughput: 0.5
+  uops: 2
+- name: vmovdqa
+  operands:
+  - class: memory
+    base: gpr
+    offset: imd
+    index: gpr
+    scale: 1
+  - class: register
+    name: xmm
+  latency: 4.0
+  port_pressure: [[1, '23'], [1, [2D, 3D]]]
+  throughput: 0.5
+  uops: 2
+- name: vmovdqa
+  operands:
+  - class: register
+    name: xmm
+  - class: memory
+    base: gpr
+    offset: ~
+    index: ~
+    scale: 1
+  latency: 0
+  port_pressure: [[1, '23'], [1, '4']]
+  throughput: 1.0
+  uops: 2
+- name: vmovdqa
+  operands:
+  - class: register
+    name: xmm
+  - class: memory
+    base: gpr
+    offset: ~
+    index: gpr
+    scale: 1
+  latency: 0
+  port_pressure: [[1, '23'], [1, '4']]
+  throughput: 1.0
+  uops: 2
+- name: vmovdqa
+  operands:
+  - class: register
+    name: xmm
+  - class: memory
+    base: gpr
+    offset: imd
+    index: gpr
+    scale: 1
+  latency: 0
+  port_pressure: [[1, '23'], [1, '4']]
+  throughput: 1.0
+  uops: 2
+- name: vmovdqu
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 0.0
+  port_pressure: []
+  throughput: 0.0
+  uops: 0
+- name: vmovdqu
+  operands:
+  - class: memory
+    base: gpr
+    offset: ~
+    index: ~
+    scale: 1
+  - class: register
+    name: xmm
+  latency: 4.0
+  port_pressure: [[1, '23'], [1, [2D, 3D]]]
+  throughput: 0.5
+  uops: 2
+- name: vmovdqu
+  operands:
+  - class: memory
+    base: gpr
+    offset: ~
+    index: gpr
+    scale: 1
+  - class: register
+    name: xmm
+  latency: 4.0
+  port_pressure: [[1, '23'], [1, [2D, 3D]]]
+  throughput: 0.5
+  uops: 2
+- name: vmovdqu
+  operands:
+  - class: memory
+    base: gpr
+    offset: imd
+    index: gpr
+    scale: 1
+  - class: register
+    name: xmm
+  latency: 4.0
+  port_pressure: [[1, '23'], [1, [2D, 3D]]]
+  throughput: 0.5
+  uops: 2
+- name: vmovdqu
+  operands:
+  - class: register
+    name: xmm
+  - class: memory
+    base: gpr
+    offset: ~
+    index: ~
+    scale: 1
+  latency: 0
+  port_pressure: [[1, '23'], [1, '4']]
+  throughput: 1.0
+  uops: 2
+- name: vmovdqu
+  operands:
+  - class: register
+    name: xmm
+  - class: memory
+    base: gpr
+    offset: ~
+    index: gpr
+    scale: 1
+  latency: 0
+  port_pressure: [[1, '23'], [1, '4']]
+  throughput: 1.0
+  uops: 2
+- name: vmovdqu
+  operands:
+  - class: register
+    name: xmm
+  - class: memory
+    base: gpr
+    offset: imd
+    index: gpr
+    scale: 1
+  latency: 0
+  port_pressure: [[1, '23'], [1, '4']]
+  throughput: 1.0
+  uops: 2
+- name: vmovq
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 0.0
+  port_pressure: []
+  throughput: 0.0
+  uops: 0
+- name: vmovq
+  operands:
+  - class: memory
+    base: gpr
+    offset: ~
+    index: ~
+    scale: 1
+  - class: register
+    name: xmm
+  latency: 4.0
+  port_pressure: [[1, '23'], [1, [2D, 3D]]]
+  throughput: 0.5
+  uops: 2
+- name: vmovq
+  operands:
+  - class: memory
+    base: gpr
+    offset: ~
+    index: gpr
+    scale: 1
+  - class: register
+    name: xmm
+  latency: 4.0
+  port_pressure: [[1, '23'], [1, [2D, 3D]]]
+  throughput: 0.5
+  uops: 2
+- name: vmovq
+  operands:
+  - class: memory
+    base: gpr
+    offset: imd
+    index: gpr
+    scale: 1
+  - class: register
+    name: xmm
+  latency: 4.0
+  port_pressure: [[1, '23'], [1, [2D, 3D]]]
+  throughput: 0.5
+  uops: 2
+- name: vmovq
+  operands:
+  - class: register
+    name: xmm
+  - class: memory
+    base: gpr
+    offset: ~
+    index: ~
+    scale: 1
+  latency: 0
+  port_pressure: [[1, '23'], [1, '4']]
+  throughput: 1.0
+  uops: 2
+- name: vmovq
+  operands:
+  - class: register
+    name: xmm
+  - class: memory
+    base: gpr
+    offset: ~
+    index: gpr
+    scale: 1
+  latency: 0
+  port_pressure: [[1, '23'], [1, '4']]
+  throughput: 1.0
+  uops: 2
+- name: vmovq
+  operands:
+  - class: register
+    name: xmm
+  - class: memory
+    base: gpr
+    offset: imd
+    index: gpr
+    scale: 1
+  latency: 0
+  port_pressure: [[1, '23'], [1, '4']]
+  throughput: 1.0
+  uops: 2
+- name: vmovsd
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 0.0
+  port_pressure: []
+  throughput: 0.0
+  uops: 0
+- name: vmovsd
+  operands:
+  - class: memory
+    base: gpr
+    offset: ~
+    index: ~
+    scale: 1
+  - class: register
+    name: xmm
+  latency: 4.0
+  port_pressure: [[1, '23'], [1, [2D, 3D]]]
+  throughput: 0.5
+  uops: 2
+- name: vmovsd
+  operands:
+  - class: memory
+    base: gpr
+    offset: ~
+    index: gpr
+    scale: 1
+  - class: register
+    name: xmm
+  latency: 4.0
+  port_pressure: [[1, '23'], [1, [2D, 3D]]]
+  throughput: 0.5
+  uops: 2
+- name: vmovsd
+  operands:
+  - class: memory
+    base: gpr
+    offset: imd
+    index: gpr
+    scale: 1
+  - class: register
+    name: xmm
+  latency: 4.0
+  port_pressure: [[1, '23'], [1, [2D, 3D]]]
+  throughput: 0.5
+  uops: 2
+- name: vmovsd
+  operands:
+  - class: register
+    name: xmm
+  - class: memory
+    base: gpr
+    offset: ~
+    index: ~
+    scale: 1
+  latency: 0
+  port_pressure: [[1, '23'], [1, '4']]
+  throughput: 1.0
+  uops: 2
+- name: vmovsd
+  operands:
+  - class: register
+    name: xmm
+  - class: memory
+    base: gpr
+    offset: ~
+    index: gpr
+    scale: 1
+  latency: 0
+  port_pressure: [[1, '23'], [1, '4']]
+  throughput: 1.0
+  uops: 2
+- name: vmovsd
+  operands:
+  - class: register
+    name: xmm
+  - class: memory
+    base: gpr
+    offset: imd
+    index: gpr
+    scale: 1
+  latency: 0
+  port_pressure: [[1, '23'], [1, '4']]
+  throughput: 1.0
+  uops: 2
+- name: vmovss
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 0.0
+  port_pressure: []
+  throughput: 0.0
+  uops: 0
+- name: vmovss
+  operands:
+  - class: memory
+    base: gpr
+    offset: ~
+    index: ~
+    scale: 1
+  - class: register
+    name: xmm
+  latency: 4.0
+  port_pressure: [[1, '23'], [1, [2D, 3D]]]
+  throughput: 0.5
+  uops: 2
+- name: vmovss
+  operands:
+  - class: memory
+    base: gpr
+    offset: ~
+    index: gpr
+    scale: 1
+  - class: register
+    name: xmm
+  latency: 4.0
+  port_pressure: [[1, '23'], [1, [2D, 3D]]]
+  throughput: 0.5
+  uops: 2
+- name: vmovss
+  operands:
+  - class: memory
+    base: gpr
+    offset: imd
+    index: gpr
+    scale: 1
+  - class: register
+    name: xmm
+  latency: 4.0
+  port_pressure: [[1, '23'], [1, [2D, 3D]]]
+  throughput: 0.5
+  uops: 2
+- name: vmovss
+  operands:
+  - class: register
+    name: xmm
+  - class: memory
+    base: gpr
+    offset: ~
+    index: ~
+    scale: 1
+  latency: 0
+  port_pressure: [[1, '23'], [1, '4']]
+  throughput: 1.0
+  uops: 2
+- name: vmovss
+  operands:
+  - class: register
+    name: xmm
+  - class: memory
+    base: gpr
+    offset: ~
+    index: gpr
+    scale: 1
+  latency: 0
+  port_pressure: [[1, '23'], [1, '4']]
+  throughput: 1.0
+  uops: 2
+- name: vmovss
+  operands:
+  - class: register
+    name: xmm
+  - class: memory
+    base: gpr
+    offset: imd
+    index: gpr
+    scale: 1
+  latency: 0
+  port_pressure: [[1, '23'], [1, '4']]
+  throughput: 1.0
+  uops: 2
+- name: vmovupd
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 0.0
+  port_pressure: []
+  throughput: 0.0
+  uops: 0
+- name: vmovupd
+  operands:
+  - class: memory
+    base: gpr
+    offset: ~
+    index: ~
+    scale: 1
+  - class: register
+    name: xmm
+  latency: 4.0
+  port_pressure: [[1, '23'], [1, [2D, 3D]]]
+  throughput: 0.5
+  uops: 2
+- name: vmovupd
+  operands:
+  - class: memory
+    base: gpr
+    offset: ~
+    index: gpr
+    scale: 1
+  - class: register
+    name: xmm
+  latency: 4.0
+  port_pressure: [[1, '23'], [1, [2D, 3D]]]
+  throughput: 0.5
+  uops: 2
+- name: vmovupd
+  operands:
+  - class: memory
+    base: gpr
+    offset: imd
+    index: gpr
+    scale: 1
+  - class: register
+    name: xmm
+  latency: 4.0
+  port_pressure: [[1, '23'], [1, [2D, 3D]]]
+  throughput: 0.5
+  uops: 2
+- name: vmovupd
+  operands:
+  - class: register
+    name: xmm
+  - class: memory
+    base: gpr
+    offset: ~
+    index: ~
+    scale: 1
+  latency: 0
+  port_pressure: [[1, '23'], [1, '4']]
+  throughput: 1.0
+  uops: 2
+- name: vmovupd
+  operands:
+  - class: register
+    name: xmm
+  - class: memory
+    base: gpr
+    offset: ~
+    index: gpr
+    scale: 1
+  latency: 0
+  port_pressure: [[1, '23'], [1, '4']]
+  throughput: 1.0
+  uops: 2
+- name: vmovupd
+  operands:
+  - class: register
+    name: xmm
+  - class: memory
+    base: gpr
+    offset: imd
+    index: gpr
+    scale: 1
+  latency: 0
+  port_pressure: [[1, '23'], [1, '4']]
+  throughput: 1.0
+  uops: 2
+- name: vmovups
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 0.0
+  port_pressure: []
+  throughput: 0.0
+  uops: 0
+- name: vmovups
+  operands:
+  - class: memory
+    base: gpr
+    offset: ~
+    index: ~
+    scale: 1
+  - class: register
+    name: xmm
+  latency: 4.0
+  port_pressure: [[1, '23'], [1, [2D, 3D]]]
+  throughput: 0.5
+  uops: 2
+- name: vmovups
+  operands:
+  - class: memory
+    base: gpr
+    offset: ~
+    index: gpr
+    scale: 1
+  - class: register
+    name: xmm
+  latency: 4.0
+  port_pressure: [[1, '23'], [1, [2D, 3D]]]
+  throughput: 0.5
+  uops: 2
+- name: vmovups
+  operands:
+  - class: memory
+    base: gpr
+    offset: imd
+    index: gpr
+    scale: 1
+  - class: register
+    name: xmm
+  latency: 4.0
+  port_pressure: [[1, '23'], [1, [2D, 3D]]]
+  throughput: 0.5
+  uops: 2
+- name: vmovups
+  operands:
+  - class: register
+    name: xmm
+  - class: memory
+    base: gpr
+    offset: ~
+    index: ~
+    scale: 1
+  latency: 0
+  port_pressure: [[1, '23'], [1, '4']]
+  throughput: 1.0
+  uops: 2
+- name: vmovups
+  operands:
+  - class: register
+    name: xmm
+  - class: memory
+    base: gpr
+    offset: ~
+    index: gpr
+    scale: 1
+  latency: 0
+  port_pressure: [[1, '23'], [1, '4']]
+  throughput: 1.0
+  uops: 2
+- name: vmovups
+  operands:
+  - class: register
+    name: xmm
+  - class: memory
+    base: gpr
+    offset: imd
+    index: gpr
+    scale: 1
+  latency: 0
+  port_pressure: [[1, '23'], [1, '4']]
+  throughput: 1.0
+  uops: 2
+- name: vmovapd
+  operands:
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  latency: 0.0
+  port_pressure: []
+  throughput: 0.0
+  uops: 0
+- name: vmovapd
+  operands:
+  - class: memory
+    base: gpr
+    offset: ~
+    index: ~
+    scale: 1
+  - class: register
+    name: ymm
+  latency: 4.0
+  port_pressure: [[1, '23'], [1, [2D, 3D]]]
+  throughput: 0.5
+  uops: 2
+- name: vmovapd
+  operands:
+  - class: memory
+    base: gpr
+    offset: ~
+    index: gpr
+    scale: 1
+  - class: register
+    name: ymm
+  latency: 4.0
+  port_pressure: [[1, '23'], [1, [2D, 3D]]]
+  throughput: 0.5
+  uops: 2
+- name: vmovapd
+  operands:
+  - class: memory
+    base: gpr
+    offset: imd
+    index: gpr
+    scale: 1
+  - class: register
+    name: ymm
+  latency: 4.0
+  port_pressure: [[1, '23'], [1, [2D, 3D]]]
+  throughput: 0.5
+  uops: 2
+- name: vmovapd
+  operands:
+  - class: register
+    name: ymm
+  - class: memory
+    base: gpr
+    offset: ~
+    index: ~
+    scale: 1
+  latency: 0
+  port_pressure: [[1, '23'], [1, '4']]
+  throughput: 1.0
+  uops: 2
+- name: vmovapd
+  operands:
+  - class: register
+    name: ymm
+  - class: memory
+    base: gpr
+    offset: ~
+    index: gpr
+    scale: 1
+  latency: 0
+  port_pressure: [[1, '23'], [1, '4']]
+  throughput: 1.0
+  uops: 2
+- name: vmovapd
+  operands:
+  - class: register
+    name: ymm
+  - class: memory
+    base: gpr
+    offset: imd
+    index: gpr
+    scale: 1
+  latency: 0
+  port_pressure: [[1, '23'], [1, '4']]
+  throughput: 1.0
+  uops: 2
+- name: vmovaps
+  operands:
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  latency: 0.0
+  port_pressure: []
+  throughput: 0.0
+  uops: 0
+- name: vmovaps
+  operands:
+  - class: memory
+    base: gpr
+    offset: ~
+    index: ~
+    scale: 1
+  - class: register
+    name: ymm
+  latency: 4.0
+  port_pressure: [[1, '23'], [1, [2D, 3D]]]
+  throughput: 0.5
+  uops: 2
+- name: vmovaps
+  operands:
+  - class: memory
+    base: gpr
+    offset: ~
+    index: gpr
+    scale: 1
+  - class: register
+    name: ymm
+  latency: 4.0
+  port_pressure: [[1, '23'], [1, [2D, 3D]]]
+  throughput: 0.5
+  uops: 2
+- name: vmovaps
+  operands:
+  - class: memory
+    base: gpr
+    offset: imd
+    index: gpr
+    scale: 1
+  - class: register
+    name: ymm
+  latency: 4.0
+  port_pressure: [[1, '23'], [1, [2D, 3D]]]
+  throughput: 0.5
+  uops: 2
+- name: vmovaps
+  operands:
+  - class: register
+    name: ymm
+  - class: memory
+    base: gpr
+    offset: ~
+    index: ~
+    scale: 1
+  latency: 0
+  port_pressure: [[1, '23'], [1, '4']]
+  throughput: 1.0
+  uops: 2
+- name: vmovaps
+  operands:
+  - class: register
+    name: ymm
+  - class: memory
+    base: gpr
+    offset: ~
+    index: gpr
+    scale: 1
+  latency: 0
+  port_pressure: [[1, '23'], [1, '4']]
+  throughput: 1.0
+  uops: 2
+- name: vmovaps
+  operands:
+  - class: register
+    name: ymm
+  - class: memory
+    base: gpr
+    offset: imd
+    index: gpr
+    scale: 1
+  latency: 0
+  port_pressure: [[1, '23'], [1, '4']]
+  throughput: 1.0
+  uops: 2
+- name: vmovdqa
+  operands:
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  latency: 0.0
+  port_pressure: []
+  throughput: 0.0
+  uops: 0
+- name: vmovdqa
+  operands:
+  - class: memory
+    base: gpr
+    offset: ~
+    index: ~
+    scale: 1
+  - class: register
+    name: ymm
+  latency: 4.0
+  port_pressure: [[1, '23'], [1, [2D, 3D]]]
+  throughput: 0.5
+  uops: 2
+- name: vmovdqa
+  operands:
+  - class: memory
+    base: gpr
+    offset: ~
+    index: gpr
+    scale: 1
+  - class: register
+    name: ymm
+  latency: 4.0
+  port_pressure: [[1, '23'], [1, [2D, 3D]]]
+  throughput: 0.5
+  uops: 2
+- name: vmovdqa
+  operands:
+  - class: memory
+    base: gpr
+    offset: imd
+    index: gpr
+    scale: 1
+  - class: register
+    name: ymm
+  latency: 4.0
+  port_pressure: [[1, '23'], [1, [2D, 3D]]]
+  throughput: 0.5
+  uops: 2
+- name: vmovdqa
+  operands:
+  - class: register
+    name: ymm
+  - class: memory
+    base: gpr
+    offset: ~
+    index: ~
+    scale: 1
+  latency: 0
+  port_pressure: [[1, '23'], [1, '4']]
+  throughput: 1.0
+  uops: 2
+- name: vmovdqa
+  operands:
+  - class: register
+    name: ymm
+  - class: memory
+    base: gpr
+    offset: ~
+    index: gpr
+    scale: 1
+  latency: 0
+  port_pressure: [[1, '23'], [1, '4']]
+  throughput: 1.0
+  uops: 2
+- name: vmovdqa
+  operands:
+  - class: register
+    name: ymm
+  - class: memory
+    base: gpr
+    offset: imd
+    index: gpr
+    scale: 1
+  latency: 0
+  port_pressure: [[1, '23'], [1, '4']]
+  throughput: 1.0
+  uops: 2
+- name: vmovdqu
+  operands:
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  latency: 0.0
+  port_pressure: []
+  throughput: 0.0
+  uops: 0
+- name: vmovdqu
+  operands:
+  - class: memory
+    base: gpr
+    offset: ~
+    index: ~
+    scale: 1
+  - class: register
+    name: ymm
+  latency: 4.0
+  port_pressure: [[1, '23'], [1, [2D, 3D]]]
+  throughput: 0.5
+  uops: 2
+- name: vmovdqu
+  operands:
+  - class: memory
+    base: gpr
+    offset: ~
+    index: gpr
+    scale: 1
+  - class: register
+    name: ymm
+  latency: 4.0
+  port_pressure: [[1, '23'], [1, [2D, 3D]]]
+  throughput: 0.5
+  uops: 2
+- name: vmovdqu
+  operands:
+  - class: memory
+    base: gpr
+    offset: imd
+    index: gpr
+    scale: 1
+  - class: register
+    name: ymm
+  latency: 4.0
+  port_pressure: [[1, '23'], [1, [2D, 3D]]]
+  throughput: 0.5
+  uops: 2
+- name: vmovdqu
+  operands:
+  - class: register
+    name: ymm
+  - class: memory
+    base: gpr
+    offset: ~
+    index: ~
+    scale: 1
+  latency: 0
+  port_pressure: [[1, '23'], [1, '4']]
+  throughput: 1.0
+  uops: 2
+- name: vmovdqu
+  operands:
+  - class: register
+    name: ymm
+  - class: memory
+    base: gpr
+    offset: ~
+    index: gpr
+    scale: 1
+  latency: 0
+  port_pressure: [[1, '23'], [1, '4']]
+  throughput: 1.0
+  uops: 2
+- name: vmovdqu
+  operands:
+  - class: register
+    name: ymm
+  - class: memory
+    base: gpr
+    offset: imd
+    index: gpr
+    scale: 1
+  latency: 0
+  port_pressure: [[1, '23'], [1, '4']]
+  throughput: 1.0
+  uops: 2
+- name: vmovq
+  operands:
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  latency: 0.0
+  port_pressure: []
+  throughput: 0.0
+  uops: 0
+- name: vmovq
+  operands:
+  - class: memory
+    base: gpr
+    offset: ~
+    index: ~
+    scale: 1
+  - class: register
+    name: ymm
+  latency: 4.0
+  port_pressure: [[1, '23'], [1, [2D, 3D]]]
+  throughput: 0.5
+  uops: 2
+- name: vmovq
+  operands:
+  - class: memory
+    base: gpr
+    offset: ~
+    index: gpr
+    scale: 1
+  - class: register
+    name: ymm
+  latency: 4.0
+  port_pressure: [[1, '23'], [1, [2D, 3D]]]
+  throughput: 0.5
+  uops: 2
+- name: vmovq
+  operands:
+  - class: memory
+    base: gpr
+    offset: imd
+    index: gpr
+    scale: 1
+  - class: register
+    name: ymm
+  latency: 4.0
+  port_pressure: [[1, '23'], [1, [2D, 3D]]]
+  throughput: 0.5
+  uops: 2
+- name: vmovq
+  operands:
+  - class: register
+    name: ymm
+  - class: memory
+    base: gpr
+    offset: ~
+    index: ~
+    scale: 1
+  latency: 0
+  port_pressure: [[1, '23'], [1, '4']]
+  throughput: 1.0
+  uops: 2
+- name: vmovq
+  operands:
+  - class: register
+    name: ymm
+  - class: memory
+    base: gpr
+    offset: ~
+    index: gpr
+    scale: 1
+  latency: 0
+  port_pressure: [[1, '23'], [1, '4']]
+  throughput: 1.0
+  uops: 2
+- name: vmovq
+  operands:
+  - class: register
+    name: ymm
+  - class: memory
+    base: gpr
+    offset: imd
+    index: gpr
+    scale: 1
+  latency: 0
+  port_pressure: [[1, '23'], [1, '4']]
+  throughput: 1.0
+  uops: 2
+- name: vmovsd
+  operands:
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  latency: 0.0
+  port_pressure: []
+  throughput: 0.0
+  uops: 0
+- name: vmovsd
+  operands:
+  - class: memory
+    base: gpr
+    offset: ~
+    index: ~
+    scale: 1
+  - class: register
+    name: ymm
+  latency: 4.0
+  port_pressure: [[1, '23'], [1, [2D, 3D]]]
+  throughput: 0.5
+  uops: 2
+- name: vmovsd
+  operands:
+  - class: memory
+    base: gpr
+    offset: ~
+    index: gpr
+    scale: 1
+  - class: register
+    name: ymm
+  latency: 4.0
+  port_pressure: [[1, '23'], [1, [2D, 3D]]]
+  throughput: 0.5
+  uops: 2
+- name: vmovsd
+  operands:
+  - class: memory
+    base: gpr
+    offset: imd
+    index: gpr
+    scale: 1
+  - class: register
+    name: ymm
+  latency: 4.0
+  port_pressure: [[1, '23'], [1, [2D, 3D]]]
+  throughput: 0.5
+  uops: 2
+- name: vmovsd
+  operands:
+  - class: register
+    name: ymm
+  - class: memory
+    base: gpr
+    offset: ~
+    index: ~
+    scale: 1
+  latency: 0
+  port_pressure: [[1, '23'], [1, '4']]
+  throughput: 1.0
+  uops: 2
+- name: vmovsd
+  operands:
+  - class: register
+    name: ymm
+  - class: memory
+    base: gpr
+    offset: ~
+    index: gpr
+    scale: 1
+  latency: 0
+  port_pressure: [[1, '23'], [1, '4']]
+  throughput: 1.0
+  uops: 2
+- name: vmovsd
+  operands:
+  - class: register
+    name: ymm
+  - class: memory
+    base: gpr
+    offset: imd
+    index: gpr
+    scale: 1
+  latency: 0
+  port_pressure: [[1, '23'], [1, '4']]
+  throughput: 1.0
+  uops: 2
+- name: vmovss
+  operands:
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  latency: 0.0
+  port_pressure: []
+  throughput: 0.0
+  uops: 0
+- name: vmovss
+  operands:
+  - class: memory
+    base: gpr
+    offset: ~
+    index: ~
+    scale: 1
+  - class: register
+    name: ymm
+  latency: 4.0
+  port_pressure: [[1, '23'], [1, [2D, 3D]]]
+  throughput: 0.5
+  uops: 2
+- name: vmovss
+  operands:
+  - class: memory
+    base: gpr
+    offset: ~
+    index: gpr
+    scale: 1
+  - class: register
+    name: ymm
+  latency: 4.0
+  port_pressure: [[1, '23'], [1, [2D, 3D]]]
+  throughput: 0.5
+  uops: 2
+- name: vmovss
+  operands:
+  - class: memory
+    base: gpr
+    offset: imd
+    index: gpr
+    scale: 1
+  - class: register
+    name: ymm
+  latency: 4.0
+  port_pressure: [[1, '23'], [1, [2D, 3D]]]
+  throughput: 0.5
+  uops: 2
+- name: vmovss
+  operands:
+  - class: register
+    name: ymm
+  - class: memory
+    base: gpr
+    offset: ~
+    index: ~
+    scale: 1
+  latency: 0
+  port_pressure: [[1, '23'], [1, '4']]
+  throughput: 1.0
+  uops: 2
+- name: vmovss
+  operands:
+  - class: register
+    name: ymm
+  - class: memory
+    base: gpr
+    offset: ~
+    index: gpr
+    scale: 1
+  latency: 0
+  port_pressure: [[1, '23'], [1, '4']]
+  throughput: 1.0
+  uops: 2
+- name: vmovss
+  operands:
+  - class: register
+    name: ymm
+  - class: memory
+    base: gpr
+    offset: imd
+    index: gpr
+    scale: 1
+  latency: 0
+  port_pressure: [[1, '23'], [1, '4']]
+  throughput: 1.0
+  uops: 2
+- name: vmovups
+  operands:
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  latency: 0.0
+  port_pressure: []
+  throughput: 0.0
+  uops: 0
+- name: vmovups
+  operands:
+  - class: memory
+    base: gpr
+    offset: ~
+    index: ~
+    scale: 1
+  - class: register
+    name: ymm
+  latency: 4.0
+  port_pressure: [[1, '23'], [1, [2D, 3D]]]
+  throughput: 0.5
+  uops: 2
+- name: vmovups
+  operands:
+  - class: memory
+    base: gpr
+    offset: ~
+    index: gpr
+    scale: 1
+  - class: register
+    name: ymm
+  latency: 4.0
+  port_pressure: [[1, '23'], [1, [2D, 3D]]]
+  throughput: 0.5
+  uops: 2
+- name: vmovups
+  operands:
+  - class: memory
+    base: gpr
+    offset: imd
+    index: gpr
+    scale: 1
+  - class: register
+    name: ymm
+  latency: 4.0
+  port_pressure: [[1, '23'], [1, [2D, 3D]]]
+  throughput: 0.5
+  uops: 2
+- name: vmovups
+  operands:
+  - class: register
+    name: ymm
+  - class: memory
+    base: gpr
+    offset: ~
+    index: ~
+    scale: 1
+  latency: 0
+  port_pressure: [[1, '23'], [1, '4']]
+  throughput: 1.0
+  uops: 2
+- name: vmovups
+  operands:
+  - class: register
+    name: ymm
+  - class: memory
+    base: gpr
+    offset: ~
+    index: gpr
+    scale: 1
+  latency: 0
+  port_pressure: [[1, '23'], [1, '4']]
+  throughput: 1.0
+  uops: 2
+- name: vmovups
+  operands:
+  - class: register
+    name: ymm
+  - class: memory
+    base: gpr
+    offset: imd
+    index: gpr
+    scale: 1
+  latency: 0
+  port_pressure: [[1, '23'], [1, '4']]
+  throughput: 1.0
+  uops: 2
+- name: vmovupd
+  operands:
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  latency: 0.0
+  port_pressure: []
+  throughput: 0.0
+  uops: 0
+- name: vmovupd
+  operands:
+  - class: memory
+    base: gpr
+    offset: ~
+    index: ~
+    scale: 1
+  - class: register
+    name: ymm
+  latency: 4.0
+  port_pressure: [[1, '23'], [1, [2D, 3D]]]
+  throughput: 0.5
+  uops: 2
+- name: vmovupd
+  operands:
+  - class: memory
+    base: gpr
+    offset: ~
+    index: gpr
+    scale: 1
+  - class: register
+    name: ymm
+  latency: 4.0
+  port_pressure: [[1, '23'], [1, [2D, 3D]]]
+  throughput: 0.5
+  uops: 2
+- name: vmovupd
+  operands:
+  - class: memory
+    base: gpr
+    offset: imd
+    index: gpr
+    scale: 1
+  - class: register
+    name: ymm
+  latency: 4.0
+  port_pressure: [[1, '23'], [1, [2D, 3D]]]
+  throughput: 0.5
+  uops: 2
+- name: vmovupd
+  operands:
+  - class: register
+    name: ymm
+  - class: memory
+    base: gpr
+    offset: ~
+    index: ~
+    scale: 1
+  latency: 0
+  port_pressure: [[1, '23'], [1, '4']]
+  throughput: 1.0
+  uops: 2
+- name: vmovupd
+  operands:
+  - class: register
+    name: ymm
+  - class: memory
+    base: gpr
+    offset: ~
+    index: gpr
+    scale: 1
+  latency: 0
+  port_pressure: [[1, '23'], [1, '4']]
+  throughput: 1.0
+  uops: 2
+- name: vmovupd
+  operands:
+  - class: register
+    name: ymm
+  - class: memory
+    base: gpr
+    offset: imd
+    index: gpr
+    scale: 1
+  latency: 0
+  port_pressure: [[1, '23'], [1, '4']]
+  throughput: 1.0
+  uops: 2
+
+- name: SLDT
+  operands:
+  - class: register
+    name: gpr
+  latency: ~
+  port_pressure: [[1, '015'], [1, '1'], [2, '5']]
+  throughput: 2.3333333333333335
+  uops: 5
+- name: POPFW
+  operands: []
+  latency: ~
+  port_pressure: [[3, '015'], [1, '1'], [1, '23'], [2, '5']]
+  throughput: 3.0
+  uops: 10
+- name: CALL
+  operands:
+  - class: register
+    name: gpr
+  latency: ~
+  port_pressure: [[1, '4'], [1, '5']]
+  throughput: 1.0
+  uops: 3
+- name: OUTSW
+  operands: []
+  latency: ~
+  port_pressure: [[12, '0'], [4, '01'], [3, '015'], [1, '05'], [11, '1'], [1, '15'], [2, '23'], [1, '4'], [23, '5']]
+  throughput: 25.0
+  uops: 58
+- name: OUTSB
+  operands: []
+  latency: ~
+  port_pressure: [[12, '0'], [4, '01'], [4, '015'], [11, '1'], [2, '23'], [1, '4'], [24, '5']]
+  throughput: 25.333333333333332
+  uops: 58
+- name: OUTSD
+  operands: []
+  latency: ~
+  port_pressure: [[12, '0'], [4, '01'], [4, '015'], [11, '1'], [2, '23'], [1, '4'], [24, '5']]
+  throughput: 25.333333333333332
+  uops: 58
+- name: JNE
+  operands:
+  - class: identifier
+  latency: 0
+  port_pressure: []
+  throughput: 0.0
+  uops: 1
+- name: JNLE
+  operands:
+  - class: identifier
+  latency: 0
+  port_pressure: []
+  throughput: 0.0
+  uops: 1
+- name: WRMSR
+  operands: []
+  latency: ~
+  port_pressure: [[18, '0'], [7, '05'], [17, '1'], [13, '15'], [1, '4'], [52, '5']]
+  throughput: 62.0
+  uops: 108
+- name: REPE SCASW
+  operands: []
+  latency: ~
+  port_pressure: [[2, '015']]
+  throughput: 0.6666666666666666
+  uops: 12
+- name: REPE SCASD
+  operands: []
+  latency: ~
+  port_pressure: [[2, '015']]
+  throughput: 0.6666666666666666
+  uops: 12
+- name: REPE SCASB
+  operands: []
+  latency: ~
+  port_pressure: [[2, '015']]
+  throughput: 0.6666666666666666
+  uops: 12
+- name: REX64 REPE SCASB
+  operands: []
+  latency: ~
+  port_pressure: [[2, '015']]
+  throughput: 0.6666666666666666
+  uops: 12
+- name: JNS
+  operands:
+  - class: identifier
+  latency: 0
+  port_pressure: []
+  throughput: 0.0
+  uops: 1
+- name: JL
+  operands:
+  - class: identifier
+  latency: 0
+  port_pressure: []
+  throughput: 0.0
+  uops: 1
+- name: JNP
+  operands:
+  - class: identifier
+  latency: 0
+  port_pressure: []
+  throughput: 0.0
+  uops: 1
+- name: JNZ
+  operands:
+  - class: identifier
+  latency: 0
+  port_pressure: []
+  throughput: 0.0
+  uops: 1
+- name: JNB
+  operands:
+  - class: identifier
+  latency: 0
+  port_pressure: []
+  throughput: 0.0
+  uops: 1
+- name: JNO
+  operands:
+  - class: identifier
+  latency: 0
+  port_pressure: []
+  throughput: 0.0
+  uops: 1
+- name: JNL
+  operands:
+  - class: identifier
+  latency: 0
+  port_pressure: []
+  throughput: 0.0
+  uops: 1
+- name: CMC
+  operands: []
+  latency: 1
+  port_pressure: [[1, '015']]
+  throughput: 0.3333333333333333
+  uops: 1
+- name: CMP
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: 1
+  port_pressure: [[1, '015']]
+  throughput: 0.3333333333333333
+  uops: 1
+- name: CMP
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: gpr
+  latency: 1
+  port_pressure: [[1, '015']]
+  throughput: 0.3333333333333333
+  uops: 1
+- name: REX CMP
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: gpr
+  latency: 1
+  port_pressure: [[1, '015']]
+  throughput: 0.3333333333333333
+  uops: 1
+- name: LAHF
+  operands: []
+  latency: 0
+  port_pressure: [[1, '05']]
+  throughput: 0.5
+  uops: 1
+- name: CBW
+  operands: []
+  latency: 1
+  port_pressure: [[1, '015']]
+  throughput: 0.3333333333333333
+  uops: 1
+- name: PUSHFW
+  operands: []
+  latency: 9
+  port_pressure: [[1, '05'], [1, '1'], [1, '23'], [1, '4']]
+  throughput: 1.0
+  uops: 4
+- name: NOT
+  operands:
+  - class: register
+    name: gpr
+  latency: 1
+  port_pressure: [[1, '015']]
+  throughput: 0.3333333333333333
+  uops: 1
+- name: REX NOT
+  operands:
+  - class: register
+    name: gpr
+  latency: 1
+  port_pressure: [[1, '015']]
+  throughput: 0.3333333333333333
+  uops: 1
+- name: INC
+  operands:
+  - class: register
+    name: gpr
+  latency: 1
+  port_pressure: [[1, '015']]
+  throughput: 0.3333333333333333
+  uops: 1
+- name: REX INC
+  operands:
+  - class: register
+    name: gpr
+  latency: 1
+  port_pressure: [[1, '015']]
+  throughput: 0.3333333333333333
+  uops: 1
+- name: CMPSW
+  operands: []
+  latency: 4
+  port_pressure: [[3, '015'], [2, '23']]
+  throughput: 1.0
+  uops: 5
+- name: CMPSB
+  operands: []
+  latency: 4
+  port_pressure: [[3, '015'], [2, '23']]
+  throughput: 1.0
+  uops: 5
+- name: CMPSD
+  operands: []
+  latency: 4
+  port_pressure: [[3, '015'], [2, '23']]
+  throughput: 1.0
+  uops: 5
+- name: SETB
+  operands:
+  - class: register
+    name: gpr
+  latency: 1
+  port_pressure: [[1, '05']]
+  throughput: 0.5
+  uops: 1
+- name: REX SETB
+  operands:
+  - class: register
+    name: gpr
+  latency: 1
+  port_pressure: [[1, '05']]
+  throughput: 0.5
+  uops: 1
+- name: SETL
+  operands:
+  - class: register
+    name: gpr
+  latency: 1
+  port_pressure: [[1, '05']]
+  throughput: 0.5
+  uops: 1
+- name: REX SETL
+  operands:
+  - class: register
+    name: gpr
+  latency: 1
+  port_pressure: [[1, '05']]
+  throughput: 0.5
+  uops: 1
+- name: SETO
+  operands:
+  - class: register
+    name: gpr
+  latency: 1
+  port_pressure: [[1, '05']]
+  throughput: 0.5
+  uops: 1
+- name: REX SETO
+  operands:
+  - class: register
+    name: gpr
+  latency: 1
+  port_pressure: [[1, '05']]
+  throughput: 0.5
+  uops: 1
+- name: BSR
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: 3
+  port_pressure: [[1, '1']]
+  throughput: 1.0
+  uops: 1
+- name: SETP
+  operands:
+  - class: register
+    name: gpr
+  latency: 1
+  port_pressure: [[1, '05']]
+  throughput: 0.5
+  uops: 1
+- name: REX SETP
+  operands:
+  - class: register
+    name: gpr
+  latency: 1
+  port_pressure: [[1, '05']]
+  throughput: 0.5
+  uops: 1
+- name: OUT
+  operands:
+  - class: register
+    name: gpr
+  - class: immediate
+    imd: int
+  latency: ~
+  port_pressure: [[3, '015'], [1, '5']]
+  throughput: 2.0
+  uops: 55
+- name: OUT
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: ~
+  port_pressure: [[3, '015']]
+  throughput: 1.0
+  uops: 54
+- name: LODSB
+  operands: []
+  latency: ~
+  port_pressure: [[2, '015'], [1, '23']]
+  throughput: 0.6666666666666666
+  uops: 3
+- name: LODSW
+  operands: []
+  latency: ~
+  port_pressure: [[2, '015'], [1, '23']]
+  throughput: 0.6666666666666666
+  uops: 3
+- name: LODSD
+  operands: []
+  latency: ~
+  port_pressure: [[1, '015'], [1, '23']]
+  throughput: 0.5
+  uops: 2
+- name: JNBE
+  operands:
+  - class: identifier
+  latency: 0
+  port_pressure: []
+  throughput: 0.0
+  uops: 1
+- name: STD
+  operands: []
+  latency: ~
+  port_pressure: [[1, '015'], [1, '5']]
+  throughput: 1.3333333333333333
+  uops: 3
+- name: STOSD
+  operands: []
+  latency: 0
+  port_pressure: [[1, '015'], [1, '23'], [1, '4']]
+  throughput: 1.0
+  uops: 3
+- name: XOR
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: gpr
+  latency: 1
+  port_pressure: [[1, '015']]
+  throughput: 0.3333333333333333
+  uops: 1
+- name: REX XOR
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: gpr
+  latency: 1
+  port_pressure: [[1, '015']]
+  throughput: 0.3333333333333333
+  uops: 1
+- name: SAR
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: gpr
+  latency: 1
+  port_pressure: [[1, '05']]
+  throughput: 0.5
+  uops: 1
+- name: REX SAR
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: gpr
+  latency: 1
+  port_pressure: [[1, '05']]
+  throughput: 0.5
+  uops: 1
+- name: STC
+  operands: []
+  latency: ~
+  port_pressure: [[1, '015']]
+  throughput: 0.3333333333333333
+  uops: 1
+- name: STI
+  operands: []
+  latency: ~
+  port_pressure: [[2, '015'], [1, '1'], [3, '5']]
+  throughput: 3.6666666666666665
+  uops: 6
+- name: STR
+  operands:
+  - class: register
+    name: gpr
+  latency: ~
+  port_pressure: [[1, '015'], [1, '1'], [2, '5']]
+  throughput: 2.3333333333333335
+  uops: 5
+- name: STOSB
+  operands: []
+  latency: 0
+  port_pressure: [[1, '015'], [1, '23'], [1, '4']]
+  throughput: 1.0
+  uops: 3
+- name: REPE LODSW
+  operands: []
+  latency: ~
+  port_pressure: [[2, '015'], [1, '23']]
+  throughput: 0.6666666666666666
+  uops: 10
+- name: REPNE LODSW
+  operands: []
+  latency: ~
+  port_pressure: [[2, '015'], [1, '23']]
+  throughput: 0.6666666666666666
+  uops: 10
+- name: RDMSR
+  operands: []
+  latency: ~
+  port_pressure: [[2, '0'], [10, '01'], [14, '05'], [5, '1'], [6, '15'], [39, '5']]
+  throughput: 49.0
+  uops: 76
+- name: REPE LODSB
+  operands: []
+  latency: ~
+  port_pressure: [[2, '015'], [1, '23']]
+  throughput: 0.6666666666666666
+  uops: 10
+- name: REX64 REPE LODSB
+  operands: []
+  latency: ~
+  port_pressure: [[2, '015'], [1, '23']]
+  throughput: 0.6666666666666666
+  uops: 10
+- name: REPNE LODSB
+  operands: []
+  latency: ~
+  port_pressure: [[2, '015'], [1, '23']]
+  throughput: 0.6666666666666666
+  uops: 10
+- name: REX64 REPNE LODSB
+  operands: []
+  latency: ~
+  port_pressure: [[2, '015'], [1, '23']]
+  throughput: 0.6666666666666666
+  uops: 10
+- name: REPE LODSD
+  operands: []
+  latency: ~
+  port_pressure: [[1, '015'], [1, '23']]
+  throughput: 0.5
+  uops: 10
+- name: REPNE LODSD
+  operands: []
+  latency: ~
+  port_pressure: [[1, '015'], [1, '23']]
+  throughput: 0.5
+  uops: 10
+- name: IDIV
+  operands:
+  - class: register
+    name: gpr
+  latency: 23
+  port_pressure: [[2, '0'], [2, '015'], [2, '05'], [2, '1'], [2, '5'], [8, [0DV]]]
+  throughput: 8.0
+  uops: 10
+- name: REX IDIV
+  operands:
+  - class: register
+    name: gpr
+  latency: 22
+  port_pressure: [[2, '0'], [3, '015'], [2, '1'], [2, '5'], [8, [0DV]]]
+  throughput: 8.0
+  uops: 9
+- name: REPNE CMPSB
+  operands: []
+  latency: ~
+  port_pressure: [[3, '015'], [2, '23']]
+  throughput: 1.0
+  uops: 12
+- name: REX64 REPNE CMPSB
+  operands: []
+  latency: ~
+  port_pressure: [[3, '015'], [2, '23']]
+  throughput: 1.0
+  uops: 12
+- name: REPNE CMPSD
+  operands: []
+  latency: ~
+  port_pressure: [[3, '015'], [2, '23']]
+  throughput: 1.0
+  uops: 12
+- name: SETS
+  operands:
+  - class: register
+    name: gpr
+  latency: 1
+  port_pressure: [[1, '05']]
+  throughput: 0.5
+  uops: 1
+- name: REX SETS
+  operands:
+  - class: register
+    name: gpr
+  latency: 1
+  port_pressure: [[1, '05']]
+  throughput: 0.5
+  uops: 1
+- name: SHR
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: gpr
+  latency: 1
+  port_pressure: [[1, '05']]
+  throughput: 0.5
+  uops: 1
+- name: REX SHR
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: gpr
+  latency: 1
+  port_pressure: [[1, '05']]
+  throughput: 0.5
+  uops: 1
+- name: SHL
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: gpr
+  latency: 1
+  port_pressure: [[1, '05']]
+  throughput: 0.5
+  uops: 1
+- name: REX SHL
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: gpr
+  latency: 1
+  port_pressure: [[1, '05']]
+  throughput: 0.5
+  uops: 1
+- name: BTS
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: gpr
+  latency: 1
+  port_pressure: [[1, '05']]
+  throughput: 0.5
+  uops: 1
+- name: BTS
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: 1
+  port_pressure: [[1, '05']]
+  throughput: 0.5
+  uops: 1
+- name: BTR
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: gpr
+  latency: 1
+  port_pressure: [[1, '05']]
+  throughput: 0.5
+  uops: 1
+- name: BTR
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: 1
+  port_pressure: [[1, '05']]
+  throughput: 0.5
+  uops: 1
+- name: LOOP
+  operands:
+  - class: identifier
+  latency: 3
+  port_pressure: [[1, '5']]
+  throughput: 1.0
+  uops: 8
+- name: BTC
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: gpr
+  latency: 1
+  port_pressure: [[1, '05']]
+  throughput: 0.5
+  uops: 1
+- name: BTC
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: 1
+  port_pressure: [[1, '05']]
+  throughput: 0.5
+  uops: 1
+- name: WBINVD
+  operands: []
+  latency: ~
+  port_pressure: [[184089, '0'], [135442, '4'], [294987, '5'], [1, [0DV]]]
+  throughput: 294987.0
+  uops: 614518
+- name: JBE
+  operands:
+  - class: identifier
+  latency: 0
+  port_pressure: []
+  throughput: 0.0
+  uops: 1
+- name: MUL
+  operands:
+  - class: register
+    name: gpr
+  latency: 3
+  port_pressure: [[1, '1']]
+  throughput: 1.0
+  uops: 1
+- name: REX MUL
+  operands:
+  - class: register
+    name: gpr
+  latency: 3
+  port_pressure: [[1, '1']]
+  throughput: 1.0
+  uops: 1
+- name: PUSH
+  operands:
+  - class: register
+    name: gpr
+  latency: ~
+  port_pressure: [[1, '1'], [1, '23'], [1, '4']]
+  throughput: 1.0
+  uops: 3
+- name: PUSHW
+  operands:
+  - class: immediate
+    imd: int
+  latency: ~
+  port_pressure: [[1, '23'], [1, '4']]
+  throughput: 1.0
+  uops: 2
+- name: PUSH
+  operands:
+  - class: immediate
+    imd: int
+  latency: ~
+  port_pressure: [[1, '23'], [1, '4']]
+  throughput: 1.0
+  uops: 2
+- name: PUSHW
+  operands:
+  - class: register
+    name: gpr
+  latency: ~
+  port_pressure: [[1, '1'], [1, '23'], [1, '4']]
+  throughput: 1.0
+  uops: 3
+- name: SETNO
+  operands:
+  - class: register
+    name: gpr
+  latency: 1
+  port_pressure: [[1, '05']]
+  throughput: 0.5
+  uops: 1
+- name: REX SETNO
+  operands:
+  - class: register
+    name: gpr
+  latency: 1
+  port_pressure: [[1, '05']]
+  throughput: 0.5
+  uops: 1
+- name: SETNL
+  operands:
+  - class: register
+    name: gpr
+  latency: 1
+  port_pressure: [[1, '05']]
+  throughput: 0.5
+  uops: 1
+- name: REX SETNL
+  operands:
+  - class: register
+    name: gpr
+  latency: 1
+  port_pressure: [[1, '05']]
+  throughput: 0.5
+  uops: 1
+- name: CLI
+  operands: []
+  latency: ~
+  port_pressure: [[1, '1'], [2, '5']]
+  throughput: 2.0
+  uops: 3
+- name: CLD
+  operands: []
+  latency: ~
+  port_pressure: [[1, '015'], [1, '5']]
+  throughput: 1.3333333333333333
+  uops: 3
+- name: SETNB
+  operands:
+  - class: register
+    name: gpr
+  latency: 1
+  port_pressure: [[1, '05']]
+  throughput: 0.5
+  uops: 1
+- name: REX SETNB
+  operands:
+  - class: register
+    name: gpr
+  latency: 1
+  port_pressure: [[1, '05']]
+  throughput: 0.5
+  uops: 1
+- name: SETNZ
+  operands:
+  - class: register
+    name: gpr
+  latency: 1
+  port_pressure: [[1, '05']]
+  throughput: 0.5
+  uops: 1
+- name: REX SETNZ
+  operands:
+  - class: register
+    name: gpr
+  latency: 1
+  port_pressure: [[1, '05']]
+  throughput: 0.5
+  uops: 1
+- name: SETNS
+  operands:
+  - class: register
+    name: gpr
+  latency: 1
+  port_pressure: [[1, '05']]
+  throughput: 0.5
+  uops: 1
+- name: REX SETNS
+  operands:
+  - class: register
+    name: gpr
+  latency: 1
+  port_pressure: [[1, '05']]
+  throughput: 0.5
+  uops: 1
+- name: SETNP
+  operands:
+  - class: register
+    name: gpr
+  latency: 1
+  port_pressure: [[1, '05']]
+  throughput: 0.5
+  uops: 1
+- name: REX SETNP
+  operands:
+  - class: register
+    name: gpr
+  latency: 1
+  port_pressure: [[1, '05']]
+  throughput: 0.5
+  uops: 1
+- name: LLDT
+  operands:
+  - class: register
+    name: gpr
+  latency: ~
+  port_pressure: [[1, '01'], [1, '015'], [3, '1'], [2, '23'], [1, '4'], [6, '5']]
+  throughput: 6.333333333333333
+  uops: 14
+- name: RET
+  operands:
+  - class: immediate
+    imd: int
+  latency: ~
+  port_pressure: [[5, '5']]
+  throughput: 5.0
+  uops: 5
+- name: RET
+  operands: []
+  latency: ~
+  port_pressure: [[3, '5']]
+  throughput: 3.0
+  uops: 3
+- name: SETNBE
+  operands:
+  - class: register
+    name: gpr
+  latency: 2
+  port_pressure: [[2, '05']]
+  throughput: 1.0
+  uops: 2
+- name: REX SETNBE
+  operands:
+  - class: register
+    name: gpr
+  latency: 2
+  port_pressure: [[2, '05']]
+  throughput: 1.0
+  uops: 2
+- name: REPE INSW
+  operands: []
+  latency: ~
+  port_pressure: [[8, '0'], [4, '01'], [3, '015'], [10, '1'], [18, '5']]
+  throughput: 19.0
+  uops: 43
+- name: REPNE INSW
+  operands: []
+  latency: ~
+  port_pressure: [[8, '0'], [4, '01'], [3, '015'], [10, '1'], [18, '5']]
+  throughput: 19.0
+  uops: 43
+- name: REPE INSB
+  operands: []
+  latency: ~
+  port_pressure: [[8, '0'], [4, '01'], [3, '015'], [10, '1'], [1, '15'], [17, '5']]
+  throughput: 18.5
+  uops: 43
+- name: REX64 REPE INSB
+  operands: []
+  latency: ~
+  port_pressure: [[8, '0'], [4, '01'], [3, '015'], [10, '1'], [1, '15'], [17, '5']]
+  throughput: 18.5
+  uops: 43
+- name: REPNE INSB
+  operands: []
+  latency: ~
+  port_pressure: [[8, '0'], [4, '01'], [3, '015'], [10, '1'], [1, '15'], [17, '5']]
+  throughput: 18.5
+  uops: 43
+- name: REX64 REPNE INSB
+  operands: []
+  latency: ~
+  port_pressure: [[8, '0'], [4, '01'], [3, '015'], [10, '1'], [1, '15'], [17, '5']]
+  throughput: 18.5
+  uops: 43
+- name: REPE INSD
+  operands: []
+  latency: ~
+  port_pressure: [[8, '0'], [4, '01'], [3, '015'], [10, '1'], [1, '15'], [17, '5']]
+  throughput: 18.5
+  uops: 43
+- name: REX64 REPE INSD
+  operands: []
+  latency: ~
+  port_pressure: [[8, '0'], [4, '01'], [3, '015'], [10, '1'], [1, '15'], [17, '5']]
+  throughput: 18.5
+  uops: 43
+- name: REPNE INSD
+  operands: []
+  latency: ~
+  port_pressure: [[8, '0'], [4, '01'], [3, '015'], [10, '1'], [1, '15'], [17, '5']]
+  throughput: 18.5
+  uops: 43
+- name: REX64 REPNE INSD
+  operands: []
+  latency: ~
+  port_pressure: [[8, '0'], [4, '01'], [3, '015'], [10, '1'], [1, '15'], [17, '5']]
+  throughput: 18.5
+  uops: 43
+- name: REPE STOSD
+  operands: []
+  latency: ~
+  port_pressure: [[1, '015'], [1, '23'], [1, '4']]
+  throughput: 1.0
+  uops: 53
+- name: REPNE STOSD
+  operands: []
+  latency: ~
+  port_pressure: [[1, '015'], [1, '23'], [1, '4']]
+  throughput: 1.0
+  uops: 53
+- name: VERR
+  operands:
+  - class: register
+    name: gpr
+  latency: 58
+  port_pressure: [[4, '0'], [1, '1'], [8, '5']]
+  throughput: 8.0
+  uops: 13
+- name: REPE STOSB
+  operands: []
+  latency: ~
+  port_pressure: [[1, '015'], [1, '23'], [1, '4']]
+  throughput: 1.0
+  uops: 75
+- name: REX64 REPE STOSB
+  operands: []
+  latency: ~
+  port_pressure: [[1, '015'], [1, '23'], [1, '4']]
+  throughput: 1.0
+  uops: 75
+- name: REPNE STOSB
+  operands: []
+  latency: ~
+  port_pressure: [[1, '015'], [1, '23'], [1, '4']]
+  throughput: 1.0
+  uops: 75
+- name: REX64 REPNE STOSB
+  operands: []
+  latency: ~
+  port_pressure: [[1, '015'], [1, '23'], [1, '4']]
+  throughput: 1.0
+  uops: 75
+- name: REPE STOSW
+  operands: []
+  latency: ~
+  port_pressure: [[1, '015'], [1, '23'], [1, '4']]
+  throughput: 1.0
+  uops: 53
+- name: REPNE STOSW
+  operands: []
+  latency: ~
+  port_pressure: [[1, '015'], [1, '23'], [1, '4']]
+  throughput: 1.0
+  uops: 53
+- name: CWD
+  operands: []
+  latency: 2
+  port_pressure: [[1, '015'], [1, '05']]
+  throughput: 0.8333333333333333
+  uops: 2
+- name: TEST
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: gpr
+  latency: 1
+  port_pressure: [[1, '015']]
+  throughput: 0.3333333333333333
+  uops: 1
+- name: REX TEST
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: gpr
+  latency: 1
+  port_pressure: [[1, '015']]
+  throughput: 0.3333333333333333
+  uops: 1
+- name: TEST
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: 1
+  port_pressure: [[1, '015']]
+  throughput: 0.3333333333333333
+  uops: 1
+- name: REX TEST
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: 1
+  port_pressure: [[1, '015']]
+  throughput: 0.3333333333333333
+  uops: 1
+- name: JZ
+  operands:
+  - class: identifier
+  latency: 0
+  port_pressure: []
+  throughput: 0.0
+  uops: 1
+- name: SCASW
+  operands: []
+  latency: 1
+  port_pressure: [[2, '015']]
+  throughput: 0.6666666666666666
+  uops: 3
+- name: JP
+  operands:
+  - class: identifier
+  latency: 0
+  port_pressure: []
+  throughput: 0.0
+  uops: 1
+- name: JS
+  operands:
+  - class: identifier
+  latency: 0
+  port_pressure: []
+  throughput: 0.0
+  uops: 1
+- name: JO
+  operands:
+  - class: identifier
+  latency: 0
+  port_pressure: []
+  throughput: 0.0
+  uops: 1
+- name: SCASD
+  operands: []
+  latency: 1
+  port_pressure: [[2, '015']]
+  throughput: 0.6666666666666666
+  uops: 3
+- name: SCASB
+  operands: []
+  latency: 1
+  port_pressure: [[2, '015']]
+  throughput: 0.6666666666666666
+  uops: 3
+- name: JB
+  operands:
+  - class: identifier
+  latency: 0
+  port_pressure: []
+  throughput: 0.0
+  uops: 1
+- name: RDPMC
+  operands: []
+  latency: ~
+  port_pressure: [[14, '01'], [9, '05'], [2, '1'], [1, '15'], [9, '5']]
+  throughput: 14.0
+  uops: 35
+- name: ENTERW
+  operands:
+  - class: immediate
+    imd: int
+  - class: immediate
+    imd: int
+  latency: ~
+  port_pressure: [[2, '01'], [4, '015'], [1, '05'], [2, '23'], [1, '4'], [2, '5']]
+  throughput: 3.833333333333333
+  uops: 12
+- name: ENTER
+  operands:
+  - class: immediate
+    imd: int
+  - class: immediate
+    imd: int
+  latency: ~
+  port_pressure: [[2, '01'], [4, '015'], [1, '05'], [2, '23'], [1, '4'], [2, '5']]
+  throughput: 3.833333333333333
+  uops: 12
+- name: REPNE SCASB
+  operands: []
+  latency: ~
+  port_pressure: [[2, '015']]
+  throughput: 0.6666666666666666
+  uops: 12
+- name: REX64 REPNE SCASB
+  operands: []
+  latency: ~
+  port_pressure: [[2, '015']]
+  throughput: 0.6666666666666666
+  uops: 12
+- name: REPNE SCASD
+  operands: []
+  latency: ~
+  port_pressure: [[2, '015']]
+  throughput: 0.6666666666666666
+  uops: 12
+- name: REPNE SCASW
+  operands: []
+  latency: ~
+  port_pressure: [[2, '015']]
+  throughput: 0.6666666666666666
+  uops: 12
+- name: LEAVEW
+  operands: []
+  latency: ~
+  port_pressure: [[2, '015']]
+  throughput: 0.6666666666666666
+  uops: 4
+- name: LEAVE
+  operands: []
+  latency: ~
+  port_pressure: [[2, '015']]
+  throughput: 0.6666666666666666
+  uops: 3
+- name: REPE OUTSW
+  operands: []
+  latency: ~
+  port_pressure: [[7, '0'], [5, '01'], [2, '015'], [1, '05'], [10, '1'], [1, '15'], [16, '5']]
+  throughput: 17.666666666666668
+  uops: 42
+- name: REPNE OUTSW
+  operands: []
+  latency: ~
+  port_pressure: [[7, '0'], [5, '01'], [2, '015'], [1, '05'], [10, '1'], [1, '15'], [16, '5']]
+  throughput: 17.666666666666668
+  uops: 42
+- name: REPE OUTSB
+  operands: []
+  latency: ~
+  port_pressure: [[7, '0'], [4, '01'], [3, '015'], [11, '1'], [17, '5']]
+  throughput: 18.0
+  uops: 42
+- name: REX64 REPE OUTSB
+  operands: []
+  latency: ~
+  port_pressure: [[7, '0'], [4, '01'], [3, '015'], [11, '1'], [17, '5']]
+  throughput: 18.0
+  uops: 42
+- name: REPNE OUTSB
+  operands: []
+  latency: ~
+  port_pressure: [[7, '0'], [4, '01'], [3, '015'], [11, '1'], [17, '5']]
+  throughput: 18.0
+  uops: 42
+- name: REX64 REPNE OUTSB
+  operands: []
+  latency: ~
+  port_pressure: [[7, '0'], [4, '01'], [3, '015'], [11, '1'], [17, '5']]
+  throughput: 18.0
+  uops: 42
+- name: REPE OUTSD
+  operands: []
+  latency: ~
+  port_pressure: [[7, '0'], [4, '01'], [3, '015'], [11, '1'], [17, '5']]
+  throughput: 18.0
+  uops: 42
+- name: REX64 REPE OUTSD
+  operands: []
+  latency: ~
+  port_pressure: [[7, '0'], [4, '01'], [3, '015'], [11, '1'], [17, '5']]
+  throughput: 18.0
+  uops: 42
+- name: REPNE OUTSD
+  operands: []
+  latency: ~
+  port_pressure: [[7, '0'], [4, '01'], [3, '015'], [11, '1'], [17, '5']]
+  throughput: 18.0
+  uops: 42
+- name: REX64 REPNE OUTSD
+  operands: []
+  latency: ~
+  port_pressure: [[7, '0'], [4, '01'], [3, '015'], [11, '1'], [17, '5']]
+  throughput: 18.0
+  uops: 42
+- name: XLAT
+  operands: []
+  latency: ~
+  port_pressure: [[2, '015'], [1, '23']]
+  throughput: 0.6666666666666666
+  uops: 3
+- name: SMSW
+  operands:
+  - class: register
+    name: gpr
+  latency: ~
+  port_pressure: [[1, '01'], [1, '015'], [2, '1'], [3, '5']]
+  throughput: 3.3333333333333335
+  uops: 7
+- name: AND
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: gpr
+  latency: 1
+  port_pressure: [[1, '015']]
+  throughput: 0.3333333333333333
+  uops: 1
+- name: REX AND
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: gpr
+  latency: 1
+  port_pressure: [[1, '015']]
+  throughput: 0.3333333333333333
+  uops: 1
+- name: JLE
+  operands:
+  - class: identifier
+  latency: 0
+  port_pressure: []
+  throughput: 0.0
+  uops: 1
+- name: CPUID
+  operands: []
+  latency: ~
+  port_pressure: [[13, '0'], [42, '5']]
+  throughput: 42.0
+  uops: 55
+- name: RDTSC
+  operands: []
+  latency: ~
+  port_pressure: [[6, '01'], [4, '015'], [1, '05'], [3, '1'], [1, '15'], [6, '5']]
+  throughput: 8.333333333333332
+  uops: 21
+- name: CDQ
+  operands: []
+  latency: 1
+  port_pressure: [[1, '05']]
+  throughput: 0.5
+  uops: 1
+- name: INSB
+  operands: []
+  latency: ~
+  port_pressure: [[11, '0'], [2, '01'], [5, '015'], [12, '1'], [3, '23'], [1, '4'], [25, '5']]
+  throughput: 26.666666666666668
+  uops: 60
+- name: INSD
+  operands: []
+  latency: ~
+  port_pressure: [[11, '0'], [2, '01'], [5, '015'], [12, '1'], [3, '23'], [1, '4'], [25, '5']]
+  throughput: 26.666666666666668
+  uops: 60
+- name: IMUL
+  operands:
+  - class: register
+    name: gpr
+  latency: 3
+  port_pressure: [[1, '1']]
+  throughput: 1.0
+  uops: 1
+- name: REX IMUL
+  operands:
+  - class: register
+    name: gpr
+  latency: 3
+  port_pressure: [[1, '1']]
+  throughput: 1.0
+  uops: 1
+- name: IMUL
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: 3
+  port_pressure: [[1, '1']]
+  throughput: 1.0
+  uops: 1
+- name: RCR
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: gpr
+  latency: 2
+  port_pressure: [[1, '015'], [2, '05']]
+  throughput: 1.3333333333333333
+  uops: 3
+- name: REX RCR
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: gpr
+  latency: 2
+  port_pressure: [[1, '015'], [2, '05']]
+  throughput: 1.3333333333333333
+  uops: 3
+- name: RCL
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: gpr
+  latency: 2
+  port_pressure: [[1, '015'], [2, '05']]
+  throughput: 1.3333333333333333
+  uops: 3
+- name: REX RCL
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: gpr
+  latency: 2
+  port_pressure: [[1, '015'], [2, '05']]
+  throughput: 1.3333333333333333
+  uops: 3
+- name: INSW
+  operands: []
+  latency: ~
+  port_pressure: [[11, '0'], [2, '01'], [5, '015'], [12, '1'], [3, '23'], [1, '4'], [25, '5']]
+  throughput: 26.666666666666668
+  uops: 60
+- name: DIV
+  operands:
+  - class: register
+    name: gpr
+  latency: 23
+  port_pressure: [[2, '0'], [1, '01'], [1, '015'], [2, '05'], [2, '1'], [3, '5'], [9, [0DV]]]
+  throughput: 9.0
+  uops: 11
+- name: STOSW
+  operands: []
+  latency: 0
+  port_pressure: [[1, '015'], [1, '23'], [1, '4']]
+  throughput: 1.0
+  uops: 3
+- name: IN
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: gpr
+  latency: ~
+  port_pressure: [[14, '0'], [5, '015'], [13, '1'], [1, '23'], [28, '5']]
+  throughput: 29.666666666666668
+  uops: 61
+- name: IN
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: ~
+  port_pressure: [[14, '0'], [6, '015'], [12, '1'], [1, '23'], [27, '5']]
+  throughput: 29.0
+  uops: 60
+- name: BT
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: gpr
+  latency: 1
+  port_pressure: [[1, '05']]
+  throughput: 0.5
+  uops: 1
+- name: BT
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: 1
+  port_pressure: [[1, '05']]
+  throughput: 0.5
+  uops: 1
+- name: POP
+  operands:
+  - class: register
+    name: gpr
+  latency: ~
+  port_pressure: [[1, '23']]
+  throughput: 0.5
+  uops: 1
+- name: JRCXZ
+  operands:
+  - class: identifier
+  latency: ~
+  port_pressure: [[1, '5']]
+  throughput: 1.0
+  uops: 2
+- name: SAHF
+  operands: []
+  latency: 0
+  port_pressure: [[1, '05']]
+  throughput: 0.5
+  uops: 1
+- name: LMSW
+  operands:
+  - class: register
+    name: gpr
+  latency: ~
+  port_pressure: [[3, '0'], [4, '01'], [1, '015'], [1, '1'], [1, '23'], [1, '4'], [10, '5']]
+  throughput: 10.333333333333334
+  uops: 21
+- name: REPE CMPSD
+  operands: []
+  latency: ~
+  port_pressure: [[3, '015'], [2, '23']]
+  throughput: 1.0
+  uops: 12
+- name: OR
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: gpr
+  latency: 1
+  port_pressure: [[1, '015']]
+  throughput: 0.3333333333333333
+  uops: 1
+- name: REX OR
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: gpr
+  latency: 1
+  port_pressure: [[1, '015']]
+  throughput: 0.3333333333333333
+  uops: 1
+- name: REPE CMPSB
+  operands: []
+  latency: ~
+  port_pressure: [[3, '015'], [2, '23']]
+  throughput: 1.0
+  uops: 12
+- name: REX64 REPE CMPSB
+  operands: []
+  latency: ~
+  port_pressure: [[3, '015'], [2, '23']]
+  throughput: 1.0
+  uops: 12
+- name: REPE CMPSW
+  operands: []
+  latency: ~
+  port_pressure: [[3, '015'], [2, '23']]
+  throughput: 1.0
+  uops: 12
+- name: CLTS
+  operands: []
+  latency: ~
+  port_pressure: [[1, '05'], [5, '5']]
+  throughput: 5.5
+  uops: 7
+- name: REPNE CMPSW
+  operands: []
+  latency: ~
+  port_pressure: [[3, '015'], [2, '23']]
+  throughput: 1.0
+  uops: 12
+- name: ROL
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: gpr
+  latency: 1
+  port_pressure: [[2, '05']]
+  throughput: 1.0
+  uops: 2
+- name: REX ROL
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: gpr
+  latency: 1
+  port_pressure: [[2, '05']]
+  throughput: 1.0
+  uops: 2
+- name: VERW
+  operands:
+  - class: register
+    name: gpr
+  latency: 60
+  port_pressure: [[4, '0'], [1, '1'], [8, '5']]
+  throughput: 8.0
+  uops: 13
+- name: JMP
+  operands:
+  - class: register
+    name: gpr
+  latency: 0
+  port_pressure: []
+  throughput: 0.0
+  uops: 1
+- name: JMP
+  operands:
+  - class: identifier
+  latency: 0
+  port_pressure: []
+  throughput: 0.0
+  uops: 1
+- name: ROR
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: gpr
+  latency: 1
+  port_pressure: [[2, '05']]
+  throughput: 1.0
+  uops: 2
+- name: REX ROR
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: gpr
+  latency: 1
+  port_pressure: [[2, '05']]
+  throughput: 1.0
+  uops: 2
+- name: SETLE
+  operands:
+  - class: register
+    name: gpr
+  latency: 1
+  port_pressure: [[1, '05']]
+  throughput: 0.5
+  uops: 1
+- name: REX SETLE
+  operands:
+  - class: register
+    name: gpr
+  latency: 1
+  port_pressure: [[1, '05']]
+  throughput: 0.5
+  uops: 1
+- name: SUB
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: gpr
+  latency: 1
+  port_pressure: [[1, '015']]
+  throughput: 0.3333333333333333
+  uops: 1
+- name: REX SUB
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: gpr
+  latency: 1
+  port_pressure: [[1, '015']]
+  throughput: 0.3333333333333333
+  uops: 1
+- name: NEG
+  operands:
+  - class: register
+    name: gpr
+  latency: 1
+  port_pressure: [[1, '015']]
+  throughput: 0.3333333333333333
+  uops: 1
+- name: REX NEG
+  operands:
+  - class: register
+    name: gpr
+  latency: 1
+  port_pressure: [[1, '015']]
+  throughput: 0.3333333333333333
+  uops: 1
+- name: SETNLE
+  operands:
+  - class: register
+    name: gpr
+  latency: 1
+  port_pressure: [[1, '05']]
+  throughput: 0.5
+  uops: 1
+- name: REX SETNLE
+  operands:
+  - class: register
+    name: gpr
+  latency: 1
+  port_pressure: [[1, '05']]
+  throughput: 0.5
+  uops: 1
+- name: ADD
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: gpr
+  latency: 1
+  port_pressure: [[1, '015']]
+  throughput: 0.3333333333333333
+  uops: 1
+- name: REX ADD
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: gpr
+  latency: 1
+  port_pressure: [[1, '015']]
+  throughput: 0.3333333333333333
+  uops: 1
+- name: CWDE
+  operands: []
+  latency: 1
+  port_pressure: [[1, '015']]
+  throughput: 0.3333333333333333
+  uops: 1
+- name: BSF
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: 3
+  port_pressure: [[1, '1']]
+  throughput: 1.0
+  uops: 1
+- name: SETZ
+  operands:
+  - class: register
+    name: gpr
+  latency: 1
+  port_pressure: [[1, '05']]
+  throughput: 0.5
+  uops: 1
+- name: REX SETZ
+  operands:
+  - class: register
+    name: gpr
+  latency: 1
+  port_pressure: [[1, '05']]
+  throughput: 0.5
+  uops: 1
+- name: DEC
+  operands:
+  - class: register
+    name: gpr
+  latency: 1
+  port_pressure: [[1, '015']]
+  throughput: 0.3333333333333333
+  uops: 1
+- name: REX DEC
+  operands:
+  - class: register
+    name: gpr
+  latency: 1
+  port_pressure: [[1, '015']]
+  throughput: 0.3333333333333333
+  uops: 1
+- name: SETBE
+  operands:
+  - class: register
+    name: gpr
+  latency: 2
+  port_pressure: [[2, '05']]
+  throughput: 1.0
+  uops: 2
+- name: REX SETBE
+  operands:
+  - class: register
+    name: gpr
+  latency: 2
+  port_pressure: [[2, '05']]
+  throughput: 1.0
+  uops: 2
+- name: BSWAP
+  operands:
+  - class: register
+    name: gpr
+  latency: 2
+  port_pressure: [[1, '05'], [1, '1']]
+  throughput: 1.0
+  uops: 2
+- name: UNPCKHPS
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '5']]
+  throughput: 1.0
+  uops: 1
+- name: DIVPS
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 13
+  port_pressure: [[1, '0'], [7, [0DV]]]
+  throughput: 7.0
+  uops: 1
+- name: ADDSS
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 3
+  port_pressure: [[1, '1']]
+  throughput: 1.0
+  uops: 1
+- name: CVTPI2PS
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: xmm
+  latency: 5
+  port_pressure: [[1, '1']]
+  throughput: 1.0
+  uops: 1
+- name: CMPSS
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 3
+  port_pressure: [[1, '1']]
+  throughput: 1.0
+  uops: 1
+- name: ANDNPS
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '5']]
+  throughput: 1.0
+  uops: 1
+- name: CVTTSS2SI
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: gpr
+  latency: 4
+  port_pressure: [[1, '0'], [1, '1']]
+  throughput: 1.0
+  uops: 2
+- name: ORPS
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '5']]
+  throughput: 1.0
+  uops: 1
+- name: DIVSS
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 13
+  port_pressure: [[1, '0'], [7, [0DV]]]
+  throughput: 7.0
+  uops: 1
+- name: RCPSS
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 5
+  port_pressure: [[1, '0']]
+  throughput: 1.0
+  uops: 1
+- name: SQRTSS
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 13
+  port_pressure: [[1, '0'], [7, [0DV]]]
+  throughput: 7.0
+  uops: 1
+- name: SUBSS
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 3
+  port_pressure: [[1, '1']]
+  throughput: 1.0
+  uops: 1
+- name: CMPPS
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 3
+  port_pressure: [[1, '1']]
+  throughput: 1.0
+  uops: 1
+- name: XORPS
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '5']]
+  throughput: 1.0
+  uops: 1
+- name: SUBPS
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 3
+  port_pressure: [[1, '1']]
+  throughput: 1.0
+  uops: 1
+- name: SHUFPS
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '5']]
+  throughput: 1.0
+  uops: 1
+- name: MINSS
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 3
+  port_pressure: [[1, '1']]
+  throughput: 1.0
+  uops: 1
+- name: ADDPS
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 3
+  port_pressure: [[1, '1']]
+  throughput: 1.0
+  uops: 1
+- name: CVTSI2SS
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: xmm
+  latency: 5
+  port_pressure: [[1, '1'], [2, '5']]
+  throughput: 2.0
+  uops: 3
+- name: SFENCE
+  operands: []
+  latency: ~
+  port_pressure: [[1, '23'], [1, '4']]
+  throughput: 1.0
+  uops: 2
+- name: RSQRTSS
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 5
+  port_pressure: [[1, '0']]
+  throughput: 1.0
+  uops: 1
+- name: UNPCKLPS
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '5']]
+  throughput: 1.0
+  uops: 1
+- name: MULSS
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 5
+  port_pressure: [[1, '0']]
+  throughput: 1.0
+  uops: 1
+- name: SQRTPS
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 13
+  port_pressure: [[1, '0'], [7, [0DV]]]
+  throughput: 7.0
+  uops: 1
+- name: CVTTPS2PI
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: gpr
+  latency: 5
+  port_pressure: [[1, '1']]
+  throughput: 1.0
+  uops: 2
+- name: RSQRTPS
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 5
+  port_pressure: [[1, '0']]
+  throughput: 1.0
+  uops: 1
+- name: MINPS
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 3
+  port_pressure: [[1, '1']]
+  throughput: 1.0
+  uops: 1
+- name: CVTPS2PI
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: gpr
+  latency: 5
+  port_pressure: [[1, '1']]
+  throughput: 1.0
+  uops: 2
+- name: MULPS
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 5
+  port_pressure: [[1, '0']]
+  throughput: 1.0
+  uops: 1
+- name: CVTSS2SI
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: gpr
+  latency: 4
+  port_pressure: [[1, '0'], [1, '1']]
+  throughput: 1.0
+  uops: 2
+- name: ANDPS
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '5']]
+  throughput: 1.0
+  uops: 1
+- name: MAXPS
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 3
+  port_pressure: [[1, '1']]
+  throughput: 1.0
+  uops: 1
+- name: COMISS
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 2
+  port_pressure: [[1, '0'], [1, '1']]
+  throughput: 1.0
+  uops: 2
+- name: RCPPS
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 5
+  port_pressure: [[1, '0']]
+  throughput: 1.0
+  uops: 1
+- name: MAXSS
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 3
+  port_pressure: [[1, '1']]
+  throughput: 1.0
+  uops: 1
+- name: UCOMISS
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 2
+  port_pressure: [[1, '0'], [1, '1']]
+  throughput: 1.0
+  uops: 2
+- name: UNPCKHPD
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '5']]
+  throughput: 1.0
+  uops: 1
+- name: PUNPCKHDQ
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '15']]
+  throughput: 0.5
+  uops: 1
+- name: CVTDQ2PD
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 4
+  port_pressure: [[1, '1'], [1, '5']]
+  throughput: 1.0
+  uops: 2
+- name: CVTTPS2DQ
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 3
+  port_pressure: [[1, '1']]
+  throughput: 1.0
+  uops: 1
+- name: DIVPD
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 20
+  port_pressure: [[1, '0'], [14, [0DV]]]
+  throughput: 14.0
+  uops: 1
+- name: PCMPGTW
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '15']]
+  throughput: 0.5
+  uops: 1
+- name: PCMPGTB
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '15']]
+  throughput: 0.5
+  uops: 1
+- name: PCMPGTD
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '15']]
+  throughput: 0.5
+  uops: 1
+- name: CVTPI2PD
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: xmm
+  latency: 5
+  port_pressure: [[1, '1'], [1, '5']]
+  throughput: 1.0
+  uops: 2
+- name: PACKUSWB
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '15']]
+  throughput: 0.5
+  uops: 1
+- name: ANDNPD
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '5']]
+  throughput: 1.0
+  uops: 1
+- name: PSLLDQ
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '15']]
+  throughput: 0.5
+  uops: 1
+- name: PSUBD
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '15']]
+  throughput: 0.5
+  uops: 1
+- name: UNPCKLPD
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '5']]
+  throughput: 1.0
+  uops: 1
+- name: PSADBW
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 5
+  port_pressure: [[1, '0']]
+  throughput: 1.0
+  uops: 1
+- name: PADDUSW
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '15']]
+  throughput: 0.5
+  uops: 1
+- name: PADDUSB
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '15']]
+  throughput: 0.5
+  uops: 1
+- name: CVTPS2DQ
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 3
+  port_pressure: [[1, '1']]
+  throughput: 1.0
+  uops: 1
+- name: PACKSSDW
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '15']]
+  throughput: 0.5
+  uops: 1
+- name: PMULLW
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 5
+  port_pressure: [[1, '0']]
+  throughput: 1.0
+  uops: 1
+- name: DIVSD
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 20
+  port_pressure: [[1, '0'], [14, [0DV]]]
+  throughput: 14.0
+  uops: 1
+- name: PCMPEQW
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '15']]
+  throughput: 0.5
+  uops: 1
+- name: PCMPEQB
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '15']]
+  throughput: 0.5
+  uops: 1
+- name: PCMPEQD
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '15']]
+  throughput: 0.5
+  uops: 1
+- name: PUNPCKLQDQ
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '15']]
+  throughput: 0.5
+  uops: 1
+- name: PUNPCKLWD
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '15']]
+  throughput: 0.5
+  uops: 1
+- name: PADDSW
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '15']]
+  throughput: 0.5
+  uops: 1
+- name: ORPD
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '5']]
+  throughput: 1.0
+  uops: 1
+- name: PXOR
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '015']]
+  throughput: 0.3333333333333333
+  uops: 1
+- name: CMPPD
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 3
+  port_pressure: [[1, '1']]
+  throughput: 1.0
+  uops: 1
+- name: PSUBB
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '15']]
+  throughput: 0.5
+  uops: 1
+- name: PSUBUSW
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '15']]
+  throughput: 0.5
+  uops: 1
+- name: PSUBW
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '15']]
+  throughput: 0.5
+  uops: 1
+- name: PADDW
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '15']]
+  throughput: 0.5
+  uops: 1
+- name: PMAXSW
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '15']]
+  throughput: 0.5
+  uops: 1
+- name: CVTPD2DQ
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 4
+  port_pressure: [[1, '1'], [1, '5']]
+  throughput: 1.0
+  uops: 2
+- name: PADDD
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '15']]
+  throughput: 0.5
+  uops: 1
+- name: PADDB
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '15']]
+  throughput: 0.5
+  uops: 1
+- name: PSRLDQ
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '15']]
+  throughput: 0.5
+  uops: 1
+- name: PADDQ
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: 1
+  port_pressure: [[1, '15']]
+  throughput: 0.5
+  uops: 1
+- name: PADDQ
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '15']]
+  throughput: 0.5
+  uops: 1
+- name: PUNPCKHQDQ
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '15']]
+  throughput: 0.5
+  uops: 1
+- name: CMPSD
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 3
+  port_pressure: [[1, '1']]
+  throughput: 1.0
+  uops: 1
+- name: PMULHUW
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 5
+  port_pressure: [[1, '0']]
+  throughput: 1.0
+  uops: 1
+- name: MINSD
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 3
+  port_pressure: [[1, '1']]
+  throughput: 1.0
+  uops: 1
+- name: CVTTSD2SI
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: gpr
+  latency: 4
+  port_pressure: [[1, '0'], [1, '1']]
+  throughput: 1.0
+  uops: 2
+- name: ADDPD
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 3
+  port_pressure: [[1, '1']]
+  throughput: 1.0
+  uops: 1
+- name: POR
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '015']]
+  throughput: 0.3333333333333333
+  uops: 1
+- name: CVTSD2SS
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 4
+  port_pressure: [[1, '1'], [1, '5']]
+  throughput: 1.0
+  uops: 2
+- name: PSLLD
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '0']]
+  throughput: 1.0
+  uops: 1
+- name: SQRTSD
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 20
+  port_pressure: [[1, '0'], [14, [0DV]]]
+  throughput: 14.0
+  uops: 1
+- name: PSLLW
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '0']]
+  throughput: 1.0
+  uops: 1
+- name: CVTSI2SD
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: xmm
+  latency: 4
+  port_pressure: [[1, '1'], [1, '5']]
+  throughput: 1.0
+  uops: 2
+- name: PSLLQ
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '0']]
+  throughput: 1.0
+  uops: 1
+- name: PSUBUSB
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '15']]
+  throughput: 0.5
+  uops: 1
+- name: PUNPCKLDQ
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '15']]
+  throughput: 0.5
+  uops: 1
+- name: MULSD
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 5
+  port_pressure: [[1, '0']]
+  throughput: 1.0
+  uops: 1
+- name: PANDN
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '015']]
+  throughput: 0.3333333333333333
+  uops: 1
+- name: SHUFPD
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '5']]
+  throughput: 1.0
+  uops: 1
+- name: SUBPD
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 3
+  port_pressure: [[1, '1']]
+  throughput: 1.0
+  uops: 1
+- name: SQRTPD
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 20
+  port_pressure: [[1, '0'], [14, [0DV]]]
+  throughput: 14.0
+  uops: 1
+- name: ANDPD
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '5']]
+  throughput: 1.0
+  uops: 1
+- name: PMULHW
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 5
+  port_pressure: [[1, '0']]
+  throughput: 1.0
+  uops: 1
+- name: PMINSW
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '15']]
+  throughput: 0.5
+  uops: 1
+- name: CVTTPD2DQ
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 4
+  port_pressure: [[1, '1'], [1, '5']]
+  throughput: 1.0
+  uops: 2
+- name: PSHUFD
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '15']]
+  throughput: 0.5
+  uops: 1
+- name: CVTSS2SD
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 2
+  port_pressure: [[1, '0']]
+  throughput: 1.0
+  uops: 2
+- name: XORPD
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '5']]
+  throughput: 1.0
+  uops: 1
+- name: MAXSD
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 3
+  port_pressure: [[1, '1']]
+  throughput: 1.0
+  uops: 1
+- name: MINPD
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 3
+  port_pressure: [[1, '1']]
+  throughput: 1.0
+  uops: 1
+- name: ADDSD
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 3
+  port_pressure: [[1, '1']]
+  throughput: 1.0
+  uops: 1
+- name: PSRLQ
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '0']]
+  throughput: 1.0
+  uops: 1
+- name: PSRLW
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '0']]
+  throughput: 1.0
+  uops: 1
+- name: PSRLD
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '0']]
+  throughput: 1.0
+  uops: 1
+- name: SUBSD
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 3
+  port_pressure: [[1, '1']]
+  throughput: 1.0
+  uops: 1
+- name: PADDSB
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '15']]
+  throughput: 0.5
+  uops: 1
+- name: CVTSD2SI
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: gpr
+  latency: 4
+  port_pressure: [[1, '0'], [1, '1']]
+  throughput: 1.0
+  uops: 2
+- name: CVTPS2PD
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 2
+  port_pressure: [[1, '0'], [1, '5']]
+  throughput: 1.0
+  uops: 2
+- name: MULPD
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 5
+  port_pressure: [[1, '0']]
+  throughput: 1.0
+  uops: 1
+- name: PSUBQ
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: 1
+  port_pressure: [[1, '15']]
+  throughput: 0.5
+  uops: 1
+- name: PSUBQ
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '15']]
+  throughput: 0.5
+  uops: 1
+- name: PUNPCKHBW
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '15']]
+  throughput: 0.5
+  uops: 1
+- name: PMULUDQ
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: 5
+  port_pressure: [[1, '0']]
+  throughput: 1.0
+  uops: 1
+- name: PMULUDQ
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 5
+  port_pressure: [[1, '0']]
+  throughput: 1.0
+  uops: 1
+- name: PMADDWD
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 5
+  port_pressure: [[1, '0']]
+  throughput: 1.0
+  uops: 1
+- name: PEXTRW
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: xmm
+  - class: register
+    name: gpr
+  latency: 2
+  port_pressure: [[1, '0'], [1, '15']]
+  throughput: 1.0
+  uops: 2
+- name: PAND
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '015']]
+  throughput: 0.3333333333333333
+  uops: 1
+- name: CVTDQ2PS
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 3
+  port_pressure: [[1, '1']]
+  throughput: 1.0
+  uops: 1
+- name: PMAXUB
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '15']]
+  throughput: 0.5
+  uops: 1
+- name: PUNPCKHWD
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '15']]
+  throughput: 0.5
+  uops: 1
+- name: CVTPD2PS
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 4
+  port_pressure: [[1, '1'], [1, '5']]
+  throughput: 1.0
+  uops: 2
+- name: CVTPD2PI
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: gpr
+  latency: 5
+  port_pressure: [[1, '1'], [1, '5']]
+  throughput: 1.0
+  uops: 2
+- name: MFENCE
+  operands: []
+  latency: ~
+  port_pressure: [[1, '23'], [1, '4']]
+  throughput: 1.0
+  uops: 3
+- name: PSHUFLW
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '15']]
+  throughput: 0.5
+  uops: 1
+- name: MAXPD
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 3
+  port_pressure: [[1, '1']]
+  throughput: 1.0
+  uops: 1
+- name: PMINUB
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '15']]
+  throughput: 0.5
+  uops: 1
+- name: PSUBSW
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '15']]
+  throughput: 0.5
+  uops: 1
+- name: PAVGW
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '15']]
+  throughput: 0.5
+  uops: 1
+- name: PSUBSB
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '15']]
+  throughput: 0.5
+  uops: 1
+- name: PAVGB
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '15']]
+  throughput: 0.5
+  uops: 1
+- name: PSRAW
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '0']]
+  throughput: 1.0
+  uops: 1
+- name: COMISD
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 2
+  port_pressure: [[1, '0'], [1, '1']]
+  throughput: 1.0
+  uops: 2
+- name: PSRAD
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '0']]
+  throughput: 1.0
+  uops: 1
+- name: PACKSSWB
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '15']]
+  throughput: 0.5
+  uops: 1
+- name: PUNPCKLBW
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '15']]
+  throughput: 0.5
+  uops: 1
+- name: UCOMISD
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 2
+  port_pressure: [[1, '0'], [1, '1']]
+  throughput: 1.0
+  uops: 2
+- name: CVTTPD2PI
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: gpr
+  latency: 5
+  port_pressure: [[1, '1'], [1, '5']]
+  throughput: 1.0
+  uops: 2
+- name: PSHUFHW
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '15']]
+  throughput: 0.5
+  uops: 1
+- name: FCHS
+  operands: []
+  latency: ~
+  port_pressure: [[1, '5']]
+  throughput: 1.0
+  uops: ~
+- name: FUCOM
+  operands: []
+  latency: ~
+  port_pressure: [[1, '1']]
+  throughput: 1.0
+  uops: ~
+- name: FCOMI
+  operands: []
+  latency: ~
+  port_pressure: [[1, '0'], [1, '1'], [1, '5']]
+  throughput: 1.0
+  uops: ~
+- name: FLDL2T
+  operands: []
+  latency: ~
+  port_pressure: [[1, '0'], [1, '1']]
+  throughput: 1.0
+  uops: ~
+- name: FLDL2E
+  operands: []
+  latency: ~
+  port_pressure: [[1, '0'], [1, '1']]
+  throughput: 1.0
+  uops: ~
+- name: FCOMIP
+  operands: []
+  latency: ~
+  port_pressure: [[1, '0'], [1, '1'], [1, '5']]
+  throughput: 1.0
+  uops: ~
+- name: FADDP
+  operands: []
+  latency: ~
+  port_pressure: [[1, '1']]
+  throughput: 1.0
+  uops: ~
+- name: FCOMPP
+  operands: []
+  latency: ~
+  port_pressure: [[1, '1'], [1, '5']]
+  throughput: 1.0
+  uops: ~
+- name: FXAM
+  operands: []
+  latency: ~
+  port_pressure: [[2, '1']]
+  throughput: 2.0
+  uops: ~
+- name: FFREE
+  operands: []
+  latency: ~
+  port_pressure: [[1, '5']]
+  throughput: 1.0
+  uops: ~
+- name: FNINIT
+  operands: []
+  latency: ~
+  port_pressure: [[3, '015'], [1, '5']]
+  throughput: 2.0
+  uops: ~
+- name: FNOP
+  operands: []
+  latency: ~
+  port_pressure: [[1, '5']]
+  throughput: 1.0
+  uops: ~
+- name: FLDPI
+  operands: []
+  latency: ~
+  port_pressure: [[1, '0'], [1, '1']]
+  throughput: 1.0
+  uops: ~
+- name: FNSTSW
+  operands: []
+  latency: ~
+  port_pressure: [[1, '0'], [1, '015']]
+  throughput: 1.3333333333333333
+  uops: ~
+- name: FWAIT
+  operands: []
+  latency: ~
+  port_pressure: [[1, '5']]
+  throughput: 1.0
+  uops: ~
+- name: FINCSTP
+  operands: []
+  latency: ~
+  port_pressure: [[1, '5']]
+  throughput: 1.0
+  uops: ~
+- name: FTST
+  operands: []
+  latency: ~
+  port_pressure: [[1, '1']]
+  throughput: 1.0
+  uops: ~
+- name: FABS
+  operands: []
+  latency: ~
+  port_pressure: [[1, '5']]
+  throughput: 1.0
+  uops: ~
+- name: FLDLN2
+  operands: []
+  latency: ~
+  port_pressure: [[1, '0'], [1, '1']]
+  throughput: 1.0
+  uops: ~
+- name: FDECSTP
+  operands: []
+  latency: ~
+  port_pressure: [[1, '5']]
+  throughput: 1.0
+  uops: ~
+- name: FLDLG2
+  operands: []
+  latency: ~
+  port_pressure: [[1, '0'], [1, '1']]
+  throughput: 1.0
+  uops: ~
+- name: FLDZ
+  operands: []
+  latency: ~
+  port_pressure: [[1, '5']]
+  throughput: 1.0
+  uops: ~
+- name: FUCOMPP
+  operands: []
+  latency: ~
+  port_pressure: [[1, '1'], [1, '5']]
+  throughput: 1.0
+  uops: ~
+- name: FLD1
+  operands: []
+  latency: ~
+  port_pressure: [[1, '0'], [1, '5']]
+  throughput: 1.0
+  uops: ~
+- name: FUCOMIP
+  operands: []
+  latency: ~
+  port_pressure: [[1, '0'], [1, '1'], [1, '5']]
+  throughput: 1.0
+  uops: ~
+- name: PUNPCKHDQ
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: 1
+  port_pressure: [[1, '15']]
+  throughput: 0.5
+  uops: 1
+- name: PCMPGTW
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: 1
+  port_pressure: [[1, '15']]
+  throughput: 0.5
+  uops: 1
+- name: PCMPGTB
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: 1
+  port_pressure: [[1, '15']]
+  throughput: 0.5
+  uops: 1
+- name: PCMPGTD
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: 1
+  port_pressure: [[1, '15']]
+  throughput: 0.5
+  uops: 1
+- name: PACKUSWB
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: 1
+  port_pressure: [[1, '0']]
+  throughput: 1.0
+  uops: 1
+- name: PSUBD
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: 1
+  port_pressure: [[1, '15']]
+  throughput: 0.5
+  uops: 1
+- name: PSADBW
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: 5
+  port_pressure: [[1, '0']]
+  throughput: 1.0
+  uops: 1
+- name: PADDUSW
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: 1
+  port_pressure: [[1, '15']]
+  throughput: 0.5
+  uops: 1
+- name: PADDUSB
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: 1
+  port_pressure: [[1, '15']]
+  throughput: 0.5
+  uops: 1
+- name: PACKSSDW
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: 1
+  port_pressure: [[1, '0']]
+  throughput: 1.0
+  uops: 1
+- name: PMULLW
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: 5
+  port_pressure: [[1, '0']]
+  throughput: 1.0
+  uops: 1
+- name: PCMPEQW
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: 1
+  port_pressure: [[1, '15']]
+  throughput: 0.5
+  uops: 1
+- name: PCMPEQB
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: 1
+  port_pressure: [[1, '15']]
+  throughput: 0.5
+  uops: 1
+- name: PCMPEQD
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: 1
+  port_pressure: [[1, '15']]
+  throughput: 0.5
+  uops: 1
+- name: PUNPCKLWD
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: 1
+  port_pressure: [[1, '15']]
+  throughput: 0.5
+  uops: 1
+- name: PADDSW
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: 1
+  port_pressure: [[1, '15']]
+  throughput: 0.5
+  uops: 1
+- name: PXOR
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: 1
+  port_pressure: [[1, '015']]
+  throughput: 0.3333333333333333
+  uops: 1
+- name: PSUBB
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: 1
+  port_pressure: [[1, '15']]
+  throughput: 0.5
+  uops: 1
+- name: PSUBUSW
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: 1
+  port_pressure: [[1, '15']]
+  throughput: 0.5
+  uops: 1
+- name: PSUBW
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: 1
+  port_pressure: [[1, '15']]
+  throughput: 0.5
+  uops: 1
+- name: PADDW
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: 1
+  port_pressure: [[1, '15']]
+  throughput: 0.5
+  uops: 1
+- name: PMAXSW
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: 1
+  port_pressure: [[1, '15']]
+  throughput: 0.5
+  uops: 1
+- name: PADDD
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: 1
+  port_pressure: [[1, '15']]
+  throughput: 0.5
+  uops: 1
+- name: PADDB
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: 1
+  port_pressure: [[1, '15']]
+  throughput: 0.5
+  uops: 1
+- name: PMULHUW
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: 5
+  port_pressure: [[1, '0']]
+  throughput: 1.0
+  uops: 1
+- name: POR
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: 1
+  port_pressure: [[1, '015']]
+  throughput: 0.3333333333333333
+  uops: 1
+- name: PSLLD
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: gpr
+  latency: 1
+  port_pressure: [[1, '0']]
+  throughput: 1.0
+  uops: 1
+- name: PSLLD
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: 1
+  port_pressure: [[1, '0']]
+  throughput: 1.0
+  uops: 1
+- name: PSLLW
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: gpr
+  latency: 1
+  port_pressure: [[1, '0']]
+  throughput: 1.0
+  uops: 1
+- name: PSLLW
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: 1
+  port_pressure: [[1, '0']]
+  throughput: 1.0
+  uops: 1
+- name: PSLLQ
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: gpr
+  latency: 1
+  port_pressure: [[1, '0']]
+  throughput: 1.0
+  uops: 1
+- name: PSLLQ
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: 1
+  port_pressure: [[1, '0']]
+  throughput: 1.0
+  uops: 1
+- name: PSUBUSB
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: 1
+  port_pressure: [[1, '15']]
+  throughput: 0.5
+  uops: 1
+- name: PUNPCKLDQ
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: 1
+  port_pressure: [[1, '15']]
+  throughput: 0.5
+  uops: 1
+- name: PANDN
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: 1
+  port_pressure: [[1, '015']]
+  throughput: 0.3333333333333333
+  uops: 1
+- name: PMULHW
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: 5
+  port_pressure: [[1, '0']]
+  throughput: 1.0
+  uops: 1
+- name: PMINSW
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: 1
+  port_pressure: [[1, '15']]
+  throughput: 0.5
+  uops: 1
+- name: PSHUFW
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: 1
+  port_pressure: [[1, '15']]
+  throughput: 0.5
+  uops: 1
+- name: PSRLQ
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: gpr
+  latency: 1
+  port_pressure: [[1, '0']]
+  throughput: 1.0
+  uops: 1
+- name: PSRLQ
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: 1
+  port_pressure: [[1, '0']]
+  throughput: 1.0
+  uops: 1
+- name: PSRLW
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: gpr
+  latency: 1
+  port_pressure: [[1, '0']]
+  throughput: 1.0
+  uops: 1
+- name: PSRLW
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: 1
+  port_pressure: [[1, '0']]
+  throughput: 1.0
+  uops: 1
+- name: PSRLD
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: gpr
+  latency: 1
+  port_pressure: [[1, '0']]
+  throughput: 1.0
+  uops: 1
+- name: PSRLD
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: 1
+  port_pressure: [[1, '0']]
+  throughput: 1.0
+  uops: 1
+- name: PADDSB
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: 1
+  port_pressure: [[1, '15']]
+  throughput: 0.5
+  uops: 1
+- name: EMMS
+  operands: []
+  latency: ~
+  port_pressure: [[1, '0'], [18, '5']]
+  throughput: 18.0
+  uops: 31
+- name: PUNPCKHBW
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: 1
+  port_pressure: [[1, '15']]
+  throughput: 0.5
+  uops: 1
+- name: PMADDWD
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: 5
+  port_pressure: [[1, '0']]
+  throughput: 1.0
+  uops: 1
+- name: PEXTRW
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: 2
+  port_pressure: [[1, '0'], [1, '15']]
+  throughput: 1.0
+  uops: 2
+- name: PAND
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: 1
+  port_pressure: [[1, '015']]
+  throughput: 0.3333333333333333
+  uops: 1
+- name: PMAXUB
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: 1
+  port_pressure: [[1, '15']]
+  throughput: 0.5
+  uops: 1
+- name: PUNPCKHWD
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: 1
+  port_pressure: [[1, '15']]
+  throughput: 0.5
+  uops: 1
+- name: PMINUB
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: 1
+  port_pressure: [[1, '15']]
+  throughput: 0.5
+  uops: 1
+- name: PSUBSW
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: 1
+  port_pressure: [[1, '15']]
+  throughput: 0.5
+  uops: 1
+- name: PAVGW
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: 1
+  port_pressure: [[1, '15']]
+  throughput: 0.5
+  uops: 1
+- name: PSUBSB
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: 1
+  port_pressure: [[1, '15']]
+  throughput: 0.5
+  uops: 1
+- name: PAVGB
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: 1
+  port_pressure: [[1, '15']]
+  throughput: 0.5
+  uops: 1
+- name: PSRAW
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: gpr
+  latency: 1
+  port_pressure: [[1, '0']]
+  throughput: 1.0
+  uops: 1
+- name: PSRAW
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: 1
+  port_pressure: [[1, '0']]
+  throughput: 1.0
+  uops: 1
+- name: PSRAD
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: gpr
+  latency: 1
+  port_pressure: [[1, '0']]
+  throughput: 1.0
+  uops: 1
+- name: PSRAD
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: 1
+  port_pressure: [[1, '0']]
+  throughput: 1.0
+  uops: 1
+- name: PACKSSWB
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: 1
+  port_pressure: [[1, '0']]
+  throughput: 1.0
+  uops: 1
+- name: PUNPCKLBW
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: 1
+  port_pressure: [[1, '15']]
+  throughput: 0.5
+  uops: 1
+- name: REPE SCASQ
+  operands: []
+  latency: ~
+  port_pressure: [[2, '015']]
+  throughput: 0.6666666666666666
+  uops: 12
+- name: CMPSQ
+  operands: []
+  latency: 4
+  port_pressure: [[3, '015'], [2, '23']]
+  throughput: 1.0
+  uops: 5
+- name: LODSQ
+  operands: []
+  latency: ~
+  port_pressure: [[1, '015'], [1, '23']]
+  throughput: 0.5
+  uops: 2
+- name: CDQE
+  operands: []
+  latency: 1
+  port_pressure: [[1, '015']]
+  throughput: 0.3333333333333333
+  uops: 1
+- name: REPE LODSQ
+  operands: []
+  latency: ~
+  port_pressure: [[1, '015'], [1, '23']]
+  throughput: 0.5
+  uops: 10
+- name: REPNE LODSQ
+  operands: []
+  latency: ~
+  port_pressure: [[1, '015'], [1, '23']]
+  throughput: 0.5
+  uops: 10
+- name: REPNE CMPSQ
+  operands: []
+  latency: ~
+  port_pressure: [[3, '015'], [2, '23']]
+  throughput: 1.0
+  uops: 12
+- name: PUSHFQ
+  operands: []
+  latency: 9
+  port_pressure: [[1, '05'], [1, '1'], [1, '23'], [1, '4']]
+  throughput: 1.0
+  uops: 4
+- name: REPE STOSQ
+  operands: []
+  latency: ~
+  port_pressure: [[1, '015'], [1, '23'], [1, '4']]
+  throughput: 1.0
+  uops: 53
+- name: REPNE STOSQ
+  operands: []
+  latency: ~
+  port_pressure: [[1, '015'], [1, '23'], [1, '4']]
+  throughput: 1.0
+  uops: 53
+- name: SCASQ
+  operands: []
+  latency: 1
+  port_pressure: [[2, '015']]
+  throughput: 0.6666666666666666
+  uops: 3
+- name: REPNE SCASQ
+  operands: []
+  latency: ~
+  port_pressure: [[2, '015']]
+  throughput: 0.6666666666666666
+  uops: 12
+- name: POPFQ
+  operands: []
+  latency: ~
+  port_pressure: [[3, '015'], [1, '1'], [1, '23'], [2, '5']]
+  throughput: 3.0
+  uops: 10
+- name: STOSQ
+  operands: []
+  latency: 0
+  port_pressure: [[1, '015'], [1, '23'], [1, '4']]
+  throughput: 1.0
+  uops: 3
+- name: CQO
+  operands: []
+  latency: 1
+  port_pressure: [[1, '05']]
+  throughput: 0.5
+  uops: 1
+- name: REPE CMPSQ
+  operands: []
+  latency: ~
+  port_pressure: [[3, '015'], [2, '23']]
+  throughput: 1.0
+  uops: 12
+- name: POPCNT
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: 3
+  port_pressure: [[1, '1']]
+  throughput: 1.0
+  uops: 1
+- name: ROUNDPD
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 3
+  port_pressure: [[1, '1']]
+  throughput: 1.0
+  uops: 1
+- name: ROUNDPS
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 3
+  port_pressure: [[1, '1']]
+  throughput: 1.0
+  uops: 1
+- name: PBLENDW
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '15']]
+  throughput: 0.5
+  uops: 1
+- name: MPSADBW
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 6
+  port_pressure: [[1, '0'], [2, '15']]
+  throughput: 1.0
+  uops: 3
+- name: PHMINPOSUW
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 5
+  port_pressure: [[1, '0']]
+  throughput: 1.0
+  uops: 1
+- name: INSERTPS
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '5']]
+  throughput: 1.0
+  uops: 1
+- name: PMULLD
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 5
+  port_pressure: [[1, '0']]
+  throughput: 1.0
+  uops: 1
+- name: PCMPEQQ
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '15']]
+  throughput: 0.5
+  uops: 1
+- name: PMINSD
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '15']]
+  throughput: 0.5
+  uops: 1
+- name: PACKUSDW
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '15']]
+  throughput: 0.5
+  uops: 1
+- name: EXTRACTPS
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: xmm
+  - class: register
+    name: gpr
+  latency: 2
+  port_pressure: [[1, '0'], [1, '5']]
+  throughput: 1.0
+  uops: 2
+- name: PMAXSB
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '15']]
+  throughput: 0.5
+  uops: 1
+- name: PMAXSD
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '15']]
+  throughput: 0.5
+  uops: 1
+- name: BLENDPD
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '05']]
+  throughput: 0.5
+  uops: 1
+- name: PTEST
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 2
+  port_pressure: [[1, '0'], [1, '5']]
+  throughput: 1.0
+  uops: 2
+- name: PMULDQ
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 5
+  port_pressure: [[1, '0']]
+  throughput: 1.0
+  uops: 1
+- name: PMINSB
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '15']]
+  throughput: 0.5
+  uops: 1
+- name: CRC32
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: 3
+  port_pressure: [[1, '1']]
+  throughput: 1.0
+  uops: 1
+- name: REX CRC32
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: 3
+  port_pressure: [[1, '1']]
+  throughput: 1.0
+  uops: 1
+- name: DPPD
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 9
+  port_pressure: [[1, '0'], [1, '1'], [1, '5']]
+  throughput: 1.0
+  uops: 3
+- name: DPPS
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 12
+  port_pressure: [[1, '0'], [2, '1'], [1, '5']]
+  throughput: 2.0
+  uops: 4
+- name: PEXTRD
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: xmm
+  - class: register
+    name: gpr
+  latency: 2
+  port_pressure: [[1, '0'], [1, '15']]
+  throughput: 1.0
+  uops: 2
+- name: PMAXUW
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '15']]
+  throughput: 0.5
+  uops: 1
+- name: PMAXUD
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '15']]
+  throughput: 0.5
+  uops: 1
+- name: BLENDPS
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '05']]
+  throughput: 0.5
+  uops: 1
+- name: PEXTRB
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: xmm
+  - class: register
+    name: gpr
+  latency: 2
+  port_pressure: [[1, '0'], [1, '15']]
+  throughput: 1.0
+  uops: 2
+- name: PMINUW
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '15']]
+  throughput: 0.5
+  uops: 1
+- name: PMINUD
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '15']]
+  throughput: 0.5
+  uops: 1
+- name: BLENDVPS
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 2
+  port_pressure: [[2, '05']]
+  throughput: 1.0
+  uops: 2
+- name: BLENDVPD
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 2
+  port_pressure: [[2, '05']]
+  throughput: 1.0
+  uops: 2
+- name: ROUNDSS
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 3
+  port_pressure: [[1, '1']]
+  throughput: 1.0
+  uops: 1
+- name: ROUNDSD
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 3
+  port_pressure: [[1, '1']]
+  throughput: 1.0
+  uops: 1
+- name: PEXTRQ
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: xmm
+  - class: register
+    name: gpr
+  latency: 2
+  port_pressure: [[1, '0'], [1, '15']]
+  throughput: 1.0
+  uops: 2
+- name: PBLENDVB
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 2
+  port_pressure: [[2, '15'], [1, '23']]
+  throughput: 1.0
+  uops: 2
+- name: PHSUBD
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: 2
+  port_pressure: [[3, '15']]
+  throughput: 1.5
+  uops: 3
+- name: PHSUBD
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 2
+  port_pressure: [[3, '15']]
+  throughput: 1.5
+  uops: 3
+- name: PMULHRSW
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: 5
+  port_pressure: [[1, '0']]
+  throughput: 1.0
+  uops: 1
+- name: PMULHRSW
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 5
+  port_pressure: [[1, '0']]
+  throughput: 1.0
+  uops: 1
+- name: PHSUBW
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: 2
+  port_pressure: [[3, '15']]
+  throughput: 1.5
+  uops: 3
+- name: PHSUBW
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 2
+  port_pressure: [[3, '15']]
+  throughput: 1.5
+  uops: 3
+- name: PSIGNW
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: 1
+  port_pressure: [[1, '15']]
+  throughput: 0.5
+  uops: 1
+- name: PSIGNW
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '15']]
+  throughput: 0.5
+  uops: 1
+- name: PSIGND
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: 1
+  port_pressure: [[1, '15']]
+  throughput: 0.5
+  uops: 1
+- name: PSIGND
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '15']]
+  throughput: 0.5
+  uops: 1
+- name: PSIGNB
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: 1
+  port_pressure: [[1, '15']]
+  throughput: 0.5
+  uops: 1
+- name: PSIGNB
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '15']]
+  throughput: 0.5
+  uops: 1
+- name: PHADDSW
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: 2
+  port_pressure: [[3, '15']]
+  throughput: 1.5
+  uops: 3
+- name: PHADDSW
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 2
+  port_pressure: [[3, '15']]
+  throughput: 1.5
+  uops: 3
+- name: PMADDUBSW
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: 5
+  port_pressure: [[1, '0']]
+  throughput: 1.0
+  uops: 1
+- name: PMADDUBSW
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 5
+  port_pressure: [[1, '0']]
+  throughput: 1.0
+  uops: 1
+- name: PHSUBSW
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: 2
+  port_pressure: [[3, '15']]
+  throughput: 1.5
+  uops: 3
+- name: PHSUBSW
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 2
+  port_pressure: [[3, '15']]
+  throughput: 1.5
+  uops: 3
+- name: PABSW
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: 1
+  port_pressure: [[1, '15']]
+  throughput: 0.5
+  uops: 1
+- name: PABSW
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '15']]
+  throughput: 0.5
+  uops: 1
+- name: PHADDD
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: 2
+  port_pressure: [[3, '15']]
+  throughput: 1.5
+  uops: 3
+- name: PHADDD
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 2
+  port_pressure: [[3, '15']]
+  throughput: 1.5
+  uops: 3
+- name: PALIGNR
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: 1
+  port_pressure: [[1, '15']]
+  throughput: 0.5
+  uops: 1
+- name: PALIGNR
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '15']]
+  throughput: 0.5
+  uops: 1
+- name: PSHUFB
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: 1
+  port_pressure: [[1, '15']]
+  throughput: 0.5
+  uops: 1
+- name: PSHUFB
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '15']]
+  throughput: 0.5
+  uops: 1
+- name: PABSD
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: 1
+  port_pressure: [[1, '15']]
+  throughput: 0.5
+  uops: 1
+- name: PABSD
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '15']]
+  throughput: 0.5
+  uops: 1
+- name: PABSB
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: 1
+  port_pressure: [[1, '15']]
+  throughput: 0.5
+  uops: 1
+- name: PABSB
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '15']]
+  throughput: 0.5
+  uops: 1
+- name: PHADDW
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: 2
+  port_pressure: [[3, '15']]
+  throughput: 1.5
+  uops: 3
+- name: PHADDW
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 2
+  port_pressure: [[3, '15']]
+  throughput: 1.5
+  uops: 3
+- name: ADDSUBPS
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 3
+  port_pressure: [[1, '1']]
+  throughput: 1.0
+  uops: 1
+- name: ADDSUBPD
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 3
+  port_pressure: [[1, '1']]
+  throughput: 1.0
+  uops: 1
+- name: HSUBPS
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 5
+  port_pressure: [[1, '1'], [2, '5']]
+  throughput: 2.0
+  uops: 3
+- name: HSUBPD
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 5
+  port_pressure: [[1, '1'], [2, '5']]
+  throughput: 2.0
+  uops: 3
+- name: HADDPD
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 5
+  port_pressure: [[1, '1'], [2, '5']]
+  throughput: 2.0
+  uops: 3
+- name: HADDPS
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 5
+  port_pressure: [[1, '1'], [2, '5']]
+  throughput: 2.0
+  uops: 3
+- name: TZCNT
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: ~
+  port_pressure: [[1, '1']]
+  throughput: 1.0
+  uops: ~
+- name: RDTSCP
+  operands: []
+  latency: ~
+  port_pressure: [[5, '0'], [1, '01'], [7, '1'], [10, '5']]
+  throughput: 10.0
+  uops: 23
+- name: AESKEYGENASSIST
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 10
+  port_pressure: [[2, '0'], [1, '015'], [1, '15'], [7, '5']]
+  throughput: 7.833333333333333
+  uops: 11
+- name: AESIMC
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 14
+  port_pressure: [[2, '5']]
+  throughput: 2.0
+  uops: 2
+- name: LZCNT
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: 3
+  port_pressure: [[1, '1']]
+  throughput: 1.0
+  uops: 1
+- name: RDRAND
+  operands:
+  - class: register
+    name: gpr
+  latency: ~
+  port_pressure: [[7, '015'], [1, '05'], [2, '1'], [1, '23'], [2, '5']]
+  throughput: 4.833333333333334
+  uops: 13
+- name: PAUSE
+  operands: []
+  latency: ~
+  port_pressure: [[3, '015'], [1, '5']]
+  throughput: 2.0
+  uops: 7
+- name: VPMULHUW
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 5
+  port_pressure: [[1, '0']]
+  throughput: 1.0
+  uops: 1
+- name: VPMULUDQ
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 5
+  port_pressure: [[1, '0']]
+  throughput: 1.0
+  uops: 1
+- name: VRCPSS
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 5
+  port_pressure: [[1, '0']]
+  throughput: 1.0
+  uops: 1
+- name: VPSLLDQ
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '15']]
+  throughput: 0.5
+  uops: 1
+- name: VPMULHRSW
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 5
+  port_pressure: [[1, '0']]
+  throughput: 1.0
+  uops: 1
+- name: VPERM2F128
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  latency: 2
+  port_pressure: [[1, '5']]
+  throughput: 1.0
+  uops: 1
+- name: VHADDPD
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 5
+  port_pressure: [[1, '1'], [2, '5']]
+  throughput: 2.0
+  uops: 3
+- name: VHADDPD
+  operands:
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  latency: 5
+  port_pressure: [[1, '1'], [2, '5']]
+  throughput: 2.0
+  uops: 3
+- name: VPUNPCKLBW
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '15']]
+  throughput: 0.5
+  uops: 1
+- name: VPERMILPS
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '5']]
+  throughput: 1.0
+  uops: 1
+- name: VPERMILPS
+  operands:
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  latency: 1
+  port_pressure: [[1, '5']]
+  throughput: 1.0
+  uops: 1
+- name: VPERMILPS
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '5']]
+  throughput: 1.0
+  uops: 1
+- name: VPERMILPS
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  latency: 1
+  port_pressure: [[1, '5']]
+  throughput: 1.0
+  uops: 1
+- name: VPCMPEQW
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '15']]
+  throughput: 0.5
+  uops: 1
+- name: VPCMPEQQ
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '15']]
+  throughput: 0.5
+  uops: 1
+- name: VPAVGW
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '15']]
+  throughput: 0.5
+  uops: 1
+- name: VPCMPEQD
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '15']]
+  throughput: 0.5
+  uops: 1
+- name: VPCMPEQB
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '15']]
+  throughput: 0.5
+  uops: 1
+- name: VPAVGB
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '15']]
+  throughput: 0.5
+  uops: 1
+- name: VPMAXSD
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '15']]
+  throughput: 0.5
+  uops: 1
+- name: VPMAXSB
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '15']]
+  throughput: 0.5
+  uops: 1
+- name: VMULSS
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 5
+  port_pressure: [[1, '0']]
+  throughput: 1.0
+  uops: 1
+- name: VANDPD
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '5']]
+  throughput: 1.0
+  uops: 1
+- name: VANDPD
+  operands:
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  latency: 1
+  port_pressure: [[1, '5']]
+  throughput: 1.0
+  uops: 1
+- name: VPMAXSW
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '15']]
+  throughput: 0.5
+  uops: 1
+- name: VANDPS
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '5']]
+  throughput: 1.0
+  uops: 1
+- name: VANDPS
+  operands:
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  latency: 1
+  port_pressure: [[1, '5']]
+  throughput: 1.0
+  uops: 1
+- name: VMULSD
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 5
+  port_pressure: [[1, '0']]
+  throughput: 1.0
+  uops: 1
+- name: VMULPS
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 5
+  port_pressure: [[1, '0']]
+  throughput: 1.0
+  uops: 1
+- name: VMULPS
+  operands:
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  latency: 5
+  port_pressure: [[1, '0']]
+  throughput: 1.0
+  uops: 1
+- name: VPSRLDQ
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '15']]
+  throughput: 0.5
+  uops: 1
+- name: VPSHUFHW
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '15']]
+  throughput: 0.5
+  uops: 1
+- name: VMAXSS
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 3
+  port_pressure: [[1, '1']]
+  throughput: 1.0
+  uops: 1
+- name: VMAXSD
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 3
+  port_pressure: [[1, '1']]
+  throughput: 1.0
+  uops: 1
+- name: VPMINSD
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '15']]
+  throughput: 0.5
+  uops: 1
+- name: VPMINSB
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '15']]
+  throughput: 0.5
+  uops: 1
+- name: VPMINSW
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '15']]
+  throughput: 0.5
+  uops: 1
+- name: VPTEST
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 2
+  port_pressure: [[1, '0'], [1, '5']]
+  throughput: 1.0
+  uops: 2
+- name: VPTEST
+  operands:
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  latency: 3
+  port_pressure: [[1, '0'], [1, '5']]
+  throughput: 1.0
+  uops: 2
+- name: VPACKSSDW
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '15']]
+  throughput: 0.5
+  uops: 1
+- name: VPMAXUB
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '15']]
+  throughput: 0.5
+  uops: 1
+- name: VADDSUBPD
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 3
+  port_pressure: [[1, '1']]
+  throughput: 1.0
+  uops: 1
+- name: VADDSUBPD
+  operands:
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  latency: 3
+  port_pressure: [[1, '1']]
+  throughput: 1.0
+  uops: 1
+- name: VPXOR
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '015']]
+  throughput: 0.3333333333333333
+  uops: 1
+- name: VSQRTSD
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 20
+  port_pressure: [[1, '0'], [14, [0DV]]]
+  throughput: 14.0
+  uops: 1
+- name: VEXTRACTPS
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: xmm
+  - class: register
+    name: gpr
+  latency: 2
+  port_pressure: [[1, '0'], [1, '5']]
+  throughput: 1.0
+  uops: 2
+- name: VSQRTSS
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 13
+  port_pressure: [[1, '0'], [7, [0DV]]]
+  throughput: 7.0
+  uops: 1
+- name: VUNPCKHPD
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '5']]
+  throughput: 1.0
+  uops: 1
+- name: VUNPCKHPD
+  operands:
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  latency: 1
+  port_pressure: [[1, '5']]
+  throughput: 1.0
+  uops: 1
+- name: VCOMISD
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 2
+  port_pressure: [[1, '0'], [1, '1']]
+  throughput: 1.0
+  uops: 2
+- name: VZEROALL
+  operands: []
+  latency: ~
+  port_pressure: [[2, '5']]
+  throughput: 2.0
+  uops: 20
+- name: VCOMISS
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 2
+  port_pressure: [[1, '0'], [1, '1']]
+  throughput: 1.0
+  uops: 2
+- name: VPSRAD
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '0']]
+  throughput: 1.0
+  uops: 1
+- name: VRSQRTSS
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 5
+  port_pressure: [[1, '0']]
+  throughput: 1.0
+  uops: 1
+- name: VPSHUFD
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '15']]
+  throughput: 0.5
+  uops: 1
+- name: VPSRAW
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '0']]
+  throughput: 1.0
+  uops: 1
+- name: VPSHUFB
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '15']]
+  throughput: 0.5
+  uops: 1
+- name: VDIVPD
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 20
+  port_pressure: [[1, '0'], [14, [0DV]]]
+  throughput: 14.0
+  uops: 1
+- name: VDIVPD
+  operands:
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  latency: 35
+  port_pressure: [[2, '0'], [1, '05'], [28, [0DV]]]
+  throughput: 28.0
+  uops: 3
+- name: VDIVPS
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 13
+  port_pressure: [[1, '0'], [7, [0DV]]]
+  throughput: 7.0
+  uops: 1
+- name: VDIVPS
+  operands:
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  latency: 21
+  port_pressure: [[2, '0'], [14, [0DV]]]
+  throughput: 14.0
+  uops: 3
+- name: VCMPSS
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 3
+  port_pressure: [[1, '1']]
+  throughput: 1.0
+  uops: 1
+- name: VPSHUFLW
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '15']]
+  throughput: 0.5
+  uops: 1
+- name: VPSLLD
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '0']]
+  throughput: 1.0
+  uops: 1
+- name: VCMPSD
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 3
+  port_pressure: [[1, '1']]
+  throughput: 1.0
+  uops: 1
+- name: VPSLLQ
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '0']]
+  throughput: 1.0
+  uops: 1
+- name: VPSLLW
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '0']]
+  throughput: 1.0
+  uops: 1
+- name: VPAND
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '015']]
+  throughput: 0.3333333333333333
+  uops: 1
+- name: VPHADDW
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 2
+  port_pressure: [[3, '15']]
+  throughput: 1.5
+  uops: 3
+- name: VPANDN
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '015']]
+  throughput: 0.3333333333333333
+  uops: 1
+- name: VSHUFPD
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '5']]
+  throughput: 1.0
+  uops: 1
+- name: VSHUFPD
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  latency: 1
+  port_pressure: [[1, '5']]
+  throughput: 1.0
+  uops: 1
+- name: VSUBSD
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 3
+  port_pressure: [[1, '1']]
+  throughput: 1.0
+  uops: 1
+- name: VSQRTPS
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 13
+  port_pressure: [[1, '0'], [7, [0DV]]]
+  throughput: 7.0
+  uops: 1
+- name: VSQRTPS
+  operands:
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  latency: 21
+  port_pressure: [[2, '0'], [14, [0DV]]]
+  throughput: 14.0
+  uops: 3
+- name: VCVTPS2DQ
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 3
+  port_pressure: [[1, '1']]
+  throughput: 1.0
+  uops: 1
+- name: VCVTPS2DQ
+  operands:
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  latency: 3
+  port_pressure: [[1, '1']]
+  throughput: 1.0
+  uops: 1
+- name: VPHADDD
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 2
+  port_pressure: [[3, '15']]
+  throughput: 1.5
+  uops: 3
+- name: VSQRTPD
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 20
+  port_pressure: [[1, '0'], [14, [0DV]]]
+  throughput: 14.0
+  uops: 1
+- name: VSQRTPD
+  operands:
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  latency: 35
+  port_pressure: [[2, '0'], [1, '05'], [28, [0DV]]]
+  throughput: 28.0
+  uops: 3
+- name: VSUBSS
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 3
+  port_pressure: [[1, '1']]
+  throughput: 1.0
+  uops: 1
+- name: VSHUFPS
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '5']]
+  throughput: 1.0
+  uops: 1
+- name: VSHUFPS
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  latency: 1
+  port_pressure: [[1, '5']]
+  throughput: 1.0
+  uops: 1
+- name: VPMULDQ
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 5
+  port_pressure: [[1, '0']]
+  throughput: 1.0
+  uops: 1
+- name: VDPPD
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 9
+  port_pressure: [[1, '0'], [1, '1'], [1, '5']]
+  throughput: 1.0
+  uops: 3
+- name: VDPPS
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 12
+  port_pressure: [[1, '0'], [2, '1'], [1, '5']]
+  throughput: 2.0
+  uops: 4
+- name: VDPPS
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  latency: 12
+  port_pressure: [[1, '0'], [2, '1'], [1, '5']]
+  throughput: 2.0
+  uops: 4
+- name: VPUNPCKHDQ
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '15']]
+  throughput: 0.5
+  uops: 1
+- name: VCVTPD2DQ
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 4
+  port_pressure: [[1, '1'], [1, '5']]
+  throughput: 1.0
+  uops: 2
+- name: VCVTPD2DQ
+  operands:
+  - class: register
+    name: ymm
+  - class: register
+    name: xmm
+  latency: 5
+  port_pressure: [[1, '1'], [1, '5']]
+  throughput: 1.0
+  uops: 2
+- name: VCVTTSS2SI
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: gpr
+  latency: 4
+  port_pressure: [[1, '0'], [1, '1']]
+  throughput: 1.0
+  uops: 2
+- name: VMULPD
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 5
+  port_pressure: [[1, '0']]
+  throughput: 1.0
+  uops: 1
+- name: VMULPD
+  operands:
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  latency: 5
+  port_pressure: [[1, '0']]
+  throughput: 1.0
+  uops: 1
+- name: VPADDSW
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '15']]
+  throughput: 0.5
+  uops: 1
+- name: VINSERTPS
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '5']]
+  throughput: 1.0
+  uops: 1
+- name: VPALIGNR
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '15']]
+  throughput: 0.5
+  uops: 1
+- name: VPADDSB
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '15']]
+  throughput: 0.5
+  uops: 1
+- name: VMAXPD
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 3
+  port_pressure: [[1, '1']]
+  throughput: 1.0
+  uops: 1
+- name: VMAXPD
+  operands:
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  latency: 3
+  port_pressure: [[1, '1']]
+  throughput: 1.0
+  uops: 1
+- name: VPACKUSWB
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '15']]
+  throughput: 0.5
+  uops: 1
+- name: VMAXPS
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 3
+  port_pressure: [[1, '1']]
+  throughput: 1.0
+  uops: 1
+- name: VMAXPS
+  operands:
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  latency: 3
+  port_pressure: [[1, '1']]
+  throughput: 1.0
+  uops: 1
+- name: VPUNPCKHQDQ
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '15']]
+  throughput: 0.5
+  uops: 1
+- name: VPSIGNW
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '15']]
+  throughput: 0.5
+  uops: 1
+- name: VPSIGNB
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '15']]
+  throughput: 0.5
+  uops: 1
+- name: VUNPCKHPS
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '5']]
+  throughput: 1.0
+  uops: 1
+- name: VUNPCKHPS
+  operands:
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  latency: 1
+  port_pressure: [[1, '5']]
+  throughput: 1.0
+  uops: 1
+- name: VPADDUSW
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '15']]
+  throughput: 0.5
+  uops: 1
+- name: VPUNPCKLWD
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '15']]
+  throughput: 0.5
+  uops: 1
+- name: VPADDUSB
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '15']]
+  throughput: 0.5
+  uops: 1
+- name: VPSIGND
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '15']]
+  throughput: 0.5
+  uops: 1
+- name: VPMULHW
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 5
+  port_pressure: [[1, '0']]
+  throughput: 1.0
+  uops: 1
+- name: VXORPD
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '5']]
+  throughput: 1.0
+  uops: 1
+- name: VXORPD
+  operands:
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  latency: 1
+  port_pressure: [[1, '5']]
+  throughput: 1.0
+  uops: 1
+- name: VROUNDSD
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 3
+  port_pressure: [[1, '1']]
+  throughput: 1.0
+  uops: 1
+- name: VROUNDSS
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 3
+  port_pressure: [[1, '1']]
+  throughput: 1.0
+  uops: 1
+- name: VPMADDUBSW
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 5
+  port_pressure: [[1, '0']]
+  throughput: 1.0
+  uops: 1
+- name: VXORPS
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '5']]
+  throughput: 1.0
+  uops: 1
+- name: VXORPS
+  operands:
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  latency: 1
+  port_pressure: [[1, '5']]
+  throughput: 1.0
+  uops: 1
+- name: VINSERTF128
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: xmm
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  latency: 2
+  port_pressure: [[1, '5']]
+  throughput: 1.0
+  uops: 1
+- name: VHSUBPD
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 5
+  port_pressure: [[1, '1'], [2, '5']]
+  throughput: 2.0
+  uops: 3
+- name: VHSUBPD
+  operands:
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  latency: 5
+  port_pressure: [[1, '1'], [2, '5']]
+  throughput: 2.0
+  uops: 3
+- name: VHSUBPS
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 5
+  port_pressure: [[1, '1'], [2, '5']]
+  throughput: 2.0
+  uops: 3
+- name: VHSUBPS
+  operands:
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  latency: 5
+  port_pressure: [[1, '1'], [2, '5']]
+  throughput: 2.0
+  uops: 3
+- name: VHADDPS
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 5
+  port_pressure: [[1, '1'], [2, '5']]
+  throughput: 2.0
+  uops: 3
+- name: VHADDPS
+  operands:
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  latency: 5
+  port_pressure: [[1, '1'], [2, '5']]
+  throughput: 2.0
+  uops: 3
+- name: VCVTTPS2DQ
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 3
+  port_pressure: [[1, '1']]
+  throughput: 1.0
+  uops: 1
+- name: VCVTTPS2DQ
+  operands:
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  latency: 3
+  port_pressure: [[1, '1']]
+  throughput: 1.0
+  uops: 1
+- name: VTESTPD
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 2
+  port_pressure: [[1, '0']]
+  throughput: 1.0
+  uops: 1
+- name: VTESTPD
+  operands:
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  latency: 2
+  port_pressure: [[1, '0']]
+  throughput: 1.0
+  uops: 1
+- name: VDIVSS
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 13
+  port_pressure: [[1, '0'], [7, [0DV]]]
+  throughput: 7.0
+  uops: 1
+- name: VDIVSD
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 20
+  port_pressure: [[1, '0'], [14, [0DV]]]
+  throughput: 14.0
+  uops: 1
+- name: VTESTPS
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 2
+  port_pressure: [[1, '0']]
+  throughput: 1.0
+  uops: 1
+- name: VTESTPS
+  operands:
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  latency: 2
+  port_pressure: [[1, '0']]
+  throughput: 1.0
+  uops: 1
+- name: VCMPPS
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 3
+  port_pressure: [[1, '1']]
+  throughput: 1.0
+  uops: 1
+- name: VCMPPS
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  latency: 3
+  port_pressure: [[1, '1']]
+  throughput: 1.0
+  uops: 1
+- name: VADDSUBPS
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 3
+  port_pressure: [[1, '1']]
+  throughput: 1.0
+  uops: 1
+- name: VADDSUBPS
+  operands:
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  latency: 3
+  port_pressure: [[1, '1']]
+  throughput: 1.0
+  uops: 1
+- name: VCMPPD
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 3
+  port_pressure: [[1, '1']]
+  throughput: 1.0
+  uops: 1
+- name: VCMPPD
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  latency: 3
+  port_pressure: [[1, '1']]
+  throughput: 1.0
+  uops: 1
+- name: VSUBPD
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 3
+  port_pressure: [[1, '1']]
+  throughput: 1.0
+  uops: 1
+- name: VSUBPD
+  operands:
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  latency: 3
+  port_pressure: [[1, '1']]
+  throughput: 1.0
+  uops: 1
+- name: VCVTSS2SI
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: gpr
+  latency: 4
+  port_pressure: [[1, '0'], [1, '1']]
+  throughput: 1.0
+  uops: 2
+- name: VMINSS
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 3
+  port_pressure: [[1, '1']]
+  throughput: 1.0
+  uops: 1
+- name: VPABSW
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '15']]
+  throughput: 0.5
+  uops: 1
+- name: VSUBPS
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 3
+  port_pressure: [[1, '1']]
+  throughput: 1.0
+  uops: 1
+- name: VSUBPS
+  operands:
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  latency: 3
+  port_pressure: [[1, '1']]
+  throughput: 1.0
+  uops: 1
+- name: VPHADDSW
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 2
+  port_pressure: [[3, '15']]
+  throughput: 1.5
+  uops: 3
+- name: VMINSD
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 3
+  port_pressure: [[1, '1']]
+  throughput: 1.0
+  uops: 1
+- name: VPSUBUSB
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '15']]
+  throughput: 0.5
+  uops: 1
+- name: VMPSADBW
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 6
+  port_pressure: [[1, '0'], [2, '15']]
+  throughput: 1.0
+  uops: 3
+- name: VPSUBUSW
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '15']]
+  throughput: 0.5
+  uops: 1
+- name: VPCMPGTB
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '15']]
+  throughput: 0.5
+  uops: 1
+- name: VANDNPS
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '5']]
+  throughput: 1.0
+  uops: 1
+- name: VANDNPS
+  operands:
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  latency: 1
+  port_pressure: [[1, '5']]
+  throughput: 1.0
+  uops: 1
+- name: VPADDQ
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '15']]
+  throughput: 0.5
+  uops: 1
+- name: VPADDW
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '15']]
+  throughput: 0.5
+  uops: 1
+- name: VPADDB
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '15']]
+  throughput: 0.5
+  uops: 1
+- name: VANDNPD
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '5']]
+  throughput: 1.0
+  uops: 1
+- name: VANDNPD
+  operands:
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  latency: 1
+  port_pressure: [[1, '5']]
+  throughput: 1.0
+  uops: 1
+- name: VPADDD
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '15']]
+  throughput: 0.5
+  uops: 1
+- name: VPABSB
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '15']]
+  throughput: 0.5
+  uops: 1
+- name: VBLENDPD
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '05']]
+  throughput: 0.5
+  uops: 1
+- name: VBLENDPD
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  latency: 1
+  port_pressure: [[1, '05']]
+  throughput: 0.5
+  uops: 1
+- name: VBLENDPS
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '05']]
+  throughput: 0.5
+  uops: 1
+- name: VBLENDPS
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  latency: 1
+  port_pressure: [[1, '05']]
+  throughput: 0.5
+  uops: 1
+- name: VRSQRTPS
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 5
+  port_pressure: [[1, '0']]
+  throughput: 1.0
+  uops: 1
+- name: VRSQRTPS
+  operands:
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  latency: 7
+  port_pressure: [[2, '0'], [1, '05']]
+  throughput: 2.5
+  uops: 3
+- name: VPEXTRB
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: xmm
+  - class: register
+    name: gpr
+  latency: 2
+  port_pressure: [[1, '0'], [1, '15']]
+  throughput: 1.0
+  uops: 2
+- name: VPEXTRD
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: xmm
+  - class: register
+    name: gpr
+  latency: 2
+  port_pressure: [[1, '0'], [1, '15']]
+  throughput: 1.0
+  uops: 2
+- name: VPHSUBW
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 2
+  port_pressure: [[3, '15']]
+  throughput: 1.5
+  uops: 3
+- name: VPEXTRQ
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: xmm
+  - class: register
+    name: gpr
+  latency: 2
+  port_pressure: [[1, '0'], [1, '15']]
+  throughput: 1.0
+  uops: 2
+- name: VPEXTRW
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: xmm
+  - class: register
+    name: gpr
+  latency: 2
+  port_pressure: [[1, '0'], [1, '15']]
+  throughput: 1.0
+  uops: 2
+- name: VPHSUBD
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 2
+  port_pressure: [[3, '15']]
+  throughput: 1.5
+  uops: 3
+- name: VADDPD
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 3
+  port_pressure: [[1, '1']]
+  throughput: 1.0
+  uops: 1
+- name: VADDPD
+  operands:
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  latency: 3
+  port_pressure: [[1, '1']]
+  throughput: 1.0
+  uops: 1
+- name: VPBLENDW
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '15']]
+  throughput: 0.5
+  uops: 1
+- name: VPOR
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '015']]
+  throughput: 0.3333333333333333
+  uops: 1
+- name: VADDPS
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 3
+  port_pressure: [[1, '1']]
+  throughput: 1.0
+  uops: 1
+- name: VADDPS
+  operands:
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  latency: 3
+  port_pressure: [[1, '1']]
+  throughput: 1.0
+  uops: 1
+- name: VPMULLD
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 5
+  port_pressure: [[1, '0']]
+  throughput: 1.0
+  uops: 1
+- name: VUCOMISS
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 2
+  port_pressure: [[1, '0'], [1, '1']]
+  throughput: 1.0
+  uops: 2
+- name: VPCMPISTRI
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 11
+  port_pressure: [[3, '0']]
+  throughput: 3.0
+  uops: 3
+- name: VPMULLW
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 5
+  port_pressure: [[1, '0']]
+  throughput: 1.0
+  uops: 1
+- name: VUCOMISD
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 2
+  port_pressure: [[1, '0'], [1, '1']]
+  throughput: 1.0
+  uops: 2
+- name: VEXTRACTF128
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: ymm
+  - class: register
+    name: xmm
+  latency: 2
+  port_pressure: [[1, '5']]
+  throughput: 1.0
+  uops: 1
+- name: VPACKUSDW
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '15']]
+  throughput: 0.5
+  uops: 1
+- name: VPMAXUD
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '15']]
+  throughput: 0.5
+  uops: 1
+- name: VPMAXUW
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '15']]
+  throughput: 0.5
+  uops: 1
+- name: VPSRLW
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '0']]
+  throughput: 1.0
+  uops: 1
+- name: VPSRLQ
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '0']]
+  throughput: 1.0
+  uops: 1
+- name: VPUNPCKLQDQ
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '15']]
+  throughput: 0.5
+  uops: 1
+- name: VPSRLD
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '0']]
+  throughput: 1.0
+  uops: 1
+- name: VPERMILPD
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '5']]
+  throughput: 1.0
+  uops: 1
+- name: VPERMILPD
+  operands:
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  latency: 1
+  port_pressure: [[1, '5']]
+  throughput: 1.0
+  uops: 1
+- name: VPERMILPD
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '5']]
+  throughput: 1.0
+  uops: 1
+- name: VPERMILPD
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  latency: 1
+  port_pressure: [[1, '5']]
+  throughput: 1.0
+  uops: 1
+- name: VMINPD
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 3
+  port_pressure: [[1, '1']]
+  throughput: 1.0
+  uops: 1
+- name: VMINPD
+  operands:
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  latency: 3
+  port_pressure: [[1, '1']]
+  throughput: 1.0
+  uops: 1
+- name: VCVTDQ2PS
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 3
+  port_pressure: [[1, '1']]
+  throughput: 1.0
+  uops: 1
+- name: VCVTDQ2PS
+  operands:
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  latency: 3
+  port_pressure: [[1, '1']]
+  throughput: 1.0
+  uops: 1
+- name: VPUNPCKLDQ
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '15']]
+  throughput: 0.5
+  uops: 1
+- name: VCVTDQ2PD
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 4
+  port_pressure: [[1, '1'], [1, '5']]
+  throughput: 1.0
+  uops: 2
+- name: VCVTDQ2PD
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: ymm
+  latency: 5
+  port_pressure: [[1, '1'], [1, '5']]
+  throughput: 1.0
+  uops: 2
+- name: VMINPS
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 3
+  port_pressure: [[1, '1']]
+  throughput: 1.0
+  uops: 1
+- name: VMINPS
+  operands:
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  latency: 3
+  port_pressure: [[1, '1']]
+  throughput: 1.0
+  uops: 1
+- name: VPSUBB
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '15']]
+  throughput: 0.5
+  uops: 1
+- name: VPSUBD
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '15']]
+  throughput: 0.5
+  uops: 1
+- name: VPSUBQ
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '15']]
+  throughput: 0.5
+  uops: 1
+- name: VPSUBW
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '15']]
+  throughput: 0.5
+  uops: 1
+- name: VPSADBW
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 5
+  port_pressure: [[1, '0']]
+  throughput: 1.0
+  uops: 1
+- name: VROUNDPD
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 3
+  port_pressure: [[1, '1']]
+  throughput: 1.0
+  uops: 1
+- name: VROUNDPD
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  latency: 3
+  port_pressure: [[1, '1']]
+  throughput: 1.0
+  uops: 1
+- name: VROUNDPS
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 3
+  port_pressure: [[1, '1']]
+  throughput: 1.0
+  uops: 1
+- name: VROUNDPS
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  latency: 3
+  port_pressure: [[1, '1']]
+  throughput: 1.0
+  uops: 1
+- name: VPSUBSB
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '15']]
+  throughput: 0.5
+  uops: 1
+- name: VPSUBSW
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '15']]
+  throughput: 0.5
+  uops: 1
+- name: VPCLMULQDQ
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 13
+  port_pressure: [[2, '0'], [4, '015'], [3, '05'], [4, '1'], [2, '15'], [3, '5']]
+  throughput: 6.833333333333333
+  uops: 18
+- name: VRCPPS
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 5
+  port_pressure: [[1, '0']]
+  throughput: 1.0
+  uops: 1
+- name: VRCPPS
+  operands:
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  latency: 7
+  port_pressure: [[2, '0'], [1, '05']]
+  throughput: 2.5
+  uops: 3
+- name: VCVTSD2SI
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: gpr
+  latency: 4
+  port_pressure: [[1, '0'], [1, '1']]
+  throughput: 1.0
+  uops: 2
+- name: VORPD
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '5']]
+  throughput: 1.0
+  uops: 1
+- name: VORPD
+  operands:
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  latency: 1
+  port_pressure: [[1, '5']]
+  throughput: 1.0
+  uops: 1
+- name: VORPS
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '5']]
+  throughput: 1.0
+  uops: 1
+- name: VORPS
+  operands:
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  latency: 1
+  port_pressure: [[1, '5']]
+  throughput: 1.0
+  uops: 1
+- name: VPMINUW
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '15']]
+  throughput: 0.5
+  uops: 1
+- name: VUNPCKLPS
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '5']]
+  throughput: 1.0
+  uops: 1
+- name: VUNPCKLPS
+  operands:
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  latency: 1
+  port_pressure: [[1, '5']]
+  throughput: 1.0
+  uops: 1
+- name: VPMINUB
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '15']]
+  throughput: 0.5
+  uops: 1
+- name: VPMINUD
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '15']]
+  throughput: 0.5
+  uops: 1
+- name: VUNPCKLPD
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '5']]
+  throughput: 1.0
+  uops: 1
+- name: VUNPCKLPD
+  operands:
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  latency: 1
+  port_pressure: [[1, '5']]
+  throughput: 1.0
+  uops: 1
+- name: VPUNPCKHBW
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '15']]
+  throughput: 0.5
+  uops: 1
+- name: VCVTTPD2DQ
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 4
+  port_pressure: [[1, '1'], [1, '5']]
+  throughput: 1.0
+  uops: 2
+- name: VCVTTPD2DQ
+  operands:
+  - class: register
+    name: ymm
+  - class: register
+    name: xmm
+  latency: 5
+  port_pressure: [[1, '1'], [1, '5']]
+  throughput: 1.0
+  uops: 2
+- name: VPCMPGTD
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '15']]
+  throughput: 0.5
+  uops: 1
+- name: VPMADDWD
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 5
+  port_pressure: [[1, '0']]
+  throughput: 1.0
+  uops: 1
+- name: VPCMPGTQ
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 5
+  port_pressure: [[1, '0']]
+  throughput: 1.0
+  uops: 1
+- name: VPCMPGTW
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '15']]
+  throughput: 0.5
+  uops: 1
+- name: VPHMINPOSUW
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 5
+  port_pressure: [[1, '0']]
+  throughput: 1.0
+  uops: 1
+- name: VPABSD
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '15']]
+  throughput: 0.5
+  uops: 1
+- name: VPUNPCKHWD
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '15']]
+  throughput: 0.5
+  uops: 1
+- name: VPHSUBSW
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 2
+  port_pressure: [[3, '15']]
+  throughput: 1.5
+  uops: 3
+- name: VCVTTSD2SI
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: gpr
+  latency: 4
+  port_pressure: [[1, '0'], [1, '1']]
+  throughput: 1.0
+  uops: 2
+- name: VCVTPD2PS
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 4
+  port_pressure: [[1, '1'], [1, '5']]
+  throughput: 1.0
+  uops: 2
+- name: VCVTPD2PS
+  operands:
+  - class: register
+    name: ymm
+  - class: register
+    name: xmm
+  latency: 5
+  port_pressure: [[1, '1'], [1, '5']]
+  throughput: 1.0
+  uops: 2
+- name: VADDSD
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 3
+  port_pressure: [[1, '1']]
+  throughput: 1.0
+  uops: 1
+- name: VPACKSSWB
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '15']]
+  throughput: 0.5
+  uops: 1
+- name: VADDSS
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 3
+  port_pressure: [[1, '1']]
+  throughput: 1.0
+  uops: 1
+- name: VCVTPS2PD
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 2
+  port_pressure: [[1, '0'], [1, '5']]
+  throughput: 1.0
+  uops: 2
+- name: VCVTPS2PD
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: ymm
+  latency: 3
+  port_pressure: [[1, '0'], [1, '5']]
+  throughput: 1.0
+  uops: 2
+- name: VCVTPH2PS
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 6
+  port_pressure: [[1, '0'], [1, '5']]
+  throughput: 1.0
+  uops: 2
+- name: VCVTPH2PS
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: ymm
+  latency: 7
+  port_pressure: [[1, '0'], [1, '5']]
+  throughput: 1.0
+  uops: 2
+- name: VCVTPS2PH
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 10
+  port_pressure: [[1, '0'], [1, '1'], [1, '5']]
+  throughput: 1.0
+  uops: 3
+- name: VCVTPS2PH
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: ymm
+  - class: register
+    name: xmm
+  latency: 10
+  port_pressure: [[1, '0'], [1, '1'], [1, '5']]
+  throughput: 1.0
+  uops: 3
+- name: VAESIMC
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 14
+  port_pressure: [[2, '5']]
+  throughput: 2.0
+  uops: 2
+- name: VAESKEYGENASSIST
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 10
+  port_pressure: [[2, '0'], [1, '015'], [1, '1'], [7, '5']]
+  throughput: 7.333333333333333
+  uops: 11
+

@@ -125,6 +125,14 @@ class ArchSemantics(ISASemantics):
             instruction_data = self._machine_model.get_instruction(
                 instruction_form['instruction'], instruction_form['operands']
             )
+            if (
+                not instruction_data
+                and self._isa == 'x86'
+                and instruction_form['instruction'][-1] in 'bwlq'
+            ):
+                instruction_data = self._machine_model.get_instruction(
+                    instruction_form['instruction'][:-1], instruction_form['operands']
+                )
             if instruction_data:
                 # instruction form in DB
                 throughput = instruction_data['throughput']
