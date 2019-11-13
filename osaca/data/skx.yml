@@ -36881,3 +36881,14 @@ instruction_forms:
   port_pressure: [[1, '01']]
   throughput: 0.5
   uops: 2
+- name: vfmadd132pd
+  operands:
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  throughput: 0.5
+  latency: 4.0  # 	1*p01
+  port_pressure: [[1, '01']]
