@@ -4,8 +4,10 @@ Unit tests for IACA/OSACA marker utilities
 """
 import os
 import unittest
+from collections import OrderedDict
 
-from osaca.semantics import reduce_to_section
+from osaca.semantics import reduce_to_section, find_basic_blocks, find_jump_labels, \
+    find_basic_loop_bodies
 from osaca.parser import ParserAArch64v81, ParserX86ATT
 
 
@@ -27,15 +29,15 @@ class TestMarkerUtils(unittest.TestCase):
 
     def test_marker_detection_AArch64(self):
         kernel = reduce_to_section(self.parsed_AArch, 'AArch64')
-        self.assertEquals(len(kernel), 138)
-        self.assertEquals(kernel[0].line_number, 307)
-        self.assertEquals(kernel[-1].line_number, 444)
+        self.assertEqual(len(kernel), 138)
+        self.assertEqual(kernel[0].line_number, 307)
+        self.assertEqual(kernel[-1].line_number, 444)
 
     def test_marker_detection_x86(self):
         kernel = reduce_to_section(self.parsed_x86, 'x86')
-        self.assertEquals(len(kernel), 9)
-        self.assertEquals(kernel[0].line_number, 146)
-        self.assertEquals(kernel[-1].line_number, 154)
+        self.assertEqual(len(kernel), 9)
+        self.assertEqual(kernel[0].line_number, 146)
+        self.assertEqual(kernel[-1].line_number, 154)
 
     def test_marker_matching_AArch64(self):
         # preparation
@@ -99,7 +101,7 @@ class TestMarkerUtils(unittest.TestCase):
                         ):
                             sample_parsed = self.parser_AArch.parse_file(sample_code)
                             sample_kernel = reduce_to_section(sample_parsed, 'AArch64')
-                            self.assertEquals(len(sample_kernel), kernel_length)
+                            self.assertEqual(len(sample_kernel), kernel_length)
                             kernel_start = len(
                                 list(
                                     filter(
@@ -110,7 +112,7 @@ class TestMarkerUtils(unittest.TestCase):
                             parsed_kernel = self.parser_AArch.parse_file(
                                 kernel, start_line=kernel_start
                             )
-                            self.assertEquals(sample_kernel, parsed_kernel)
+                            self.assertEqual(sample_kernel, parsed_kernel)
 
     def test_marker_matching_x86(self):
         # preparation
@@ -161,7 +163,7 @@ class TestMarkerUtils(unittest.TestCase):
                         ):
                             sample_parsed = self.parser_x86.parse_file(sample_code)
                             sample_kernel = reduce_to_section(sample_parsed, 'x86')
-                            self.assertEquals(len(sample_kernel), kernel_length)
+                            self.assertEqual(len(sample_kernel), kernel_length)
                             kernel_start = len(
                                 list(
                                     filter(
@@ -172,7 +174,7 @@ class TestMarkerUtils(unittest.TestCase):
                             parsed_kernel = self.parser_x86.parse_file(
                                 kernel, start_line=kernel_start
                             )
-                            self.assertEquals(sample_kernel, parsed_kernel)
+                            self.assertEqual(sample_kernel, parsed_kernel)
 
     def test_marker_special_cases_AArch(self):
         bytes_line = '.byte     213,3,32,31\n'
@@ -192,27 +194,27 @@ class TestMarkerUtils(unittest.TestCase):
         code_beginning = mov_start + bytes_line + kernel + mov_end + bytes_line + epilogue
         beginning_parsed = self.parser_AArch.parse_file(code_beginning)
         test_kernel = reduce_to_section(beginning_parsed, 'AArch64')
-        self.assertEquals(len(test_kernel), kernel_length)
+        self.assertEqual(len(test_kernel), kernel_length)
         kernel_start = len(list(filter(None, (mov_start + bytes_line).split('\n'))))
         parsed_kernel = self.parser_AArch.parse_file(kernel, start_line=kernel_start)
-        self.assertEquals(test_kernel, parsed_kernel)
+        self.assertEqual(test_kernel, parsed_kernel)
 
         # marker at the end
         code_end = prologue + mov_start + bytes_line + kernel + mov_end + bytes_line + epilogue
         end_parsed = self.parser_AArch.parse_file(code_end)
         test_kernel = reduce_to_section(end_parsed, 'AArch64')
-        self.assertEquals(len(test_kernel), kernel_length)
+        self.assertEqual(len(test_kernel), kernel_length)
         kernel_start = len(list(filter(None, (prologue + mov_start + bytes_line).split('\n'))))
         parsed_kernel = self.parser_AArch.parse_file(kernel, start_line=kernel_start)
-        self.assertEquals(test_kernel, parsed_kernel)
+        self.assertEqual(test_kernel, parsed_kernel)
 
         # no kernel
         code_empty = prologue + mov_start + bytes_line + mov_end + bytes_line + epilogue
         empty_parsed = self.parser_AArch.parse_file(code_empty)
         test_kernel = reduce_to_section(empty_parsed, 'AArch64')
-        self.assertEquals(len(test_kernel), 0)
+        self.assertEqual(len(test_kernel), 0)
         kernel_start = len(list(filter(None, (prologue + mov_start + bytes_line).split('\n'))))
-        self.assertEquals(test_kernel, [])
+        self.assertEqual(test_kernel, [])
 
         # no start marker
         code_no_start = prologue + bytes_line + kernel + mov_end + bytes_line + epilogue
@@ -251,27 +253,27 @@ class TestMarkerUtils(unittest.TestCase):
         code_beginning = mov_start + bytes_line + kernel + mov_end + bytes_line + epilogue
         beginning_parsed = self.parser_x86.parse_file(code_beginning)
         test_kernel = reduce_to_section(beginning_parsed, 'x86')
-        self.assertEquals(len(test_kernel), kernel_length)
+        self.assertEqual(len(test_kernel), kernel_length)
         kernel_start = len(list(filter(None, (mov_start + bytes_line).split('\n'))))
         parsed_kernel = self.parser_x86.parse_file(kernel, start_line=kernel_start)
-        self.assertEquals(test_kernel, parsed_kernel)
+        self.assertEqual(test_kernel, parsed_kernel)
 
         # marker at the end
         code_end = prologue + mov_start + bytes_line + kernel + mov_end + bytes_line + epilogue
         end_parsed = self.parser_x86.parse_file(code_end)
         test_kernel = reduce_to_section(end_parsed, 'x86')
-        self.assertEquals(len(test_kernel), kernel_length)
+        self.assertEqual(len(test_kernel), kernel_length)
         kernel_start = len(list(filter(None, (prologue + mov_start + bytes_line).split('\n'))))
         parsed_kernel = self.parser_x86.parse_file(kernel, start_line=kernel_start)
-        self.assertEquals(test_kernel, parsed_kernel)
+        self.assertEqual(test_kernel, parsed_kernel)
 
         # no kernel
         code_empty = prologue + mov_start + bytes_line + mov_end + bytes_line + epilogue
         empty_parsed = self.parser_x86.parse_file(code_empty)
         test_kernel = reduce_to_section(empty_parsed, 'x86')
-        self.assertEquals(len(test_kernel), 0)
+        self.assertEqual(len(test_kernel), 0)
         kernel_start = len(list(filter(None, (prologue + mov_start + bytes_line).split('\n'))))
-        self.assertEquals(test_kernel, [])
+        self.assertEqual(test_kernel, [])
 
         # no start marker
         code_no_start = prologue + bytes_line + kernel + mov_end + bytes_line + epilogue
@@ -290,6 +292,61 @@ class TestMarkerUtils(unittest.TestCase):
         no_marker_parsed = self.parser_x86.parse_file(code_no_marker)
         with self.assertRaises(LookupError):
             reduce_to_section(no_marker_parsed, 'x86')
+
+    def test_find_jump_labels(self):
+        self.assertEqual(find_jump_labels(self.parsed_x86),
+                         OrderedDict([('.LFB24', 10), ('.L4', 65), ('.L3', 79), ('.L2', 102),
+                                      ('.L13', 111), ('.L12', 120), ('.L6', 132), ('.L10', 145),
+                                      ('.L9', 161), ('.L8', 183), ('.L15', 252), ('.L26', 256),
+                                      ('.L14', 259), ('.LFB25', 277), ('.L28', 289)]))
+
+        self.assertEqual(
+            find_jump_labels(self.parsed_AArch),
+            OrderedDict([('triad', 18), ('.LBB0_3', 71), ('.LBB0_4', 76), ('.LBB0_5', 84),
+                         ('.LBB0_7', 92), ('.LBB0_8', 95), ('.LBB0_9', 106), ('.LBB0_11', 118),
+                         ('.LBB0_12', 133), ('.LBB0_14', 177), ('.LBB0_15', 190),
+                         ('.LBB0_16', 205), ('.LBB0_17', 208), ('.LBB0_18', 221),
+                         ('.LBB0_19', 228), ('.LBB0_20', 260), ('.LBB0_22', 272),
+                         ('.LBB0_24', 283), ('.LBB0_26', 290), ('.LBB0_28', 298),
+                         ('.LBB0_29', 306), ('.LBB0_31', 448), ('.LBB0_32', 458),
+                         ('.LBB0_33', 480), ('.LBB0_34', 484), ('.LBB0_35', 493),
+                         ('.LBB0_36', 504), ('.LBB0_37', 508), ('.LBB0_38', 518),
+                         ('main', 574)]))
+
+    def test_find_basic_blocks(self):
+        self.assertEqual(
+            [(k, v[0]['line_number'], v[-1]['line_number'])
+             for k, v in find_basic_blocks(self.parsed_x86).items()],
+            [('.LFB24', 12, 56), ('.L4', 67, 74), ('.L3', 81, 89), ('.L2', 104, 112),
+             ('.L13', 113, 121), ('.L12', 122, 125), ('.L6', 134, 135), ('.L10', 147, 154),
+             ('.L9', 163, 170), ('.L8', 185, 187), ('.L15', 254, 256), ('.L26', 258, 259),
+             ('.L14', 261, 262), ('.LFB25', 279, 290), ('.L28', 291, 300)])
+
+        self.assertEqual(
+            [(k, v[0]['line_number'], v[-1]['line_number'])
+             for k, v in find_basic_blocks(self.parsed_AArch).items()],
+            [('triad', 20, 64), ('.LBB0_3', 73, 77), ('.LBB0_4', 78, 83), ('.LBB0_5', 86, 89),
+             ('.LBB0_7', 94, 95), ('.LBB0_8', 97, 105), ('.LBB0_9', 108, 114),
+             ('.LBB0_11', 120, 134), ('.LBB0_12', 135, 173), ('.LBB0_14', 179, 191),
+             ('.LBB0_15', 192, 205), ('.LBB0_16', 207, 208), ('.LBB0_17', 210, 222),
+             ('.LBB0_18', 223, 228), ('.LBB0_19', 230, 261), ('.LBB0_20', 262, 269),
+             ('.LBB0_22', 274, 280), ('.LBB0_24', 285, 286), ('.LBB0_26', 292, 293),
+             ('.LBB0_28', 300, 307), ('.LBB0_29', 308, 444), ('.LBB0_31', 450, 459),
+             ('.LBB0_32', 460, 480), ('.LBB0_33', 482, 484), ('.LBB0_34', 486, 494),
+             ('.LBB0_35', 495, 504), ('.LBB0_36', 506, 508), ('.LBB0_37', 510, 518),
+             ('.LBB0_38', 520, 568), ('main', 576, 590)])
+
+    def test_find_basic_loop_body(self):
+        self.assertEqual(
+            [(k, v[0]['line_number'], v[-1]['line_number'])
+             for k, v in find_basic_loop_bodies(self.parsed_x86).items()],
+            [('.L4', 67, 74), ('.L10', 147, 154), ('.L28', 291, 300)])
+
+        self.assertEqual(
+            [(k, v[0]['line_number'], v[-1]['line_number'])
+             for k, v in find_basic_loop_bodies(self.parsed_AArch).items()],
+            [('.LBB0_12', 135, 173), ('.LBB0_15', 192, 205), ('.LBB0_18', 223, 228),
+             ('.LBB0_29', 308, 444), ('.LBB0_32', 460, 480), ('.LBB0_35', 495, 504)])
 
     ##################
     # Helper functions
