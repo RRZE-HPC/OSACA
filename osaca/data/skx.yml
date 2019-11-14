@@ -2836,6 +2836,12 @@ instruction_forms:
   port_pressure: []
   throughput: 0.0
   uops: 1
+- name: JA
+  operands:
+  - class: identifier
+  throughput: 0.0
+  latency: 0.0
+  port_pressure: []
 - name: WRMSR
   operands: []
   latency: ~
@@ -36881,14 +36887,3 @@ instruction_forms:
   port_pressure: [[1, '01']]
   throughput: 0.5
   uops: 2
-- name: vfmadd132pd
-  operands:
-  - class: register
-    name: ymm
-  - class: register
-    name: ymm
-  - class: register
-    name: ymm
-  throughput: 0.5
-  latency: 4.0  # 	1*p01
-  port_pressure: [[1, '01']]

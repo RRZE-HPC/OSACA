@@ -122,7 +122,8 @@ class TestParserAArch64v81(unittest.TestCase):
         self.assertEqual(parsed_5.operands[0].register.name, '0')
         self.assertEqual(parsed_5.operands[0].register.prefix, 'x')
         self.assertEqual(parsed_5.operands[1].memory.offset.identifier.name, 'q2c')
-        self.assertEqual(parsed_5.operands[1].memory.offset.identifier.relocation, ':got_lo12:')
+        self.assertEqual(parsed_5.operands[1].memory.offset.identifier.relocation,
+                         ':got_lo12:')
         self.assertEqual(parsed_5.operands[1].memory.base.name, '0')
         self.assertEqual(parsed_5.operands[1].memory.base.prefix, 'x')
         self.assertIsNone(parsed_5.operands[1].memory.index)
@@ -139,7 +140,8 @@ class TestParserAArch64v81(unittest.TestCase):
         self.assertEqual(parsed_7.operands[0].register.prefix, 'v')
         self.assertEqual(parsed_7.operands[0].register.lanes, '2')
         self.assertEqual(parsed_7.operands[0].register.shape, 'd')
-        self.assertEqual(self.parser.get_full_reg_name(parsed_7.operands[2].register), 'v1.2d')
+        self.assertEqual(self.parser.get_full_reg_name(parsed_7.operands[2].register),
+                         'v1.2d')
 
     def test_parse_line(self):
         line_comment = '// -- Begin  main'
@@ -152,7 +154,7 @@ class TestParserAArch64v81(unittest.TestCase):
 
         instruction_form_1 = {
             'instruction': None,
-            'operands': None,
+            'operands': [],
             'directive': None,
             'comment': '-- Begin main',
             'label': None,
@@ -162,7 +164,7 @@ class TestParserAArch64v81(unittest.TestCase):
 
         instruction_form_2 = {
             'instruction': None,
-            'operands': None,
+            'operands': [],
             'directive': None,
             'comment': '=>This Inner Loop Header: Depth=1',
             'label': '.LBB0_1',
@@ -171,7 +173,7 @@ class TestParserAArch64v81(unittest.TestCase):
         }
         instruction_form_3 = {
             'instruction': None,
-            'operands': None,
+            'operands': [],
             'directive': {'name': 'cfi_def_cfa', 'parameters': ['w29', '-16']},
             'comment': None,
             'label': None,

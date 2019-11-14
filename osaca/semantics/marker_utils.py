@@ -67,6 +67,7 @@ def get_marker(isa):
 
 
 def find_marked_section(lines, parser, mov_instr, mov_reg, mov_vals, nop_bytes, reverse=False):
+    # TODO match to instructions returned by get_marker
     index_start = -1
     index_end = -1
     for i, line in enumerate(lines):

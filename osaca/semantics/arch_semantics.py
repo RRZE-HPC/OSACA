@@ -182,13 +182,13 @@ class ArchSemantics(ISASemantics):
                         assign_unknown = False
                         reg_types = [
                             self._parser.get_reg_type(op['register'])
-                            for op in operands['operand_list']
+                            for op in operands
                             if 'register' in op
                         ]
                         load_port_uops = self._machine_model.get_load_throughput(
                             [
                                 x['memory']
-                                for x in instruction_form['operands']['source']
+                                for x in instruction_form['semantic_operands']['source']
                                 if 'memory' in x
                             ][0]
                         )
@@ -243,36 +243,9 @@ class ArchSemantics(ISASemantics):
         instruction_form['latency_lcd'] = 0
 
     def substitute_mem_address(self, operands):
-        regs = [op for op in operands['operand_list'] if 'register' in op]
-        if (
-            len(regs) > 1
-            and len(set([self._parser.get_reg_type(x['register']) for x in regs])) != 1
-        ):
-            warnings.warn('Load type could not be identified clearly.')
-        reg_type = self._parser.get_reg_type(regs[0]['register'])
-
-        source = [
-            operand if 'memory' not in operand else self.convert_mem_to_reg(operand, reg_type)
-            for operand in operands['source']
-        ]
-        destination = [
-            operand if 'memory' not in operand else self.convert_mem_to_reg(operand, reg_type)
-            for operand in operands['destination']
-        ]
-        src_dst = [
-            operand if 'memory' not in operand else self.convert_mem_to_reg(operand, reg_type)
-            for operand in operands['destination']
-        ]
-        operand_list = [
-            operand if 'memory' not in operand else self.convert_mem_to_reg(operand, reg_type)
-            for operand in operands['operand_list']
-        ]
-        return {
-            'source': source,
-            'destination': destination,
-            'src_dst': src_dst,
-            'operand_list': operand_list,
-        }
+        reg_ops = [op for op in operands if 'register' in op]
+        reg_type = self._parser.get_reg_type(reg_ops[0]['register'])
+        return [self.convert_mem_to_reg(op, reg_type) for op in operands]
 
     def convert_mem_to_reg(self, memory, reg_type, reg_id='0'):
         if self._isa == 'x86':

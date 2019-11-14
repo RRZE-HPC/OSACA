@@ -136,7 +136,7 @@ class TestParserX86ATT(unittest.TestCase):
 
         instruction_form_1 = {
             'instruction': None,
-            'operands': None,
+            'operands': [],
             'directive': None,
             'comment': '-- Begin main',
             'label': None,
@@ -145,7 +145,7 @@ class TestParserX86ATT(unittest.TestCase):
         }
         instruction_form_2 = {
             'instruction': None,
-            'operands': None,
+            'operands': [],
             'directive': None,
             'comment': 'Preds ..B1.6',
             'label': '..B1.7',
@@ -154,7 +154,7 @@ class TestParserX86ATT(unittest.TestCase):
         }
         instruction_form_3 = {
             'instruction': None,
-            'operands': None,
+            'operands': [],
             'directive': {'name': 'quad', 'parameters': ['.2.3_2__kmpc_loc_pack.2']},
             'comment': 'qed',
             'label': None,

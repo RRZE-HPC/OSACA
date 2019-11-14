@@ -178,7 +178,7 @@ class ParserAArch64v81(BaseParser):
         instruction_form = AttrDict(
             {
                 self.INSTRUCTION_ID: None,
-                self.OPERANDS_ID: None,
+                self.OPERANDS_ID: [],
                 self.DIRECTIVE_ID: None,
                 self.COMMENT_ID: None,
                 self.LABEL_ID: None,

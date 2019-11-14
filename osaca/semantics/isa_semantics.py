@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+from itertools import chain
 
 from osaca import utils
 from osaca.parser import AttrDict, ParserAArch64v81, ParserX86ATT
@@ -39,9 +40,11 @@ class ISASemantics(object):
     # - destination
     # - source/destination
     def assign_src_dst(self, instruction_form):
-        """Update instruction form dictionary with source and destination information."""
+        """Update instruction form dictionary with source, destination and flag information."""
         # if the instruction form doesn't have operands, there's nothing to do
         if instruction_form['operands'] is None:
+            instruction_form['semantic_operands'] = AttrDict(
+                {'source': [], 'destination': [], 'src_dst': []})
             return
         # check if instruction form is in ISA yaml, otherwise apply standard operand assignment
         # (one dest, others source)
@@ -71,8 +74,7 @@ class ISASemantics(object):
                     op_dict['destination'].append(operands[i])
                     continue
         # store operand list in dict and reassign operand key/value pair
-        op_dict['operand_list'] = operands
-        instruction_form['operands'] = AttrDict.convert_dict(op_dict)
+        instruction_form['semantic_operands'] = AttrDict.convert_dict(op_dict)
         # assign LD/ST flags
         instruction_form['flags'] = (
             instruction_form['flags'] if 'flags' in instruction_form else []
@@ -83,17 +85,15 @@ class ISASemantics(object):
             instruction_form['flags'] += [INSTR_FLAGS.HAS_ST]
 
     def _has_load(self, instruction_form):
-        for operand in (
-            instruction_form['operands']['source'] + instruction_form['operands']['src_dst']
-        ):
+        for operand in chain(instruction_form['semantic_operands']['source'],
+                             instruction_form['semantic_operands']['src_dst']):
             if 'memory' in operand:
                 return True
         return False
 
     def _has_store(self, instruction_form):
-        for operand in (
-            instruction_form['operands']['destination'] + instruction_form['operands']['src_dst']
-        ):
+        for operand in chain(instruction_form['semantic_operands']['destination'],
+                             instruction_form['semantic_operands']['src_dst']):
             if 'memory' in operand:
                 return True
         return False
@@ -101,13 +101,9 @@ class ISASemantics(object):
     def _get_regular_source_operands(self, instruction_form):
         if self._isa == 'x86':
             # return all but last operand
-            return [
-                op for op in instruction_form['operands'][0:len(instruction_form['operands']) - 1]
-            ]
+            return [op for op in instruction_form['operands'][0:-1]]
         elif self._isa == 'aarch64':
-            return [
-                op for op in instruction_form['operands'][1:len(instruction_form['operands'])]
-            ]
+            return [op for op in instruction_form['operands'][1:]]
         else:
             raise ValueError("Unsupported ISA {}.".format(self._isa))
 
