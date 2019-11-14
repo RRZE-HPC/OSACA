@@ -149,9 +149,10 @@ class KernelDG(nx.DiGraph):
             raise NotImplementedError('Kernel is cyclic.')
 
     def find_depending(self, instruction_form, kernel, include_write=False):
-        if instruction_form.operands is None:
+        if instruction_form.semantic_operands is None:
             return
-        for dst in instruction_form.operands.destination + instruction_form.operands.src_dst:
+        for dst in chain(instruction_form.semantic_operands.destination,
+                         instruction_form.semantic_operands.src_dst):
             if 'register' in dst:
                 # Check for read of register until overwrite
                 for instr_form in kernel:
@@ -199,9 +200,10 @@ class KernelDG(nx.DiGraph):
 
     def is_read(self, register, instruction_form):
         is_read = False
-        if instruction_form.operands is None:
+        if instruction_form.semantic_operands is None:
             return is_read
-        for src in instruction_form.operands.source + instruction_form.operands.src_dst:
+        for src in chain(instruction_form.semantic_operands.source,
+                         instruction_form.semantic_operands.src_dst):
             if 'register' in src:
                 is_read = self.parser.is_reg_dependend_of(register, src.register) or is_read
             if 'memory' in src:
@@ -212,7 +214,8 @@ class KernelDG(nx.DiGraph):
                         self.parser.is_reg_dependend_of(register, src.memory.index) or is_read
                     )
         # Check also if read in destination memory address
-        for dst in instruction_form.operands.destination + instruction_form.operands.src_dst:
+        for dst in chain(instruction_form.semantic_operands.destination,
+                         instruction_form.semantic_operands.src_dst):
             if 'memory' in dst:
                 if dst.memory.base is not None:
                     is_read = self.parser.is_reg_dependend_of(register, dst.memory.base) or is_read
@@ -224,9 +227,10 @@ class KernelDG(nx.DiGraph):
 
     def is_written(self, register, instruction_form):
         is_written = False
-        if instruction_form.operands is None:
+        if instruction_form.semantic_operands is None:
             return is_written
-        for dst in instruction_form.operands.destination + instruction_form.operands.src_dst:
+        for dst in chain(instruction_form.semantic_operands.destination,
+                         instruction_form.semantic_operands.src_dst):
             if 'register' in dst:
                 is_written = self.parser.is_reg_dependend_of(register, dst.register) or is_written
             if 'memory' in dst:
@@ -235,7 +239,8 @@ class KernelDG(nx.DiGraph):
                         self.parser.is_reg_dependend_of(register, dst.memory.base) or is_written
                     )
         # Check also for possible pre- or post-indexing in memory addresses
-        for src in instruction_form.operands.source + instruction_form.operands.src_dst:
+        for src in chain(instruction_form.semantic_operands.source,
+                         instruction_form.semantic_operands.src_dst):
             if 'memory' in src:
                 if 'pre_indexed' in src.memory or 'post_indexed' in src.memory:
                     is_written = (

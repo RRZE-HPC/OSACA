@@ -228,8 +228,6 @@ class MachineModel(object):
         return False
 
     def _match_operands(self, i_operands, operands):
-        if isinstance(operands, dict):
-            operands = operands['operand_list']
         operands_ok = True
         if len(operands) != len(i_operands):
             return False
