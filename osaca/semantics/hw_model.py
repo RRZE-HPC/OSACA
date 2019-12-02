@@ -12,7 +12,7 @@ from osaca.parser import ParserX86ATT
 
 
 class MachineModel(object):
-    def __init__(self, arch=None, path_to_yaml=None, isa=None):
+    def __init__(self, arch=None, path_to_yaml=None, isa=None, lazy=False):
         if not arch and not path_to_yaml:
             if not isa:
                 raise ValueError('One of arch, path_to_yaml and isa must be specified')
@@ -42,11 +42,19 @@ class MachineModel(object):
             yaml = self._create_yaml_object()
             if arch:
                 self._arch = arch.lower()
-                with open(utils.find_file(self._arch + '.yml'), 'r') as f:
+                self._path = utils.find_file(self._arch + '.yml')
+            with open(self._path, 'r') as f:
+                if not lazy:
                     self._data = yaml.load(f)
-            elif path_to_yaml:
-                with open(self._path, 'r') as f:
-                    self._data = yaml.load(f)
+                else:
+                    file_content = ''
+                    line = f.readline()
+                    while 'instruction_forms:' not in line:
+                        file_content += line
+                        line = f.readline()
+                    self._data = yaml.load(file_content)
+                    self._data['instruction_forms'] = []
+            self._data['instruction_dict'] = self._convert_to_dict(self._data['instruction_forms'])
 
     def __getitem__(self, key):
         """Return configuration entry."""
@@ -60,20 +68,31 @@ class MachineModel(object):
 
     def get_instruction(self, name, operands):
         """Find and return instruction data from name and operands."""
+        return self.get_instruction_from_dict(name, operands)
+        # if name is None:
+        #     return None
+        # try:
+        #     return next(
+        #         instruction_form
+        #         for instruction_form in self._data['instruction_forms']
+        #         if instruction_form['name'].upper() == name.upper()
+        #         and self._match_operands(instruction_form['operands'], operands)
+        #     )
+        # except StopIteration:
+        #     return None
+        # except TypeError as e:
+        #     print('\nname: {}\noperands: {}'.format(name, operands))
+        #     raise TypeError from e
+
+    def get_instruction_from_dict(self, name, operands):
         if name is None:
             return None
         try:
-            return next(
-                instruction_form
-                for instruction_form in self._data['instruction_forms']
-                if instruction_form['name'].upper() == name.upper()
-                and self._match_operands(instruction_form['operands'], operands)
-            )
-        except StopIteration:
+            # Check if key is in dict
+            instruction_form = self._data['instruction_dict'][self._get_key(name, operands)]
+            return instruction_form
+        except KeyError:
             return None
-        except TypeError as e:
-            print('\nname: {}\noperands: {}'.format(name, operands))
-            raise TypeError from e
 
     def average_port_pressure(self, port_pressure):
         """Construct average port pressure list from instruction data."""
@@ -206,8 +225,14 @@ class MachineModel(object):
         if not stream:
             stream = StringIO()
 
-        yaml.dump({k: v for k, v in self._data.items()
-                   if k not in ['instruction_forms', 'load_throughput']}, stream)
+        yaml.dump(
+            {
+                k: v
+                for k, v in self._data.items()
+                if k not in ['instruction_forms', 'load_throughput']
+            },
+            stream,
+        )
         yaml.dump({'load_throughput': formatted_load_throughput}, stream)
         yaml.dump({'instruction_forms': formatted_instruction_forms}, stream)
 
@@ -215,6 +240,88 @@ class MachineModel(object):
             return stream.getvalue()
 
     ######################################################
+
+    def _get_key(self, name, operands):
+        key_string = name.lower() + '-'
+        key_string += '_'.join([self._get_operand_hash(op) for op in operands])
+        return key_string
+
+    def _convert_to_dict(self, instruction_forms):
+        instruction_dict = {}
+        for instruction_form in instruction_forms:
+            instruction_dict[
+                self._get_key(instruction_form['name'], instruction_form['operands'])
+            ] = instruction_form
+        return instruction_dict
+
+    def _get_operand_hash(self, operand):
+        operand_string = ''
+        if 'class' in operand:
+            # DB entry
+            opclass = operand['class']
+        else:
+            # parsed instruction
+            opclass = list(operand.keys())[0]
+            operand = operand[opclass]
+        if opclass == 'immediate':
+            # Immediate
+            operand_string += 'i'
+        elif opclass == 'register':
+            # Register
+            if 'prefix' in operand:
+                operand_string += operand['prefix']
+                operand_string += operand['shape'] if 'shape' in operand else ''
+            elif 'name' in operand:
+                operand_string += 'r' if operand['name'] == 'gpr' else operand['name'][0]
+        elif opclass == 'memory':
+            # Memory
+            operand_string += 'm'
+            operand_string += 'b' if operand['base'] is not None else ''
+            operand_string += 'o' if operand['offset'] is not None else ''
+            operand_string += 'i' if operand['index'] is not None else ''
+            operand_string += 's' if operand['scale'] > 1 else ''
+            if 'pre-indexed' in operand:
+                operand_string += 'r' if operand['pre-indexed'] else ''
+                operand_string += 'p' if operand['post-indexed'] else ''
+        return operand_string
+
+    def _create_db_operand_aarch64(operand):
+        if operand == 'i':
+            return {'class': 'immediate', 'imd': 'int'}
+        elif operand in 'wxbhsdq':
+            return {'class': 'register', 'prefix': operand}
+        elif operand.startswith('v'):
+            return {'class': 'register', 'prefix': 'v', 'shape': operand[1:2]}
+        elif operand.startswith('m'):
+            return {
+                'class': 'memory',
+                'base': 'x' if 'b' in operand else None,
+                'offset': 'imd' if 'o' in operand else None,
+                'index': 'gpr' if 'i' in operand else None,
+                'scale': 8 if 's' in operand else 1,
+                'pre-indexed': True if 'r' in operand else False,
+                'post-indexed': True if 'p' in operand else False,
+            }
+        else:
+            raise ValueError('Parameter {} is not a valid operand code'.format(operand))
+
+    def _create_db_operand_x86(operand):
+        if operand == 'r':
+            return {'class': 'register', 'name': 'gpr'}
+        elif operand in 'xyz':
+            return {'class': 'register', 'name': operand + 'mm'}
+        elif operand == 'i':
+            return {'class': 'immediate', 'imd': 'int'}
+        elif operand.startswith('m'):
+            return {
+                'class': 'memory',
+                'base': 'gpr' if 'b' in operand else None,
+                'offset': 'imd' if 'o' in operand else None,
+                'index': 'gpr' if 'i' in operand else None,
+                'scale': 8 if 's' in operand else 1,
+            }
+        else:
+            raise ValueError('Parameter {} is not a valid operand code'.format(operand))
 
     def _check_for_duplicate(self, name, operands):
         matches = [

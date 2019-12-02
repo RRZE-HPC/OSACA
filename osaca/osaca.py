@@ -5,7 +5,6 @@ import io
 import os
 import re
 import sys
-from subprocess import call
 
 from osaca.db_interface import sanity_check, import_benchmark_output
 from osaca.frontend import Frontend

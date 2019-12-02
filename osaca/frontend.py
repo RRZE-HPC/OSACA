@@ -28,9 +28,9 @@ class Frontend(object):
         self._arch = arch
         if arch:
             self._arch = arch.lower()
-            self._machine_model = MachineModel(arch=arch)
+            self._machine_model = MachineModel(arch=arch, lazy=True)
         elif path_to_yaml:
-            self._machine_model = MachineModel(path_to_yaml=path_to_yaml)
+            self._machine_model = MachineModel(path_to_yaml=path_to_yaml, lazy=True)
             self._arch = self._machine_model.get_arch()
 
     def _is_comment(self, instruction_form):
