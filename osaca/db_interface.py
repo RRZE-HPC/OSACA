@@ -213,7 +213,7 @@ def _create_db_operand_aarch64(operand):
     elif operand.startswith('m'):
         return {
             'class': 'memory',
-            'base': 'gpr' if 'b' in operand else None,
+            'base': 'x' if 'b' in operand else None,
             'offset': 'imd' if 'o' in operand else None,
             'index': 'gpr' if 'i' in operand else None,
             'scale': 8 if 's' in operand else 1,
