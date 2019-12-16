@@ -68,21 +68,21 @@ class MachineModel(object):
 
     def get_instruction(self, name, operands):
         """Find and return instruction data from name and operands."""
-        return self.get_instruction_from_dict(name, operands)
-        # if name is None:
-        #     return None
-        # try:
-        #     return next(
-        #         instruction_form
-        #         for instruction_form in self._data['instruction_forms']
-        #         if instruction_form['name'].upper() == name.upper()
-        #         and self._match_operands(instruction_form['operands'], operands)
-        #     )
-        # except StopIteration:
-        #     return None
-        # except TypeError as e:
-        #     print('\nname: {}\noperands: {}'.format(name, operands))
-        #     raise TypeError from e
+        # return self.get_instruction_from_dict(name, operands)
+        if name is None:
+            return None
+        try:
+            return next(
+                instruction_form
+                for instruction_form in self._data['instruction_forms']
+                if instruction_form['name'].upper() == name.upper()
+                and self._match_operands(instruction_form['operands'], operands)
+            )
+        except StopIteration:
+            return None
+        except TypeError as e:
+            print('\nname: {}\noperands: {}'.format(name, operands))
+            raise TypeError from e
 
     def get_instruction_from_dict(self, name, operands):
         if name is None:
