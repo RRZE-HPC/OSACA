@@ -155,7 +155,7 @@ class MachineModel(object):
         ld_tp = [m for m in self._data['load_throughput'] if self._match_mem_entries(memory, m)]
         if len(ld_tp) > 0:
             return ld_tp[0]['port_pressure']
-        return None
+        return self._data['load_throughput_default']
 
     def _match_mem_entries(self, mem, i_mem):
         if self._data['isa'].lower() == 'aarch64':
@@ -489,6 +489,11 @@ class MachineModel(object):
                         i_mem['offset'] == 'imd'
                         or (i_mem['offset'] is None and mem['offset']['value'] == '0')
                     )
+                )
+                or (
+                    mem['offset'] is not None
+                    and 'identifier' in mem['offset']
+                    and i_mem['offset'] == 'id'
                 )
             )
             # check index

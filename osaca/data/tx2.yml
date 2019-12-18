@@ -40,6 +40,7 @@ load_throughput:
 - {base: x, index: x, offset: imd, scale: 8, pre-indexed: false, post-indexed: false, port_pressure: [[1, '34']]}
 - {base: x, index: x, offset: imd, scale: 8, pre-indexed: true, post-indexed: true, port_pressure:   [[1, '34']]}
 - {base: x, index: x, offset: imd, scale: 8, pre-indexed: true, post-indexed: false, port_pressure:  [[1, '34']]}
+load_throughput_default: [[1, '34']]
 ports: ['0', 0DV, '1', 1DV, '2', '3', '4', '5']
 port_model_scheme: |
   ┌-----------------------------------------------------------┐
