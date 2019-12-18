@@ -46,6 +46,15 @@ class TestParserX86ATT(unittest.TestCase):
         self.assertEqual(self._get_directive(self.parser, '\t.align\t16,0x90').name, 'align')
         self.assertEqual(len(self._get_directive(self.parser, '\t.align\t16,0x90').parameters), 2)
         self.assertEqual(
+            self._get_directive(self.parser, '\t.set\tL$set$0,LECIE1-LSCIE1').parameters,
+            [{'name': 'L$set$0'}, {'name': 'LECIE1-LSCIE1'}])
+        self.assertEqual(
+            self._get_directive(self.parser, 
+                '\t.section __TEXT,__eh_frame,coalesced,no_toc+strip_static_syms+live_support'
+                ).parameters,
+            [{'name': v} for v in 
+             ['__TEXT', '__eh_frame', 'coalesced', 'no_toc+strip_static_syms+live_support']])
+        self.assertEqual(
             self._get_directive(self.parser, '\t.align\t16,0x90').parameters[1], '0x90'
         )
         self.assertEqual(

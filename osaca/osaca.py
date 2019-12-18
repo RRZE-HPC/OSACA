@@ -128,7 +128,7 @@ def check_arguments(args, parser):
     supported_archs = ['SNB', 'IVB', 'HSW', 'BDW', 'SKX', 'CSX', 'ZEN1', 'TX2']
     supported_import_files = ['ibench', 'asmbench']
 
-    if 'arch' in args and args.arch.upper() not in supported_archs:
+    if 'arch' in args and (args.arch is None or args.arch.upper() not in supported_archs):
         parser.error(
             'Microarchitecture not supported. Please see --help for all valid architecture codes.'
         )
