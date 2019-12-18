@@ -13,6 +13,7 @@ load_throughput:
 - {base: gpr, index: gpr, offset: ~, scale: 8, port_pressure:   [[1, '89'], [1, ['8D','9D']]]}
 - {base: gpr, index: gpr, offset: imd, scale: 1, port_pressure: [[1, '89'], [1, ['8D','9D']]]}
 - {base: gpr, index: gpr, offset: imd, scale: 8, port_pressure: [[1, '89'], [1, ['8D','9D']]]}
+load_throughput_default: [[1, '89'], [1, ['8D', '9D']]]
 hidden_loads: false
 ports: ['0', '1', '2', '3', 3DV, '4', '5', '6', '7', '8', '9', 8D, 9D, ST]
 port_model_scheme: |

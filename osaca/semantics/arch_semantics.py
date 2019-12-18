@@ -249,7 +249,10 @@ class ArchSemantics(ISASemantics):
 
     def convert_mem_to_reg(self, memory, reg_type, reg_id='0'):
         if self._isa == 'x86':
-            register = {'register': {'name': reg_type + reg_id}}
+            if reg_type == 'gpr':
+                register = {'register': {'name': 'r' + str(int(reg_id) + 9)}}
+            else:
+                register = {'register': {'name': reg_type + reg_id}}
         elif self._isa == 'aarch64':
             register = {'register': {'prefix': reg_type, 'name': reg_id}}
         return register

@@ -197,7 +197,7 @@ class Frontend(object):
             sums[dep] = sum(
                 [instr_form['latency_lcd'] for instr_form in dep_dict[dep]['dependencies']]
             )
-        lcd_sum = max(sums.values())
+        lcd_sum = max(sums.values()) if len(sums) > 0 else 0.0
         lcd_lines = []
         longest_lcd = [line_no for line_no in sums if sums[line_no] == lcd_sum][0]
         lcd_lines = [d['line_number'] for d in dep_dict[longest_lcd]['dependencies']]
