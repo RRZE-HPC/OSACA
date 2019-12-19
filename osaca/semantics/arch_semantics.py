@@ -135,7 +135,12 @@ class ArchSemantics(ISASemantics):
                 )
             if instruction_data:
                 # instruction form in DB
-                latency_wo_load = self._handle_instruction_found(
+                (
+                    throughput,
+                    port_pressure,
+                    latency,
+                    latency_wo_load,
+                ) = self._handle_instruction_found(
                     instruction_data, port_number, instruction_form, flags
                 )
             else:
@@ -246,7 +251,7 @@ class ArchSemantics(ISASemantics):
             flags.append(INSTR_FLAGS.LT_UNKWN)
         if INSTR_FLAGS.HAS_LD in instruction_form['flags']:
             flags.append(INSTR_FLAGS.LD)
-        return latency_wo_load
+        return throughput, port_pressure, latency, latency_wo_load
 
     def substitute_mem_address(self, operands):
         # reg_ops = [op for op in operands if 'register' in op]
