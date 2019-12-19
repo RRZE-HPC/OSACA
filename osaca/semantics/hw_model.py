@@ -347,11 +347,21 @@ class MachineModel(object):
         else:
             return False
 
-    def _check_operands(self, i_operands, operands):
+    def _check_operands(self, i_operand, operand):
+        # check for wildcard
+        if '*' in operand:
+            if (
+                'class' in i_operand
+                and i_operand['class'] == 'register'
+                or 'register' in i_operand
+            ):
+                return True
+            else:
+                return False
         if self._data['isa'].lower() == 'aarch64':
-            return self._check_AArch64_operands(i_operands, operands)
+            return self._check_AArch64_operands(i_operand, operand)
         if self._data['isa'].lower() == 'x86':
-            return self._check_x86_operands(i_operands, operands)
+            return self._check_x86_operands(i_operand, operand)
 
     def _check_AArch64_operands(self, i_operand, operand):
         if 'class' in operand:
