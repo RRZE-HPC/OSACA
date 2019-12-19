@@ -72,11 +72,12 @@ class ParserX86ATT(BaseParser):
         )
         directive_parameter = (
             pp.quotedString
-            | directive_option
-            | identifier
-            | hex_number
-            | decimal_number
-            | self.register
+            ^ directive_option
+            ^ identifier
+            ^ hex_number
+            ^ decimal_number
+            ^ self.register
+            ^ pp.Group(pp.Word(pp.alphanums + '_').setResultsName('name'))
         )
         commaSeparatedList = pp.delimitedList(pp.Optional(directive_parameter), delim=',')
         self.directive = pp.Group(
