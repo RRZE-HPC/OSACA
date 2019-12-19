@@ -417,7 +417,19 @@ instruction_forms:
     scale: 1
   - class: register
     name: xmm
-  throughput: 1.0
+  throughput: 0.5
+  latency: 4.0  # 	1*p23+1*p2D3D
+  port_pressure: [[1, '23'], [1, [2D, 3D]]]
+- name: vmovapd
+  operands:
+  - class: memory
+    base: gpr
+    offset: ~
+    index: gpr
+    scale: 1
+  - class: register
+    name: ymm
+  throughput: 0.5
   latency: 4.0  # 	1*p23+1*p2D3D
   port_pressure: [[1, '23'], [1, [2D, 3D]]]
 - name: vmovapd
@@ -429,7 +441,7 @@ instruction_forms:
     scale: 1
   - class: register
     name: ymm
-  throughput: 1.0
+  throughput: 0.5
   latency: 4.0  # 	1*p23+1*p2D3D
   port_pressure: [[1, '23'], [1, [2D, 3D]]]
 - name: vmovapd
@@ -441,7 +453,7 @@ instruction_forms:
     offset: ~
     index: gpr
     scale: 1
-  throughput: 1.0
+  throughput: 0.5
   latency: 4.0  # 	1*p23+1*p4
   port_pressure: [[1, '23'], [1, '4']]
 - name: vmovapd

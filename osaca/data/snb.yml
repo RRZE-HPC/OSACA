@@ -2632,6 +2632,13 @@ instruction_forms:
   port_pressure: [[10, '0'], [4, '01'], [3, '015'], [1, '05'], [11, '1'], [1, '15'], [2, '23'], [1, '4'], [25, '5']]
   throughput: 27.0
   uops: 58
+- name: JA
+  operands:
+  - class: identifier
+  latency: 0
+  port_pressure: []
+  throughput: 0.0
+  uops: 1
 - name: JNE
   operands:
   - class: identifier
@@ -4190,6 +4197,16 @@ instruction_forms:
   operands:
   - class: immediate
     imd: int
+  - class: register
+    name: gpr
+  latency: 1
+  port_pressure: [[1, '015']]
+  throughput: 0.3333333333333333
+  uops: 1
+- name: ADD
+  operands:
+  - class: register
+    name: gpr
   - class: register
     name: gpr
   latency: 1

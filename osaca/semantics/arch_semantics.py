@@ -135,39 +135,9 @@ class ArchSemantics(ISASemantics):
                 )
             if instruction_data:
                 # instruction form in DB
-                throughput = instruction_data['throughput']
-                port_pressure = self._machine_model.average_port_pressure(
-                    instruction_data['port_pressure']
+                latency_wo_load = self._handle_instruction_found(
+                    instruction_data, port_number, instruction_form, flags
                 )
-                instruction_form['port_uops'] = instruction_data['port_pressure']
-                try:
-                    assert isinstance(port_pressure, list)
-                    assert len(port_pressure) == port_number
-                    instruction_form['port_pressure'] = port_pressure
-                    if sum(port_pressure) == 0 and throughput is not None:
-                        # port pressure on all ports 0 --> not bound to a port
-                        flags.append(INSTR_FLAGS.NOT_BOUND)
-                except AssertionError:
-                    warnings.warn(
-                        'Port pressure could not be imported correctly from database. '
-                        + 'Please check entry for:\n {}'.format(instruction_form)
-                    )
-                    instruction_form['port_pressure'] = [0.0 for i in range(port_number)]
-                    instruction_form['port_uops'] = []
-                    flags.append(INSTR_FLAGS.TP_UNKWN)
-                if throughput is None:
-                    # assume 0 cy and mark as unknown
-                    throughput = 0.0
-                    flags.append(INSTR_FLAGS.TP_UNKWN)
-                latency = instruction_data['latency']
-                latency_wo_load = latency
-                if latency is None:
-                    # assume 0 cy and mark as unknown
-                    latency = 0.0
-                    latency_wo_load = latency
-                    flags.append(INSTR_FLAGS.LT_UNKWN)
-                if INSTR_FLAGS.HAS_LD in instruction_form['flags']:
-                    flags.append(INSTR_FLAGS.LD)
             else:
                 # instruction could not be found in DB
                 assign_unknown = True
@@ -217,9 +187,9 @@ class ArchSemantics(ISASemantics):
                                 ),
                             )
                         ]
-                        instruction_form['port_uops'] = list(chain(
-                            instruction_data_reg['port_pressure'], load_port_uops
-                        ))
+                        instruction_form['port_uops'] = list(
+                            chain(instruction_data_reg['port_pressure'], load_port_uops)
+                        )
 
                 if assign_unknown:
                     # --> mark as unknown and assume 0 cy for latency/throughput
@@ -242,12 +212,51 @@ class ArchSemantics(ISASemantics):
         instruction_form['latency_cp'] = 0
         instruction_form['latency_lcd'] = 0
 
-    def substitute_mem_address(self, operands):
-        reg_ops = [op for op in operands if 'register' in op]
-        reg_type = self._parser.get_reg_type(reg_ops[0]['register'])
-        return [self.convert_mem_to_reg(op, reg_type) for op in operands]
+    def _handle_instruction_found(self, instruction_data, port_number, instruction_form, flags):
+        throughput = instruction_data['throughput']
+        port_pressure = self._machine_model.average_port_pressure(
+            instruction_data['port_pressure']
+        )
+        instruction_form['port_uops'] = instruction_data['port_pressure']
+        try:
+            assert isinstance(port_pressure, list)
+            assert len(port_pressure) == port_number
+            instruction_form['port_pressure'] = port_pressure
+            if sum(port_pressure) == 0 and throughput is not None:
+                # port pressure on all ports 0 --> not bound to a port
+                flags.append(INSTR_FLAGS.NOT_BOUND)
+        except AssertionError:
+            warnings.warn(
+                'Port pressure could not be imported correctly from database. '
+                + 'Please check entry for:\n {}'.format(instruction_form)
+            )
+            instruction_form['port_pressure'] = [0.0 for i in range(port_number)]
+            instruction_form['port_uops'] = []
+            flags.append(INSTR_FLAGS.TP_UNKWN)
+        if throughput is None:
+            # assume 0 cy and mark as unknown
+            throughput = 0.0
+            flags.append(INSTR_FLAGS.TP_UNKWN)
+        latency = instruction_data['latency']
+        latency_wo_load = latency
+        if latency is None:
+            # assume 0 cy and mark as unknown
+            latency = 0.0
+            latency_wo_load = latency
+            flags.append(INSTR_FLAGS.LT_UNKWN)
+        if INSTR_FLAGS.HAS_LD in instruction_form['flags']:
+            flags.append(INSTR_FLAGS.LD)
+        return latency_wo_load
 
-    def convert_mem_to_reg(self, memory, reg_type, reg_id='0'):
+    def substitute_mem_address(self, operands):
+        # reg_ops = [op for op in operands if 'register' in op]
+        # reg_type = self._parser.get_reg_type(reg_ops[0]['register'])
+        return [self._create_reg_wildcard() if 'memory' in op else op for op in operands]
+
+    def _create_reg_wildcard(self):
+        return {'*': '*'}
+
+    def convert_op_to_reg(self, reg_type, reg_id='0'):
         if self._isa == 'x86':
             if reg_type == 'gpr':
                 register = {'register': {'name': 'r' + str(int(reg_id) + 9)}}
