@@ -215,4 +215,34 @@ instruction_forms:
           name: "ymm"
           source: true
           destination: true
-
+    - name: vextractf128
+      operands:
+        - class: "immediate"
+          imd: "int"
+          source: true
+          destination: false
+        - class: "register"
+          name: "ymm"
+          source: true
+          destination: false
+        - class: "register"
+          name: "xmm"
+          source: true
+          destination: true
+    - name: vextractf128
+      operands:
+        - class: "immediate"
+          imd: "int"
+          source: true
+          destination: false
+        - class: "register"
+          name: "ymm"
+          source: true
+          destination: false
+        - class: "memory"
+          base: "gpr"
+          offset: "imd"
+          index: "gpr"
+          scale: 1
+          source: true
+          destination: true
