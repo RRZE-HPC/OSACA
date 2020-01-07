@@ -164,6 +164,7 @@ class ArchSemantics(ISASemantics):
                             [
                                 x['memory']
                                 for x in instruction_form['semantic_operands']['source']
+                                + instruction_form['semantic_operands']['src_dst']
                                 if 'memory' in x
                             ][0]
                         )
