@@ -10,6 +10,8 @@ from .isa_semantics import INSTR_FLAGS, ISASemantics
 
 
 class ArchSemantics(ISASemantics):
+    GAS_SUFFIXES = 'bswlqt'
+
     def __init__(self, machine_model: MachineModel, path_to_yaml=None):
         super().__init__(machine_model.get_ISA().lower(), path_to_yaml=path_to_yaml)
         self._machine_model = machine_model
@@ -128,8 +130,9 @@ class ArchSemantics(ISASemantics):
             if (
                 not instruction_data
                 and self._isa == 'x86'
-                and instruction_form['instruction'][-1] in 'bwlq'
+                and instruction_form['instruction'][-1] in self.GAS_SUFFIXES
             ):
+                # check for instruction without GAS suffix
                 instruction_data = self._machine_model.get_instruction(
                     instruction_form['instruction'][:-1], instruction_form['operands']
                 )
@@ -153,6 +156,15 @@ class ArchSemantics(ISASemantics):
                     instruction_data_reg = self._machine_model.get_instruction(
                         instruction_form['instruction'], operands
                     )
+                    if (
+                        not instruction_data_reg
+                        and self._isa == 'x86'
+                        and instruction_form['instruction'][-1] in self.GAS_SUFFIXES
+                    ):
+                        # check for instruction without GAS suffix
+                        instruction_data_reg = self._machine_model.get_instruction(
+                            instruction_form['instruction'][:-1], operands
+                        )
                     if instruction_data_reg:
                         assign_unknown = False
                         reg_types = [
