@@ -38,6 +38,7 @@ class ParserX86ATT(BaseParser):
         self.register = pp.Group(
             pp.Literal('%')
             + pp.Word(pp.alphanums).setResultsName('name')
+            + pp.Optional(pp.Literal('(') + pp.Word(pp.nums) + pp.Literal(')'))
             + pp.Optional(
                 pp.Literal('{')
                 + pp.Literal('%')
@@ -55,15 +56,41 @@ class ParserX86ATT(BaseParser):
             self.IMMEDIATE_ID
         )
         scale = pp.Word('1248', exact=1)
+        # Segment register extension
+        segment_extension = (
+            hex_number
+            ^ pp.Word(pp.nums)
+            ^ pp.Group(
+                pp.Optional(offset.setResultsName('offset'))
+                + pp.Literal('(')
+                + pp.Optional(self.register.setResultsName('base'))
+                + pp.Optional(pp.Suppress(pp.Literal(',')))
+                + pp.Optional(self.register.setResultsName('index'))
+                + pp.Optional(pp.Suppress(pp.Literal(',')))
+                + pp.Optional(scale.setResultsName('scale'))
+                + pp.Literal(')')
+            )
+        )
+        memory_segmentation = (
+            self.register.setResultsName('base')
+            + pp.Literal(':')
+            + segment_extension.setResultsName(self.SEGMENT_EXT_ID)
+        )
+
         memory = pp.Group(
-            pp.Optional(offset.setResultsName('offset'))
-            + pp.Literal('(')
-            + pp.Optional(self.register.setResultsName('base'))
-            + pp.Optional(pp.Suppress(pp.Literal(',')))
-            + pp.Optional(self.register.setResultsName('index'))
-            + pp.Optional(pp.Suppress(pp.Literal(',')))
-            + pp.Optional(scale.setResultsName('scale'))
-            + pp.Literal(')')
+            (
+                pp.Optional(pp.Suppress(pp.Literal('*')))
+                + pp.Optional(offset.setResultsName('offset'))
+                + pp.Literal('(')
+                + pp.Optional(self.register.setResultsName('base'))
+                + pp.Optional(pp.Suppress(pp.Literal(',')))
+                + pp.Optional(self.register.setResultsName('index'))
+                + pp.Optional(pp.Suppress(pp.Literal(',')))
+                + pp.Optional(scale.setResultsName('scale'))
+                + pp.Literal(')')
+            )
+            | memory_segmentation
+            | (hex_number | pp.Word(pp.nums)).setResultsName('offset')
         ).setResultsName(self.MEMORY_ID)
 
         # Directive
@@ -235,7 +262,12 @@ class ParserX86ATT(BaseParser):
         base = None if 'base' not in memory_address else memory_address['base']
         index = None if 'index' not in memory_address else memory_address['index']
         scale = 1 if 'scale' not in memory_address else int(memory_address['scale'])
+        if isinstance(offset, str) and base is None and index is None:
+            offset = {'value': offset}
         new_dict = AttrDict({'offset': offset, 'base': base, 'index': index, 'scale': scale})
+        # Add segmentation extension if existing
+        if self.SEGMENT_EXT_ID in memory_address:
+            new_dict[self.SEGMENT_EXT_ID] = memory_address[self.SEGMENT_EXT_ID]
         return AttrDict({self.MEMORY_ID: new_dict})
 
     def substitute_label(self, label):
@@ -312,6 +344,8 @@ class ParserX86ATT(BaseParser):
         return True
 
     def is_gpr(self, register):
+        if register is None:
+            return False
         gpr_parser = (
             pp.CaselessLiteral('R')
             + pp.Word(pp.nums).setResultsName('id')
@@ -327,13 +361,20 @@ class ParserX86ATT(BaseParser):
                 return False
 
     def is_vector_register(self, register):
-        if len(register['name']) > 2 and register['name'][1:3].lower() == 'mm':
+        if register is None:
+            return False
+        if (
+            len(register['name']) > 2
+            and ''.join([_ for _ in register['name'] if not _.isdigit()])[-2:].lower() == 'mm'
+        ):
             return True
         return False
 
     def get_reg_type(self, register):
+        if register is None:
+            return False
         if self.is_gpr(register):
             return 'gpr'
         elif self.is_vector_register(register):
-            return register['name'][:3].lower()
+            return ''.join([_ for _ in register['name'] if not _.isdigit()]).lower()
         raise ValueError

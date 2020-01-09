@@ -2,7 +2,7 @@ osaca_version: 0.3.1.dev1
 micro_architecture: AMD Zen (family 17h)
 arch_code: ZEN1
 isa: x86
-load_latency: {gpr: 4.0, xmm: 4.0, ymm: 4.0}
+load_latency: {gpr: 4.0, mm: 4.0, xmm: 4.0, ymm: 4.0}
 load_throughput_multiplier: {gpr: 1.0, xmm: 1.0, ymm: 2.0}
 load_throughput:
 - {base: gpr, index: ~, offset: ~, scale: 1, port_pressure:     [[1, '89'], [1, ['8D','9D']]]}

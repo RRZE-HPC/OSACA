@@ -9,6 +9,7 @@ class BaseParser(object):
     LABEL_ID = 'label'
     MEMORY_ID = 'memory'
     REGISTER_ID = 'register'
+    SEGMENT_EXT_ID = 'segment_extension'
     INSTRUCTION_ID = 'instruction'
     OPERANDS_ID = 'operands'
 

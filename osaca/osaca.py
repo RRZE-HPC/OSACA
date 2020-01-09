@@ -6,10 +6,10 @@ import os
 import re
 import sys
 
-from osaca.db_interface import sanity_check, import_benchmark_output
+from osaca.db_interface import import_benchmark_output, sanity_check
 from osaca.frontend import Frontend
 from osaca.parser import BaseParser, ParserAArch64v81, ParserX86ATT
-from osaca.semantics import (KernelDG, MachineModel, ArchSemantics,
+from osaca.semantics import (ArchSemantics, KernelDG, MachineModel,
                              reduce_to_section)
 
 MODULE_DATA_DIR = os.path.join(
@@ -65,15 +65,13 @@ def create_parser():
         '-V', '--version', action='version', version='%(prog)s ' + __find_version('__init__.py')
     )
     parser.add_argument(
-        '--arch',
-        type=str,
-        help='Define architecture (SNB, IVB, HSW, BDW, SKX, CSX, ZEN1, TX2).',
+        '--arch', type=str, help='Define architecture (SNB, IVB, HSW, BDW, SKX, CSX, ZEN1, TX2).'
     )
     parser.add_argument(
         '--fixed',
         action='store_true',
         help='Run the throughput analysis with fixed probabilities for all suitable ports per '
-        'instruction. Otherwise, OSACA will print out the optimal port utilization for the kernel.'
+        'instruction. Otherwise, OSACA will print out the optimal port utilization for the kernel.',
     )
     parser.add_argument(
         '--db-check',
@@ -107,6 +105,12 @@ def create_parser():
         type=str,
         help='Output path for .dot file export. If "." is given, the file will be stored as '
         '"./osaca_dg.dot"',
+    )
+    parser.add_argument(
+        '--ignore-unknown',
+        dest='ignore_unknown',
+        action='store_true',
+        help='Ignore if instructions cannot be found in the data file and print analysis anyway.',
     )
     parser.add_argument(
         '--verbose', '-v', action='count', default=0, help='Increases verbosity level.'
@@ -204,6 +208,7 @@ def inspect(args):
     arch = args.arch
     isa = MachineModel.get_isa_for_arch(arch)
     verbose = args.verbose
+    ignore_unknown = args.ignore_unknown
 
     # Read file
     code = args.file.read()
@@ -226,7 +231,9 @@ def inspect(args):
         kernel_graph.export_graph(args.dotpath if args.dotpath != '.' else None)
     # Print analysis
     frontend = Frontend(args.file.name, arch=arch)
-    frontend.print_full_analysis(kernel, kernel_graph, verbose=verbose)
+    frontend.print_full_analysis(
+        kernel, kernel_graph, ignore_unknown=ignore_unknown, verbose=verbose
+    )
 
 
 def run(args, output_file=sys.stdout):
