@@ -5,7 +5,7 @@ isa: "x86"
 #   mnemonic op1 ... opN
 # means that opN is the only destination operand and op1 to op(N-1) are source operands.
 instruction_forms:
-    - name: addl
+    - name: adc
       operands:
         - class: "immediate"
           imd: "int"
@@ -15,7 +15,43 @@ instruction_forms:
           name: "gpr"
           source: true
           destination: true
-    - name: addq
+    - name: adc
+      operands:
+        - class: "register"
+          name: "gpr"
+          source: true
+          destination: false
+        - class: "register"
+          name: "gpr"
+          source: true
+          destination: true
+    - name: adc
+      operands:
+        - class: "immediate"
+          imd: "int"
+          source: true
+          destination: false
+        - class: "memory"
+          base: "gpr"
+          offset: "imd"
+          index: ~
+          scale: 1
+          source: true
+          destination: true
+    - name: adc
+      operands:
+        - class: "register"
+          name: "gpr"
+          source: true
+          destination: false
+        - class: "memory"
+          base: "gpr"
+          offset: "imd"
+          index: ~
+          scale: 1
+          source: true
+          destination: true
+    - name: add
       operands:
         - class: "immediate"
           imd: "int"
@@ -23,6 +59,42 @@ instruction_forms:
           destination: false
         - class: "register"
           name: "gpr"
+          source: true
+          destination: true
+    - name: add
+      operands:
+        - class: "register"
+          name: "gpr"
+          source: true
+          destination: false
+        - class: "register"
+          name: "gpr"
+          source: true
+          destination: true
+    - name: add
+      operands:
+        - class: "immediate"
+          imd: "int"
+          source: true
+          destination: false
+        - class: "memory"
+          base: "gpr"
+          offset: "imd"
+          index: ~
+          scale: 1
+          source: true
+          destination: true
+    - name: add
+      operands:
+        - class: "register"
+          name: "gpr"
+          source: true
+          destination: false
+        - class: "memory"
+          base: "gpr"
+          offset: "imd"
+          index: ~
+          scale: 1
           source: true
           destination: true
     - name: addsd
@@ -45,7 +117,122 @@ instruction_forms:
           name: "xmm"
           source: true
           destination: false
-    - name: cmpl
+    - name: and
+      operands:
+        - class: "immediate"
+          imd: "int"
+          source: true
+          destination: false
+        - class: "register"
+          name: "gpr"
+          source: true
+          destination: true
+    - name: and
+      operands:
+        - class: "register"
+          name: "gpr"
+          source: true
+          destination: false
+        - class: "register"
+          name: "gpr"
+          source: true
+          destination: true
+    - name: and
+      operands:
+        - class: "immediate"
+          imd: "int"
+          source: true
+          destination: false
+        - class: "memory"
+          base: "gpr"
+          offset: "imd"
+          index: ~
+          scale: 1
+          source: true
+          destination: true
+    - name: and
+      operands:
+        - class: "register"
+          name: "gpr"
+          source: true
+          destination: false
+        - class: "memory"
+          base: "gpr"
+          offset: "imd"
+          index: ~
+          scale: 1
+          source: true
+          destination: true
+    - name: bts
+      operands:
+        - class: "immediate"
+          imd: "int"
+          source: true
+          destination: false
+        - class: "register"
+          name: "gpr"
+          source: true
+          destination: true
+    - name: bts
+      operands:
+        - class: "register"
+          name: "gpr"
+          source: true
+          destination: false
+        - class: "register"
+          name: "gpr"
+          source: true
+          destination: true
+    - name: bts
+      operands:
+        - class: "immediate"
+          imd: "int"
+          source: true
+          destination: false
+        - class: "memory"
+          base: "gpr"
+          offset: "imd"
+          index: ~
+          scale: 1
+          source: true
+          destination: true
+    - name: bts
+      operands:
+        - class: "register"
+          name: "gpr"
+          source: true
+          destination: false
+        - class: "memory"
+          base: "gpr"
+          offset: "imd"
+          index: ~
+          scale: 1
+          source: true
+          destination: true
+    - name: cmp
+      operands:
+        - class: "immediate"
+          imd: "int"
+          source: true
+          destination: false
+        - class: "register"
+          name: "gpr"
+          source: true
+          destination: true
+    - name: cmp
+      operands:
+        - class: "immediate"
+          imd: "int"
+          source: true
+          destination: false
+        - class: "memory"
+          base: "gpr"
+          offset: "imd"
+          index: ~
+          scale: 1
+          source: true
+          destination: true
+    - name: cmp
       operands:
         - class: "register"
           name: "gpr"
@@ -55,17 +242,7 @@ instruction_forms:
           name: "gpr"
           source: true
           destination: false
-    - name: cmpq
-      operands:
-        - class: "register"
-          name: "gpr"
-          source: true
-          destination: false
-        - class: "register"
-          name: "gpr"
-          source: true
-          destination: false
-    - name: cmpq
+    - name: cmp
       operands:
         - class: "register"
           name: "gpr"
@@ -78,11 +255,77 @@ instruction_forms:
           scale: 1
           source: true
           destination: false
-    - name: ja
+    - name: dec
       operands:
-        - class: "identifier"
+        - class: "register"
+          name: "gpr"
+          source: true
+          destination: true
+    - name: dec
+      operands:
+        - class: "memory"
+          base: "gpr"
+          offset: "imd"
+          index: ~
+          scale: 1
+          source: true
+          destination: true
+    - name: dec
+      operands:
+        - class: "memory"
+          base: "gpr"
+          offset: ~
+          index: ~
+          scale: 1
+          source: true
+          destination: true
+    - name: imul
+      operands:
+        - class: "register"
+          name: "gpr"
           source: true
           destination: false
+        - class: "register"
+          name: "gpr"
+          source: true
+          destination: true
+    - name: imul
+      operands:
+        - class: "memory"
+          base: "gpr"
+          offset: "imd"
+          index: ~
+          scale: 1
+          source: true
+          destination: false
+        - class: "register"
+          name: "gpr"
+          source: true
+          destination: true
+    - name: inc
+      operands:
+        - class: "register"
+          name: "gpr"
+          source: true
+          destination: true
+    - name: inc
+      operands:
+        - class: "memory"
+          base: "gpr"
+          offset: "imd"
+          index: ~
+          scale: 1
+          source: true
+          destination: true
+    - name: inc
+      operands:
+        - class: "memory"
+          base: "gpr"
+          offset: ~
+          index: ~
+          scale: 1
+          source: true
+          destination: true
     - name: mulsd
       operands:
         - class: "register"
@@ -103,7 +346,7 @@ instruction_forms:
           name: "xmm"
           source: true
           destination: false
-    - name: subq
+    - name: sub
       operands:
         - class: "immediate"
           imd: "int"
@@ -111,6 +354,42 @@ instruction_forms:
           destination: false
         - class: "register"
           name: "gpr"
+          source: true
+          destination: true
+    - name: sub
+      operands:
+        - class: "register"
+          name: "gpr"
+          source: true
+          destination: false
+        - class: "register"
+          name: "gpr"
+          source: true
+          destination: true
+    - name: sub
+      operands:
+        - class: "immediate"
+          imd: "int"
+          source: true
+          destination: false
+        - class: "memory"
+          base: "gpr"
+          offset: "imd"
+          index: ~
+          scale: 1
+          source: true
+          destination: true
+    - name: sub
+      operands:
+        - class: "register"
+          name: "gpr"
+          source: true
+          destination: false
+        - class: "memory"
+          base: "gpr"
+          offset: "imd"
+          index: ~
+          scale: 1
           source: true
           destination: true
     - name: vfmadd132pd
