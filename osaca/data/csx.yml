@@ -6,7 +6,7 @@ ROB_size: 224
 retired_uOps_per_cycle: 4
 scheduler_size: 97
 hidden_loads: false
-load_latency: {gpr: 4.0, xmm: 4.0, ymm: 4.0, zmm: 4.0}
+load_latency: {gpr: 4.0, mm: 4.0, xmm: 4.0, ymm: 4.0, zmm: 4.0}
 load_throughput:
 - {base: gpr, index: ~, offset: ~, scale: 1, port_pressure:     [[1, '23'], [1, ['2D', '3D']]]}
 - {base: gpr, index: ~, offset: ~, scale: 8, port_pressure:     [[1, '23'], [1, ['2D', '3D']]]}
@@ -77,7 +77,7 @@ instruction_forms:
   throughput: 0.5
   latency: 4.0  # 	1*p01
   port_pressure: [[1, '01']]
-- name: addl
+- name: add
   operands:
   - class: immediate
     imd: int
@@ -86,39 +86,21 @@ instruction_forms:
   throughput: 0.25
   latency: 1.0  # 	1*p0156
   port_pressure: [[1, '0156']]
-- name: addq
+- name: cmp
   operands:
-  - class: immediate
-    imd: int
+  - class: register
+    name: gpr
   - class: register
     name: gpr
   throughput: 0.25
   latency: 1.0  # 	1*p0156
   port_pressure: [[1, '0156']]
-- name: cmpl
-  operands:
-  - class: register
-    name: gpr
-  - class: register
-    name: gpr
-  throughput: 0.25
-  latency: ~  # 	1*p0156
-  port_pressure: [[1, '0156']]
-- name: cmpq
-  operands:
-  - class: register
-    name: gpr
-  - class: register
-    name: gpr
-  throughput: 0.25
-  latency: ~  # 	1*p0156
-  port_pressure: [[1, '0156']]
-- name: incq
+- name: inc
   operands:
   - class: register
     name: gpr
   throughput: 0.25
-  latency: ~  # 	1*p0156
+  latency: 1.0  # 	1*p0156
   port_pressure: [[1, '0156']]
 - name: ja
   operands:

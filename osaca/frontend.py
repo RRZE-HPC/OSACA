@@ -144,7 +144,9 @@ class Frontend(object):
                 )
             )
 
-    def print_full_analysis(self, kernel, kernel_dg: KernelDG, verbose=False):
+    def print_full_analysis(
+        self, kernel, kernel_dg: KernelDG, ignore_unknown=False, verbose=False
+    ):
         """
         Prints the full analysis report including header, the symbol map, the combined TP/CP/LCD
         view and the list based LCD view.
@@ -153,17 +155,25 @@ class Frontend(object):
         :type kernel: list
         :param kernel_dg: directed graph containing CP and LCD
         :type kernel_dg: :class:`~osaca.semantics.KernelDG`
-        :param verbose: verbose output flag, defaults to `False`
-        :type verbose: bool, optional
+        :param ignore_unknown: flag for ignore warning if performance data is missing, defaults to
+            `False`
+        :type ignore_unknown: boolean, optional
+        :param verbose: flag for verbosity level, defaults to False
+        :type verbose: boolean, optional
         """
         self._print_header_report()
         self._print_symbol_map()
         self.print_combined_view(
-            kernel, kernel_dg.get_critical_path(), kernel_dg.get_loopcarried_dependencies()
+            kernel,
+            kernel_dg.get_critical_path(),
+            kernel_dg.get_loopcarried_dependencies(),
+            ignore_unknown,
         )
         self.print_loopcarried_dependencies(kernel_dg.get_loopcarried_dependencies())
 
-    def print_combined_view(self, kernel, cp_kernel: KernelDG, dep_dict, show_cmnts=True):
+    def print_combined_view(
+        self, kernel, cp_kernel: KernelDG, dep_dict, ignore_unknown=False, show_cmnts=True
+    ):
         """
         Prints the combined view of the kernel including the port pressure (TP), a CP column and a
         LCD column.
@@ -174,6 +184,9 @@ class Frontend(object):
         :type kernel_dg: :class:`~osaca.semantics.KernelDG`
         :param dep_dict: dictionary with first instruction in LCD as key and the deps as value
         :type dep_dict: dict
+        :param ignore_unknown: flag for showing result despite of missing instructions, defaults to
+            `False`
+        :type ignore_unknown: bool, optional
         :param show_cmnts: flag for showing comment-only lines in kernel, defaults to `True`
         :type show_cmnts: bool, optional
         """
@@ -199,8 +212,9 @@ class Frontend(object):
             )
         lcd_sum = max(sums.values()) if len(sums) > 0 else 0.0
         lcd_lines = []
-        longest_lcd = [line_no for line_no in sums if sums[line_no] == lcd_sum][0]
-        lcd_lines = [d['line_number'] for d in dep_dict[longest_lcd]['dependencies']]
+        if len(dep_dict) > 0:
+            longest_lcd = [line_no for line_no in sums if sums[line_no] == lcd_sum][0]
+            lcd_lines = [d['line_number'] for d in dep_dict[longest_lcd]['dependencies']]
 
         print(headline_str.format(headline))
         print(
@@ -232,18 +246,40 @@ class Frontend(object):
             )
             print(line)
         print()
-        # lcd_sum already calculated before
-        tp_sum = ArchSemantics.get_throughput_sum(kernel)
-        cp_sum = sum([x['latency_cp'] for x in cp_kernel])
-        print(
-            lineno_filler
-            + self._get_port_pressure(tp_sum, port_len, separator=' ')
-            + ' {:^6} {:^6}'.format(cp_sum, lcd_sum)
-        )
+        # check for unknown instructions and throw warning if called without --ignore-unknown
+        if not ignore_unknown and INSTR_FLAGS.TP_UNKWN in [
+            flag for instr in kernel for flag in instr['flags']
+        ]:
+            num_missing = len(
+                [instr['flags'] for instr in kernel if INSTR_FLAGS.TP_UNKWN in instr['flags']]
+            )
+            self._print_missing_instruction_error(num_missing)
+        else:
+            # lcd_sum already calculated before
+            tp_sum = ArchSemantics.get_throughput_sum(kernel)
+            cp_sum = sum([x['latency_cp'] for x in cp_kernel])
+            print(
+                lineno_filler
+                + self._get_port_pressure(tp_sum, port_len, separator=' ')
+                + ' {:^6} {:^6}'.format(cp_sum, lcd_sum)
+            )
 
     ####################
     # HELPER FUNCTIONS
     ####################
+
+    def _print_missing_instruction_error(self, amount):
+        print(
+            (
+                '------------------ WARNING: The performance data for {} instructions is missing.'
+                '------------------\n'
+                '                     No final analysis is given. If you want to ignore this\n'
+                '                     warning and run the analysis anyway, start osaca with\n'
+                '                                       --ignore_unknown flag.\n'
+                '--------------------------------------------------------------------------------'
+                '----------------{}'
+            ).format(amount, '-' * len(str(amount)))
+        )
 
     def _get_separator_list(self, separator, separator_2=' '):
         """Creates column view for seperators in the TP/combined view."""

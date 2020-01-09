@@ -234,6 +234,19 @@ instruction_forms:
           destination: true
     - name: cmp
       operands:
+        - class: "immediate"
+          imd: "int"
+          source: true
+          destination: false
+        - class: "memory"
+          base: "gpr"
+          offset: ~
+          index: ~
+          scale: 1
+          source: true
+          destination: true
+    - name: cmp
+      operands:
         - class: "register"
           name: "gpr"
           source: true
@@ -251,6 +264,19 @@ instruction_forms:
         - class: "memory"
           base: "gpr"
           offset: "imd"
+          index: ~
+          scale: 1
+          source: true
+          destination: false
+    - name: cmp
+      operands:
+        - class: "register"
+          name: "gpr"
+          source: true
+          destination: false
+        - class: "memory"
+          base: "gpr"
+          offset: ~
           index: ~
           scale: 1
           source: true

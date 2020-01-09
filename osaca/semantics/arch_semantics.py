@@ -167,11 +167,11 @@ class ArchSemantics(ISASemantics):
                         )
                     if instruction_data_reg:
                         assign_unknown = False
-                        reg_types = [
-                            self._parser.get_reg_type(op['register'])
-                            for op in operands
-                            if 'register' in op
-                        ]
+                        reg_type = self._parser.get_reg_type(
+                            instruction_data_reg['operands'][
+                                operands.index(self._create_reg_wildcard())
+                            ]
+                        )
                         load_port_uops = self._machine_model.get_load_throughput(
                             [
                                 x['memory']
@@ -185,14 +185,14 @@ class ArchSemantics(ISASemantics):
                         )
                         if 'load_throughput_multiplier' in self._machine_model:
                             multiplier = self._machine_model['load_throughput_multiplier'][
-                                reg_types[0]
+                                reg_type
                             ]
                             load_port_pressure = [pp * multiplier for pp in load_port_pressure]
                         throughput = max(
                             max(load_port_pressure), instruction_data_reg['throughput']
                         )
                         latency = (
-                            self._machine_model.get_load_latency(reg_types[0])
+                            self._machine_model.get_load_latency(reg_type)
                             + instruction_data_reg['latency']
                         )
                         latency_wo_load = instruction_data_reg['latency']

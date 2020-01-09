@@ -21,6 +21,8 @@ class INSTR_FLAGS:
 
 
 class ISASemantics(object):
+    GAS_SUFFIXES = 'bswlqt'
+
     def __init__(self, isa, path_to_yaml=None):
         self._isa = isa.lower()
         path = utils.find_file('isa/' + self._isa + '.yml') if not path_to_yaml else path_to_yaml
@@ -41,8 +43,8 @@ class ISASemantics(object):
     # - source/destination
     def assign_src_dst(self, instruction_form):
         """Update instruction form dictionary with source, destination and flag information."""
-        # if the instruction form doesn't have operands, there's nothing to do
-        if instruction_form['operands'] is None:
+        # if the instruction form doesn't have operands or is None, there's nothing to do
+        if instruction_form['operands'] is None or instruction_form['instruction'] is None:
             instruction_form['semantic_operands'] = AttrDict(
                 {'source': [], 'destination': [], 'src_dst': []})
             return
@@ -51,6 +53,11 @@ class ISASemantics(object):
         isa_data = self._isa_model.get_instruction(
             instruction_form['instruction'], instruction_form['operands']
         )
+        if isa_data is None and instruction_form['instruction'][-1] in self.GAS_SUFFIXES:
+            # Check for instruction without GAS suffix
+            isa_data = self._isa_model.get_instruction(
+                instruction_form['instruction'][:-1], instruction_form['operands']
+            )
         operands = instruction_form['operands']
         op_dict = {}
         if isa_data is None:
@@ -99,6 +106,9 @@ class ISASemantics(object):
         return False
 
     def _get_regular_source_operands(self, instruction_form):
+        # if there is only one operand, assume it is a source operand
+        if len(instruction_form['operands']) == 1:
+            return [instruction_form['operands'][0]]
         if self._isa == 'x86':
             # return all but last operand
             return [op for op in instruction_form['operands'][0:-1]]
@@ -108,6 +118,9 @@ class ISASemantics(object):
             raise ValueError("Unsupported ISA {}.".format(self._isa))
 
     def _get_regular_destination_operands(self, instruction_form):
+        # if there is only one operand, assume no destination
+        if len(instruction_form['operands']) == 1:
+            return []
         if self._isa == 'x86':
             # return last operand
             return instruction_form['operands'][-1:]
