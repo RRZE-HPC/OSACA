@@ -12,6 +12,8 @@ from osaca.parser import ParserX86ATT
 
 
 class MachineModel(object):
+    WILDCARD = '*'
+
     def __init__(self, arch=None, path_to_yaml=None, isa=None, lazy=False):
         if not arch and not path_to_yaml:
             if not isa:
@@ -280,7 +282,9 @@ class MachineModel(object):
             operand_string += 'b' if operand['base'] is not None else ''
             operand_string += 'o' if operand['offset'] is not None else ''
             operand_string += 'i' if operand['index'] is not None else ''
-            operand_string += 's' if operand['scale'] > 1 else ''
+            operand_string += (
+                's' if operand['scale'] == self.WILDCARD or operand['scale'] > 1 else ''
+            )
             if 'pre-indexed' in operand:
                 operand_string += 'r' if operand['pre-indexed'] else ''
                 operand_string += 'p' if operand['post-indexed'] else ''
@@ -349,7 +353,7 @@ class MachineModel(object):
 
     def _check_operands(self, i_operand, operand):
         # check for wildcard
-        if '*' in operand:
+        if self.WILDCARD in operand:
             if (
                 'class' in i_operand
                 and i_operand['class'] == 'register'
@@ -450,10 +454,15 @@ class MachineModel(object):
     def _is_AArch64_mem_type(self, i_mem, mem):
         if (
             # check base
-            mem['base']['prefix'] == i_mem['base']
+            (
+                (mem['base'] is None and i_mem['base'] is None)
+                or i_mem['base'] == self.WILDCARD
+                or mem['base']['prefix'] == i_mem['base']
+            )
             # check offset
             and (
                 mem['offset'] == i_mem['offset']
+                or i_mem['offset'] == self.WILDCARD
                 or (
                     mem['offset'] is not None
                     and 'identifier' in mem['offset']
@@ -468,15 +477,29 @@ class MachineModel(object):
             # check index
             and (
                 mem['index'] == i_mem['index']
+                or i_mem['index'] == self.WILDCARD
                 or (
                     mem['index'] is not None
                     and 'prefix' in mem['index']
                     and mem['index']['prefix'] == i_mem['index']
                 )
             )
-            and (mem['scale'] == i_mem['scale'] or (mem['scale'] != 1 and i_mem['scale'] != 1))
-            and (('pre_indexed' in mem) == (i_mem['pre-indexed']))
-            and (('post_indexed' in mem) == (i_mem['post-indexed']))
+            # check scale
+            and (
+                mem['scale'] == i_mem['scale']
+                or i_mem['scale'] == self.WILDCARD
+                or (mem['scale'] != 1 and i_mem['scale'] != 1)
+            )
+            # check pre-indexing
+            and (
+                i_mem['pre-indexed'] == self.WILDCARD
+                or ('pre_indexed' in mem) == (i_mem['pre-indexed'])
+            )
+            # check post-indexing
+            and (
+                i_mem['post-indexed'] == self.WILDCARD
+                or ('post_indexed' in mem) == (i_mem['post-indexed'])
+            )
         ):
             return True
         return False
@@ -484,10 +507,15 @@ class MachineModel(object):
     def _is_x86_mem_type(self, i_mem, mem):
         if (
             # check base
-            self._is_x86_reg_type(i_mem['base'], mem['base'])
+            (
+                (mem['base'] is None and i_mem['base'] is None)
+                or i_mem['base'] == self.WILDCARD
+                or self._is_x86_reg_type(i_mem['base'], mem['base'])
+            )
             # check offset
             and (
                 mem['offset'] == i_mem['offset']
+                or i_mem['offset'] == self.WILDCARD
                 or (
                     mem['offset'] is not None
                     and 'identifier' in mem['offset']
@@ -510,13 +538,19 @@ class MachineModel(object):
             # check index
             and (
                 mem['index'] == i_mem['index']
+                or i_mem['index'] == self.WILDCARD
                 or (
                     mem['index'] is not None
                     and 'name' in mem['index']
                     and self._is_x86_reg_type(i_mem['index'], mem['index'])
                 )
             )
-            and (mem['scale'] == i_mem['scale'] or (mem['scale'] != 1 and i_mem['scale'] != 1))
+            # check scale
+            and (
+                mem['scale'] == i_mem['scale']
+                or i_mem['scale'] == self.WILDCARD
+                or (mem['scale'] != 1 and i_mem['scale'] != 1)
+            )
         ):
             return True
         return False
