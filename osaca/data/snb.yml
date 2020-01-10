@@ -39,6 +39,26 @@ port_model_scheme: |
    └-------┘└-------┘ └-------┘                |  SHUF |
                                                └-------┘
 instruction_forms:
+- name: ADC
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: gpr
+  latency: 2  # JH: measure
+  port_pressure: [[1, '015'], [1, '05']]  # uops.info
+  throughput: 1  # JH: measured on phinally with asmbench "adc \$1, {srcdst:i32:r}"
+  uops: 2
+- name: ADC # copied from ADC imd reg
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: 2
+  port_pressure: [[1, '015'], [1, '05']]  # uops.info
+  throughput: 1
+  uops: 2
 - name: mov
   operands:
   - class: register
@@ -3806,6 +3826,16 @@ instruction_forms:
   operands:
   - class: immediate
     imd: int
+  - class: register
+    name: gpr
+  latency: 1
+  port_pressure: [[1, '015']]
+  throughput: 0.3333333333333333
+  uops: 1
+- name: AND
+  operands:
+  - class: register
+    name: gpr
   - class: register
     name: gpr
   latency: 1

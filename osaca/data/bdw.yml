@@ -3240,6 +3240,16 @@ instruction_forms:
   port_pressure: [[1, '0156']]
   throughput: 0.25
   uops: 1
+- name: AND
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: 1
+  port_pressure: [[1, '0156']]
+  throughput: 0.25
+  uops: 1
 - name: REX AND
   operands:
   - class: immediate
@@ -3841,6 +3851,16 @@ instruction_forms:
   port_pressure: [[1, '0156']]
   throughput: 0.25
   uops: 1
+- name: ADD
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: 1
+  port_pressure: [[1, '0156']]
+  throughput: 0.25
+  uops: 1
 - name: REX ADD
   operands:
   - class: immediate
@@ -3855,6 +3875,16 @@ instruction_forms:
   operands:
   - class: immediate
     imd: int
+  - class: register
+    name: gpr
+  latency: 1
+  port_pressure: [[1, '06']]
+  throughput: 0.5
+  uops: 1
+- name: ADC  # JH: copied from ADC imd reg
+  operands:
+  - class: register
+    name: gpr
   - class: register
     name: gpr
   latency: 1

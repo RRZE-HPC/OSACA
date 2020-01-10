@@ -41,6 +41,26 @@ port_model_scheme: |
    |AVX MUL| |AVX ADD|
    └-------┘ └-------┘
 instruction_forms:
+- name: ADC
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: gpr
+  latency: 2  # JH: measured
+  port_pressure: [[1, '0156'], [1, '06']]  # uops.info
+  throughput: 1  # JH: measured on hasep1 with asmbench "adc \$1, {srcdst:i32:r}"
+  uops: 2
+- name: ADC # copied from ADC imd reg
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: 2
+  port_pressure: [[1, '0156'], [1, '06']]  # uops.info
+  throughput: 1
+  uops: 2
 - name: mov
   operands:
   - class: register
@@ -3864,6 +3884,16 @@ instruction_forms:
   port_pressure: [[1, '0156']]
   throughput: 0.25
   uops: 1
+- name: AND
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: 1
+  port_pressure: [[1, '0156']]
+  throughput: 0.25
+  uops: 1
 - name: REX AND
   operands:
   - class: immediate
@@ -4249,6 +4279,16 @@ instruction_forms:
   operands:
   - class: immediate
     imd: int
+  - class: register
+    name: gpr
+  latency: 1
+  port_pressure: [[1, '0156']]
+  throughput: 0.25
+  uops: 1
+- name: ADD
+  operands:
+  - class: register
+    name: gpr
   - class: register
     name: gpr
   latency: 1
