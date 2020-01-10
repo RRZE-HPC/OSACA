@@ -3,6 +3,7 @@ from itertools import chain
 
 from osaca import utils
 from osaca.parser import AttrDict, ParserAArch64v81, ParserX86ATT
+
 from .hw_model import MachineModel
 
 
@@ -46,14 +47,19 @@ class ISASemantics(object):
         # if the instruction form doesn't have operands or is None, there's nothing to do
         if instruction_form['operands'] is None or instruction_form['instruction'] is None:
             instruction_form['semantic_operands'] = AttrDict(
-                {'source': [], 'destination': [], 'src_dst': []})
+                {'source': [], 'destination': [], 'src_dst': []}
+            )
             return
         # check if instruction form is in ISA yaml, otherwise apply standard operand assignment
         # (one dest, others source)
         isa_data = self._isa_model.get_instruction(
             instruction_form['instruction'], instruction_form['operands']
         )
-        if isa_data is None and instruction_form['instruction'][-1] in self.GAS_SUFFIXES:
+        if (
+            isa_data is None
+            and self._isa == 'x86'
+            and instruction_form['instruction'][-1] in self.GAS_SUFFIXES
+        ):
             # Check for instruction without GAS suffix
             isa_data = self._isa_model.get_instruction(
                 instruction_form['instruction'][:-1], instruction_form['operands']
@@ -80,6 +86,20 @@ class ISASemantics(object):
                 if op['destination']:
                     op_dict['destination'].append(operands[i])
                     continue
+        # post-process pre- and post-indexing for aarch64 memory operands
+        if self._isa == 'aarch64':
+            for operand in [op for op in op_dict['source'] if 'memory' in op]:
+                if ('post_indexed' in operand['memory'] and operand['memory']['post_indexed']) or (
+                    'pre_indexed' in operand['memory'] and operand['memory']['pre_indexed']
+                ):
+                    op_dict['source'].remove(operand)
+                    op_dict['src_dst'].append(operand)
+            for operand in [op for op in op_dict['destination'] if 'memory' in op]:
+                if ('post_indexed' in operand['memory'] and operand['memory']['post_indexed']) or (
+                    'pre_indexed' in operand['memory'] and operand['memory']['pre_indexed']
+                ):
+                    op_dict['destination'].remove(operand)
+                    op_dict['src_dst'].append(operand)
         # store operand list in dict and reassign operand key/value pair
         instruction_form['semantic_operands'] = AttrDict.convert_dict(op_dict)
         # assign LD/ST flags
@@ -92,15 +112,19 @@ class ISASemantics(object):
             instruction_form['flags'] += [INSTR_FLAGS.HAS_ST]
 
     def _has_load(self, instruction_form):
-        for operand in chain(instruction_form['semantic_operands']['source'],
-                             instruction_form['semantic_operands']['src_dst']):
+        for operand in chain(
+            instruction_form['semantic_operands']['source'],
+            instruction_form['semantic_operands']['src_dst'],
+        ):
             if 'memory' in operand:
                 return True
         return False
 
     def _has_store(self, instruction_form):
-        for operand in chain(instruction_form['semantic_operands']['destination'],
-                             instruction_form['semantic_operands']['src_dst']):
+        for operand in chain(
+            instruction_form['semantic_operands']['destination'],
+            instruction_form['semantic_operands']['src_dst'],
+        ):
             if 'memory' in operand:
                 return True
         return False
