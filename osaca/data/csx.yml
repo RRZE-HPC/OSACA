@@ -59,6 +59,136 @@ port_model_scheme: |
    └-------┘ |  VNNI |                         
              └-------┘                         
 instruction_forms:
+- name: BT
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: gpr
+  latency: 1
+  port_pressure: [[1, '06']]  # JH: assumed from SKX
+  throughput: 0.5  # JH: could not measure; according to uops.info SKX
+  uops: 1
+- name: BT
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: 1
+  port_pressure: [[1, '06']]  # JH: assumed from SKX
+  throughput: 0.5  # JH: measured on casclakesp2
+  uops: 1
+- name: BSWAP
+  operands:
+  - class: register
+    name: gpr
+  latency: 2
+  port_pressure: [[1, '06'], [1, '15']]  # JH: assumed from SKX
+  throughput: 0.5  # JH: could not measure; according to uops.info SKX
+  uops: 2
+- name: BSR
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: 3
+  port_pressure: [[1, '1']]  # JH: assumed from SKX
+  throughput: 1.0  # JH: measured on casclakesp2
+  uops: 1
+- name: BLSR
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: 1
+  port_pressure: [[1, '15']]  # JH: assumed from SKX
+  throughput: 0.5  # JH: measured on casclakesp2
+  uops: 1
+- name: BSF
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: 3
+  port_pressure: [[1, '1']]  # JH: assumed from SKX
+  throughput: 1.0  # JH: measured on casclakesp2
+  uops: 1
+- name: ANDPS
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '015']]  # JH: assumed from SKX
+  throughput: 0.3333333333333333  # JH: measured on casclakesp2
+  uops: 1
+- name: ANDPD
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '015']]  # JH: assumed from SKX
+  throughput: 0.3333333333333333  # JH: measured on casclakesp2
+  uops: 1
+- name: AND  # JH: assumed from SKX
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: gpr
+  latency: 1
+  port_pressure: [[1, '0156']]  # JH: assumed from SKX
+  throughput: 0.25  # JH: measured on casclakesp2
+  uops: 1
+- name: AND
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: 1
+  port_pressure: [[1, '0156']]  # JH: assumed from SKX
+  throughput: 0.25  # JH: measured on casclakesp2
+  uops: 1
+- name: ANDN
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: 1
+  port_pressure: [[1, '15']]  # JH: assumed from SKX
+  throughput: 0.5  # JH: measured on casclakesp2
+  uops: 1
+- name: ADC
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: gpr
+  latency: 1
+  port_pressure: [[1, '06']]  # JH: assumed from SKX
+  throughput: 0.5  # JH: measured on casclakesp2
+  uops: 1
+- name: ADC
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: 1
+  port_pressure: [[1, '06']]  # JH: assumed from SKX
+  throughput: 0.5  # JH: measured on casclakesp2
+  uops: 1
 - name: addsd
   operands:
   - class: register
@@ -86,6 +216,35 @@ instruction_forms:
   throughput: 0.25
   latency: 1.0  # 	1*p0156
   port_pressure: [[1, '0156']]
+- name: add
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  throughput: 0.25
+  latency: 1.0  # 	1*p0156
+  port_pressure: [[1, '0156']]
+- name: addpd  # JH: copied from SKX
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 4
+  port_pressure: [[1, '01']]  # uops.info (measured)
+  throughput: 0.5
+  uops: 1
+- name: addps  # JH: measured
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 4
+  port_pressure: [[1, '01']]  # uops.info (measured)
+  throughput: 0.5
+  uops: 1
 - name: cmp
   operands:
   - class: register

@@ -163,6 +163,50 @@ instruction_forms:
           scale: "*"
           source: true
           destination: true
+    - name: andn
+      operands:
+        - class: "register"
+          name: "gpr"
+          source: true
+          destination: false
+        - class: "register"
+          name: "gpr"
+          source: true
+          destination: false
+        - class: "register"
+          name: "gpr"
+          source: false
+          destination: true
+    - name: blsr
+      operands:
+        - class: "register"
+          name: "gpr"
+          source: true
+          destination: false
+        - class: "register"
+          name: "gpr"
+          source: false
+          destination: true
+    - name: bsf
+      operands:
+        - class: "register"
+          name: "gpr"
+          source: true
+          destination: false
+        - class: "register"
+          name: "gpr"
+          source: false
+          destination: true
+    - name: bsr
+      operands:
+        - class: "register"
+          name: "gpr"
+          source: true
+          destination: false
+        - class: "register"
+          name: "gpr"
+          source: false
+          destination: true
     - name: bts
       operands:
         - class: "immediate"

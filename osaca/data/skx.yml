@@ -4081,6 +4081,16 @@ instruction_forms:
   port_pressure: [[1, '0156']]
   throughput: 0.25
   uops: 1
+- name: AND
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: 1
+  port_pressure: [[1, '0156']]
+  throughput: 0.25
+  uops: 1
 - name: REX AND
   operands:
   - class: immediate
@@ -4472,6 +4482,16 @@ instruction_forms:
   port_pressure: [[1, '0156']]
   throughput: 0.25
   uops: 1
+- name: ADD
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: 1
+  port_pressure: [[1, '0156']]
+  throughput: 0.25
+  uops: 1
 - name: REX ADD
   operands:
   - class: immediate
@@ -4486,6 +4506,16 @@ instruction_forms:
   operands:
   - class: immediate
     imd: int
+  - class: register
+    name: gpr
+  latency: 1
+  port_pressure: [[1, '06']]
+  throughput: 0.5
+  uops: 1
+- name: ADC
+  operands:
+  - class: register
+    name: gpr
   - class: register
     name: gpr
   latency: 1
@@ -4757,8 +4787,8 @@ instruction_forms:
   - class: register
     name: xmm
   latency: 4
-  port_pressure: [[1, '015']]
-  throughput: 0.3333333333333333
+  port_pressure: [[1, '01']]  # uops.info (measured)
+  throughput: 0.5  # JH: measured
   uops: 1
 - name: CVTSI2SS
   operands:
@@ -5407,8 +5437,8 @@ instruction_forms:
   - class: register
     name: xmm
   latency: 4
-  port_pressure: [[1, '015']]
-  throughput: 0.3333333333333333
+  port_pressure: [[1, '01']]  # uops.info (measured)
+  throughput: 0.5  # uops.info (measured)
   uops: 1
 - name: POR
   operands:
