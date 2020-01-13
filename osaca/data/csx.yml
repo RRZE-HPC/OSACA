@@ -594,7 +594,7 @@ instruction_forms:
     offset: ~
     index: gpr
     scale: 1
-  throughput: 0.5
+  throughput: 1.0
   latency: 4.0  # 	1*p23+1*p4
   port_pressure: [[1, '23'], [1, '4']]
 - name: vmovapd
