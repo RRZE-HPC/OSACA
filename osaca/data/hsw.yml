@@ -8,14 +8,17 @@ scheduler_size: 60
 hidden_loads: false
 load_latency: {gpr: 4.0, mm: 4.0, xmm: 4.0, ymm: 4.0}
 load_throughput:
-- {base: gpr, index: gpr, offset: imd, scale: 1, port_pressure: [[1, '23'], [1, [2D, 3D]]]}
-- {base: gpr, index: gpr, offset: imd, scale: 8, port_pressure: [[1, '23'], [1, [2D, 3D]]]}
-- {base: gpr, index: gpr, offset: ~, scale: 1, port_pressure: [[1, '23'], [1, [2D, 3D]]]}
-- {base: gpr, index: gpr, offset: ~, scale: 8, port_pressure: [[1, '23'], [1, [2D, 3D]]]}
-- {base: gpr, index: ~, offset: imd, scale: 1, port_pressure: [[1, '23'], [1, [2D, 3D]]]}
-- {base: gpr, index: ~, offset: imd, scale: 8, port_pressure: [[1, '23'], [1, [2D, 3D]]]}
-- {base: gpr, index: ~, offset: ~, scale: 1, port_pressure: [[1, '23'], [1, [2D, 3D]]]}
-- {base: gpr, index: ~, offset: ~, scale: 8, port_pressure: [[1, '23'], [1, [2D, 3D]]]}
+- {base: gpr, offset: ~,   index: ~,   scale: 1, port_pressure: [[1, '23'], [1, ['2D', '3D']]]}
+- {base: gpr, offset: ~,   index: gpr, scale: 1, port_pressure: [[1, '23'], [1, ['2D', '3D']]]}
+- {base: gpr, offset: ~,   index: gpr, scale: 8, port_pressure: [[1, '23'], [1, ['2D', '3D']]]}
+- {base: gpr, offset: imd, index: gpr, scale: 1, port_pressure: [[1, '23'], [1, ['2D', '3D']]]}
+- {base: gpr, offset: imd, index: gpr, scale: 8, port_pressure: [[1, '23'], [1, ['2D', '3D']]]}
+- {base: gpr, offset: imd, index: ~,   scale: 1, port_pressure: [[1, '23'], [1, ['2D', '3D']]]}
+- {base: ~,   offset: imd, index: ~,   scale: 1, port_pressure: [[1, '23'], [1, ['2D', '3D']]]}
+- {base: ~,   offset: ~,   index: gpr, scale: 1, port_pressure: [[1, '23'], [1, ['2D', '3D']]]}
+- {base: ~,   offset: ~,   index: gpr, scale: 8, port_pressure: [[1, '23'], [1, ['2D', '3D']]]}
+- {base: ~,   offset: imd, index: gpr, scale: 1, port_pressure: [[1, '23'], [1, ['2D', '3D']]]}
+- {base: ~,   offset: imd, index: gpr, scale: 8, port_pressure: [[1, '23'], [1, ['2D', '3D']]]}
 load_throughput_default: [[1, '23'], [1, ['2D', '3D']]]
 ports: ['0', 0DV, '1', '2', '2D', '3', '3D', '4', '5', '6', '7']
 port_model_scheme: |
@@ -41,6 +44,97 @@ port_model_scheme: |
    |AVX MUL| |AVX ADD|
    └-------┘ └-------┘
 instruction_forms:
+- name: LEA
+  operands:
+  - class: memory
+    base: gpr
+    offset: ~
+    index: ~
+    scale: 1
+  - class: register
+    name: gpr
+  latency: 1.0
+  port_pressure: [[1, '15']]
+  throughput: 0.5
+  uops: 1
+- name: LEA
+  operands:
+  - class: memory
+    base: gpr
+    offset: ~
+    index: gpr
+    scale: *
+  - class: register
+    name: gpr
+  latency: 1.0
+  port_pressure: [[1, '15']]
+  throughput: 0.5
+  uops: 1
+- name: LEA
+  operands:
+  - class: memory
+    base: gpr
+    offset: imd
+    index: gpr
+    scale: *
+  - class: register
+    name: gpr
+  latency: 3.0
+  port_pressure: [[1, '1']]
+  throughput: 1.0
+  uops: 1
+- name: LEA
+  operands:
+  - class: memory
+    base: gpr
+    offset: imd
+    index: ~
+    scale: 1
+  - class: register
+    name: gpr
+  latency: 1.0
+  port_pressure: [[1, '15']]
+  throughput: 0.5
+  uops: 1
+- name: LEA
+  operands:
+  - class: memory
+    base: ~
+    offset: imd
+    index: ~
+    scale: 1
+  - class: register
+    name: gpr
+  latency: 1.0
+  port_pressure: [[1, '15']]
+  throughput: 0.5
+  uops: 1
+- name: LEA
+  operands:
+  - class: memory
+    base: ~
+    offset: ~
+    index: gpr
+    scale: *
+  - class: register
+    name: gpr
+  latency: 1.0
+  port_pressure: [[1, '15']]
+  throughput: 0.5
+  uops: 1
+- name: LEA
+  operands:
+  - class: memory
+    base: ~
+    offset: imd
+    index: gpr
+    scale: *
+  - class: register
+    name: gpr
+  latency: 1.0
+  port_pressure: [[1, '15']]
+  throughput: 0.5
+  uops: 1
 - name: ADC
   operands:
   - class: immediate
