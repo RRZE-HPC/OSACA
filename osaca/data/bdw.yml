@@ -63,7 +63,7 @@ instruction_forms:
     base: gpr
     offset: ~
     index: gpr
-    scale: *
+    scale: '*'
   - class: register
     name: gpr
   latency: 1.0
@@ -76,7 +76,7 @@ instruction_forms:
     base: gpr
     offset: imd
     index: gpr
-    scale: *
+    scale: '*'
   - class: register
     name: gpr
   latency: 3.0
@@ -115,7 +115,7 @@ instruction_forms:
     base: ~
     offset: ~
     index: gpr
-    scale: *
+    scale: '*'
   - class: register
     name: gpr
   latency: 1.0
@@ -128,7 +128,7 @@ instruction_forms:
     base: ~
     offset: imd
     index: gpr
-    scale: *
+    scale: '*'
   - class: register
     name: gpr
   latency: 1.0
