@@ -451,10 +451,10 @@ class MachineModel(object):
         return True
 
     def _is_x86_reg_type(self, i_reg_name, reg):
-        # differentiate between vector registers (xmm, ymm, zmm) and others (gpr)
+        # differentiate between vector registers (mm, xmm, ymm, zmm) and others (gpr)
         parser_x86 = ParserX86ATT()
         if parser_x86.is_vector_register(reg):
-            if reg['name'][0:3] == i_reg_name:
+            if ''.join([l for l in reg['name'] if not l.isdigit()])[-2:] == i_reg_name[-2:]:
                 return True
         else:
             if i_reg_name == 'gpr':
