@@ -86,6 +86,23 @@ class ISASemantics(object):
                 if op['destination']:
                     op_dict['destination'].append(operands[i])
                     continue
+            # check for hidden operands like flags or registers
+            if 'hidden_operands' in isa_data:
+                # add operand(s) to semantic_operands of instruction form
+                for op in isa_data['hidden_operands']:
+                    dict_key = (
+                        'src_dst'
+                        if op['source'] and op['destination']
+                        else 'source'
+                        if op['source']
+                        else 'destination'
+                    )
+                    hidden_op = {op['class']: {}}
+                    key_filter = ['class', 'source', 'destination']
+                    for key in [k for k in op.keys() if k not in key_filter]:
+                        hidden_op[op['class']][key] = op[key]
+                    hidden_op = AttrDict.convert_dict(hidden_op)
+                    op_dict[dict_key].append(hidden_op)
         # post-process pre- and post-indexing for aarch64 memory operands
         if self._isa == 'aarch64':
             for operand in [op for op in op_dict['source'] if 'memory' in op]:

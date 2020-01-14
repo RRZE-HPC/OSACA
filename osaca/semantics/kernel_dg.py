@@ -6,7 +6,7 @@ from itertools import chain, product
 import networkx as nx
 
 from osaca.parser import AttrDict
-from osaca.semantics import MachineModel
+from osaca.semantics import INSTR_FLAGS, MachineModel
 
 
 class KernelDG(nx.DiGraph):
@@ -26,10 +26,9 @@ class KernelDG(nx.DiGraph):
             dg.add_node(instruction_form['line_number'])
             dg.nodes[instruction_form['line_number']]['instruction_form'] = instruction_form
             # add load as separate node if existent
-            # TODO use INSTR_FLAGS here
             if (
-                'performs_load' in instruction_form['flags']
-                and 'is_load_instruction' not in instruction_form['flags']
+                INSTR_FLAGS.HAS_LD in instruction_form['flags']
+                and INSTR_FLAGS.LD not in instruction_form['flags']
             ):
                 # add new node
                 dg.add_node(instruction_form['line_number'] + 0.1)
@@ -167,6 +166,20 @@ class KernelDG(nx.DiGraph):
                         if include_write:
                             yield instr_form
                         break
+            if 'flag' in dst:
+                # Check for read of flag until overwrite
+                for instr_form in kernel:
+                    if self.is_read(dst.flag, instr_form):
+                        yield instr_form
+                        if self.is_written(dst.flag, instr_form):
+                            # operand in src_dst list
+                            if include_write:
+                                yield instr_form
+                            break
+                    elif self.is_written(dst.flag, instr_form):
+                        if include_write:
+                            yield instr_form
+                        break
             elif 'memory' in dst:
                 # Check if base register is altered during memory access
                 if 'pre_indexed' in dst.memory or 'post_indexed' in dst.memory:
@@ -206,6 +219,8 @@ class KernelDG(nx.DiGraph):
                          instruction_form.semantic_operands.src_dst):
             if 'register' in src:
                 is_read = self.parser.is_reg_dependend_of(register, src.register) or is_read
+            if 'flag' in src:
+                is_read = self.parser.is_flag_dependend_of(register, src.flag) or is_read
             if 'memory' in src:
                 if src.memory.base is not None:
                     is_read = self.parser.is_reg_dependend_of(register, src.memory.base) or is_read
@@ -233,6 +248,8 @@ class KernelDG(nx.DiGraph):
                          instruction_form.semantic_operands.src_dst):
             if 'register' in dst:
                 is_written = self.parser.is_reg_dependend_of(register, dst.register) or is_written
+            if 'flag' in dst:
+                is_written = self.parser.is_flag_dependend_of(register, dst.flag) or is_written
             if 'memory' in dst:
                 if 'pre_indexed' in dst.memory or 'post_indexed' in dst.memory:
                     is_written = (
