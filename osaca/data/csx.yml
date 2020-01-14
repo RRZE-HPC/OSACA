@@ -169,6 +169,26 @@ instruction_forms:
   port_pressure: [[1, '06']]  # JH: assumed from SKX
   throughput: 0.5  # JH: measured on casclakesp2
   uops: 1
+- name: BTS
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: gpr
+  latency: 1
+  port_pressure: [[1, '06']]  # JH: assumed from SKX
+  throughput: 0.5  # JH: measured on casclakesp2
+  uops: 1
+- name: BTS
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: 1
+  port_pressure: [[1, '06']]  # JH: assumed from SKX
+  throughput: 0.5  # JH: measured on casclakesp2
+  uops: 1
 - name: BSWAP
   operands:
   - class: register
@@ -206,6 +226,26 @@ instruction_forms:
   latency: 3
   port_pressure: [[1, '1']]  # JH: assumed from SKX
   throughput: 1.0  # JH: measured on casclakesp2
+  uops: 1
+- name: ANDNPD
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '015']]  # JH: assumedfrom SKX
+  throughput: 0.3333333333333333  # JH: measured on casclakesp2
+  uops: 1
+- name: ANDNPS
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '015']]  # JH: assumedfrom SKX
+  throughput: 0.3333333333333333  # JH: measured on casclakesp2
   uops: 1
 - name: ANDPS
   operands:
