@@ -1222,6 +1222,308 @@ instruction_forms:
   throughput: 1.0
   uops: 2
 
+##### conditional moves
+- name: cmova
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: 1.0  # JH: measured on broadep1
+  port_pressure: [[2, '06']]  # JH: assumed from uops.info cmovbe
+  throughput: 1.0   # JH: measured on broadep1
+  uops: 2
+- name: cmovae
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: 1.0  # JH: measured on broadep1
+  port_pressure: [[1, '06']]  # JH: assumed from uops.info cmovb
+  throughput: 0.5   # JH: measured on broadep1
+  uops: 1
+- name: cmovb
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: 1.0  # JH: measured on broadep1
+  port_pressure: [[1, '06']]  # JH: assumed from uops.info
+  throughput: 0.5   # JH: measured on broadep1
+  uops: 1
+- name: cmovbe
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: 1.0  # JH: measured on broadep1
+  port_pressure: [[2, '06']]  # JH: assumed from uops.info
+  throughput: 1.0   # JH: measured on broadep1
+  uops: 2
+- name: cmovc
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: 1.0  # JH: measured on broadep1
+  port_pressure: [[1, '06']]  # JH: assumed from uops.info cmovb
+  throughput: 0.5   # JH: measured on broadep1
+  uops: 1
+- name: cmove
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: 1.0  # JH: measured on broadep1
+  port_pressure: [[1, '06']]  # JH: assumed from uops.info cmovb
+  throughput: 0.5   # JH: measured on broadep1
+  uops: 1
+- name: cmovg
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: 1.0  # JH: measured on broadep1
+  port_pressure: [[1, '06']]  # JH: assumed from uops.info cmovb
+  throughput: 0.5   # JH: measured on broadep1
+  uops: 1
+- name: cmovge
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: 1.0  # JH: measured on broadep1
+  port_pressure: [[1, '06']]  # JH: assumed from uops.info cmovb
+  throughput: 0.5   # JH: measured on broadep1
+  uops: 1
+- name: cmovl
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: 1.0  # JH: measured on broadep1
+  port_pressure: [[1, '06']]  # JH: assumed from uops.info
+  throughput: 0.5   # JH: measured on broadep1
+  uops: 1
+- name: cmovle
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: 1.0  # JH: measured on broadep1
+  port_pressure: [[1, '06']]  # JH: assumed from uops.info
+  throughput: 0.5   # JH: measured on broadep1
+  uops: 1
+- name: cmovna
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: 1.0  # JH: measured on broadep1
+  port_pressure: [[2, '06']]  # JH: assumed from uops.info cmovbe
+  throughput: 1.0   # JH: measured on broadep1
+  uops: 1
+- name: cmovnae
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: 1.0  # JH: measured on broadep1
+  port_pressure: [[1, '06']]  # JH: assumed from uops.info cmovb
+  throughput: 0.5   # JH: measured on broadep1
+  uops: 1
+- name: cmovnb
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: 1.0  # JH: measured on broadep1
+  port_pressure: [[1, '06']]  # JH: assumed from uops.info cmovb
+  throughput: 0.5   # JH: measured on broadep1
+  uops: 1
+- name: cmovnbe
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: 1.0  # JH: measured on broadep1
+  port_pressure: [[2, '06']]  # JH: assumed from uops.info cmovbe
+  throughput: 1.0   # JH: measured on broadep1
+  uops: 2
+- name: cmovnc
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: 1.0  # JH: measured on broadep1
+  port_pressure: [[1, '06']]  # JH: assumed from uops.info cmovb
+  throughput: 0.5   # JH: measured on broadep1
+  uops: 1
+- name: cmovne
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: 1.0  # JH: measured on broadep1
+  port_pressure: [[1, '06']]  # JH: assumed from uops.info cmovb
+  throughput: 0.5   # JH: measured on broadep1
+  uops: 1
+- name: cmovng
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: 1.0  # JH: measured on broadep1
+  port_pressure: [[1, '06']]  # JH: assumed from uops.info cmovb
+  throughput: 0.5   # JH: measured on broadep1
+  uops: 1
+- name: cmovnge
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: 1.0  # JH: measured on broadep1
+  port_pressure: [[1, '06']]  # JH: assumed from uops.info cmovb
+  throughput: 0.5   # JH: measured on broadep1
+  uops: 1
+- name: cmovnl
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: 1.0  # JH: measured on broadep1
+  port_pressure: [[1, '06']]  # JH: assumed from uops.info cmovb
+  throughput: 0.5   # JH: measured on broadep1
+  uops: 1
+- name: cmovnle
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: 1.0  # JH: measured on broadep1
+  port_pressure: [[1, '06']]  # JH: assumed from uops.info cmovb
+  throughput: 0.5   # JH: measured on broadep1
+  uops: 1
+- name: cmovno
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: 1.0  # JH: measured on broadep1
+  port_pressure: [[1, '06']]  # JH: assumed from uops.info cmovb
+  throughput: 0.5   # JH: measured on broadep1
+  uops: 1
+- name: cmovnp
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: 1.0  # JH: measured on broadep1
+  port_pressure: [[1, '06']]  # JH: assumed from uops.info cmovb
+  throughput: 0.5   # JH: measured on broadep1
+  uops: 1
+- name: cmovns
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: 1.0  # JH: measured on broadep1
+  port_pressure: [[1, '06']]  # JH: assumed from uops.info
+  throughput: 0.5   # JH: measured on broadep1
+  uops: 1
+- name: cmovnz
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: 1.0  # JH: measured on broadep1
+  port_pressure: [[1, '06']]  # JH: assumed from uops.info cmovb
+  throughput: 0.5   # JH: measured on broadep1
+  uops: 1
+- name: cmovo
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: 1.0  # JH: measured on broadep1
+  port_pressure: [[1, '06']]  # JH: assumed from uops.info cmovb
+  throughput: 0.5   # JH: measured on broadep1
+  uops: 1
+- name: cmovp
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: 1.0  # JH: measured on broadep1
+  port_pressure: [[1, '06']]  # JH: assumed from uops.info cmovb
+  throughput: 0.5   # JH: measured on broadep1
+  uops: 1
+- name: cmovpe
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: 1.0  # JH: measured on broadep1
+  port_pressure: [[1, '06']]  # JH: assumed from uops.info cmovb
+  throughput: 0.5   # JH: measured on broadep1
+  uops: 1
+- name: cmovpo
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: 1.0  # JH: measured on broadep1
+  port_pressure: [[1, '06']]  # JH: assumed from uops.info cmovb
+  throughput: 0.5   # JH: measured on broadep1
+  uops: 1
+- name: cmovs
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: 1.0  # JH: measured on broadep1
+  port_pressure: [[1, '06']]  # JH: assumed from uops.info
+  throughput: 0.5   # JH: measured on broadep1
+  uops: 1
+- name: cmovz
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: 1.0  # JH: measured on broadep1
+  port_pressure: [[1, '06']]  # JH: assumed from uops.info cmovb
+  throughput: 0.5   # JH: measured on broadep1
+  uops: 1
+
 - name: SLDT
   operands:
   - class: register
@@ -1394,16 +1696,6 @@ instruction_forms:
   port_pressure: [[1, '0156']]
   throughput: 0.25
   uops: 1
-- name: CMOVLE
-  operands:
-  - class: register
-    name: gpr
-  - class: register
-    name: gpr
-  latency: 1
-  port_pressure: [[1, '06']]
-  throughput: 0.5
-  uops: 1
 - name: LAHF
   operands: []
   latency: 0
@@ -1572,16 +1864,6 @@ instruction_forms:
   port_pressure: [[9, '0156'], [9, '06'], [2, '23'], [1, '237'], [1, '4'], [1, '5']]
   throughput: 6.75
   uops: 54
-- name: CMOVNLE
-  operands:
-  - class: register
-    name: gpr
-  - class: register
-    name: gpr
-  latency: 1
-  port_pressure: [[1, '06']]
-  throughput: 0.5
-  uops: 1
 - name: SBB
   operands:
   - class: immediate
@@ -2388,16 +2670,6 @@ instruction_forms:
   port_pressure: [[2, '01'], [10, '015'], [17, '06'], [1, '1'], [1, '15'], [3, '5']]
   throughput: 12.833333333333334
   uops: 34
-- name: CMOVNP
-  operands:
-  - class: register
-    name: gpr
-  - class: register
-    name: gpr
-  latency: 1
-  port_pressure: [[1, '06']]
-  throughput: 0.5
-  uops: 1
 - name: RETFW
   operands:
   - class: immediate
@@ -2793,66 +3065,6 @@ instruction_forms:
   port_pressure: [[10, '0156'], [9, '06'], [3, '23'], [1, '5']]
   throughput: 7.0
   uops: 60
-- name: CMOVNZ
-  operands:
-  - class: register
-    name: gpr
-  - class: register
-    name: gpr
-  latency: 1
-  port_pressure: [[1, '06']]
-  throughput: 0.5
-  uops: 1
-- name: CMOVNS
-  operands:
-  - class: register
-    name: gpr
-  - class: register
-    name: gpr
-  latency: 1
-  port_pressure: [[1, '06']]
-  throughput: 0.5
-  uops: 1
-- name: CMOVNO
-  operands:
-  - class: register
-    name: gpr
-  - class: register
-    name: gpr
-  latency: 1
-  port_pressure: [[1, '06']]
-  throughput: 0.5
-  uops: 1
-- name: CMOVNL
-  operands:
-  - class: register
-    name: gpr
-  - class: register
-    name: gpr
-  latency: 1
-  port_pressure: [[1, '06']]
-  throughput: 0.5
-  uops: 1
-- name: CMOVNB
-  operands:
-  - class: register
-    name: gpr
-  - class: register
-    name: gpr
-  latency: 1
-  port_pressure: [[1, '06']]
-  throughput: 0.5
-  uops: 1
-- name: CMOVO
-  operands:
-  - class: register
-    name: gpr
-  - class: register
-    name: gpr
-  latency: 1
-  port_pressure: [[1, '06']]
-  throughput: 0.5
-  uops: 1
 - name: BT
   operands:
   - class: immediate
@@ -2905,56 +3117,6 @@ instruction_forms:
   latency: 0
   port_pressure: [[1, '0156']]
   throughput: 0.25
-  uops: 1
-- name: CMOVZ
-  operands:
-  - class: register
-    name: gpr
-  - class: register
-    name: gpr
-  latency: 1
-  port_pressure: [[1, '06']]
-  throughput: 0.5
-  uops: 1
-- name: CMOVP
-  operands:
-  - class: register
-    name: gpr
-  - class: register
-    name: gpr
-  latency: 1
-  port_pressure: [[1, '06']]
-  throughput: 0.5
-  uops: 1
-- name: CMOVS
-  operands:
-  - class: register
-    name: gpr
-  - class: register
-    name: gpr
-  latency: 1
-  port_pressure: [[1, '06']]
-  throughput: 0.5
-  uops: 1
-- name: CMOVL
-  operands:
-  - class: register
-    name: gpr
-  - class: register
-    name: gpr
-  latency: 1
-  port_pressure: [[1, '06']]
-  throughput: 0.5
-  uops: 1
-- name: CMOVB
-  operands:
-  - class: register
-    name: gpr
-  - class: register
-    name: gpr
-  latency: 1
-  port_pressure: [[1, '06']]
-  throughput: 0.5
   uops: 1
 - name: LMSW
   operands:
