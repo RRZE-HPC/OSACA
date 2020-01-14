@@ -408,6 +408,13 @@ class ParserAArch64v81(BaseParser):
             return True
         return False
 
+    def is_flag_dependend_of(self, flag_a, flag_b):
+        # we assume flags are independent of each other, e.g., CF can be read while ZF gets written
+        # TODO validate this assumption
+        if flag_a.name == flag_b.name:
+            return True
+        return False
+
     def is_reg_dependend_of(self, reg_a, reg_b):
         prefixes_gpr = 'wx'
         prefixes_vec = 'bhsdqv'

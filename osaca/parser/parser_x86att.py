@@ -295,6 +295,13 @@ class ParserX86ATT(BaseParser):
         # identifier
         return imd
 
+    def is_flag_dependend_of(self, flag_a, flag_b):
+        # we assume flags are independent of each other, e.g., CF can be read while ZF gets written
+        # TODO validate this assumption
+        if flag_a.name == flag_b.name:
+            return True
+        return False
+
     def is_reg_dependend_of(self, reg_a, reg_b):
         # Check if they are the same registers
         if reg_a.name == reg_b.name:
