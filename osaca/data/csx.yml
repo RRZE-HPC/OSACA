@@ -1969,8 +1969,6 @@ instruction_forms:
   port_pressure: [[1, '23'], [1, '4']]
   throughput: 1.0
   uops: 2
-<<<<<<< Updated upstream
-=======
 
 ##### conditional moves
 - name: cmova
@@ -2273,4 +2271,3 @@ instruction_forms:
   port_pressure: [[1, '06']]  # JH: assumed from uops.info cmovb on SKX
   throughput: 0.5   # JH: measured on casclakesp2
   uops: 1
->>>>>>> Stashed changes
