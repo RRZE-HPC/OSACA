@@ -150,8 +150,12 @@ class ArchSemantics(ISASemantics):
                 # instruction could not be found in DB
                 assign_unknown = True
                 # check for equivalent register-operands DB entry if LD
-                if INSTR_FLAGS.HAS_LD in instruction_form['flags']:
-                    # --> combine LD and reg form of instruction form
+                if (
+                    INSTR_FLAGS.HAS_LD in instruction_form['flags']
+                    or INSTR_FLAGS.HAS_ST in instruction_form['flags']
+                ):
+                    # dynamically combine LD/ST and reg form of instruction form
+                    # substitute mem and look for reg-only variant
                     operands = self.substitute_mem_address(instruction_form['operands'])
                     instruction_data_reg = self._machine_model.get_instruction(
                         instruction_form['instruction'], operands
@@ -172,41 +176,64 @@ class ArchSemantics(ISASemantics):
                                 operands.index(self._create_reg_wildcard())
                             ]
                         )
-                        load_port_uops = self._machine_model.get_load_throughput(
-                            [
-                                x['memory']
-                                for x in instruction_form['semantic_operands']['source']
-                                + instruction_form['semantic_operands']['src_dst']
-                                if 'memory' in x
-                            ][0]
-                        )
-                        load_port_pressure = self._machine_model.average_port_pressure(
-                            load_port_uops
-                        )
-                        if 'load_throughput_multiplier' in self._machine_model:
-                            multiplier = self._machine_model['load_throughput_multiplier'][
-                                reg_type
-                            ]
-                            load_port_pressure = [pp * multiplier for pp in load_port_pressure]
+                        if INSTR_FLAGS.HAS_LD in instruction_form['flags']:
+                            # LOAD performance data
+                            data_port_uops = self._machine_model.get_load_throughput(
+                                [
+                                    x['memory']
+                                    for x in instruction_form['semantic_operands']['source']
+                                    + instruction_form['semantic_operands']['src_dst']
+                                    if 'memory' in x
+                                ][0]
+                            )
+                            data_port_pressure = self._machine_model.average_port_pressure(
+                                data_port_uops
+                            )
+                            if 'load_throughput_multiplier' in self._machine_model:
+                                multiplier = self._machine_model['load_throughput_multiplier'][
+                                    reg_type
+                                ]
+                                data_port_pressure = [pp * multiplier for pp in data_port_pressure]
+                        if INSTR_FLAGS.HAS_ST in instruction_form['flags']:
+                            # STORE performance data
+                            data_port_uops = self._machine_model.get_store_throughput(
+                                [
+                                    x['memory']
+                                    for x in instruction_form['semantic_operands']['destination']
+                                    + instruction_form['semantic_operands']['src_dst']
+                                    if 'memory' in x
+                                ][0]
+                            )
+                            data_port_pressure = self._machine_model.average_port_pressure(
+                                data_port_uops
+                            )
                         throughput = max(
-                            max(load_port_pressure), instruction_data_reg['throughput']
+                            max(data_port_pressure), instruction_data_reg['throughput']
                         )
-                        latency = (
+                        latency = instruction_data_reg['latency']
+                        # Add LD and ST latency
+                        latency += (
                             self._machine_model.get_load_latency(reg_type)
-                            + instruction_data_reg['latency']
+                            if INSTR_FLAGS.HAS_LD in instruction_form['flags']
+                            else 0
+                        )
+                        latency += (
+                            self._machine_model.get_store_latency(reg_type)
+                            if INSTR_FLAGS.HAS_ST in instruction_form['flags']
+                            else 0
                         )
                         latency_wo_load = instruction_data_reg['latency']
                         instruction_form['port_pressure'] = [
                             sum(x)
                             for x in zip(
-                                load_port_pressure,
+                                data_port_pressure,
                                 self._machine_model.average_port_pressure(
                                     instruction_data_reg['port_pressure']
                                 ),
                             )
                         ]
                         instruction_form['port_uops'] = list(
-                            chain(instruction_data_reg['port_pressure'], load_port_uops)
+                            chain(instruction_data_reg['port_pressure'], data_port_uops)
                         )
 
                 if assign_unknown:

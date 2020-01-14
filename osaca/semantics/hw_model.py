@@ -160,6 +160,16 @@ class MachineModel(object):
             return ld_tp[0]['port_pressure']
         return self._data['load_throughput_default']
 
+    def get_store_latency(self, reg_type):
+        # assume 0 for now, since load-store-dependencies currently not detectable
+        return 0
+
+    def get_store_throughput(self, memory):
+        st_tp = [m for m in self._data['store_throughput'] if self._match_mem_entries(memory, m)]
+        if len(st_tp) > 0:
+            return st_tp[0]['port_pressure']
+        return self._data['store_throughput_default']
+
     def _match_mem_entries(self, mem, i_mem):
         if self._data['isa'].lower() == 'aarch64':
             return self._is_AArch64_mem_type(i_mem, mem)
