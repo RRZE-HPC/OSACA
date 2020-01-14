@@ -262,7 +262,7 @@ instruction_forms:
         - class: "register"
           name: "gpr"
           source: true
-          destination: true
+          destination: false
     - name: cmp
       operands:
         - class: "immediate"
@@ -275,7 +275,7 @@ instruction_forms:
           index: "*"
           scale: "*"
           source: true
-          destination: true
+          destination: false
     - name: cmp
       operands:
         - class: "register"

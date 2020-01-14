@@ -1242,6 +1242,115 @@ instruction_forms:
   throughput: 1.0
   uops: 2
 
+- name: movhps  # with load
+  operands:
+  - class: memory
+    base: "*"
+    offset: "*"
+    index: "*"
+    scale: "*"
+  - class: register
+    name: xmm
+  latency: 4.0
+  port_pressure: [[1, '23'], [1, [2D, 3D]]]
+  throughput: 0.5
+  uops: 2
+- name: movhps  # with store, simple AGU
+  operands:
+  - class: register
+    name: xmm
+  - class: memory
+    base: "*"
+    offset: "*"
+    index: ~
+    scale: "*"
+  latency: 0
+  port_pressure: [[1, '237'], [1, '4']]
+  throughput: 1.0
+  uops: 2
+- name: movhps  # with store, complex AGU
+  operands:
+  - class: register
+    name: xmm
+  - class: memory
+    base: "*"
+    offset: "*"
+    index: gpr
+    scale: "*"
+  latency: 0
+  port_pressure: [[1, '23'], [1, '4']]
+  throughput: 1.0
+  uops: 2
+- name: movhps  # with load
+  operands:
+  - class: memory
+    base: "*"
+    offset: "*"
+    index: "*"
+    scale: "*"
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 4.0
+  port_pressure: [[1, '23'], [1, [2D, 3D]]]
+  throughput: 0.5
+  uops: 2
+- name: vmovhpd  # with load
+  operands:
+  - class: memory
+    base: "*"
+    offset: "*"
+    index: "*"
+    scale: "*"
+  - class: register
+    name: xmm
+  latency: 4.0
+  port_pressure: [[1, '23'], [1, [2D, 3D]]]
+  throughput: 0.5
+  uops: 2
+- name: vmovhpd  # with store, simple AGU
+  operands:
+  - class: register
+    name: xmm
+  - class: memory
+    base: "*"
+    offset: "*"
+    index: ~
+    scale: "*"
+  latency: 0
+  port_pressure: [[1, '237'], [1, '4']]
+  throughput: 1.0
+  uops: 2
+- name: vmovhpd  # with store, complex AGU
+  operands:
+  - class: register
+    name: xmm
+  - class: memory
+    base: "*"
+    offset: "*"
+    index: gpr
+    scale: "*"
+  latency: 0
+  port_pressure: [[1, '23'], [1, '4']]
+  throughput: 1.0
+  uops: 2
+- name: vmovhpd  # with load
+  operands:
+  - class: memory
+    base: "*"
+    offset: "*"
+    index: "*"
+    scale: "*"
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 4.0
+  port_pressure: [[1, '23'], [1, [2D, 3D]]]
+  throughput: 0.5
+  uops: 2
+
 ##### conditional moves
 - name: cmova
   operands:
@@ -3428,7 +3537,7 @@ instruction_forms:
   port_pressure: [[1, '1']]
   throughput: 1.0
   uops: 1
-- name: CMPPS
+- name: cmpps
   operands:
   - class: immediate
     imd: int
@@ -3436,9 +3545,89 @@ instruction_forms:
     name: xmm
   - class: register
     name: xmm
-  latency: 3
-  port_pressure: [[1, '1']]
-  throughput: 1.0
+  latency: 3.0  # JH: measured on phinally
+  port_pressure: [[1, '1']]  # JH: according to uops.info
+  throughput: 1.0  # JH: measured on phinally
+  uops: 1
+- name: cmpeqps  # same as CMPPS xmm1, xmm2, 0
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 3.0  # JH: measured on phinally
+  port_pressure: [[1, '1']]  # JH: according to uops.info
+  throughput: 1.0  # JH: measured on phinally
+  uops: 1
+- name: cmpltps  # same as CMPPS xmm1, xmm2, 1
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 3.0  # JH: measured on phinally
+  port_pressure: [[1, '1']]  # JH: according to uops.info
+  throughput: 1.0  # JH: measured on phinally
+  uops: 1
+- name: cmpleps  # same as CMPPS xmm1, xmm2, 2
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 3.0  # JH: measured on phinally
+  port_pressure: [[1, '1']]  # JH: according to uops.info
+  throughput: 1.0  # JH: measured on phinally
+  uops: 1
+- name: cmpunordps  # same as CMPPS xmm1, xmm2, 3
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 3.0  # JH: measured on phinally
+  port_pressure: [[1, '1']]  # JH: according to uops.info
+  throughput: 1.0  # JH: measured on phinally
+  uops: 1
+- name: cmpneqps  # same as CMPPS xmm1, xmm2, 4
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 3.0  # JH: measured on phinally
+  port_pressure: [[1, '1']]  # JH: according to uops.info
+  throughput: 1.0  # JH: measured on phinally
+  uops: 1
+- name: cmpnltps  # same as CMPPS xmm1, xmm2, 5
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 3.0  # JH: measured on phinally
+  port_pressure: [[1, '1']]  # JH: according to uops.info
+  throughput: 1.0  # JH: measured on phinally
+  uops: 1
+- name: cmpnleps  # same as CMPPS xmm1, xmm2, 6
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 3.0  # JH: measured on phinally
+  port_pressure: [[1, '1']]  # JH: according to uops.info
+  throughput: 1.0  # JH: measured on phinally
+  uops: 1
+- name: cmpordps  # same as CMPPS xmm1, xmm2, 7
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 3.0  # JH: measured on phinally
+  port_pressure: [[1, '1']]  # JH: according to uops.info
+  throughput: 1.0  # JH: measured on phinally
   uops: 1
 - name: XORPS
   operands:
@@ -3958,7 +4147,7 @@ instruction_forms:
   port_pressure: [[1, '015']]
   throughput: 0.3333333333333333
   uops: 1
-- name: CMPPD
+- name: cmppd
   operands:
   - class: immediate
     imd: int
@@ -3966,9 +4155,89 @@ instruction_forms:
     name: xmm
   - class: register
     name: xmm
-  latency: 3
-  port_pressure: [[1, '1']]
-  throughput: 1.0
+  latency: 3.0  # JH: measured on phinally
+  port_pressure: [[1, '1']]  # JH: according to uops.info
+  throughput: 1.0  # JH: measured on phinally
+  uops: 1
+- name: cmpeqpd  # same as CMPPD xmm1, xmm2, 0
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 3.0  # JH: measured on phinally
+  port_pressure: [[1, '1']]  # JH: according to uops.info
+  throughput: 1.0  # JH: measured on phinally
+  uops: 1
+- name: cmpltpd  # same as CMPPD xmm1, xmm2, 1
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 3.0  # JH: measured on phinally
+  port_pressure: [[1, '1']]  # JH: according to uops.info
+  throughput: 1.0  # JH: measured on phinally
+  uops: 1
+- name: cmplepd  # same as CMPPD xmm1, xmm2, 2
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 3.0  # JH: measured on phinally
+  port_pressure: [[1, '1']]  # JH: according to uops.info
+  throughput: 1.0  # JH: measured on phinally
+  uops: 1
+- name: cmpunordpd  # same as CMPPD xmm1, xmm2, 3
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 3.0  # JH: measured on phinally
+  port_pressure: [[1, '1']]  # JH: according to uops.info
+  throughput: 1.0  # JH: measured on phinally
+  uops: 1
+- name: cmpneqpd  # same as CMPPD xmm1, xmm2, 4
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 3.0  # JH: measured on phinally
+  port_pressure: [[1, '1']]  # JH: according to uops.info
+  throughput: 1.0  # JH: measured on phinally
+  uops: 1
+- name: cmpnltpd  # same as CMPPD xmm1, xmm2, 5
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 3.0  # JH: measured on phinally
+  port_pressure: [[1, '1']]  # JH: according to uops.info
+  throughput: 1.0  # JH: measured on phinally
+  uops: 1
+- name: cmpnlepd  # same as CMPPD xmm1, xmm2, 6
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 3.0  # JH: measured on phinally
+  port_pressure: [[1, '1']]  # JH: according to uops.info
+  throughput: 1.0  # JH: measured on phinally
+  uops: 1
+- name: cmpordpd  # same as CMPPD xmm1, xmm2, 7
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 3.0  # JH: measured on phinally
+  port_pressure: [[1, '1']]  # JH: according to uops.info
+  throughput: 1.0  # JH: measured on phinally
   uops: 1
 - name: PSUBB
   operands:
