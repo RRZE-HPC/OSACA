@@ -1969,3 +1969,308 @@ instruction_forms:
   port_pressure: [[1, '23'], [1, '4']]
   throughput: 1.0
   uops: 2
+<<<<<<< Updated upstream
+=======
+
+##### conditional moves
+- name: cmova
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: 1.0  # JH: measured on casclakesp2
+  port_pressure: [[2, '06']]  # JH: assumed from uops.info cmovbe on SKX
+  throughput: 1.0   # JH: measured on casclakesp2
+  uops: 2
+- name: cmovae
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: 1.0  # JH: measured on casclakesp2
+  port_pressure: [[1, '06']]  # JH: assumed from uops.info cmovb on SKX
+  throughput: 0.5   # JH: measured on casclakesp2
+  uops: 1
+- name: cmovb
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: 1.0  # JH: measured on casclakesp2
+  port_pressure: [[1, '06']]  # JH: assumed from uops.info on SKX
+  throughput: 0.5   # JH: measured on casclakesp2
+  uops: 1
+- name: cmovbe
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: 1.0  # JH: measured on casclakesp2
+  port_pressure: [[2, '06']]  # JH: assumed from uops.info on SKX
+  throughput: 1.0   # JH: measured on casclakesp2
+  uops: 2
+- name: cmovc
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: 1.0  # JH: measured on casclakesp2
+  port_pressure: [[1, '06']]  # JH: assumed from uops.info cmovb on SKX
+  throughput: 0.5   # JH: measured on casclakesp2
+  uops: 1
+- name: cmove
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: 1.0  # JH: measured on casclakesp2
+  port_pressure: [[1, '06']]  # JH: assumed from uops.info cmovb on SKX
+  throughput: 0.5   # JH: measured on casclakesp2
+  uops: 1
+- name: cmovg
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: 1.0  # JH: measured on casclakesp2
+  port_pressure: [[1, '06']]  # JH: assumed from uops.info cmovb on SKX
+  throughput: 0.5   # JH: measured on casclakesp2
+  uops: 1
+- name: cmovge
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: 1.0  # JH: measured on casclakesp2
+  port_pressure: [[1, '06']]  # JH: assumed from uops.info cmovb on SKX
+  throughput: 0.5   # JH: measured on casclakesp2
+  uops: 1
+- name: cmovl
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: 1.0  # JH: measured on casclakesp2
+  port_pressure: [[1, '06']]  # JH: assumed from uops.info on SKX
+  throughput: 0.5   # JH: measured on casclakesp2
+  uops: 1
+- name: cmovle
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: 1.0  # JH: measured on casclakesp2
+  port_pressure: [[1, '06']]  # JH: assumed from uops.info on SKX
+  throughput: 0.5   # JH: measured on casclakesp2
+  uops: 1
+- name: cmovna
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: 1.0  # JH: measured on casclakesp2
+  port_pressure: [[2, '06']]  # JH: assumed from uops.info cmovbe on SKX
+  throughput: 1.0   # JH: measured on casclakesp2
+  uops: 1
+- name: cmovnae
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: 1.0  # JH: measured on casclakesp2
+  port_pressure: [[1, '06']]  # JH: assumed from uops.info cmovb on SKX
+  throughput: 0.5   # JH: measured on casclakesp2
+  uops: 1
+- name: cmovnb
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: 1.0  # JH: measured on casclakesp2
+  port_pressure: [[1, '06']]  # JH: assumed from uops.info cmovb on SKX
+  throughput: 0.5   # JH: measured on casclakesp2
+  uops: 1
+- name: cmovnbe
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: 1.0  # JH: measured on casclakesp2
+  port_pressure: [[2, '06']]  # JH: assumed from uops.info cmovbe on SKX
+  throughput: 1.0   # JH: measured on casclakesp2
+  uops: 2
+- name: cmovnc
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: 1.0  # JH: measured on casclakesp2
+  port_pressure: [[1, '06']]  # JH: assumed from uops.info cmovb on SKX
+  throughput: 0.5   # JH: measured on casclakesp2
+  uops: 1
+- name: cmovne
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: 1.0  # JH: measured on casclakesp2
+  port_pressure: [[1, '06']]  # JH: assumed from uops.info cmovb on SKX
+  throughput: 0.5   # JH: measured on casclakesp2
+  uops: 1
+- name: cmovng
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: 1.0  # JH: measured on casclakesp2
+  port_pressure: [[1, '06']]  # JH: assumed from uops.info cmovb on SKX
+  throughput: 0.5   # JH: measured on casclakesp2
+  uops: 1
+- name: cmovnge
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: 1.0  # JH: measured on casclakesp2
+  port_pressure: [[1, '06']]  # JH: assumed from uops.info cmovb on SKX
+  throughput: 0.5   # JH: measured on casclakesp2
+  uops: 1
+- name: cmovnl
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: 1.0  # JH: measured on casclakesp2
+  port_pressure: [[1, '06']]  # JH: assumed from uops.info cmovb on SKX
+  throughput: 0.5   # JH: measured on casclakesp2
+  uops: 1
+- name: cmovnle
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: 1.0  # JH: measured on casclakesp2
+  port_pressure: [[1, '06']]  # JH: assumed from uops.info cmovb on SKX
+  throughput: 0.5   # JH: measured on casclakesp2
+  uops: 1
+- name: cmovno
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: 1.0  # JH: measured on casclakesp2
+  port_pressure: [[1, '06']]  # JH: assumed from uops.info cmovb on SKX
+  throughput: 0.5   # JH: measured on casclakesp2
+  uops: 1
+- name: cmovnp
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: 1.0  # JH: measured on casclakesp2
+  port_pressure: [[1, '06']]  # JH: assumed from uops.info cmovb on SKX
+  throughput: 0.5   # JH: measured on casclakesp2
+  uops: 1
+- name: cmovns
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: 1.0  # JH: measured on casclakesp2
+  port_pressure: [[1, '06']]  # JH: assumed from uops.info on SKX
+  throughput: 0.5   # JH: measured on casclakesp2
+  uops: 1
+- name: cmovnz
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: 1.0  # JH: measured on casclakesp2
+  port_pressure: [[1, '06']]  # JH: assumed from uops.info cmovb on SKX
+  throughput: 0.5   # JH: measured on casclakesp2
+  uops: 1
+- name: cmovo
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: 1.0  # JH: measured on casclakesp2
+  port_pressure: [[1, '06']]  # JH: assumed from uops.info cmovb on SKX
+  throughput: 0.5   # JH: measured on casclakesp2
+  uops: 1
+- name: cmovp
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: 1.0  # JH: measured on casclakesp2
+  port_pressure: [[1, '06']]  # JH: assumed from uops.info cmovb on SKX
+  throughput: 0.5   # JH: measured on casclakesp2
+  uops: 1
+- name: cmovpe
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: 1.0  # JH: measured on casclakesp2
+  port_pressure: [[1, '06']]  # JH: assumed from uops.info cmovb on SKX
+  throughput: 0.5   # JH: measured on casclakesp2
+  uops: 1
+- name: cmovpo
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: 1.0  # JH: measured on casclakesp2
+  port_pressure: [[1, '06']]  # JH: assumed from uops.info cmovb on SKX
+  throughput: 0.5   # JH: measured on casclakesp2
+  uops: 1
+- name: cmovs
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: 1.0  # JH: measured on casclakesp2
+  port_pressure: [[1, '06']]  # JH: assumed from uops.info on SKX
+  throughput: 0.5   # JH: measured on casclakesp2
+  uops: 1
+- name: cmovz
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: 1.0  # JH: measured on casclakesp2
+  port_pressure: [[1, '06']]  # JH: assumed from uops.info cmovb on SKX
+  throughput: 0.5   # JH: measured on casclakesp2
+  uops: 1
+>>>>>>> Stashed changes
