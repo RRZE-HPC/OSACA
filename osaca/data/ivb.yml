@@ -203,7 +203,7 @@ instruction_forms:
     index: ~
     scale: "*"
   latency: 0
-  port_pressure: [[1, '237'], [1, '4']]
+  port_pressure: [[1, '23'], [1, '4']]
   throughput: 1.0
   uops: 2
 - name: mov  # with store, complex AGU
@@ -254,7 +254,7 @@ instruction_forms:
     index: ~
     scale: "*"
   latency: 0
-  port_pressure: [[1, '237'], [1, '4']]
+  port_pressure: [[1, '23'], [1, '4']]
   throughput: 1.0
   uops: 2
 - name: movabs  # with store, complex AGU
@@ -305,7 +305,7 @@ instruction_forms:
     index: ~
     scale: "*"
   latency: 0
-  port_pressure: [[1, '237'], [1, '4']]
+  port_pressure: [[1, '23'], [1, '4']]
   throughput: 1.0
   uops: 2
 - name: movapd  # with store, complex AGU
@@ -356,7 +356,7 @@ instruction_forms:
     index: ~
     scale: "*"
   latency: 0
-  port_pressure: [[1, '237'], [1, '4']]
+  port_pressure: [[1, '23'], [1, '4']]
   throughput: 1.0
   uops: 2
 - name: movaps  # with store, complex AGU
@@ -407,7 +407,7 @@ instruction_forms:
     index: ~
     scale: "*"
   latency: 0
-  port_pressure: [[1, '237'], [1, '4']]
+  port_pressure: [[1, '23'], [1, '4']]
   throughput: 1.0
   uops: 2
 - name: movdqa  # with store, complex AGU
@@ -458,7 +458,7 @@ instruction_forms:
     index: ~
     scale: "*"
   latency: 0
-  port_pressure: [[1, '237'], [1, '4']]
+  port_pressure: [[1, '23'], [1, '4']]
   throughput: 1.0
   uops: 2
 - name: movdqu  # with store, complex AGU
@@ -509,7 +509,7 @@ instruction_forms:
     index: ~
     scale: "*"
   latency: 0
-  port_pressure: [[1, '237'], [1, '4']]
+  port_pressure: [[1, '23'], [1, '4']]
   throughput: 1.0
   uops: 2
 - name: movsd  # with store, complex AGU
@@ -560,7 +560,7 @@ instruction_forms:
     index: ~
     scale: "*"
   latency: 0
-  port_pressure: [[1, '237'], [1, '4']]
+  port_pressure: [[1, '23'], [1, '4']]
   throughput: 1.0
   uops: 2
 - name: movss  # with store, complex AGU
@@ -611,7 +611,7 @@ instruction_forms:
     index: ~
     scale: "*"
   latency: 0
-  port_pressure: [[1, '237'], [1, '4']]
+  port_pressure: [[1, '23'], [1, '4']]
   throughput: 1.0
   uops: 2
 - name: movupd  # with store, complex AGU
@@ -662,7 +662,7 @@ instruction_forms:
     index: ~
     scale: "*"
   latency: 0
-  port_pressure: [[1, '237'], [1, '4']]
+  port_pressure: [[1, '23'], [1, '4']]
   throughput: 1.0
   uops: 2
 - name: movups  # with store, complex AGU
@@ -713,7 +713,7 @@ instruction_forms:
     index: ~
     scale: "*"
   latency: 0
-  port_pressure: [[1, '237'], [1, '4']]
+  port_pressure: [[1, '23'], [1, '4']]
   throughput: 1.0
   uops: 2
 - name: movd  # with store, complex AGU
@@ -764,7 +764,7 @@ instruction_forms:
     index: ~
     scale: "*"
   latency: 0
-  port_pressure: [[1, '237'], [1, '4']]
+  port_pressure: [[1, '23'], [1, '4']]
   throughput: 1.0
   uops: 2
 - name: movd  # with store, complex AGU
@@ -815,7 +815,7 @@ instruction_forms:
     index: ~
     scale: "*"
   latency: 0
-  port_pressure: [[1, '237'], [1, '4']]
+  port_pressure: [[1, '23'], [1, '4']]
   throughput: 1.0
   uops: 2
 - name: movq  # with store, complex AGU
@@ -866,7 +866,7 @@ instruction_forms:
     index: ~
     scale: "*"
   latency: 0
-  port_pressure: [[1, '237'], [1, '4']]
+  port_pressure: [[1, '23'], [1, '4']]
   throughput: 1.0
   uops: 2
 - name: movq  # with store, complex AGU
@@ -917,7 +917,7 @@ instruction_forms:
     index: ~
     scale: "*"
   latency: 0
-  port_pressure: [[1, '237'], [1, '4']]
+  port_pressure: [[1, '23'], [1, '4']]
   throughput: 1.0
   uops: 2
 - name: vmovapd  # with store, complex AGU
@@ -968,7 +968,7 @@ instruction_forms:
     index: ~
     scale: "*"
   latency: 0
-  port_pressure: [[1, '237'], [1, '4']]
+  port_pressure: [[1, '23'], [1, '4']]
   throughput: 1.0
   uops: 2
 - name: vmovaps  # with store, complex AGU
@@ -1019,7 +1019,7 @@ instruction_forms:
     index: ~
     scale: "*"
   latency: 0
-  port_pressure: [[1, '237'], [1, '4']]
+  port_pressure: [[1, '23'], [1, '4']]
   throughput: 1.0
   uops: 2
 - name: vmovdqa  # with store, complex AGU
@@ -1070,7 +1070,7 @@ instruction_forms:
     index: ~
     scale: "*"
   latency: 0
-  port_pressure: [[1, '237'], [1, '4']]
+  port_pressure: [[1, '23'], [1, '4']]
   throughput: 1.0
   uops: 2
 - name: vmovdqu  # with store, complex AGU
@@ -1121,7 +1121,7 @@ instruction_forms:
     index: ~
     scale: "*"
   latency: 0
-  port_pressure: [[1, '237'], [1, '4']]
+  port_pressure: [[1, '23'], [1, '4']]
   throughput: 1.0
   uops: 2
 - name: vmovupd  # with store, complex AGU
@@ -1172,7 +1172,7 @@ instruction_forms:
     index: ~
     scale: "*"
   latency: 0
-  port_pressure: [[1, '237'], [1, '4']]
+  port_pressure: [[1, '23'], [1, '4']]
   throughput: 1.0
   uops: 2
 - name: vmovd  # with store, complex AGU
@@ -1223,7 +1223,7 @@ instruction_forms:
     index: ~
     scale: "*"
   latency: 0
-  port_pressure: [[1, '237'], [1, '4']]
+  port_pressure: [[1, '23'], [1, '4']]
   throughput: 1.0
   uops: 2
 - name: vmovq  # with store, complex AGU
