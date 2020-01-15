@@ -1126,24 +1126,11 @@ instruction_forms:
   - class: register
     name: xmm
   - class: register
-    name: xmm
-  latency: 0.0
-  port_pressure: []
-  throughput: 0.0
-  uops: 0
-- name: vmovd  # with load
-  operands:
-  - class: memory
-    base: "*"
-    offset: "*"
-    index: "*"
-    scale: "*"
-  - class: register
-    name: xmm
-  latency: 4.0
-  port_pressure: [[1, '23'], [1, [2D, 3D]]]
-  throughput: 0.5
-  uops: 2
+    name: gpr
+  latency: 1.0  # JH: according to uops.info
+  port_pressure: [[1, '0']]  # JH: according to uops.info
+  throughput: 1.0  # JH: according to uops.info
+  uops: 1  # JH: according to uops.info
 - name: vmovd  # with store, simple AGU
   operands:
   - class: register
@@ -1154,7 +1141,7 @@ instruction_forms:
     index: ~
     scale: "*"
   latency: 0
-  port_pressure: [[1, '237'], [1, '4']]
+  port_pressure: [[1, '23'], [1, '4']]
   throughput: 1.0
   uops: 2
 - name: vmovd  # with store, complex AGU
@@ -1171,18 +1158,17 @@ instruction_forms:
   throughput: 1.0
   uops: 2
 
-
-- name: vmovq
+- name: vmovd
   operands:
   - class: register
-    name: xmm
+    name: gpr
   - class: register
     name: xmm
-  latency: 0.0
-  port_pressure: []
-  throughput: 0.0
-  uops: 0
-- name: vmovq  # with load
+  latency: 1.0  # JH: according to uops.info
+  port_pressure: [[1, '5']]  # JH: according to uops.info
+  throughput: 1.0  # JH: according to uops.info
+  uops: 1  # JH: according to uops.info
+- name: vmovd  # with load
   operands:
   - class: memory
     base: "*"
@@ -1195,6 +1181,17 @@ instruction_forms:
   port_pressure: [[1, '23'], [1, [2D, 3D]]]
   throughput: 0.5
   uops: 2
+
+- name: vmovq
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: gpr
+  latency: 1.0  # JH: according to uops.info
+  port_pressure: [[1, '0']]  # JH: according to uops.info
+  throughput: 1.0  # JH: according to uops.info
+  uops: 1  # JH: according to uops.info
 - name: vmovq  # with store, simple AGU
   operands:
   - class: register
@@ -1205,7 +1202,7 @@ instruction_forms:
     index: ~
     scale: "*"
   latency: 0
-  port_pressure: [[1, '237'], [1, '4']]
+  port_pressure: [[1, '23'], [1, '4']]
   throughput: 1.0
   uops: 2
 - name: vmovq  # with store, complex AGU
@@ -1221,6 +1218,31 @@ instruction_forms:
   port_pressure: [[1, '23'], [1, '4']]
   throughput: 1.0
   uops: 2
+
+- name: vmovq
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: xmm
+  latency: 1.0  # JH: according to uops.info
+  port_pressure: [[1, '5']]  # JH: according to uops.info
+  throughput: 1.0  # JH: according to uops.info
+  uops: 1  # JH: according to uops.info
+- name: movq  # with load
+  operands:
+  - class: memory
+    base: "*"
+    offset: "*"
+    index: "*"
+    scale: "*"
+  - class: register
+    name: xmm
+  latency: 4.0
+  port_pressure: [[1, '23'], [1, [2D, 3D]]]
+  throughput: 0.5
+  uops: 2
+
 
 - name: movhps  # with load
   operands:
@@ -4950,26 +4972,283 @@ instruction_forms:
   port_pressure: [[1, '0'], [1, '5']]
   throughput: 1.0
   uops: 2
-- name: MOVD
+
+- name: movd
+  operands:
+  - class: register
+    name: mm
+  - class: register
+    name: gpr
+  latency: 1.0  # JH: according to uops.info
+  port_pressure: [[1, '0']]  # JH: according to uops.info
+  throughput: 1.0  # JH: according to uops.info
+  uops: 1  # JH: according to uops.info
+- name: movd  # with store, simple AGU
+  operands:
+  - class: register
+    name: mm
+  - class: memory
+    base: "*"
+    offset: "*"
+    index: ~
+    scale: "*"
+  latency: 0
+  port_pressure: [[1, '23'], [1, '4']]
+  throughput: 1.0
+  uops: 2
+- name: movd  # with store, complex AGU
+  operands:
+  - class: register
+    name: mm
+  - class: memory
+    base: "*"
+    offset: "*"
+    index: gpr
+    scale: "*"
+  latency: 0
+  port_pressure: [[1, '23'], [1, '4']]
+  throughput: 1.0
+  uops: 2
+
+
+- name: movd
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: gpr
+  latency: 1.0  # JH: according to uops.info
+  port_pressure: [[1, '0']]  # JH: according to uops.info
+  throughput: 1.0  # JH: according to uops.info
+  uops: 1  # JH: according to uops.info
+- name: movd  # with store, simple AGU
+  operands:
+  - class: register
+    name: xmm
+  - class: memory
+    base: "*"
+    offset: "*"
+    index: ~
+    scale: "*"
+  latency: 0
+  port_pressure: [[1, '23'], [1, '4']]
+  throughput: 1.0
+  uops: 2
+- name: movd  # with store, complex AGU
+  operands:
+  - class: register
+    name: xmm
+  - class: memory
+    base: "*"
+    offset: "*"
+    index: gpr
+    scale: "*"
+  latency: 0
+  port_pressure: [[1, '23'], [1, '4']]
+  throughput: 1.0
+  uops: 2
+
+
+- name: movd
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: mm
+  latency: 1.0  # JH: according to uops.info
+  port_pressure: [[1, '5']]  # JH: according to uops.info
+  throughput: 1.0  # JH: according to uops.info
+  uops: 1  # JH: according to uops.info
+- name: movd  # with load
+  operands:
+  - class: memory
+    base: "*"
+    offset: "*"
+    index: "*"
+    scale: "*"
+  - class: register
+    name: mm
+  latency: 4.0
+  port_pressure: [[1, '23'], [1, [2D, 3D]]]
+  throughput: 0.5
+  uops: 2
+
+
+- name: movd
   operands:
   - class: register
     name: gpr
   - class: register
     name: xmm
-  latency: 1
-  port_pressure: [[1, '5']]
+  latency: 1.0  # JH: according to uops.info
+  port_pressure: [[1, '5']]  # JH: according to uops.info
+  throughput: 1.0  # JH: according to uops.info
+  uops: 1  # JH: according to uops.info
+- name: movd  # with load
+  operands:
+  - class: memory
+    base: "*"
+    offset: "*"
+    index: "*"
+    scale: "*"
+  - class: register
+    name: xmm
+  latency: 4.0
+  port_pressure: [[1, '23'], [1, [2D, 3D]]]
+  throughput: 0.5
+  uops: 2
+
+
+- name: movq
+  operands:
+  - class: register
+    name: mm
+  - class: register
+    name: mm
+  latency: 1.0  # JH: according to uops.info
+  port_pressure: [[1, '015']]  # JH: according to uops.info
+  throughput: 0.3333333333333  # JH: according to uops.info
+  uops: 1  # JH: according to uops.info
+
+
+- name: movq
+  operands:
+  - class: register
+    name: mm
+  - class: register
+    name: mm
+  latency: 1.0  # JH: according to uops.info
+  port_pressure: [[1, '015']]  # JH: according to uops.info
+  throughput: 0.3333333333333  # JH: according to uops.info
+  uops: 1  # JH: according to uops.info
+
+
+- name: movq
+  operands:
+  - class: register
+    name: mm
+  - class: register
+    name: gpr
+  latency: 1.0  # JH: according to uops.info
+  port_pressure: [[1, '0']]  # JH: according to uops.info
+  throughput: 1.0  # JH: according to uops.info
+  uops: 1  # JH: according to uops.info
+- name: movq  # with store, simple AGU
+  operands:
+  - class: register
+    name: mm
+  - class: memory
+    base: "*"
+    offset: "*"
+    index: ~
+    scale: "*"
+  latency: 0
+  port_pressure: [[1, '23'], [1, '4']]
   throughput: 1.0
-  uops: 1
-- name: MOVD
+  uops: 2
+- name: movq  # with store, complex AGU
+  operands:
+  - class: register
+    name: mm
+  - class: memory
+    base: "*"
+    offset: "*"
+    index: gpr
+    scale: "*"
+  latency: 0
+  port_pressure: [[1, '23'], [1, '4']]
+  throughput: 1.0
+  uops: 2
+
+
+- name: movq
   operands:
   - class: register
     name: xmm
   - class: register
     name: gpr
-  latency: 1
-  port_pressure: [[1, '0']]
+  latency: 1.0  # JH: according to uops.info
+  port_pressure: [[1, '0']]  # JH: according to uops.info
+  throughput: 1.0  # JH: according to uops.info
+  uops: 1  # JH: according to uops.info
+- name: movq  # with store, simple AGU
+  operands:
+  - class: register
+    name: xmm
+  - class: memory
+    base: "*"
+    offset: "*"
+    index: ~
+    scale: "*"
+  latency: 0
+  port_pressure: [[1, '23'], [1, '4']]
   throughput: 1.0
-  uops: 1
+  uops: 2
+- name: movq  # with store, complex AGU
+  operands:
+  - class: register
+    name: xmm
+  - class: memory
+    base: "*"
+    offset: "*"
+    index: gpr
+    scale: "*"
+  latency: 0
+  port_pressure: [[1, '23'], [1, '4']]
+  throughput: 1.0
+  uops: 2
+
+
+- name: movq
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: mm
+  latency: 1.0  # JH: according to uops.info
+  port_pressure: [[1, '5']]  # JH: according to uops.info
+  throughput: 1.0  # JH: according to uops.info
+  uops: 1  # JH: according to uops.info
+- name: movq  # with load
+  operands:
+  - class: memory
+    base: "*"
+    offset: "*"
+    index: "*"
+    scale: "*"
+  - class: register
+    name: mm
+  latency: 4.0
+  port_pressure: [[1, '23'], [1, [2D, 3D]]]
+  throughput: 0.5
+  uops: 2
+
+
+- name: movq
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: xmm
+  latency: 1.0  # JH: according to uops.info
+  port_pressure: [[1, '5']]  # JH: according to uops.info
+  throughput: 1.0  # JH: according to uops.info
+  uops: 1  # JH: according to uops.info
+- name: movq  # with load
+  operands:
+  - class: memory
+    base: "*"
+    offset: "*"
+    index: "*"
+    scale: "*"
+  - class: register
+    name: xmm
+  latency: 4.0
+  port_pressure: [[1, '23'], [1, [2D, 3D]]]
+  throughput: 0.5
+  uops: 2
+
+
 - name: MULPD
   operands:
   - class: register
