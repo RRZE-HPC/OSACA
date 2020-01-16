@@ -26,7 +26,7 @@ class MOVEntryBuilder:
             comment = "  # " + comment
         else:
             comment = ""
-        description = '- name: {}{}\n  - operands:\n'.format(instruction_name, comment)
+        description = '- name: {}{}\n  operands:\n'.format(instruction_name, comment)
 
         for ot in operand_types:
             if ot == 'imd':
