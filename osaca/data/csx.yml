@@ -826,6 +826,48 @@ instruction_forms:
   throughput: 0.5
   latency: 4.0  # 	1"*"p01
   port_pressure: [[1, '01']]
+- name: VZEROUPPER  # JH: assumed from SKX
+  operands: []
+  latency: 1
+  port_pressure: [[1, '015'], [3, '0156']]
+  throughput: 1.0
+  uops: 4
+- name: wait
+  operands: []
+  latency: 1
+  port_pressure: []
+  throughput: 1
+  uops: 0
+- name: xadd
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: 3
+  port_pressure: [[3, '0156']]
+  throughput: 0.75
+  uops: 3
+- name: xor  # assumed from SKX
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: gpr
+  latency: 1
+  port_pressure: [[1, '0156']]
+  throughput: 0.25
+  uops: 1
+- name: xor  # assumed from SKX
+  operands:
+  - class: register
+    imd: gpr
+  - class: register
+    name: gpr
+  latency: 1
+  port_pressure: [[1, '0156']]
+  throughput: 0.25
+  uops: 1
 - name: mov                                                 # ./generate_mov_entries.py csx
   operands:                                               # ./generate_mov_entries.py csx
   - class: register                                         # ./generate_mov_entries.py csx

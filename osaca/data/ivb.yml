@@ -525,10 +525,30 @@ instruction_forms:
   port_pressure: [[1, '015'], [1, '23'], [1, '4']]
   throughput: 1.0
   uops: 3
+- name: xadd
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: 3
+  port_pressure: [[3, '015']]
+  throughput: 1.0
+  uops: 3
 - name: XOR
   operands:
   - class: immediate
     imd: int
+  - class: register
+    name: gpr
+  latency: 1
+  port_pressure: [[1, '015']]
+  throughput: 0.3333333333333333
+  uops: 1
+- name: XOR
+  operands:
+  - class: register
+    imd: gpr
   - class: register
     name: gpr
   latency: 1
@@ -802,6 +822,12 @@ instruction_forms:
   port_pressure: [[1, '05']]
   throughput: 0.5
   uops: 1
+- name: wait
+  operands: []
+  latency: 1
+  port_pressure: []
+  throughput: 1
+  uops: 0
 - name: WBINVD
   operands: []
   latency: ~
@@ -5787,6 +5813,12 @@ instruction_forms:
   port_pressure: [[2, '5']]
   throughput: 2.0
   uops: 20
+- name: VZEROUPPER
+  operands: []
+  latency: 2
+  port_pressure: [[1, '015'], [3, '015']]
+  throughput: 1.0
+  uops: 4
 - name: VCOMISS
   operands:
   - class: register

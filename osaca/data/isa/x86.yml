@@ -61,6 +61,31 @@ instruction_forms:
           name: "gpr"
           source: true
           destination: true
+      hidden_operands:
+        - class: "flag"
+          name: "OF"
+          source: true
+          destination: false
+        - class: "flag"
+          name: "SF"
+          source: false
+          destination: true
+        - class: "flag"
+          name: "ZF"
+          source: false
+          destination: true
+        - class: "flag"
+          name: "AF"
+          source: false
+          destination: true
+        - class: "flag"
+          name: "PF"
+          source: false
+          destination: true
+        - class: "flag"
+          name: "CF"
+          source: false
+          destination: true
     - name: add
       operands:
         - class: "register"
@@ -70,6 +95,31 @@ instruction_forms:
         - class: "register"
           name: "gpr"
           source: true
+          destination: true
+      hidden_operands:
+        - class: "flag"
+          name: "OF"
+          source: false
+          destination: true
+        - class: "flag"
+          name: "SF"
+          source: false
+          destination: true
+        - class: "flag"
+          name: "ZF"
+          source: false
+          destination: true
+        - class: "flag"
+          name: "AF"
+          source: false
+          destination: true
+        - class: "flag"
+          name: "PF"
+          source: false
+          destination: true
+        - class: "flag"
+          name: "CF"
+          source: false
           destination: true
     - name: add
       operands:
@@ -84,6 +134,31 @@ instruction_forms:
           scale: "*"
           source: true
           destination: true
+      hidden_operands:
+        - class: "flag"
+          name: "OF"
+          source: false
+          destination: true
+        - class: "flag"
+          name: "SF"
+          source: false
+          destination: true
+        - class: "flag"
+          name: "ZF"
+          source: false
+          destination: true
+        - class: "flag"
+          name: "AF"
+          source: false
+          destination: true
+        - class: "flag"
+          name: "PF"
+          source: false
+          destination: true
+        - class: "flag"
+          name: "CF"
+          source: false
+          destination: true
     - name: add
       operands:
         - class: "register"
@@ -96,6 +171,31 @@ instruction_forms:
           index: "*"
           scale: "*"
           source: true
+          destination: true
+      hidden_operands:
+        - class: "flag"
+          name: "OF"
+          source: false
+          destination: true
+        - class: "flag"
+          name: "SF"
+          source: false
+          destination: true
+        - class: "flag"
+          name: "ZF"
+          source: false
+          destination: true
+        - class: "flag"
+          name: "AF"
+          source: false
+          destination: true
+        - class: "flag"
+          name: "PF"
+          source: false
+          destination: true
+        - class: "flag"
+          name: "CF"
+          source: false
           destination: true
     - name: addsd
       operands:
@@ -253,6 +353,1704 @@ instruction_forms:
           scale: "*"
           source: true
           destination: true
+    - name: cmova
+      operands:
+        - class: "register"
+          name: "gpr"
+          source: true
+          destination: false
+        - class: "register"
+          name: "gpr"
+          source: false
+          destination: true
+      hidden_operands:
+        - class: "flag"
+          name: "CF"
+          source: true
+          destination: false
+        - class: "flag"
+          name: "ZF"
+          source: true
+          destination: false
+    - name: cmova
+      operands:
+        - class: "memory"
+          base: "*"
+          offset: "*"
+          index: "*"
+          scale: "*"
+          source: true
+          destination: false
+        - class: "register"
+          name: "gpr"
+          source: false
+          destination: true
+      hidden_operands:
+        - class: "flag"
+          name: "CF"
+          source: true
+          destination: false
+        - class: "flag"
+          name: "ZF"
+          source: true
+          destination: false
+    - name: cmova
+      operands:
+        - class: "register"
+          name: "gpr"
+          source: true
+          destination: false
+        - class: "memory"
+          base: "*"
+          offset: "*"
+          index: "*"
+          scale: "*"
+          source: false
+          destination: true
+      hidden_operands:
+        - class: "flag"
+          name: "CF"
+          source: true
+          destination: false
+        - class: "flag"
+          name: "ZF"
+          source: true
+          destination: false
+    - name: cmovae
+      operands:
+        - class: "register"
+          name: "gpr"
+          source: true
+          destination: false
+        - class: "register"
+          name: "gpr"
+          source: false
+          destination: true
+      hidden_operands:
+        - class: "flag"
+          name: "CF"
+          source: true
+          destination: false
+    - name: cmovae
+      operands:
+        - class: "memory"
+          base: "*"
+          offset: "*"
+          index: "*"
+          scale: "*"
+          source: true
+          destination: false
+        - class: "register"
+          name: "gpr"
+          source: false
+          destination: true
+      hidden_operands:
+        - class: "flag"
+          name: "CF"
+          source: true
+          destination: false
+    - name: cmovae
+      operands:
+        - class: "register"
+          name: "gpr"
+          source: true
+          destination: false
+        - class: "memory"
+          base: "*"
+          offset: "*"
+          index: "*"
+          scale: "*"
+          source: false
+          destination: true
+      hidden_operands:
+        - class: "flag"
+          name: "CF"
+          source: true
+          destination: false
+    - name: cmovb
+      operands:
+        - class: "register"
+          name: "gpr"
+          source: true
+          destination: false
+        - class: "register"
+          name: "gpr"
+          source: false
+          destination: true
+      hidden_operands:
+        - class: "flag"
+          name: "CF"
+          source: true
+          destination: false
+    - name: cmovb
+      operands:
+        - class: "memory"
+          base: "*"
+          offset: "*"
+          index: "*"
+          scale: "*"
+          source: true
+          destination: false
+        - class: "register"
+          name: "gpr"
+          source: false
+          destination: true
+      hidden_operands:
+        - class: "flag"
+          name: "CF"
+          source: true
+          destination: false
+    - name: cmovb
+      operands:
+        - class: "register"
+          name: "gpr"
+          source: true
+          destination: false
+        - class: "memory"
+          base: "*"
+          offset: "*"
+          index: "*"
+          scale: "*"
+          source: false
+          destination: true
+      hidden_operands:
+        - class: "flag"
+          name: "CF"
+          source: true
+          destination: false
+    - name: cmovbe
+      operands:
+        - class: "register"
+          name: "gpr"
+          source: true
+          destination: false
+        - class: "register"
+          name: "gpr"
+          source: false
+          destination: true
+      hidden_operands:
+        - class: "flag"
+          name: "CF"
+          source: true
+          destination: false
+        - class: "flag"
+          name: "ZF"
+          source: true
+          destination: false
+    - name: cmovbe
+      operands:
+        - class: "memory"
+          base: "*"
+          offset: "*"
+          index: "*"
+          scale: "*"
+          source: true
+          destination: false
+        - class: "register"
+          name: "gpr"
+          source: false
+          destination: true
+      hidden_operands:
+        - class: "flag"
+          name: "CF"
+          source: true
+          destination: false
+        - class: "flag"
+          name: "ZF"
+          source: true
+          destination: false
+    - name: cmovbe
+      operands:
+        - class: "register"
+          name: "gpr"
+          source: true
+          destination: false
+        - class: "memory"
+          base: "*"
+          offset: "*"
+          index: "*"
+          scale: "*"
+          source: false
+          destination: true
+      hidden_operands:
+        - class: "flag"
+          name: "CF"
+          source: true
+          destination: false
+        - class: "flag"
+          name: "ZF"
+          source: true
+          destination: false
+    - name: cmovc
+      operands:
+        - class: "register"
+          name: "gpr"
+          source: true
+          destination: false
+        - class: "register"
+          name: "gpr"
+          source: false
+          destination: true
+      hidden_operands:
+        - class: "flag"
+          name: "CF"
+          source: true
+          destination: false
+    - name: cmovc
+      operands:
+        - class: "memory"
+          base: "*"
+          offset: "*"
+          index: "*"
+          scale: "*"
+          source: true
+          destination: false
+        - class: "register"
+          name: "gpr"
+          source: false
+          destination: true
+      hidden_operands:
+        - class: "flag"
+          name: "CF"
+          source: true
+          destination: false
+    - name: cmovc
+      operands:
+        - class: "register"
+          name: "gpr"
+          source: true
+          destination: false
+        - class: "memory"
+          base: "*"
+          offset: "*"
+          index: "*"
+          scale: "*"
+          source: false
+          destination: true
+      hidden_operands:
+        - class: "flag"
+          name: "CF"
+          source: true
+          destination: false
+    - name: cmove
+      operands:
+        - class: "register"
+          name: "gpr"
+          source: true
+          destination: false
+        - class: "register"
+          name: "gpr"
+          source: false
+          destination: true
+      hidden_operands:
+        - class: "flag"
+          name: "ZF"
+          source: true
+          destination: false
+    - name: cmove
+      operands:
+        - class: "memory"
+          base: "*"
+          offset: "*"
+          index: "*"
+          scale: "*"
+          source: true
+          destination: false
+        - class: "register"
+          name: "gpr"
+          source: false
+          destination: true
+      hidden_operands:
+        - class: "flag"
+          name: "ZF"
+          source: true
+          destination: false
+    - name: cmove
+      operands:
+        - class: "register"
+          name: "gpr"
+          source: true
+          destination: false
+        - class: "memory"
+          base: "*"
+          offset: "*"
+          index: "*"
+          scale: "*"
+          source: false
+          destination: true
+      hidden_operands:
+        - class: "flag"
+          name: "ZF"
+          source: true
+          destination: false
+    - name: cmovg
+      operands:
+        - class: "register"
+          name: "gpr"
+          source: true
+          destination: false
+        - class: "register"
+          name: "gpr"
+          source: false
+          destination: true
+      hidden_operands:
+        - class: "flag"
+          name: "ZF"
+          source: true
+          destination: false
+        - class: "flag"
+          name: "SF"
+          source: true
+          destination: false
+    - name: cmovg
+      operands:
+        - class: "memory"
+          base: "*"
+          offset: "*"
+          index: "*"
+          scale: "*"
+          source: true
+          destination: false
+        - class: "register"
+          name: "gpr"
+          source: false
+          destination: true
+      hidden_operands:
+        - class: "flag"
+          name: "ZF"
+          source: true
+          destination: false
+        - class: "flag"
+          name: "SF"
+          source: true
+          destination: false
+    - name: cmovg
+      operands:
+        - class: "register"
+          name: "gpr"
+          source: true
+          destination: false
+        - class: "memory"
+          base: "*"
+          offset: "*"
+          index: "*"
+          scale: "*"
+          source: false
+          destination: true
+      hidden_operands:
+        - class: "flag"
+          name: "ZF"
+          source: true
+          destination: false
+        - class: "flag"
+          name: "SF"
+          source: true
+          destination: false
+    - name: cmovge
+      operands:
+        - class: "register"
+          name: "gpr"
+          source: true
+          destination: false
+        - class: "register"
+          name: "gpr"
+          source: false
+          destination: true
+      hidden_operands:
+        - class: "flag"
+          name: "SF"
+          source: true
+          destination: false
+    - name: cmovge
+      operands:
+        - class: "memory"
+          base: "*"
+          offset: "*"
+          index: "*"
+          scale: "*"
+          source: true
+          destination: false
+        - class: "register"
+          name: "gpr"
+          source: false
+          destination: true
+      hidden_operands:
+        - class: "flag"
+          name: "SF"
+          source: true
+          destination: false
+    - name: cmovge
+      operands:
+        - class: "register"
+          name: "gpr"
+          source: true
+          destination: false
+        - class: "memory"
+          base: "*"
+          offset: "*"
+          index: "*"
+          scale: "*"
+          source: false
+          destination: true
+      hidden_operands:
+        - class: "flag"
+          name: "SF"
+          source: true
+          destination: false
+    - name: cmovl
+      operands:
+        - class: "register"
+          name: "gpr"
+          source: true
+          destination: false
+        - class: "register"
+          name: "gpr"
+          source: false
+          destination: true
+      hidden_operands:
+        - class: "flag"
+          name: "SF"
+          source: true
+          destination: false
+        - class: "flag"
+          name: "OF"
+          source: true
+          destination: false
+    - name: cmovl
+      operands:
+        - class: "memory"
+          base: "*"
+          offset: "*"
+          index: "*"
+          scale: "*"
+          source: true
+          destination: false
+        - class: "register"
+          name: "gpr"
+          source: false
+          destination: true
+      hidden_operands:
+        - class: "flag"
+          name: "SF"
+          source: true
+          destination: false
+        - class: "flag"
+          name: "OF"
+          source: true
+          destination: false
+    - name: cmovl
+      operands:
+        - class: "register"
+          name: "gpr"
+          source: true
+          destination: false
+        - class: "memory"
+          base: "*"
+          offset: "*"
+          index: "*"
+          scale: "*"
+          source: false
+          destination: true
+      hidden_operands:
+        - class: "flag"
+          name: "SF"
+          source: true
+          destination: false
+        - class: "flag"
+          name: "OF"
+          source: true
+          destination: false
+    - name: cmovle
+      operands:
+        - class: "register"
+          name: "gpr"
+          source: true
+          destination: false
+        - class: "register"
+          name: "gpr"
+          source: false
+          destination: true
+      hidden_operands:
+        - class: "flag"
+          name: "ZF"
+          source: true
+          destination: false
+        - class: "flag"
+          name: "SF"
+          source: true
+          destination: false
+        - class: "flag"
+          name: "OF"
+          source: true
+          destination: false
+    - name: cmovle
+      operands:
+        - class: "memory"
+          base: "*"
+          offset: "*"
+          index: "*"
+          scale: "*"
+          source: true
+          destination: false
+        - class: "register"
+          name: "gpr"
+          source: false
+          destination: true
+      hidden_operands:
+        - class: "flag"
+          name: "ZF"
+          source: true
+          destination: false
+        - class: "flag"
+          name: "SF"
+          source: true
+          destination: false
+        - class: "flag"
+          name: "OF"
+          source: true
+          destination: false
+    - name: cmovle
+      operands:
+        - class: "register"
+          name: "gpr"
+          source: true
+          destination: false
+        - class: "memory"
+          base: "*"
+          offset: "*"
+          index: "*"
+          scale: "*"
+          source: false
+          destination: true
+      hidden_operands:
+        - class: "flag"
+          name: "ZF"
+          source: true
+          destination: false
+        - class: "flag"
+          name: "SF"
+          source: true
+          destination: false
+        - class: "flag"
+          name: "OF"
+          source: true
+          destination: false
+    - name: cmovna
+      operands:
+        - class: "register"
+          name: "gpr"
+          source: true
+          destination: false
+        - class: "register"
+          name: "gpr"
+          source: false
+          destination: true
+      hidden_operands:
+        - class: "flag"
+          name: "CF"
+          source: true
+          destination: false
+        - class: "flag"
+          name: "ZF"
+          source: true
+          destination: false
+    - name: cmovna
+      operands:
+        - class: "memory"
+          base: "*"
+          offset: "*"
+          index: "*"
+          scale: "*"
+          source: true
+          destination: false
+        - class: "register"
+          name: "gpr"
+          source: false
+          destination: true
+      hidden_operands:
+        - class: "flag"
+          name: "CF"
+          source: true
+          destination: false
+        - class: "flag"
+          name: "ZF"
+          source: true
+          destination: false
+    - name: cmovna
+      operands:
+        - class: "register"
+          name: "gpr"
+          source: true
+          destination: false
+        - class: "memory"
+          base: "*"
+          offset: "*"
+          index: "*"
+          scale: "*"
+          source: false
+          destination: true
+      hidden_operands:
+        - class: "flag"
+          name: "CF"
+          source: true
+          destination: false
+        - class: "flag"
+          name: "ZF"
+          source: true
+          destination: false
+    - name: cmovnae
+      operands:
+        - class: "register"
+          name: "gpr"
+          source: true
+          destination: false
+        - class: "register"
+          name: "gpr"
+          source: false
+          destination: true
+      hidden_operands:
+        - class: "flag"
+          name: "CF"
+          source: true
+          destination: false
+    - name: cmovnae
+      operands:
+        - class: "memory"
+          base: "*"
+          offset: "*"
+          index: "*"
+          scale: "*"
+          source: true
+          destination: false
+        - class: "register"
+          name: "gpr"
+          source: false
+          destination: true
+      hidden_operands:
+        - class: "flag"
+          name: "CF"
+          source: true
+          destination: false
+    - name: cmovnae
+      operands:
+        - class: "register"
+          name: "gpr"
+          source: true
+          destination: false
+        - class: "memory"
+          base: "*"
+          offset: "*"
+          index: "*"
+          scale: "*"
+          source: false
+          destination: true
+      hidden_operands:
+        - class: "flag"
+          name: "CF"
+          source: true
+          destination: false
+    - name: cmovnb
+      operands:
+        - class: "register"
+          name: "gpr"
+          source: true
+          destination: false
+        - class: "register"
+          name: "gpr"
+          source: false
+          destination: true
+      hidden_operands:
+        - class: "flag"
+          name: "CF"
+          source: true
+          destination: false
+    - name: cmovnb
+      operands:
+        - class: "memory"
+          base: "*"
+          offset: "*"
+          index: "*"
+          scale: "*"
+          source: true
+          destination: false
+        - class: "register"
+          name: "gpr"
+          source: false
+          destination: true
+      hidden_operands:
+        - class: "flag"
+          name: "CF"
+          source: true
+          destination: false
+    - name: cmovnb
+      operands:
+        - class: "register"
+          name: "gpr"
+          source: true
+          destination: false
+        - class: "memory"
+          base: "*"
+          offset: "*"
+          index: "*"
+          scale: "*"
+          source: false
+          destination: true
+      hidden_operands:
+        - class: "flag"
+          name: "CF"
+          source: true
+          destination: false
+    - name: cmovnbe
+      operands:
+        - class: "register"
+          name: "gpr"
+          source: true
+          destination: false
+        - class: "register"
+          name: "gpr"
+          source: false
+          destination: true
+      hidden_operands:
+        - class: "flag"
+          name: "CF"
+          source: true
+          destination: false
+        - class: "flag"
+          name: "ZF"
+          source: true
+          destination: false
+    - name: cmovnbe
+      operands:
+        - class: "memory"
+          base: "*"
+          offset: "*"
+          index: "*"
+          scale: "*"
+          source: true
+          destination: false
+        - class: "register"
+          name: "gpr"
+          source: false
+          destination: true
+      hidden_operands:
+        - class: "flag"
+          name: "CF"
+          source: true
+          destination: false
+        - class: "flag"
+          name: "ZF"
+          source: true
+          destination: false
+    - name: cmovnbe
+      operands:
+        - class: "register"
+          name: "gpr"
+          source: true
+          destination: false
+        - class: "memory"
+          base: "*"
+          offset: "*"
+          index: "*"
+          scale: "*"
+          source: false
+          destination: true
+      hidden_operands:
+        - class: "flag"
+          name: "CF"
+          source: true
+          destination: false
+        - class: "flag"
+          name: "ZF"
+          source: true
+          destination: false
+    - name: cmovnc
+      operands:
+        - class: "register"
+          name: "gpr"
+          source: true
+          destination: false
+        - class: "register"
+          name: "gpr"
+          source: false
+          destination: true
+      hidden_operands:
+        - class: "flag"
+          name: "CF"
+          source: true
+          destination: false
+    - name: cmovnc
+      operands:
+        - class: "memory"
+          base: "*"
+          offset: "*"
+          index: "*"
+          scale: "*"
+          source: true
+          destination: false
+        - class: "register"
+          name: "gpr"
+          source: false
+          destination: true
+      hidden_operands:
+        - class: "flag"
+          name: "CF"
+          source: true
+          destination: false
+    - name: cmovnc
+      operands:
+        - class: "register"
+          name: "gpr"
+          source: true
+          destination: false
+        - class: "memory"
+          base: "*"
+          offset: "*"
+          index: "*"
+          scale: "*"
+          source: false
+          destination: true
+      hidden_operands:
+        - class: "flag"
+          name: "CF"
+          source: true
+          destination: false
+    - name: cmovne
+      operands:
+        - class: "register"
+          name: "gpr"
+          source: true
+          destination: false
+        - class: "register"
+          name: "gpr"
+          source: false
+          destination: true
+      hidden_operands:
+        - class: "flag"
+          name: "ZF"
+          source: true
+          destination: false
+    - name: cmovne
+      operands:
+        - class: "memory"
+          base: "*"
+          offset: "*"
+          index: "*"
+          scale: "*"
+          source: true
+          destination: false
+        - class: "register"
+          name: "gpr"
+          source: false
+          destination: true
+      hidden_operands:
+        - class: "flag"
+          name: "ZF"
+          source: true
+          destination: false
+    - name: cmovne
+      operands:
+        - class: "register"
+          name: "gpr"
+          source: true
+          destination: false
+        - class: "memory"
+          base: "*"
+          offset: "*"
+          index: "*"
+          scale: "*"
+          source: false
+          destination: true
+      hidden_operands:
+        - class: "flag"
+          name: "ZF"
+          source: true
+          destination: false
+    - name: cmovng
+      operands:
+        - class: "register"
+          name: "gpr"
+          source: true
+          destination: false
+        - class: "register"
+          name: "gpr"
+          source: false
+          destination: true
+      hidden_operands:
+        - class: "flag"
+          name: "ZF"
+          source: true
+          destination: false
+        - class: "flag"
+          name: "SF"
+          source: true
+          destination: false
+        - class: "flag"
+          name: "OF"
+          source: true
+          destination: false
+    - name: cmovng
+      operands:
+        - class: "memory"
+          base: "*"
+          offset: "*"
+          index: "*"
+          scale: "*"
+          source: true
+          destination: false
+        - class: "register"
+          name: "gpr"
+          source: false
+          destination: true
+      hidden_operands:
+        - class: "flag"
+          name: "ZF"
+          source: true
+          destination: false
+        - class: "flag"
+          name: "SF"
+          source: true
+          destination: false
+        - class: "flag"
+          name: "OF"
+          source: true
+          destination: false
+    - name: cmovng
+      operands:
+        - class: "register"
+          name: "gpr"
+          source: true
+          destination: false
+        - class: "memory"
+          base: "*"
+          offset: "*"
+          index: "*"
+          scale: "*"
+          source: false
+          destination: true
+      hidden_operands:
+        - class: "flag"
+          name: "ZF"
+          source: true
+          destination: false
+        - class: "flag"
+          name: "SF"
+          source: true
+          destination: false
+        - class: "flag"
+          name: "OF"
+          source: true
+          destination: false
+    - name: cmovnge
+      operands:
+        - class: "register"
+          name: "gpr"
+          source: true
+          destination: false
+        - class: "register"
+          name: "gpr"
+          source: false
+          destination: true
+      hidden_operands:
+        - class: "flag"
+          name: "ZF"
+          source: true
+          destination: false
+        - class: "flag"
+          name: "OF"
+          source: true
+          destination: false
+    - name: cmovnge
+      operands:
+        - class: "memory"
+          base: "*"
+          offset: "*"
+          index: "*"
+          scale: "*"
+          source: true
+          destination: false
+        - class: "register"
+          name: "gpr"
+          source: false
+          destination: true
+      hidden_operands:
+        - class: "flag"
+          name: "ZF"
+          source: true
+          destination: false
+        - class: "flag"
+          name: "OF"
+          source: true
+          destination: false
+    - name: cmovnge
+      operands:
+        - class: "register"
+          name: "gpr"
+          source: true
+          destination: false
+        - class: "memory"
+          base: "*"
+          offset: "*"
+          index: "*"
+          scale: "*"
+          source: false
+          destination: true
+      hidden_operands:
+        - class: "flag"
+          name: "ZF"
+          source: true
+          destination: false
+        - class: "flag"
+          name: "OF"
+          source: true
+          destination: false
+    - name: cmovnl
+      operands:
+        - class: "register"
+          name: "gpr"
+          source: true
+          destination: false
+        - class: "register"
+          name: "gpr"
+          source: false
+          destination: true
+      hidden_operands:
+        - class: "flag"
+          name: "SF"
+          source: true
+          destination: false
+        - class: "flag"
+          name: "OF"
+          source: true
+          destination: false
+    - name: cmovnl
+      operands:
+        - class: "memory"
+          base: "*"
+          offset: "*"
+          index: "*"
+          scale: "*"
+          source: true
+          destination: false
+        - class: "register"
+          name: "gpr"
+          source: false
+          destination: true
+      hidden_operands:
+        - class: "flag"
+          name: "SF"
+          source: true
+          destination: false
+        - class: "flag"
+          name: "OF"
+          source: true
+          destination: false
+    - name: cmovnl
+      operands:
+        - class: "register"
+          name: "gpr"
+          source: true
+          destination: false
+        - class: "memory"
+          base: "*"
+          offset: "*"
+          index: "*"
+          scale: "*"
+          source: false
+          destination: true
+      hidden_operands:
+        - class: "flag"
+          name: "SF"
+          source: true
+          destination: false
+        - class: "flag"
+          name: "OF"
+          source: true
+          destination: false
+    - name: cmovnle
+      operands:
+        - class: "register"
+          name: "gpr"
+          source: true
+          destination: false
+        - class: "register"
+          name: "gpr"
+          source: false
+          destination: true
+      hidden_operands:
+        - class: "flag"
+          name: "ZF"
+          source: true
+          destination: false
+        - class: "flag"
+          name: "SF"
+          source: true
+          destination: false
+        - class: "flag"
+          name: "OF"
+          source: true
+          destination: false
+    - name: cmovnle
+      operands:
+        - class: "memory"
+          base: "*"
+          offset: "*"
+          index: "*"
+          scale: "*"
+          source: true
+          destination: false
+        - class: "register"
+          name: "gpr"
+          source: false
+          destination: true
+      hidden_operands:
+        - class: "flag"
+          name: "ZF"
+          source: true
+          destination: false
+        - class: "flag"
+          name: "SF"
+          source: true
+          destination: false
+        - class: "flag"
+          name: "OF"
+          source: true
+          destination: false
+    - name: cmovnle
+      operands:
+        - class: "register"
+          name: "gpr"
+          source: true
+          destination: false
+        - class: "memory"
+          base: "*"
+          offset: "*"
+          index: "*"
+          scale: "*"
+          source: false
+          destination: true
+      hidden_operands:
+        - class: "flag"
+          name: "ZF"
+          source: true
+          destination: false
+        - class: "flag"
+          name: "SF"
+          source: true
+          destination: false
+        - class: "flag"
+          name: "OF"
+          source: true
+          destination: false
+    - name: cmovno
+      operands:
+        - class: "register"
+          name: "gpr"
+          source: true
+          destination: false
+        - class: "register"
+          name: "gpr"
+          source: false
+          destination: true
+      hidden_operands:
+        - class: "flag"
+          name: "OF"
+          source: true
+          destination: false
+    - name: cmovno
+      operands:
+        - class: "memory"
+          base: "*"
+          offset: "*"
+          index: "*"
+          scale: "*"
+          source: true
+          destination: false
+        - class: "register"
+          name: "gpr"
+          source: false
+          destination: true
+      hidden_operands:
+        - class: "flag"
+          name: "OF"
+          source: true
+          destination: false
+    - name: cmovno
+      operands:
+        - class: "register"
+          name: "gpr"
+          source: true
+          destination: false
+        - class: "memory"
+          base: "*"
+          offset: "*"
+          index: "*"
+          scale: "*"
+          source: false
+          destination: true
+      hidden_operands:
+        - class: "flag"
+          name: "OF"
+          source: true
+          destination: false
+    - name: cmovnp
+      operands:
+        - class: "register"
+          name: "gpr"
+          source: true
+          destination: false
+        - class: "register"
+          name: "gpr"
+          source: false
+          destination: true
+      hidden_operands:
+        - class: "flag"
+          name: "PF"
+          source: true
+          destination: false
+    - name: cmovnp
+      operands:
+        - class: "memory"
+          base: "*"
+          offset: "*"
+          index: "*"
+          scale: "*"
+          source: true
+          destination: false
+        - class: "register"
+          name: "gpr"
+          source: false
+          destination: true
+      hidden_operands:
+        - class: "flag"
+          name: "PF"
+          source: true
+          destination: false
+    - name: cmovnp
+      operands:
+        - class: "register"
+          name: "gpr"
+          source: true
+          destination: false
+        - class: "memory"
+          base: "*"
+          offset: "*"
+          index: "*"
+          scale: "*"
+          source: false
+          destination: true
+      hidden_operands:
+        - class: "flag"
+          name: "PF"
+          source: true
+          destination: false
+    - name: cmovns
+      operands:
+        - class: "register"
+          name: "gpr"
+          source: true
+          destination: false
+        - class: "register"
+          name: "gpr"
+          source: false
+          destination: true
+      hidden_operands:
+        - class: "flag"
+          name: "SF"
+          source: true
+          destination: false
+    - name: cmovns
+      operands:
+        - class: "memory"
+          base: "*"
+          offset: "*"
+          index: "*"
+          scale: "*"
+          source: true
+          destination: false
+        - class: "register"
+          name: "gpr"
+          source: false
+          destination: true
+      hidden_operands:
+        - class: "flag"
+          name: "SF"
+          source: true
+          destination: false
+    - name: cmovns
+      operands:
+        - class: "register"
+          name: "gpr"
+          source: true
+          destination: false
+        - class: "memory"
+          base: "*"
+          offset: "*"
+          index: "*"
+          scale: "*"
+          source: false
+          destination: true
+      hidden_operands:
+        - class: "flag"
+          name: "SF"
+          source: true
+          destination: false
+    - name: cmovnz
+      operands:
+        - class: "register"
+          name: "gpr"
+          source: true
+          destination: false
+        - class: "register"
+          name: "gpr"
+          source: false
+          destination: true
+      hidden_operands:
+        - class: "flag"
+          name: "ZF"
+          source: true
+          destination: false
+    - name: cmovnz
+      operands:
+        - class: "memory"
+          base: "*"
+          offset: "*"
+          index: "*"
+          scale: "*"
+          source: true
+          destination: false
+        - class: "register"
+          name: "gpr"
+          source: false
+          destination: true
+      hidden_operands:
+        - class: "flag"
+          name: "ZF"
+          source: true
+          destination: false
+    - name: cmovnz
+      operands:
+        - class: "register"
+          name: "gpr"
+          source: true
+          destination: false
+        - class: "memory"
+          base: "*"
+          offset: "*"
+          index: "*"
+          scale: "*"
+          source: false
+          destination: true
+      hidden_operands:
+        - class: "flag"
+          name: "ZF"
+          source: true
+          destination: false
+    - name: cmovo
+      operands:
+        - class: "register"
+          name: "gpr"
+          source: true
+          destination: false
+        - class: "register"
+          name: "gpr"
+          source: false
+          destination: true
+      hidden_operands:
+        - class: "flag"
+          name: "OF"
+          source: true
+          destination: false
+    - name: cmovo
+      operands:
+        - class: "memory"
+          base: "*"
+          offset: "*"
+          index: "*"
+          scale: "*"
+          source: true
+          destination: false
+        - class: "register"
+          name: "gpr"
+          source: false
+          destination: true
+      hidden_operands:
+        - class: "flag"
+          name: "OF"
+          source: true
+          destination: false
+    - name: cmovo
+      operands:
+        - class: "register"
+          name: "gpr"
+          source: true
+          destination: false
+        - class: "memory"
+          base: "*"
+          offset: "*"
+          index: "*"
+          scale: "*"
+          source: false
+          destination: true
+      hidden_operands:
+        - class: "flag"
+          name: "OF"
+          source: true
+          destination: false
+    - name: cmovp
+      operands:
+        - class: "register"
+          name: "gpr"
+          source: true
+          destination: false
+        - class: "register"
+          name: "gpr"
+          source: false
+          destination: true
+      hidden_operands:
+        - class: "flag"
+          name: "PF"
+          source: true
+          destination: false
+    - name: cmovp
+      operands:
+        - class: "memory"
+          base: "*"
+          offset: "*"
+          index: "*"
+          scale: "*"
+          source: true
+          destination: false
+        - class: "register"
+          name: "gpr"
+          source: false
+          destination: true
+      hidden_operands:
+        - class: "flag"
+          name: "PF"
+          source: true
+          destination: false
+    - name: cmovp
+      operands:
+        - class: "register"
+          name: "gpr"
+          source: true
+          destination: false
+        - class: "memory"
+          base: "*"
+          offset: "*"
+          index: "*"
+          scale: "*"
+          source: false
+          destination: true
+      hidden_operands:
+        - class: "flag"
+          name: "PF"
+          source: true
+          destination: false
+    - name: cmovpe
+      operands:
+        - class: "register"
+          name: "gpr"
+          source: true
+          destination: false
+        - class: "register"
+          name: "gpr"
+          source: false
+          destination: true
+      hidden_operands:
+        - class: "flag"
+          name: "PF"
+          source: true
+          destination: false
+    - name: cmovpe
+      operands:
+        - class: "memory"
+          base: "*"
+          offset: "*"
+          index: "*"
+          scale: "*"
+          source: true
+          destination: false
+        - class: "register"
+          name: "gpr"
+          source: false
+          destination: true
+      hidden_operands:
+        - class: "flag"
+          name: "PF"
+          source: true
+          destination: false
+    - name: cmovpe
+      operands:
+        - class: "register"
+          name: "gpr"
+          source: true
+          destination: false
+        - class: "memory"
+          base: "*"
+          offset: "*"
+          index: "*"
+          scale: "*"
+          source: false
+          destination: true
+      hidden_operands:
+        - class: "flag"
+          name: "PF"
+          source: true
+          destination: false
+    - name: cmovpo
+      operands:
+        - class: "register"
+          name: "gpr"
+          source: true
+          destination: false
+        - class: "register"
+          name: "gpr"
+          source: false
+          destination: true
+      hidden_operands:
+        - class: "flag"
+          name: "PF"
+          source: true
+          destination: false
+    - name: cmovpo
+      operands:
+        - class: "memory"
+          base: "*"
+          offset: "*"
+          index: "*"
+          scale: "*"
+          source: true
+          destination: false
+        - class: "register"
+          name: "gpr"
+          source: false
+          destination: true
+      hidden_operands:
+        - class: "flag"
+          name: "PF"
+          source: true
+          destination: false
+    - name: cmovpo
+      operands:
+        - class: "register"
+          name: "gpr"
+          source: true
+          destination: false
+        - class: "memory"
+          base: "*"
+          offset: "*"
+          index: "*"
+          scale: "*"
+          source: false
+          destination: true
+      hidden_operands:
+        - class: "flag"
+          name: "PF"
+          source: true
+          destination: false
+    - name: cmovs
+      operands:
+        - class: "register"
+          name: "gpr"
+          source: true
+          destination: false
+        - class: "register"
+          name: "gpr"
+          source: false
+          destination: true
+      hidden_operands:
+        - class: "flag"
+          name: "SF"
+          source: true
+          destination: false
+    - name: cmovs
+      operands:
+        - class: "memory"
+          base: "*"
+          offset: "*"
+          index: "*"
+          scale: "*"
+          source: true
+          destination: false
+        - class: "register"
+          name: "gpr"
+          source: false
+          destination: true
+      hidden_operands:
+        - class: "flag"
+          name: "SF"
+          source: true
+          destination: false
+    - name: cmovs
+      operands:
+        - class: "register"
+          name: "gpr"
+          source: true
+          destination: false
+        - class: "memory"
+          base: "*"
+          offset: "*"
+          index: "*"
+          scale: "*"
+          source: false
+          destination: true
+      hidden_operands:
+        - class: "flag"
+          name: "SF"
+          source: true
+          destination: false
+    - name: cmovz
+      operands:
+        - class: "register"
+          name: "gpr"
+          source: true
+          destination: false
+        - class: "register"
+          name: "gpr"
+          source: false
+          destination: true
+      hidden_operands:
+        - class: "flag"
+          name: "ZF"
+          source: true
+          destination: false
+    - name: cmovz
+      operands:
+        - class: "memory"
+          base: "*"
+          offset: "*"
+          index: "*"
+          scale: "*"
+          source: true
+          destination: false
+        - class: "register"
+          name: "gpr"
+          source: false
+          destination: true
+      hidden_operands:
+        - class: "flag"
+          name: "ZF"
+          source: true
+          destination: false
+    - name: cmovz
+      operands:
+        - class: "register"
+          name: "gpr"
+          source: true
+          destination: false
+        - class: "memory"
+          base: "*"
+          offset: "*"
+          index: "*"
+          scale: "*"
+          source: false
+          destination: true
+      hidden_operands:
+        - class: "flag"
+          name: "ZF"
+          source: true
+          destination: false
     - name: cmp
       operands:
         - class: "immediate"
@@ -263,6 +2061,31 @@ instruction_forms:
           name: "gpr"
           source: true
           destination: false
+      hidden_operands:
+        - class: "flag"
+          name: "CF"
+          source: false
+          destination: true
+        - class: "flag"
+          name: "OF"
+          source: false
+          destination: true
+        - class: "flag"
+          name: "SF"
+          source: false
+          destination: true
+        - class: "flag"
+          name: "ZF"
+          source: false
+          destination: true
+        - class: "flag"
+          name: "AF"
+          source: false
+          destination: true
+        - class: "flag"
+          name: "PF"
+          source: false
+          destination: true
     - name: cmp
       operands:
         - class: "immediate"
@@ -276,6 +2099,31 @@ instruction_forms:
           scale: "*"
           source: true
           destination: false
+      hidden_operands:
+        - class: "flag"
+          name: "CF"
+          source: false
+          destination: true
+        - class: "flag"
+          name: "OF"
+          source: false
+          destination: true
+        - class: "flag"
+          name: "SF"
+          source: false
+          destination: true
+        - class: "flag"
+          name: "ZF"
+          source: false
+          destination: true
+        - class: "flag"
+          name: "AF"
+          source: false
+          destination: true
+        - class: "flag"
+          name: "PF"
+          source: false
+          destination: true
     - name: cmp
       operands:
         - class: "register"
@@ -286,6 +2134,31 @@ instruction_forms:
           name: "gpr"
           source: true
           destination: false
+      hidden_operands:
+        - class: "flag"
+          name: "CF"
+          source: false
+          destination: true
+        - class: "flag"
+          name: "OF"
+          source: false
+          destination: true
+        - class: "flag"
+          name: "SF"
+          source: false
+          destination: true
+        - class: "flag"
+          name: "ZF"
+          source: false
+          destination: true
+        - class: "flag"
+          name: "AF"
+          source: false
+          destination: true
+        - class: "flag"
+          name: "PF"
+          source: false
+          destination: true
     - name: cmp
       operands:
         - class: "register"
@@ -299,11 +2172,57 @@ instruction_forms:
           scale: "*"
           source: true
           destination: false
+      hidden_operands:
+        - class: "flag"
+          name: "CF"
+          source: false
+          destination: true
+        - class: "flag"
+          name: "OF"
+          source: false
+          destination: true
+        - class: "flag"
+          name: "SF"
+          source: false
+          destination: true
+        - class: "flag"
+          name: "ZF"
+          source: false
+          destination: true
+        - class: "flag"
+          name: "AF"
+          source: false
+          destination: true
+        - class: "flag"
+          name: "PF"
+          source: false
+          destination: true
     - name: dec
       operands:
         - class: "register"
           name: "gpr"
           source: true
+          destination: true
+      hidden_operands:
+        - class: "flag"
+          name: "OF"
+          source: false
+          destination: true
+        - class: "flag"
+          name: "SF"
+          source: false
+          destination: true
+        - class: "flag"
+          name: "ZF"
+          source: false
+          destination: true
+        - class: "flag"
+          name: "AF"
+          source: false
+          destination: true
+        - class: "flag"
+          name: "PF"
+          source: false
           destination: true
     - name: dec
       operands:
@@ -313,6 +2232,27 @@ instruction_forms:
           index: "*"
           scale: "*"
           source: true
+          destination: true
+      hidden_operands:
+        - class: "flag"
+          name: "OF"
+          source: false
+          destination: true
+        - class: "flag"
+          name: "SF"
+          source: false
+          destination: true
+        - class: "flag"
+          name: "ZF"
+          source: false
+          destination: true
+        - class: "flag"
+          name: "AF"
+          source: false
+          destination: true
+        - class: "flag"
+          name: "PF"
+          source: false
           destination: true
     - name: imul
       operands:
@@ -324,6 +2264,15 @@ instruction_forms:
           name: "gpr"
           source: true
           destination: true
+      hidden_operands:
+        - class: "flag"
+          name: "CF"
+          source: false
+          destination: true
+        - class: "flag"
+          name: "OF"
+          source: false
+          destination: true
     - name: imul
       operands:
         - class: "memory"
@@ -337,11 +2286,41 @@ instruction_forms:
           name: "gpr"
           source: true
           destination: true
+      hidden_operands:
+        - class: "flag"
+          name: "CF"
+          source: false
+          destination: true
+        - class: "flag"
+          name: "OF"
+          source: false
+          destination: true
     - name: inc
       operands:
         - class: "register"
           name: "gpr"
           source: true
+          destination: true
+      hidden_operands:
+        - class: "flag"
+          name: "OF"
+          source: false
+          destination: true
+        - class: "flag"
+          name: "SF"
+          source: false
+          destination: true
+        - class: "flag"
+          name: "ZF"
+          source: false
+          destination: true
+        - class: "flag"
+          name: "AF"
+          source: false
+          destination: true
+        - class: "flag"
+          name: "PF"
+          source: false
           destination: true
     - name: inc
       operands:
@@ -351,6 +2330,27 @@ instruction_forms:
           index: "*"
           scale: "*"
           source: true
+          destination: true
+      hidden_operands:
+        - class: "flag"
+          name: "OF"
+          source: false
+          destination: true
+        - class: "flag"
+          name: "SF"
+          source: false
+          destination: true
+        - class: "flag"
+          name: "ZF"
+          source: false
+          destination: true
+        - class: "flag"
+          name: "AF"
+          source: false
+          destination: true
+        - class: "flag"
+          name: "PF"
+          source: false
           destination: true
     - name: mulsd
       operands:
@@ -382,6 +2382,31 @@ instruction_forms:
           name: "gpr"
           source: true
           destination: true
+      hidden_operands:
+        - class: "flag"
+          name: "OF"
+          source: false
+          destination: true
+        - class: "flag"
+          name: "SF"
+          source: false
+          destination: true
+        - class: "flag"
+          name: "ZF"
+          source: false
+          destination: true
+        - class: "flag"
+          name: "AF"
+          source: false
+          destination: true
+        - class: "flag"
+          name: "PF"
+          source: false
+          destination: true
+        - class: "flag"
+          name: "CF"
+          source: false
+          destination: true
     - name: sub
       operands:
         - class: "register"
@@ -391,6 +2416,31 @@ instruction_forms:
         - class: "register"
           name: "gpr"
           source: true
+          destination: true
+      hidden_operands:
+        - class: "flag"
+          name: "OF"
+          source: false
+          destination: true
+        - class: "flag"
+          name: "SF"
+          source: false
+          destination: true
+        - class: "flag"
+          name: "ZF"
+          source: false
+          destination: true
+        - class: "flag"
+          name: "AF"
+          source: false
+          destination: true
+        - class: "flag"
+          name: "PF"
+          source: false
+          destination: true
+        - class: "flag"
+          name: "CF"
+          source: false
           destination: true
     - name: sub
       operands:
@@ -405,6 +2455,31 @@ instruction_forms:
           scale: "*"
           source: true
           destination: true
+      hidden_operands:
+        - class: "flag"
+          name: "OF"
+          source: false
+          destination: true
+        - class: "flag"
+          name: "SF"
+          source: false
+          destination: true
+        - class: "flag"
+          name: "ZF"
+          source: false
+          destination: true
+        - class: "flag"
+          name: "AF"
+          source: false
+          destination: true
+        - class: "flag"
+          name: "PF"
+          source: false
+          destination: true
+        - class: "flag"
+          name: "CF"
+          source: false
+          destination: true
     - name: sub
       operands:
         - class: "register"
@@ -417,6 +2492,129 @@ instruction_forms:
           index: "*"
           scale: "*"
           source: true
+          destination: true
+      hidden_operands:
+        - class: "flag"
+          name: "OF"
+          source: false
+          destination: true
+        - class: "flag"
+          name: "SF"
+          source: false
+          destination: true
+        - class: "flag"
+          name: "ZF"
+          source: false
+          destination: true
+        - class: "flag"
+          name: "AF"
+          source: false
+          destination: true
+        - class: "flag"
+          name: "PF"
+          source: false
+          destination: true
+        - class: "flag"
+          name: "CF"
+          source: false
+          destination: true
+    - name: test
+      operands:
+        - class: "register"
+          name: "gpr"
+          source: true
+          destination: false
+        - class: "register"
+          name: "gpr"
+          source: true
+          destination: false
+      hidden_operands:
+        - class: "flag"
+          name: "SF"
+          source: false
+          destination: true
+        - class: "flag"
+          name: "ZF"
+          source: false
+          destination: true
+        - class: "flag"
+          name: "PF"
+          source: false
+          destination: true
+    - name: test
+      operands:
+        - class: "register"
+          name: "gpr"
+          source: true
+          destination: false
+        - class: "memory"
+          base: "*"
+          offset: "*"
+          index: "*"
+          scale: "*"
+          source: true
+          destination: false
+      hidden_operands:
+        - class: "flag"
+          name: "SF"
+          source: false
+          destination: true
+        - class: "flag"
+          name: "ZF"
+          source: false
+          destination: true
+        - class: "flag"
+          name: "PF"
+          source: false
+          destination: true
+    - name: test
+      operands:
+        - class: "immediate"
+          imd: "int"
+          source: true
+          destination: false
+        - class: "memory"
+          base: "*"
+          offset: "*"
+          index: "*"
+          scale: "*"
+          source: true
+          destination: false
+      hidden_operands:
+        - class: "flag"
+          name: "SF"
+          source: false
+          destination: true
+        - class: "flag"
+          name: "ZF"
+          source: false
+          destination: true
+        - class: "flag"
+          name: "PF"
+          source: false
+          destination: true
+    - name: test
+      operands:
+        - class: "immediate"
+          imd: "int"
+          source: true
+          destination: false
+        - class: "register"
+          name: "gpr"
+          source: true
+          destination: false
+      hidden_operands:
+        - class: "flag"
+          name: "SF"
+          source: false
+          destination: true
+        - class: "flag"
+          name: "ZF"
+          source: false
+          destination: true
+        - class: "flag"
+          name: "PF"
+          source: false
           destination: true
     - name: vfmadd132pd
       operands:
@@ -499,4 +2697,138 @@ instruction_forms:
           index: "*"
           scale: "*"
           source: true
+          destination: true
+    - name: vzeroall
+      hidden_operands:
+        - class: "register"
+          name: "ymm0"
+          source: false
+          destination: true
+        - class: "register"
+          name: "ymm1"
+          source: false
+          destination: true
+        - class: "register"
+          name: "ymm2"
+          source: false
+          destination: true
+        - class: "register"
+          name: "ymm3"
+          source: false
+          destination: true
+        - class: "register"
+          name: "ymm4"
+          source: false
+          destination: true
+        - class: "register"
+          name: "ymm5"
+          source: false
+          destination: true
+        - class: "register"
+          name: "ymm6"
+          source: false
+          destination: true
+        - class: "register"
+          name: "ymm7"
+          source: false
+          destination: true
+        - class: "register"
+          name: "ymm8"
+          source: false
+          destination: true
+        - class: "register"
+          name: "ymm9"
+          source: false
+          destination: true
+        - class: "register"
+          name: "ymm10"
+          source: false
+          destination: true
+        - class: "register"
+          name: "ymm11"
+          source: false
+          destination: true
+        - class: "register"
+          name: "ymm12"
+          source: false
+          destination: true
+        - class: "register"
+          name: "ymm13"
+          source: false
+          destination: true
+        - class: "register"
+          name: "ymm14"
+          source: false
+          destination: true
+        - class: "register"
+          name: "ymm15"
+          source: false
+          destination: true
+    - name: vzeroupper
+      # TODO not quite correct:
+      # only upper half is zeroed, not the xmm part
+      hidden_operands:
+        - class: "register"
+          name: "ymm0"
+          source: false
+          destination: true
+        - class: "register"
+          name: "ymm1"
+          source: false
+          destination: true
+        - class: "register"
+          name: "ymm2"
+          source: false
+          destination: true
+        - class: "register"
+          name: "ymm3"
+          source: false
+          destination: true
+        - class: "register"
+          name: "ymm4"
+          source: false
+          destination: true
+        - class: "register"
+          name: "ymm5"
+          source: false
+          destination: true
+        - class: "register"
+          name: "ymm6"
+          source: false
+          destination: true
+        - class: "register"
+          name: "ymm7"
+          source: false
+          destination: true
+        - class: "register"
+          name: "ymm8"
+          source: false
+          destination: true
+        - class: "register"
+          name: "ymm9"
+          source: false
+          destination: true
+        - class: "register"
+          name: "ymm10"
+          source: false
+          destination: true
+        - class: "register"
+          name: "ymm11"
+          source: false
+          destination: true
+        - class: "register"
+          name: "ymm12"
+          source: false
+          destination: true
+        - class: "register"
+          name: "ymm13"
+          source: false
+          destination: true
+        - class: "register"
+          name: "ymm14"
+          source: false
+          destination: true
+        - class: "register"
+          name: "ymm15"
+          source: false
           destination: true

@@ -213,6 +213,12 @@ instruction_forms:
   throughput: 0.0
   latency: 0.0
   port_pressure: []
+- name: wait
+  operands: []
+  latency: 1
+  port_pressure: []
+  throughput: 1
+  uops: 0
 - name: WRMSR
   operands: []
   latency: ~
@@ -573,10 +579,30 @@ instruction_forms:
   port_pressure: [[1, '0156'], [1, '237'], [1, '4']]
   throughput: 1.0
   uops: 3
+- name: xadd
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: 3
+  port_pressure: [[3, '0156']]
+  throughput: 0.75
+  uops: 3
 - name: XOR
   operands:
   - class: immediate
     imd: int
+  - class: register
+    name: gpr
+  latency: 1
+  port_pressure: [[1, '0156']]
+  throughput: 0.25
+  uops: 1
+- name: XOR
+  operands:
+  - class: register
+    imd: gpr
   - class: register
     name: gpr
   latency: 1
@@ -7294,10 +7320,10 @@ instruction_forms:
   uops: 1
 - name: VZEROUPPER
   operands: []
-  latency: ~
+  latency: 1
   port_pressure: [[1, '015'], [3, '0156']]
-  throughput: 1.0833333333333333
-  uops: 0
+  throughput: 1.0
+  uops: 4
 - name: VANDNPS
   operands:
   - class: register
