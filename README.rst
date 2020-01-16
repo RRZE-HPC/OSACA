@@ -13,12 +13,8 @@ auto-generating of testcases for assembly instructions creating latency
 and throughput benchmarks on a specific instruction form and throughput
 analysis and throughput prediction for a innermost loop kernel.
 
-.. image:: https://travis-ci.org/RRZE-HPC/OSACA.svg?token=393L6z2HEXNiGLtZ43s6&branch=master
+.. image:: https://travis-ci.org/RRZE-HPC/OSACA.svg?branch=master
     :target: https://travis-ci.org/RRZE-HPC/OSACA
-
-.. ..image:: https://landscape.io/github/RRZE-HPC/OSACA/master/landscape.svg?style=flat&badge_auth_token=c95f01b247f94bc79c09d21c5c827697
-..   :target: https://landscape.io/github/RRZE-HPC/OSACA/master
-..   :alt: Code Health
 
 .. image:: https://codecov.io/github/RRZE-HPC/OSACA/coverage.svg?branch=master
     :target: https://codecov.io/github/RRZE-HPC/OSACA?branch=master
