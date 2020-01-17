@@ -323,9 +323,25 @@ instruction_forms:
   port_pressure: [[1, '0156']]
   throughput: 0.25
   uops: 1
-- name: PUSHFW
+- name: PUSH
+  operands:
+  - class: immediate
+    imd: int
+  latency: 5
+  port_pressure: [[1, '237'], [1, '4']]
+  throughput: 1.0
+  uops: 2
+- name: PUSH
+  operands:
+  - class: register
+    name: gpr
+  latency: 5
+  port_pressure: [[1, '1'], [1, '237'], [1, '4']]
+  throughput: 1.0
+  uops: 3
+- name: PUSHF
   operands: []
-  latency: 9
+  latency: 7
   port_pressure: [[1, '237'], [1, '4']]
   throughput: 1.0
   uops: 4
@@ -906,38 +922,6 @@ instruction_forms:
   port_pressure: [[1, '1']]
   throughput: 1.0
   uops: 1
-- name: PUSH
-  operands:
-  - class: register
-    name: gpr
-  latency: ~
-  port_pressure: [[1, '1'], [1, '237'], [1, '4']]
-  throughput: 1.0
-  uops: 3
-- name: PUSHW
-  operands:
-  - class: immediate
-    imd: int
-  latency: ~
-  port_pressure: [[1, '237'], [1, '4']]
-  throughput: 1.0
-  uops: 2
-- name: PUSH
-  operands:
-  - class: immediate
-    imd: int
-  latency: ~
-  port_pressure: [[1, '237'], [1, '4']]
-  throughput: 1.0
-  uops: 2
-- name: PUSHW
-  operands:
-  - class: register
-    name: gpr
-  latency: ~
-  port_pressure: [[1, '1'], [1, '237'], [1, '4']]
-  throughput: 1.0
-  uops: 3
 - name: SETNO
   operands:
   - class: register
@@ -4462,9 +4446,9 @@ instruction_forms:
 - name: PUNPCKLWD
   operands:
   - class: register
-    name: gpr
+    name: mm
   - class: register
-    name: gpr
+    name: mm
   latency: 1
   port_pressure: [[1, '5']]
   throughput: 1.0
@@ -5039,12 +5023,6 @@ instruction_forms:
   port_pressure: [[10, '06'], [1, '1'], [1, '5']]
   throughput: 5.0
   uops: 12
-- name: PUSHFQ
-  operands: []
-  latency: 9
-  port_pressure: [[1, '237'], [1, '4']]
-  throughput: 1.0
-  uops: 4
 - name: MOVSXD
   operands:
   - class: register
@@ -6747,6 +6725,28 @@ instruction_forms:
   port_pressure: [[1, '015']]
   throughput: 0.3333333333333333
   uops: 1
+- name: VSTMXCSR
+  operands:
+  - class: memory
+    base: "*"
+    offset: "*"
+    index: ~
+    scale: "*"
+  latency: 9
+  port_pressure: [[1, '0'], [1, '06'], [1, '237'], [1, '4']]
+  throughput: 1
+  uops: 4
+- name: VSTMXCSR
+  operands:
+  - class: memory
+    base: "*"
+    offset: "*"
+    index: "gpr"
+    scale: "*"
+  latency: 9
+  port_pressure: [[1, '0'], [1, '06'], [1, '23'], [1, '4']]
+  throughput: 1
+  uops: 4
 - name: VSQRTSD
   operands:
   - class: register
@@ -8021,6 +8021,30 @@ instruction_forms:
   port_pressure: [[1, '1']]
   throughput: 1.0
   uops: 1
+- name: vcvtss2sd
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '0']]
+  throughput: 1.0
+  uops: 1
+- name: vcvtsi2ss
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 5
+  port_pressure: [[1, '1'], [2, '5']]
+  throughput: 1.0
+  uops: 1
 - name: VCVTSS2SI
   operands:
   - class: register
@@ -8705,6 +8729,17 @@ instruction_forms:
   port_pressure: [[1, '5']]
   throughput: 1.0
   uops: 1
+- name: vpsrld
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '0'], [1, '15']]
+  throughput: 1
 - name: VPSRLD
   operands:
   - class: immediate

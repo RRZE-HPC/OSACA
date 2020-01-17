@@ -2352,6 +2352,16 @@ instruction_forms:
           name: "PF"
           source: false
           destination: true
+    - name: ldmxcsr
+      operands:
+        - class: "memory"
+          base: "*"
+          offset: "*"
+          index: "*"
+          scale: "*"
+          source: true
+          destination: false
+      # TODO sets MXCSR
     - name: mulsd
       operands:
         - class: "register"
@@ -2372,6 +2382,99 @@ instruction_forms:
           name: "xmm"
           source: true
           destination: false
+    - name: push
+      operands:
+        - class: "register"
+          name: "gpr"
+          source: true
+          destination: false
+      hidden_operands:
+        - class: "memory"
+          base: "gpr"
+          offset: ~
+          index: ~
+          scale: 1
+          source: false
+          destination: true
+        - class: "register"
+          name: "rsp"
+          source: true
+          destination: true
+    - name: pushfq
+      operands: []
+      hidden_operands:
+        - class: "memory"
+          base: "gpr"
+          offset: ~
+          index: ~
+          scale: 1
+          source: false
+          destination: true
+        - class: "register"
+          name: "rsp"
+          source: true
+          destination: true
+        # All of EFLAGS and RFLAGS, without VM and RF
+        - class: "flag"
+          name: "CF"
+          source: true
+          destination: false
+        - class: "flag"
+          name: "PF"
+          source: true
+          destination: false
+        - class: "flag"
+          name: "AF"
+          source: true
+          destination: false
+        - class: "flag"
+          name: "ZF"
+          source: true
+          destination: false
+        - class: "flag"
+          name: "SF"
+          source: true
+          destination: false
+        - class: "flag"
+          name: "TF"
+          source: true
+          destination: false
+        - class: "flag"
+          name: "IF"
+          source: true
+          destination: false
+        - class: "flag"
+          name: "DF"
+          source: true
+          destination: false
+        - class: "flag"
+          name: "OF"
+          source: true
+          destination: false
+        - class: "flag"
+          name: "IOPL"
+          source: true
+          destination: false
+        - class: "flag"
+          name: "NT"
+          source: true
+          destination: false
+        - class: "flag"
+          name: "AC"
+          source: true
+          destination: false
+        - class: "flag"
+          name: "VIF"
+          source: true
+          destination: false
+        - class: "flag"
+          name: "VIP"
+          source: true
+          destination: false
+        - class: "flag"
+          name: "ID"
+          source: true
+          destination: false
     - name: sub
       operands:
         - class: "immediate"
@@ -2616,6 +2719,16 @@ instruction_forms:
           name: "PF"
           source: false
           destination: true
+    - name: vldmxcsr
+      operands:
+        - class: "memory"
+          base: "*"
+          offset: "*"
+          index: "*"
+          scale: "*"
+          source: true
+          destination: false
+      # TODO sets MXCSR
     - name: vfmadd132pd
       operands:
         - class: "memory"

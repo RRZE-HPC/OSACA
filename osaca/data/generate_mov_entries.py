@@ -358,6 +358,10 @@ snb_mov_instructions = [
     ('movsb mem gpr', ('', 0)),  # AT&T version
     ('movsw gpr gpr', ('1*p015', 1)),  # AT&T version
     ('movsw mem gpr', ('', 0)),  # AT&T version
+    ('movsl gpr gpr', ('1*p015', 1)),  # AT&T version
+    ('movsl mem gpr', ('', 0)),  # AT&T version
+    ('movsq gpr gpr', ('1*p015', 1)),  # AT&T version
+    ('movsq mem gpr', ('', 0)),  # AT&T version
 
     # https://www.felixcloutier.com/x86/movupd
     ('movupd xmm xmm', ('1*p5', 1)),
@@ -388,6 +392,10 @@ snb_mov_instructions = [
     ('movzb mem gpr', ('', 0)),  # AT&T version
     ('movzw gpr gpr', ('1*p015', 1)),  # AT&T version
     ('movzw mem gpr', ('', 0)),  # AT&T version
+    ('movzl gpr gpr', ('1*p015', 1)),  # AT&T version
+    ('movzl mem gpr', ('', 0)),  # AT&T version
+    ('movzq gpr gpr', ('1*p015', 1)),  # AT&T version
+    ('movzq mem gpr', ('', 0)),  # AT&T version
 
     # https://www.felixcloutier.com/x86/cmovcc
     ('cmova gpr gpr', ('1*p015+2*p05', 2)),
@@ -452,10 +460,9 @@ snb_mov_instructions = [
     ('cmovz mem gpr', ('1*p015+1*p05', 2)),
 
     # https://www.felixcloutier.com/x86/pmovmskb
-    ('pmovmskb gpr mm', ('1*p0', 2)),
-    ('pmovmskb gpr xmm', ('1*p0', 2)),
-    ('vpmovmskb gpr xmm', ('1*p0', 2)),
-    ('vpmovmskb gpr ymm', ('1*p0', 2)),
+    ('pmovmskb mm gpr', ('1*p0', 2)),
+    ('pmovmskb xmm gpr', ('1*p0', 2)),
+    ('vpmovmskb xmm gpr', ('1*p0', 2)),
     
     # https://www.felixcloutier.com/x86/pmovsx
     ('pmovsxbw xmm xmm', ('1*p15', 1)),
@@ -543,13 +550,17 @@ hsw_mov_instructions = list(OrderedDict(ivb_mov_instructions + [
 
     # https://www.felixcloutier.com/x86/movsx:movsxd
     ('movsx gpr gpr', ('1*p0156', 1)),
-    ('movsb gpr gpr', ('1*p015', 1)),  # AT&T version
-    ('movsw gpr gpr', ('1*p015', 1)),  # AT&T version
+    ('movsb gpr gpr', ('1*p0156', 1)),  # AT&T version
+    ('movsw gpr gpr', ('1*p0156', 1)),  # AT&T version
+    ('movsl gpr gpr', ('1*p0156', 1)),  # AT&T version
+    ('movsq gpr gpr', ('1*p0156', 1)),  # AT&T version
 
     # https://www.felixcloutier.com/x86/movzx
     ('movzx gpr gpr', ('1*p0156', 1)),
     ('movzb gpr gpr', ('1*p0156', 1)),  # AT&T version
     ('movzw gpr gpr', ('1*p0156', 1)),  # AT&T version
+    ('movzl gpr gpr', ('1*p0156', 1)),  # AT&T version
+    ('movzq gpr gpr', ('1*p0156', 1)),  # AT&T version
 
     # https://www.felixcloutier.com/x86/cmovcc
     ('cmova gpr gpr',   ('1*p0156+2*p06', 2)),
@@ -614,10 +625,10 @@ hsw_mov_instructions = list(OrderedDict(ivb_mov_instructions + [
     ('cmovz mem gpr',   ('1*p0156+1*p06', 2)),
 
     # https://www.felixcloutier.com/x86/pmovmskb
-    ('pmovmskb gpr mm', ('1*p0', 3)),
-    ('pmovmskb gpr xmm', ('1*p0', 3)),
-    ('vpmovmskb gpr xmm', ('1*p0', 3)),
-    ('vpmovmskb gpr ymm', ('1*p0', 3)),
+    ('pmovmskb mm gpr', ('1*p0', 3)),
+    ('pmovmskb xmm gpr', ('1*p0', 3)),
+    ('vpmovmskb xmm gpr', ('1*p0', 3)),
+    ('vpmovmskb ymm gpr', ('1*p0', 3)),
 
     # https://www.felixcloutier.com/x86/pmovsx
     ('pmovsxbw xmm xmm', ('1*p5', 1)),
