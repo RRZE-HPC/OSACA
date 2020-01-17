@@ -62,6 +62,62 @@ instruction_forms:
   port_pressure: []
   throughput: 1
   uops: 0
+- name: cbtw  # AT&T version of CBW
+  operands: []
+  latency: 1
+  port_pressure: [[1, '015']]
+  throughput: 0.3333333333333333
+  uops: 1
+- name: cwtl  # AT&T version of CWDE
+  operands: []
+  latency: 1
+  port_pressure: [[1, '015']]
+  throughput: 0.3333333333333333
+  uops: 1
+- name: cwtd  # AT&T version of CWD
+  operands: []
+  latency: 2
+  port_pressure: [[1, '015'], [1, '05']]
+  throughput: 0.8333333333333333
+  uops: 2
+- name: cltd  # AT&T version of CDQ
+  operands: []
+  latency: 1
+  port_pressure: [[1, '05']]
+  throughput: 0.5
+  uops: 1
+- name: cltq  # AT&T version of CDQE
+  operands: []
+  latency: 1
+  port_pressure: [[1, '015']]
+  throughput: 0.3333333333333333
+  uops: 1
+- name: cqtq  # AT&T version of CQO
+  operands: []
+  latency: 1
+  port_pressure: [[1, '05']]
+  throughput: 0.5
+  uops: 1
+- name: [cmpeqsd, cmpltsd, cmplesd, cmpunordsd, cmpneqsd, cmpnltsd, cmpnlesd, cmpordsd]
+  # same as CMPSD xmm1, xmm2, imd
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 3
+  port_pressure: [[1, '1']]
+  throughput: 1
+- name: [cmpeqss, cmpltss, cmpless, cmpunordss, cmpneqss, cmpnltss, cmpnless, cmpordss]
+  # same as CMPSS xmm1, xmm2, imd
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 3
+  port_pressure: [[1, '1']]
+  throughput: 1
 - name: cmpeqps  # same as CMPPS xmm1, xmm2, 0
   operands:
   - class: register
@@ -222,6 +278,38 @@ instruction_forms:
   port_pressure: [[1, '1']]  # JH: according to uops.info
   throughput: 1.0  # JH: measured on phinally
   uops: 1
+- name: [vcmpeqsd, vcmpltsd, vcmplesd, vcmpunordsd, vcmpneqsd, vcmpnltsd, vcmpnlesd, vcmpordsd,
+         vcmpeq_uqsd, vcmpngesd, vcmpngtsd, vcmpfalsesd, vcmpneq_oqsd, vcmpgesd, vcmpgtsd,
+         vcmptruesd, vcmpeq_ossd, vcmplt_oqsd, vcmple_oqsd, vcmpunord_ssd, vcmpneq_ussd,
+         vcmpnlt_uqsd, vcmpnle_uqsd, vcmpord_ssd, vcmpeq_ussd, vcmpnge_uqsd, vcmpngt_uqsd,
+         vcmpfalse_ossd, vcmpneq_ossd, vcmpge_oqsd, vcmpgt_oqsd, vcmptrue_ussd]
+  # same as VCMPSD xmm, xmm, xmm, imd
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 3
+  port_pressure: [[1, '1']]
+  throughput: 1
+- name: [vcmpeqss, vcmpltss, vcmpless, vcmpunordss, vcmpneqss, vcmpnltss, vcmpnless, vcmpordss,
+         vcmpeq_uqss, vcmpngess, vcmpngtss, vcmpfalsess, vcmpneq_oqss, vcmpgess, vcmpgtss,
+         vcmptruess, vcmpeq_osss, vcmplt_oqss, vcmple_oqss, vcmpunord_sss, vcmpneq_usss,
+         vcmpnlt_uqss, vcmpnle_uqss, vcmpord_sss, vcmpeq_usss, vcmpnge_uqss, vcmpngt_uqss,
+         vcmpfalse_osss, vcmpneq_osss, vcmpge_oqss, vcmpgt_oqss, vcmptrue_usss]
+  # same as VCMPSS xmm, xmm, xmm, imd
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 3
+  port_pressure: [[1, '1']]
+  throughput: 1
 - name: vpsrld
   operands:
   - class: register
