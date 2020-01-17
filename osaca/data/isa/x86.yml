@@ -2699,6 +2699,7 @@ instruction_forms:
           source: true
           destination: true
     - name: vzeroall
+      operands: []
       hidden_operands:
         - class: "register"
           name: "ymm0"
@@ -2765,6 +2766,7 @@ instruction_forms:
           source: false
           destination: true
     - name: vzeroupper
+      operands: []
       # TODO not quite correct:
       # only upper half is zeroed, not the xmm part
       hidden_operands:

@@ -57,7 +57,10 @@ class MachineModel(object):
                         line = f.readline()
                     self._data = yaml.load(file_content)
                     self._data['instruction_forms'] = []
-            self._data['instruction_dict'] = self._convert_to_dict(self._data['instruction_forms'])
+            # For use with dict instead of list as DB
+            # self._data['instruction_dict'] = (
+            #     self._convert_to_dict(self._data['instruction_forms'])
+            # )
 
     def __getitem__(self, key):
         """Return configuration entry."""
@@ -71,6 +74,7 @@ class MachineModel(object):
 
     def get_instruction(self, name, operands):
         """Find and return instruction data from name and operands."""
+        # For use with dict instead of list as DB
         # return self.get_instruction_from_dict(name, operands)
         if name is None:
             return None
@@ -79,7 +83,10 @@ class MachineModel(object):
                 instruction_form
                 for instruction_form in self._data['instruction_forms']
                 if instruction_form['name'].upper() == name.upper()
-                and self._match_operands(instruction_form['operands'], operands)
+                and self._match_operands(
+                    instruction_form['operands'] if 'operands' in instruction_form else [],
+                    operands,
+                )
             )
         except StopIteration:
             return None
@@ -256,6 +263,8 @@ class MachineModel(object):
 
     def _get_key(self, name, operands):
         key_string = name.lower() + '-'
+        if operands is None:
+            return key_string[:-1]
         key_string += '_'.join([self._get_operand_hash(op) for op in operands])
         return key_string
 
@@ -263,7 +272,10 @@ class MachineModel(object):
         instruction_dict = {}
         for instruction_form in instruction_forms:
             instruction_dict[
-                self._get_key(instruction_form['name'], instruction_form['operands'])
+                self._get_key(
+                    instruction_form['name'],
+                    instruction_form['operands'] if 'operands' in instruction_form else None,
+                )
             ] = instruction_form
         return instruction_dict
 
