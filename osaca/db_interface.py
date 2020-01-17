@@ -278,6 +278,15 @@ def _check_sanity_arch_db(arch_mm, isa_mm):
                 if isa_mm.get_instruction(instr_form['name'], instr_form['operands']) is None:
                     # if not, mark them as suspicious and print it on the screen
                     suspicious_instructions.append(instr_form)
+        # instr forms with less than 3 operands might need an ISA DB entry due to src_reg operands
+        if (
+            len(instr_form['operands']) < 3
+            and 'mov' not in instr_form['name'].lower()
+            and not instr_form['name'].lower().startswith('j')
+            and instr_form not in suspicious_instructions
+            and isa_mm.get_instruction(instr_form['name'], instr_form['operands']) is None
+        ):
+            suspicious_instructions.append(instr_form)
         # check for duplicates in DB
         if arch_mm._check_for_duplicate(instr_form['name'], instr_form['operands']):
             duplicate_instr_arch.append(instr_form)
