@@ -49,6 +49,17 @@ class MachineModel(object):
             with open(self._path, 'r') as f:
                 if not lazy:
                     self._data = yaml.load(f)
+                    # separate multi-alias instruction forms
+                    for entry in [
+                        x for x in self._data['instruction_forms'] if isinstance(x['name'], list)
+                    ]:
+                        for name in entry['name']:
+                            new_entry = {'name': name}
+                            for k in [x for x in entry.keys() if x != 'name']:
+                                new_entry[k] = entry[k]
+                            self._data['instruction_forms'].append(new_entry)
+                        # remove old entry
+                        self._data['instruction_forms'].remove(entry)
                 else:
                     file_content = ''
                     line = f.readline()
