@@ -277,23 +277,23 @@ class ParserAArch64v81(BaseParser):
     def process_operand(self, operand):
         # structure memory addresses
         if self.MEMORY_ID in operand:
-            return self.substitute_memory_address(operand[self.MEMORY_ID])
+            return self.process_memory_address(operand[self.MEMORY_ID])
         # structure register lists
         if self.REGISTER_ID in operand and (
             'list' in operand[self.REGISTER_ID] or 'range' in operand[self.REGISTER_ID]
         ):
             # TODO: discuss if ranges should be converted to lists
-            return self.substitute_register_list(operand[self.REGISTER_ID])
+            return self.process_register_list(operand[self.REGISTER_ID])
         if self.REGISTER_ID in operand and operand[self.REGISTER_ID]['name'] == 'sp':
-            return self.substitute_sp_register(operand[self.REGISTER_ID])
+            return self.process_sp_register(operand[self.REGISTER_ID])
         # add value attribute to floating point immediates without exponent
         if self.IMMEDIATE_ID in operand:
-            return self.substitute_immediate(operand[self.IMMEDIATE_ID])
+            return self.process_immediate(operand[self.IMMEDIATE_ID])
         if self.LABEL_ID in operand:
-            return self.substitute_label(operand[self.LABEL_ID])
+            return self.process_label(operand[self.LABEL_ID])
         return operand
 
-    def substitute_memory_address(self, memory_address):
+    def process_memory_address(self, memory_address):
         # Remove unnecessarily created dictionary entries during parsing
         offset = None if 'offset' not in memory_address else memory_address['offset']
         base = None if 'base' not in memory_address else memory_address['base']
@@ -315,12 +315,12 @@ class ParserAArch64v81(BaseParser):
             new_dict['post_indexed'] = memory_address['post_indexed']
         return AttrDict({self.MEMORY_ID: new_dict})
 
-    def substitute_sp_register(self, register):
+    def process_sp_register(self, register):
         reg = register
         reg['prefix'] = 'x'
         return AttrDict({self.REGISTER_ID: reg})
 
-    def substitute_register_list(self, register_list):
+    def process_register_list(self, register_list):
         # Remove unnecessarily created dictionary entries during parsing
         vlist = []
         dict_name = ''
@@ -336,7 +336,7 @@ class ParserAArch64v81(BaseParser):
         new_dict = AttrDict({dict_name: vlist, 'index': index})
         return AttrDict({self.REGISTER_ID: new_dict})
 
-    def substitute_immediate(self, immediate):
+    def process_immediate(self, immediate):
         dict_name = ''
         if 'identifier' in immediate:
             # actually an identifier, change declaration
@@ -360,7 +360,7 @@ class ParserAArch64v81(BaseParser):
                 {self.IMMEDIATE_ID: AttrDict({'value': immediate[dict_name]['mantissa']})}
             )
 
-    def substitute_label(self, label):
+    def process_label(self, label):
         # remove duplicated 'name' level due to identifier
         label['name'] = label['name']['name']
         return AttrDict({self.LABEL_ID: label})
