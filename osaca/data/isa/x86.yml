@@ -353,6 +353,91 @@ instruction_forms:
           scale: "*"
           source: true
           destination: true
+    - name: cld
+      operands: []
+      hidden_operands:
+        - class: "flag"
+          name: "DF"
+          source: false
+          destination: true
+    - name: cbtw
+      operands: []
+      hidden_operands:
+        - class: "register"
+          name: "al"
+          source: true
+          destination: false
+        - class: "register"
+          name: "ax"
+          source: false
+          destination: true
+    - name: cwtl
+      operands: []
+      hidden_operands:
+        - class: "register"
+          name: "ax"
+          source: true
+          destination: false
+        - class: "register"
+          name: "eax"
+          source: false
+          destination: true
+    - name: cwtd
+      operands: []
+      hidden_operands:
+        - class: "register"
+          name: "ax"
+          source: true
+          destination: false
+        - class: "register"
+          name: "dx"
+          source: false
+          destination: true
+        - class: "register"
+          name: "ax"
+          source: false
+          destination: true
+    - name: cltd
+      operands: []
+      hidden_operands:
+        - class: "register"
+          name: "eax"
+          source: true
+          destination: false
+        - class: "register"
+          name: "edx"
+          source: false
+          destination: true
+        - class: "register"
+          name: "eax"
+          source: false
+          destination: true
+    - name: cltq
+      operands: []
+      hidden_operands:
+        - class: "register"
+          name: "eax"
+          source: true
+          destination: false
+        - class: "register"
+          name: "rax"
+          source: false
+          destination: true
+    - name: cqtq
+      operands: []
+      hidden_operands:
+        - class: "register"
+          name: "rax"
+          source: true
+          destination: false
+        - class: "register"
+          name: "rdx"
+          source: false
+          destination: true
+        - class: "register"
+          name: "rax"
+          source: false
+          destination: true
     - name: cmova
       operands:
         - class: "register"
@@ -2196,6 +2281,69 @@ instruction_forms:
         - class: "flag"
           name: "PF"
           source: false
+          destination: true
+    - name: cmpxchg
+      operands:
+        - class: "register"
+          name: "gpr"
+          source: true
+          destination: false
+        - class: "register"
+          name: "gpr"
+          source: true
+          destination: true
+      hidden_operands:
+        - class: "register"
+          name: "rax"
+          source: true
+          destination: true
+        - class: "flag"
+          name: "ZF"
+          source: true
+          destination: true
+    - name: cmpxchg
+      operands:
+        - class: "memory"
+          base: "*"
+          offset: "*"
+          index: "*"
+          scale: "*"
+          source: true
+          destination: false
+        - class: "register"
+          name: "gpr"
+          source: true
+          destination: true
+      hidden_operands:
+        - class: "register"
+          name: "rax"
+          source: true
+          destination: true
+        - class: "flag"
+          name: "ZF"
+          source: true
+          destination: true
+    - name: cmpxchg
+      operands:
+        - class: "register"
+          name: "gpr"
+          source: true
+          destination: false
+        - class: "memory"
+          base: "*"
+          offset: "*"
+          index: "*"
+          scale: "*"
+          source: true
+          destination: true
+      hidden_operands:
+        - class: "register"
+          name: "rax"
+          source: true
+          destination: true
+        - class: "flag"
+          name: "ZF"
+          source: true
           destination: true
     - name: dec
       operands:
