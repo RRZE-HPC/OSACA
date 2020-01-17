@@ -215,6 +215,10 @@ class MachineModel(object):
         arch_dict = {
             'tx2': 'aarch64',
             'zen1': 'x86',
+            'zen+': 'x86',
+            'zen2': 'x86',
+            'con': 'x86',  # Intel Conroe
+            'wol': 'x86',  # Intel Wolfdale
             'snb': 'x86',
             'ivb': 'x86',
             'hsw': 'x86',
@@ -227,7 +231,7 @@ class MachineModel(object):
             'kbl': 'x86',
             'cnl': 'x86',
             'cfl': 'x86',
-            'zen+': 'x86',
+
         }
         arch = arch.lower()
         if arch in arch_dict:

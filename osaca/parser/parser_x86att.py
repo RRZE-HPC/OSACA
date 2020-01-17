@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import pyparsing as pp
+import string
 
 from osaca.parser import AttrDict, BaseParser
 
@@ -376,10 +377,7 @@ class ParserX86ATT(BaseParser):
     def is_vector_register(self, register):
         if register is None:
             return False
-        if (
-            len(register['name']) > 2
-            and ''.join([_ for _ in register['name'] if not _.isdigit()])[-2:].lower() == 'mm'
-        ):
+        if register['name'].rstrip(string.digits).lower() in ['mm', 'xmm', 'ymm', 'zmm']:
             return True
         return False
 
@@ -389,5 +387,5 @@ class ParserX86ATT(BaseParser):
         if self.is_gpr(register):
             return 'gpr'
         elif self.is_vector_register(register):
-            return ''.join([_ for _ in register['name'] if not _.isdigit()]).lower()
+            return register['name'].rstrip(string.digits).lower()
         raise ValueError
