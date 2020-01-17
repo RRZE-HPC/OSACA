@@ -625,15 +625,206 @@ instruction_forms:
   throughput: 0.5
   latency: 4.0  # 	1"*"p01
   port_pressure: [[1, '01']]
-- name: rcpss
+- name: PUNPCKLWD
+  operands:
+  - class: register
+    name: mm
+  - class: register
+    name: mm
+  latency: 1
+  port_pressure: [[1, '5']]
+  throughput: 1.0
+  uops: 1
+- name: PUNPCKLWD
   operands:
   - class: register
     name: xmm
   - class: register
     name: xmm
+  latency: 1
+  port_pressure: [[1, '5']]
   throughput: 1.0
-  latency: 4.0
-  port_pressure: ~
+  uops: 1
+- name: PUSH
+  operands:
+  - class: immediate
+    imd: int
+  latency: 5
+  port_pressure: [[1, '237'], [1, '4']]
+  throughput: 1.0
+  uops: 2
+- name: PUSH
+  operands:
+  - class: register
+    name: gpr
+  latency: 5
+  port_pressure: [[1, '1'], [1, '237'], [1, '4']]
+  throughput: 1.0
+  uops: 3
+- name: PUSHF
+  operands: []
+  latency: 7
+  port_pressure: [[1, '237'], [1, '4']]
+  throughput: 1.0
+  uops: 4
+- name: PXOR
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: 1
+  port_pressure: [[1, '05']]
+  throughput: 0.5
+  uops: 1
+- name: PXOR
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '015']]
+  throughput: 0.3333333333333333
+  uops: 1
+- name: RCPSS
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 4
+  port_pressure: [[1, '0']]
+  throughput: 1.0
+  uops: 1
+- name: RCPPS
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 4
+  port_pressure: [[1, '0']]
+  throughput: 1.0
+  uops: 1
+- name: RSQRTSS
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 5
+  port_pressure: [[1, '0']]
+  throughput: 1.0
+  uops: 1
+- name: ROR
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: gpr
+  latency: 1
+  port_pressure: [[2, '06']]
+  throughput: 1.0
+  uops: 2
+- name: RORX
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: 1
+  port_pressure: [[1, '06']]
+  throughput: 0.5
+  uops: 1
+- name: SAR
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: gpr
+  latency: 1
+  port_pressure: [[1, '06']]
+  throughput: 0.5
+  uops: 1
+- name: SARX
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: 1
+  port_pressure: [[1, '06']]
+  throughput: 0.5
+  uops: 1
+- name: SETP
+  operands:
+  - class: register
+    name: gpr
+  latency: 1
+  port_pressure: [[1, '06']]
+  throughput: 0.5
+  uops: 1
+- name: SHL
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: gpr
+  latency: 1
+  port_pressure: [[1, '06']]
+  throughput: 0.5
+  uops: 1
+- name: SHLX
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: 1
+  port_pressure: [[1, '06']]
+  throughput: 0.5
+  uops: 1
+- name: SHR
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: gpr
+  latency: 1
+  port_pressure: [[1, '06']]
+  throughput: 0.5
+  uops: 1
+- name: SHRX
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: 1
+  port_pressure: [[1, '06']]
+  throughput: 0.5
+  uops: 1
+- name: SHUFPS
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '5']]
+  throughput: 1.0
+  uops: 1
 - name: sqrtsd
   operands:
   - class: register
@@ -661,6 +852,122 @@ instruction_forms:
   throughput: 0.25
   latency: 1.0  # 	1"*"p0156
   port_pressure: [[1, '0156']]
+- name: TEST
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: gpr
+  latency: 1
+  port_pressure: [[1, '0156']]
+  throughput: 0.25
+  uops: 1
+- name: TEST
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: 1
+  port_pressure: [[1, '0156']]
+  throughput: 0.25
+  uops: 1
+- name: TZCNT
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: 3
+  port_pressure: [[1, '1']]
+  throughput: 1.0
+  uops: 1
+- name: UCOMISS
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 3
+  port_pressure: [[1, '0']]
+  throughput: 1.0
+  uops: 1
+- name: UNPCKHPS
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '5']]
+  throughput: 1.0
+  uops: 1
+- name: UNPCKHPD
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '5']]
+  throughput: 1.0
+  uops: 1
+- name: UNPCKLPS
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '5']]
+  throughput: 1.0
+  uops: 1
+- name: UNPCKLPD
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '5']]
+  throughput: 1.0
+  uops: 1
+- name: VADDPS
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 4
+  port_pressure: [[1, '01']]
+  throughput: 0.5
+  uops: 1
+- name: VADDPS
+  operands:
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  latency: 4
+  port_pressure: [[1, '01']]
+  throughput: 0.5
+  uops: 1
+- name: VADDPS
+  operands:
+  - class: register
+    name: zmm
+  - class: register
+    name: zmm
+  - class: register
+    name: zmm
+  latency: 4
+  port_pressure: [[1, '05']]
+  throughput: 0.5
+  uops: 1
 - name: vaddpd
   operands:
   - class: register
@@ -705,6 +1012,366 @@ instruction_forms:
   throughput: 0.5
   latency: 4.0  # 	1"*"p01
   port_pressure: [[1, '01']]
+- name: VADDSUBPS
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 4
+  port_pressure: [[1, '01']]
+  throughput: 0.5
+  uops: 1
+- name: VADDSUBPS
+  operands:
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  latency: 4
+  port_pressure: [[1, '01']]
+  throughput: 0.5
+  uops: 1
+- name: VADDSUBPD
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 4
+  port_pressure: [[1, '01']]
+  throughput: 0.5
+  uops: 1
+- name: VADDSUBPD
+  operands:
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  latency: 4
+  port_pressure: [[1, '01']]
+  throughput: 0.5
+  uops: 1
+- name: VANDNPS
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '015']]
+  throughput: 0.3333333333333333
+  uops: 1
+- name: VANDNPS
+  operands:
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  latency: 1
+  port_pressure: [[1, '015']]
+  throughput: 0.3333333333333333
+  uops: 1
+- name: VANDPS
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '015']]
+  throughput: 0.3333333333333333
+  uops: 1
+- name: VANDNPS
+  operands:
+  - class: register
+    name: zmm
+  - class: register
+    name: zmm
+  - class: register
+    name: zmm
+  latency: 1
+  port_pressure: [[1, '05']]
+  throughput: 0.5
+  uops: 1
+- name: VANDNPD
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '015']]
+  throughput: 0.3333333333333333
+  uops: 1
+- name: VANDNPD
+  operands:
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  latency: 1
+  port_pressure: [[1, '015']]
+  throughput: 0.3333333333333333
+  uops: 1
+- name: VANDNPD
+  operands:
+  - class: register
+    name: zmm
+  - class: register
+    name: zmm
+  - class: register
+    name: zmm
+  latency: 1
+  port_pressure: [[1, '05']]
+  throughput: 0.5
+  uops: 1
+- name: VANDPS
+  operands:
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  latency: 1
+  port_pressure: [[1, '015']]
+  throughput: 0.3333333333333333
+  uops: 1
+- name: VANDPS
+  operands:
+  - class: register
+    name: zmm
+  - class: register
+    name: zmm
+  - class: register
+    name: zmm
+  latency: 1
+  port_pressure: [[1, '05']]
+  throughput: 0.5
+  uops: 1
+- name: VBLENDPD
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '015']]
+  throughput: 0.3333333333333333
+  uops: 1
+- name: VBLENDPD
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  latency: 1
+  port_pressure: [[1, '015']]
+  throughput: 0.3333333333333333
+  uops: 1
+- name: VCOMISS
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 3
+  port_pressure: [[1, '0']]
+  throughput: 1.0
+  uops: 1
+- name: VCVTPS2PD
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 5
+  port_pressure: [[1, '01']]
+  throughput: 0.5
+  uops: 2
+- name: VCVTPS2PD
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: ymm
+  latency: 7
+  port_pressure: [[1, '01']]
+  throughput: 0.5
+  uops: 2
+- name: VCVTPS2DQ
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 4
+  port_pressure: [[1, '01']]
+  throughput: 0.5
+  uops: 1
+- name: VCVTPS2DQ
+  operands:
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  latency: 4
+  port_pressure: [[1, '01']]
+  throughput: 0.5
+  uops: 1
+- name: VCVTPS2DQ
+  operands:
+  - class: register
+    name: zmm
+  - class: register
+    name: zmm
+  latency: 4
+  port_pressure: [[1, '05']]
+  throughput: 0.5
+  uops: 1
+- name: VCVTPD2PS
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 5
+  port_pressure: [[1, '015'], [1, '5']]
+  throughput: 1.3333333333333333
+  uops: 2
+- name: VCVTDQ2PD
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 5
+  port_pressure: [[1, '0'], [1, '5']]
+  throughput: 1.0
+  uops: 2
+- name: VCVTDQ2PD
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: ymm
+  latency: 7
+  port_pressure: [[1, '0'], [1, '5']]
+  throughput: 1.0
+  uops: 2
+- name: VCVTDQ2PD
+  operands:
+  - class: register
+    name: ymm
+  - class: register
+    name: zmm
+  latency: 7
+  port_pressure: [[1, '05'], [1, '5']]
+  throughput: 1.5
+  uops: 2
+- name: VCVTPD2PS
+  operands:
+  - class: register
+    name: ymm
+  - class: register
+    name: xmm
+  latency: 7
+  port_pressure: [[1, '015'], [1, '5']]
+  throughput: 1.3333333333333333
+  uops: 2
+- name: VCVTPD2PS
+  operands:
+  - class: register
+    name: zmm
+  - class: register
+    name: ymm
+  latency: 7
+  port_pressure: [[1, '05'], [1, '5']]
+  throughput: 1.5
+  uops: 2
+- name: VCVTPS2PD
+  operands:
+  - class: register
+    name: ymm
+  - class: register
+    name: zmm
+  latency: 7
+  port_pressure: [[1, '05'], [1, '5']]
+  throughput: 1.5
+  uops: 2
+- name: vcvtsi2ss
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 2
+  port_pressure: [[1, '015'], [2, '5']]
+  throughput: 1.0
+  uops: 1
+- name: vcvtss2sd
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '01']]
+  throughput: 1.0
+  uops: 1
+- name: VCVTTSS2SD
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '0']]
+  throughput: 1.0
+  uops: 1
+- name: VCVTTSS2SI
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: gpr
+  latency: 8
+  port_pressure: [[1, '0'], [1, '015'], [1, '5']]
+  throughput: 1.3333333333333333
+  uops: 3
 - name: vdivsd
   operands:
   - class: register
@@ -727,40 +1394,7 @@ instruction_forms:
   throughput: 3.0
   latency: 11.0  # 	1"*"p0+3"*"p0DV
   port_pressure: [[1, '0'], [3.0, [0DV]]]
-- name: vfmadd213pd
-  operands:
-  - class: register
-    name: ymm
-  - class: register
-    name: ymm
-  - class: register
-    name: ymm
-  throughput: 0.5
-  latency: 4.0  # 	1"*"p01
-  port_pressure: [[1, '01']]
-- name: vfmadd132pd
-  operands:
-  - class: register
-    name: ymm
-  - class: register
-    name: ymm
-  - class: register
-    name: ymm
-  throughput: 0.5
-  latency: 4.0  # 	1"*"p01
-  port_pressure: [[1, '01']]
-- name: vfmadd231pd
-  operands:
-  - class: register
-    name: ymm
-  - class: register
-    name: ymm
-  - class: register
-    name: ymm
-  throughput: 0.5
-  latency: 4.0  # 	1"*"p01
-  port_pressure: [[1, '01']]
-- name: vfmadd132pd
+- name: VDIVPD
   operands:
   - class: register
     name: xmm
@@ -768,10 +1402,35 @@ instruction_forms:
     name: xmm
   - class: register
     name: xmm
-  throughput: 0.5
-  latency: 4.0  # 	1"*"p01
-  port_pressure: [[1, '01']]
-- name: vfmadd213pd
+  latency: 15
+  port_pressure: [[1, '0'], [4, [0DV]]]
+  throughput: 4.0
+  uops: 1
+- name: VDIVPD
+  operands:
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  latency: 15
+  port_pressure: [[1, '0'], [8, [0DV]]]
+  throughput: 8.0
+  uops: 1
+- name: VDIVPD
+  operands:
+  - class: register
+    name: zmm
+  - class: register
+    name: zmm
+  - class: register
+    name: zmm
+  latency: 24
+  port_pressure: [[2, '0'], [1, '05'], [16, [0DV]]]
+  throughput: 16.0
+  uops: 3
+- name: VDIVPS
   operands:
   - class: register
     name: xmm
@@ -779,10 +1438,35 @@ instruction_forms:
     name: xmm
   - class: register
     name: xmm
-  throughput: 0.5
-  latency: 4.0  # 	1"*"p01
-  port_pressure: [[1, '01']]
-- name: vfmadd231pd
+  latency: 12
+  port_pressure: [[1, '0'], [3, [0DV]]]
+  throughput: 3.0
+  uops: 1
+- name: VDIVPS
+  operands:
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  latency: 12
+  port_pressure: [[1, '0'], [5, [0DV]]]
+  throughput: 5.0
+  uops: 1
+- name: VDIVPS
+  operands:
+  - class: register
+    name: zmm
+  - class: register
+    name: zmm
+  - class: register
+    name: zmm
+  latency: 18
+  port_pressure: [[2, '0'], [1, '05'], [10, [0DV]]]
+  throughput: 10.0
+  uops: 3
+- name: VDIVSS
   operands:
   - class: register
     name: xmm
@@ -790,9 +1474,1418 @@ instruction_forms:
     name: xmm
   - class: register
     name: xmm
-  throughput: 0.5
-  latency: 4.0  # 	1"*"p01
+  latency: 12
+  port_pressure: [[1, '0'], [3, [0DV]]]
+  throughput: 3.0
+  uops: 1
+- name: VDIVSD
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 15
+  port_pressure: [[1, '0'], [4, [0DV]]]
+  throughput: 4.0
+  uops: 1
+- name: VEXTRACTF128
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: ymm
+  - class: register
+    name: xmm
+  latency: 3
+  port_pressure: [[1, '5']]
+  throughput: 1.0
+  uops: 1
+- name: VEXTRACTI128
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: ymm
+  - class: register
+    name: xmm
+  latency: 3
+  port_pressure: [[1, '5']]
+  throughput: 1.0
+  uops: 1
+- name: VEXTRACTPS
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: xmm
+  - class: register
+    name: gpr
+  latency: 4
+  port_pressure: [[1, '0'], [1, '5']]
+  throughput: 1.0
+  uops: 2
+- name: VFMADDSUB231PS  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 4
   port_pressure: [[1, '01']]
+  throughput: 0.5
+  uops: 1
+- name: VFMADDSUB231PS  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  latency: 4
+  port_pressure: [[1, '01']]
+  throughput: 0.5
+  uops: 1
+- name: VFMADDSUB231PD  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 4
+  port_pressure: [[1, '01']]
+  throughput: 0.5
+  uops: 1
+- name: VFMADDSUB231PD  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  latency: 4
+  port_pressure: [[1, '01']]
+  throughput: 0.5
+  uops: 1
+- name: VFMSUB132PS  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 4
+  port_pressure: [[1, '01']]
+  throughput: 0.5
+  uops: 1
+- name: VFMSUB132PS  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  latency: 4
+  port_pressure: [[1, '01']]
+  throughput: 0.5
+  uops: 1
+- name: VFMSUB132PD  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 4
+  port_pressure: [[1, '01']]
+  throughput: 0.5
+  uops: 1
+- name: VFMSUB132PD  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  latency: 4
+  port_pressure: [[1, '01']]
+  throughput: 0.5
+  uops: 1
+- name: VFNMADD213SS  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 4
+  port_pressure: [[1, '01']]
+  throughput: 0.5
+  uops: 1
+- name: VFNMADD213SD  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 4
+  port_pressure: [[1, '01']]
+  throughput: 0.5
+  uops: 1
+- name: VFNMSUB213SD  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 4
+  port_pressure: [[1, '01']]
+  throughput: 0.5
+  uops: 1
+- name: VFMSUB213PS  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 4
+  port_pressure: [[1, '01']]
+  throughput: 0.5
+  uops: 1
+- name: VFMSUB213PS  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  latency: 4
+  port_pressure: [[1, '01']]
+  throughput: 0.5
+  uops: 1
+- name: VFMSUB213PD  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 4
+  port_pressure: [[1, '01']]
+  throughput: 0.5
+  uops: 1
+- name: VFMSUB213PD  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  latency: 4
+  port_pressure: [[1, '01']]
+  throughput: 0.5
+  uops: 1
+- name: VFMSUB132SS  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 4
+  port_pressure: [[1, '01']]
+  throughput: 0.5
+  uops: 1
+- name: VFMSUBADD213PD  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 4
+  port_pressure: [[1, '01']]
+  throughput: 0.5
+  uops: 1
+- name: VFMSUBADD213PD  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  latency: 4
+  port_pressure: [[1, '01']]
+  throughput: 0.5
+  uops: 1
+- name: VFMSUB132SD  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 4
+  port_pressure: [[1, '01']]
+  throughput: 0.5
+  uops: 1
+- name: VFNMADD213PS  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 4
+  port_pressure: [[1, '01']]
+  throughput: 0.5
+  uops: 1
+- name: VFNMADD213PS  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  latency: 4
+  port_pressure: [[1, '01']]
+  throughput: 0.5
+  uops: 1
+- name: VFMSUB231PS  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 4
+  port_pressure: [[1, '01']]
+  throughput: 0.5
+  uops: 1
+- name: VFMSUB231PS  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  latency: 4
+  port_pressure: [[1, '01']]
+  throughput: 0.5
+  uops: 1
+- name: VFNMADD213PD  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 4
+  port_pressure: [[1, '01']]
+  throughput: 0.5
+  uops: 1
+- name: VFNMADD213PD  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  latency: 4
+  port_pressure: [[1, '01']]
+  throughput: 0.5
+  uops: 1
+- name: VFMADD231SS  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 4
+  port_pressure: [[1, '01']]
+  throughput: 0.5
+  uops: 1
+- name: VFMADD231SD  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 4
+  port_pressure: [[1, '01']]
+  throughput: 0.5
+  uops: 1
+- name: VFMSUB213SD  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 4
+  port_pressure: [[1, '01']]
+  throughput: 0.5
+  uops: 1
+- name: VFNMSUB132PD  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 4
+  port_pressure: [[1, '01']]
+  throughput: 0.5
+  uops: 1
+- name: VFNMSUB132PD  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  latency: 4
+  port_pressure: [[1, '01']]
+  throughput: 0.5
+  uops: 1
+- name: VFMSUB213SS  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 4
+  port_pressure: [[1, '01']]
+  throughput: 0.5
+  uops: 1
+- name: VFNMSUB132PS  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 4
+  port_pressure: [[1, '01']]
+  throughput: 0.5
+  uops: 1
+- name: VFNMSUB132PS  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  latency: 4
+  port_pressure: [[1, '01']]
+  throughput: 0.5
+  uops: 1
+- name: VFMADD231PD  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 4
+  port_pressure: [[1, '01']]
+  throughput: 0.5
+  uops: 1
+- name: VFMADD231PD  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  latency: 4
+  port_pressure: [[1, '01']]
+  throughput: 0.5
+  uops: 1
+- name: VFMADD231PS  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 4
+  port_pressure: [[1, '01']]
+  throughput: 0.5
+  uops: 1
+- name: VFMADD231PS  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  latency: 4
+  port_pressure: [[1, '01']]
+  throughput: 0.5
+  uops: 1
+- name: VFMADD132SD  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 4
+  port_pressure: [[1, '01']]
+  throughput: 0.5
+  uops: 1
+- name: VFMADD132SS  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 4
+  port_pressure: [[1, '01']]
+  throughput: 0.5
+  uops: 1
+- name: VFNMADD231SS  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 4
+  port_pressure: [[1, '01']]
+  throughput: 0.5
+  uops: 1
+- name: VFNMADD231SD  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 4
+  port_pressure: [[1, '01']]
+  throughput: 0.5
+  uops: 1
+- name: VFMSUB231SD  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 4
+  port_pressure: [[1, '01']]
+  throughput: 0.5
+  uops: 1
+- name: VFMSUB231SS  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 4
+  port_pressure: [[1, '01']]
+  throughput: 0.5
+  uops: 1
+- name: VFMADD132PD  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 4
+  port_pressure: [[1, '01']]
+  throughput: 0.5
+  uops: 1
+- name: VFMADD132PD  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  latency: 4
+  port_pressure: [[1, '01']]
+  throughput: 0.5
+  uops: 1
+- name: VFMADD132PS  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 4
+  port_pressure: [[1, '01']]
+  throughput: 0.5
+  uops: 1
+- name: VFMADD132PS  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  latency: 4
+  port_pressure: [[1, '01']]
+  throughput: 0.5
+  uops: 1
+- name: VFNMSUB132SD  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 4
+  port_pressure: [[1, '01']]
+  throughput: 0.5
+  uops: 1
+- name: VFNMSUB132SS  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 4
+  port_pressure: [[1, '01']]
+  throughput: 0.5
+  uops: 1
+- name: VFNMSUB231PS  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 4
+  port_pressure: [[1, '01']]
+  throughput: 0.5
+  uops: 1
+- name: VFNMSUB231PS  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  latency: 4
+  port_pressure: [[1, '01']]
+  throughput: 0.5
+  uops: 1
+- name: VFNMSUB231PD  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 4
+  port_pressure: [[1, '01']]
+  throughput: 0.5
+  uops: 1
+- name: VFNMSUB231PD  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  latency: 4
+  port_pressure: [[1, '01']]
+  throughput: 0.5
+  uops: 1
+- name: VFNMSUB213SS  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 4
+  port_pressure: [[1, '01']]
+  throughput: 0.5
+  uops: 1
+- name: VFMADD213SD  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 4
+  port_pressure: [[1, '01']]
+  throughput: 0.5
+  uops: 1
+- name: VFMADD213SS  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 4
+  port_pressure: [[1, '01']]
+  throughput: 0.5
+  uops: 1
+- name: VFNMADD132SD  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 4
+  port_pressure: [[1, '01']]
+  throughput: 0.5
+  uops: 1
+- name: VFNMADD132SS  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 4
+  port_pressure: [[1, '01']]
+  throughput: 0.5
+  uops: 1
+- name: VFNMSUB213PS  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 4
+  port_pressure: [[1, '01']]
+  throughput: 0.5
+  uops: 1
+- name: VFNMSUB213PS  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  latency: 4
+  port_pressure: [[1, '01']]
+  throughput: 0.5
+  uops: 1
+- name: VFNMSUB213PD  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 4
+  port_pressure: [[1, '01']]
+  throughput: 0.5
+  uops: 1
+- name: VFNMSUB213PD  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  latency: 4
+  port_pressure: [[1, '01']]
+  throughput: 0.5
+  uops: 1
+- name: VFMSUBADD132PD  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 4
+  port_pressure: [[1, '01']]
+  throughput: 0.5
+  uops: 1
+- name: VFMSUBADD132PD  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  latency: 4
+  port_pressure: [[1, '01']]
+  throughput: 0.5
+  uops: 1
+- name: VFMSUBADD132PS  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 4
+  port_pressure: [[1, '01']]
+  throughput: 0.5
+  uops: 1
+- name: VFMSUBADD132PS  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  latency: 4
+  port_pressure: [[1, '01']]
+  throughput: 0.5
+  uops: 1
+- name: VFMSUBADD213PS  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 4
+  port_pressure: [[1, '01']]
+  throughput: 0.5
+  uops: 1
+- name: VFMSUBADD213PS  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  latency: 4
+  port_pressure: [[1, '01']]
+  throughput: 0.5
+  uops: 1
+- name: VFMSUBADD231PS  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 4
+  port_pressure: [[1, '01']]
+  throughput: 0.5
+  uops: 1
+- name: VFMSUBADD231PS  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  latency: 4
+  port_pressure: [[1, '01']]
+  throughput: 0.5
+  uops: 1
+- name: VFNMADD231PS  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 4
+  port_pressure: [[1, '01']]
+  throughput: 0.5
+  uops: 1
+- name: VFNMADD231PS  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  latency: 4
+  port_pressure: [[1, '01']]
+  throughput: 0.5
+  uops: 1
+- name: VFMSUBADD231PD  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 4
+  port_pressure: [[1, '01']]
+  throughput: 0.5
+  uops: 1
+- name: VFMSUBADD231PD  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  latency: 4
+  port_pressure: [[1, '01']]
+  throughput: 0.5
+  uops: 1
+- name: VFNMADD231PD  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 4
+  port_pressure: [[1, '01']]
+  throughput: 0.5
+  uops: 1
+- name: VFNMADD231PD  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  latency: 4
+  port_pressure: [[1, '01']]
+  throughput: 0.5
+  uops: 1
+- name: VFNMSUB231SS  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 4
+  port_pressure: [[1, '01']]
+  throughput: 0.5
+  uops: 1
+- name: VFNMSUB231SD  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 4
+  port_pressure: [[1, '01']]
+  throughput: 0.5
+  uops: 1
+- name: VFMADDSUB213PS  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 4
+  port_pressure: [[1, '01']]
+  throughput: 0.5
+  uops: 1
+- name: VFMADDSUB213PS  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  latency: 4
+  port_pressure: [[1, '01']]
+  throughput: 0.5
+  uops: 1
+- name: VFMADDSUB213PD  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 4
+  port_pressure: [[1, '01']]
+  throughput: 0.5
+  uops: 1
+- name: VFMADDSUB213PD  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  latency: 4
+  port_pressure: [[1, '01']]
+  throughput: 0.5
+  uops: 1
+- name: VFMADD213PD  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 4
+  port_pressure: [[1, '01']]
+  throughput: 0.5
+  uops: 1
+- name: VFMADD213PD  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  latency: 4
+  port_pressure: [[1, '01']]
+  throughput: 0.5
+  uops: 1
+- name: VFMADD213PS  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 4
+  port_pressure: [[1, '01']]
+  throughput: 0.5
+  uops: 1
+- name: VFMADD213PS  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  latency: 4
+  port_pressure: [[1, '01']]
+  throughput: 0.5
+  uops: 1
+- name: VFMADDSUB132PD  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 4
+  port_pressure: [[1, '01']]
+  throughput: 0.5
+  uops: 1
+- name: VFMADDSUB132PD  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  latency: 4
+  port_pressure: [[1, '01']]
+  throughput: 0.5
+  uops: 1
+- name: VFMADDSUB132PS  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 4
+  port_pressure: [[1, '01']]
+  throughput: 0.5
+  uops: 1
+- name: VFMADDSUB132PS  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  latency: 4
+  port_pressure: [[1, '01']]
+  throughput: 0.5
+  uops: 1
+- name: VFNMADD132PD  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 4
+  port_pressure: [[1, '01']]
+  throughput: 0.5
+  uops: 1
+- name: VFNMADD132PD  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  latency: 4
+  port_pressure: [[1, '01']]
+  throughput: 0.5
+  uops: 1
+- name: VFNMADD132PS  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 4
+  port_pressure: [[1, '01']]
+  throughput: 0.5
+  uops: 1
+- name: VFNMADD132PS  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  latency: 4
+  port_pressure: [[1, '01']]
+  throughput: 0.5
+  uops: 1
+- name: VFMSUB231PD  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 4
+  port_pressure: [[1, '01']]
+  throughput: 0.5
+  uops: 1
+- name: VFMSUB231PD  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  latency: 4
+  port_pressure: [[1, '01']]
+  throughput: 0.5
+  uops: 1
+- name: VFMADDSUB231PS  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: zmm
+  - class: register
+    name: zmm
+  - class: register
+    name: zmm
+  latency: 4
+  port_pressure: [[1, '05']]
+  throughput: 0.5
+  uops: 1
+- name: VFMADDSUB231PD  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: zmm
+  - class: register
+    name: zmm
+  - class: register
+    name: zmm
+  latency: 4
+  port_pressure: [[1, '05']]
+  throughput: 0.5
+  uops: 1
+- name: VFMSUBADD231PS  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: zmm
+  - class: register
+    name: zmm
+  - class: register
+    name: zmm
+  latency: 4
+  port_pressure: [[1, '05']]
+  throughput: 0.5
+  uops: 1
+- name: VFMSUB132PS  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: zmm
+  - class: register
+    name: zmm
+  - class: register
+    name: zmm
+  latency: 4
+  port_pressure: [[1, '05']]
+  throughput: 0.5
+  uops: 1
+- name: VFMSUB132PD  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: zmm
+  - class: register
+    name: zmm
+  - class: register
+    name: zmm
+  latency: 4
+  port_pressure: [[1, '05']]
+  throughput: 0.5
+  uops: 1
+- name: VFMSUB213PS  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: zmm
+  - class: register
+    name: zmm
+  - class: register
+    name: zmm
+  latency: 4
+  port_pressure: [[1, '05']]
+  throughput: 0.5
+  uops: 1
+- name: VFMSUB213PD  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: zmm
+  - class: register
+    name: zmm
+  - class: register
+    name: zmm
+  latency: 4
+  port_pressure: [[1, '05']]
+  throughput: 0.5
+  uops: 1
+- name: VFMSUBADD213PS  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: zmm
+  - class: register
+    name: zmm
+  - class: register
+    name: zmm
+  latency: 4
+  port_pressure: [[1, '05']]
+  throughput: 0.5
+  uops: 1
+- name: VHADDPS  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 6
+  port_pressure: [[1, '01']]
+  throughput: 0.5
+  uops: 3
+- name: VHADDPS  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  latency: 6
+  port_pressure: [[1, '01']]
+  throughput: 0.5
+  uops: 3
+- name: VINSERTI128  # JH: assumed from SKX
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: xmm
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  latency: 3
+  port_pressure: [[1, '5']]
+  throughput: 1.0
+  uops: 1
+- name: VINSERTPS  # JH: assumed from SKX
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '5']]
+  throughput: 1.0
+  uops: 1
+- name: VMAXSD  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 4
+  port_pressure: [[1, '01']]
+  throughput: 0.5
+  uops: 1
+- name: VMAXSS  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 4
+  port_pressure: [[1, '01']]
+  throughput: 0.5
+  uops: 1
+- name: VMINPS  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 4
+  port_pressure: [[1, '01']]
+  throughput: 0.5
+  uops: 1
+- name: VMINPS  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  latency: 4
+  port_pressure: [[1, '01']]
+  throughput: 0.5
+  uops: 1
+- name: VMINPS  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: zmm
+  - class: register
+    name: zmm
+  - class: register
+    name: zmm
+  latency: 4
+  port_pressure: [[1, '05']]
+  throughput: 0.5
+  uops: 1
 - name: vmulsd
   operands:
   - class: register
@@ -818,6 +2911,17 @@ instruction_forms:
 - name: vmulpd
   operands:
   - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  throughput: 0.5
+  latency: 4.0  # 	1"*"p01
+  port_pressure: [[1, '01']]
+- name: vmulpd
+  operands:
+  - class: register
     name: ymm
   - class: register
     name: ymm
@@ -826,6 +2930,1596 @@ instruction_forms:
   throughput: 0.5
   latency: 4.0  # 	1"*"p01
   port_pressure: [[1, '01']]
+- name: vmulpd
+  operands:
+  - class: register
+    name: zmm
+  - class: register
+    name: zmm
+  - class: register
+    name: zmm
+  throughput: 0.5
+  latency: 4.0  # 	1"*"p01
+  port_pressure: [[1, '05']]
+- name: VMULPS  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 4
+  port_pressure: [[1, '01']]
+  throughput: 0.5
+  uops: 1
+- name: VMULPS  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  latency: 4
+  port_pressure: [[1, '01']]
+  throughput: 0.5
+  uops: 1
+- name: VMULPS  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: zmm
+  - class: register
+    name: zmm
+  - class: register
+    name: zmm
+  latency: 4
+  port_pressure: [[1, '05']]
+  throughput: 0.5
+  uops: 1
+- name: VORPD  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '015']]
+  throughput: 0.3333333333333333
+  uops: 1
+- name: VORPD  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  latency: 1
+  port_pressure: [[1, '015']]
+  throughput: 0.3333333333333333
+  uops: 1
+- name: VORPD  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: zmm
+  - class: register
+    name: zmm
+  - class: register
+    name: zmm
+  latency: 1
+  port_pressure: [[1, '05']]
+  throughput: 0.5
+  uops: 1
+- name: VORPS  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '015']]
+  throughput: 0.3333333333333333
+  uops: 1
+- name: VORPS  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  latency: 1
+  port_pressure: [[1, '015']]
+  throughput: 0.3333333333333333
+  uops: 1
+- name: VORPS  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: zmm
+  - class: register
+    name: zmm
+  - class: register
+    name: zmm
+  latency: 1
+  port_pressure: [[1, '05']]
+  throughput: 0.5
+  uops: 1
+- name: VPADDD  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '015']]
+  throughput: 0.3333333333333333
+  uops: 1
+- name: VPADDD  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  latency: 1
+  port_pressure: [[1, '015']]
+  throughput: 0.3333333333333333
+  uops: 1
+- name: VPADDD  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: zmm
+  - class: register
+    name: zmm
+  - class: register
+    name: zmm
+  latency: 1
+  port_pressure: [[1, '05']]
+  throughput: 0.5
+  uops: 1
+- name: VPADDQ  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '015']]
+  throughput: 0.3333333333333333
+  uops: 1
+- name: VPADDQ  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  latency: 1
+  port_pressure: [[1, '015']]
+  throughput: 0.3333333333333333
+  uops: 1
+- name: VPADDQ  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: zmm
+  - class: register
+    name: zmm
+  - class: register
+    name: zmm
+  latency: 1
+  port_pressure: [[1, '05']]
+  throughput: 0.5
+  uops: 1
+- name: VPALIGNR  # JH: assumed from SKX
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '5']]
+  throughput: 1.0
+  uops: 1
+- name: VPALIGNR  # JH: assumed from SKX
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  latency: 1
+  port_pressure: [[1, '5']]
+  throughput: 1.0
+  uops: 1
+- name: VPALIGNR  # JH: assumed from SKX
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: zmm
+  - class: register
+    name: zmm
+  - class: register
+    name: zmm
+  latency: 1
+  port_pressure: [[1, '5']]
+  throughput: 1.0
+  uops: 1
+- name: VPANDN  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '015']]
+  throughput: 0.3333333333333333
+  uops: 1
+- name: VPANDN  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  latency: 1
+  port_pressure: [[1, '015']]
+  throughput: 0.3333333333333333
+  uops: 1
+- name: VPANDND  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '015']]
+  throughput: 0.3333333333333333
+  uops: 1
+- name: VPANDND  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  latency: 1
+  port_pressure: [[1, '015']]
+  throughput: 0.3333333333333333
+  uops: 1
+- name: VPANDNQ  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: zmm
+  - class: register
+    name: zmm
+  - class: register
+    name: zmm
+  latency: 1
+  port_pressure: [[1, '05']]
+  throughput: 0.5
+  uops: 1
+- name: VPANDNQ  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '015']]
+  throughput: 0.3333333333333333
+  uops: 1
+- name: VPANDNQ  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  latency: 1
+  port_pressure: [[1, '015']]
+  throughput: 0.3333333333333333
+  uops: 1
+- name: VPANDND  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: zmm
+  - class: register
+    name: zmm
+  - class: register
+    name: zmm
+  latency: 1
+  port_pressure: [[1, '05']]
+  throughput: 0.5
+  uops: 1
+- name: VPBLENDD  # JH: assumed from SKX
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '015']]
+  throughput: 0.3333333333333333
+  uops: 1
+- name: VPBLENDD  # JH: assumed from SKX
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  latency: 1
+  port_pressure: [[1, '015']]
+  throughput: 0.3333333333333333
+  uops: 1
+- name: VPBROADCASTB  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '5']]
+  throughput: 1.0
+  uops: 1
+- name: VPBROADCASTB  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: ymm
+  latency: 3
+  port_pressure: [[1, '5']]
+  throughput: 1.0
+  uops: 1
+- name: VPBROADCASTB  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: zmm
+  latency: 3
+  port_pressure: [[1, '5']]
+  throughput: 1.0
+  uops: 1
+- name: VPBROADCASTB  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: zmm
+  latency: 5
+  port_pressure: [[1, '5']]
+  throughput: 1.0
+  uops: 1
+- name: VPBROADCASTW  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '5']]
+  throughput: 1.0
+  uops: 1
+- name: VPBROADCASTW  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: ymm
+  latency: 3
+  port_pressure: [[1, '5']]
+  throughput: 1.0
+  uops: 1
+- name: VPBROADCASTW  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: zmm
+  latency: 3
+  port_pressure: [[1, '5']]
+  throughput: 1.0
+  uops: 1
+- name: VPBROADCASTW  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: zmm
+  latency: 5
+  port_pressure: [[1, '5']]
+  throughput: 1.0
+  uops: 1
+- name: VPBROADCASTD  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '5']]
+  throughput: 1.0
+  uops: 1
+- name: VPBROADCASTD  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: ymm
+  latency: 3
+  port_pressure: [[1, '5']]
+  throughput: 1.0
+  uops: 1
+- name: VPBROADCASTD  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: zmm
+  latency: 3
+  port_pressure: [[1, '5']]
+  throughput: 1.0
+  uops: 1
+- name: VPBROADCASTD  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: zmm
+  latency: 5
+  port_pressure: [[1, '5']]
+  throughput: 1.0
+  uops: 1
+- name: VPBROADCASTQ  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '5']]
+  throughput: 1.0
+  uops: 1
+- name: VPBROADCASTQ  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: ymm
+  latency: 3
+  port_pressure: [[1, '5']]
+  throughput: 1.0
+  uops: 1
+- name: VPBROADCASTQ  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: zmm
+  latency: 3
+  port_pressure: [[1, '5']]
+  throughput: 1.0
+  uops: 1
+- name: VPBROADCASTQ  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: zmm
+  latency: 5
+  port_pressure: [[1, '5']]
+  throughput: 1.0
+  uops: 1
+- name: VPCMPGTD  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '01']]
+  throughput: 0.5
+  uops: 1
+- name: VPCMPGTD  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  latency: 1
+  port_pressure: [[1, '01']]
+  throughput: 0.5
+  uops: 1
+- name: VPERM2F128  # JH: assumed from SKX
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  latency: 3
+  port_pressure: [[1, '5']]
+  throughput: 1.0
+  uops: 1
+- name: VPERMD  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  latency: 3
+  port_pressure: [[1, '5']]
+  throughput: 1.0
+  uops: 1
+- name: VPERMQ  # JH: assumed from SKX
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  latency: 3
+  port_pressure: [[1, '5']]
+  throughput: 1.0
+  uops: 1
+- name: VPEXTRD  # JH: assumed from SKX
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: xmm
+  - class: register
+    name: gpr
+  latency: 4
+  port_pressure: [[1, '0'], [1, '5']]
+  throughput: 1.0
+  uops: 2
+- name: VPINSRQ  # JH: assumed from SKX
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: gpr
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 2
+  port_pressure: [[2, '5']]
+  throughput: 2.0
+  uops: 2
+- name: VPMAXSD  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '01']]
+  throughput: 0.5
+  uops: 1
+- name: VPMAXSB  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '01']]
+  throughput: 0.5
+  uops: 1
+- name: VPMAXSW  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '01']]
+  throughput: 0.5
+  uops: 1
+- name: VPMAXSD  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  latency: 1
+  port_pressure: [[1, '01']]
+  throughput: 0.5
+  uops: 1
+- name: VPMAXSB  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  latency: 1
+  port_pressure: [[1, '01']]
+  throughput: 0.5
+  uops: 1
+- name: VPMAXSW  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  latency: 1
+  port_pressure: [[1, '01']]
+  throughput: 0.5
+  uops: 1
+- name: VPMAXSD  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: zmm
+  - class: register
+    name: zmm
+  - class: register
+    name: zmm
+  latency: 1
+  port_pressure: [[1, '0']]
+  throughput: 1.0
+  uops: 1
+- name: VPMAXSB  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: zmm
+  - class: register
+    name: zmm
+  - class: register
+    name: zmm
+  latency: 1
+  port_pressure: [[1, '0']]
+  throughput: 1.0
+  uops: 1
+- name: VPMAXSW  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: zmm
+  - class: register
+    name: zmm
+  - class: register
+    name: zmm
+  latency: 1
+  port_pressure: [[1, '0']]
+  throughput: 1.0
+  uops: 1
+- name: VPMINSD  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '01']]
+  throughput: 0.5
+  uops: 1
+- name: VPMINSB  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '01']]
+  throughput: 0.5
+  uops: 1
+- name: VPMINSW  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '01']]
+  throughput: 0.5
+  uops: 1
+- name: VPMINSD  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  latency: 1
+  port_pressure: [[1, '01']]
+  throughput: 0.5
+  uops: 1
+- name: VPMINSB  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  latency: 1
+  port_pressure: [[1, '01']]
+  throughput: 0.5
+  uops: 1
+- name: VPMINSW  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  latency: 1
+  port_pressure: [[1, '01']]
+  throughput: 0.5
+  uops: 1
+- name: VPMINSD  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: zmm
+  - class: register
+    name: zmm
+  - class: register
+    name: zmm
+  latency: 1
+  port_pressure: [[1, '0']]
+  throughput: 1.0
+  uops: 1
+- name: VPMINSB  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: zmm
+  - class: register
+    name: zmm
+  - class: register
+    name: zmm
+  latency: 1
+  port_pressure: [[1, '0']]
+  throughput: 1.0
+  uops: 1
+- name: VPMINSW  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: zmm
+  - class: register
+    name: zmm
+  - class: register
+    name: zmm
+  latency: 1
+  port_pressure: [[1, '0']]
+  throughput: 1.0
+  uops: 1
+- name: VPMULUDQ  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 5
+  port_pressure: [[1, '01']]
+  throughput: 0.5
+  uops: 1
+- name: VPMULUDQ  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  latency: 5
+  port_pressure: [[1, '01']]
+  throughput: 0.5
+  uops: 1
+- name: VPMULUDQ  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: zmm
+  - class: register
+    name: zmm
+  - class: register
+    name: zmm
+  latency: 6
+  port_pressure: [[1, '05']]
+  throughput: 0.5
+  uops: 1
+- name: VPOR  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '015']]
+  throughput: 0.3333333333333333
+  uops: 1
+- name: VPOR  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  latency: 1
+  port_pressure: [[1, '015']]
+  throughput: 0.3333333333333333
+  uops: 1
+- name: VPORD  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: zmm
+  - class: register
+    name: zmm
+  - class: register
+    name: zmm
+  latency: 1
+  port_pressure: [[1, '05']]
+  throughput: 0.5
+  uops: 1
+- name: VPORD  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '015']]
+  throughput: 0.3333333333333333
+  uops: 1
+- name: VPORD  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  latency: 1
+  port_pressure: [[1, '015']]
+  throughput: 0.3333333333333333
+  uops: 1
+- name: VPORQ  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: zmm
+  - class: register
+    name: zmm
+  - class: register
+    name: zmm
+  latency: 1
+  port_pressure: [[1, '05']]
+  throughput: 0.5
+  uops: 1
+- name: VPORQ  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '015']]
+  throughput: 0.3333333333333333
+  uops: 1
+- name: VPORQ  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  latency: 1
+  port_pressure: [[1, '015']]
+  throughput: 0.3333333333333333
+  uops: 1
+- name: VPSHUFB  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '5']]
+  throughput: 1.0
+  uops: 1
+- name: VPSHUFB  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  latency: 1
+  port_pressure: [[1, '5']]
+  throughput: 1.0
+  uops: 1
+- name: VPSHUFB  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: zmm
+  - class: register
+    name: zmm
+  - class: register
+    name: zmm
+  latency: 1
+  port_pressure: [[1, '5']]
+  throughput: 1.0
+  uops: 1
+- name: VPSHUFD  # JH: assumed from SKX
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '5']]
+  throughput: 1.0
+  uops: 1
+- name: VPSHUFD  # JH: assumed from SKX
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  latency: 1
+  port_pressure: [[1, '5']]
+  throughput: 1.0
+  uops: 1
+- name: VPSHUFD  # JH: assumed from SKX
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: zmm
+  - class: register
+    name: zmm
+  latency: 1
+  port_pressure: [[1, '5']]
+  throughput: 1.0
+  uops: 1
+- name: VPSLLD  # JH: assumed from SKX
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '01']]
+  throughput: 0.5
+  uops: 1
+- name: VPSLLD  # JH: assumed from SKX
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  latency: 1
+  port_pressure: [[1, '01']]
+  throughput: 0.5
+  uops: 1
+- name: VPSLLD  # JH: assumed from SKX
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: zmm
+  - class: register
+    name: zmm
+  latency: 1
+  port_pressure: [[1, '0']]
+  throughput: 1.0
+  uops: 1
+- name: VPSLLDQ  # JH: assumed from SKX
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '5']]
+  throughput: 1.0
+  uops: 1
+- name: VPSLLDQ  # JH: assumed from SKX
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  latency: 1
+  port_pressure: [[1, '5']]
+  throughput: 1.0
+  uops: 1
+- name: VPSLLDQ  # JH: assumed from SKX
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: zmm
+  - class: register
+    name: zmm
+  latency: 1
+  port_pressure: [[1, '5']]
+  throughput: 1.0
+  uops: 1
+- name: VPSLLQ  # JH: assumed from SKX
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '01']]
+  throughput: 0.5
+  uops: 1
+- name: VPSLLQ  # JH: assumed from SKX
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  latency: 1
+  port_pressure: [[1, '01']]
+  throughput: 0.5
+  uops: 1
+- name: VPSLLQ  # JH: assumed from SKX
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: zmm
+  - class: register
+    name: zmm
+  latency: 1
+  port_pressure: [[1, '0']]
+  throughput: 1.0
+  uops: 1
+- name: vpsrld  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '0'], [1, '15']]
+  throughput: 1
+- name: VPSRLDQ  # JH: assumed from SKX
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '5']]
+  throughput: 1.0
+  uops: 1
+- name: VPSRLD  # JH: assumed from SKX
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  latency: 1
+  port_pressure: [[1, '01']]
+  throughput: 0.5
+  uops: 1
+- name: VPSRLD  # JH: assumed from SKX
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: zmm
+  - class: register
+    name: zmm
+  latency: 1
+  port_pressure: [[1, '0']]
+  throughput: 1.0
+  uops: 1
+- name: VPSRLQ  # JH: assumed from SKX
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  latency: 1
+  port_pressure: [[1, '01']]
+  throughput: 0.5
+  uops: 1
+- name: VPSRLQ  # JH: assumed from SKX
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: zmm
+  - class: register
+    name: zmm
+  latency: 1
+  port_pressure: [[1, '0']]
+  throughput: 1.0
+  uops: 1
+- name: VPSRLQ  # JH: assumed from SKX
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: zmm
+  - class: register
+    name: gpr
+  - class: register
+    name: zmm
+  latency: 1
+  port_pressure: [[1, '0']]
+  throughput: 1.0
+  uops: 1
+- name: VPSRLQ  # JH: assumed from SKX
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '01']]
+  throughput: 0.5
+  uops: 1
+- name: VPXOR  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '015']]
+  throughput: 0.3333333333333333
+  uops: 1
+- name: VPXOR  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  latency: 1
+  port_pressure: [[1, '015']]
+  throughput: 0.3333333333333333
+  uops: 1
+- name: VRCPPS  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 4
+  port_pressure: [[1, '0']]
+  throughput: 1.0
+  uops: 1
+- name: VRCPPS  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  latency: 4
+  port_pressure: [[1, '0']]
+  throughput: 1.0
+  uops: 1
+- name: VROUNDPS  # JH: assumed from SKX
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 8
+  port_pressure: [[2, '01']]
+  throughput: 1.0
+  uops: 2
+- name: VROUNDPS  # JH: assumed from SKX
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  latency: 8
+  port_pressure: [[2, '01']]
+  throughput: 1.0
+  uops: 2
+- name: VRSQRTPS  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 5
+  port_pressure: [[1, '0']]
+  throughput: 1.0
+  uops: 1
+- name: VRSQRTPS  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  latency: 5
+  port_pressure: [[1, '0']]
+  throughput: 1.0
+  uops: 1
+- name: VSHUFPS  # JH: assumed from SKX
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '5']]
+  throughput: 1.0
+  uops: 1
+- name: VSHUFPS  # JH: assumed from SKX
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  latency: 1
+  port_pressure: [[1, '5']]
+  throughput: 1.0
+  uops: 1
+- name: VSTMXCSR  # JH: assumed from SKX
+  operands:
+  - class: memory
+    base: "*"
+    offset: "*"
+    index: ~
+    scale: "*"
+  latency: 11
+  port_pressure: [[1, '0'], [1, '06'], [1, '237'], [1, '4']]
+  throughput: 1
+  uops: 4
+- name: VSTMXCSR  # JH: assumed from SKX
+  operands:
+  - class: memory
+    base: "*"
+    offset: "*"
+    index: "gpr"
+    scale: "*"
+  latency: 11
+  port_pressure: [[1, '0'], [1, '06'], [1, '23'], [1, '4']]
+  throughput: 1
+  uops: 4
+- name: VSUBSS  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 4
+  port_pressure: [[1, '01']]
+  throughput: 0.5
+  uops: 1
+- name: VSUBPD  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 4
+  port_pressure: [[1, '01']]
+  throughput: 0.5
+  uops: 1
+- name: VSUBPS  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 4
+  port_pressure: [[1, '01']]
+  throughput: 0.5
+  uops: 1
+- name: VSUBSD  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 4
+  port_pressure: [[1, '01']]
+  throughput: 0.5
+  uops: 1
+- name: VSUBSS  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  latency: 4
+  port_pressure: [[1, '01']]
+  throughput: 0.5
+  uops: 1
+- name: VSUBPD  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  latency: 4
+  port_pressure: [[1, '01']]
+  throughput: 0.5
+  uops: 1
+- name: VSUBPS  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  latency: 4
+  port_pressure: [[1, '01']]
+  throughput: 0.5
+  uops: 1
+- name: VSUBSD  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  latency: 4
+  port_pressure: [[1, '01']]
+  throughput: 0.5
+  uops: 1
+- name: VSQRTSS  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 13
+  port_pressure: [[1, '0'], [3, [0DV]]]
+  throughput: 3.0
+  uops: 1
+- name: VUCOMISS  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 3
+  port_pressure: [[1, '0']]
+  throughput: 1.0
+  uops: 1
+- name: VUCOMISD  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 3
+  port_pressure: [[1, '0']]
+  throughput: 1.0
+  uops: 1
+- name: VUNPCKLPS  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '5']]
+  throughput: 1.0
+  uops: 1
+- name: VUNPCKLPS  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  latency: 1
+  port_pressure: [[1, '5']]
+  throughput: 1.0
+  uops: 1
+- name: VUNPCKLPD  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '5']]
+  throughput: 1.0
+  uops: 1
+- name: VUNPCKLPD  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  latency: 1
+  port_pressure: [[1, '5']]
+  throughput: 1.0
+  uops: 1
+- name: VXORPS  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '015']]
+  throughput: 0.3333333333333333
+  uops: 1
+- name: VXORPS  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  latency: 1
+  port_pressure: [[1, '015']]
+  throughput: 0.3333333333333333
+- name: VXORPD  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '015']]
+  throughput: 0.3333333333333333
+  uops: 1
+- name: VXORPD  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  latency: 1
+  port_pressure: [[1, '015']]
+  throughput: 0.3333333333333333
 - name: VZEROUPPER  # JH: assumed from SKX
   operands: []
   latency: 1

@@ -40,10 +40,10 @@ def extract_paramters(instruction_tag, parser, isa):
             parameters.append(parameter)
         elif p_type == 'mem':
             parameter['class'] = 'memory'
-            parameter['base'] = 'gpr'
-            parameter['offset'] = None
-            parameter['index'] = None
-            parameter['scale'] = 1
+            parameter['base'] = "*"
+            parameter['offset'] = "*"
+            parameter['index'] = "*"
+            parameter['scale'] = "*"
             parameters.append(parameter)
         elif p_type == 'reg':
             parameter['class'] = 'register'
@@ -94,6 +94,9 @@ def extract_model(tree, arch):
         ignore = False
 
         mnemonic = instruction_tag.attrib['asm']
+        # skip any mnemonic which contain spaces (e.g., "REX CRC32")
+        if ' ' in mnemonic:
+            continue
 
         # Extract parameter components
         try:
