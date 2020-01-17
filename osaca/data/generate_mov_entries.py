@@ -148,6 +148,7 @@ snb_mov_instructions = [
     ('mov mem gpr', ('', 0)),
     ('mov imd gpr', ('1*p015', 1)),
     ('mov imd mem', ('', 0)),
+    ('movabs imd gpr', ('1*p015', 1)),  # AT&T version
 
     # https://www.felixcloutier.com/x86/movapd
     ('movapd xmm xmm', ('1*p5', 1)),
@@ -533,6 +534,7 @@ hsw_mov_instructions = list(OrderedDict(ivb_mov_instructions + [
     # https://www.felixcloutier.com/x86/mov
     ('mov imd gpr', ('1*p0156', 1)),
     ('mov gpr gpr', ('1*p0156', 1)),
+    ('movabs imd gpr', ('1*p0156', 1)),  # AT&T version
 
     # https://www.felixcloutier.com/x86/movbe
     ('movbe gpr mem', ('1*p15', 6)),
