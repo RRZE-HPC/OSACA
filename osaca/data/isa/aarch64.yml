@@ -160,3 +160,18 @@ instruction_forms:
           post-indexed: "*"
           source: false
           destination: true
+    - name: "stur"
+      operands:
+        - class: "register"
+          prefix: "q"
+          source: true
+          destination: false
+        - class: "memory"
+          base: "*"
+          offset: "*"
+          index: "*"
+          scale: "*"
+          pre-indexed: "*"
+          post-indexed: "*"
+          source: false
+          destination: true
