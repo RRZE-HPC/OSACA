@@ -15,9 +15,8 @@ class ParserX86ATT(BaseParser):
             pp.Optional(pp.Literal('-')) + pp.Word(pp.nums)
         ).setResultsName('value')
         hex_number = pp.Combine(pp.Literal('0x') + pp.Word(pp.hexnums)).setResultsName('value')
-        # Comment
-        symbol_comment = '#'
-        self.comment = pp.Literal(symbol_comment) + pp.Group(
+        # Comment - either '#' or '//' (icc)
+        self.comment = (pp.Literal('#') | pp.Literal('//')) + pp.Group(
             pp.ZeroOrMore(pp.Word(pp.printables))
         ).setResultsName(self.COMMENT_ID)
         # Define x86 assembly identifier
@@ -51,7 +50,8 @@ class ParserX86ATT(BaseParser):
         immediate = pp.Group(
             pp.Literal(symbol_immediate) + (hex_number | decimal_number | identifier)
         ).setResultsName(self.IMMEDIATE_ID)
-        # Memory: offset(base, index, scale)
+
+        # Memory preparations
         offset = pp.Group(identifier | hex_number | decimal_number).setResultsName(
             self.IMMEDIATE_ID
         )
@@ -76,7 +76,7 @@ class ParserX86ATT(BaseParser):
             + pp.Literal(':')
             + segment_extension.setResultsName(self.SEGMENT_EXT_ID)
         )
-
+        # Memory: offset | seg:seg_ext | offset(base, index, scale){mask}
         memory = pp.Group(
             (
                 pp.Optional(pp.Suppress(pp.Literal('*')))
@@ -88,6 +88,12 @@ class ParserX86ATT(BaseParser):
                 + pp.Optional(pp.Suppress(pp.Literal(',')))
                 + pp.Optional(scale.setResultsName('scale'))
                 + pp.Literal(')')
+                + pp.Optional(
+                    pp.Literal('{')
+                    + pp.Literal('%')
+                    + pp.Word(pp.alphanums).setResultsName('mask')
+                    + pp.Literal('}')
+                )
             )
             | memory_segmentation
             | (hex_number | pp.Word(pp.nums)).setResultsName('offset')
@@ -249,14 +255,14 @@ class ParserX86ATT(BaseParser):
     def process_operand(self, operand):
         # For the moment, only used to structure memory addresses
         if self.MEMORY_ID in operand:
-            return self.substitute_memory_address(operand[self.MEMORY_ID])
+            return self.process_memory_address(operand[self.MEMORY_ID])
         if self.IMMEDIATE_ID in operand:
-            return self.substitue_immediate(operand[self.IMMEDIATE_ID])
+            return self.process_immediate(operand[self.IMMEDIATE_ID])
         if self.LABEL_ID in operand:
-            return self.substitute_label(operand[self.LABEL_ID])
+            return self.process_label(operand[self.LABEL_ID])
         return operand
 
-    def substitute_memory_address(self, memory_address):
+    def process_memory_address(self, memory_address):
         # Remove unecessarily created dictionary entries during memory address parsing
         offset = None if 'offset' not in memory_address else memory_address['offset']
         base = None if 'base' not in memory_address else memory_address['base']
@@ -270,12 +276,12 @@ class ParserX86ATT(BaseParser):
             new_dict[self.SEGMENT_EXT_ID] = memory_address[self.SEGMENT_EXT_ID]
         return AttrDict({self.MEMORY_ID: new_dict})
 
-    def substitute_label(self, label):
+    def process_label(self, label):
         # remove duplicated 'name' level due to identifier
         label['name'] = label['name']['name']
         return AttrDict({self.LABEL_ID: label})
 
-    def substitue_immediate(self, immediate):
+    def process_immediate(self, immediate):
         if 'identifier' in immediate:
             # actually an identifier, change declaration
             return immediate
