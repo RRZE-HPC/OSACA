@@ -21089,6 +21089,17 @@ instruction_forms:
   throughput: 0.0                                                       # ./generate_mov_entries.py ivb
   uops: 0                                                               # ./generate_mov_entries.py ivb
                                                                         # ./generate_mov_entries.py ivb
+- name: movabs                                                          # ./generate_mov_entries.py ivb
+  operands:                                                             # ./generate_mov_entries.py ivb
+  - class: immediate                                                    # ./generate_mov_entries.py ivb
+    imd: int                                                            # ./generate_mov_entries.py ivb
+  - class: register                                                     # ./generate_mov_entries.py ivb
+    name: gpr                                                           # ./generate_mov_entries.py ivb
+  latency: 0                                                            # ./generate_mov_entries.py ivb
+  port_pressure: []                                                     # ./generate_mov_entries.py ivb
+  throughput: 0.0                                                       # ./generate_mov_entries.py ivb
+  uops: 0                                                               # ./generate_mov_entries.py ivb
+                                                                        # ./generate_mov_entries.py ivb
 - name: mov  # with store                                               # ./generate_mov_entries.py ivb
   operands:                                                             # ./generate_mov_entries.py ivb
   - class: immediate                                                    # ./generate_mov_entries.py ivb

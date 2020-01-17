@@ -20819,6 +20819,18 @@ instruction_forms:
   port_pressure: [[1, '015']]                                           # ./generate_mov_entries.py snb
   throughput: 0.3333333333333333                                        # ./generate_mov_entries.py snb
   uops: 1                                                               # ./generate_mov_entries.py snb
+
+                                                                        # ./generate_mov_entries.py snb
+- name: movabs                                                          # ./generate_mov_entries.py snb
+  operands:                                                             # ./generate_mov_entries.py snb
+  - class: immediate                                                    # ./generate_mov_entries.py snb
+    imd: int                                                            # ./generate_mov_entries.py snb
+  - class: register                                                     # ./generate_mov_entries.py snb
+    name: gpr                                                           # ./generate_mov_entries.py snb
+  latency: 1                                                            # ./generate_mov_entries.py snb
+  port_pressure: [[1, '015']]                                           # ./generate_mov_entries.py snb
+  throughput: 0.3333333333333333                                        # ./generate_mov_entries.py snb
+  uops: 1                                                               # ./generate_mov_entries.py snb
                                                                         # ./generate_mov_entries.py snb
 - name: mov  # with store                                               # ./generate_mov_entries.py snb
   operands:                                                             # ./generate_mov_entries.py snb
