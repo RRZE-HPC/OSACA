@@ -416,6 +416,34 @@ instruction_forms:
   throughput: 1.0
   latency: ~  # 	2*p34
   port_pressure: [[2.0, '34']]
+- name: ldur    # JL: assumed from ldr
+  operands:
+  - class: register
+    prefix: q
+  - class: memory
+    base: x
+    offset: '*'
+    index: '*'
+    scale: '*'
+    post-indexed: false
+    pre-indexed: false
+  throughput: 0.5
+  latency: 4.0  # 	1*p34
+  port_pressure: [[1.0, '34']]
+- name: ldr
+  operands:
+  - class: register
+    prefix: q
+  - class: memory
+    base: x
+    offset: '*'
+    index: '*'
+    scale: '*'
+    post-indexed: false
+    pre-indexed: false
+  throughput: 0.5
+  latency: 4.0  # 	1*p34
+  port_pressure: [[1.0, '34']]
 - name: ldr
   operands:
   - class: register
@@ -601,6 +629,20 @@ instruction_forms:
   throughput: 2.0
   latency: ~  # 	2*p34+2*p5
   port_pressure: [[2.0, '34'], [2.0, '5']]
+- name: stur # JL: assumed from str
+  operands:
+  - class: register
+    prefix: q
+  - class: memory
+    base: x
+    offset: '*'
+    index: '*'
+    scale: '*'
+    pre-indexed: false
+    post-indexed: false
+  throughput: 1.0
+  latency: 4.0  # 	1*p34+1*p5
+  port_pressure: [[1.0, '34'], [1.0, '5']]
 - name: str
   operands:
   - class: register
@@ -621,9 +663,9 @@ instruction_forms:
     prefix: d
   - class: memory
     base: x
-    offset: imd
-    index: ~
-    scale: 1
+    offset: '*'
+    index: '*'
+    scale: '*'
     pre-indexed: false
     post-indexed: false
   throughput: 1.0
@@ -649,8 +691,8 @@ instruction_forms:
     prefix: q
   - class: memory
     base: x
-    offset: ~
-    index: x
+    offset: '*'
+    index: '*'
     scale: 1
     pre-indexed: false
     post-indexed: false
