@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import os.path
 import argparse
 import sys
 import xml.etree.ElementTree as ET
@@ -13,7 +14,8 @@ def port_pressure_from_tag_attributes(attrib):
     # [[1, '015'], [1, '1'], [1, '23'], [1, '4'], [3, '5']]
     port_occupation = []
     for p in attrib['ports'].split('+'):
-        cycles, ports = p.split('*p')
+        cycles, ports = p.split('*')
+        ports = ports.lstrip('p')
         port_occupation.append([int(cycles), ports])
 
     # Also
@@ -40,10 +42,10 @@ def extract_paramters(instruction_tag, parser, isa):
             parameters.append(parameter)
         elif p_type == 'mem':
             parameter['class'] = 'memory'
-            parameter['base'] = 'gpr'
-            parameter['offset'] = None
-            parameter['index'] = None
-            parameter['scale'] = 1
+            parameter['base'] = "*"
+            parameter['offset'] = "*"
+            parameter['index'] = "*"
+            parameter['scale'] = "*"
             parameters.append(parameter)
         elif p_type == 'reg':
             parameter['class'] = 'register'
@@ -72,13 +74,11 @@ def extract_paramters(instruction_tag, parser, isa):
             parameter['class'] = 'identifier'
             parameters.append(parameter)
         elif p_type == 'agen':
-            # FIXME actually only address generation
             parameter['class'] = 'memory'
-            parameter['base'] = 'gpr'
-            parameter['offset'] = None
-            parameter['index'] = None
-            parameter['scale'] = 1
-            parameters.append(parameter)
+            parameter['base'] = "*"
+            parameter['offset'] = "*"
+            parameter['index'] = "*"
+            parameter['scale'] = "*"
             parameters.append(parameter)
         else:
             raise ValueError("Unknown paramter type {}".format(parameter_tag.attrib))
@@ -86,7 +86,11 @@ def extract_paramters(instruction_tag, parser, isa):
 
 
 def extract_model(tree, arch):
-    isa = MachineModel.get_isa_for_arch(arch)
+    try:
+        isa = MachineModel.get_isa_for_arch(arch)
+    except:
+        print("Skipping...", file=sys.stderr)
+        return None
     mm = MachineModel(isa=isa)
     parser = get_parser(isa)
 
@@ -94,6 +98,9 @@ def extract_model(tree, arch):
         ignore = False
 
         mnemonic = instruction_tag.attrib['asm']
+        # skip any mnemonic which contain spaces (e.g., "REX CRC32")
+        if ' ' in mnemonic:
+            continue
 
         # Extract parameter components
         try:
@@ -133,10 +140,12 @@ def extract_model(tree, arch):
                     if 'max_cycles' in l_tag.attrib
                 ]
             if latencies[1:] != latencies[:-1]:
-                print("Contradicting latencies found:", mnemonic, file=sys.stderr)
-                ignore = True
-            elif latencies:
+                print("Contradicting latencies found, using first:", mnemonic, latencies,
+                      file=sys.stderr)
+            if latencies:
                 latency = latencies[0]
+        if ignore:
+            continue
 
         # Ordered by IACA version (newest last)
         for iaca_tag in sorted(
@@ -144,15 +153,13 @@ def extract_model(tree, arch):
         ):
             if 'ports' in iaca_tag.attrib:
                 port_pressure.append(port_pressure_from_tag_attributes(iaca_tag.attrib))
-        if ignore:
-            continue
 
         # Check if all are equal
         if port_pressure:
             if port_pressure[1:] != port_pressure[:-1]:
                 print(
-                    "Contradicting port occupancies, using latest IACA:", mnemonic, file=sys.stderr
-                )
+                    "Contradicting port occupancies, using latest IACA:",
+                    mnemonic, file=sys.stderr)
             port_pressure = port_pressure[-1]
 
             # Add missing ports:
@@ -170,6 +177,15 @@ def extract_model(tree, arch):
     return mm
 
 
+def rhs_comment(uncommented_string, comment):
+    max_length = max([len(l) for l in uncommented_string.split('\n')])
+
+    commented_string = ""
+    for l in uncommented_string.split('\n'):
+        commented_string += ("{:<"+str(max_length)+"}  # {}\n").format(l, comment)
+    return commented_string
+
+
 def architectures(tree):
     return set([a.attrib['name'] for a in tree.findall('.//architecture')])
 
@@ -184,18 +200,22 @@ def main():
         'if not given, all will be extracted and saved to file in CWD.',
     )
     args = parser.parse_args()
+    basename = os.path.basename(__file__)
 
     tree = ET.parse(args.xml)
     print('Available architectures:', ', '.join(architectures(tree)))
     if args.arch:
         model = extract_model(tree, args.arch)
-        print(model.dump())
+        if model is not None:
+            print(rhs_comment(model.dump(), basename+" "+sys.argv[0]))
     else:
         for arch in architectures(tree):
             print(arch, end='')
             model = extract_model(tree, arch.lower())
+            model_string = rhs_comment(model.dump(), basename+" "+arch)
+            
             with open('{}.yml'.format(arch.lower()), 'w') as f:
-                model.dump(f)
+                f.write(model_string)
             print('.')
 
 
