@@ -90,10 +90,8 @@ setup(
     # requirements files see:
     # https://packaging.python.org/en/latest/requirements.html
     install_requires=[
-        'kerncraft',
         'networkx',
         'pyparsing',
-        'pygraphviz',
     ],
     python_requires='>=3.5',
 
