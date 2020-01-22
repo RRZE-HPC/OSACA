@@ -318,7 +318,7 @@ instruction_forms:
     pre-indexed: false
     post-indexed: false
   throughput: 1.0
-  latency: ~  # 	2*p34
+  latency: 4.0  # 	2*p34
   port_pressure: [[2.0, '34']]
 - name: ldp
   operands:
@@ -334,7 +334,7 @@ instruction_forms:
     pre-indexed: false
     post-indexed: true
   throughput: 1.0
-  latency: ~  # 	2*p34
+  latency: 4.0  # 	2*p34
   port_pressure: [[2.0, '34']]
 - name: ldp
   operands:
@@ -344,13 +344,13 @@ instruction_forms:
     prefix: q
   - class: memory
     base: x
-    offset: imd
-    index: ~
+    offset: '*'
+    index: '*'
     scale: 1
     pre-indexed: false
     post-indexed: false
   throughput: 1.0
-  latency: ~  # 	2*p34
+  latency: 4.0  # 	2*p34
   port_pressure: [[2.0, '34']]
 - name: ldp
   operands:
@@ -366,7 +366,7 @@ instruction_forms:
     pre-indexed: false
     post-indexed: true
   throughput: 1.0
-  latency: ~  # 	2*p34
+  latency: 4.0  # 	2*p34
   port_pressure: [[2.0, '34']]
 - name: ldp
   operands:
@@ -376,13 +376,13 @@ instruction_forms:
     prefix: q
   - class: memory
     base: x
-    offset: ~
-    index: ~
-    scale: 1
+    offset: '*'
+    index: '*'
+    scale: '*'
     pre-indexed: false
     post-indexed: false
   throughput: 1.0
-  latency: ~  # 	2*p34
+  latency: 4.0  # 	2*p34
   port_pressure: [[2.0, '34']]
 - name: ldp
   operands:
@@ -392,13 +392,13 @@ instruction_forms:
     prefix: q
   - class: memory
     base: x
-    offset: imd
-    index: ~
-    scale: 1
+    offset: '*'
+    index: '*'
+    scale: '*'
     pre-indexed: true
     post-indexed: false
   throughput: 1.0
-  latency: ~  # 	2*p34
+  latency: 4.0  # 	2*p34
   port_pressure: [[2.0, '34']]
 - name: ldp
   operands:
@@ -408,13 +408,13 @@ instruction_forms:
     prefix: d
   - class: memory
     base: x
-    offset: ~
-    index: ~
-    scale: 1
+    offset: '*'
+    index: '*'
+    scale: '*'
     pre-indexed: false
     post-indexed: true
   throughput: 1.0
-  latency: ~  # 	2*p34
+  latency: 4.0  # 	2*p34
   port_pressure: [[2.0, '34']]
 - name: ldur    # JL: assumed from ldr
   operands:
@@ -450,9 +450,9 @@ instruction_forms:
     prefix: d
   - class: memory
     base: x
-    offset: ~
-    index: ~
-    scale: 1
+    offset: '*'
+    index: '*'
+    scale: '*'
     post-indexed: false
     pre-indexed: false
   throughput: 0.5
@@ -465,8 +465,8 @@ instruction_forms:
   - class: memory
     base: x
     offset: imd
-    index: ~
-    scale: 1
+    index: '*'
+    scale: '*'
     post-indexed: false
     pre-indexed: false
   throughput: 0.5
@@ -478,9 +478,9 @@ instruction_forms:
     prefix: d
   - class: memory
     base: x
-    offset: ~
-    index: x
-    scale: 8
+    offset: '*'
+    index: '*'
+    scale: '*'
     post-indexed: false
     pre-indexed: false
   throughput: 0.5
@@ -557,29 +557,13 @@ instruction_forms:
     prefix: d
   - class: memory
     base: x
-    offset: ~
-    index: ~
-    scale: 1
+    offset: '*'
+    index: '*'
+    scale: '*'
     pre-indexed: false
     post-indexed: false
   throughput: 2.0
-  latency: ~  # 	4*p34
-  port_pressure: [[4.0, '34']]
-- name: stp
-  operands:
-  - class: register
-    prefix: d
-  - class: register
-    prefix: d
-  - class: memory
-    base: x
-    offset: imd
-    index: ~
-    scale: 1
-    pre-indexed: false
-    post-indexed: false
-  throughput: 2.0
-  latency: ~  # 	4*p34
+  latency: 0  # 	4*p34
   port_pressure: [[4.0, '34']]
 - name: stp
   operands:
@@ -589,13 +573,13 @@ instruction_forms:
     prefix: q
   - class: memory
     base: x
-    offset: ~
-    index: ~
-    scale: 1
+    offset: '*'
+    index: '*'
+    scale: '*'
     pre-indexed: false
     post-indexed: true
   throughput: 2.0
-  latency: ~  # 	2*p34+2*p5
+  latency: 0  # 	2*p34+2*p5
   port_pressure: [[2.0, '34'], [2.0, '5']]
 - name: stp
   operands:
@@ -605,30 +589,28 @@ instruction_forms:
     prefix: q
   - class: memory
     base: x
-    offset: ~
-    index: ~
-    scale: 1
+    offset: '*'
+    index: '*'
+    scale: '*'
     pre-indexed: false
     post-indexed: false
   throughput: 2.0
-  latency: ~  # 	2*p34+2*p5
+  latency: 0  # 	2*p34+2*p5
   port_pressure: [[2.0, '34'], [2.0, '5']]
-- name: stp
+- name: stur # JL: assumed from str
   operands:
   - class: register
-    prefix: q
-  - class: register
-    prefix: q
+    prefix: d
   - class: memory
     base: x
-    offset: imd
-    index: ~
-    scale: 1
+    offset: '*'
+    index: '*'
+    scale: '*'
     pre-indexed: false
     post-indexed: false
-  throughput: 2.0
-  latency: ~  # 	2*p34+2*p5
-  port_pressure: [[2.0, '34'], [2.0, '5']]
+  throughput: 1.0
+  latency: 4.0  # 	1*p34+1*p5
+  port_pressure: [[1.0, '34'], [1.0, '5']]
 - name: stur # JL: assumed from str
   operands:
   - class: register
@@ -649,13 +631,13 @@ instruction_forms:
     prefix: x
   - class: memory
     base: x
-    offset: ~
-    index: ~
-    scale: 1
+    offset: '*'
+    index: '*'
+    scale: '*'
     pre-indexed: false
     post-indexed: false
   throughput: 1.0
-  latency: 4.0  # 	1*p34+1*p5
+  latency: 0  # 	1*p34+1*p5
   port_pressure: [[1.0, '34'], [1.0, '5']]
 - name: str
   operands:
@@ -669,7 +651,7 @@ instruction_forms:
     pre-indexed: false
     post-indexed: false
   throughput: 1.0
-  latency: 4.0  # 	1*p34+1*p5
+  latency: 0  # 	1*p34+1*p5
   port_pressure: [[1.0, '34'], [1.0, '5']]
 - name: str
   operands:
@@ -677,13 +659,13 @@ instruction_forms:
     prefix: d
   - class: memory
     base: x
-    offset: ~
-    index: ~
-    scale: 1
+    offset: '*'
+    index: '*'
+    scale: '*'
     pre-indexed: false
     post-indexed: true
   throughput: 1.0
-  latency: 4.0  # 	1*p34+1*p5
+  latency: 0  # 	1*p34+1*p5
   port_pressure: [[1.0, '34'], [1.0, '5']]
 - name: str
   operands:
@@ -697,7 +679,7 @@ instruction_forms:
     pre-indexed: false
     post-indexed: false
   throughput: 1.0
-  latency: 4.0  # 	1*p34+1*p5
+  latency: 0  # 	1*p34+1*p5
   port_pressure: [[1.0, '34'], [1.0, '5']]
 - name: str
   operands:
@@ -705,13 +687,13 @@ instruction_forms:
     prefix: q
   - class: memory
     base: x
-    offset: ~
-    index: ~
-    scale: 1
+    offset: '*'
+    index: '*'
+    scale: '*'
     pre-indexed: false
     post-indexed: true
   throughput: 1.0
-  latency: 4.0  # 	1*p34+1*p5
+  latency: 0  # 	1*p34+1*p5
   port_pressure: [[1.0, '34'], [1.0, '5']]
 - name: str
   operands:
@@ -719,25 +701,22 @@ instruction_forms:
     prefix: x
   - class: memory
     base: x
-    offset: ~
-    index: ~
-    scale: 1
+    offset: '*'
+    index: '*'
+    scale: '*'
     pre-indexed: false
     post-indexed: true
   throughput: 1.0
-  latency: 4.0  # 	1*p34+1*p5
+  latency: 0  # 	1*p34+1*p5
   port_pressure: [[1.0, '34'], [1.0, '5']]
-- name: str
+- name: sub
   operands:
   - class: register
-    prefix: x
-  - class: memory
-    base: x
-    offset: ~
-    index: x
-    scale: 1
-    pre-indexed: false
-    post-indexed: false
-  throughput: 1.0
-  latency: 4.0  # 	1*p34+1*p5
-  port_pressure: [[1.0, '34'], [1.0, '5']]
+    prefix: w
+  - class: register
+    prefix: w
+  - class: immediate
+    imd: int
+  throughput: 0.33333333
+  latency: 1.0  # 	1*p012
+  port_pressure: [[1, '012']]

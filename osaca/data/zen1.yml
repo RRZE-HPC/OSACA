@@ -82,7 +82,7 @@ instruction_forms:
   - class: register
     name: gpr
   throughput: 0.25
-  latency: ~  # 	1*p4567
+  latency: 1.0  # 	1*p4567
   port_pressure: [[1, '4567']]
 - name: cmpq
   operands:
@@ -91,7 +91,7 @@ instruction_forms:
   - class: register
     name: gpr
   throughput: 0.25
-  latency: ~  # 	1*p4567
+  latency: 1.0  # 	1*p4567
   port_pressure: [[1, '4567']]
 - name: incq
   operands:
@@ -104,19 +104,19 @@ instruction_forms:
   operands:
   - class: identifier
   throughput: 0.0
-  latency: ~
+  latency: 0
   port_pressure: []
 - name: jb
   operands:
   - class: identifier
   throughput: 0.0
-  latency: ~
+  latency: 0
   port_pressure: []
 - name: jne
   operands:
   - class: identifier
   throughput: 0.0
-  latency: ~
+  latency: 0
   port_pressure: []
 - name: leaq
   operands:
@@ -128,7 +128,7 @@ instruction_forms:
   - class: register
     name: gpr
   throughput: 0.5
-  latency: ~  # 	1*p89
+  latency: 1.0  # 	1*p89
   port_pressure: [[1, '89']]
 - name: movl
   operands:
@@ -367,7 +367,7 @@ instruction_forms:
     index: gpr
     scale: 1
   throughput: 1.0
-  latency: 4.0  # 	1*p89+1*pST
+  latency: 0  # 	1*p89+1*pST
   port_pressure: [[1, '89'], [1, [ST]]]
 - name: vmovapd
   operands:
@@ -388,7 +388,7 @@ instruction_forms:
     index: gpr
     scale: 1
   throughput: 2.0
-  latency: 3.0  # 	2*p89+2*pST
+  latency: 0  # 	2*p89+2*pST
   port_pressure: [[2, '89'], [2, [ST]]]
 - name: vmovapd
   operands:
@@ -400,19 +400,31 @@ instruction_forms:
     index: gpr
     scale: 1
   throughput: 2.0
-  latency: 3.0  # 	2*p89+2*pST
+  latency: 0  # 	2*p89+2*pST
   port_pressure: [[2, '89'], [2, [ST]]]
-- name: vmovaps
+- name: vmovups
+  operands:
+  - class: memory
+    base: gpr
+    offset: "*"
+    index: "*"
+    scale: "*"
+  - class: register
+    name: xmm
+  throughput: 0.5
+  latency: 4.0  # 	1*p89+1*p8D9D
+  port_pressure: [[1, '89'], [1, [8D, 9D]]]
+- name: vmovups
   operands:
   - class: register
     name: xmm
   - class: memory
     base: gpr
-    offset: ~
-    index: gpr
-    scale: 1
+    offset: "*"
+    index: "*"
+    scale: "*"
   throughput: 1.0
-  latency: 4.0  # 	1*p89+1*pST
+  latency: 0  # 	1*p89+1*pST
   port_pressure: [[1, '89'], [1, [ST]]]
 - name: vmovaps
   operands:
@@ -420,11 +432,11 @@ instruction_forms:
     name: xmm
   - class: memory
     base: gpr
-    offset: imd
-    index: gpr
-    scale: 1
+    offset: "*"
+    index: "*"
+    scale: "*"
   throughput: 1.0
-  latency: 4.0  # 	1*p89+1*pST
+  latency: 0  # 	1*p89+1*pST
   port_pressure: [[1, '89'], [1, [ST]]]
 - name: vmovupd
   operands:
@@ -436,7 +448,7 @@ instruction_forms:
     index: gpr
     scale: 1
   throughput: 2.0
-  latency: 3.0  # 	2*p89+2*pST
+  latency: 0  # 	2*p89+2*pST
   port_pressure: [[2, '89'], [2, [ST]]]
 - name: vmovupd
   operands:
@@ -448,7 +460,7 @@ instruction_forms:
     index: gpr
     scale: 1
   throughput: 2.0
-  latency: 3.0  # 	2*p89+2*pST
+  latency: 0  # 	2*p89+2*pST
   port_pressure: [[2, '89'], [2, [ST]]]
 - name: vmovupd
   operands:
@@ -460,7 +472,7 @@ instruction_forms:
     index: gpr
     scale: 1
   throughput: 2.0
-  latency: 3.0  # 	2*p89+2*pST
+  latency: 0  # 	2*p89+2*pST
   port_pressure: [[2, '89'], [2, [ST]]]
 - name: vmovupd
   operands:
@@ -502,7 +514,7 @@ instruction_forms:
     index: ~
     scale: 1
   throughput: 1.0
-  latency: 4.0  # 	1*p89+1*pST
+  latency: 0  # 	1*p89+1*pST
   port_pressure: [[1, '89'], [1, [ST]]]
 - name: vmovsd
   operands:
@@ -514,7 +526,7 @@ instruction_forms:
     index: ~
     scale: 1
   throughput: 1.0
-  latency: 4.0  # 	1*p89+1*pST
+  latency: 0  # 	1*p89+1*pST
   port_pressure: [[1, '89'], [1, [ST]]]
 - name: vmovsd
   operands:
@@ -526,7 +538,7 @@ instruction_forms:
     index: gpr
     scale: 1
   throughput: 1.0
-  latency: 4.0  # 	1*p89+1*pST
+  latency: 0  # 	1*p89+1*pST
   port_pressure: [[1, '89'], [1, [ST]]]
 - name: vmovsd
   operands:
@@ -538,5 +550,5 @@ instruction_forms:
     index: gpr
     scale: 1
   throughput: 1.0
-  latency: 4.0  # 	1*p89+1*pST
+  latency: 0  # 	1*p89+1*pST
   port_pressure: [[1, '89'], [1, [ST]]]

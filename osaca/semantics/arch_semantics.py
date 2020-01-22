@@ -176,6 +176,8 @@ class ArchSemantics(ISASemantics):
                                 operands.index(self._create_reg_wildcard())
                             ]
                         )
+                        data_port_pressure = [0.0 for _ in range(port_number)]
+                        data_port_uops = []
                         if INSTR_FLAGS.HAS_LD in instruction_form['flags']:
                             # LOAD performance data
                             data_port_uops = self._machine_model.get_load_throughput(
@@ -196,17 +198,41 @@ class ArchSemantics(ISASemantics):
                                 data_port_pressure = [pp * multiplier for pp in data_port_pressure]
                         if INSTR_FLAGS.HAS_ST in instruction_form['flags']:
                             # STORE performance data
-                            data_port_uops = self._machine_model.get_store_throughput(
-                                [
-                                    x['memory']
-                                    for x in instruction_form['semantic_operands']['destination']
-                                    + instruction_form['semantic_operands']['src_dst']
-                                    if 'memory' in x
-                                ][0]
+                            destinations = (
+                                instruction_form['semantic_operands']['destination']
+                                + instruction_form['semantic_operands']['src_dst']
                             )
-                            data_port_pressure = self._machine_model.average_port_pressure(
-                                data_port_uops
+                            st_data_port_uops = self._machine_model.get_store_throughput(
+                                [x['memory'] for x in destinations if 'memory' in x][0]
                             )
+                            # zero data port pressure and remove HAS_ST flag if
+                            #   - no mem operand in dst &&
+                            #   - all mem operands in src_dst are pre-/post-indexed
+                            # since it is no mem store
+                            if (
+                                self._isa == 'aarch64'
+                                and 'memory'
+                                not in instruction_form['semantic_operands']['destination']
+                                and all(
+                                    [
+                                        'post_indexed' in op['memory']
+                                        or 'pre_indexed' in op['memory']
+                                        for op in instruction_form['semantic_operands']['src_dst']
+                                        if 'memory' in op
+                                    ]
+                                )
+                            ):
+                                st_data_port_uops = []
+                                instruction_form['flags'].remove(INSTR_FLAGS.HAS_ST)
+
+                            # sum up all data ports in case for LOAD and STORE
+                            st_data_port_pressure = self._machine_model.average_port_pressure(
+                                st_data_port_uops
+                            )
+                            data_port_pressure = [
+                                sum(x) for x in zip(data_port_pressure, st_data_port_pressure)
+                            ]
+                            data_port_uops += st_data_port_uops
                         throughput = max(
                             max(data_port_pressure), instruction_data_reg['throughput']
                         )
