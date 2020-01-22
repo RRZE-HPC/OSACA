@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 
-import pyparsing as pp
 import string
+
+import pyparsing as pp
 
 from osaca.parser import AttrDict, BaseParser
 
@@ -34,7 +35,7 @@ class ParserX86ATT(BaseParser):
         self.label = pp.Group(
             identifier.setResultsName('name') + pp.Literal(':') + pp.Optional(self.comment)
         ).setResultsName(self.LABEL_ID)
-        # Register: pp.Regex('^%[0-9a-zA-Z]+,?')
+        # Register: pp.Regex('^%[0-9a-zA-Z]+{}{z},?')
         self.register = pp.Group(
             pp.Literal('%')
             + pp.Word(pp.alphanums).setResultsName('name')
@@ -44,6 +45,11 @@ class ParserX86ATT(BaseParser):
                 + pp.Literal('%')
                 + pp.Word(pp.alphanums).setResultsName('mask')
                 + pp.Literal('}')
+                + pp.Optional(
+                    pp.Suppress(pp.Literal('{'))
+                    + pp.Literal('z').setResultsName('zeroing')
+                    + pp.Suppress(pp.Literal('}'))
+                )
             )
         ).setResultsName(self.REGISTER_ID)
         # Immediate: pp.Regex('^\$(-?[0-9]+)|(0x[0-9a-fA-F]+),?')
