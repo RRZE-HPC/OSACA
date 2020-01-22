@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
 
+import base64
+import pickle
 import re
+import os
 from copy import deepcopy
 from itertools import product
 
@@ -46,28 +49,36 @@ class MachineModel(object):
             if arch:
                 self._arch = arch.lower()
                 self._path = utils.find_file(self._arch + '.yml')
-            with open(self._path, 'r') as f:
-                if not lazy:
-                    self._data = yaml.load(f)
-                    # separate multi-alias instruction forms
-                    for entry in [
-                        x for x in self._data['instruction_forms'] if isinstance(x['name'], list)
-                    ]:
-                        for name in entry['name']:
-                            new_entry = {'name': name}
-                            for k in [x for x in entry.keys() if x != 'name']:
-                                new_entry[k] = entry[k]
-                            self._data['instruction_forms'].append(new_entry)
-                        # remove old entry
-                        self._data['instruction_forms'].remove(entry)
-                else:
-                    file_content = ''
-                    line = f.readline()
-                    while 'instruction_forms:' not in line:
-                        file_content += line
+            # check if file is cached
+            cached = self._get_cached(self._path) if not lazy else False
+            if cached:
+                self._data = cached
+            else:
+                # otherwise load
+                with open(self._path, 'r') as f:
+                    if not lazy:
+                        self._data = yaml.load(f)
+                        # cache file for next call
+                        self._write_in_cache(self._path, self._data)
+                    else:
+                        file_content = ''
                         line = f.readline()
-                    self._data = yaml.load(file_content)
-                    self._data['instruction_forms'] = []
+                        while 'instruction_forms:' not in line:
+                            file_content += line
+                            line = f.readline()
+                        self._data = yaml.load(file_content)
+                        self._data['instruction_forms'] = []
+            # separate multi-alias instruction forms
+            for entry in [
+                x for x in self._data['instruction_forms'] if isinstance(x['name'], list)
+            ]:
+                for name in entry['name']:
+                    new_entry = {'name': name}
+                    for k in [x for x in entry.keys() if x != 'name']:
+                        new_entry[k] = entry[k]
+                    self._data['instruction_forms'].append(new_entry)
+                # remove old entry
+                self._data['instruction_forms'].remove(entry)
             # For use with dict instead of list as DB
             # self._data['instruction_dict'] = (
             #     self._convert_to_dict(self._data['instruction_forms'])
@@ -231,7 +242,6 @@ class MachineModel(object):
             'kbl': 'x86',
             'cnl': 'x86',
             'cfl': 'x86',
-
         }
         arch = arch.lower()
         if arch in arch_dict:
@@ -275,6 +285,28 @@ class MachineModel(object):
             return stream.getvalue()
 
     ######################################################
+
+    def _get_cached(self, filepath):
+        hashname = self._get_hashname(filepath)
+        cachepath = utils.exists_cached_file(hashname + '.pickle')
+        if cachepath:
+            # Check if modification date of DB is older than cached version
+            if os.path.getmtime(filepath) < os.path.getmtime(cachepath):
+                # load cached version
+                cached_db = pickle.load(open(cachepath, 'rb'))
+                return cached_db
+            else:
+                # DB newer than cached version --> delete cached file and return False
+                os.remove(cachepath)
+        return False
+
+    def _write_in_cache(self, filepath, data):
+        hashname = self._get_hashname(filepath)
+        filepath = os.path.join(utils.CACHE_DIR, hashname + '.pickle')
+        pickle.dump(data, open(filepath, 'wb'))
+
+    def _get_hashname(self, name):
+        return base64.b64encode(name.encode()).decode()
 
     def _get_key(self, name, operands):
         key_string = name.lower() + '-'
