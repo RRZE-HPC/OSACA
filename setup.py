@@ -92,6 +92,7 @@ setup(
     install_requires=[
         'networkx',
         'pyparsing',
+        'ruamel.yaml',
     ],
     python_requires='>=3.5',
 
