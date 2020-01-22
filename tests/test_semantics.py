@@ -108,48 +108,48 @@ class TestSemanticTools(unittest.TestCase):
 
     def test_kernelDG_x86(self):
         #
-        #  3
-        #   \___>5__>6
+        #  4
+        #   \___>6__>7
         #   /
-        #  2
-        #     4_______>8
+        #  3
+        #     5_______>9
         #
         dg = KernelDG(self.kernel_x86, self.parser_x86, self.machine_model_csx)
         self.assertTrue(nx.algorithms.dag.is_directed_acyclic_graph(dg.dg))
+        self.assertEqual(len(list(dg.get_dependent_instruction_forms(line_number=3))), 1)
+        self.assertEqual(next(dg.get_dependent_instruction_forms(line_number=3)), 6)
         self.assertEqual(len(list(dg.get_dependent_instruction_forms(line_number=4))), 1)
-        self.assertEqual(next(dg.get_dependent_instruction_forms(line_number=4)), 7)
+        self.assertEqual(next(dg.get_dependent_instruction_forms(line_number=4)), 6)
         self.assertEqual(len(list(dg.get_dependent_instruction_forms(line_number=5))), 1)
-        self.assertEqual(next(dg.get_dependent_instruction_forms(line_number=5)), 7)
+        self.assertEqual(next(dg.get_dependent_instruction_forms(line_number=5)), 9)
         self.assertEqual(len(list(dg.get_dependent_instruction_forms(line_number=6))), 1)
-        self.assertEqual(next(dg.get_dependent_instruction_forms(line_number=6)), 10)
-        self.assertEqual(len(list(dg.get_dependent_instruction_forms(line_number=7))), 1)
-        self.assertEqual(next(dg.get_dependent_instruction_forms(line_number=7)), 8)
+        self.assertEqual(next(dg.get_dependent_instruction_forms(line_number=6)), 7)
+        self.assertEqual(len(list(dg.get_dependent_instruction_forms(line_number=7))), 0)
         self.assertEqual(len(list(dg.get_dependent_instruction_forms(line_number=8))), 0)
-        self.assertEqual(len(list(dg.get_dependent_instruction_forms(line_number=9))), 0)
         with self.assertRaises(ValueError):
             dg.get_dependent_instruction_forms()
 
     def test_kernelDG_AArch64(self):
         dg = KernelDG(self.kernel_AArch64, self.parser_AArch64, self.machine_model_tx2)
         self.assertTrue(nx.algorithms.dag.is_directed_acyclic_graph(dg.dg))
-        self.assertEqual(set(dg.get_dependent_instruction_forms(line_number=4)), {8, 9})
-        self.assertEqual(set(dg.get_dependent_instruction_forms(line_number=5)), {10, 11})
-        self.assertEqual(set(dg.get_dependent_instruction_forms(line_number=6)), {7, 8, 9})
-        self.assertEqual(set(dg.get_dependent_instruction_forms(line_number=7)), {10, 11})
+        self.assertEqual(set(dg.get_dependent_instruction_forms(line_number=3)), {7, 8})
+        self.assertEqual(set(dg.get_dependent_instruction_forms(line_number=4)), {9, 10})
+        self.assertEqual(set(dg.get_dependent_instruction_forms(line_number=5)), {6, 7, 8})
+        self.assertEqual(set(dg.get_dependent_instruction_forms(line_number=6)), {9, 10})
+        self.assertEqual(next(dg.get_dependent_instruction_forms(line_number=7)), 13)
         self.assertEqual(next(dg.get_dependent_instruction_forms(line_number=8)), 14)
-        self.assertEqual(next(dg.get_dependent_instruction_forms(line_number=9)), 15)
+        self.assertEqual(next(dg.get_dependent_instruction_forms(line_number=9)), 16)
         self.assertEqual(next(dg.get_dependent_instruction_forms(line_number=10)), 17)
-        self.assertEqual(next(dg.get_dependent_instruction_forms(line_number=11)), 18)
-        self.assertEqual(set(dg.get_dependent_instruction_forms(line_number=12)), {14, 15})
-        self.assertEqual(set(dg.get_dependent_instruction_forms(line_number=13)), {17, 18})
-        self.assertEqual(next(dg.get_dependent_instruction_forms(line_number=14)), 16)
-        self.assertEqual(next(dg.get_dependent_instruction_forms(line_number=15)), 16)
-        self.assertEqual(len(list(dg.get_dependent_instruction_forms(line_number=16))), 0)
-        self.assertEqual(next(dg.get_dependent_instruction_forms(line_number=17)), 19)
-        self.assertEqual(next(dg.get_dependent_instruction_forms(line_number=18)), 19)
+        self.assertEqual(set(dg.get_dependent_instruction_forms(line_number=11)), {13, 14})
+        self.assertEqual(set(dg.get_dependent_instruction_forms(line_number=12)), {16, 17})
+        self.assertEqual(next(dg.get_dependent_instruction_forms(line_number=13)), 15)
+        self.assertEqual(next(dg.get_dependent_instruction_forms(line_number=14)), 15)
+        self.assertEqual(len(list(dg.get_dependent_instruction_forms(line_number=15))), 0)
+        self.assertEqual(next(dg.get_dependent_instruction_forms(line_number=16)), 18)
+        self.assertEqual(next(dg.get_dependent_instruction_forms(line_number=17)), 18)
+        self.assertEqual(len(list(dg.get_dependent_instruction_forms(line_number=18))), 0)
         self.assertEqual(len(list(dg.get_dependent_instruction_forms(line_number=19))), 0)
         self.assertEqual(len(list(dg.get_dependent_instruction_forms(line_number=20))), 0)
-        self.assertEqual(len(list(dg.get_dependent_instruction_forms(line_number=21))), 0)
         with self.assertRaises(ValueError):
             dg.get_dependent_instruction_forms()
 
@@ -185,12 +185,12 @@ class TestSemanticTools(unittest.TestCase):
             dg.get_loopcarried_dependencies()
 
     def test_loop_carried_dependency_x86(self):
-        lcd_id = 9
-        lcd_id2 = 10
+        lcd_id = 8
+        lcd_id2 = 9
         dg = KernelDG(self.kernel_x86, self.parser_x86, self.machine_model_csx)
         lc_deps = dg.get_loopcarried_dependencies()
         self.assertEqual(len(lc_deps), 2)
-        # ID 9
+        # ID 8
         self.assertEqual(
             lc_deps[lcd_id]['root'], dg.dg.nodes(data=True)[lcd_id]['instruction_form']
         )
@@ -198,7 +198,7 @@ class TestSemanticTools(unittest.TestCase):
         self.assertEqual(
             lc_deps[lcd_id]['dependencies'][0], dg.dg.nodes(data=True)[lcd_id]['instruction_form']
         )
-        # ursprünglich ID 6 mit LCD zu ID 6 (len=1)
+        # ID 9  ursprünglich ID 5 mit LCD zu ID 5 (len=1)
         # TODO discuss
         self.assertEqual(
             lc_deps[lcd_id2]['root'], dg.dg.nodes(data=True)[lcd_id2]['instruction_form']

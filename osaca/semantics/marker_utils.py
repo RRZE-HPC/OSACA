@@ -3,6 +3,8 @@ from collections import OrderedDict
 
 from osaca.parser import ParserAArch64v81, ParserX86ATT, get_parser
 
+COMMENT_MARKER = {'start': 'OSACA-BEGIN', 'end': 'OSACA-END'}
+
 
 def reduce_to_section(kernel, isa):
     isa = isa.lower()
@@ -22,14 +24,27 @@ def reduce_to_section(kernel, isa):
 def find_marked_kernel_AArch64(lines):
     nop_bytes = ['213', '3', '32', '31']
     return find_marked_section(
-        lines, ParserAArch64v81(), ['mov'], 'x1', [111, 222], nop_bytes, reverse=True
+        lines,
+        ParserAArch64v81(),
+        ['mov'],
+        'x1',
+        [111, 222],
+        nop_bytes,
+        reverse=True,
+        comments=COMMENT_MARKER,
     )
 
 
 def find_marked_kernel_x86ATT(lines):
     nop_bytes = ['100', '103', '144']
     return find_marked_section(
-        lines, ParserX86ATT(), ['mov', 'movl'], 'ebx', [111, 222], nop_bytes
+        lines,
+        ParserX86ATT(),
+        ['mov', 'movl'],
+        'ebx',
+        [111, 222],
+        nop_bytes,
+        comments=COMMENT_MARKER,
     )
 
 
@@ -70,13 +85,20 @@ def get_marker(isa, comment=""):
     return start_marker, end_marker
 
 
-def find_marked_section(lines, parser, mov_instr, mov_reg, mov_vals, nop_bytes, reverse=False):
+def find_marked_section(
+    lines, parser, mov_instr, mov_reg, mov_vals, nop_bytes, reverse=False, comments=None
+):
     # TODO match to instructions returned by get_marker
     index_start = -1
     index_end = -1
     for i, line in enumerate(lines):
         try:
-            if line.instruction in mov_instr and lines[i + 1].directive is not None:
+            if line.instruction is None and comments is not None and line.comment is not None:
+                if comments['start'] == line.comment:
+                    index_start = i + 1
+                elif comments['end'] == line.comment:
+                    index_end = i
+            elif line.instruction in mov_instr and lines[i + 1].directive is not None:
                 source = line.operands[0 if not reverse else 1]
                 destination = line.operands[1 if not reverse else 0]
                 # instruction pair matches, check for operands
@@ -121,7 +143,7 @@ def match_bytes(lines, index, byte_list):
         line_count += 1
         extracted_bytes += lines[index].directive.parameters
         index += 1
-    if extracted_bytes[0:len(byte_list)] == byte_list:
+    if extracted_bytes[0 : len(byte_list)] == byte_list:
         return True, line_count
     return False, -1
 
@@ -156,7 +178,7 @@ def find_jump_labels(lines):
         if all(
             [
                 l['instruction'].startswith('.')
-                for l in lines[labels[label][0]:labels[label][1]]
+                for l in lines[labels[label][0] : labels[label][1]]
                 if l['instruction'] is not None
             ]
         ):
@@ -180,7 +202,7 @@ def find_basic_blocks(lines):
     blocks = OrderedDict()
     for label, label_line_idx in valid_jump_labels.items():
         blocks[label] = []
-        for line in lines[label_line_idx + 1:]:
+        for line in lines[label_line_idx + 1 :]:
             terminate = False
             blocks[label].append(line)
             # Find end of block by searching for references to valid jump labels
@@ -209,7 +231,7 @@ def find_basic_loop_bodies(lines):
     loop_bodies = OrderedDict()
     for label, label_line_idx in valid_jump_labels.items():
         current_block = []
-        for line in lines[label_line_idx + 1:]:
+        for line in lines[label_line_idx + 1 :]:
             terminate = False
             current_block.append(line)
             # Find end of block by searching for references to valid jump labels
