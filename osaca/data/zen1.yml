@@ -205,6 +205,17 @@ instruction_forms:
 - name: vaddpd
   operands:
   - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  throughput: 0.5
+  latency: 3.0  # 	2*p23
+  port_pressure: [[1, '23']]
+- name: vaddpd
+  operands:
+  - class: register
     name: ymm
   - class: register
     name: ymm

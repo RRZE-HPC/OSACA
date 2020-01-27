@@ -48,6 +48,15 @@ class ParserAArch64v81(BaseParser):
             + commaSeparatedList.setResultsName('parameters')
             + pp.Optional(self.comment)
         ).setResultsName(self.DIRECTIVE_ID)
+        # LLVM-MCA markers
+        self.llvm_markers = pp.Group(
+            pp.Literal('#')
+            + pp.Combine(
+                pp.CaselessLiteral('LLVM-MCA-')
+                + (pp.CaselessLiteral('BEGIN') | pp.CaselessLiteral('END'))
+            )
+            + pp.Optional(self.comment)
+        ).setResultsName(self.COMMENT_ID)
 
         ##############################
         # Instructions
@@ -195,7 +204,15 @@ class ParserAArch64v81(BaseParser):
             instruction_form[self.COMMENT_ID] = ' '.join(result[self.COMMENT_ID])
         except pp.ParseException:
             pass
-
+        # 1.2 check for llvm-mca marker
+        try:
+            result = self.process_operand(
+                self.llvm_markers.parseString(line, parseAll=True).asDict()
+            )
+            result = AttrDict.convert_dict(result)
+            instruction_form[self.COMMENT_ID] = ' '.join(result[self.COMMENT_ID])
+        except pp.ParseException:
+            pass
         # 2. Parse label
         if result is None:
             try:

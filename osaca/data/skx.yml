@@ -37191,7 +37191,26 @@ instruction_forms:
   port_pressure: [[1, '23'], [1, '4']]                      # ./generate_mov_entries.py skx
   throughput: 1.0                                           # ./generate_mov_entries.py skx
   uops: 2                                                   # ./generate_mov_entries.py skx
-                                                            # ./generate_mov_entries.py skx
+- name: vmovupd 
+  operands:        
+  - class: register
+    name: zmm      
+  - class: register
+    name: zmm      
+  latency: 0       
+  port_pressure: []
+  throughput: 0.0  
+  uops: 0
+- name: vmovups    
+  operands:        
+  - class: register
+    name: zmm      
+  - class: register
+    name: zmm      
+  latency: 0       
+  port_pressure: []
+  throughput: 0.0  
+  uops: 0
 - name: vmovups                                             # ./generate_mov_entries.py skx
   operands:                                                 # ./generate_mov_entries.py skx
   - class: register                                         # ./generate_mov_entries.py skx
