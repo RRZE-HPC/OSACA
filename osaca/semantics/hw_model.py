@@ -4,6 +4,7 @@ import base64
 import pickle
 import re
 import os
+import string
 from copy import deepcopy
 from itertools import product
 
@@ -513,7 +514,7 @@ class MachineModel(object):
         # differentiate between vector registers (mm, xmm, ymm, zmm) and others (gpr)
         parser_x86 = ParserX86ATT()
         if parser_x86.is_vector_register(reg):
-            if ''.join([l for l in reg['name'] if not l.isdigit()])[-2:] == i_reg_name[-2:]:
+            if reg['name'].rstrip(string.digits).lower() == i_reg_name:
                 return True
         else:
             if i_reg_name == 'gpr':
