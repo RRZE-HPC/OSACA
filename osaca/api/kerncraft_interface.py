@@ -40,9 +40,7 @@ class KerncraftAPI(object):
     def create_output(self, verbose=False):
         kernel_graph = KernelDG(self.kernel, self.parser, self.machine_model)
         frontend = Frontend(arch=self.machine_model.get_arch())
-        with Capturing() as output:
-            frontend.print_full_analysis(self.kernel, kernel_graph, verbose=verbose)
-        return '\n'.join(output)
+        return frontend.full_analysis(self.kernel, kernel_graph, verbose=verbose)
 
     def get_unmatched_instruction_ratio(self):
         unmatched_counter = 0

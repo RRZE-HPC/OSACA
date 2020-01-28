@@ -201,7 +201,7 @@ def find_basic_blocks(lines):
     # an instruction referencing a valid jump label
     blocks = OrderedDict()
     for label, label_line_idx in valid_jump_labels.items():
-        blocks[label] = []
+        blocks[label] = [lines[label_line_idx]]
         for line in lines[label_line_idx + 1 :]:
             terminate = False
             blocks[label].append(line)
@@ -230,7 +230,7 @@ def find_basic_loop_bodies(lines):
     # an instruction referencing a valid jump label
     loop_bodies = OrderedDict()
     for label, label_line_idx in valid_jump_labels.items():
-        current_block = []
+        current_block = [lines[label_line_idx]]
         for line in lines[label_line_idx + 1 :]:
             terminate = False
             current_block.append(line)

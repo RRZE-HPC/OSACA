@@ -10,7 +10,7 @@ from osaca.db_interface import import_benchmark_output, sanity_check
 from osaca.frontend import Frontend
 from osaca.parser import BaseParser, ParserAArch64v81, ParserX86ATT
 from osaca.semantics import (ArchSemantics, KernelDG, MachineModel,
-                             reduce_to_section)
+                             reduce_to_section, INSTR_FLAGS)
 
 MODULE_DATA_DIR = os.path.join(
     os.path.dirname(os.path.split(os.path.abspath(__file__))[0]), 'osaca/data/'
@@ -231,9 +231,9 @@ def inspect(args):
         kernel_graph.export_graph(args.dotpath if args.dotpath != '.' else None)
     # Print analysis
     frontend = Frontend(args.file.name, arch=arch)
-    frontend.print_full_analysis(
+    print(frontend.full_analysis(
         kernel, kernel_graph, ignore_unknown=ignore_unknown, verbose=verbose
-    )
+    ))
 
 
 def run(args, output_file=sys.stdout):
@@ -258,7 +258,6 @@ def run(args, output_file=sys.stdout):
         inspect(args)
 
 
-# ---------------------------------------------------
 def get_asm_parser(arch) -> BaseParser:
     """
     Helper function to create the right parser for a specific architecture.
@@ -274,7 +273,14 @@ def get_asm_parser(arch) -> BaseParser:
         return ParserAArch64v81()
 
 
-# ---------------------------------------------------
+def get_unmatched_instruction_ratio(kernel):
+    """Return ratio of unmatched from total instructions in kernel."""
+    unmatched_counter = 0
+    for instruction in kernel:
+        if INSTR_FLAGS.TP_UNKWN in instruction['flags'] and \
+                INSTR_FLAGS.LT_UNKWN in instruction['flags']:
+            unmatched_counter += 1
+    return unmatched_counter / len(kernel)
 
 
 def main():
