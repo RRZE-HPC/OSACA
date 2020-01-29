@@ -249,6 +249,20 @@ class ArchSemantics(ISASemantics):
                             else 0
                         )
                         latency_wo_load = instruction_data_reg['latency']
+                        # add latency of ADD if post- or pre-indexed load
+                        # TODO more investigation: check dot-graph, wrong latency distribution!
+                        # if (
+                        #     latency_wo_load == 0
+                        #     and self._isa == 'aarch64'
+                        #     and any(
+                        #         [
+                        #             'post_indexed' in op['memory'] or 'pre_indexed' in op['memory']
+                        #             for op in instruction_form['operands']
+                        #             if 'memory' in op
+                        #         ]
+                        #     )
+                        # ):
+                        #     latency_wo_load = 1.0
                         instruction_form['port_pressure'] = [
                             sum(x)
                             for x in zip(

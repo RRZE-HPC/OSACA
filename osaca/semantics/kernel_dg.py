@@ -147,7 +147,7 @@ class KernelDG(nx.DiGraph):
             # split to DAG
             raise NotImplementedError('Kernel is cyclic.')
 
-    def find_depending(self, instruction_form, kernel, include_write=False):
+    def find_depending(self, instruction_form, kernel, include_write=False, flag_dependencies=False):
         if instruction_form.semantic_operands is None:
             return
         for dst in chain(instruction_form.semantic_operands.destination,
@@ -166,7 +166,7 @@ class KernelDG(nx.DiGraph):
                         if include_write:
                             yield instr_form
                         break
-            if 'flag' in dst:
+            if 'flag' in dst and flag_dependencies:
                 # Check for read of flag until overwrite
                 for instr_form in kernel:
                     if self.is_read(dst.flag, instr_form):
