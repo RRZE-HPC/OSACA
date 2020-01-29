@@ -2515,21 +2515,31 @@ instruction_forms:
         - class: "register"
           name: "xmm"
           source: true
-          destination: true
+          destination: false
         - class: "register"
           name: "xmm"
           source: true
-          destination: false
+          destination: true
     - name: mulss
       operands:
         - class: "register"
           name: "xmm"
           source: true
+          destination: false
+        - class: "register"
+          name: "xmm"
+          source: true
           destination: true
+    - name: mulpd
+      operands:
         - class: "register"
           name: "xmm"
           source: true
           destination: false
+        - class: "register"
+          name: "xmm"
+          source: true
+          destination: true
     - name: push
       operands:
         - class: "register"

@@ -135,6 +135,16 @@ instruction_forms:
   throughput: 0.33333333
   latency: 1.0  # 	1*p012
   port_pressure: [[1, '012']]
+- name: dup
+  operands:
+  - class: register
+    prefix: d
+  - class: register
+    prefix: v
+    shape: d
+  throughput: 0.5
+  latency: 5.0  # 	1*p01
+  port_pressure: [[1, '01']]
 - name: fadd
   operands:
   - class: register

@@ -106,6 +106,12 @@ instruction_forms:
   throughput: 0.0
   latency: 0
   port_pressure: []
+- name: jge
+  operands:
+  - class: identifier
+  throughput: 0.0
+  latency: 0
+  port_pressure: []
 - name: jb
   operands:
   - class: identifier
@@ -277,7 +283,29 @@ instruction_forms:
   - class: register
     name: ymm
   throughput: 1.0
-  latency: 4.0  # 	2*p01
+  latency: 5.0  # 	2*p01
+  port_pressure: [[2, '01']]
+- name: vfmadd213pd
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  throughput: 0.5
+  latency: 5.0  # 	1*p01
+  port_pressure: [[1, '01']]
+- name: vfmadd213pd
+  operands:
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  throughput: 1.0
+  latency: 5.0  # 	2*p01
   port_pressure: [[2, '01']]
 - name: vfmadd231pd
   operands:
@@ -288,8 +316,19 @@ instruction_forms:
   - class: register
     name: ymm
   throughput: 1.0
-  latency: 4.0  # 	2*p01
+  latency: 5.0  # 	2*p01
   port_pressure: [[2, '01']]
+- name: vfmadd132pd
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  throughput: 0.5
+  latency: 5.0  # 	2*p01
+  port_pressure: [[1, '01']]
 - name: vfmadd132pd
   operands:
   - class: register
@@ -299,7 +338,7 @@ instruction_forms:
   - class: register
     name: ymm
   throughput: 1.0
-  latency: 4.0  # 	2*p01
+  latency: 5.0  # 	2*p01
   port_pressure: [[2, '01']]
 - name: vmulsd
   operands:
