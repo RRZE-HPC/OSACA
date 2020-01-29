@@ -132,24 +132,18 @@ class Frontend(object):
         )
         # TODO find a way to overcome padding for different tab-lengths
         for dep in dep_dict:
-            s += (
-                '{:4d} {} {:4.1f} {} {:36}{} {}'.format(
-                    dep,
-                    separator,
-                    sum(
-                        [instr_form['latency_lcd'] for instr_form in dep_dict[dep]['dependencies']]
-                    ),
-                    separator,
-                    dep_dict[dep]['root']['line'],
-                    separator,
-                    [node['line_number'] for node in dep_dict[dep]['dependencies']],
-                )
+            s += '{:4d} {} {:4.1f} {} {:36}{} {}'.format(
+                dep,
+                separator,
+                sum([instr_form['latency_lcd'] for instr_form in dep_dict[dep]['dependencies']]),
+                separator,
+                dep_dict[dep]['root']['line'],
+                separator,
+                [node['line_number'] for node in dep_dict[dep]['dependencies']],
             )
         return s
 
-    def full_analysis(
-        self, kernel, kernel_dg: KernelDG, ignore_unknown=False, verbose=False
-    ):
+    def full_analysis(self, kernel, kernel_dg: KernelDG, ignore_unknown=False, verbose=False):
         """
         Build the full analysis report including header, the symbol map, the combined TP/CP/LCD
         view and the list based LCD view.
@@ -165,14 +159,16 @@ class Frontend(object):
         :type verbose: boolean, optional
         """
         return (
-            self._header_report() +
-            self._symbol_map() +
-            self.combined_view(
+            self._header_report()
+            + self._symbol_map()
+            + self.combined_view(
                 kernel,
                 kernel_dg.get_critical_path(),
                 kernel_dg.get_loopcarried_dependencies(),
-                ignore_unknown) +
-            self.loopcarried_dependencies(kernel_dg.get_loopcarried_dependencies()))
+                ignore_unknown,
+            )
+            + self.loopcarried_dependencies(kernel_dg.get_loopcarried_dependencies())
+        )
 
     def combined_view(
         self, kernel, cp_kernel: KernelDG, dep_dict, ignore_unknown=False, show_cmnts=True
@@ -221,17 +217,22 @@ class Frontend(object):
 
         s += headline_str.format(headline) + '\n'
         s += (
-            lineno_filler
-            + self._get_port_number_line(port_len, separator=col_sep)
-            + '{}{:^6}{}{:^6}{}'.format(col_sep, 'CP', col_sep, 'LCD', col_sep)
-        ) + '\n' + separator + '\n'
+            (
+                lineno_filler
+                + self._get_port_number_line(port_len, separator=col_sep)
+                + '{}{:^6}{}{:^6}{}'.format(col_sep, 'CP', col_sep, 'LCD', col_sep)
+            )
+            + '\n'
+            + separator
+            + '\n'
+        )
         for instruction_form in kernel:
             if show_cmnts is False and self._is_comment(instruction_form):
                 continue
             line_number = instruction_form['line_number']
             used_ports = [list(uops[1]) for uops in instruction_form['port_uops']]
             used_ports = list(set([p for uops_ports in used_ports for p in uops_ports]))
-            s +=  '{:4d} {}{} {} {}\n'.format(
+            s += '{:4d} {}{} {} {}\n'.format(
                 line_number,
                 self._get_port_pressure(
                     instruction_form['port_pressure'], port_len, used_ports, sep_list
@@ -254,7 +255,7 @@ class Frontend(object):
             num_missing = len(
                 [instr['flags'] for instr in kernel if INSTR_FLAGS.TP_UNKWN in instr['flags']]
             )
-            self._missing_instruction_error(num_missing)
+            s += self._missing_instruction_error(num_missing)
         else:
             # lcd_sum already calculated before
             tp_sum = ArchSemantics.get_throughput_sum(kernel)
@@ -278,7 +279,9 @@ class Frontend(object):
             '                     warning and run the analysis anyway, start osaca with\n'
             '                                       --ignore_unknown flag.\n'
             '--------------------------------------------------------------------------------'
-            '----------------{}\n').format(amount, '-' * len(str(amount)))
+            '----------------{}\n'
+        ).format(amount, '-' * len(str(amount)))
+        return s
 
     def _get_separator_list(self, separator, separator_2=' '):
         """Creates column view for seperators in the TP/combined view."""
