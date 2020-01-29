@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Frontend interface for OSACA. Does everything necessary for printing analysis to the terminal.
+Frontend interface for OSACA. Does everything necessary for analysis report generation.
 """
 import re
 from datetime import datetime as dt
@@ -42,11 +42,11 @@ class Frontend(object):
         """
         return instruction_form['comment'] is not None and instruction_form['instruction'] is None
 
-    def print_throughput_analysis(self, kernel, show_lineno=False, show_cmnts=True):
+    def throughput_analysis(self, kernel, show_lineno=False, show_cmnts=True):
         """
-        Print throughput analysis only.
+        Build throughput analysis only.
 
-        :param kernel: Kernel to print throughput analysis for.
+        :param kernel: Kernel to build throughput analysis for.
         :type kernel: list
         :param show_lineno: flag for showing the line number of instructions, defaults to `False`
         :type show_lineno: bool, optional
@@ -62,10 +62,10 @@ class Frontend(object):
         headline = 'Port pressure in cycles'
         headline_str = '{{:^{}}}'.format(len(separator))
 
-        print('\n\nThroughput Analysis Report\n' + '--------------------------')
-        print(headline_str.format(headline))
-        print(lineno_filler + self._get_port_number_line(port_len))
-        print(separator)
+        s = '\n\nThroughput Analysis Report\n--------------------------\n'
+        s += headline_str.format(headline) + '\n'
+        s += lineno_filler + self._get_port_number_line(port_len) + '\n'
+        s += separator + '\n'
         for instruction_form in kernel:
             line = '{:4d} {} {} {}'.format(
                 instruction_form['line_number'],
@@ -80,23 +80,24 @@ class Frontend(object):
             line = line if show_lineno else col_sep + col_sep.join(line.split(col_sep)[1:])
             if show_cmnts is False and self._is_comment(instruction_form):
                 continue
-            print(line)
-        print()
+            s += line + '\n'
+        s += '\n'
         tp_sum = ArchSemantics.get_throughput_sum(kernel)
-        print(lineno_filler + self._get_port_pressure(tp_sum, port_len, separator=' '))
+        s += lineno_filler + self._get_port_pressure(tp_sum, port_len, separator=' ') + '\n'
+        return s
 
-    def print_latency_analysis(self, cp_kernel, separator='|'):
+    def latency_analysis(self, cp_kernel, separator='|'):
         """
-        Print a list-based CP analysis to the terminal.
+        Build a list-based CP analysis report.
 
         :param cp_kernel: loop kernel containing the CP information for each instruction form
         :type cp_kernel: list
         :separator: separator symbol for the columns, defaults to '|'
         :type separator: str, optional
         """
-        print('\n\nLatency Analysis Report\n' + '-----------------------')
+        s = '\n\nLatency Analysis Report\n-----------------------\n'
         for instruction_form in cp_kernel:
-            print(
+            s += (
                 '{:4d} {} {:4.1f} {}{}{} {}'.format(
                     instruction_form['line_number'],
                     separator,
@@ -106,16 +107,17 @@ class Frontend(object):
                     separator,
                     instruction_form['line'],
                 )
-            )
-        print(
+            ) + '\n'
+        s += (
             '\n{:4} {} {:4.1f}'.format(
                 ' ' * max([len(str(instr_form['line_number'])) for instr_form in cp_kernel]),
                 ' ' * len(separator),
                 sum([instr_form['latency_cp'] for instr_form in cp_kernel]),
             )
-        )
+        ) + '\n'
+        return s
 
-    def print_loopcarried_dependencies(self, dep_dict, separator='|'):
+    def loopcarried_dependencies(self, dep_dict, separator='|'):
         """
         Print a list-based LCD analysis to the terminal.
 
@@ -124,13 +126,13 @@ class Frontend(object):
         :separator: separator symbol for the columns, defaults to '|'
         :type separator: str, optional
         """
-        print(
+        s = (
             '\n\nLoop-Carried Dependencies Analysis Report\n'
-            + '-----------------------------------------'
+            + '-----------------------------------------\n'
         )
         # TODO find a way to overcome padding for different tab-lengths
         for dep in dep_dict:
-            print(
+            s += (
                 '{:4d} {} {:4.1f} {} {:36}{} {}'.format(
                     dep,
                     separator,
@@ -143,15 +145,16 @@ class Frontend(object):
                     [node['line_number'] for node in dep_dict[dep]['dependencies']],
                 )
             )
+        return s
 
-    def print_full_analysis(
+    def full_analysis(
         self, kernel, kernel_dg: KernelDG, ignore_unknown=False, verbose=False
     ):
         """
-        Prints the full analysis report including header, the symbol map, the combined TP/CP/LCD
+        Build the full analysis report including header, the symbol map, the combined TP/CP/LCD
         view and the list based LCD view.
 
-        :param kernel: kernel to print
+        :param kernel: kernel to report on
         :type kernel: list
         :param kernel_dg: directed graph containing CP and LCD
         :type kernel_dg: :class:`~osaca.semantics.KernelDG`
@@ -161,24 +164,24 @@ class Frontend(object):
         :param verbose: flag for verbosity level, defaults to False
         :type verbose: boolean, optional
         """
-        self._print_header_report()
-        self._print_symbol_map()
-        self.print_combined_view(
-            kernel,
-            kernel_dg.get_critical_path(),
-            kernel_dg.get_loopcarried_dependencies(),
-            ignore_unknown,
-        )
-        self.print_loopcarried_dependencies(kernel_dg.get_loopcarried_dependencies())
+        return (
+            self._header_report() +
+            self._symbol_map() +
+            self.combined_view(
+                kernel,
+                kernel_dg.get_critical_path(),
+                kernel_dg.get_loopcarried_dependencies(),
+                ignore_unknown) +
+            self.loopcarried_dependencies(kernel_dg.get_loopcarried_dependencies()))
 
-    def print_combined_view(
+    def combined_view(
         self, kernel, cp_kernel: KernelDG, dep_dict, ignore_unknown=False, show_cmnts=True
     ):
         """
-        Prints the combined view of the kernel including the port pressure (TP), a CP column and a
+        Build combined view of kernel including port pressure (TP), a CP column and a
         LCD column.
 
-        :param kernel: kernel to print
+        :param kernel: kernel to report on
         :type kernel: list
         :param kernel_dg: directed graph containing CP and LCD
         :type kernel_dg: :class:`~osaca.semantics.KernelDG`
@@ -190,7 +193,7 @@ class Frontend(object):
         :param show_cmnts: flag for showing comment-only lines in kernel, defaults to `True`
         :type show_cmnts: bool, optional
         """
-        print('\n\nCombined Analysis Report\n' + '------------------------')
+        s = '\n\nCombined Analysis Report\n------------------------\n'
         lineno_filler = '     '
         port_len = self._get_max_port_len(kernel)
         # Separator for ports
@@ -216,20 +219,19 @@ class Frontend(object):
             longest_lcd = [line_no for line_no in sums if sums[line_no] == lcd_sum][0]
             lcd_lines = [d['line_number'] for d in dep_dict[longest_lcd]['dependencies']]
 
-        print(headline_str.format(headline))
-        print(
+        s += headline_str.format(headline) + '\n'
+        s += (
             lineno_filler
             + self._get_port_number_line(port_len, separator=col_sep)
             + '{}{:^6}{}{:^6}{}'.format(col_sep, 'CP', col_sep, 'LCD', col_sep)
-        )
-        print(separator)
+        ) + '\n' + separator + '\n'
         for instruction_form in kernel:
             if show_cmnts is False and self._is_comment(instruction_form):
                 continue
             line_number = instruction_form['line_number']
             used_ports = [list(uops[1]) for uops in instruction_form['port_uops']]
             used_ports = list(set([p for uops_ports in used_ports for p in uops_ports]))
-            line = '{:4d} {}{} {} {}'.format(
+            s +=  '{:4d} {}{} {} {}\n'.format(
                 line_number,
                 self._get_port_pressure(
                     instruction_form['port_pressure'], port_len, used_ports, sep_list
@@ -244,8 +246,7 @@ class Frontend(object):
                 else ' ',
                 instruction_form['line'].strip(),
             )
-            print(line)
-        print()
+        s += '\n'
         # check for unknown instructions and throw warning if called without --ignore-unknown
         if not ignore_unknown and INSTR_FLAGS.TP_UNKWN in [
             flag for instr in kernel for flag in instr['flags']
@@ -253,33 +254,31 @@ class Frontend(object):
             num_missing = len(
                 [instr['flags'] for instr in kernel if INSTR_FLAGS.TP_UNKWN in instr['flags']]
             )
-            self._print_missing_instruction_error(num_missing)
+            self._missing_instruction_error(num_missing)
         else:
             # lcd_sum already calculated before
             tp_sum = ArchSemantics.get_throughput_sum(kernel)
             cp_sum = sum([x['latency_cp'] for x in cp_kernel])
-            print(
+            s += (
                 lineno_filler
                 + self._get_port_pressure(tp_sum, port_len, separator=' ')
-                + ' {:^6} {:^6}'.format(cp_sum, lcd_sum)
+                + ' {:^6} {:^6}\n'.format(cp_sum, lcd_sum)
             )
+        return s
 
     ####################
     # HELPER FUNCTIONS
     ####################
 
-    def _print_missing_instruction_error(self, amount):
-        print(
-            (
-                '------------------ WARNING: The performance data for {} instructions is missing.'
-                '------------------\n'
-                '                     No final analysis is given. If you want to ignore this\n'
-                '                     warning and run the analysis anyway, start osaca with\n'
-                '                                       --ignore_unknown flag.\n'
-                '--------------------------------------------------------------------------------'
-                '----------------{}'
-            ).format(amount, '-' * len(str(amount)))
-        )
+    def _missing_instruction_error(self, amount):
+        s = (
+            '------------------ WARNING: The performance data for {} instructions is missing.'
+            '------------------\n'
+            '                     No final analysis is given. If you want to ignore this\n'
+            '                     warning and run the analysis anyway, start osaca with\n'
+            '                                       --ignore_unknown flag.\n'
+            '--------------------------------------------------------------------------------'
+            '----------------{}\n').format(amount, '-' * len(str(amount)))
 
     def _get_separator_list(self, separator, separator_2=' '):
         """Creates column view for seperators in the TP/combined view."""
@@ -352,7 +351,7 @@ class Frontend(object):
             string_result += substr.format(self._machine_model.get_ports()[i]) + separator_list[i]
         return string_result
 
-    def _print_header_report(self):
+    def _header_report(self):
         """Prints header information"""
         version = 'v0.3'
         adjust = 20
@@ -363,9 +362,9 @@ class Frontend(object):
         header += 'Timestamp:'.ljust(adjust) + '{}\n'.format(
             dt.utcnow().strftime('%Y-%m-%d %H:%M:%S')
         )
-        print(header)
+        return header + '\n'
 
-    def _print_symbol_map(self):
+    def _symbol_map(self):
         """Prints instruction flag map."""
         symbol_dict = {
             INSTR_FLAGS.NOT_BOUND: 'Instruction micro-ops not bound to a port',
@@ -378,7 +377,7 @@ class Frontend(object):
         for flag in sorted(symbol_dict.keys()):
             symbol_map += ' {} - {}\n'.format(self._get_flag_symbols([flag]), symbol_dict[flag])
 
-        print(symbol_map, end='')
+        return symbol_map
 
-    def _print_port_binding_summary(self):
+    def _port_binding_summary(self):
         raise NotImplementedError
