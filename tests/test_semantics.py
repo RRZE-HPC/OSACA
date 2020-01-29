@@ -186,7 +186,7 @@ class TestSemanticTools(unittest.TestCase):
 
     def test_loop_carried_dependency_x86(self):
         lcd_id = 8
-        lcd_id2 = 9
+        lcd_id2 = 5
         dg = KernelDG(self.kernel_x86, self.parser_x86, self.machine_model_csx)
         lc_deps = dg.get_loopcarried_dependencies()
         self.assertEqual(len(lc_deps), 2)
@@ -198,14 +198,15 @@ class TestSemanticTools(unittest.TestCase):
         self.assertEqual(
             lc_deps[lcd_id]['dependencies'][0], dg.dg.nodes(data=True)[lcd_id]['instruction_form']
         )
-        # ID 9  ursprünglich ID 5 mit LCD zu ID 5 (len=1)
+        # w/  flag dependencies: ID 9 w/ len=2
+        # w/o flag dependencies: ID 5 w/ len=1
         # TODO discuss
         self.assertEqual(
             lc_deps[lcd_id2]['root'], dg.dg.nodes(data=True)[lcd_id2]['instruction_form']
         )
-        self.assertEqual(len(lc_deps[lcd_id2]['dependencies']), 2)
+        self.assertEqual(len(lc_deps[lcd_id2]['dependencies']), 1)
         self.assertEqual(
-            lc_deps[lcd_id2]['dependencies'][1],
+            lc_deps[lcd_id2]['dependencies'][0],
             dg.dg.nodes(data=True)[lcd_id2]['instruction_form'],
         )
 
