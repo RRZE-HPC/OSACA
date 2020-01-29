@@ -971,6 +971,17 @@ instruction_forms:
 - name: vaddpd
   operands:
   - class: register
+    name: zmm
+  - class: register
+    name: zmm
+  - class: register
+    name: zmm
+  throughput: 0.5
+  latency: 4.0  # 	1"*"p01
+  port_pressure: [[1, '05']]
+- name: vaddpd
+  operands:
+  - class: register
     name: ymm
   - class: register
     name: ymm
@@ -2534,6 +2545,18 @@ instruction_forms:
   port_pressure: [[1, '01']]
   throughput: 0.5
   uops: 1
+- name: VFMADD213PD  # JH: assumed from SKX
+  operands:
+  - class: register
+    name: zmm
+  - class: register
+    name: zmm
+  - class: register
+    name: zmm
+  latency: 4
+  port_pressure: [[1, '05']]
+  throughput: 0.5
+  uops: 1
 - name: VFMADD213PS  # JH: assumed from SKX
   operands:
   - class: register
@@ -2901,6 +2924,15 @@ instruction_forms:
   operands:
   - class: register
     name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  throughput: 0.5
+  latency: 4.0  # 	1"*"p01
+  port_pressure: [[1, '01']]
+- name: mulpd
+  operands:
   - class: register
     name: xmm
   - class: register
@@ -4424,6 +4456,30 @@ instruction_forms:
     name: xmm
   latency: 3
   port_pressure: [[1, '0']]
+  throughput: 1.0
+  uops: 1
+- name: VUNPCKHPD # JL: assumed from SKX
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '5']]
+  throughput: 1.0
+  uops: 1
+- name: VEXTRACTF64X2 # JL: assumed from SKX
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: ymm
+  - class: register
+    name: xmm
+  latency: 3
+  port_pressure: [[1, '5']]
   throughput: 1.0
   uops: 1
 - name: VUNPCKLPS  # JH: assumed from SKX
@@ -7171,7 +7227,58 @@ instruction_forms:
   port_pressure: [[1, '23'], [1, '4']]                      # ./generate_mov_entries.py csx
   throughput: 1.0                                           # ./generate_mov_entries.py csx
   uops: 2                                                   # ./generate_mov_entries.py csx
-                                                            # ./generate_mov_entries.py csx
+- name: vmovupd                                             
+  operands:                                                 
+  - class: register                                         
+    name: zmm                                               
+  - class: register                                         
+    name: zmm                                               
+  latency: 0                                                
+  port_pressure: []                                         
+  throughput: 0.0                                           
+  uops: 0                                                   
+                                                            
+- name: vmovupd  # with load                                
+  operands:                                                 
+  - class: memory                                           
+    base: "*"                                               
+    offset: "*"                                             
+    index: "*"                                              
+    scale: "*"                                              
+  - class: register                                         
+    name: zmm                                               
+  latency: 4                                                
+  port_pressure: [[1, '23'], [1, ['2D', '3D']]]             
+  throughput: 0.5                                           
+  uops: 2                                                   
+                                                            
+- name: vmovupd  # with store, simple AGU                   
+  operands:                                                 
+  - class: register                                         
+    name: zmm                                               
+  - class: memory                                           
+    base: "*"                                               
+    offset: "*"                                             
+    index: ~                                                
+    scale: "*"                                              
+  latency: 0                                                
+  port_pressure: [[1, '237'], [1, '4']]                     
+  throughput: 1.0                                           
+  uops: 2                                                   
+                                                            
+- name: vmovupd  # with store, complex AGU                  
+  operands:                                                 
+  - class: register                                         
+    name: zmm                                               
+  - class: memory                                           
+    base: "*"                                               
+    offset: "*"                                             
+    index: gpr                                              
+    scale: "*"                                              
+  latency: 0                                                
+  port_pressure: [[1, '23'], [1, '4']]                      
+  throughput: 1.0                                           
+  uops: 2                                                   
 - name: movups                                              # ./generate_mov_entries.py csx
   operands:                                                 # ./generate_mov_entries.py csx
   - class: register                                         # ./generate_mov_entries.py csx
@@ -7330,6 +7437,59 @@ instruction_forms:
   port_pressure: [[1, '23'], [1, '4']]                      # ./generate_mov_entries.py csx
   throughput: 1.0                                           # ./generate_mov_entries.py csx
   uops: 2                                                   # ./generate_mov_entries.py csx
+- name: vmovups                                            
+  operands:                                                
+  - class: register                                        
+    name: zymm                                              
+  - class: register                                        
+    name: zmm                                              
+  latency: 0                                               
+  port_pressure: []                                        
+  throughput: 0.0                                          
+  uops: 0                                                  
+
+- name: vmovups  # with load                                
+  operands:                                                 
+  - class: memory                                           
+    base: "*"                                               
+    offset: "*"                                             
+    index: "*"                                              
+    scale: "*"                                              
+  - class: register                                         
+    name: zmm                                               
+  latency: 4                                                
+  port_pressure: [[1, '23'], [1, ['2D', '3D']]]             
+  throughput: 0.5                                           
+  uops: 2                                                   
+                                                            
+- name: vmovups  # with store, simple AGU                   
+  operands:                                                 
+  - class: register                                         
+    name: zmm                                               
+  - class: memory                                           
+    base: "*"                                               
+    offset: "*"                                             
+    index: ~                                                
+    scale: "*"                                              
+  latency: 0                                                
+  port_pressure: [[1, '237'], [1, '4']]                     
+  throughput: 1.0                                           
+  uops: 2                                                   
+                                                            
+- name: vmovups  # with store, complex AGU                  
+  operands:                                                 
+  - class: register                                         
+    name: zmm                                               
+  - class: memory                                           
+    base: "*"                                               
+    offset: "*"                                             
+    index: gpr                                              
+    scale: "*"                                              
+  latency: 0                                                
+  port_pressure: [[1, '23'], [1, '4']]                      
+  throughput: 1.0                                           
+  uops: 2
+
                                                             # ./generate_mov_entries.py csx
 - name: movzx                                               # ./generate_mov_entries.py csx
   operands:                                                 # ./generate_mov_entries.py csx
