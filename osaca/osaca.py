@@ -172,7 +172,7 @@ def insert_byte_marker(args):
         print('Marker insertion for non-x86 is not yet supported by Kerncraft.', file=sys.stderr)
         sys.exit(1)
     try:
-        from kerncraft import iaca
+        from kerncraft.incore_model import asm_instrumentation
     except ImportError:
         print(
             "Module kerncraft not installed. Use 'pip install --user "
@@ -185,7 +185,7 @@ def insert_byte_marker(args):
     assembly = args.file.read()
     unmarked_assembly = io.StringIO(assembly)
     marked_assembly = io.StringIO()
-    iaca.iaca_instrumentation(
+    asm_instrumentation(
         input_file=unmarked_assembly,
         output_file=marked_assembly,
         block_selection='manual',
