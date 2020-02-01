@@ -1,4 +1,4 @@
-osaca_version: 0.3.1.dev1
+osaca_version: 0.3.2.dev5
 micro_architecture: Intel Ivy Bridge
 arch_code: IVB
 isa: x86

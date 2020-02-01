@@ -1,4 +1,4 @@
-osaca_version: 0.3.1.dev1
+osaca_version: 0.3.2.dev5
 micro_architecture: Thunder X2
 arch_code: tx2
 isa: AArch64
@@ -573,8 +573,8 @@ instruction_forms:
     pre-indexed: false
     post-indexed: false
   throughput: 2.0
-  latency: 0  # 	4*p34
-  port_pressure: [[4.0, '34']]
+  latency: 0  # 	2*p34+2*p5
+  port_pressure: [[2.0, '34'], [2.0, '5']]
 - name: stp
   operands:
   - class: register
@@ -589,7 +589,7 @@ instruction_forms:
     pre-indexed: false
     post-indexed: true
   throughput: 2.0
-  latency: 0  # 	2*p34+2*p5
+  latency: 0  # 	2*p34+2*p5+1*012
   port_pressure: [[2.0, '34'], [2.0, '5'], [1, '012']]
 - name: stp
   operands:
