@@ -8,6 +8,9 @@ from distutils.version import StrictVersion
 from osaca.parser import get_parser
 from osaca.semantics import MachineModel
 
+intel_archs = ['CON', 'WOL', 'NHM', 'WSM', 'SNB', 'IVB', 'HSW', 'BDW', 'SKL', 'SKX', 'KBL', 'CFL', 
+               'CNL', 'ICL']
+
 
 def port_pressure_from_tag_attributes(attrib):
     # '1*p015+1*p1+1*p23+1*p4+3*p5' ->
@@ -18,7 +21,7 @@ def port_pressure_from_tag_attributes(attrib):
         ports = ports.lstrip('p')
         port_occupation.append([int(cycles), ports])
 
-    # Also
+    # Also consider div on DIV pipeline
     if 'div_cycles' in attrib:
         port_occupation.append([int(attrib['div_cycles']), ['DIV']])
 
@@ -161,19 +164,35 @@ def extract_model(tree, arch):
                     "Contradicting port occupancies, using latest IACA:",
                     mnemonic, file=sys.stderr)
             port_pressure = port_pressure[-1]
-
-            # Add missing ports:
-            for ports in [pp[1] for pp in port_pressure]:
-                for p in ports:
-                    mm.add_port(p)
-
-            throughput = max(mm.average_port_pressure(port_pressure))
         else:
             # print("No data available for this architecture:", mnemonic, file=sys.stderr)
             continue
-        # ---------------------------------------------
-        mm.set_instruction(mnemonic, parameters, latency, port_pressure, throughput, uops)
+        
+        # Adding Intel's 2D and 3D pipelines on Intel µarchs, without Ice Lake:
+        if arch.upper() in intel_archs and not arch.upper() in ['ICL']:  
+            if any([p['class'] == 'memory' for p in parameters]):
+                # We have a memory parameter, if ports 2 & 3 are present, also add 2D & 3D
+                # TODO remove port7 on 'hsw' onward and split entries depending on addressing mode
+                port_23 = False
+                port_4 = False
+                for i, pp in enumerate(port_pressure):
+                    if '2' in pp[1] and '3' in pp[1]:
+                        port_23 = True
+                    if '4' in pp[1]:
+                        port_4 = True
+                # Add (1, ['2D', '3D']) if load ports (2 & 3) are used, but not the store port (4)
+                if port_23 and not port_4:
+                    port_pressure.append((1, ['2D', '3D']))
+        
+        # Add missing ports:
+        for ports in [pp[1] for pp in port_pressure]:
+            for p in ports:
+                mm.add_port(p)
 
+        throughput = max(mm.average_port_pressure(port_pressure))
+
+        mm.set_instruction(mnemonic, parameters, latency, port_pressure, throughput, uops)
+    # TODO eliminate entries which could be covered by automatic load / store expansion
     return mm
 
 
@@ -212,11 +231,12 @@ def main():
         for arch in architectures(tree):
             print(arch, end='')
             model = extract_model(tree, arch.lower())
-            model_string = rhs_comment(model.dump(), basename+" "+arch)
-            
-            with open('{}.yml'.format(arch.lower()), 'w') as f:
-                f.write(model_string)
-            print('.')
+            if model:
+                model_string = rhs_comment(model.dump(), basename+" "+arch)
+
+                with open('{}.yml'.format(arch.lower()), 'w') as f:
+                    f.write(model_string)
+                print('.')
 
 
 if __name__ == '__main__':
