@@ -243,6 +243,7 @@ class MachineModel(object):
             'kbl': 'x86',
             'cnl': 'x86',
             'cfl': 'x86',
+            'icl': 'x86',
         }
         arch = arch.lower()
         if arch in arch_dict:
