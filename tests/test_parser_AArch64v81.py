@@ -15,7 +15,7 @@ class TestParserAArch64v81(unittest.TestCase):
     @classmethod
     def setUpClass(self):
         self.parser = ParserAArch64v81()
-        with open(self._find_file('triad-arm-iaca.s')) as f:
+        with open(self._find_file('triad_arm_iaca.s')) as f:
             self.triad_code = f.read()
 
     ##################

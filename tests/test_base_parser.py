@@ -16,7 +16,7 @@ class TestBaseParser(unittest.TestCase):
             self.parser = BaseParser()
         except NotImplementedError:
             pass
-        with open(self._find_file('triad-x86-iaca.s')) as f:
+        with open(self._find_file('triad_x86_iaca.s')) as f:
             self.triad_code = f.read()
 
     ##################

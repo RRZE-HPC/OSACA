@@ -1,0 +1,16 @@
+testinstr-i_d_v
+Latency: 4.013 cy
+Throughput: 0.501 cy
+
+testinstr2-mboi_v
+Latency: 4.013 cy
+Throughput: 0.501 cy
+
+testinstr3-mbisr_v
+Latency: 4.013 cy
+Throughput: 0.501 cy
+
+testinstr3-mboisp_v
+Latency: 4.013 cy
+Throughput: 0.501 cy
+

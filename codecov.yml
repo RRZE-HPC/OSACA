@@ -1,3 +1,3 @@
 ignore:
-  - "tests/**/*"        # ignore test folder and all its contents
+  - "tests"        # ignore test folder and all its contents
   - "**/__init__.py"    # ignore init files
