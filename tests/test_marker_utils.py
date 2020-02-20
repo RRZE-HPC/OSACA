@@ -16,9 +16,9 @@ class TestMarkerUtils(unittest.TestCase):
     def setUpClass(self):
         self.parser_AArch = ParserAArch64v81()
         self.parser_x86 = ParserX86ATT()
-        with open(self._find_file('triad-arm-iaca.s')) as f:
+        with open(self._find_file('triad_arm_iaca.s')) as f:
             triad_code_arm = f.read()
-        with open(self._find_file('triad-x86-iaca.s')) as f:
+        with open(self._find_file('triad_x86_iaca.s')) as f:
             triad_code_x86 = f.read()
         self.parsed_AArch = self.parser_AArch.parse_file(triad_code_arm)
         self.parsed_x86 = self.parser_x86.parse_file(triad_code_x86)

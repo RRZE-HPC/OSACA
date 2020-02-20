@@ -29,9 +29,9 @@ class TestSemanticTools(unittest.TestCase):
         # set up parser and kernels
         self.parser_x86 = ParserX86ATT()
         self.parser_AArch64 = ParserAArch64v81()
-        with open(self._find_file('kernel-x86.s')) as f:
+        with open(self._find_file('kernel_x86.s')) as f:
             self.code_x86 = f.read()
-        with open(self._find_file('kernel-AArch64.s')) as f:
+        with open(self._find_file('kernel_aarch64.s')) as f:
             self.code_AArch64 = f.read()
         self.kernel_x86 = self.parser_x86.parse_file(self.code_x86)
         self.kernel_AArch64 = self.parser_AArch64.parse_file(self.code_AArch64)
