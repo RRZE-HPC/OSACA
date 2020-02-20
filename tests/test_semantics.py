@@ -5,6 +5,7 @@ Unit tests for Semantic Analysis
 
 import os
 import unittest
+from copy import deepcopy
 from subprocess import call
 
 import networkx as nx
@@ -105,6 +106,26 @@ class TestSemanticTools(unittest.TestCase):
                 self.assertTrue('latency' in instruction_form)
                 self.assertIsInstance(instruction_form['port_pressure'], list)
                 self.assertEqual(len(instruction_form['port_pressure']), port_num)
+
+    def test_optimal_throughput_assignment(self):
+        # x86
+        kernel_fixed = deepcopy(self.kernel_x86)
+        self.semantics_csx.add_semantics(kernel_fixed)
+        kernel_optimal = deepcopy(kernel_fixed)
+        self.semantics_csx.assign_optimal_throughput(kernel_optimal)
+        tp_fixed = self.semantics_csx.get_throughput_sum(kernel_fixed)
+        tp_optimal = self.semantics_csx.get_throughput_sum(kernel_optimal)
+        self.assertNotEqual(tp_fixed, tp_optimal)
+        self.assertTrue(max(tp_optimal) <= max(tp_fixed))
+        # arm
+        kernel_fixed = deepcopy(self.kernel_AArch64)
+        self.semantics_tx2.add_semantics(kernel_fixed)
+        kernel_optimal = deepcopy(kernel_fixed)
+        self.semantics_tx2.assign_optimal_throughput(kernel_optimal)
+        tp_fixed = self.semantics_tx2.get_throughput_sum(kernel_fixed)
+        tp_optimal = self.semantics_tx2.get_throughput_sum(kernel_optimal)
+        self.assertNotEqual(tp_fixed, tp_optimal)
+        self.assertTrue(max(tp_optimal) <= max(tp_fixed))
 
     def test_kernelDG_x86(self):
         #
