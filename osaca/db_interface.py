@@ -52,7 +52,7 @@ def sanity_check(arch: str, verbose=False):
     )
 
 
-def import_benchmark_output(arch, bench_type, filepath):
+def import_benchmark_output(arch, bench_type, filepath, output=None):
     """
     Import benchmark results from micro-benchmarks.
 
@@ -62,6 +62,8 @@ def import_benchmark_output(arch, bench_type, filepath):
     :type bench_type: str
     :param filepath: filepath to the output file
     :type filepath: str
+    :param output: output filepath to dump, defaults to None
+    :type output: str
     """
     supported_bench_outputs = ['ibench', 'asmbench']
     assert os.path.exists(filepath)
@@ -78,7 +80,11 @@ def import_benchmark_output(arch, bench_type, filepath):
     # write entries to DB
     for entry in db_entries:
         mm.set_instruction_entry(db_entries[entry])
-    sys.stdout.write(mm.dump())
+    if output is None:
+        print(mm.dump())
+    else:
+        with open(output, 'w') as f:
+            mm.dump(stream=f)
 
 
 ##################

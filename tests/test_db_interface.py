@@ -2,9 +2,11 @@
 """
 Unit tests for DB interface
 """
-
+import os
+import sys
 import unittest
 
+import osaca.db_interface as dbi
 from osaca.db_interface import sanity_check
 from osaca.semantics import MachineModel
 
@@ -71,14 +73,39 @@ class TestDBInterface(unittest.TestCase):
         sanity_check('csx', verbose=False)
         sanity_check('tx2', verbose=False)
         sanity_check('zen1', verbose=False)
+
         # verbose
-        sanity_check('csx', verbose=True)
-        sanity_check('tx2', verbose=True)
-        sanity_check('zen1', verbose=True)
+        stdout = sys.stdout
+        with open('/dev/null', 'w') as sys.stdout:
+            sanity_check('csx', verbose=True)
+            sanity_check('tx2', verbose=True)
+            sanity_check('zen1', verbose=True)
+        sys.stdout = stdout
+
+    def test_ibench_import(self):
+        # only check import without dumping the DB file (takes too much time)
+        with open(self._find_file('ibench_import_x86.dat')) as input_file:
+            entries = dbi._get_ibench_output(input_file, 'x86')
+            self.assertEqual(len(entries), 3)
+            for _, e in entries.items():
+                self.assertIsNotNone(e['throughput'])
+                self.assertIsNotNone(e['latency'])
+        with open(self._find_file('ibench_import_aarch64.dat')) as input_file:
+            entries = dbi._get_ibench_output(input_file, 'aarch64')
+            self.assertEqual(len(entries), 4)
+            for _, e in entries.items():
+                self.assertIsNotNone(e['throughput'])
+                self.assertIsNotNone(e['latency'])
 
     ##################
     # Helper functions
     ##################
+    @staticmethod
+    def _find_file(name):
+        testdir = os.path.dirname(__file__)
+        name = os.path.join(testdir, 'test_files', name)
+        assert os.path.exists(name)
+        return name
 
 
 if __name__ == '__main__':
