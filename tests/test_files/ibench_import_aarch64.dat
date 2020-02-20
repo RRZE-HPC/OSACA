@@ -1,0 +1,9 @@
+Using frequency 2.20GHz.
+testinstr-i_d_v-TP: 0.501 (clock cycles)    [DEBUG - result: 0.007813]
+testinstr-i_d_v-LT:    4.013 (clock cycles)    [DEBUG - result: 1.000000]
+testinstr2-mboi_v-TP: 0.501 (clock cycles)    [DEBUG - result: 0.007813]
+testinstr2-mboi_v-LT:    4.013 (clock cycles)    [DEBUG - result: 1.000000]
+testinstr3-mbisr_v-TP: 0.501 (clock cycles)    [DEBUG - result: 0.007813]
+testinstr3-mbisr_v-LT:    4.013 (clock cycles)    [DEBUG - result: 1.000000]
+testinstr4-mboisp_v-TP: 0.501 (clock cycles)    [DEBUG - result: 0.007813]
+testinstr4-mboisp_v-LT:    4.013 (clock cycles)    [DEBUG - result: 1.000000]

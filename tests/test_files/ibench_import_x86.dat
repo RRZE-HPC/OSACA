@@ -1,0 +1,7 @@
+Using frequency 2.50GHz.
+testinstr-i_r_x-TP: 0.251 (clock cycles)    [DEBUG - result: 0.007813]
+testinstr-i_r_x-LT:    4.013 (clock cycles)    [DEBUG - result: 1.000000]
+testinstr2-mboi_x-TP:   0.501 (clock cycles)    [DEBUG - result: 0.007813]
+testinstr2-mboi_x-LT:  8.010 (clock cycles)    [DEBUG - result: 1.000000]
+testinstr3-mbis_y-TP:   0.334 (clock cycles)    [DEBUG - result: 0.007813]
+testinstr3-mbis_y-LT:  8.010 (clock cycles)    [DEBUG - result: 1.000000]
