@@ -115,6 +115,16 @@ class TestDBInterface(unittest.TestCase):
             for _, e in entries.items():
                 self.assertIsNotNone(e['throughput'])
                 self.assertIsNotNone(e['latency'])
+            # remove empty line => no import since broken format
+            del input_data[3]
+            entries = dbi._get_asmbench_output(input_data, 'aarch64')
+            self.assertEqual(len(entries), 0)
+        with self.assertRaises(ValueError):
+            dbi.import_benchmark_output(
+                'csx', 'invalid_bench_type', self._find_file('asmbench_import_x86.dat')
+            )
+        with self.assertRaises(AssertionError):
+            dbi.import_benchmark_output('csx', 'ibench', 'invalid_file')
 
     ##################
     # Helper functions
