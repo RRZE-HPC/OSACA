@@ -18,9 +18,9 @@ class TestKerncraftAPI(unittest.TestCase):
         # set up parser and kernels
         self.parser_x86 = ParserX86ATT()
         self.parser_AArch64 = ParserAArch64v81()
-        with open(self._find_file('triad-x86-iaca.s')) as f:
+        with open(self._find_file('triad_x86_iaca.s')) as f:
             self.code_x86 = f.read()
-        with open(self._find_file('triad-arm-iaca.s')) as f:
+        with open(self._find_file('triad_arm_iaca.s')) as f:
             self.code_AArch64 = f.read()
 
     ###########
