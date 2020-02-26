@@ -8,6 +8,7 @@ python:
 before_install: 
 #  - pip install tox-travis
   - pip install codecov
+  - pip install pygraphviz
 install:
   - pip install -e .
 cache: pip
