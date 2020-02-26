@@ -135,13 +135,13 @@ class TestSemanticTools(unittest.TestCase):
         # test get_store_tp
         self.assertEqual(
             test_mm_x86.get_store_throughput(
-                {'base': 'x', 'offset': None, 'index': None, 'scale': 1}
+                {'base': {'name': 'x'}, 'offset': None, 'index': None, 'scale': 1}
             ),
             [[2, '237'], [2, '4']],
         )
         self.assertEqual(
             test_mm_x86.get_store_throughput(
-                {'base': 'NOT_IN_DB', 'offset': None, 'index': 'NOT_NONE', 'scale': 1}
+                {'base': {'prefix': 'NOT_IN_DB'}, 'offset': None, 'index': 'NOT_NONE', 'scale': 1}
             ),
             [[1, '23'], [1, '4']],
         )
@@ -161,19 +161,27 @@ class TestSemanticTools(unittest.TestCase):
         # test get_store_lt
         self.assertEqual(
             test_mm_x86.get_store_latency(
-                {'base': 'x', 'offset': None, 'index': None, 'scale': '1'}
+                {'base': {'name': 'x'}, 'offset': None, 'index': None, 'scale': '1'}
             ),
             0,
         )
         self.assertEqual(
             test_mm_arm.get_store_latency(
-                {'base': 'x', 'offset': None, 'index': None, 'scale': '1'}
+                {'base': {'prefix': 'x'}, 'offset': None, 'index': None, 'scale': '1'}
             ),
             0,
         )
 
         # test has_hidden_load
         self.assertFalse(test_mm_x86.has_hidden_loads())
+
+        # test default load tp
+        self.assertEqual(
+            test_mm_x86.get_load_throughput(
+                {'base': {'name': 'x'}, 'offset': None, 'index': None, 'scale': 1}
+            ),
+            [[1, '23'], [1, ['2D', '3D']]]
+        )
 
         # test adding port
         test_mm_x86.add_port('dummyPort')
@@ -262,6 +270,8 @@ class TestSemanticTools(unittest.TestCase):
         self.assertEqual(len(list(dg.get_dependent_instruction_forms(line_number=8))), 0)
         with self.assertRaises(ValueError):
             dg.get_dependent_instruction_forms()
+        # test dot creation
+        dg.export_graph(filepath='/dev/null')
 
     def test_kernelDG_AArch64(self):
         dg = KernelDG(self.kernel_AArch64, self.parser_AArch64, self.machine_model_tx2)
@@ -286,6 +296,8 @@ class TestSemanticTools(unittest.TestCase):
         self.assertEqual(len(list(dg.get_dependent_instruction_forms(line_number=20))), 0)
         with self.assertRaises(ValueError):
             dg.get_dependent_instruction_forms()
+        # test dot creation
+        dg.export_graph(filepath='/dev/null')
 
     def test_hidden_load(self):
         machine_model_hld = MachineModel(
