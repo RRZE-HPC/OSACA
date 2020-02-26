@@ -11,8 +11,7 @@ from subprocess import call
 import networkx as nx
 
 from osaca.parser import AttrDict, ParserAArch64v81, ParserX86ATT
-from osaca.semantics import (INSTR_FLAGS, KernelDG, MachineModel,
-                             ArchSemantics)
+from osaca.semantics import INSTR_FLAGS, ArchSemantics, KernelDG, MachineModel
 
 
 class TestSemanticTools(unittest.TestCase):
@@ -70,6 +69,120 @@ class TestSemanticTools(unittest.TestCase):
             ArchSemantics(tmp_mm)
         except ValueError:
             self.fail()
+
+    def test_machine_model_various_functions(self):
+        # check dummy MachineModel creation
+        try:
+            MachineModel(isa='x86')
+            MachineModel(isa='aarch64')
+        except ValueError:
+            self.fail()
+        test_mm_x86 = MachineModel(path_to_yaml=self._find_file('test_db_x86.yml'))
+        test_mm_arm = MachineModel(path_to_yaml=self._find_file('test_db_aarch64.yml'))
+
+        # test get_instruction without mnemonic
+        self.assertIsNone(test_mm_x86.get_instruction(None, []))
+        self.assertIsNone(test_mm_arm.get_instruction(None, []))
+
+        # test dict DB creation
+        test_mm_x86._data['instruction_dict'] = test_mm_x86._convert_to_dict(
+            test_mm_x86._data['instruction_forms']
+        )
+        test_mm_arm._data['instruction_dict'] = test_mm_arm._convert_to_dict(
+            test_mm_arm._data['instruction_forms']
+        )
+        # test get_instruction from dict DB
+        self.assertIsNone(test_mm_x86.get_instruction_from_dict(None, []))
+        self.assertIsNone(test_mm_arm.get_instruction_from_dict(None, []))
+        self.assertIsNone(test_mm_x86.get_instruction_from_dict('NOT_IN_DB', []))
+        self.assertIsNone(test_mm_arm.get_instruction_from_dict('NOT_IN_DB', []))
+        name_x86_1 = 'vaddpd'
+        operands_x86_1 = [
+            {'class': 'register', 'name': 'xmm'},
+            {'class': 'register', 'name': 'xmm'},
+            {'class': 'register', 'name': 'xmm'},
+        ]
+        instr_form_x86_1 = test_mm_x86.get_instruction_from_dict(name_x86_1, operands_x86_1)
+        self.assertEqual(instr_form_x86_1, test_mm_x86.get_instruction(name_x86_1, operands_x86_1))
+        self.assertEqual(
+            test_mm_x86.get_instruction_from_dict('jg', [{'class': 'identifier'}]),
+            test_mm_x86.get_instruction('jg', [{'class': 'identifier'}]),
+        )
+        name_arm_1 = 'fadd'
+        operands_arm_1 = [
+            {'class': 'register', 'prefix': 'v', 'shape': 's'},
+            {'class': 'register', 'prefix': 'v', 'shape': 's'},
+            {'class': 'register', 'prefix': 'v', 'shape': 's'},
+        ]
+        instr_form_arm_1 = test_mm_arm.get_instruction_from_dict(name_arm_1, operands_arm_1)
+        self.assertEqual(instr_form_arm_1, test_mm_arm.get_instruction(name_arm_1, operands_arm_1))
+        self.assertEqual(
+            test_mm_arm.get_instruction_from_dict('b.ne', [{'class': 'identifier'}]),
+            test_mm_arm.get_instruction('b.ne', [{'class': 'identifier'}]),
+        )
+
+        # test full instruction name
+        self.assertEqual(
+            MachineModel.get_full_instruction_name(instr_form_x86_1),
+            'vaddpd  register(name:xmm),register(name:xmm),register(name:xmm)',
+        )
+        self.assertEqual(
+            MachineModel.get_full_instruction_name(instr_form_arm_1),
+            'fadd  register(prefix:v,shape:s),register(prefix:v,shape:s),'
+            + 'register(prefix:v,shape:s)',
+        )
+
+        # test get_store_tp
+        self.assertEqual(
+            test_mm_x86.get_store_throughput(
+                {'base': 'x', 'offset': None, 'index': None, 'scale': 1}
+            ),
+            [[2, '237'], [2, '4']],
+        )
+        self.assertEqual(
+            test_mm_x86.get_store_throughput(
+                {'base': 'NOT_IN_DB', 'offset': None, 'index': 'NOT_NONE', 'scale': 1}
+            ),
+            [[1, '23'], [1, '4']],
+        )
+        self.assertEqual(
+            test_mm_arm.get_store_throughput(
+                {'base': {'prefix': 'x'}, 'offset': None, 'index': None, 'scale': 1}
+            ),
+            [[2, '34'], [2, '5']],
+        )
+        self.assertEqual(
+            test_mm_arm.get_store_throughput(
+                {'base': {'prefix': 'NOT_IN_DB'}, 'offset': None, 'index': None, 'scale': 1}
+            ),
+            [[1, '34'], [1, '5']],
+        )
+
+        # test get_store_lt
+        self.assertEqual(
+            test_mm_x86.get_store_latency(
+                {'base': 'x', 'offset': None, 'index': None, 'scale': '1'}
+            ),
+            0,
+        )
+        self.assertEqual(
+            test_mm_arm.get_store_latency(
+                {'base': 'x', 'offset': None, 'index': None, 'scale': '1'}
+            ),
+            0,
+        )
+
+        # test has_hidden_load
+        self.assertFalse(test_mm_x86.has_hidden_loads())
+
+        # test adding port
+        test_mm_x86.add_port('dummyPort')
+        test_mm_arm.add_port('dummyPort')
+
+        # test dump of DB
+        with open('/dev/null', 'w') as dev_null:
+            test_mm_x86.dump(stream=dev_null)
+            test_mm_arm.dump(stream=dev_null)
 
     def test_src_dst_assignment_x86(self):
         for instruction_form in self.kernel_x86:
