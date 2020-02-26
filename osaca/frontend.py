@@ -132,7 +132,7 @@ class Frontend(object):
         )
         # TODO find a way to overcome padding for different tab-lengths
         for dep in dep_dict:
-            s += '{:4d} {} {:4.1f} {} {:36}{} {}'.format(
+            s += '{:4d} {} {:4.1f} {} {:36}{} {}\n'.format(
                 dep,
                 separator,
                 sum([instr_form['latency_lcd'] for instr_form in dep_dict[dep]['dependencies']]),
