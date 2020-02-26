@@ -198,12 +198,13 @@ def insert_byte_marker(args):
         f.write(assembly)
 
 
-def inspect(args):
+def inspect(args, output_file=sys.stdout):
     """
     Does the actual throughput and critical path analysis of OSACA and prints it to the
     terminal.
 
     :param args: arguments given from :class:`~argparse.ArgumentParser` after parsing
+    :param output_file: Define the stream for output, defaults to :class:`sys.stdout`
     """
     arch = args.arch
     isa = MachineModel.get_isa_for_arch(arch)
@@ -233,7 +234,7 @@ def inspect(args):
     frontend = Frontend(args.file.name, arch=arch)
     print(frontend.full_analysis(
         kernel, kernel_graph, ignore_unknown=ignore_unknown, verbose=verbose
-    ))
+    ), file=output_file)
 
 
 def run(args, output_file=sys.stdout):
@@ -255,7 +256,7 @@ def run(args, output_file=sys.stdout):
         insert_byte_marker(args)
     else:
         # Analyze kernel
-        inspect(args)
+        inspect(args, output_file=output_file)
 
 
 def get_asm_parser(arch) -> BaseParser:
