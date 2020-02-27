@@ -6,9 +6,12 @@ Unit tests for the CLI of OSACA and running the sample kernels in examples/
 import argparse
 import os
 import unittest
+from unittest.mock import patch
 from io import StringIO
+from shutil import copyfile
 
 import osaca.osaca as osaca
+from osaca.parser import ParserAArch64v81, ParserX86ATT
 
 
 class ErrorRaisingArgumentParser(argparse.ArgumentParser):
@@ -27,7 +30,9 @@ class TestCLI(unittest.TestCase):
         args = parser.parse_args(['--arch', 'WRONG_ARCH', self._find_file('gs', 'csx', 'gcc')])
         with self.assertRaises(ValueError):
             osaca.check_arguments(args, parser)
-        args = parser.parse_args(['--import', 'WRONG_BENCH', self._find_file('gs', 'csx', 'gcc')])
+        args = parser.parse_args(
+            ['--arch', 'csx', '--import', 'WRONG_BENCH', self._find_file('gs', 'csx', 'gcc')]
+        )
         with self.assertRaises(ValueError):
             osaca.check_arguments(args, parser)
 
@@ -47,6 +52,7 @@ class TestCLI(unittest.TestCase):
                 self._find_test_file('asmbench_import_aarch64.dat'),
             ]
         )
+        osaca.run(args, output_file=output)
 
     def test_check_db(self):
         parser = osaca.create_parser(parser=ErrorRaisingArgumentParser())
@@ -55,6 +61,49 @@ class TestCLI(unittest.TestCase):
         )
         output = StringIO()
         osaca.run(args, output_file=output)
+
+    def test_get_parser(self):
+        self.assertTrue(isinstance(osaca.get_asm_parser('csx'), ParserX86ATT))
+        self.assertTrue(isinstance(osaca.get_asm_parser('tx2'), ParserAArch64v81))
+        with self.assertRaises(ValueError):
+            osaca.get_asm_parser('UNKNOWN')
+
+    def test_marker_insert_x86(self):
+        # copy file to add markers
+        name = self._find_test_file('kernel_x86.s')
+        name_copy = name + '.copy.s'
+        copyfile(name, name_copy)
+
+        user_input = ['.L10']
+        output = StringIO()
+        parser = osaca.create_parser()
+        args = parser.parse_args(['--arch', 'csx', '--insert-marker', name_copy])
+        with patch('builtins.input', side_effect=user_input):
+            osaca.run(args, output_file=output)
+
+        lines_orig = len(open(name).readlines())
+        lines_copy = len(open(name_copy).readlines())
+        self.assertEqual(lines_copy, lines_orig + 5 + 4)
+        # remove copy again
+        os.remove(name_copy)
+
+    def test_marker_insert_aarch64(self):
+        # copy file to add markers
+        name = self._find_test_file('kernel_aarch64.s')
+        name_copy = name + '.copy.s'
+        copyfile(name, name_copy)
+
+        user_input = ['.LBB0_32', '64']
+        parser = osaca.create_parser()
+        args = parser.parse_args(['--arch', 'tx2', '--insert-marker', name_copy])
+        with patch('builtins.input', side_effect=user_input):
+            osaca.run(args)
+
+        lines_orig = len(open(name).readlines())
+        lines_copy = len(open(name_copy).readlines())
+        self.assertEqual(lines_copy, lines_orig + 3 + 2)
+        # remove copy again
+        os.remove(name_copy)
 
     def test_examples(self):
         kernels = [
@@ -76,7 +125,9 @@ class TestCLI(unittest.TestCase):
             for a in archs:
                 for c in comps[a]:
                     with self.subTest(kernel=k, arch=a, comp=c):
-                        args = parser.parse_args(['--arch', a, self._find_file(k, a, c)])
+                        args = parser.parse_args(
+                            ['--arch', a, self._find_file(k, a, c), '--export-graph', '/dev/null']
+                        )
                         output = StringIO()
                         osaca.run(args, output_file=output)
                         self.assertTrue('WARNING' not in output.getvalue())

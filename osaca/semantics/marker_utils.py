@@ -50,6 +50,7 @@ def find_marked_kernel_x86ATT(lines):
 
 def get_marker(isa, comment=""):
     """Return tuple of start and end marker lines."""
+    isa = isa.lower()
     if isa == 'x86':
         start_marker_raw = (
             'movl      $111, %ebx # OSACA START MARKER\n'
@@ -65,7 +66,7 @@ def get_marker(isa, comment=""):
             '.byte     103        # OSACA END MARKER\n'
             '.byte     144        # OSACA END MARKER\n'
         )
-    elif isa == 'AArch64':
+    elif isa == 'aarch64':
         start_marker_raw = (
             'mov       x1, #111    // OSACA START MARKER\n'
             '.byte     213,3,32,31 // OSACA START MARKER\n'

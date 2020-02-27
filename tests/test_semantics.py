@@ -10,8 +10,10 @@ from subprocess import call
 
 import networkx as nx
 
+from osaca.osaca import get_unmatched_instruction_ratio
 from osaca.parser import AttrDict, ParserAArch64v81, ParserX86ATT
-from osaca.semantics import INSTR_FLAGS, ArchSemantics, KernelDG, MachineModel
+from osaca.semantics import (INSTR_FLAGS, ArchSemantics, KernelDG,
+                             MachineModel, reduce_to_section)
 
 
 class TestSemanticTools(unittest.TestCase):
@@ -33,8 +35,10 @@ class TestSemanticTools(unittest.TestCase):
             self.code_x86 = f.read()
         with open(self._find_file('kernel_aarch64.s')) as f:
             self.code_AArch64 = f.read()
-        self.kernel_x86 = self.parser_x86.parse_file(self.code_x86)
-        self.kernel_AArch64 = self.parser_AArch64.parse_file(self.code_AArch64)
+        self.kernel_x86 = reduce_to_section(self.parser_x86.parse_file(self.code_x86), 'x86')
+        self.kernel_AArch64 = reduce_to_section(
+            self.parser_AArch64.parse_file(self.code_AArch64), 'aarch64'
+        )
 
         # set up machine models
         self.machine_model_csx = MachineModel(
@@ -180,7 +184,7 @@ class TestSemanticTools(unittest.TestCase):
             test_mm_x86.get_load_throughput(
                 {'base': {'name': 'x'}, 'offset': None, 'index': None, 'scale': 1}
             ),
-            [[1, '23'], [1, ['2D', '3D']]]
+            [[1, '23'], [1, ['2D', '3D']]],
         )
 
         # test adding port
@@ -232,15 +236,18 @@ class TestSemanticTools(unittest.TestCase):
         # x86
         kernel_fixed = deepcopy(self.kernel_x86)
         self.semantics_csx.add_semantics(kernel_fixed)
+        self.assertEqual(get_unmatched_instruction_ratio(kernel_fixed), 0)
         kernel_optimal = deepcopy(kernel_fixed)
         self.semantics_csx.assign_optimal_throughput(kernel_optimal)
         tp_fixed = self.semantics_csx.get_throughput_sum(kernel_fixed)
         tp_optimal = self.semantics_csx.get_throughput_sum(kernel_optimal)
         self.assertNotEqual(tp_fixed, tp_optimal)
         self.assertTrue(max(tp_optimal) <= max(tp_fixed))
+
         # arm
         kernel_fixed = deepcopy(self.kernel_AArch64)
         self.semantics_tx2.add_semantics(kernel_fixed)
+        self.assertEqual(get_unmatched_instruction_ratio(kernel_fixed), 0)
         kernel_optimal = deepcopy(kernel_fixed)
         self.semantics_tx2.assign_optimal_throughput(kernel_optimal)
         tp_fixed = self.semantics_tx2.get_throughput_sum(kernel_fixed)
