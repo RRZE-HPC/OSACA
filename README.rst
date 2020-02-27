@@ -337,6 +337,8 @@ It shows the whole kernel together with the optimized port pressure of each inst
 Furthermore, in the two columns on the right, the critical path (CP) and the longest loop-carried dependency (LCD) of the loop kernel.
 In the bottom, all loop-carried dependencies are shown, each with a list of line numbers being part of this dependency chain on the right.
 
+You can find more (already marked) examples and sample outputs for various architectures in the `examples <examples/>`_ directory.
+
 Credits
 =======
 Implementation: Jan Laukemann
