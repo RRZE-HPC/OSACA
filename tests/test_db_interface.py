@@ -5,6 +5,7 @@ Unit tests for DB interface
 import os
 import sys
 import unittest
+from io import StringIO
 
 import osaca.db_interface as dbi
 from osaca.db_interface import sanity_check
@@ -69,18 +70,16 @@ class TestDBInterface(unittest.TestCase):
             MachineModel('csx').set_instruction()
 
     def test_sanity_check(self):
+        output = StringIO()
         # non-verbose
-        sanity_check('csx', verbose=False)
-        sanity_check('tx2', verbose=False)
-        sanity_check('zen1', verbose=False)
+        sanity_check('csx', verbose=False, output_file=output)
+        sanity_check('tx2', verbose=False, output_file=output)
+        sanity_check('zen1', verbose=False, output_file=output)
 
         # verbose
-        stdout = sys.stdout
-        with open('/dev/null', 'w') as sys.stdout:
-            sanity_check('csx', verbose=True)
-            sanity_check('tx2', verbose=True)
-            sanity_check('zen1', verbose=True)
-        sys.stdout = stdout
+        sanity_check('csx', verbose=True, output_file=output)
+        sanity_check('tx2', verbose=True, output_file=output)
+        sanity_check('zen1', verbose=True, output_file=output)
 
     def test_ibench_import(self):
         # only check import without dumping the DB file (takes too much time)

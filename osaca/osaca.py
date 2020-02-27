@@ -9,8 +9,8 @@ import sys
 from osaca.db_interface import import_benchmark_output, sanity_check
 from osaca.frontend import Frontend
 from osaca.parser import BaseParser, ParserAArch64v81, ParserX86ATT
-from osaca.semantics import (ArchSemantics, KernelDG, MachineModel,
-                             reduce_to_section, INSTR_FLAGS)
+from osaca.semantics import (INSTR_FLAGS, ArchSemantics, KernelDG,
+                             MachineModel, reduce_to_section)
 
 MODULE_DATA_DIR = os.path.join(
     os.path.dirname(os.path.split(os.path.abspath(__file__))[0]), 'osaca/data/'
@@ -47,18 +47,19 @@ def get_version():
     return __find_version('__init__.py')
 
 
-def create_parser():
+def create_parser(parser=None):
     """
     Return argparse parser.
 
     :returns: The newly created :class:`~Argparse.ArgumentParser` object.
     """
     # Create parser
-    parser = argparse.ArgumentParser(
-        description='Analyzes a marked innermost loop snippet for a given architecture type.',
-        epilog='For help, examples, documentation and bug reports go to:\nhttps://github.com'
-        '/RRZE-HPC/OSACA/ | License: AGPLv3',
-    )
+    if not parser:
+        parser = argparse.ArgumentParser(
+            description='Analyzes a marked innermost loop snippet for a given architecture type.',
+            epilog='For help, examples, documentation and bug reports go to:\nhttps://github.com'
+            '/RRZE-HPC/OSACA/ | License: AGPLv3',
+        )
 
     # Add arguments
     parser.add_argument(
@@ -71,7 +72,7 @@ def create_parser():
         '--fixed',
         action='store_true',
         help='Run the throughput analysis with fixed probabilities for all suitable ports per '
-        'instruction. Otherwise, OSACA will print out the optimal port utilization for the kernel.',
+        'instruction. Otherwise, OSACA will print the optimal port utilization for the kernel.',
     )
     parser.add_argument(
         '--db-check',
@@ -143,7 +144,7 @@ def check_arguments(args, parser):
         )
 
 
-def import_data(benchmark_type, arch, filepath):
+def import_data(benchmark_type, arch, filepath, output_file=sys.stdout):
     """
     Imports benchmark results from micro-benchmarks.
 
@@ -155,9 +156,9 @@ def import_data(benchmark_type, arch, filepath):
     :type filepath: str
     """
     if benchmark_type.lower() == 'ibench':
-        import_benchmark_output(arch, 'ibench', filepath)
+        import_benchmark_output(arch, 'ibench', filepath, output=output_file)
     elif benchmark_type.lower() == 'asmbench':
-        import_benchmark_output(arch, 'asmbench', filepath)
+        import_benchmark_output(arch, 'asmbench', filepath, output=output_file)
     else:
         raise NotImplementedError('This benchmark input variant is not supported.')
 
@@ -232,9 +233,12 @@ def inspect(args, output_file=sys.stdout):
         kernel_graph.export_graph(args.dotpath if args.dotpath != '.' else None)
     # Print analysis
     frontend = Frontend(args.file.name, arch=arch)
-    print(frontend.full_analysis(
-        kernel, kernel_graph, ignore_unknown=ignore_unknown, verbose=verbose
-    ), file=output_file)
+    print(
+        frontend.full_analysis(
+            kernel, kernel_graph, ignore_unknown=ignore_unknown, verbose=verbose
+        ),
+        file=output_file,
+    )
 
 
 def run(args, output_file=sys.stdout):
@@ -247,10 +251,10 @@ def run(args, output_file=sys.stdout):
     if args.check_db:
         # Sanity check on DB
         verbose = True if args.verbose > 0 else False
-        sanity_check(args.arch, verbose=verbose)
+        sanity_check(args.arch, verbose=verbose, output_file=output_file)
     elif 'import_data' in args:
         # Import microbench output file into DB
-        import_data(args.import_data, args.arch, args.file.name)
+        import_data(args.import_data, args.arch, args.file.name, output_file=output_file)
     elif args.insert_marker:
         # Try to add IACA marker
         insert_byte_marker(args)
@@ -278,8 +282,10 @@ def get_unmatched_instruction_ratio(kernel):
     """Return ratio of unmatched from total instructions in kernel."""
     unmatched_counter = 0
     for instruction in kernel:
-        if INSTR_FLAGS.TP_UNKWN in instruction['flags'] and \
-                INSTR_FLAGS.LT_UNKWN in instruction['flags']:
+        if (
+            INSTR_FLAGS.TP_UNKWN in instruction['flags']
+            and INSTR_FLAGS.LT_UNKWN in instruction['flags']
+        ):
             unmatched_counter += 1
     return unmatched_counter / len(kernel)
 
