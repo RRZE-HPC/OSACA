@@ -9,6 +9,7 @@ before_install:
 #  - pip install tox-travis
   - pip install codecov
   - pip install pygraphviz
+  - pip install kerncraft>=0.8.4.dev2
 install:
   - pip install -e .
 cache: pip

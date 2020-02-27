@@ -169,9 +169,6 @@ def insert_byte_marker(args):
 
     :param args: arguments given from :class:`~argparse.ArgumentParser` after parsing
     """
-    if MachineModel.get_isa_for_arch(args.arch) != 'x86':
-        print('Marker insertion for non-x86 is not yet supported by Kerncraft.', file=sys.stderr)
-        sys.exit(1)
     try:
         from kerncraft.incore_model import asm_instrumentation
     except ImportError:
@@ -191,6 +188,7 @@ def insert_byte_marker(args):
         output_file=marked_assembly,
         block_selection='manual',
         pointer_increment='auto_with_manual_fallback',
+        isa=MachineModel.get_isa_for_arch(args.arch)
     )
 
     marked_assembly.seek(0)
