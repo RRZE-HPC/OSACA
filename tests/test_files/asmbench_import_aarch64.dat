@@ -1,8 +1,8 @@
-testinstr-i_d_v
+testinstr-i_d_vd
 Latency: 4.013 cy
 Throughput: 0.501 cy
 
-testinstr2-mboi_v
+testinstr2-mboi_vs
 Latency: 4.013 cy
 Throughput: 0.501 cy
 

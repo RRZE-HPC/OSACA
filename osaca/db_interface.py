@@ -216,7 +216,11 @@ def _create_db_operand_aarch64(operand):
     elif operand in 'wxbhsdq':
         return {'class': 'register', 'prefix': operand}
     elif operand.startswith('v'):
-        return {'class': 'register', 'prefix': 'v', 'shape': operand[1:2]}
+        return {
+            'class': 'register',
+            'prefix': 'v',
+            'shape': operand[1:2] if operand[1:2] != '' else 'd',
+        }
     elif operand.startswith('m'):
         return {
             'class': 'memory',
@@ -391,9 +395,7 @@ def _get_sanity_report_verbose(
     s += 'Instruction forms without port pressure assignment:\n' if len(m_pp) != 0 else ''
     for instr_form in m_pp:
         s += '{}{}{}\n'.format(BRIGHT_MAGENTA, _get_full_instruction_name(instr_form), WHITE)
-    s += (
-        'Instruction forms which might miss an ISA DB entry:\n' if len(suspic_instr) != 0 else ''
-    )
+    s += 'Instruction forms which might miss an ISA DB entry:\n' if len(suspic_instr) != 0 else ''
     for instr_form in suspic_instr:
         s += '{}{}{}\n'.format(BRIGHT_CYAN, _get_full_instruction_name(instr_form), WHITE)
     s += 'Duplicate instruction forms in uarch DB:\n' if len(dup_arch) != 0 else ''
@@ -403,9 +405,7 @@ def _get_sanity_report_verbose(
     for instr_form in dup_isa:
         s += '{}{}{}\n'.format(BRIGHT_YELLOW, _get_full_instruction_name(instr_form), WHITE)
     s += (
-        'Instruction forms existing in ISA DB but not in uarch DB:\n'
-        if len(only_isa) != 0
-        else ''
+        'Instruction forms existing in ISA DB but not in uarch DB:\n' if len(only_isa) != 0 else ''
     )
     for instr_form in only_isa:
         s += '{}{}{}\n'.format(CYAN, _get_full_instruction_name(instr_form), WHITE)
