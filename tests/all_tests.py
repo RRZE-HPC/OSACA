@@ -14,7 +14,7 @@ suite = unittest.TestLoader().loadTestsFromNames(
         'test_frontend',
         'test_db_interface',
         'test_kerncraftAPI',
-        'test_examples',
+        'test_cli',
     ]
 )
 

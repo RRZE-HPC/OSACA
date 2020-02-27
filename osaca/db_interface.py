@@ -10,7 +10,7 @@ import ruamel.yaml
 from osaca.semantics import MachineModel
 
 
-def sanity_check(arch: str, verbose=False):
+def sanity_check(arch: str, verbose=False, output_file=sys.stdout):
     """
     Checks the database for missing TP/LT values, instructions might missing int the ISA DB and
     duplicate instructions.
@@ -39,7 +39,7 @@ def sanity_check(arch: str, verbose=False):
     # check ISA DB entries
     duplicate_instr_isa, only_in_isa = _check_sanity_isa_db(arch_mm, isa_mm)
 
-    _print_sanity_report(
+    report = _get_sanity_report(
         num_of_instr,
         missing_throughput,
         missing_latency,
@@ -49,10 +49,12 @@ def sanity_check(arch: str, verbose=False):
         duplicate_instr_isa,
         only_in_isa,
         verbose=verbose,
+        colors=True if output_file == sys.stdout else False,
     )
+    print(report, file=output_file)
 
 
-def import_benchmark_output(arch, bench_type, filepath, output=None):
+def import_benchmark_output(arch, bench_type, filepath, output=sys.stdout):
     """
     Import benchmark results from micro-benchmarks.
 
@@ -62,8 +64,8 @@ def import_benchmark_output(arch, bench_type, filepath, output=None):
     :type bench_type: str
     :param filepath: filepath to the output file
     :type filepath: str
-    :param output: output filepath to dump, defaults to None
-    :type output: str
+    :param output: output stream to dump, defaults to sys.stdout
+    :type output: stream
     """
     supported_bench_outputs = ['ibench', 'asmbench']
     assert os.path.exists(filepath)
@@ -83,8 +85,7 @@ def import_benchmark_output(arch, bench_type, filepath, output=None):
     if output is None:
         print(mm.dump())
     else:
-        with open(output, 'w') as f:
-            mm.dump(stream=f)
+        mm.dump(stream=output)
 
 
 ##################
@@ -335,88 +336,80 @@ def _check_sanity_isa_db(arch_mm, isa_mm):
     return duplicate_instr_isa, only_in_isa
 
 
-def _print_sanity_report(
-    total, m_tp, m_l, m_pp, suspic_instr, dup_arch, dup_isa, only_isa, verbose=False
+def _get_sanity_report(
+    total, m_tp, m_l, m_pp, suspic_instr, dup_arch, dup_isa, only_isa, verbose=False, colors=False
 ):
+    s = ''
     # non-verbose summary
-    print('SUMMARY\n----------------------')
-    print(
-        '{}% ({}/{}) of instruction forms have no throughput value.'.format(
-            round(100 * len(m_tp) / total), len(m_tp), total
-        )
+    s += 'SUMMARY\n----------------------\n'
+    s += '{}% ({}/{}) of instruction forms have no throughput value.\n'.format(
+        round(100 * len(m_tp) / total), len(m_tp), total
     )
-    print(
-        '{}% ({}/{}) of instruction forms have no latency value.'.format(
-            round(100 * len(m_l) / total), len(m_l), total
-        )
+    s += '{}% ({}/{}) of instruction forms have no latency value.\n'.format(
+        round(100 * len(m_l) / total), len(m_l), total
     )
-    print(
-        '{}% ({}/{}) of instruction forms have no port pressure assignment.'.format(
-            round(100 * len(m_pp) / total), len(m_pp), total
-        )
+    s += '{}% ({}/{}) of instruction forms have no port pressure assignment.\n'.format(
+        round(100 * len(m_pp) / total), len(m_pp), total
     )
-    print(
-        '{}% ({}/{}) of instruction forms might miss an ISA DB entry.'.format(
-            round(100 * len(suspic_instr) / total), len(suspic_instr), total
-        )
+    s += '{}% ({}/{}) of instruction forms might miss an ISA DB entry.\n'.format(
+        round(100 * len(suspic_instr) / total), len(suspic_instr), total
     )
-    print('{} duplicate instruction forms in uarch DB.'.format(len(dup_arch)))
-    print('{} duplicate instruction forms in ISA DB.'.format(len(dup_isa)))
-    print(
+    s += '{} duplicate instruction forms in uarch DB.\n'.format(len(dup_arch))
+    s += '{} duplicate instruction forms in ISA DB.\n'.format(len(dup_isa))
+    s += (
         '{} instruction forms in ISA DB are not referenced by instruction '.format(len(only_isa))
-        + 'forms in uarch DB.'
+        + 'forms in uarch DB.\n'
     )
-    print('----------------------\n')
+    s += '----------------------\n'
     # verbose version
     if verbose:
-        _print_sanity_report_verbose(
-            total, m_tp, m_l, m_pp, suspic_instr, dup_arch, dup_isa, only_isa
+        s += _get_sanity_report_verbose(
+            total, m_tp, m_l, m_pp, suspic_instr, dup_arch, dup_isa, only_isa, colors=colors
         )
+    return s
 
 
-def _print_sanity_report_verbose(
-    total, m_tp, m_l, m_pp, suspic_instr, dup_arch, dup_isa, only_isa
+def _get_sanity_report_verbose(
+    total, m_tp, m_l, m_pp, suspic_instr, dup_arch, dup_isa, only_isa, colors=False
 ):
-    BRIGHT_CYAN = '\033[1;36;1m'
-    BRIGHT_BLUE = '\033[1;34;1m'
-    BRIGHT_RED = '\033[1;31;1m'
-    BRIGHT_MAGENTA = '\033[1;35;1m'
-    BRIGHT_YELLOW = '\033[1;33;1m'
-    CYAN = '\033[36m'
-    YELLOW = '\033[33m'
-    WHITE = '\033[0m'
+    BRIGHT_CYAN = '\033[1;36;1m' if colors else ''
+    BRIGHT_BLUE = '\033[1;34;1m' if colors else ''
+    BRIGHT_RED = '\033[1;31;1m' if colors else ''
+    BRIGHT_MAGENTA = '\033[1;35;1m' if colors else ''
+    BRIGHT_YELLOW = '\033[1;33;1m' if colors else ''
+    CYAN = '\033[36m' if colors else ''
+    YELLOW = '\033[33m' if colors else ''
+    WHITE = '\033[0m' if colors else ''
 
-    print('Instruction forms without throughput value:\n' if len(m_tp) != 0 else '', end='')
+    s = ''
+    s += 'Instruction forms without throughput value:\n' if len(m_tp) != 0 else ''
     for instr_form in m_tp:
-        print('{}{}{}'.format(BRIGHT_BLUE, _get_full_instruction_name(instr_form), WHITE))
-    print('Instruction forms without latency value:\n' if len(m_l) != 0 else '', end='')
+        s += '{}{}{}\n'.format(BRIGHT_BLUE, _get_full_instruction_name(instr_form), WHITE)
+    s += 'Instruction forms without latency value:\n' if len(m_l) != 0 else ''
     for instr_form in m_l:
-        print('{}{}{}'.format(BRIGHT_RED, _get_full_instruction_name(instr_form), WHITE))
-    print(
-        'Instruction forms without port pressure assignment:\n' if len(m_pp) != 0 else '', end=''
-    )
+        s += '{}{}{}\n'.format(BRIGHT_RED, _get_full_instruction_name(instr_form), WHITE)
+    s += 'Instruction forms without port pressure assignment:\n' if len(m_pp) != 0 else ''
     for instr_form in m_pp:
-        print('{}{}{}'.format(BRIGHT_MAGENTA, _get_full_instruction_name(instr_form), WHITE))
-    print(
-        'Instruction forms which might miss an ISA DB entry:\n' if len(suspic_instr) != 0 else '',
-        end='',
+        s += '{}{}{}\n'.format(BRIGHT_MAGENTA, _get_full_instruction_name(instr_form), WHITE)
+    s += (
+        'Instruction forms which might miss an ISA DB entry:\n' if len(suspic_instr) != 0 else ''
     )
     for instr_form in suspic_instr:
-        print('{}{}{}'.format(BRIGHT_CYAN, _get_full_instruction_name(instr_form), WHITE))
-    print('Duplicate instruction forms in uarch DB:\n' if len(dup_arch) != 0 else '', end='')
+        s += '{}{}{}\n'.format(BRIGHT_CYAN, _get_full_instruction_name(instr_form), WHITE)
+    s += 'Duplicate instruction forms in uarch DB:\n' if len(dup_arch) != 0 else ''
     for instr_form in dup_arch:
-        print('{}{}{}'.format(YELLOW, _get_full_instruction_name(instr_form), WHITE))
-    print('Duplicate instruction forms in ISA DB:\n' if len(dup_isa) != 0 else '', end='')
+        s += '{}{}{}\n'.format(YELLOW, _get_full_instruction_name(instr_form), WHITE)
+    s += 'Duplicate instruction forms in ISA DB:\n' if len(dup_isa) != 0 else ''
     for instr_form in dup_isa:
-        print('{}{}{}'.format(BRIGHT_YELLOW, _get_full_instruction_name(instr_form), WHITE))
-    print(
+        s += '{}{}{}\n'.format(BRIGHT_YELLOW, _get_full_instruction_name(instr_form), WHITE)
+    s += (
         'Instruction forms existing in ISA DB but not in uarch DB:\n'
         if len(only_isa) != 0
-        else '',
-        end='',
+        else ''
     )
     for instr_form in only_isa:
-        print('{}{}{}'.format(CYAN, _get_full_instruction_name(instr_form), WHITE))
+        s += '{}{}{}\n'.format(CYAN, _get_full_instruction_name(instr_form), WHITE)
+    return s
 
 
 ###################
