@@ -6,12 +6,9 @@ OSACA
 =====
 
 Open Source Architecture Code Analyzer
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+--------------------------------------
 
-This tool allows automatic instruction fetching of assembly code,
-auto-generating of testcases for assembly instructions creating latency
-and throughput benchmarks on a specific instruction form and throughput
-analysis and throughput prediction for a innermost loop kernel.
+For an innermost loop kernel in assembly, this tool allows automatic instruction fetching of assembly code and automatic runtime prediction including throughput analysis and detection for critical path and loop-carried dependencies.
 
 .. image:: https://travis-ci.org/RRZE-HPC/OSACA.svg?branch=master
     :target: https://travis-ci.org/RRZE-HPC/OSACA
@@ -26,7 +23,7 @@ Getting started
 ===============
 
 Installation
-~~~~~~~~~~~~
+------------
 On most systems with python pip and setuputils installed, just run:
 
 .. code:: bash
@@ -44,7 +41,7 @@ To build OSACA from source, clone this repository using ``git clone https://gith
 After installation, OSACA can be started with the command ``osaca`` in the CLI.
 
 Dependencies:
-~~~~~~~~~~~~~~~
+-------------
 Additional requirements are:
 
 -  `Python3 <https://www.python.org/>`_
@@ -69,31 +66,37 @@ The usage of OSACA can be listed as:
 
     osaca [-h] [-V] [--arch ARCH] [--fixed] [--db-check] 
     	  [--import MICROBENCH] [--insert-marker] 
-	  [--export-graph GRAPHNAME] FILEPATH
+	  [--export-graph GRAPHNAME] [--ignore-unknown] [--verbose]
+	  FILEPATH
 
 -h, --help
   prints out the help message.
 -V, --version
   shows the program’s version number.
 --arch ARCH
-  needs to be replaced with the wished architecture abbreviation.
-  Possible options are ``SNB``, ``IVB``, ``HSW``, ``BDW``, ``SKX`` and ``CSX`` for the latest Intel micro architectures starting from Intel Sandy Bridge and ``ZEN1`` for AMD Zen (17h family) architecture.
+  needs to be replaced with the target architecture abbreviation.
+  Possible options are ``SNB``, ``IVB``, ``HSW``, ``BDW``, ``SKX`` and ``CSX`` for the latest Intel micro architectures starting from Intel Sandy Bridge and ``ZEN1``, ``ZEN2`` for AMD Zen architectures.
   Furthermore, ``TX2`` for Marvell`s ARM-based ThunderX2 architecture is available.
 --fixed
-  Run the throughput analysis with fixed probabilities for all suitable ports per instruction.
+  Run the throughput analysis with fixed port utilization for all suitable ports per instruction.
   Otherwise, OSACA will print out the optimal port utilization for the kernel.
 --db-check
   Run a sanity check on the by "--arch" specified database.
   The output depends on the verbosity level.
-  Keep in mind you have to provide a (dummy) filename in anyway.
+  Keep in mind you have to provide an existing (dummy) filename in anyway.
 --import MICROBENCH
   Import a given microbenchmark output file into the corresponding architecture instruction database.
   Define the type of microbenchmark either as "ibench" or "asmbench".
 --insert-marker
-  OSACA calls the Kerncraft module for the interactively insertion of `IACA <https://software.intel.com/en-us/articles/intel-architecture-code-analyzer>`_ marker in suggested assembly blocks.
+  OSACA calls the Kerncraft module for the interactively insertion of `IACA <https://software.intel.com/en-us/articles/intel-architecture-code-analyzer>`_ byte markers or OSACA AArch64 byte markers in suggested assembly blocks.
 --export-graph EXPORT_PATH
   Output path for .dot file export. If "." is given, the file will be stored as "./osaca_dg.dot".
-  After the file was created, you can convert it to a PDF file using dot: `dot -Tpdf osaca_dg.dot -o osaca_dependency_graph.pdf`
+  After the file was created, you can convert it to a PDF file using `dot <https://graphviz.gitlab.io/_pages/pdf/dotguide.pdf>`_.
+--ignore-unknown
+  Force OSACA to apply a throughput and latency of 0.0 cy for all unknown instruction forms.
+  If not specified, a warning will be printed instead if one ore more isntruction form is unknown to OSACA.
+-v, --verbose
+  Increases verbosity level
 
 The **FILEPATH** describes the filepath to the file to work with and is always necessary
 
@@ -102,50 +105,179 @@ ______________________
 Hereinafter OSACA's scope of function will be described.
 
 Throughput & Latency analysis
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-As main functionality of OSACA this process starts by default. It is always necessary to specify the core architecture by the flag ``--arch ARCH``, where ``ARCH`` can stand for ``SNB``, ``IVB``, ``HSW``, ``BDW``, ``SKX``, ``CSX``, ``ZEN`` or ``TX2``.
+-----------------------------
+As main functionality of OSACA, the tool starts the analysis on a marked assembly file by running the following command with one or more of the optional parameters:
 
-For extracting the right kernel, one has to mark it beforehand.
-Currently, only the detechtion of markers in the assembly code and therefore the analysis of assemly files is supported by OSACA.
+.. code-block:: bash
 
-**Assembly code**
+    osaca --arch ARCH [--fixed] [--ignore-unknown]
+                      [--export-graph EXPORT_PATH]
+          file
+
+The ``file`` parameter specifies the target assembly file and is always mandatory. |br|
+The parameter ``ARCH`` is positional for the analysis and must be replaced by the target architecture abbreviation. |br|
+OSACA assumes an optimal scheduling for all instructions and assumes the processor to be able to schedule instructions in a way that it achieves a minimal reciprocal throughput.
+However, in older versions (<=v0.2.2) of OSACA, a fixed probability for port utilization was assumed.
+This means, instructions with *N* available ports for execution were scheduled with a probability of *1/N* to each of the ports.
+This behavior can be enforced by using the ``--fixed`` flag. |br|
+If one or more instruction forms are unknown to OSACA, it refuses to print an overall throughput, CP and
+LCD analysis and marks all unknown instruction forms with ``X`` next to the mnemonic.
+This is done so the user does not miss out on this unrecognized instruction and might assume an incorrect runtime prediction.
+To force OSACA to apply a throughput and latency of 0.0 cy for all unknown instruction forms, the flag ``--ignore-unknown`` can be specified. |br|
+To get a visualization of the analyzed kernel and its dependency chains, OSACA provides the option to additionally produce a graph as DOT file, which represents the kernel and all register dependencies inside of it.
+The tool highlights all LCDs and the CP.
+The graph generation is done by running OSACA with the ``--export-graph EXPORT_GRAPH`` flag.
+OSACA stores the DOT file either at the by ``EXPORT_GRAPH`` specified filepath or uses the default filename "osaca_dg.dot" in the current working directory.
+Subsequently, the DOT-graph can be adjusted in its appearance and converted to various output formats such as PDF, SVG, or PNG using the `dot command <https://graphviz.gitlab.io/_pages/pdf/dotguide.pdf>`_, e.g., ``dot -Tpdf osaca_dg.dot -o
+graph.pdf`` to generate a PDF document.
+
+Marker insertion
+----------------
+For extracting the right kernel, one has to mark it in beforehand.
+Currently, only the detection of markers in the assembly code and therefore the analysis of assembly files is supported by OSACA.
 
 Marking a kernel means to insert the byte markers in the assembly file in before and after the loop.
 For this, the start marker has to be inserted right in front of the loop label and the end marker directly after the jump instruction.
-For the convience of the user, in x86 assembly IACA byte markers are used.
+IACA requires byte markers since it operates on opcode-level.
+To provide a trade-off between reusability for such tool and convenient usability, OSACA supports both byte markers and comment line markers.
+While the byte markers for x86 are equivalent to IACA byte markers, the comment keywords ``OSACA-BEGIN`` and ``OSACA-END`` are based on LLVM-MCA's markers.
 
-**x86 Byte Markers**
-
-.. code-block:: gas
-
-    movl    $111,%ebx       #IACA/OSACA START MARKER
-    .byte   100,103,144     #IACA/OSACA START MARKER
-    Loop:
-      # ...
-    movl    $222,%ebx       #IACA/OSACA END MARKER
-    .byte   100,103,144     #IACA/OSACA END MARKER
-
-**AArch64 Byte Markers**
+x86 markers
+^^^^^^^^^^^
+**Byte markers**
 
 .. code-block:: asm
 
-    mov x1, #111            // OSACA START
-    .byte 213,3,32,31       // OSACA START
-      \\ ...
-    mov x1, #222            // OSACA END
-    .byte 213,3,32,31       // OSACA END
+      movl    $111,%ebx       #IACA/OSACA START MARKER
+      .byte   100,103,144     #IACA/OSACA START MARKER
+    .loop:
+      # loop body
+      jb      .loop
+      movl    $222,%ebx       #IACA/OSACA END MARKER
+      .byte   100,103,144     #IACA/OSACA END MARKER
 
-.. Include new measurements into the data file
-.. ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-.. Running OSACA with the flag ``-i`` or ``--include-ibench`` and a specified micro architecture ``ARCH``, it takes the values given in an ibench output file and checks them for reasonability. If a value is not in the data file already, it will be added, otherwise OSACA prints out a warning message and keeps the old value in the data file. If a value does not pass the validation, a warning message is shown, however, OSACA will keep working with the new value. The handling of ibench is shortly described in the example section below.
+**Comment line markers**
 
-Insert IACA markers
-~~~~~~~~~~~~~~~~~~~
-Using the ``--insert-marker`` flags for a given file, OSACA calls the implemented Kerncraft module for identifying and marking the inner-loop block in *manual mode*. More information about how this is done can be found in the `Kerncraft repository <https://github.com/RRZE-HPC/kerncraft>`_.
-Note that this currrently only works for x86 loop kernels
+.. code-block:: asm
 
-Example
-=======
+      # OSACA-BEGIN
+    .loop:
+      # loop body
+      jb      .loop
+      # OSACA-END
+
+AArch64 markers
+^^^^^^^^^^^^^^^
+**Byte markers**
+
+.. code-block:: asm
+
+      mov      x1, #111        // OSACA START
+      .byte    213,3,32,31     // OSACA START
+    .loop:
+      // loop body
+      b.ne     .loop
+      mov      x1, #222        // OSACA END
+      .byte    213,3,32,31     // OSACA END
+    
+**Comment line markers**
+
+.. code-block:: asm
+  
+      // OSACA-BEGIN
+    .loop:
+      // loop body
+      b.ne     .loop
+      // OSACA-END
+
+OSACA in combination with Kerncraft provides a functionality for the automatic detection of possible loop kernels and inserting markers.
+This can be done by using the ``--insert-marker`` flag together with the path to the target assembly file and the target architecture.
+
+Benchmark import
+----------------
+OSACA supports the automatic integration of new instruction forms by parsing the output of the micro-
+benchmark tools `asmbench <https://github.com/RRZE-HPC/asmbench>`_ and `ibench <https://github.com/RRZE-HPC/ibench>`_.
+This can be achieved by running OSACA with the command line option ``--import MICROBENCH``:
+
+.. code-block:: bash
+
+  osaca --arch ARCH --import MICROBENCH file
+
+``MICROBENCH`` specifies one of the currently supported benchmark tools, i.e., "asmbench" or "ibench".
+``ARCH`` defines the abbreviation of the target architecture for which the instructions will be added and file must be the path to the generated output file of the benchmark.
+The format of this file has to match either the basic command line output of ibench, e.g.,
+
+.. code-block::
+
+  [INSTRUCTION FORM]-TP:    0.500 (clock cycles)    [DEBUG - result: 1.000000]
+  [INSTRUCTION FORM]-LT:    4.000 (clock cycles)    [DEBUG - result: 1.000000]
+
+or the command line output of asmbench including the name of the instruction form in a separate line at the
+beginning, e.g.:
+
+.. code-block::
+
+  [INSTRUCTION FORM]
+  Latency: 4.00 cycle
+  Throughput: 0.50 cycle
+  
+  
+Note that there must be an empty line after each throughput measurement as part of the output so that one instruction form entry consists of four (4) lines.
+
+To let OSACA import the instruction form with the correct operands, the naming conventions for the instruction form name must be followed:
+
+* The first part of the name is the mnemonic and ends with the character "``-``" (not part of the mnemonic in the DB).
+
+* The second part of the name are the operands. Each operand must be separated from another operand by the character "``_``".
+
+* For each **x86** operand, one of the following symbols must be used:
+
+  * "``r``" for general purpose registers (rax, edi, r9, ...)
+  * "``x``", "``y``", or "``z``" for xmm, ymm, or zmm registers, respectively
+  * "``i``" for immediates
+  * "``m``" for a memory address. Add "``b``" if the memory address contains a base register, "``o``" if it contains an offset,
+    "``i``" if it contains an index register, and "``s``" if the index register additionally has a scale factor of *more* than 1.
+
+* For each **AArch64** operand, one of the following symbols must be used:
+
+  * "``w``", "``x``", "``b``", "``h``", "``s``", "``d``", or "``q``" for registers with the corresponding prefix.
+  * "``v``" followed by a single character ("``b``", "``h``", "``s``", or "``d``") for vector registers with the corresponding lane width of the second character.
+    If no second character is given, OSACA assumes a lane width of 64 bit (``d``) as default.
+  * "``i``" for immediates
+  * "``m``" for a memory address. Add "``b``" if the memory address contains a base register, "``o``" if it contains an offset,
+    "``i``" if it contains an index register, and "``s``" if the index register additionally has a scale factor of *more* 
+    than 1. Add "``r``" if the address format uses pre-indexing and "``p``" if it uses post-indexing.
+ 
+Valid instruction form examples for x86 are ``vaddpd-x_x_x``, ``mov-r_mboi``, and ``vfmadd213pd-mbis_y_y``. |br|
+Valid instruction form examples for AArch64 are ``fadd-vd_vd_v``, ``ldp-d_d_mo``, and ``fmov-s_i``. |br|
+
+Note that the options to define operands are limited, therefore, one might need to adjust the instruction forms in the architecture DB after importing.
+OSACA parses the output for an arbitrary number of instruction forms and adds them as entries to the architecture DB.
+The user must edit the ISA DB in case the instruction form shows irregular source and destination operands for its ISA syntax. OSACA applies the following rules by default:
+
+* If there is only one operand, it is considered as source operand
+
+* In case of multiple operands the target operand (depending on the ISA syntax the last or first one) is considered to be the
+  destination operand, all others are considered as source operands.
+
+Database check
+--------------
+Since a manual adjustment of the ISA DB is currently indispensable when adding new instruction forms,
+OSACA provides a database sanity check using the --db-check flag. It can be executed via:
+
+.. code-block::
+
+  osaca --arch ARCH --db-check [-v] file
+
+``ARCH`` defines the abbreviation of the target architecture of the database to check.
+The ``file`` argument needs to be specified as it is positional but may be any existing dummy path.
+When called, OSACA prints a summary of database information containing the amount of missing throughput values, latency values or μ-ops assignments for an instruction form.
+Furthermore, it shows the amount of duplicate instruction forms in both the architecture DB and the ISA DB and checks how many instruction forms in the ISA DB are non-existent in the architecture DB.
+Finally, it checks via simple heuristics how many of the instruction forms contained in the architecture DB might miss an ISA DB entry.
+Running the database check including the ``-v`` verbosity flag, OSACA prints in addition the specific name of the identified instruction forms so that the user can check the mentioned incidents.
+
+Examples
+========
 For clarifying the functionality of OSACA a sample kernel is analyzed for an Intel CSX core hereafter:
 
 .. code-block:: c
@@ -212,3 +344,8 @@ Implementation: Jan Laukemann
 License
 =======
 `AGPL-3.0 </LICENSE>`_
+
+.. # define a hard line break for HTML
+.. |br| raw:: html
+
+   <br />
