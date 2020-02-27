@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Unit tests for OSACA sample kernels in examples/
+Unit tests for the CLI of OSACA and running the sample kernels in examples/
 """
 
 import argparse
@@ -57,7 +57,6 @@ class TestCLI(unittest.TestCase):
         osaca.run(args, output_file=output)
 
     def test_examples(self):
-        return
         kernels = [
             'add',
             'copy',
