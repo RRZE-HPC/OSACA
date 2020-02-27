@@ -6,9 +6,9 @@ Unit tests for the CLI of OSACA and running the sample kernels in examples/
 import argparse
 import os
 import unittest
-from unittest.mock import patch
 from io import StringIO
 from shutil import copyfile
+from unittest.mock import patch
 
 import osaca.osaca as osaca
 from osaca.parser import ParserAArch64v81, ParserX86ATT
@@ -39,7 +39,13 @@ class TestCLI(unittest.TestCase):
     def test_import_data(self):
         parser = osaca.create_parser(parser=ErrorRaisingArgumentParser())
         args = parser.parse_args(
-            ['--arch', 'csx', '--import', 'ibench', self._find_test_file('ibench_import_x86.dat')]
+            [
+                '--arch',
+                'tx2',
+                '--import',
+                'ibench',
+                self._find_test_file('ibench_import_aarch64.dat'),
+            ]
         )
         output = StringIO()
         osaca.run(args, output_file=output)
