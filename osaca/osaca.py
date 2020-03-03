@@ -66,7 +66,9 @@ def create_parser(parser=None):
         '-V', '--version', action='version', version='%(prog)s ' + __find_version('__init__.py')
     )
     parser.add_argument(
-        '--arch', type=str, help='Define architecture (SNB, IVB, HSW, BDW, SKX, CSX, ZEN1, TX2).'
+        '--arch',
+        type=str,
+        help='Define architecture (SNB, IVB, HSW, BDW, SKX, CSX, ZEN1, ZEN2, TX2).',
     )
     parser.add_argument(
         '--fixed',
@@ -130,7 +132,7 @@ def check_arguments(args, parser):
     :param args: arguments given from :class:`~argparse.ArgumentParser` after parsing
     :param parser: :class:`~argparse.ArgumentParser` object
     """
-    supported_archs = ['SNB', 'IVB', 'HSW', 'BDW', 'SKX', 'CSX', 'ZEN1', 'TX2']
+    supported_archs = ['SNB', 'IVB', 'HSW', 'BDW', 'SKX', 'CSX', 'ZEN1', 'ZEN2', 'TX2']
     supported_import_files = ['ibench', 'asmbench']
 
     if 'arch' in args and (args.arch is None or args.arch.upper() not in supported_archs):
@@ -188,7 +190,7 @@ def insert_byte_marker(args):
         output_file=marked_assembly,
         block_selection='manual',
         pointer_increment='auto_with_manual_fallback',
-        isa=MachineModel.get_isa_for_arch(args.arch)
+        isa=MachineModel.get_isa_for_arch(args.arch),
     )
 
     marked_assembly.seek(0)
