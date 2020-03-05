@@ -51,6 +51,8 @@ def create_parser(parser=None):
     """
     Return argparse parser.
 
+    :param parser: Existing parser object to add the arguments, defaults to `None`
+    :type parser: :class:`~Argparse.ArgumentParser`
     :returns: The newly created :class:`~Argparse.ArgumentParser` object.
     """
     # Create parser
@@ -156,6 +158,8 @@ def import_data(benchmark_type, arch, filepath, output_file=sys.stdout):
     :type arch: str
     :param filepath: filepath of the output file"
     :type filepath: str
+    :param output_file: output stream specifying where to write output, defaults to :class:`sys.stdout`
+    :type output_file: stream
     """
     if benchmark_type.lower() == 'ibench':
         import_benchmark_output(arch, 'ibench', filepath, output=output_file)
