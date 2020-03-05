@@ -1,4 +1,4 @@
-.. image:: doc/img/osaca-logo.png
+.. image:: /img/osaca-logo.png
    :alt: OSACA logo
    :width: 80%
    
@@ -53,7 +53,7 @@ Design
 ======
 A schematic design of OSACA's workflow is shown below:
 
-.. image:: doc/img/osaca-workflow.png
+.. image:: /img/osaca-workflow.png
    :alt: OSACA workflow
    :width: 80%
 
