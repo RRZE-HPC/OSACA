@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+"""Parser superclass of specific parsers."""
 
 
 class BaseParser(object):
@@ -17,14 +18,14 @@ class BaseParser(object):
         self.construct_parser()
 
     def parse_file(self, file_content, start_line=0):
-        '''
+        """
         Parse assembly file. This includes *not* extracting of the marked kernel and
         the parsing of the instruction forms.
 
         :param str file_content: assembly code
         :param int start_line: offset, if first line in file_content is meant to be not 1
         :return: list of instruction forms
-        '''
+        """
         # Create instruction form list
         asm_instructions = []
         lines = file_content.split('\n')

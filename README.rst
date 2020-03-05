@@ -218,7 +218,7 @@ This can be achieved by running OSACA with the command line option ``--import MI
 ``ARCH`` defines the abbreviation of the target architecture for which the instructions will be added and file must be the path to the generated output file of the benchmark.
 The format of this file has to match either the basic command line output of ibench, e.g.,
 
-.. code-block::
+.. code-block:: bash
 
   [INSTRUCTION FORM]-TP:    0.500 (clock cycles)    [DEBUG - result: 1.000000]
   [INSTRUCTION FORM]-LT:    4.000 (clock cycles)    [DEBUG - result: 1.000000]
@@ -226,7 +226,7 @@ The format of this file has to match either the basic command line output of ibe
 or the command line output of asmbench including the name of the instruction form in a separate line at the
 beginning, e.g.:
 
-.. code-block::
+.. code-block:: bash
 
   [INSTRUCTION FORM]
   Latency: 4.00 cycle
@@ -276,7 +276,7 @@ Database check
 Since a manual adjustment of the ISA DB is currently indispensable when adding new instruction forms,
 OSACA provides a database sanity check using the --db-check flag. It can be executed via:
 
-.. code-block::
+.. code-block:: bash
 
   osaca --arch ARCH --db-check [-v] file
 
@@ -304,7 +304,7 @@ The code shows a simple scalar multiplication of a vector ``b`` and a floating-p
 The result is written in vector ``a``.
 After including the OSACA byte marker into the assembly, one can start the analysis typing 
 
-.. code:: bash
+.. code-block:: bash
 
     osaca --arch CSX PATH/TO/FILE
 
@@ -312,7 +312,7 @@ in the command line.
 
 The output is:
 
-.. code-block::
+.. code-block:: bash
 
     Open Source Architecture Code Analyzer (OSACA) - v0.3
     Analyzed file:      scale.s.csx.O3.s

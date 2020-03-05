@@ -12,6 +12,7 @@ class ParserAArch64v81(BaseParser):
         self.isa = 'aarch64'
 
     def construct_parser(self):
+        """Create parser for ARM AArch64 ISA."""
         # Comment
         symbol_comment = '//'
         self.comment = pp.Literal(symbol_comment) + pp.Group(
@@ -181,8 +182,9 @@ class ParserAArch64v81(BaseParser):
         Parse line and return instruction form.
 
         :param str line: line of assembly code
-        :param int line_id: default None, identifier of instruction form
-        :return: parsed instruction form
+        :param line_number: identifier of instruction form, defautls to None
+        :type line_number: int, optional
+        :return: `dict` -- parsed asm line (comment, label, directive or instruction form)
         """
         instruction_form = AttrDict(
             {
@@ -263,6 +265,12 @@ class ParserAArch64v81(BaseParser):
         return instruction_form
 
     def parse_instruction(self, instruction):
+        """
+        Parse instruction in asm line.
+
+        :param str instruction: Assembly line string.
+        :returns: `dict` -- parsed instruction form
+        """
         result = self.instruction_parser.parseString(instruction, parseAll=True).asDict()
         result = AttrDict.convert_dict(result)
         operands = []
@@ -292,6 +300,7 @@ class ParserAArch64v81(BaseParser):
         return return_dict
 
     def process_operand(self, operand):
+        """Post-process operand"""
         # structure memory addresses
         if self.MEMORY_ID in operand:
             return self.process_memory_address(operand[self.MEMORY_ID])
@@ -311,6 +320,7 @@ class ParserAArch64v81(BaseParser):
         return operand
 
     def process_memory_address(self, memory_address):
+        """Post-process memory address operand"""
         # Remove unnecessarily created dictionary entries during parsing
         offset = None if 'offset' not in memory_address else memory_address['offset']
         base = None if 'base' not in memory_address else memory_address['base']
@@ -333,11 +343,13 @@ class ParserAArch64v81(BaseParser):
         return AttrDict({self.MEMORY_ID: new_dict})
 
     def process_sp_register(self, register):
+        """Post-process stack pointer register"""
         reg = register
         reg['prefix'] = 'x'
         return AttrDict({self.REGISTER_ID: reg})
 
     def process_register_list(self, register_list):
+        """Post-process register lists (e.g., {r0,r3,r5}) and register ranges (e.g., {r0-r7})"""
         # Remove unnecessarily created dictionary entries during parsing
         vlist = []
         dict_name = ''
@@ -354,6 +366,7 @@ class ParserAArch64v81(BaseParser):
         return AttrDict({self.REGISTER_ID: new_dict})
 
     def process_immediate(self, immediate):
+        """Post-process immediate operand"""
         dict_name = ''
         if 'identifier' in immediate:
             # actually an identifier, change declaration
@@ -378,11 +391,13 @@ class ParserAArch64v81(BaseParser):
             )
 
     def process_label(self, label):
+        """Post-process label asm line"""
         # remove duplicated 'name' level due to identifier
         label['name'] = label['name']['name']
         return AttrDict({self.LABEL_ID: label})
 
     def get_full_reg_name(self, register):
+        """Return one register name string including all attributes"""
         if 'lanes' in register:
             return (
                 register['prefix']
@@ -394,19 +409,21 @@ class ParserAArch64v81(BaseParser):
         return register['prefix'] + str(register['name'])
 
     def normalize_imd(self, imd):
+        """Normalize immediate to decimal based representation"""
         if 'value' in imd:
             if imd['value'].lower().startswith('0x'):
                 # hex, return decimal
                 return int(imd['value'], 16)
             return int(imd['value'], 10)
         elif 'float' in imd:
-            return self.ieee_to_int(imd['float'])
+            return self.ieee_to_float(imd['float'])
         elif 'double' in imd:
-            return self.ieee_to_int(imd['double'])
+            return self.ieee_to_float(imd['double'])
         # identifier
         return imd
 
-    def ieee_to_int(self, ieee_val):
+    def ieee_to_float(self, ieee_val):
+        """Convert IEEE representation to python float"""
         exponent = int(ieee_val['exponent'], 10)
         if ieee_val['e_sign'] == '-':
             exponent *= -1
@@ -416,16 +433,19 @@ class ParserAArch64v81(BaseParser):
         raise NotImplementedError
 
     def is_gpr(self, register):
+        """Check if register is a general purpose register"""
         if register['prefix'] in 'wx':
             return True
         return False
 
     def is_vector_register(self, register):
+        """Check if register is a vector register"""
         if register['prefix'] in 'bhsdqv':
             return True
         return False
 
     def is_flag_dependend_of(self, flag_a, flag_b):
+        """Check if ``flag_a`` is dependent on ``flag_b``"""
         # we assume flags are independent of each other, e.g., CF can be read while ZF gets written
         # TODO validate this assumption
         if flag_a.name == flag_b.name:
@@ -433,6 +453,7 @@ class ParserAArch64v81(BaseParser):
         return False
 
     def is_reg_dependend_of(self, reg_a, reg_b):
+        """Check if ``reg_a`` is dependent on ``reg_b``"""
         prefixes_gpr = 'wx'
         prefixes_vec = 'bhsdqv'
         if reg_a['name'] == reg_b['name']:
@@ -443,4 +464,5 @@ class ParserAArch64v81(BaseParser):
         return False
 
     def get_reg_type(self, register):
+        """Get register type"""
         return register['prefix']
