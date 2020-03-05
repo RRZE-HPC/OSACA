@@ -44,12 +44,3 @@ osaca.utils module
    :members:
    :undoc-members:
    :show-inheritance:
-
-
-Module contents
----------------
-
-.. automodule:: osaca
-   :members:
-   :undoc-members:
-   :show-inheritance:

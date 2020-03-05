@@ -1,8 +1,6 @@
 osaca.parser package
 ====================
-
-Submodules
-----------
+Parser module for parsing the assembly code.
 
 osaca.parser.attr\_dict module
 ------------------------------

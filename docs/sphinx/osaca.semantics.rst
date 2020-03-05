@@ -1,8 +1,6 @@
 osaca.semantics package
 =======================
-
-Submodules
-----------
+Semantic part of OSACA.
 
 osaca.semantics.arch\_semantics module
 --------------------------------------
