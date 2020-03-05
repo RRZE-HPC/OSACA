@@ -1,8 +1,6 @@
 osaca.api package
 =================
-
-Submodules
-----------
+Provides interfaces to other tools.
 
 osaca.api.kerncraft\_interface module
 -------------------------------------
