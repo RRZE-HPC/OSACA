@@ -1,4 +1,4 @@
-.. image:: doc/img/osaca-logo.png
+.. image:: docs/img/osaca-logo.png
    :alt: OSACA logo
    :width: 80%
    
@@ -12,12 +12,23 @@ For an innermost loop kernel in assembly, this tool allows automatic instruction
 
 .. image:: https://travis-ci.org/RRZE-HPC/OSACA.svg?branch=master
     :target: https://travis-ci.org/RRZE-HPC/OSACA
+    :alt: Build Status
 
 .. image:: https://codecov.io/github/RRZE-HPC/OSACA/coverage.svg?branch=master
     :target: https://codecov.io/github/RRZE-HPC/OSACA?branch=master
+    :alt: Code Coverage
+
+.. image:: https://readthedocs.org/projects/osaca/badge/?version=latest
+    :target: https://osaca.readthedocs.io/en/latest/?badge=latest
+    :alt: Documentation Status
+
+.. image:: https://img.shields.io/badge/read-the_docs-blue
+    :target: https://osaca.readthedocs.io/
+    :alt: Docs
 
 .. image:: https://img.shields.io/badge/code%20style-black-000000.svg
     :target: https://github.com/ambv/black
+    :alt: Code Style
 
 Getting started
 ===============
@@ -53,7 +64,7 @@ Design
 ======
 A schematic design of OSACA's workflow is shown below:
 
-.. image:: doc/img/osaca-workflow.png
+.. image:: docs/img/osaca-workflow.png
    :alt: OSACA workflow
    :width: 80%
 
