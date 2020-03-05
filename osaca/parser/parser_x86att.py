@@ -13,6 +13,7 @@ class ParserX86ATT(BaseParser):
         self.isa = 'x86'
 
     def construct_parser(self):
+        """Create parser for ARM AArch64 ISA."""
         decimal_number = pp.Combine(
             pp.Optional(pp.Literal('-')) + pp.Word(pp.nums)
         ).setResultsName('value')
@@ -148,6 +149,7 @@ class ParserX86ATT(BaseParser):
         )
 
     def parse_register(self, register_string):
+        """Parse register string"""
         try:
             return self.process_operand(
                 self.register.parseString(register_string, parseAll=True).asDict()
@@ -160,8 +162,9 @@ class ParserX86ATT(BaseParser):
         Parse line and return instruction form.
 
         :param str line: line of assembly code
-        :param int line_id: default None, identifier of instruction form
-        :return: parsed instruction form
+        :param line_number: default None, identifier of instruction form
+        :type line_number: int, optional
+        :return: ``dict`` -- parsed asm line (comment, label, directive or instruction form)
         """
         instruction_form = AttrDict(
             {
@@ -232,6 +235,12 @@ class ParserX86ATT(BaseParser):
         return instruction_form
 
     def parse_instruction(self, instruction):
+        """
+        Parse instruction in asm line.
+
+        :param str instruction: Assembly line string.
+        :returns: `dict` -- parsed instruction form
+        """
         result = self.instruction_parser.parseString(instruction, parseAll=True).asDict()
         result = AttrDict.convert_dict(result)
         operands = []
@@ -260,6 +269,7 @@ class ParserX86ATT(BaseParser):
         return return_dict
 
     def process_operand(self, operand):
+        """Post-process operand"""
         # For the moment, only used to structure memory addresses
         if self.MEMORY_ID in operand:
             return self.process_memory_address(operand[self.MEMORY_ID])
@@ -270,6 +280,7 @@ class ParserX86ATT(BaseParser):
         return operand
 
     def process_memory_address(self, memory_address):
+        """Post-process memory address operand"""
         # Remove unecessarily created dictionary entries during memory address parsing
         offset = None if 'offset' not in memory_address else memory_address['offset']
         base = None if 'base' not in memory_address else memory_address['base']
@@ -284,11 +295,13 @@ class ParserX86ATT(BaseParser):
         return AttrDict({self.MEMORY_ID: new_dict})
 
     def process_label(self, label):
+        """Post-process label asm line"""
         # remove duplicated 'name' level due to identifier
         label['name'] = label['name']['name']
         return AttrDict({self.LABEL_ID: label})
 
     def process_immediate(self, immediate):
+        """Post-process immediate operand"""
         if 'identifier' in immediate:
             # actually an identifier, change declaration
             return immediate
@@ -296,10 +309,12 @@ class ParserX86ATT(BaseParser):
         return AttrDict({self.IMMEDIATE_ID: immediate})
 
     def get_full_reg_name(self, register):
+        """Return one register name string including all attributes"""
         # nothing to do
         return register['name']
 
     def normalize_imd(self, imd):
+        """Normalize immediate to decimal based representation"""
         if 'value' in imd:
             if imd['value'].lower().startswith('0x'):
                 # hex, return decimal
@@ -309,6 +324,7 @@ class ParserX86ATT(BaseParser):
         return imd
 
     def is_flag_dependend_of(self, flag_a, flag_b):
+        """Check if ``flag_a`` is dependent on ``flag_b``"""
         # we assume flags are independent of each other, e.g., CF can be read while ZF gets written
         # TODO validate this assumption
         if flag_a.name == flag_b.name:
@@ -316,6 +332,7 @@ class ParserX86ATT(BaseParser):
         return False
 
     def is_reg_dependend_of(self, reg_a, reg_b):
+        """Check if ``reg_a`` is dependent on ``reg_b``"""
         # Check if they are the same registers
         if reg_a.name == reg_b.name:
             return True
@@ -359,11 +376,13 @@ class ParserX86ATT(BaseParser):
         return False
 
     def is_basic_gpr(self, register):
+        """Check if register is a basic general purpose register (ebi, rax, ...)"""
         if any(char.isdigit() for char in register['name']):
             return False
         return True
 
     def is_gpr(self, register):
+        """Check if register is a general purpose register"""
         if register is None:
             return False
         gpr_parser = (
@@ -381,6 +400,7 @@ class ParserX86ATT(BaseParser):
                 return False
 
     def is_vector_register(self, register):
+        """Check if register is a vector register"""
         if register is None:
             return False
         if register['name'].rstrip(string.digits).lower() in ['mm', 'xmm', 'ymm', 'zmm']:
@@ -388,6 +408,7 @@ class ParserX86ATT(BaseParser):
         return False
 
     def get_reg_type(self, register):
+        """Ger register type"""
         if register is None:
             return False
         if self.is_gpr(register):

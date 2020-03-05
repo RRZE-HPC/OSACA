@@ -1,5 +1,5 @@
 OSACA |br| Open Source Architecture Code Analyzer
-======================
+=================================================
 
 .. toctree::
    :maxdepth: 2

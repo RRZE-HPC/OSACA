@@ -19,6 +19,9 @@ def sanity_check(arch: str, verbose=False, output_file=sys.stdout):
     :type arch: str
     :param verbose: verbose output flag, defaults to `False`
     :type verbose: bool, optional
+    :param output_file: output stream specifying where to write output, defaults to :class:`sys.      stdout`
+    :type output_file: stream, optional
+
     """
     # load arch machine model
     arch_mm = MachineModel(arch=arch)
@@ -184,6 +187,10 @@ def _get_ibench_output(input_data, isa):
 
 
 def _validate_measurement(measurement, mode):
+    """
+    Check if latency has a maximum deviation of 0.05% and throughput is a reciprocal of a
+    an integer number.
+    """
     if mode == 'lt':
         if (
             math.floor(measurement) * 1.05 >= measurement
@@ -204,6 +211,7 @@ def _validate_measurement(measurement, mode):
 
 
 def _create_db_operand(operand, isa):
+    """Get DB operand by input string and ISA."""
     if isa == 'aarch64':
         return _create_db_operand_aarch64(operand)
     elif isa == 'x86':
@@ -211,6 +219,7 @@ def _create_db_operand(operand, isa):
 
 
 def _create_db_operand_aarch64(operand):
+    """Get DB operand for AArch64 by operand string."""
     if operand == 'i':
         return {'class': 'immediate', 'imd': 'int'}
     elif operand in 'wxbhsdq':
@@ -236,6 +245,7 @@ def _create_db_operand_aarch64(operand):
 
 
 def _create_db_operand_x86(operand):
+    """Get DB operand for AArch64 by operand string."""
     if operand == 'r':
         return {'class': 'register', 'name': 'gpr'}
     elif operand in 'xyz':
@@ -260,6 +270,7 @@ def _create_db_operand_x86(operand):
 
 
 def _check_sanity_arch_db(arch_mm, isa_mm):
+    """Do sanity check for ArchDB by given ISA."""
     suspicious_prefixes_x86 = ['vfm', 'fm']
     suspicious_prefixes_arm = ['fml', 'ldp', 'stp', 'str']
     if arch_mm.get_ISA().lower() == 'aarch64':
@@ -318,6 +329,7 @@ def _check_sanity_arch_db(arch_mm, isa_mm):
 
 
 def _check_sanity_isa_db(arch_mm, isa_mm):
+    """Do sanity check for an ISA DB."""
     # returned lists
     duplicate_instr_isa = []
     only_in_isa = []
@@ -343,6 +355,7 @@ def _check_sanity_isa_db(arch_mm, isa_mm):
 def _get_sanity_report(
     total, m_tp, m_l, m_pp, suspic_instr, dup_arch, dup_isa, only_isa, verbose=False, colors=False
 ):
+    """Get sanity summary report."""
     s = ''
     # non-verbose summary
     s += 'SUMMARY\n----------------------\n'
@@ -376,6 +389,7 @@ def _get_sanity_report(
 def _get_sanity_report_verbose(
     total, m_tp, m_l, m_pp, suspic_instr, dup_arch, dup_isa, only_isa, colors=False
 ):
+    """Get the verbose part of the sanity report with all missing instruction forms."""
     BRIGHT_CYAN = '\033[1;36;1m' if colors else ''
     BRIGHT_BLUE = '\033[1;34;1m' if colors else ''
     BRIGHT_RED = '\033[1;31;1m' if colors else ''
@@ -418,6 +432,7 @@ def _get_sanity_report_verbose(
 
 
 def _get_full_instruction_name(instruction_form):
+    """Get full instruction form name/identifier string out of given instruction form."""
     operands = []
     for op in instruction_form['operands']:
         op_attrs = [
@@ -429,16 +444,19 @@ def _get_full_instruction_name(instruction_form):
 
 
 def __represent_none(self, data):
+    """Get YAML None representation."""
     return self.represent_scalar(u'tag:yaml.org,2002:null', u'~')
 
 
 def _create_yaml_object():
+    """Create YAML module with None representation."""
     yaml_obj = ruamel.yaml.YAML()
     yaml_obj.representer.add_representer(type(None), __represent_none)
     return yaml_obj
 
 
 def __dump_data_to_yaml(filepath, data):
+    """Dump data to YAML file at given filepath."""
     # first add 'normal' meta data in the right order (no ordered dict yet)
     meta_data = dict(data)
     del meta_data['instruction_forms']

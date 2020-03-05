@@ -159,7 +159,7 @@ def import_data(benchmark_type, arch, filepath, output_file=sys.stdout):
     :param filepath: filepath of the output file"
     :type filepath: str
     :param output_file: output stream specifying where to write output, defaults to :class:`sys.stdout`
-    :type output_file: stream
+    :type output_file: stream, optional
     """
     if benchmark_type.lower() == 'ibench':
         import_benchmark_output(arch, 'ibench', filepath, output=output_file)
@@ -210,6 +210,7 @@ def inspect(args, output_file=sys.stdout):
 
     :param args: arguments given from :class:`~argparse.ArgumentParser` after parsing
     :param output_file: Define the stream for output, defaults to :class:`sys.stdout`
+    :type output_file: stream, optional
     """
     arch = args.arch
     isa = MachineModel.get_isa_for_arch(arch)
@@ -251,6 +252,7 @@ def run(args, output_file=sys.stdout):
 
     :param args: arguments given from :class:`~argparse.ArgumentParser` after parsing
     :param output_file: Define the stream for output, defaults to :class:`sys.stdout`
+    :type output_file: stream, optional
     """
     if args.check_db:
         # Sanity check on DB

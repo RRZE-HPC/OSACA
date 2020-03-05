@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+"""Semantics opbject responsible for architecture specific semantic operations"""
 
 import warnings
 from functools import reduce
@@ -19,6 +20,12 @@ class ArchSemantics(ISASemantics):
 
     # SUMMARY FUNCTION
     def add_semantics(self, kernel):
+        """
+        Applies performance data (throughput, latency, port pressure) and source/destination
+        distribution to each instruction of a given kernel.
+
+        :param list kernel: kernel to apply semantics
+        """
         for instruction_form in kernel:
             self.assign_src_dst(instruction_form)
             self.assign_tp_lt(instruction_form)
@@ -26,6 +33,11 @@ class ArchSemantics(ISASemantics):
             self.set_hidden_loads(kernel)
 
     def assign_optimal_throughput(self, kernel):
+        """
+        Assign optimal throughput port pressure to a kernel. This is done in steps of ``0.01cy``.
+
+        :param list kernel: kernel to apply optimal port utilization
+        """
         INC = 0.01
         kernel.reverse()
         port_list = self._machine_model.get_ports()
@@ -74,6 +86,7 @@ class ArchSemantics(ISASemantics):
         kernel.reverse()
 
     def set_hidden_loads(self, kernel):
+        """Hide loads behind stores if architecture supports hidden loads (depricated)"""
         loads = [instr for instr in kernel if INSTR_FLAGS.HAS_LD in instr['flags']]
         stores = [instr for instr in kernel if INSTR_FLAGS.HAS_ST in instr['flags']]
         # Filter instructions including load and store
@@ -114,6 +127,7 @@ class ArchSemantics(ISASemantics):
     # get parser result and assign throughput and latency value to instruction form
     # mark instruction form with semantic flags
     def assign_tp_lt(self, instruction_form):
+        """Assign throughput and latency to an instruction form."""
         flags = []
         port_number = len(self._machine_model['ports'])
         if instruction_form['instruction'] is None:
@@ -298,6 +312,7 @@ class ArchSemantics(ISASemantics):
         instruction_form['latency_lcd'] = 0
 
     def _handle_instruction_found(self, instruction_data, port_number, instruction_form, flags):
+        """Apply performance data to instruction if it was found in the archDB"""
         throughput = instruction_data['throughput']
         port_pressure = self._machine_model.average_port_pressure(
             instruction_data['port_pressure']
@@ -334,14 +349,17 @@ class ArchSemantics(ISASemantics):
         return throughput, port_pressure, latency, latency_wo_load
 
     def substitute_mem_address(self, operands):
+        """Create memory wildcard for all memory operands"""
         # reg_ops = [op for op in operands if 'register' in op]
         # reg_type = self._parser.get_reg_type(reg_ops[0]['register'])
         return [self._create_reg_wildcard() if 'memory' in op else op for op in operands]
 
     def _create_reg_wildcard(self):
+        """Wildcard constructor"""
         return {'*': '*'}
 
     def convert_op_to_reg(self, reg_type, reg_id='0'):
+        """Create register operand for a memory addressing operand"""
         if self._isa == 'x86':
             if reg_type == 'gpr':
                 register = {'register': {'name': 'r' + str(int(reg_id) + 9)}}
@@ -352,6 +370,7 @@ class ArchSemantics(ISASemantics):
         return register
 
     def _nullify_data_ports(self, port_pressure):
+        """Set all ports to 0.0 for the ports of a machine model"""
         data_ports = self._machine_model.get_data_ports()
         for port in data_ports:
             index = self._machine_model.get_ports().index(port)
@@ -381,6 +400,7 @@ class ArchSemantics(ISASemantics):
 
     @staticmethod
     def get_throughput_sum(kernel):
+        """Get the overall throughput sum separated by port of all instructions of a kernel."""
         tp_sum = reduce(
             (lambda x, y: [sum(z) for z in zip(x, y)]),
             [instr['port_pressure'] for instr in kernel],
