@@ -37,7 +37,8 @@ class Frontend(object):
         """
         Checks if instruction form is a comment-only line.
 
-        :param instruction_form: instruction form as dict
+        :param instruction_form: instruction form to check
+        :type instruction_form: `dict`
         :returns: `True` if comment line, `False` otherwise
         """
         return instruction_form['comment'] is not None and instruction_form['instruction'] is None
@@ -272,6 +273,7 @@ class Frontend(object):
     ####################
 
     def _missing_instruction_error(self, amount):
+        """Returns the warning for if any instruction form in the analysis is missing."""
         s = (
             '------------------ WARNING: The performance data for {} instructions is missing.'
             '------------------\n'

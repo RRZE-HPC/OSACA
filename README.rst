@@ -170,7 +170,7 @@ AArch64 markers
 ^^^^^^^^^^^^^^^
 **Byte markers**
 
-.. code-block:: asm
+.. code-block:: arm
 
       mov      x1, #111        // OSACA START
       .byte    213,3,32,31     // OSACA START
@@ -182,7 +182,7 @@ AArch64 markers
     
 **Comment line markers**
 
-.. code-block:: asm
+.. code-block:: arm
   
       // OSACA-BEGIN
     .loop:
