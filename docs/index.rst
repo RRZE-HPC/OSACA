@@ -1,4 +1,4 @@
-OSACA |br| Open Source Architecture Code Analyzer
+OSACA -- Open Source Architecture Code Analyzer
 =================================================
 
 .. toctree::
@@ -12,6 +12,3 @@ OSACA |br| Open Source Architecture Code Analyzer
    :alt: OSACA logo
    :width: 80%
 
-.. |br| raw:: html
-
-   <br />
