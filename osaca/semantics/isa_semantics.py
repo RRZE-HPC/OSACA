@@ -129,6 +129,7 @@ class ISASemantics(object):
             instruction_form['flags'] += [INSTR_FLAGS.HAS_ST]
 
     def _has_load(self, instruction_form):
+        """Check if instruction form performs a LOAD"""
         for operand in chain(
             instruction_form['semantic_operands']['source'],
             instruction_form['semantic_operands']['src_dst'],
@@ -138,6 +139,7 @@ class ISASemantics(object):
         return False
 
     def _has_store(self, instruction_form):
+        """Check if instruction form perfroms a STORE"""
         for operand in chain(
             instruction_form['semantic_operands']['destination'],
             instruction_form['semantic_operands']['src_dst'],
@@ -147,6 +149,7 @@ class ISASemantics(object):
         return False
 
     def _get_regular_source_operands(self, instruction_form):
+        """Get source operand of given instruction form assuming regular src/dst behavior."""
         # if there is only one operand, assume it is a source operand
         if len(instruction_form['operands']) == 1:
             return [instruction_form['operands'][0]]
@@ -159,6 +162,7 @@ class ISASemantics(object):
             raise ValueError("Unsupported ISA {}.".format(self._isa))
 
     def _get_regular_destination_operands(self, instruction_form):
+        """Get destination operand of given instruction form assuming regular src/dst behavior."""
         # if there is only one operand, assume no destination
         if len(instruction_form['operands']) == 1:
             return []

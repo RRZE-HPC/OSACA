@@ -118,6 +118,7 @@ class MachineModel(object):
             raise TypeError from e
 
     def get_instruction_from_dict(self, name, operands):
+        """Find and return instruction data from name and operands stored in dictionary."""
         if name is None:
             return None
         try:
@@ -154,6 +155,7 @@ class MachineModel(object):
         instr_data['uops'] = uops
 
     def set_instruction_entry(self, entry):
+        """Import instruction as entry object form information."""
         self.set_instruction(
             entry['name'],
             entry['operands'] if 'operands' in entry else None,
@@ -164,55 +166,67 @@ class MachineModel(object):
         )
 
     def add_port(self, port):
+        """Add port in port model of current machine model."""
         if port not in self._data['ports']:
             self._data['ports'].append(port)
 
     def get_ISA(self):
+        """Return ISA of :class:`MachineModel`."""
         return self._data['isa'].lower()
 
     def get_arch(self):
+        """Return micro-architecture code of :class:`MachineModel`."""
         return self._data['arch_code'].lower()
 
     def get_ports(self):
+        """Return port model of :class:`MachineModel`."""
         return self._data['ports']
 
     def has_hidden_loads(self):
+        """Return if model has hidden loads."""
         if 'hidden_loads' in self._data:
             return self._data['hidden_loads']
         return False
 
     def get_load_latency(self, reg_type):
+        """Return load latency for given register type."""
         return self._data['load_latency'][reg_type]
 
     def get_load_throughput(self, memory):
+        """Return load thorughput for given register type."""
         ld_tp = [m for m in self._data['load_throughput'] if self._match_mem_entries(memory, m)]
         if len(ld_tp) > 0:
             return ld_tp[0]['port_pressure']
         return self._data['load_throughput_default']
 
     def get_store_latency(self, reg_type):
+        """Return store latency for given register type."""
         # assume 0 for now, since load-store-dependencies currently not detectable
         return 0
 
     def get_store_throughput(self, memory):
+        """Return store throughput for given register type."""
         st_tp = [m for m in self._data['store_throughput'] if self._match_mem_entries(memory, m)]
         if len(st_tp) > 0:
             return st_tp[0]['port_pressure']
         return self._data['store_throughput_default']
 
     def _match_mem_entries(self, mem, i_mem):
+        """Check if memory addressing ``mem`` and ``i_mem`` are of the same type."""
         if self._data['isa'].lower() == 'aarch64':
             return self._is_AArch64_mem_type(i_mem, mem)
         if self._data['isa'].lower() == 'x86':
             return self._is_x86_mem_type(i_mem, mem)
 
     def get_data_ports(self):
+        """Return all data ports (i.e., ports with D-suffix) of current model."""
         data_port = re.compile(r'^[0-9]+D$')
         data_ports = [x for x in filter(data_port.match, self._data['ports'])]
         return data_ports
 
     @staticmethod
     def get_full_instruction_name(instruction_form):
+        """Get one instruction name string including the mnemonic and all operands."""
         operands = []
         for op in instruction_form['operands']:
             op_attrs = [
@@ -224,6 +238,7 @@ class MachineModel(object):
 
     @staticmethod
     def get_isa_for_arch(arch):
+        """Return ISA for given micro-arch ``arch``."""
         arch_dict = {
             'tx2': 'aarch64',
             'zen1': 'x86',
@@ -252,6 +267,7 @@ class MachineModel(object):
             raise ValueError("Unknown architecture {!r}.".format(arch))
 
     def dump(self, stream=None):
+        """Dump machine model to stream or return it as a ``str`` if no stream is given."""
         # Replace instruction form's port_pressure with styled version for RoundtripDumper
         formatted_instruction_forms = deepcopy(self._data['instruction_forms'])
         for instruction_form in formatted_instruction_forms:
@@ -289,6 +305,13 @@ class MachineModel(object):
     ######################################################
 
     def _get_cached(self, filepath):
+        """
+        Check if machine model is cached and if so, load it.
+
+        :param filepath: path to check for cached machine model
+        :type filepath: str
+        :returns: cached DB if existing, `False` otherwise
+        """
         hashname = self._get_hashname(filepath)
         cachepath = utils.exists_cached_file(hashname + '.pickle')
         if cachepath:
@@ -303,14 +326,24 @@ class MachineModel(object):
         return False
 
     def _write_in_cache(self, filepath, data):
+        """
+        Write machine model to cache
+
+        :param filepath: path to store DB
+        :type filepath: str
+        :param data: :class:`MachineModel` to store
+        :type data: :class:`dict`
+        """
         hashname = self._get_hashname(filepath)
         filepath = os.path.join(utils.CACHE_DIR, hashname + '.pickle')
         pickle.dump(data, open(filepath, 'wb'))
 
     def _get_hashname(self, name):
+        """Returns unique hashname for machine model"""
         return base64.b64encode(name.encode()).decode()
 
     def _get_key(self, name, operands):
+        """Get unique instruction form key for dict DB."""
         key_string = name.lower() + '-'
         if operands is None:
             return key_string[:-1]
@@ -318,6 +351,7 @@ class MachineModel(object):
         return key_string
 
     def _convert_to_dict(self, instruction_forms):
+        """Convert list DB to dict DB"""
         instruction_dict = {}
         for instruction_form in instruction_forms:
             instruction_dict[
@@ -329,6 +363,7 @@ class MachineModel(object):
         return instruction_dict
 
     def _get_operand_hash(self, operand):
+        """Get unique key for operand for dict DB"""
         operand_string = ''
         if 'class' in operand:
             # DB entry
@@ -362,6 +397,7 @@ class MachineModel(object):
         return operand_string
 
     def _create_db_operand_aarch64(operand):
+        """Create instruction form operand for DB out of operand string."""
         if operand == 'i':
             return {'class': 'immediate', 'imd': 'int'}
         elif operand in 'wxbhsdq':
@@ -382,6 +418,7 @@ class MachineModel(object):
             raise ValueError('Parameter {} is not a valid operand code'.format(operand))
 
     def _create_db_operand_x86(operand):
+        """Create instruction form operand for DB out of operand string."""
         if operand == 'r':
             return {'class': 'register', 'name': 'gpr'}
         elif operand in 'xyz':
@@ -400,6 +437,14 @@ class MachineModel(object):
             raise ValueError('Parameter {} is not a valid operand code'.format(operand))
 
     def _check_for_duplicate(self, name, operands):
+        """
+        Check if instruction form exists at least twice in DB.
+
+        :param str name: mnemonic of instruction form
+        :param list operands: instruction form operands
+
+        :returns: `True`, if duplicate exists, `False` otherwise
+        """
         matches = [
             instruction_form
             for instruction_form in self._data['instruction_forms']
@@ -411,6 +456,7 @@ class MachineModel(object):
         return False
 
     def _match_operands(self, i_operands, operands):
+        """Check if all operand types of ``i_operands`` and ``operands`` match."""
         operands_ok = True
         if len(operands) != len(i_operands):
             return False
@@ -423,6 +469,7 @@ class MachineModel(object):
             return False
 
     def _check_operands(self, i_operand, operand):
+        """Check if the types of operand ``i_operand`` and ``operand`` match."""
         # check for wildcard
         if self.WILDCARD in operand:
             if (
@@ -439,6 +486,7 @@ class MachineModel(object):
             return self._check_x86_operands(i_operand, operand)
 
     def _check_AArch64_operands(self, i_operand, operand):
+        """Check if the types of operand ``i_operand`` and ``operand`` match."""
         if 'class' in operand:
             # compare two DB entries
             return self._compare_db_entries(i_operand, operand)
@@ -470,6 +518,7 @@ class MachineModel(object):
         return False
 
     def _check_x86_operands(self, i_operand, operand):
+        """Check if the types of operand ``i_operand`` and ``operand`` match."""
         if 'class' in operand:
             # compare two DB entries
             return self._compare_db_entries(i_operand, operand)
@@ -491,6 +540,7 @@ class MachineModel(object):
             return i_operand['class'] == 'identifier'
 
     def _compare_db_entries(self, operand_1, operand_2):
+        """Check if operand types in DB format (i.e., not parsed) match."""
         operand_attributes = list(
             filter(lambda x: True if x != 'source' and x != 'destination' else False, operand_1)
         )
@@ -503,6 +553,7 @@ class MachineModel(object):
         return True
 
     def _is_AArch64_reg_type(self, i_reg, reg):
+        """Check if register type match."""
         if reg['prefix'] != i_reg['prefix']:
             return False
         if 'shape' in reg:
@@ -512,6 +563,7 @@ class MachineModel(object):
         return True
 
     def _is_x86_reg_type(self, i_reg_name, reg):
+        """Check if register type match."""
         # differentiate between vector registers (mm, xmm, ymm, zmm) and others (gpr)
         parser_x86 = ParserX86ATT()
         if parser_x86.is_vector_register(reg):
@@ -523,6 +575,7 @@ class MachineModel(object):
         return False
 
     def _is_AArch64_mem_type(self, i_mem, mem):
+        """Check if memory addressing type match."""
         if (
             # check base
             (
@@ -576,6 +629,7 @@ class MachineModel(object):
         return False
 
     def _is_x86_mem_type(self, i_mem, mem):
+        """Check if memory addressing type match."""
         if (
             # check base
             (
@@ -627,6 +681,7 @@ class MachineModel(object):
         return False
 
     def _create_yaml_object(self):
+        """Create YAML object for parsing and dumping DB"""
         yaml_obj = ruamel.yaml.YAML()
         yaml_obj.representer.add_representer(type(None), self.__represent_none)
         yaml_obj.default_flow_style = None
@@ -635,4 +690,5 @@ class MachineModel(object):
         return yaml_obj
 
     def __represent_none(self, yaml_obj, data):
+        """YAML representation for `None`"""
         return yaml_obj.represent_scalar(u'tag:yaml.org,2002:null', u'~')

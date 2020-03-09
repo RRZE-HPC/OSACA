@@ -7,6 +7,13 @@ COMMENT_MARKER = {'start': 'OSACA-BEGIN', 'end': 'OSACA-END'}
 
 
 def reduce_to_section(kernel, isa):
+    """
+    Finds OSACA markers in given kernel and returns marked section
+
+    :param list kernel: kernel to check
+    :param str isa: ISA of given kernel
+    :returns: `list` -- marked section of kernel as list of instruction forms
+    """
     isa = isa.lower()
     if isa == 'x86':
         start, end = find_marked_kernel_x86ATT(kernel)
@@ -22,6 +29,12 @@ def reduce_to_section(kernel, isa):
 
 
 def find_marked_kernel_AArch64(lines):
+    """
+    Find marked section for AArch64
+
+    :param list lines: kernel
+    :returns: `tuple of int` -- start and end line of marked section
+    """
     nop_bytes = ['213', '3', '32', '31']
     return find_marked_section(
         lines,
@@ -36,6 +49,12 @@ def find_marked_kernel_AArch64(lines):
 
 
 def find_marked_kernel_x86ATT(lines):
+    """
+    Find marked section for x86
+
+    :param list lines: kernel
+    :returns: `tuple of int` -- start and end line of marked section
+    """
     nop_bytes = ['100', '103', '144']
     return find_marked_section(
         lines,
@@ -59,7 +78,7 @@ def get_marker(isa, comment=""):
             '.byte     144        # OSACA START MARKER\n'
         )
         if comment:
-            start_marker_raw += "# {}\m".format(comment)
+            start_marker_raw += "# {}\n".format(comment)
         end_marker_raw = (
             'movl      $222, %ebx # OSACA END MARKER\n'
             '.byte     100        # OSACA END MARKER\n'
@@ -89,6 +108,26 @@ def get_marker(isa, comment=""):
 def find_marked_section(
     lines, parser, mov_instr, mov_reg, mov_vals, nop_bytes, reverse=False, comments=None
 ):
+    """
+    Return indexes of marked section
+
+    :param list lines: kernel
+    :param parser: parser to use for checking
+    :type parser: :class:`~parser.BaseParser`
+    :param mov_instr: all MOV instruction possible for the marker
+    :type mov_instr: `list of str`
+    :param mov_reg: register used for the marker
+    :type mov_reg: `str`
+    :param mov_vals: values needed to be moved to ``mov_reg`` for valid marker
+    :type mov_vals: `list of int`
+    :param nop_bytes: bytes representing opcode of NOP
+    :type nop_bytes: `list of int`
+    :param reverse: indicating if ISA syntax requires reverse operand order, defaults to `False`
+    :type reverse: boolean, optional
+    :param comments: dictionary with start and end markers in comment format, defaults to None
+    :type comments: dict, optional
+    :returns: `tuple of int` -- start and end line of marked section
+    """
     # TODO match to instructions returned by get_marker
     index_start = -1
     index_end = -1
@@ -133,6 +172,7 @@ def find_marked_section(
 
 
 def match_bytes(lines, index, byte_list):
+    """Match bytes directives of markers"""
     # either all bytes are in one line or in separate ones
     extracted_bytes = []
     line_count = 0
