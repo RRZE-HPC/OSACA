@@ -1,4 +1,4 @@
-osaca_version: 0.3.2.dev5
+osaca_version: 0.3.2
 micro_architecture: AMD Zen2
 arch_code: ZEN2
 isa: x86
