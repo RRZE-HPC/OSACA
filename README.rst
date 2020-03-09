@@ -125,16 +125,20 @@ As main functionality of OSACA, the tool starts the analysis on a marked assembl
                       [--export-graph EXPORT_PATH]
           file
 
-The ``file`` parameter specifies the target assembly file and is always mandatory. |br|
-The parameter ``ARCH`` is positional for the analysis and must be replaced by the target architecture abbreviation. |br|
+The ``file`` parameter specifies the target assembly file and is always mandatory.
+
+The parameter ``ARCH`` is positional for the analysis and must be replaced by the target architecture abbreviation.
+
 OSACA assumes an optimal scheduling for all instructions and assumes the processor to be able to schedule instructions in a way that it achieves a minimal reciprocal throughput.
 However, in older versions (<=v0.2.2) of OSACA, a fixed probability for port utilization was assumed.
 This means, instructions with *N* available ports for execution were scheduled with a probability of *1/N* to each of the ports.
-This behavior can be enforced by using the ``--fixed`` flag. |br|
+This behavior can be enforced by using the ``--fixed`` flag.
+
 If one or more instruction forms are unknown to OSACA, it refuses to print an overall throughput, CP and
 LCD analysis and marks all unknown instruction forms with ``X`` next to the mnemonic.
 This is done so the user does not miss out on this unrecognized instruction and might assume an incorrect runtime prediction.
-To force OSACA to apply a throughput and latency of 0.0 cy for all unknown instruction forms, the flag ``--ignore-unknown`` can be specified. |br|
+To force OSACA to apply a throughput and latency of 0.0 cy for all unknown instruction forms, the flag ``--ignore-unknown`` can be specified.
+
 To get a visualization of the analyzed kernel and its dependency chains, OSACA provides the option to additionally produce a graph as DOT file, which represents the kernel and all register dependencies inside of it.
 The tool highlights all LCDs and the CP.
 The graph generation is done by running OSACA with the ``--export-graph EXPORT_GRAPH`` flag.
@@ -259,8 +263,9 @@ To let OSACA import the instruction form with the correct operands, the naming c
     "``i``" if it contains an index register, and "``s``" if the index register additionally has a scale factor of *more* 
     than 1. Add "``r``" if the address format uses pre-indexing and "``p``" if it uses post-indexing.
  
-Valid instruction form examples for x86 are ``vaddpd-x_x_x``, ``mov-r_mboi``, and ``vfmadd213pd-mbis_y_y``. |br|
-Valid instruction form examples for AArch64 are ``fadd-vd_vd_v``, ``ldp-d_d_mo``, and ``fmov-s_i``. |br|
+Valid instruction form examples for x86 are ``vaddpd-x_x_x``, ``mov-r_mboi``, and ``vfmadd213pd-mbis_y_y``. 
+
+Valid instruction form examples for AArch64 are ``fadd-vd_vd_v``, ``ldp-d_d_mo``, and ``fmov-s_i``.
 
 Note that the options to define operands are limited, therefore, one might need to adjust the instruction forms in the architecture DB after importing.
 OSACA parses the output for an arbitrary number of instruction forms and adds them as entries to the architecture DB.
@@ -357,8 +362,3 @@ Implementation: Jan Laukemann
 License
 =======
 `AGPL-3.0 </LICENSE>`__
-
-.. # define a hard line break for HTML
-.. |br| raw:: html
-
-   <br />
