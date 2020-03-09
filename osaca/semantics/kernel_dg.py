@@ -18,6 +18,13 @@ class KernelDG(nx.DiGraph):
         self.loopcarried_deps = self.check_for_loopcarried_dep(self.kernel)
 
     def create_DG(self, kernel):
+        """
+        Create directed graph from given kernel
+
+        :param kernel: Parsed asm kernel with assigned semantic information
+        :type kerne: list
+        :returns: :class:`~nx.DiGraph` -- directed graph object
+        """
         # 1. go through kernel instruction forms and add them as node attribute
         # 2. find edges (to dependend further instruction)
         # 3. get LT value and set as edge weight
@@ -41,7 +48,7 @@ class KernelDG(nx.DiGraph):
                     instruction_form['line_number'],
                     latency=instruction_form['latency'] - instruction_form['latency_wo_load'],
                 )
-            for dep in self.find_depending(instruction_form, kernel[i + 1:]):
+            for dep in self.find_depending(instruction_form, kernel[i + 1 :]):
                 edge_weight = (
                     instruction_form['latency']
                     if 'latency_wo_load' not in instruction_form
@@ -54,6 +61,13 @@ class KernelDG(nx.DiGraph):
         return dg
 
     def check_for_loopcarried_dep(self, kernel):
+        """
+        Try to find loop-carried dependencies in given kernel.
+
+        :param kernel: Parsed asm kernel with assigned semantic information
+        :type kernel: list
+        :returns: `dict` -- dependency dictionary with all cyclic LCDs
+        """
         multiplier = len(kernel) + 1
         # increase line number for second kernel loop
         kernel_length = len(kernel)
@@ -111,9 +125,11 @@ class KernelDG(nx.DiGraph):
         return loopcarried_deps_dict
 
     def _get_node_by_lineno(self, lineno):
+        """Return instruction form with line number ``lineno`` from  kernel"""
         return [instr for instr in self.kernel if instr.line_number == lineno][0]
 
     def get_critical_path(self):
+        """Find and return critical path after the creation of a directed graph."""
         if nx.algorithms.dag.is_directed_acyclic_graph(self.dg):
             longest_path = nx.algorithms.dag.dag_longest_path(self.dg, weight='latency')
             for line_number in longest_path:
@@ -141,17 +157,35 @@ class KernelDG(nx.DiGraph):
             raise NotImplementedError('Kernel is cyclic.')
 
     def get_loopcarried_dependencies(self):
+        """
+        Return all LCDs from kernel (after :func:`~KernelDG.check_for_loopcarried_dep` was run)
+        """
         if nx.algorithms.dag.is_directed_acyclic_graph(self.dg):
             return self.loopcarried_deps
         else:
             # split to DAG
             raise NotImplementedError('Kernel is cyclic.')
 
-    def find_depending(self, instruction_form, kernel, include_write=False, flag_dependencies=False):
+    def find_depending(
+        self, instruction_form, kernel, include_write=False, flag_dependencies=False
+    ):
+        """
+        Find instructions in kernel depending on a given instruction form.
+
+        :param dict instruction_form: instruction form to check for dependencies
+        :param list kernel: kernel containing the instructions to check
+        :param include_write: indicating if instruction ending the dependency chain should be included, defaults to `False`
+        :type include_write: boolean, optional
+        :param flag_dependencies: indicating if dependencies of flags should be considered, defaults to `False`
+        :type flag_dependencies: boolean, optional
+        :returns: iterator if all directly dependent instruction forms
+        """
         if instruction_form.semantic_operands is None:
             return
-        for dst in chain(instruction_form.semantic_operands.destination,
-                         instruction_form.semantic_operands.src_dst):
+        for dst in chain(
+            instruction_form.semantic_operands.destination,
+            instruction_form.semantic_operands.src_dst,
+        ):
             if 'register' in dst:
                 # Check for read of register until overwrite
                 for instr_form in kernel:
@@ -212,11 +246,13 @@ class KernelDG(nx.DiGraph):
         return iter([])
 
     def is_read(self, register, instruction_form):
+        """Check if instruction form reads from given register"""
         is_read = False
         if instruction_form.semantic_operands is None:
             return is_read
-        for src in chain(instruction_form.semantic_operands.source,
-                         instruction_form.semantic_operands.src_dst):
+        for src in chain(
+            instruction_form.semantic_operands.source, instruction_form.semantic_operands.src_dst
+        ):
             if 'register' in src:
                 is_read = self.parser.is_reg_dependend_of(register, src.register) or is_read
             if 'flag' in src:
@@ -229,8 +265,10 @@ class KernelDG(nx.DiGraph):
                         self.parser.is_reg_dependend_of(register, src.memory.index) or is_read
                     )
         # Check also if read in destination memory address
-        for dst in chain(instruction_form.semantic_operands.destination,
-                         instruction_form.semantic_operands.src_dst):
+        for dst in chain(
+            instruction_form.semantic_operands.destination,
+            instruction_form.semantic_operands.src_dst,
+        ):
             if 'memory' in dst:
                 if dst.memory.base is not None:
                     is_read = self.parser.is_reg_dependend_of(register, dst.memory.base) or is_read
@@ -241,11 +279,14 @@ class KernelDG(nx.DiGraph):
         return is_read
 
     def is_written(self, register, instruction_form):
+        """Check if instruction form writes in given register"""
         is_written = False
         if instruction_form.semantic_operands is None:
             return is_written
-        for dst in chain(instruction_form.semantic_operands.destination,
-                         instruction_form.semantic_operands.src_dst):
+        for dst in chain(
+            instruction_form.semantic_operands.destination,
+            instruction_form.semantic_operands.src_dst,
+        ):
             if 'register' in dst:
                 is_written = self.parser.is_reg_dependend_of(register, dst.register) or is_written
             if 'flag' in dst:
@@ -256,8 +297,9 @@ class KernelDG(nx.DiGraph):
                         self.parser.is_reg_dependend_of(register, dst.memory.base) or is_written
                     )
         # Check also for possible pre- or post-indexing in memory addresses
-        for src in chain(instruction_form.semantic_operands.source,
-                         instruction_form.semantic_operands.src_dst):
+        for src in chain(
+            instruction_form.semantic_operands.source, instruction_form.semantic_operands.src_dst
+        ):
             if 'memory' in src:
                 if 'pre_indexed' in src.memory or 'post_indexed' in src.memory:
                     is_written = (
@@ -266,6 +308,13 @@ class KernelDG(nx.DiGraph):
         return is_written
 
     def export_graph(self, filepath=None):
+        """
+        Export graph with highlighted CP and LCDs as DOT file. Writes it to 'osaca_dg.dot'
+        if no other path is given.
+
+        :param filepath: path to write DOT file, defaults to None.
+        :type filepath: str, optional
+        """
         graph = copy.deepcopy(self.dg)
         cp = self.get_critical_path()
         cp_line_numbers = [x['line_number'] for x in cp]
