@@ -296,17 +296,17 @@ instruction_forms:
   throughput: 0.5
   latency: 5.0  # 	1*p01
   port_pressure: [[1, '01']]
-- name: vfmadd213pd
+- name: vfmadd231pd
   operands:
   - class: register
-    name: ymm
+    name: xmm
   - class: register
-    name: ymm
+    name: xmm
   - class: register
-    name: ymm
-  throughput: 1.0
-  latency: 5.0  # 	2*p01
-  port_pressure: [[2, '01']]
+    name: xmm
+  throughput: 0.5
+  latency: 5.0  # 	1*p01
+  port_pressure: [[1, '01']]
 - name: vfmadd231pd
   operands:
   - class: register
