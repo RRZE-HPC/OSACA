@@ -185,7 +185,7 @@ AArch64 markers
 ^^^^^^^^^^^^^^^
 **Byte markers**
 
-.. code-block:: arm
+::
 
       mov      x1, #111        // OSACA START
       .byte    213,3,32,31     // OSACA START
@@ -197,8 +197,8 @@ AArch64 markers
     
 **Comment line markers**
 
-.. code-block:: arm
-  
+::
+ 
       // OSACA-BEGIN
     .loop:
       // loop body
@@ -222,7 +222,7 @@ This can be achieved by running OSACA with the command line option ``--import MI
 ``ARCH`` defines the abbreviation of the target architecture for which the instructions will be added and file must be the path to the generated output file of the benchmark.
 The format of this file has to match either the basic command line output of ibench, e.g.,
 
-.. code-block:: bash
+::
 
   [INSTRUCTION FORM]-TP:    0.500 (clock cycles)    [DEBUG - result: 1.000000]
   [INSTRUCTION FORM]-LT:    4.000 (clock cycles)    [DEBUG - result: 1.000000]
@@ -230,7 +230,7 @@ The format of this file has to match either the basic command line output of ibe
 or the command line output of asmbench including the name of the instruction form in a separate line at the
 beginning, e.g.:
 
-.. code-block:: bash
+::
 
   [INSTRUCTION FORM]
   Latency: 4.00 cycle
@@ -317,7 +317,7 @@ in the command line.
 
 The output is:
 
-.. code-block:: bash
+::
 
     Open Source Architecture Code Analyzer (OSACA) - v0.3
     Analyzed file:      scale.s.csx.O3.s
