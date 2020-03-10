@@ -52,6 +52,7 @@ class ISASemantics(object):
             return
         # check if instruction form is in ISA yaml, otherwise apply standard operand assignment
         # (one dest, others source)
+        # import pdb; pdb.set_trace()
         isa_data = self._isa_model.get_instruction(
             instruction_form['instruction'], instruction_form['operands']
         )
@@ -66,43 +67,36 @@ class ISASemantics(object):
             )
         operands = instruction_form['operands']
         op_dict = {}
-        if isa_data is None:
+        assign_default = False
+        if isa_data:
+            # load src/dst structure from isa_data
+            op_dict = self._apply_found_ISA_data(isa_data, operands)
+        else:
+            # Couldn't found instruction form in ISA DB
+            assign_default = True
+            # check for equivalent register-operands DB entry if LD/ST
+            if any(['memory' in op for op in operands]):
+                operands_reg = self.substitute_mem_address(instruction_form['operands'])
+                isa_data_reg = self._isa_model.get_instruction(
+                    instruction_form['instruction'], operands_reg
+                )
+                if (
+                    isa_data_reg is None
+                    and self._isa == 'x86'
+                    and instruction_form['instruction'][-1] in self.GAS_SUFFIXES
+                ):
+                    # Check for instruction without GAS suffix
+                    isa_data_reg = self._isa_model.get_instruction(
+                        instruction_form['instruction'][:-1], operands_reg
+                    )
+                if isa_data_reg:
+                    assign_default = False
+                    op_dict = self._apply_found_ISA_data(isa_data_reg, operands)
+        if assign_default:
             # no irregular operand structure, apply default
             op_dict['source'] = self._get_regular_source_operands(instruction_form)
             op_dict['destination'] = self._get_regular_destination_operands(instruction_form)
             op_dict['src_dst'] = []
-        else:
-            # load src/dst structure from isa_data
-            op_dict['source'] = []
-            op_dict['destination'] = []
-            op_dict['src_dst'] = []
-            for i, op in enumerate(isa_data['operands']):
-                if op['source'] and op['destination']:
-                    op_dict['src_dst'].append(operands[i])
-                    continue
-                if op['source']:
-                    op_dict['source'].append(operands[i])
-                    continue
-                if op['destination']:
-                    op_dict['destination'].append(operands[i])
-                    continue
-            # check for hidden operands like flags or registers
-            if 'hidden_operands' in isa_data:
-                # add operand(s) to semantic_operands of instruction form
-                for op in isa_data['hidden_operands']:
-                    dict_key = (
-                        'src_dst'
-                        if op['source'] and op['destination']
-                        else 'source'
-                        if op['source']
-                        else 'destination'
-                    )
-                    hidden_op = {op['class']: {}}
-                    key_filter = ['class', 'source', 'destination']
-                    for key in [k for k in op.keys() if k not in key_filter]:
-                        hidden_op[op['class']][key] = op[key]
-                    hidden_op = AttrDict.convert_dict(hidden_op)
-                    op_dict[dict_key].append(hidden_op)
         # post-process pre- and post-indexing for aarch64 memory operands
         if self._isa == 'aarch64':
             for operand in [op for op in op_dict['source'] if 'memory' in op]:
@@ -127,6 +121,48 @@ class ISASemantics(object):
             instruction_form['flags'] += [INSTR_FLAGS.HAS_LD]
         if self._has_store(instruction_form):
             instruction_form['flags'] += [INSTR_FLAGS.HAS_ST]
+
+    def _apply_found_ISA_data(self, isa_data, operands):
+        """
+        Create operand dictionary containing src/dst operands out of the ISA data entry and
+        the oeprands of an instruction form
+
+        :param dict isa_data: ISA DB entry
+        :param list operands: operands of the instruction form
+        :returns: `dict` -- operands dictionary with src/dst assignment
+        """
+        op_dict = {}
+        op_dict['source'] = []
+        op_dict['destination'] = []
+        op_dict['src_dst'] = []
+        for i, op in enumerate(isa_data['operands']):
+            if op['source'] and op['destination']:
+                op_dict['src_dst'].append(operands[i])
+                continue
+            if op['source']:
+                op_dict['source'].append(operands[i])
+                continue
+            if op['destination']:
+                op_dict['destination'].append(operands[i])
+                continue
+        # check for hidden operands like flags or registers
+        if 'hidden_operands' in isa_data:
+            # add operand(s) to semantic_operands of instruction form
+            for op in isa_data['hidden_operands']:
+                dict_key = (
+                    'src_dst'
+                    if op['source'] and op['destination']
+                    else 'source'
+                    if op['source']
+                    else 'destination'
+                )
+                hidden_op = {op['class']: {}}
+                key_filter = ['class', 'source', 'destination']
+                for key in [k for k in op.keys() if k not in key_filter]:
+                    hidden_op[op['class']][key] = op[key]
+                hidden_op = AttrDict.convert_dict(hidden_op)
+                op_dict[dict_key].append(hidden_op)
+        return op_dict
 
     def _has_load(self, instruction_form):
         """Check if instruction form performs a LOAD"""
@@ -174,3 +210,11 @@ class ISASemantics(object):
             return instruction_form['operands'][:1]
         else:
             raise ValueError("Unsupported ISA {}.".format(self._isa))
+
+    def substitute_mem_address(self, operands):
+        """Create memory wildcard for all memory operands"""
+        return [self._create_reg_wildcard() if 'memory' in op else op for op in operands]
+
+    def _create_reg_wildcard(self):
+        """Wildcard constructor"""
+        return {'*': '*'}

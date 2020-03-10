@@ -348,16 +348,6 @@ class ArchSemantics(ISASemantics):
             flags.append(INSTR_FLAGS.LD)
         return throughput, port_pressure, latency, latency_wo_load
 
-    def substitute_mem_address(self, operands):
-        """Create memory wildcard for all memory operands"""
-        # reg_ops = [op for op in operands if 'register' in op]
-        # reg_type = self._parser.get_reg_type(reg_ops[0]['register'])
-        return [self._create_reg_wildcard() if 'memory' in op else op for op in operands]
-
-    def _create_reg_wildcard(self):
-        """Wildcard constructor"""
-        return {'*': '*'}
-
     def convert_op_to_reg(self, reg_type, reg_id='0'):
         """Create register operand for a memory addressing operand"""
         if self._isa == 'x86':

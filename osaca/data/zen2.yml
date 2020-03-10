@@ -5109,20 +5109,6 @@ instruction_forms:
   port_pressure: [[1, '0123']]          # model_importer.py ./model_importer.py
   throughput: 0.25                      # model_importer.py ./model_importer.py
   uops: 1                               # model_importer.py ./model_importer.py
-- name: VINSERTF128                     # model_importer.py ./model_importer.py
-  operands:                             # model_importer.py ./model_importer.py
-  - class: immediate                    # model_importer.py ./model_importer.py
-    imd: int                            # model_importer.py ./model_importer.py
-  - class: register                     # model_importer.py ./model_importer.py
-    name: xmm                           # model_importer.py ./model_importer.py
-  - class: register                     # model_importer.py ./model_importer.py
-    name: ymm                           # model_importer.py ./model_importer.py
-  - class: register                     # model_importer.py ./model_importer.py
-    name: ymm                           # model_importer.py ./model_importer.py
-  latency: 1                            # model_importer.py ./model_importer.py
-  port_pressure: [[1, '2']]             # model_importer.py ./model_importer.py
-  throughput: 1.0                       # model_importer.py ./model_importer.py
-  uops: 1                               # model_importer.py ./model_importer.py
 - name: VCVTTPS2DQ                      # model_importer.py ./model_importer.py
   operands:                             # model_importer.py ./model_importer.py
   - class: register                     # model_importer.py ./model_importer.py
