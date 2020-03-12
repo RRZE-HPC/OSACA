@@ -2,15 +2,17 @@
 
 import math
 import os
+import re
 import sys
 import warnings
+from collections import OrderedDict
 
 import ruamel.yaml
 
 from osaca.semantics import MachineModel
 
 
-def sanity_check(arch: str, verbose=False, output_file=sys.stdout):
+def sanity_check(arch: str, verbose=False, internet_check=False, output_file=sys.stdout):
     """
     Checks the database for missing TP/LT values, instructions might missing int the ISA DB and
     duplicate instructions.
@@ -19,7 +21,9 @@ def sanity_check(arch: str, verbose=False, output_file=sys.stdout):
     :type arch: str
     :param verbose: verbose output flag, defaults to `False`
     :type verbose: bool, optional
-    :param output_file: output stream specifying where to write output, defaults to :class:`sys.      stdout`
+    :param internet_check: indicates if OSACA should try to look up the src/dst distribution in the internet, defaults to False
+    :type internet_check: boolean, optional
+    :param output_file: output stream specifying where to write output, defaults to :class:`sys.stdout`
     :type output_file: stream, optional
 
     """
@@ -38,7 +42,7 @@ def sanity_check(arch: str, verbose=False, output_file=sys.stdout):
         missing_port_pressure,
         suspicious_instructions,
         duplicate_instr_arch,
-    ) = _check_sanity_arch_db(arch_mm, isa_mm)
+    ) = _check_sanity_arch_db(arch_mm, isa_mm, internet_check=internet_check)
     # check ISA DB entries
     duplicate_instr_isa, only_in_isa = _check_sanity_isa_db(arch_mm, isa_mm)
 
@@ -269,10 +273,91 @@ def _create_db_operand_x86(operand):
 ########################
 
 
-def _check_sanity_arch_db(arch_mm, isa_mm):
+def _scrape_from_felixcloutier(mnemonic):
+    """Scrape src/dst information from felixcloutier website and return infromation for user."""
+    from bs4 import BeautifulSoup
+    import requests
+
+    index = 'https://www.felixcloutier.com/x86/index.html'
+    base_url = 'https://www.felixcloutier.com/x86/'
+    url = base_url + mnemonic.lower()
+
+    suspicious = True
+    operands = []
+
+    # GET website
+    r = requests.get(url=url)
+    # Parse result
+    soup = BeautifulSoup(r.text, 'html.parser')
+    if r.status_code == 200:
+        # Found result
+        table = soup.find('h2', attrs={'id': 'instruction-operand-encoding'}).findNextSibling()
+        operands = _get_src_dst_from_table(table)
+    elif r.status_code == 404:
+        # Check for alternative href
+        index = BeautifulSoup(requests.get(url=index).text, 'html.parser')
+        alternatives = [ref for ref in index.findAll('a') if ref.text == mnemonic.upper()]
+        if len(alternatives) > 0:
+            # alternative(s) found, take first one
+            url = base_url + alternatives[0].attrs['href'][2:]
+            table = (
+                BeautifulSoup(requests.get(url=url).text, 'html.parser')
+                .find('h2', attrs={'id': 'instruction-operand-encoding'})
+                .findNextSibling()
+            )
+            operands = _get_src_dst_from_table(table)
+    if operands:
+        # Found src/dst assignment for NUM_OPERANDS
+        if not any(['r' in x and 'w' in x for x in operands]):
+            suspicious = False
+    return (suspicious, ' '.join(operands))
+
+
+def _get_src_dst_from_table(table):
+    """Prettify bs4 table object to string for user"""
+    NUM_OPERANDS = 2
+    # Parse table
+    header = [''.join(x.string.lower().split()) for x in table.find('tr').findAll('td')]
+    data = table.findAll('tr')[1:]
+    data_dict = OrderedDict()
+    for i, row in enumerate(data):
+        data_dict[i] = {}
+        for j, col in enumerate(row.findAll('td')):
+            if col.string != 'NA':
+                data_dict[i][header[j]] = col.string
+    # Get only the instruction forms with 2 operands
+    num_ops = [_get_number_of_operands(row) for _, row in data_dict.items()]
+    if NUM_OPERANDS in num_ops:
+        row = data_dict[num_ops.index(NUM_OPERANDS)]
+        reads_writes = []
+        for i in range(1, NUM_OPERANDS + 1):
+            m = re.search(r'(\([^\(\)]+\))', row['operand{}'.format(i)])
+            if not m:
+                # no parentheses (probably immediate operand), assume READ
+                reads_writes.append('(r)')
+                continue
+            reads_writes.append(''.join(m.group(0).split()))
+        # reverse reads_writes for AT&T syntax
+        reads_writes.reverse()
+        return reads_writes
+    return []
+
+
+def _get_number_of_operands(data_dict_row):
+    """Return the number of `Operand [X]` attributes in row"""
+    num = 0
+    for i in range(1, 5):
+        if 'operand{}'.format(i) in [''.join(x.split()).lower() for x in data_dict_row]:
+            num += 1
+    return num
+
+
+def _check_sanity_arch_db(arch_mm, isa_mm, internet_check=True):
     """Do sanity check for ArchDB by given ISA."""
+    # prefixes of instruction forms which we assume to have non-default operands
     suspicious_prefixes_x86 = ['vfm', 'fm']
     suspicious_prefixes_arm = ['fml', 'ldp', 'stp', 'str']
+    # already known to be default-operand instruction forms with 2 operands
     if arch_mm.get_ISA().lower() == 'aarch64':
         suspicious_prefixes = suspicious_prefixes_arm
     if arch_mm.get_ISA().lower() == 'x86':
@@ -308,7 +393,14 @@ def _check_sanity_arch_db(arch_mm, isa_mm):
             and instr_form not in suspicious_instructions
             and isa_mm.get_instruction(instr_form['name'], instr_form['operands']) is None
         ):
-            suspicious_instructions.append(instr_form)
+            # validate with data from internet if connected flag is set
+            if internet_check:
+                is_susp, info_string = _scrape_from_felixcloutier(instr_form['name'])
+                if is_susp:
+                    instr_form['note'] = info_string
+                    suspicious_instructions.append(instr_form)
+            else:
+                suspicious_instructions.append(instr_form)
         # check for duplicates in DB
         if arch_mm._check_for_duplicate(instr_form['name'], instr_form['operands']):
             duplicate_instr_arch.append(instr_form)
@@ -401,27 +493,32 @@ def _get_sanity_report_verbose(
 
     s = ''
     s += 'Instruction forms without throughput value:\n' if len(m_tp) != 0 else ''
-    for instr_form in m_tp:
+    for instr_form in sorted(m_tp, key=lambda i: i['name']):
         s += '{}{}{}\n'.format(BRIGHT_BLUE, _get_full_instruction_name(instr_form), WHITE)
     s += 'Instruction forms without latency value:\n' if len(m_l) != 0 else ''
-    for instr_form in m_l:
+    for instr_form in sorted(m_l, key=lambda i: i['name']):
         s += '{}{}{}\n'.format(BRIGHT_RED, _get_full_instruction_name(instr_form), WHITE)
     s += 'Instruction forms without port pressure assignment:\n' if len(m_pp) != 0 else ''
-    for instr_form in m_pp:
+    for instr_form in sorted(m_pp, key=lambda i: i['name']):
         s += '{}{}{}\n'.format(BRIGHT_MAGENTA, _get_full_instruction_name(instr_form), WHITE)
     s += 'Instruction forms which might miss an ISA DB entry:\n' if len(suspic_instr) != 0 else ''
-    for instr_form in suspic_instr:
-        s += '{}{}{}\n'.format(BRIGHT_CYAN, _get_full_instruction_name(instr_form), WHITE)
+    for instr_form in sorted(suspic_instr, key=lambda i: i['name']):
+        s += '{}{}{}{}\n'.format(
+            BRIGHT_CYAN,
+            _get_full_instruction_name(instr_form),
+            ' -- ' + instr_form['note'] if 'note' in instr_form else '',
+            WHITE,
+        )
     s += 'Duplicate instruction forms in uarch DB:\n' if len(dup_arch) != 0 else ''
-    for instr_form in dup_arch:
+    for instr_form in sorted(dup_arch, key=lambda i: i['name']):
         s += '{}{}{}\n'.format(YELLOW, _get_full_instruction_name(instr_form), WHITE)
     s += 'Duplicate instruction forms in ISA DB:\n' if len(dup_isa) != 0 else ''
-    for instr_form in dup_isa:
+    for instr_form in sorted(dup_isa, key=lambda i: i['name']):
         s += '{}{}{}\n'.format(BRIGHT_YELLOW, _get_full_instruction_name(instr_form), WHITE)
     s += (
         'Instruction forms existing in ISA DB but not in uarch DB:\n' if len(only_isa) != 0 else ''
     )
-    for instr_form in only_isa:
+    for instr_form in sorted(only_isa, key=lambda i: i['name']):
         s += '{}{}{}\n'.format(CYAN, _get_full_instruction_name(instr_form), WHITE)
     return s
 

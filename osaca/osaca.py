@@ -86,6 +86,13 @@ def create_parser(parser=None):
         'on the verbosity level.',
     )
     parser.add_argument(
+        '--online',
+        dest='internet_check',
+        action='store_true',
+        help='Run sanity check with online DB validation (currently felixcloutier) to see the '
+        'src/dst distribution of the operands. Can be only used in combination with --db-check.',
+    )
+    parser.add_argument(
         '--import',
         metavar='MICROBENCH',
         dest='import_data',
@@ -146,6 +153,8 @@ def check_arguments(args, parser):
             'Microbenchmark not supported for data import. Please see --help for all valid '
             'microbenchmark codes.'
         )
+    if args.internet_check and not args.check_db:
+        parser.error('--online requires --check-db')
 
 
 def import_data(benchmark_type, arch, filepath, output_file=sys.stdout):
@@ -257,7 +266,9 @@ def run(args, output_file=sys.stdout):
     if args.check_db:
         # Sanity check on DB
         verbose = True if args.verbose > 0 else False
-        sanity_check(args.arch, verbose=verbose, output_file=output_file)
+        sanity_check(
+            args.arch, verbose=verbose, internet_check=args.internet_check, output_file=output_file
+        )
     elif 'import_data' in args:
         # Import microbench output file into DB
         import_data(args.import_data, args.arch, args.file.name, output_file=output_file)
