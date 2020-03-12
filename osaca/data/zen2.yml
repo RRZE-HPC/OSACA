@@ -765,7 +765,7 @@ instruction_forms:
   throughput: 0.0
   latency: 0
   port_pressure: []
-- name: [jc, hb, jae, jnb, jna, jbe, ja, jnbe]
+- name: [jc, jb, jae, jnb, jna, jbe, ja, jnbe]
   operands:
   - class: identifier
   throughput: 0.0
@@ -1242,7 +1242,7 @@ instruction_forms:
   - class: register                     # model_importer.py ./model_importer.py
     name: xmm                           # model_importer.py ./model_importer.py
   - class: register                     # model_importer.py ./model_importer.py
-    name: mm0                           # model_importer.py ./model_importer.py
+    name: mm                           # model_importer.py ./model_importer.py
   latency: 5                            # model_importer.py ./model_importer.py
   port_pressure: [[1, '3']]             # model_importer.py ./model_importer.py
   throughput: 1.0                       # model_importer.py ./model_importer.py
@@ -1262,7 +1262,7 @@ instruction_forms:
   - class: register                     # model_importer.py ./model_importer.py
     name: xmm                           # model_importer.py ./model_importer.py
   - class: register                     # model_importer.py ./model_importer.py
-    name: mm0                           # model_importer.py ./model_importer.py
+    name: mm                           # model_importer.py ./model_importer.py
   latency: 5                            # model_importer.py ./model_importer.py
   port_pressure: [[1, '3']]             # model_importer.py ./model_importer.py
   throughput: 1.0                       # model_importer.py ./model_importer.py
@@ -1592,7 +1592,7 @@ instruction_forms:
 - name: MOVQ2DQ                         # model_importer.py ./model_importer.py
   operands:                             # model_importer.py ./model_importer.py
   - class: register                     # model_importer.py ./model_importer.py
-    name: mm0                           # model_importer.py ./model_importer.py
+    name: mm                           # model_importer.py ./model_importer.py
   - class: register                     # model_importer.py ./model_importer.py
     name: xmm                           # model_importer.py ./model_importer.py
   latency: 1                            # model_importer.py ./model_importer.py
@@ -1692,9 +1692,9 @@ instruction_forms:
 - name: PADDQ                           # model_importer.py ./model_importer.py
   operands:                             # model_importer.py ./model_importer.py
   - class: register                     # model_importer.py ./model_importer.py
-    name: mm0                           # model_importer.py ./model_importer.py
+    name: mm                           # model_importer.py ./model_importer.py
   - class: register                     # model_importer.py ./model_importer.py
-    name: mm0                           # model_importer.py ./model_importer.py
+    name: mm                           # model_importer.py ./model_importer.py
   latency: 1                            # model_importer.py ./model_importer.py
   port_pressure: [[1, '013']]           # model_importer.py ./model_importer.py
   throughput: 0.3333333333333333        # model_importer.py ./model_importer.py
@@ -2130,7 +2130,7 @@ instruction_forms:
   - class: register                     # model_importer.py ./model_importer.py
     name: xmm                           # model_importer.py ./model_importer.py
   - class: register                     # model_importer.py ./model_importer.py
-    name: mm0                           # model_importer.py ./model_importer.py
+    name: mm                           # model_importer.py ./model_importer.py
   latency: 1                            # model_importer.py ./model_importer.py
   port_pressure: [[1, '0123']]          # model_importer.py ./model_importer.py
   throughput: 0.25                      # model_importer.py ./model_importer.py
@@ -2148,9 +2148,9 @@ instruction_forms:
 - name: PSUBQ                           # model_importer.py ./model_importer.py
   operands:                             # model_importer.py ./model_importer.py
   - class: register                     # model_importer.py ./model_importer.py
-    name: mm0                           # model_importer.py ./model_importer.py
+    name: mm                           # model_importer.py ./model_importer.py
   - class: register                     # model_importer.py ./model_importer.py
-    name: mm0                           # model_importer.py ./model_importer.py
+    name: mm                           # model_importer.py ./model_importer.py
   latency: 1                            # model_importer.py ./model_importer.py
   port_pressure: [[1, '013']]           # model_importer.py ./model_importer.py
   throughput: 0.3333333333333333        # model_importer.py ./model_importer.py
@@ -2178,9 +2178,9 @@ instruction_forms:
 - name: PMULUDQ                         # model_importer.py ./model_importer.py
   operands:                             # model_importer.py ./model_importer.py
   - class: register                     # model_importer.py ./model_importer.py
-    name: mm0                           # model_importer.py ./model_importer.py
+    name: mm                           # model_importer.py ./model_importer.py
   - class: register                     # model_importer.py ./model_importer.py
-    name: mm0                           # model_importer.py ./model_importer.py
+    name: mm                           # model_importer.py ./model_importer.py
   latency: 3                            # model_importer.py ./model_importer.py
   port_pressure: [[1, '0']]             # model_importer.py ./model_importer.py
   throughput: 1.0                       # model_importer.py ./model_importer.py
@@ -2402,9 +2402,9 @@ instruction_forms:
 - name: PUNPCKHDQ                       # model_importer.py ./model_importer.py
   operands:                             # model_importer.py ./model_importer.py
   - class: register                     # model_importer.py ./model_importer.py
-    name: mm0                           # model_importer.py ./model_importer.py
+    name: mm                           # model_importer.py ./model_importer.py
   - class: register                     # model_importer.py ./model_importer.py
-    name: mm0                           # model_importer.py ./model_importer.py
+    name: mm                           # model_importer.py ./model_importer.py
   latency: 1                            # model_importer.py ./model_importer.py
   port_pressure: [[1, '12']]            # model_importer.py ./model_importer.py
   throughput: 0.5                       # model_importer.py ./model_importer.py
@@ -2412,9 +2412,9 @@ instruction_forms:
 - name: PCMPGTW                         # model_importer.py ./model_importer.py
   operands:                             # model_importer.py ./model_importer.py
   - class: register                     # model_importer.py ./model_importer.py
-    name: mm0                           # model_importer.py ./model_importer.py
+    name: mm                           # model_importer.py ./model_importer.py
   - class: register                     # model_importer.py ./model_importer.py
-    name: mm0                           # model_importer.py ./model_importer.py
+    name: mm                           # model_importer.py ./model_importer.py
   latency: 1                            # model_importer.py ./model_importer.py
   port_pressure: [[1, '013']]           # model_importer.py ./model_importer.py
   throughput: 0.3333333333333333        # model_importer.py ./model_importer.py
@@ -2422,9 +2422,9 @@ instruction_forms:
 - name: PCMPGTB                         # model_importer.py ./model_importer.py
   operands:                             # model_importer.py ./model_importer.py
   - class: register                     # model_importer.py ./model_importer.py
-    name: mm0                           # model_importer.py ./model_importer.py
+    name: mm                           # model_importer.py ./model_importer.py
   - class: register                     # model_importer.py ./model_importer.py
-    name: mm0                           # model_importer.py ./model_importer.py
+    name: mm                           # model_importer.py ./model_importer.py
   latency: 1                            # model_importer.py ./model_importer.py
   port_pressure: [[1, '013']]           # model_importer.py ./model_importer.py
   throughput: 0.3333333333333333        # model_importer.py ./model_importer.py
@@ -2432,9 +2432,9 @@ instruction_forms:
 - name: PCMPGTD                         # model_importer.py ./model_importer.py
   operands:                             # model_importer.py ./model_importer.py
   - class: register                     # model_importer.py ./model_importer.py
-    name: mm0                           # model_importer.py ./model_importer.py
+    name: mm                           # model_importer.py ./model_importer.py
   - class: register                     # model_importer.py ./model_importer.py
-    name: mm0                           # model_importer.py ./model_importer.py
+    name: mm                           # model_importer.py ./model_importer.py
   latency: 1                            # model_importer.py ./model_importer.py
   port_pressure: [[1, '013']]           # model_importer.py ./model_importer.py
   throughput: 0.3333333333333333        # model_importer.py ./model_importer.py
@@ -2442,9 +2442,9 @@ instruction_forms:
 - name: PACKUSWB                        # model_importer.py ./model_importer.py
   operands:                             # model_importer.py ./model_importer.py
   - class: register                     # model_importer.py ./model_importer.py
-    name: mm0                           # model_importer.py ./model_importer.py
+    name: mm                           # model_importer.py ./model_importer.py
   - class: register                     # model_importer.py ./model_importer.py
-    name: mm0                           # model_importer.py ./model_importer.py
+    name: mm                           # model_importer.py ./model_importer.py
   latency: 1                            # model_importer.py ./model_importer.py
   port_pressure: [[1, '12']]            # model_importer.py ./model_importer.py
   throughput: 0.5                       # model_importer.py ./model_importer.py
@@ -2452,9 +2452,9 @@ instruction_forms:
 - name: PSUBD                           # model_importer.py ./model_importer.py
   operands:                             # model_importer.py ./model_importer.py
   - class: register                     # model_importer.py ./model_importer.py
-    name: mm0                           # model_importer.py ./model_importer.py
+    name: mm                           # model_importer.py ./model_importer.py
   - class: register                     # model_importer.py ./model_importer.py
-    name: mm0                           # model_importer.py ./model_importer.py
+    name: mm                           # model_importer.py ./model_importer.py
   latency: 1                            # model_importer.py ./model_importer.py
   port_pressure: [[1, '013']]           # model_importer.py ./model_importer.py
   throughput: 0.3333333333333333        # model_importer.py ./model_importer.py
@@ -2462,9 +2462,9 @@ instruction_forms:
 - name: PSADBW                          # model_importer.py ./model_importer.py
   operands:                             # model_importer.py ./model_importer.py
   - class: register                     # model_importer.py ./model_importer.py
-    name: mm0                           # model_importer.py ./model_importer.py
+    name: mm                           # model_importer.py ./model_importer.py
   - class: register                     # model_importer.py ./model_importer.py
-    name: mm0                           # model_importer.py ./model_importer.py
+    name: mm                           # model_importer.py ./model_importer.py
   latency: 3                            # model_importer.py ./model_importer.py
   port_pressure: [[1, '0']]             # model_importer.py ./model_importer.py
   throughput: 1.0                       # model_importer.py ./model_importer.py
@@ -2472,9 +2472,9 @@ instruction_forms:
 - name: PADDUSW                         # model_importer.py ./model_importer.py
   operands:                             # model_importer.py ./model_importer.py
   - class: register                     # model_importer.py ./model_importer.py
-    name: mm0                           # model_importer.py ./model_importer.py
+    name: mm                           # model_importer.py ./model_importer.py
   - class: register                     # model_importer.py ./model_importer.py
-    name: mm0                           # model_importer.py ./model_importer.py
+    name: mm                           # model_importer.py ./model_importer.py
   latency: 1                            # model_importer.py ./model_importer.py
   port_pressure: [[1, '03']]            # model_importer.py ./model_importer.py
   throughput: 0.5                       # model_importer.py ./model_importer.py
@@ -2482,9 +2482,9 @@ instruction_forms:
 - name: PADDUSB                         # model_importer.py ./model_importer.py
   operands:                             # model_importer.py ./model_importer.py
   - class: register                     # model_importer.py ./model_importer.py
-    name: mm0                           # model_importer.py ./model_importer.py
+    name: mm                           # model_importer.py ./model_importer.py
   - class: register                     # model_importer.py ./model_importer.py
-    name: mm0                           # model_importer.py ./model_importer.py
+    name: mm                           # model_importer.py ./model_importer.py
   latency: 1                            # model_importer.py ./model_importer.py
   port_pressure: [[1, '03']]            # model_importer.py ./model_importer.py
   throughput: 0.5                       # model_importer.py ./model_importer.py
@@ -2492,9 +2492,9 @@ instruction_forms:
 - name: PACKSSDW                        # model_importer.py ./model_importer.py
   operands:                             # model_importer.py ./model_importer.py
   - class: register                     # model_importer.py ./model_importer.py
-    name: mm0                           # model_importer.py ./model_importer.py
+    name: mm                           # model_importer.py ./model_importer.py
   - class: register                     # model_importer.py ./model_importer.py
-    name: mm0                           # model_importer.py ./model_importer.py
+    name: mm                           # model_importer.py ./model_importer.py
   latency: 1                            # model_importer.py ./model_importer.py
   port_pressure: [[1, '12']]            # model_importer.py ./model_importer.py
   throughput: 0.5                       # model_importer.py ./model_importer.py
@@ -2502,9 +2502,9 @@ instruction_forms:
 - name: PMULLW                          # model_importer.py ./model_importer.py
   operands:                             # model_importer.py ./model_importer.py
   - class: register                     # model_importer.py ./model_importer.py
-    name: mm0                           # model_importer.py ./model_importer.py
+    name: mm                           # model_importer.py ./model_importer.py
   - class: register                     # model_importer.py ./model_importer.py
-    name: mm0                           # model_importer.py ./model_importer.py
+    name: mm                           # model_importer.py ./model_importer.py
   latency: 3                            # model_importer.py ./model_importer.py
   port_pressure: [[1, '0']]             # model_importer.py ./model_importer.py
   throughput: 1.0                       # model_importer.py ./model_importer.py
@@ -2512,9 +2512,9 @@ instruction_forms:
 - name: PCMPEQW                         # model_importer.py ./model_importer.py
   operands:                             # model_importer.py ./model_importer.py
   - class: register                     # model_importer.py ./model_importer.py
-    name: mm0                           # model_importer.py ./model_importer.py
+    name: mm                           # model_importer.py ./model_importer.py
   - class: register                     # model_importer.py ./model_importer.py
-    name: mm0                           # model_importer.py ./model_importer.py
+    name: mm                           # model_importer.py ./model_importer.py
   latency: 1                            # model_importer.py ./model_importer.py
   port_pressure: [[1, '013']]           # model_importer.py ./model_importer.py
   throughput: 0.3333333333333333        # model_importer.py ./model_importer.py
@@ -2522,9 +2522,9 @@ instruction_forms:
 - name: PCMPEQB                         # model_importer.py ./model_importer.py
   operands:                             # model_importer.py ./model_importer.py
   - class: register                     # model_importer.py ./model_importer.py
-    name: mm0                           # model_importer.py ./model_importer.py
+    name: mm                           # model_importer.py ./model_importer.py
   - class: register                     # model_importer.py ./model_importer.py
-    name: mm0                           # model_importer.py ./model_importer.py
+    name: mm                           # model_importer.py ./model_importer.py
   latency: 1                            # model_importer.py ./model_importer.py
   port_pressure: [[1, '013']]           # model_importer.py ./model_importer.py
   throughput: 0.3333333333333333        # model_importer.py ./model_importer.py
@@ -2532,9 +2532,9 @@ instruction_forms:
 - name: PCMPEQD                         # model_importer.py ./model_importer.py
   operands:                             # model_importer.py ./model_importer.py
   - class: register                     # model_importer.py ./model_importer.py
-    name: mm0                           # model_importer.py ./model_importer.py
+    name: mm                           # model_importer.py ./model_importer.py
   - class: register                     # model_importer.py ./model_importer.py
-    name: mm0                           # model_importer.py ./model_importer.py
+    name: mm                           # model_importer.py ./model_importer.py
   latency: 1                            # model_importer.py ./model_importer.py
   port_pressure: [[1, '013']]           # model_importer.py ./model_importer.py
   throughput: 0.3333333333333333        # model_importer.py ./model_importer.py
@@ -2542,9 +2542,9 @@ instruction_forms:
 - name: PUNPCKLWD                       # model_importer.py ./model_importer.py
   operands:                             # model_importer.py ./model_importer.py
   - class: register                     # model_importer.py ./model_importer.py
-    name: mm0                           # model_importer.py ./model_importer.py
+    name: mm                           # model_importer.py ./model_importer.py
   - class: register                     # model_importer.py ./model_importer.py
-    name: mm0                           # model_importer.py ./model_importer.py
+    name: mm                           # model_importer.py ./model_importer.py
   latency: 1                            # model_importer.py ./model_importer.py
   port_pressure: [[1, '12']]            # model_importer.py ./model_importer.py
   throughput: 0.5                       # model_importer.py ./model_importer.py
@@ -2552,9 +2552,9 @@ instruction_forms:
 - name: PADDSW                          # model_importer.py ./model_importer.py
   operands:                             # model_importer.py ./model_importer.py
   - class: register                     # model_importer.py ./model_importer.py
-    name: mm0                           # model_importer.py ./model_importer.py
+    name: mm                           # model_importer.py ./model_importer.py
   - class: register                     # model_importer.py ./model_importer.py
-    name: mm0                           # model_importer.py ./model_importer.py
+    name: mm                           # model_importer.py ./model_importer.py
   latency: 1                            # model_importer.py ./model_importer.py
   port_pressure: [[1, '03']]            # model_importer.py ./model_importer.py
   throughput: 0.5                       # model_importer.py ./model_importer.py
@@ -2562,9 +2562,9 @@ instruction_forms:
 - name: PXOR                            # model_importer.py ./model_importer.py
   operands:                             # model_importer.py ./model_importer.py
   - class: register                     # model_importer.py ./model_importer.py
-    name: mm0                           # model_importer.py ./model_importer.py
+    name: mm                           # model_importer.py ./model_importer.py
   - class: register                     # model_importer.py ./model_importer.py
-    name: mm0                           # model_importer.py ./model_importer.py
+    name: mm                           # model_importer.py ./model_importer.py
   latency: 1                            # model_importer.py ./model_importer.py
   port_pressure: [[1, '0123']]          # model_importer.py ./model_importer.py
   throughput: 0.25                      # model_importer.py ./model_importer.py
@@ -2572,9 +2572,9 @@ instruction_forms:
 - name: PSUBB                           # model_importer.py ./model_importer.py
   operands:                             # model_importer.py ./model_importer.py
   - class: register                     # model_importer.py ./model_importer.py
-    name: mm0                           # model_importer.py ./model_importer.py
+    name: mm                           # model_importer.py ./model_importer.py
   - class: register                     # model_importer.py ./model_importer.py
-    name: mm0                           # model_importer.py ./model_importer.py
+    name: mm                           # model_importer.py ./model_importer.py
   latency: 1                            # model_importer.py ./model_importer.py
   port_pressure: [[1, '013']]           # model_importer.py ./model_importer.py
   throughput: 0.3333333333333333        # model_importer.py ./model_importer.py
@@ -2582,9 +2582,9 @@ instruction_forms:
 - name: PSUBUSW                         # model_importer.py ./model_importer.py
   operands:                             # model_importer.py ./model_importer.py
   - class: register                     # model_importer.py ./model_importer.py
-    name: mm0                           # model_importer.py ./model_importer.py
+    name: mm                           # model_importer.py ./model_importer.py
   - class: register                     # model_importer.py ./model_importer.py
-    name: mm0                           # model_importer.py ./model_importer.py
+    name: mm                           # model_importer.py ./model_importer.py
   latency: 1                            # model_importer.py ./model_importer.py
   port_pressure: [[1, '03']]            # model_importer.py ./model_importer.py
   throughput: 0.5                       # model_importer.py ./model_importer.py
@@ -2592,9 +2592,9 @@ instruction_forms:
 - name: PSUBW                           # model_importer.py ./model_importer.py
   operands:                             # model_importer.py ./model_importer.py
   - class: register                     # model_importer.py ./model_importer.py
-    name: mm0                           # model_importer.py ./model_importer.py
+    name: mm                           # model_importer.py ./model_importer.py
   - class: register                     # model_importer.py ./model_importer.py
-    name: mm0                           # model_importer.py ./model_importer.py
+    name: mm                           # model_importer.py ./model_importer.py
   latency: 1                            # model_importer.py ./model_importer.py
   port_pressure: [[1, '013']]           # model_importer.py ./model_importer.py
   throughput: 0.3333333333333333        # model_importer.py ./model_importer.py
@@ -2602,9 +2602,9 @@ instruction_forms:
 - name: PADDW                           # model_importer.py ./model_importer.py
   operands:                             # model_importer.py ./model_importer.py
   - class: register                     # model_importer.py ./model_importer.py
-    name: mm0                           # model_importer.py ./model_importer.py
+    name: mm                           # model_importer.py ./model_importer.py
   - class: register                     # model_importer.py ./model_importer.py
-    name: mm0                           # model_importer.py ./model_importer.py
+    name: mm                           # model_importer.py ./model_importer.py
   latency: 1                            # model_importer.py ./model_importer.py
   port_pressure: [[1, '013']]           # model_importer.py ./model_importer.py
   throughput: 0.3333333333333333        # model_importer.py ./model_importer.py
@@ -2612,9 +2612,9 @@ instruction_forms:
 - name: PMAXSW                          # model_importer.py ./model_importer.py
   operands:                             # model_importer.py ./model_importer.py
   - class: register                     # model_importer.py ./model_importer.py
-    name: mm0                           # model_importer.py ./model_importer.py
+    name: mm                           # model_importer.py ./model_importer.py
   - class: register                     # model_importer.py ./model_importer.py
-    name: mm0                           # model_importer.py ./model_importer.py
+    name: mm                           # model_importer.py ./model_importer.py
   latency: 1                            # model_importer.py ./model_importer.py
   port_pressure: [[1, '013']]           # model_importer.py ./model_importer.py
   throughput: 0.3333333333333333        # model_importer.py ./model_importer.py
@@ -2622,9 +2622,9 @@ instruction_forms:
 - name: PADDD                           # model_importer.py ./model_importer.py
   operands:                             # model_importer.py ./model_importer.py
   - class: register                     # model_importer.py ./model_importer.py
-    name: mm0                           # model_importer.py ./model_importer.py
+    name: mm                           # model_importer.py ./model_importer.py
   - class: register                     # model_importer.py ./model_importer.py
-    name: mm0                           # model_importer.py ./model_importer.py
+    name: mm                           # model_importer.py ./model_importer.py
   latency: 1                            # model_importer.py ./model_importer.py
   port_pressure: [[1, '013']]           # model_importer.py ./model_importer.py
   throughput: 0.3333333333333333        # model_importer.py ./model_importer.py
@@ -2632,9 +2632,9 @@ instruction_forms:
 - name: PADDB                           # model_importer.py ./model_importer.py
   operands:                             # model_importer.py ./model_importer.py
   - class: register                     # model_importer.py ./model_importer.py
-    name: mm0                           # model_importer.py ./model_importer.py
+    name: mm                           # model_importer.py ./model_importer.py
   - class: register                     # model_importer.py ./model_importer.py
-    name: mm0                           # model_importer.py ./model_importer.py
+    name: mm                           # model_importer.py ./model_importer.py
   latency: 1                            # model_importer.py ./model_importer.py
   port_pressure: [[1, '013']]           # model_importer.py ./model_importer.py
   throughput: 0.3333333333333333        # model_importer.py ./model_importer.py
@@ -2642,9 +2642,9 @@ instruction_forms:
 - name: PMULHUW                         # model_importer.py ./model_importer.py
   operands:                             # model_importer.py ./model_importer.py
   - class: register                     # model_importer.py ./model_importer.py
-    name: mm0                           # model_importer.py ./model_importer.py
+    name: mm                           # model_importer.py ./model_importer.py
   - class: register                     # model_importer.py ./model_importer.py
-    name: mm0                           # model_importer.py ./model_importer.py
+    name: mm                           # model_importer.py ./model_importer.py
   latency: 3                            # model_importer.py ./model_importer.py
   port_pressure: [[1, '0']]             # model_importer.py ./model_importer.py
   throughput: 1.0                       # model_importer.py ./model_importer.py
@@ -2652,9 +2652,9 @@ instruction_forms:
 - name: POR                             # model_importer.py ./model_importer.py
   operands:                             # model_importer.py ./model_importer.py
   - class: register                     # model_importer.py ./model_importer.py
-    name: mm0                           # model_importer.py ./model_importer.py
+    name: mm                           # model_importer.py ./model_importer.py
   - class: register                     # model_importer.py ./model_importer.py
-    name: mm0                           # model_importer.py ./model_importer.py
+    name: mm                           # model_importer.py ./model_importer.py
   latency: 1                            # model_importer.py ./model_importer.py
   port_pressure: [[1, '0123']]          # model_importer.py ./model_importer.py
   throughput: 0.25                      # model_importer.py ./model_importer.py
@@ -2664,7 +2664,7 @@ instruction_forms:
   - class: immediate                    # model_importer.py ./model_importer.py
     imd: int                            # model_importer.py ./model_importer.py
   - class: register                     # model_importer.py ./model_importer.py
-    name: mm0                           # model_importer.py ./model_importer.py
+    name: mm                           # model_importer.py ./model_importer.py
   latency: 1                            # model_importer.py ./model_importer.py
   port_pressure: [[1, '2']]             # model_importer.py ./model_importer.py
   throughput: 1.0                       # model_importer.py ./model_importer.py
@@ -2672,9 +2672,9 @@ instruction_forms:
 - name: PSLLD                           # model_importer.py ./model_importer.py
   operands:                             # model_importer.py ./model_importer.py
   - class: register                     # model_importer.py ./model_importer.py
-    name: mm0                           # model_importer.py ./model_importer.py
+    name: mm                           # model_importer.py ./model_importer.py
   - class: register                     # model_importer.py ./model_importer.py
-    name: mm0                           # model_importer.py ./model_importer.py
+    name: mm                           # model_importer.py ./model_importer.py
   latency: 1                            # model_importer.py ./model_importer.py
   port_pressure: [[1, '2']]             # model_importer.py ./model_importer.py
   throughput: 1.0                       # model_importer.py ./model_importer.py
@@ -2684,7 +2684,7 @@ instruction_forms:
   - class: immediate                    # model_importer.py ./model_importer.py
     imd: int                            # model_importer.py ./model_importer.py
   - class: register                     # model_importer.py ./model_importer.py
-    name: mm0                           # model_importer.py ./model_importer.py
+    name: mm                           # model_importer.py ./model_importer.py
   latency: 1                            # model_importer.py ./model_importer.py
   port_pressure: [[1, '2']]             # model_importer.py ./model_importer.py
   throughput: 1.0                       # model_importer.py ./model_importer.py
@@ -2692,9 +2692,9 @@ instruction_forms:
 - name: PSLLW                           # model_importer.py ./model_importer.py
   operands:                             # model_importer.py ./model_importer.py
   - class: register                     # model_importer.py ./model_importer.py
-    name: mm0                           # model_importer.py ./model_importer.py
+    name: mm                           # model_importer.py ./model_importer.py
   - class: register                     # model_importer.py ./model_importer.py
-    name: mm0                           # model_importer.py ./model_importer.py
+    name: mm                           # model_importer.py ./model_importer.py
   latency: 1                            # model_importer.py ./model_importer.py
   port_pressure: [[1, '2']]             # model_importer.py ./model_importer.py
   throughput: 1.0                       # model_importer.py ./model_importer.py
@@ -2704,7 +2704,7 @@ instruction_forms:
   - class: immediate                    # model_importer.py ./model_importer.py
     imd: int                            # model_importer.py ./model_importer.py
   - class: register                     # model_importer.py ./model_importer.py
-    name: mm0                           # model_importer.py ./model_importer.py
+    name: mm                           # model_importer.py ./model_importer.py
   latency: 1                            # model_importer.py ./model_importer.py
   port_pressure: [[1, '2']]             # model_importer.py ./model_importer.py
   throughput: 1.0                       # model_importer.py ./model_importer.py
@@ -2712,9 +2712,9 @@ instruction_forms:
 - name: PSLLQ                           # model_importer.py ./model_importer.py
   operands:                             # model_importer.py ./model_importer.py
   - class: register                     # model_importer.py ./model_importer.py
-    name: mm0                           # model_importer.py ./model_importer.py
+    name: mm                           # model_importer.py ./model_importer.py
   - class: register                     # model_importer.py ./model_importer.py
-    name: mm0                           # model_importer.py ./model_importer.py
+    name: mm                           # model_importer.py ./model_importer.py
   latency: 1                            # model_importer.py ./model_importer.py
   port_pressure: [[1, '2']]             # model_importer.py ./model_importer.py
   throughput: 1.0                       # model_importer.py ./model_importer.py
@@ -2722,9 +2722,9 @@ instruction_forms:
 - name: PSUBUSB                         # model_importer.py ./model_importer.py
   operands:                             # model_importer.py ./model_importer.py
   - class: register                     # model_importer.py ./model_importer.py
-    name: mm0                           # model_importer.py ./model_importer.py
+    name: mm                           # model_importer.py ./model_importer.py
   - class: register                     # model_importer.py ./model_importer.py
-    name: mm0                           # model_importer.py ./model_importer.py
+    name: mm                           # model_importer.py ./model_importer.py
   latency: 1                            # model_importer.py ./model_importer.py
   port_pressure: [[1, '03']]            # model_importer.py ./model_importer.py
   throughput: 0.5                       # model_importer.py ./model_importer.py
@@ -2732,7 +2732,7 @@ instruction_forms:
 - name: PMOVMSKB                        # model_importer.py ./model_importer.py
   operands:                             # model_importer.py ./model_importer.py
   - class: register                     # model_importer.py ./model_importer.py
-    name: mm0                           # model_importer.py ./model_importer.py
+    name: mm                           # model_importer.py ./model_importer.py
   - class: register                     # model_importer.py ./model_importer.py
     name: gpr                           # model_importer.py ./model_importer.py
   latency: 6                            # model_importer.py ./model_importer.py
@@ -2742,9 +2742,9 @@ instruction_forms:
 - name: PUNPCKLDQ                       # model_importer.py ./model_importer.py
   operands:                             # model_importer.py ./model_importer.py
   - class: register                     # model_importer.py ./model_importer.py
-    name: mm0                           # model_importer.py ./model_importer.py
+    name: mm                           # model_importer.py ./model_importer.py
   - class: register                     # model_importer.py ./model_importer.py
-    name: mm0                           # model_importer.py ./model_importer.py
+    name: mm                           # model_importer.py ./model_importer.py
   latency: 1                            # model_importer.py ./model_importer.py
   port_pressure: [[1, '12']]            # model_importer.py ./model_importer.py
   throughput: 0.5                       # model_importer.py ./model_importer.py
@@ -2752,9 +2752,9 @@ instruction_forms:
 - name: PANDN                           # model_importer.py ./model_importer.py
   operands:                             # model_importer.py ./model_importer.py
   - class: register                     # model_importer.py ./model_importer.py
-    name: mm0                           # model_importer.py ./model_importer.py
+    name: mm                           # model_importer.py ./model_importer.py
   - class: register                     # model_importer.py ./model_importer.py
-    name: mm0                           # model_importer.py ./model_importer.py
+    name: mm                           # model_importer.py ./model_importer.py
   latency: 1                            # model_importer.py ./model_importer.py
   port_pressure: [[1, '0123']]          # model_importer.py ./model_importer.py
   throughput: 0.25                      # model_importer.py ./model_importer.py
@@ -2762,9 +2762,9 @@ instruction_forms:
 - name: PMULHW                          # model_importer.py ./model_importer.py
   operands:                             # model_importer.py ./model_importer.py
   - class: register                     # model_importer.py ./model_importer.py
-    name: mm0                           # model_importer.py ./model_importer.py
+    name: mm                           # model_importer.py ./model_importer.py
   - class: register                     # model_importer.py ./model_importer.py
-    name: mm0                           # model_importer.py ./model_importer.py
+    name: mm                           # model_importer.py ./model_importer.py
   latency: 3                            # model_importer.py ./model_importer.py
   port_pressure: [[1, '0']]             # model_importer.py ./model_importer.py
   throughput: 1.0                       # model_importer.py ./model_importer.py
@@ -2772,7 +2772,7 @@ instruction_forms:
 - name: MOVQ                            # model_importer.py ./model_importer.py
   operands:                             # model_importer.py ./model_importer.py
   - class: register                     # model_importer.py ./model_importer.py
-    name: mm0                           # model_importer.py ./model_importer.py
+    name: mm                           # model_importer.py ./model_importer.py
   - class: register                     # model_importer.py ./model_importer.py
     name: gpr                           # model_importer.py ./model_importer.py
   latency: 6                            # model_importer.py ./model_importer.py
@@ -2782,9 +2782,9 @@ instruction_forms:
 - name: PMINSW                          # model_importer.py ./model_importer.py
   operands:                             # model_importer.py ./model_importer.py
   - class: register                     # model_importer.py ./model_importer.py
-    name: mm0                           # model_importer.py ./model_importer.py
+    name: mm                           # model_importer.py ./model_importer.py
   - class: register                     # model_importer.py ./model_importer.py
-    name: mm0                           # model_importer.py ./model_importer.py
+    name: mm                           # model_importer.py ./model_importer.py
   latency: 1                            # model_importer.py ./model_importer.py
   port_pressure: [[1, '013']]           # model_importer.py ./model_importer.py
   throughput: 0.3333333333333333        # model_importer.py ./model_importer.py
@@ -2794,9 +2794,9 @@ instruction_forms:
   - class: immediate                    # model_importer.py ./model_importer.py
     imd: int                            # model_importer.py ./model_importer.py
   - class: register                     # model_importer.py ./model_importer.py
-    name: mm0                           # model_importer.py ./model_importer.py
+    name: mm                           # model_importer.py ./model_importer.py
   - class: register                     # model_importer.py ./model_importer.py
-    name: mm0                           # model_importer.py ./model_importer.py
+    name: mm                           # model_importer.py ./model_importer.py
   latency: 1                            # model_importer.py ./model_importer.py
   port_pressure: [[1, '12']]            # model_importer.py ./model_importer.py
   throughput: 0.5                       # model_importer.py ./model_importer.py
@@ -2806,7 +2806,7 @@ instruction_forms:
   - class: immediate                    # model_importer.py ./model_importer.py
     imd: int                            # model_importer.py ./model_importer.py
   - class: register                     # model_importer.py ./model_importer.py
-    name: mm0                           # model_importer.py ./model_importer.py
+    name: mm                           # model_importer.py ./model_importer.py
   latency: 1                            # model_importer.py ./model_importer.py
   port_pressure: [[1, '2']]             # model_importer.py ./model_importer.py
   throughput: 1.0                       # model_importer.py ./model_importer.py
@@ -2814,9 +2814,9 @@ instruction_forms:
 - name: PSRLQ                           # model_importer.py ./model_importer.py
   operands:                             # model_importer.py ./model_importer.py
   - class: register                     # model_importer.py ./model_importer.py
-    name: mm0                           # model_importer.py ./model_importer.py
+    name: mm                           # model_importer.py ./model_importer.py
   - class: register                     # model_importer.py ./model_importer.py
-    name: mm0                           # model_importer.py ./model_importer.py
+    name: mm                           # model_importer.py ./model_importer.py
   latency: 1                            # model_importer.py ./model_importer.py
   port_pressure: [[1, '2']]             # model_importer.py ./model_importer.py
   throughput: 1.0                       # model_importer.py ./model_importer.py
@@ -2826,7 +2826,7 @@ instruction_forms:
   - class: immediate                    # model_importer.py ./model_importer.py
     imd: int                            # model_importer.py ./model_importer.py
   - class: register                     # model_importer.py ./model_importer.py
-    name: mm0                           # model_importer.py ./model_importer.py
+    name: mm                           # model_importer.py ./model_importer.py
   latency: 1                            # model_importer.py ./model_importer.py
   port_pressure: [[1, '2']]             # model_importer.py ./model_importer.py
   throughput: 1.0                       # model_importer.py ./model_importer.py
@@ -2834,9 +2834,9 @@ instruction_forms:
 - name: PSRLW                           # model_importer.py ./model_importer.py
   operands:                             # model_importer.py ./model_importer.py
   - class: register                     # model_importer.py ./model_importer.py
-    name: mm0                           # model_importer.py ./model_importer.py
+    name: mm                           # model_importer.py ./model_importer.py
   - class: register                     # model_importer.py ./model_importer.py
-    name: mm0                           # model_importer.py ./model_importer.py
+    name: mm                           # model_importer.py ./model_importer.py
   latency: 1                            # model_importer.py ./model_importer.py
   port_pressure: [[1, '2']]             # model_importer.py ./model_importer.py
   throughput: 1.0                       # model_importer.py ./model_importer.py
@@ -2846,7 +2846,7 @@ instruction_forms:
   - class: immediate                    # model_importer.py ./model_importer.py
     imd: int                            # model_importer.py ./model_importer.py
   - class: register                     # model_importer.py ./model_importer.py
-    name: mm0                           # model_importer.py ./model_importer.py
+    name: mm                           # model_importer.py ./model_importer.py
   latency: 1                            # model_importer.py ./model_importer.py
   port_pressure: [[1, '2']]             # model_importer.py ./model_importer.py
   throughput: 1.0                       # model_importer.py ./model_importer.py
@@ -2854,9 +2854,9 @@ instruction_forms:
 - name: PSRLD                           # model_importer.py ./model_importer.py
   operands:                             # model_importer.py ./model_importer.py
   - class: register                     # model_importer.py ./model_importer.py
-    name: mm0                           # model_importer.py ./model_importer.py
+    name: mm                           # model_importer.py ./model_importer.py
   - class: register                     # model_importer.py ./model_importer.py
-    name: mm0                           # model_importer.py ./model_importer.py
+    name: mm                           # model_importer.py ./model_importer.py
   latency: 1                            # model_importer.py ./model_importer.py
   port_pressure: [[1, '2']]             # model_importer.py ./model_importer.py
   throughput: 1.0                       # model_importer.py ./model_importer.py
@@ -2864,9 +2864,9 @@ instruction_forms:
 - name: PADDSB                          # model_importer.py ./model_importer.py
   operands:                             # model_importer.py ./model_importer.py
   - class: register                     # model_importer.py ./model_importer.py
-    name: mm0                           # model_importer.py ./model_importer.py
+    name: mm                           # model_importer.py ./model_importer.py
   - class: register                     # model_importer.py ./model_importer.py
-    name: mm0                           # model_importer.py ./model_importer.py
+    name: mm                           # model_importer.py ./model_importer.py
   latency: 1                            # model_importer.py ./model_importer.py
   port_pressure: [[1, '03']]            # model_importer.py ./model_importer.py
   throughput: 0.5                       # model_importer.py ./model_importer.py
@@ -2874,7 +2874,7 @@ instruction_forms:
 - name: MOVD                            # model_importer.py ./model_importer.py
   operands:                             # model_importer.py ./model_importer.py
   - class: register                     # model_importer.py ./model_importer.py
-    name: mm0                           # model_importer.py ./model_importer.py
+    name: mm                           # model_importer.py ./model_importer.py
   - class: register                     # model_importer.py ./model_importer.py
     name: gpr                           # model_importer.py ./model_importer.py
   latency: 6                            # model_importer.py ./model_importer.py
@@ -2884,9 +2884,9 @@ instruction_forms:
 - name: PUNPCKHBW                       # model_importer.py ./model_importer.py
   operands:                             # model_importer.py ./model_importer.py
   - class: register                     # model_importer.py ./model_importer.py
-    name: mm0                           # model_importer.py ./model_importer.py
+    name: mm                           # model_importer.py ./model_importer.py
   - class: register                     # model_importer.py ./model_importer.py
-    name: mm0                           # model_importer.py ./model_importer.py
+    name: mm                           # model_importer.py ./model_importer.py
   latency: 1                            # model_importer.py ./model_importer.py
   port_pressure: [[1, '12']]            # model_importer.py ./model_importer.py
   throughput: 0.5                       # model_importer.py ./model_importer.py
@@ -2894,9 +2894,9 @@ instruction_forms:
 - name: PMADDWD                         # model_importer.py ./model_importer.py
   operands:                             # model_importer.py ./model_importer.py
   - class: register                     # model_importer.py ./model_importer.py
-    name: mm0                           # model_importer.py ./model_importer.py
+    name: mm                           # model_importer.py ./model_importer.py
   - class: register                     # model_importer.py ./model_importer.py
-    name: mm0                           # model_importer.py ./model_importer.py
+    name: mm                           # model_importer.py ./model_importer.py
   latency: 3                            # model_importer.py ./model_importer.py
   port_pressure: [[1, '0']]             # model_importer.py ./model_importer.py
   throughput: 1.0                       # model_importer.py ./model_importer.py
@@ -2904,9 +2904,9 @@ instruction_forms:
 - name: PAND                            # model_importer.py ./model_importer.py
   operands:                             # model_importer.py ./model_importer.py
   - class: register                     # model_importer.py ./model_importer.py
-    name: mm0                           # model_importer.py ./model_importer.py
+    name: mm                           # model_importer.py ./model_importer.py
   - class: register                     # model_importer.py ./model_importer.py
-    name: mm0                           # model_importer.py ./model_importer.py
+    name: mm                           # model_importer.py ./model_importer.py
   latency: 1                            # model_importer.py ./model_importer.py
   port_pressure: [[1, '0123']]          # model_importer.py ./model_importer.py
   throughput: 0.25                      # model_importer.py ./model_importer.py
@@ -2914,9 +2914,9 @@ instruction_forms:
 - name: PMAXUB                          # model_importer.py ./model_importer.py
   operands:                             # model_importer.py ./model_importer.py
   - class: register                     # model_importer.py ./model_importer.py
-    name: mm0                           # model_importer.py ./model_importer.py
+    name: mm                           # model_importer.py ./model_importer.py
   - class: register                     # model_importer.py ./model_importer.py
-    name: mm0                           # model_importer.py ./model_importer.py
+    name: mm                           # model_importer.py ./model_importer.py
   latency: 1                            # model_importer.py ./model_importer.py
   port_pressure: [[1, '013']]           # model_importer.py ./model_importer.py
   throughput: 0.3333333333333333        # model_importer.py ./model_importer.py
@@ -2924,9 +2924,9 @@ instruction_forms:
 - name: PUNPCKHWD                       # model_importer.py ./model_importer.py
   operands:                             # model_importer.py ./model_importer.py
   - class: register                     # model_importer.py ./model_importer.py
-    name: mm0                           # model_importer.py ./model_importer.py
+    name: mm                           # model_importer.py ./model_importer.py
   - class: register                     # model_importer.py ./model_importer.py
-    name: mm0                           # model_importer.py ./model_importer.py
+    name: mm                           # model_importer.py ./model_importer.py
   latency: 1                            # model_importer.py ./model_importer.py
   port_pressure: [[1, '12']]            # model_importer.py ./model_importer.py
   throughput: 0.5                       # model_importer.py ./model_importer.py
@@ -2934,9 +2934,9 @@ instruction_forms:
 - name: PMINUB                          # model_importer.py ./model_importer.py
   operands:                             # model_importer.py ./model_importer.py
   - class: register                     # model_importer.py ./model_importer.py
-    name: mm0                           # model_importer.py ./model_importer.py
+    name: mm                           # model_importer.py ./model_importer.py
   - class: register                     # model_importer.py ./model_importer.py
-    name: mm0                           # model_importer.py ./model_importer.py
+    name: mm                           # model_importer.py ./model_importer.py
   latency: 1                            # model_importer.py ./model_importer.py
   port_pressure: [[1, '013']]           # model_importer.py ./model_importer.py
   throughput: 0.3333333333333333        # model_importer.py ./model_importer.py
@@ -2944,9 +2944,9 @@ instruction_forms:
 - name: PSUBSW                          # model_importer.py ./model_importer.py
   operands:                             # model_importer.py ./model_importer.py
   - class: register                     # model_importer.py ./model_importer.py
-    name: mm0                           # model_importer.py ./model_importer.py
+    name: mm                           # model_importer.py ./model_importer.py
   - class: register                     # model_importer.py ./model_importer.py
-    name: mm0                           # model_importer.py ./model_importer.py
+    name: mm                           # model_importer.py ./model_importer.py
   latency: 1                            # model_importer.py ./model_importer.py
   port_pressure: [[1, '03']]            # model_importer.py ./model_importer.py
   throughput: 0.5                       # model_importer.py ./model_importer.py
@@ -2954,9 +2954,9 @@ instruction_forms:
 - name: PAVGW                           # model_importer.py ./model_importer.py
   operands:                             # model_importer.py ./model_importer.py
   - class: register                     # model_importer.py ./model_importer.py
-    name: mm0                           # model_importer.py ./model_importer.py
+    name: mm                           # model_importer.py ./model_importer.py
   - class: register                     # model_importer.py ./model_importer.py
-    name: mm0                           # model_importer.py ./model_importer.py
+    name: mm                           # model_importer.py ./model_importer.py
   latency: 1                            # model_importer.py ./model_importer.py
   port_pressure: [[1, '03']]            # model_importer.py ./model_importer.py
   throughput: 0.5                       # model_importer.py ./model_importer.py
@@ -2964,9 +2964,9 @@ instruction_forms:
 - name: PSUBSB                          # model_importer.py ./model_importer.py
   operands:                             # model_importer.py ./model_importer.py
   - class: register                     # model_importer.py ./model_importer.py
-    name: mm0                           # model_importer.py ./model_importer.py
+    name: mm                           # model_importer.py ./model_importer.py
   - class: register                     # model_importer.py ./model_importer.py
-    name: mm0                           # model_importer.py ./model_importer.py
+    name: mm                           # model_importer.py ./model_importer.py
   latency: 1                            # model_importer.py ./model_importer.py
   port_pressure: [[1, '03']]            # model_importer.py ./model_importer.py
   throughput: 0.5                       # model_importer.py ./model_importer.py
@@ -2974,9 +2974,9 @@ instruction_forms:
 - name: PAVGB                           # model_importer.py ./model_importer.py
   operands:                             # model_importer.py ./model_importer.py
   - class: register                     # model_importer.py ./model_importer.py
-    name: mm0                           # model_importer.py ./model_importer.py
+    name: mm                           # model_importer.py ./model_importer.py
   - class: register                     # model_importer.py ./model_importer.py
-    name: mm0                           # model_importer.py ./model_importer.py
+    name: mm                           # model_importer.py ./model_importer.py
   latency: 1                            # model_importer.py ./model_importer.py
   port_pressure: [[1, '03']]            # model_importer.py ./model_importer.py
   throughput: 0.5                       # model_importer.py ./model_importer.py
@@ -2986,7 +2986,7 @@ instruction_forms:
   - class: immediate                    # model_importer.py ./model_importer.py
     imd: int                            # model_importer.py ./model_importer.py
   - class: register                     # model_importer.py ./model_importer.py
-    name: mm0                           # model_importer.py ./model_importer.py
+    name: mm                           # model_importer.py ./model_importer.py
   latency: 1                            # model_importer.py ./model_importer.py
   port_pressure: [[1, '2']]             # model_importer.py ./model_importer.py
   throughput: 1.0                       # model_importer.py ./model_importer.py
@@ -2994,9 +2994,9 @@ instruction_forms:
 - name: PSRAW                           # model_importer.py ./model_importer.py
   operands:                             # model_importer.py ./model_importer.py
   - class: register                     # model_importer.py ./model_importer.py
-    name: mm0                           # model_importer.py ./model_importer.py
+    name: mm                           # model_importer.py ./model_importer.py
   - class: register                     # model_importer.py ./model_importer.py
-    name: mm0                           # model_importer.py ./model_importer.py
+    name: mm                           # model_importer.py ./model_importer.py
   latency: 1                            # model_importer.py ./model_importer.py
   port_pressure: [[1, '2']]             # model_importer.py ./model_importer.py
   throughput: 1.0                       # model_importer.py ./model_importer.py
@@ -3006,7 +3006,7 @@ instruction_forms:
   - class: immediate                    # model_importer.py ./model_importer.py
     imd: int                            # model_importer.py ./model_importer.py
   - class: register                     # model_importer.py ./model_importer.py
-    name: mm0                           # model_importer.py ./model_importer.py
+    name: mm                           # model_importer.py ./model_importer.py
   latency: 1                            # model_importer.py ./model_importer.py
   port_pressure: [[1, '2']]             # model_importer.py ./model_importer.py
   throughput: 1.0                       # model_importer.py ./model_importer.py
@@ -3014,9 +3014,9 @@ instruction_forms:
 - name: PSRAD                           # model_importer.py ./model_importer.py
   operands:                             # model_importer.py ./model_importer.py
   - class: register                     # model_importer.py ./model_importer.py
-    name: mm0                           # model_importer.py ./model_importer.py
+    name: mm                           # model_importer.py ./model_importer.py
   - class: register                     # model_importer.py ./model_importer.py
-    name: mm0                           # model_importer.py ./model_importer.py
+    name: mm                           # model_importer.py ./model_importer.py
   latency: 1                            # model_importer.py ./model_importer.py
   port_pressure: [[1, '2']]             # model_importer.py ./model_importer.py
   throughput: 1.0                       # model_importer.py ./model_importer.py
@@ -3024,9 +3024,9 @@ instruction_forms:
 - name: PACKSSWB                        # model_importer.py ./model_importer.py
   operands:                             # model_importer.py ./model_importer.py
   - class: register                     # model_importer.py ./model_importer.py
-    name: mm0                           # model_importer.py ./model_importer.py
+    name: mm                           # model_importer.py ./model_importer.py
   - class: register                     # model_importer.py ./model_importer.py
-    name: mm0                           # model_importer.py ./model_importer.py
+    name: mm                           # model_importer.py ./model_importer.py
   latency: 1                            # model_importer.py ./model_importer.py
   port_pressure: [[1, '12']]            # model_importer.py ./model_importer.py
   throughput: 0.5                       # model_importer.py ./model_importer.py
@@ -3034,9 +3034,9 @@ instruction_forms:
 - name: PUNPCKLBW                       # model_importer.py ./model_importer.py
   operands:                             # model_importer.py ./model_importer.py
   - class: register                     # model_importer.py ./model_importer.py
-    name: mm0                           # model_importer.py ./model_importer.py
+    name: mm                           # model_importer.py ./model_importer.py
   - class: register                     # model_importer.py ./model_importer.py
-    name: mm0                           # model_importer.py ./model_importer.py
+    name: mm                           # model_importer.py ./model_importer.py
   latency: 1                            # model_importer.py ./model_importer.py
   port_pressure: [[1, '12']]            # model_importer.py ./model_importer.py
   throughput: 0.5                       # model_importer.py ./model_importer.py
@@ -3396,9 +3396,9 @@ instruction_forms:
 - name: PMULHRSW                        # model_importer.py ./model_importer.py
   operands:                             # model_importer.py ./model_importer.py
   - class: register                     # model_importer.py ./model_importer.py
-    name: mm0                           # model_importer.py ./model_importer.py
+    name: mm                           # model_importer.py ./model_importer.py
   - class: register                     # model_importer.py ./model_importer.py
-    name: mm0                           # model_importer.py ./model_importer.py
+    name: mm                           # model_importer.py ./model_importer.py
   latency: 4                            # model_importer.py ./model_importer.py
   port_pressure: [[1, '0']]             # model_importer.py ./model_importer.py
   throughput: 1.0                       # model_importer.py ./model_importer.py
@@ -3416,9 +3416,9 @@ instruction_forms:
 - name: PSIGNW                          # model_importer.py ./model_importer.py
   operands:                             # model_importer.py ./model_importer.py
   - class: register                     # model_importer.py ./model_importer.py
-    name: mm0                           # model_importer.py ./model_importer.py
+    name: mm                           # model_importer.py ./model_importer.py
   - class: register                     # model_importer.py ./model_importer.py
-    name: mm0                           # model_importer.py ./model_importer.py
+    name: mm                           # model_importer.py ./model_importer.py
   latency: 1                            # model_importer.py ./model_importer.py
   port_pressure: [[1, '03']]            # model_importer.py ./model_importer.py
   throughput: 0.5                       # model_importer.py ./model_importer.py
@@ -3436,9 +3436,9 @@ instruction_forms:
 - name: PSIGND                          # model_importer.py ./model_importer.py
   operands:                             # model_importer.py ./model_importer.py
   - class: register                     # model_importer.py ./model_importer.py
-    name: mm0                           # model_importer.py ./model_importer.py
+    name: mm                           # model_importer.py ./model_importer.py
   - class: register                     # model_importer.py ./model_importer.py
-    name: mm0                           # model_importer.py ./model_importer.py
+    name: mm                           # model_importer.py ./model_importer.py
   latency: 1                            # model_importer.py ./model_importer.py
   port_pressure: [[1, '03']]            # model_importer.py ./model_importer.py
   throughput: 0.5                       # model_importer.py ./model_importer.py
@@ -3456,9 +3456,9 @@ instruction_forms:
 - name: PSIGNB                          # model_importer.py ./model_importer.py
   operands:                             # model_importer.py ./model_importer.py
   - class: register                     # model_importer.py ./model_importer.py
-    name: mm0                           # model_importer.py ./model_importer.py
+    name: mm                           # model_importer.py ./model_importer.py
   - class: register                     # model_importer.py ./model_importer.py
-    name: mm0                           # model_importer.py ./model_importer.py
+    name: mm                           # model_importer.py ./model_importer.py
   latency: 1                            # model_importer.py ./model_importer.py
   port_pressure: [[1, '03']]            # model_importer.py ./model_importer.py
   throughput: 0.5                       # model_importer.py ./model_importer.py
@@ -3476,9 +3476,9 @@ instruction_forms:
 - name: PMADDUBSW                       # model_importer.py ./model_importer.py
   operands:                             # model_importer.py ./model_importer.py
   - class: register                     # model_importer.py ./model_importer.py
-    name: mm0                           # model_importer.py ./model_importer.py
+    name: mm                           # model_importer.py ./model_importer.py
   - class: register                     # model_importer.py ./model_importer.py
-    name: mm0                           # model_importer.py ./model_importer.py
+    name: mm                           # model_importer.py ./model_importer.py
   latency: 4                            # model_importer.py ./model_importer.py
   port_pressure: [[1, '0']]             # model_importer.py ./model_importer.py
   throughput: 1.0                       # model_importer.py ./model_importer.py
@@ -3496,9 +3496,9 @@ instruction_forms:
 - name: PABSW                           # model_importer.py ./model_importer.py
   operands:                             # model_importer.py ./model_importer.py
   - class: register                     # model_importer.py ./model_importer.py
-    name: mm0                           # model_importer.py ./model_importer.py
+    name: mm                           # model_importer.py ./model_importer.py
   - class: register                     # model_importer.py ./model_importer.py
-    name: mm0                           # model_importer.py ./model_importer.py
+    name: mm                           # model_importer.py ./model_importer.py
   latency: 1                            # model_importer.py ./model_importer.py
   port_pressure: [[1, '03']]            # model_importer.py ./model_importer.py
   throughput: 0.5                       # model_importer.py ./model_importer.py
@@ -3518,9 +3518,9 @@ instruction_forms:
   - class: immediate                    # model_importer.py ./model_importer.py
     imd: int                            # model_importer.py ./model_importer.py
   - class: register                     # model_importer.py ./model_importer.py
-    name: mm0                           # model_importer.py ./model_importer.py
+    name: mm                           # model_importer.py ./model_importer.py
   - class: register                     # model_importer.py ./model_importer.py
-    name: mm0                           # model_importer.py ./model_importer.py
+    name: mm                           # model_importer.py ./model_importer.py
   latency: 1                            # model_importer.py ./model_importer.py
   port_pressure: [[1, '12']]            # model_importer.py ./model_importer.py
   throughput: 0.5                       # model_importer.py ./model_importer.py
@@ -3540,9 +3540,9 @@ instruction_forms:
 - name: PSHUFB                          # model_importer.py ./model_importer.py
   operands:                             # model_importer.py ./model_importer.py
   - class: register                     # model_importer.py ./model_importer.py
-    name: mm0                           # model_importer.py ./model_importer.py
+    name: mm                           # model_importer.py ./model_importer.py
   - class: register                     # model_importer.py ./model_importer.py
-    name: mm0                           # model_importer.py ./model_importer.py
+    name: mm                           # model_importer.py ./model_importer.py
   latency: 1                            # model_importer.py ./model_importer.py
   port_pressure: [[1, '12']]            # model_importer.py ./model_importer.py
   throughput: 0.5                       # model_importer.py ./model_importer.py
@@ -3560,9 +3560,9 @@ instruction_forms:
 - name: PABSD                           # model_importer.py ./model_importer.py
   operands:                             # model_importer.py ./model_importer.py
   - class: register                     # model_importer.py ./model_importer.py
-    name: mm0                           # model_importer.py ./model_importer.py
+    name: mm                           # model_importer.py ./model_importer.py
   - class: register                     # model_importer.py ./model_importer.py
-    name: mm0                           # model_importer.py ./model_importer.py
+    name: mm                           # model_importer.py ./model_importer.py
   latency: 1                            # model_importer.py ./model_importer.py
   port_pressure: [[1, '03']]            # model_importer.py ./model_importer.py
   throughput: 0.5                       # model_importer.py ./model_importer.py
@@ -3580,9 +3580,9 @@ instruction_forms:
 - name: PABSB                           # model_importer.py ./model_importer.py
   operands:                             # model_importer.py ./model_importer.py
   - class: register                     # model_importer.py ./model_importer.py
-    name: mm0                           # model_importer.py ./model_importer.py
+    name: mm                           # model_importer.py ./model_importer.py
   - class: register                     # model_importer.py ./model_importer.py
-    name: mm0                           # model_importer.py ./model_importer.py
+    name: mm                           # model_importer.py ./model_importer.py
   latency: 1                            # model_importer.py ./model_importer.py
   port_pressure: [[1, '03']]            # model_importer.py ./model_importer.py
   throughput: 0.5                       # model_importer.py ./model_importer.py
