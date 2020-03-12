@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 
 import base64
+import os
 import pickle
 import re
-import os
 import string
 from copy import deepcopy
 from itertools import product
@@ -546,7 +546,7 @@ class MachineModel(object):
         )
         for key in operand_attributes:
             try:
-                if operand_1[key] != operand_2[key]:
+                if operand_1[key] != operand_2[key] and not any([x == self.WILDCARD for x in [operand_1[key], operand_2[key]]]):
                     return False
             except KeyError:
                 return False
@@ -554,6 +554,17 @@ class MachineModel(object):
 
     def _is_AArch64_reg_type(self, i_reg, reg):
         """Check if register type match."""
+        # check for wildcards
+        if reg['prefix'] == self.WILDCARD or i_reg['prefix'] == self.WILDCARD:
+            if 'shape' in reg:
+                if 'shape' in i_reg and (
+                    reg['shape'] == i_reg['shape']
+                    or self.WILDCARD in (reg['shape'] + i_reg['shape'])
+                ):
+                    return True
+                return False
+            return True
+        # check for prefix and shape
         if reg['prefix'] != i_reg['prefix']:
             return False
         if 'shape' in reg:
@@ -564,6 +575,9 @@ class MachineModel(object):
 
     def _is_x86_reg_type(self, i_reg_name, reg):
         """Check if register type match."""
+        # check for wildcards
+        if i_reg_name == self.WILDCARD or reg['name'] == self.WILDCARD:
+            return True
         # differentiate between vector registers (mm, xmm, ymm, zmm) and others (gpr)
         parser_x86 = ParserX86ATT()
         if parser_x86.is_vector_register(reg):
