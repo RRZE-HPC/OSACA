@@ -7,16 +7,6 @@ isa: "x86"
 instruction_forms:
     - name: adc
       operands:
-        - class: "immediate"
-          imd: "int"
-          source: true
-          destination: false
-        - class: "register"
-          name: "gpr"
-          source: true
-          destination: true
-    - name: adc
-      operands:
         - class: "register"
           name: "gpr"
           source: true
@@ -31,11 +21,8 @@ instruction_forms:
           imd: "int"
           source: true
           destination: false
-        - class: "memory"
-          base: "*"
-          offset: "*"
-          index: "*"
-          scale: "*"
+        - class: "register"
+          name: "gpr"
           source: true
           destination: true
     - name: adc
@@ -44,11 +31,8 @@ instruction_forms:
           name: "gpr"
           source: true
           destination: false
-        - class: "memory"
-          base: "*"
-          offset: "*"
-          index: "*"
-          scale: "*"
+        - class: "register"
+          name: "gpr"
           source: true
           destination: true
     - name: add
@@ -2887,55 +2871,88 @@ instruction_forms:
           source: true
           destination: false
       # TODO sets MXCSR
-    - name: vfmadd132pd
+    - name: [vfmadd132pd, vfmadd213pd, vfmadd231pd]
       operands:
-        - class: "memory"
-          base: "*"
-          offset: "*"
-          index: "*"
-          scale: "*"
+        - class: "register"
+          name: "*"
           source: true
           destination: false
         - class: "register"
-          name: "ymm"
+          name: "*"
           source: true
           destination: false
         - class: "register"
-          name: "ymm"
+          name: "*"
           source: true
           destination: true
-    - name: vfmadd213pd
+    - name: [vfmadd132ps, vfmadd213ps, vfmadd231ps]
       operands:
-        - class: "memory"
-          base: "*"
-          offset: "*"
-          index: "*"
-          scale: "*"
+        - class: "register"
+          name: "*"
           source: true
           destination: false
         - class: "register"
-          name: "ymm"
+          name: "*"
           source: true
           destination: false
         - class: "register"
-          name: "ymm"
+          name: "*"
           source: true
           destination: true
-    - name: vfmadd231pd
+    - name: [vfmadd132sd, vfmadd213sd, vfmadd231sd]
       operands:
-        - class: "memory"
-          base: "*"
-          offset: "*"
-          index: "*"
-          scale: "*"
+        - class: "register"
+          name: "xmm"
           source: true
           destination: false
         - class: "register"
-          name: "ymm"
+          name: "xmm"
           source: true
           destination: false
         - class: "register"
-          name: "ymm"
+          name: "xmm"
+          source: true
+          destination: true
+    - name: [vfmadd132ss, vfmadd213ss, vfmadd231ss]
+      operands:
+        - class: "register"
+          name: "xmm"
+          source: true
+          destination: false
+        - class: "register"
+          name: "xmm"
+          source: true
+          destination: false
+        - class: "register"
+          name: "xmm"
+          source: true
+          destination: true
+    - name: [vfmaddsub132pd, vfmaddsub213pd, vfmaddsub231pd]
+      operands:
+        - class: "register"
+          name: "*"
+          source: true
+          destination: false
+        - class: "register"
+          name: "*"
+          source: true
+          destination: false
+        - class: "register"
+          name: "*"
+          source: true
+          destination: true
+    - name: [vfmaddsub132ps, vfmaddsub213ps, vfmaddsub231ps]
+      operands:
+        - class: "register"
+          name: "*"
+          source: true
+          destination: false
+        - class: "register"
+          name: "*"
+          source: true
+          destination: false
+        - class: "register"
+          name: "*"
           source: true
           destination: true
     - name: vextractf128
