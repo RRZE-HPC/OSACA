@@ -3,7 +3,6 @@
 Unit tests for DB interface
 """
 import os
-import sys
 import unittest
 from io import StringIO
 
@@ -72,14 +71,14 @@ class TestDBInterface(unittest.TestCase):
     def test_sanity_check(self):
         output = StringIO()
         # non-verbose
-        sanity_check('csx', verbose=False, output_file=output)
-        sanity_check('tx2', verbose=False, output_file=output)
-        sanity_check('zen1', verbose=False, output_file=output)
+        sanity_check('csx', verbose=False, internet_check=False, output_file=output)
+        sanity_check('tx2', verbose=False, internet_check=False, output_file=output)
+        sanity_check('zen1', verbose=False, internet_check=False, output_file=output)
 
         # verbose
-        sanity_check('csx', verbose=True, output_file=output)
-        sanity_check('tx2', verbose=True, output_file=output)
-        sanity_check('zen1', verbose=True, output_file=output)
+        sanity_check('csx', verbose=True, internet_check=False, output_file=output)
+        sanity_check('tx2', verbose=True, internet_check=False, output_file=output)
+        sanity_check('zen1', verbose=True, internet_check=False, output_file=output)
 
     def test_ibench_import(self):
         # only check import without dumping the DB file (takes too much time)
