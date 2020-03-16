@@ -12,6 +12,7 @@ from unittest.mock import patch
 
 import osaca.osaca as osaca
 from osaca.parser import ParserAArch64v81, ParserX86ATT
+from osaca.semantics import MachineModel
 
 
 class ErrorRaisingArgumentParser(argparse.ArgumentParser):
@@ -137,6 +138,20 @@ class TestCLI(unittest.TestCase):
                         output = StringIO()
                         osaca.run(args, output_file=output)
                         self.assertTrue('WARNING' not in output.getvalue())
+
+    def test_architectures(self):
+        parser = osaca.create_parser()
+        # Run the test kernel for all architectures
+        archs = osaca.SUPPORTED_ARCHS
+        for arch in archs:
+            with self.subTest(micro_arch=arch):
+                isa = MachineModel.get_isa_for_arch(arch)
+                kernel = 'kernel_{}.s'.format(isa)
+                args = parser.parse_args(
+                    ['--arch', arch, self._find_test_file(kernel)]
+                )
+                output = StringIO()
+                osaca.run(args, output_file=output)
 
     ##################
     # Helper functions
