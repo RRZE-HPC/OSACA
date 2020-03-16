@@ -17,6 +17,7 @@ MODULE_DATA_DIR = os.path.join(
 )
 LOCAL_OSACA_DIR = os.path.join(os.path.expanduser('~') + '/.osaca/')
 DATA_DIR = os.path.join(LOCAL_OSACA_DIR, 'data/')
+SUPPORTED_ARCHS = ['SNB', 'IVB', 'HSW', 'BDW', 'SKX', 'CSX', 'ZEN1', 'ZEN2', 'TX2']
 
 
 # Stolen from pip
@@ -141,10 +142,9 @@ def check_arguments(args, parser):
     :param args: arguments given from :class:`~argparse.ArgumentParser` after parsing
     :param parser: :class:`~argparse.ArgumentParser` object
     """
-    supported_archs = ['SNB', 'IVB', 'HSW', 'BDW', 'SKX', 'CSX', 'ZEN1', 'ZEN2', 'TX2']
     supported_import_files = ['ibench', 'asmbench']
 
-    if 'arch' in args and (args.arch is None or args.arch.upper() not in supported_archs):
+    if 'arch' in args and (args.arch is None or args.arch.upper() not in SUPPORTED_ARCHS):
         parser.error(
             'Microarchitecture not supported. Please see --help for all valid architecture codes.'
         )
