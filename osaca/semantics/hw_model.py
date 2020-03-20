@@ -318,7 +318,8 @@ class MachineModel(object):
             # Check if modification date of DB is older than cached version
             if os.path.getmtime(filepath) < os.path.getmtime(cachepath):
                 # load cached version
-                cached_db = pickle.load(open(cachepath, 'rb'))
+                with open(cachepath, 'rb') as f:
+                    cached_db = pickle.load(f)
                 return cached_db
             else:
                 # DB newer than cached version --> delete cached file and return False
