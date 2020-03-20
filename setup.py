@@ -91,8 +91,8 @@ setup(
     # https://packaging.python.org/en/latest/requirements.html
     install_requires=[
         'networkx',
-        'pyparsing',
-        'ruamel.yaml',
+        'pyparsing>=2.3.1',
+        'ruamel.yaml>=0.15.71',
     ],
     python_requires='>=3.5',
 
