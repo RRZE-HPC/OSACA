@@ -279,7 +279,7 @@ class Frontend(object):
             '------------------\n'
             '                     No final analysis is given. If you want to ignore this\n'
             '                     warning and run the analysis anyway, start osaca with\n'
-            '                                       --ignore_unknown flag.\n'
+            '                                       --ignore-unknown flag.\n'
             '--------------------------------------------------------------------------------'
             '----------------{}\n'
         ).format(amount, '-' * len(str(amount)))
