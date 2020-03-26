@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import re
 import string
 
 import pyparsing as pp
@@ -108,23 +109,19 @@ class ParserX86ATT(BaseParser):
         ).setResultsName(self.MEMORY_ID)
 
         # Directive
-        directive_option = pp.Combine(
-            pp.Word('#@.', exact=1) + pp.Word(pp.printables, excludeChars=',')
-        )
         directive_parameter = (
             pp.quotedString
-            ^ directive_option
-            ^ identifier
-            ^ hex_number
-            ^ decimal_number
-            ^ self.register
-            ^ pp.Group(pp.Word(pp.alphanums + '_').setResultsName('name'))
+            ^ (
+                pp.Word(pp.printables, excludeChars=',#')
+                + pp.Optional(pp.Suppress(pp.Literal(',')))
+            )
+            ^ pp.Suppress(pp.Literal(','))
         )
-        commaSeparatedList = pp.delimitedList(pp.Optional(directive_parameter), delim=',')
         self.directive = pp.Group(
             pp.Literal('.')
             + pp.Word(pp.alphanums + '_').setResultsName('name')
-            + commaSeparatedList.setResultsName('parameters')
+            # + pp.ZeroOrMore(directive_parameter).setResultsName('parameters')
+            + pp.ZeroOrMore(directive_parameter).setResultsName('parameters')
             + pp.Optional(self.comment)
         ).setResultsName(self.DIRECTIVE_ID)
 
@@ -277,7 +274,17 @@ class ParserX86ATT(BaseParser):
             return self.process_immediate(operand[self.IMMEDIATE_ID])
         if self.LABEL_ID in operand:
             return self.process_label(operand[self.LABEL_ID])
+        if self.DIRECTIVE_ID in operand:
+            return self.process_directive(operand[self.DIRECTIVE_ID])
         return operand
+
+    def process_directive(self, directive):
+        directive_new = {'name': directive['name'], 'parameters': []}
+        if 'parameters' in directive:
+            directive_new['parameters'] = directive['parameters']
+        if 'comment' in directive:
+            directive_new['comment'] = directive['comment']
+        return AttrDict({self.DIRECTIVE_ID: directive_new})
 
     def process_memory_address(self, memory_address):
         """Post-process memory address operand"""

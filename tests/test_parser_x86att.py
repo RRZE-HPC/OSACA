@@ -47,18 +47,26 @@ class TestParserX86ATT(unittest.TestCase):
         self.assertEqual(len(self._get_directive(self.parser, '\t.align\t16,0x90').parameters), 2)
         self.assertEqual(
             self._get_directive(self.parser, '\t.set\tL$set$0,LECIE1-LSCIE1').parameters,
-            [{'name': 'L$set$0'}, {'name': 'LECIE1-LSCIE1'}])
+            ['L$set$0', 'LECIE1-LSCIE1'],
+        )
         self.assertEqual(
             self._get_directive(
-                self.parser, 
-                '\t.section __TEXT,__eh_frame,coalesced,no_toc+strip_static_syms+live_support'
-                ).parameters,
-            [{'name': v} for v in 
-             ['__TEXT', '__eh_frame', 'coalesced', 'no_toc+strip_static_syms+live_support']])
+                self.parser,
+                '\t.section __TEXT,__eh_frame,coalesced,no_toc+strip_static_syms+live_support',
+            ).parameters,
+            [
+                '__TEXT',
+                '__eh_frame',
+                'coalesced',
+                'no_toc+strip_static_syms+live_support',
+            ],
+        )
         self.assertEqual(
             self._get_directive(
-                self.parser, '\t.section\t__TEXT,__literal16,16byte_literals').parameters,
-            [{'name': v} for v in ['__TEXT', '__literal16', '16byte_literals']])
+                self.parser, '\t.section\t__TEXT,__literal16,16byte_literals'
+            ).parameters,
+            ['__TEXT', '__literal16', '16byte_literals'],
+        )
         self.assertEqual(
             self._get_directive(self.parser, '\t.align\t16,0x90').parameters[1], '0x90'
         )
@@ -169,7 +177,7 @@ class TestParserX86ATT(unittest.TestCase):
         instruction_form_3 = {
             'instruction': None,
             'operands': [],
-            'directive': {'name': 'quad', 'parameters': [{'name': '.2.3_2__kmpc_loc_pack.2'}]},
+            'directive': {'name': 'quad', 'parameters': ['.2.3_2__kmpc_loc_pack.2']},
             'comment': 'qed',
             'label': None,
             'line': '.quad   .2.3_2__kmpc_loc_pack.2 #qed',
@@ -186,9 +194,7 @@ class TestParserX86ATT(unittest.TestCase):
                         'scale': 1,
                     }
                 },
-                {
-                    'register': {'name': 'ecx'}
-                }
+                {'register': {'name': 'ecx'}},
             ],
             'directive': None,
             'comment': '12.9',

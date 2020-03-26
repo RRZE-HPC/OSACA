@@ -188,9 +188,9 @@ def insert_byte_marker(args):
         from kerncraft.incore_model import asm_instrumentation
     except ImportError:
         print(
-            "Module kerncraft not installed. Use 'pip install --user "
-            "kerncraft' for installation.\nFor more information see "
-            "https://github.com/RRZE-HPC/kerncraft",
+            'Module kerncraft not installed. Use \'pip install --user '
+            'kerncraft\' for installation.\nFor more information see '
+            'https://github.com/RRZE-HPC/kerncraft',
             file=sys.stderr,
         )
         sys.exit(1)
