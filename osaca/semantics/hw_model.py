@@ -337,7 +337,8 @@ class MachineModel(object):
         """
         hashname = self._get_hashname(filepath)
         filepath = os.path.join(utils.CACHE_DIR, hashname + '.pickle')
-        pickle.dump(data, open(filepath, 'wb'))
+        with open(filepath, 'wb') as f:
+            pickle.dump(data, f)
 
     def _get_hashname(self, name):
         """Returns unique hashname for machine model"""
@@ -397,7 +398,7 @@ class MachineModel(object):
                 operand_string += 'p' if operand['post-indexed'] else ''
         return operand_string
 
-    def _create_db_operand_aarch64(operand):
+    def _create_db_operand_aarch64(self, operand):
         """Create instruction form operand for DB out of operand string."""
         if operand == 'i':
             return {'class': 'immediate', 'imd': 'int'}
@@ -418,7 +419,7 @@ class MachineModel(object):
         else:
             raise ValueError('Parameter {} is not a valid operand code'.format(operand))
 
-    def _create_db_operand_x86(operand):
+    def _create_db_operand_x86(self, operand):
         """Create instruction form operand for DB out of operand string."""
         if operand == 'r':
             return {'class': 'register', 'name': 'gpr'}
