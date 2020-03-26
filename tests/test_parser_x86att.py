@@ -45,6 +45,14 @@ class TestParserX86ATT(unittest.TestCase):
         self.assertEqual(len(self._get_directive(self.parser, '\t.text').parameters), 0)
         self.assertEqual(self._get_directive(self.parser, '\t.align\t16,0x90').name, 'align')
         self.assertEqual(len(self._get_directive(self.parser, '\t.align\t16,0x90').parameters), 2)
+        self.assertEqual(len(self._get_directive(self.parser, '.text').parameters), 0)
+        self.assertEqual(
+            len(self._get_directive(self.parser, '.file\t1 "path/to/file.c"').parameters), 2
+        )
+        self.assertEqual(
+            self._get_directive(self.parser, '.file\t1 "path/to/file.c"').parameters[1],
+            '"path/to/file.c"',
+        )
         self.assertEqual(
             self._get_directive(self.parser, '\t.set\tL$set$0,LECIE1-LSCIE1').parameters,
             ['L$set$0', 'LECIE1-LSCIE1'],
@@ -54,12 +62,7 @@ class TestParserX86ATT(unittest.TestCase):
                 self.parser,
                 '\t.section __TEXT,__eh_frame,coalesced,no_toc+strip_static_syms+live_support',
             ).parameters,
-            [
-                '__TEXT',
-                '__eh_frame',
-                'coalesced',
-                'no_toc+strip_static_syms+live_support',
-            ],
+            ['__TEXT', '__eh_frame', 'coalesced', 'no_toc+strip_static_syms+live_support'],
         )
         self.assertEqual(
             self._get_directive(
