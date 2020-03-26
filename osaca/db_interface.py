@@ -274,9 +274,18 @@ def _create_db_operand_x86(operand):
 
 
 def _scrape_from_felixcloutier(mnemonic):
-    """Scrape src/dst information from felixcloutier website and return infromation for user."""
-    from bs4 import BeautifulSoup
+    """Scrape src/dst information from felixcloutier website and return information for user."""
     import requests
+
+    try:
+        from bs4 import BeautifulSoup
+    except ImportError:
+        print(
+            'Module BeautifulSoup not installed. Fetching instruction form information '
+            'online requires BeautifulSoup.\nUse \'pip install bs4\' for installation.',
+            file=sys.stderr,
+        )
+        sys.exit(1)
 
     index = 'https://www.felixcloutier.com/x86/index.html'
     base_url = 'https://www.felixcloutier.com/x86/'
@@ -287,12 +296,15 @@ def _scrape_from_felixcloutier(mnemonic):
 
     # GET website
     r = requests.get(url=url)
-    # Parse result
-    soup = BeautifulSoup(r.text, 'html.parser')
     if r.status_code == 200:
         # Found result
-        table = soup.find('h2', attrs={'id': 'instruction-operand-encoding'}).findNextSibling()
-        operands = _get_src_dst_from_table(table)
+        operand_enc = BeautifulSoup(r.text, 'html.parser').find(
+            'h2', attrs={'id': 'instruction-operand-encoding'}
+        )
+        if operand_enc:
+            # operand encoding found, otherwise, no need to mark as suspicous
+            table = operand_enc.findNextSibling()
+            operands = _get_src_dst_from_table(table)
     elif r.status_code == 404:
         # Check for alternative href
         index = BeautifulSoup(requests.get(url=index).text, 'html.parser')
@@ -300,12 +312,15 @@ def _scrape_from_felixcloutier(mnemonic):
         if len(alternatives) > 0:
             # alternative(s) found, take first one
             url = base_url + alternatives[0].attrs['href'][2:]
-            table = (
-                BeautifulSoup(requests.get(url=url).text, 'html.parser')
-                .find('h2', attrs={'id': 'instruction-operand-encoding'})
-                .findNextSibling()
+            operand_enc = BeautifulSoup(requests.get(url=url).text, 'html.parser').find(
+                'h2', attrs={'id': 'instruction-operand-encoding'}
             )
-            operands = _get_src_dst_from_table(table)
+            if operand_enc:
+                # operand encoding found, otherwise, no need to mark as suspicous
+                table = (
+                    operand_enc.findNextSibling()
+                )
+                operands = _get_src_dst_from_table(table)
     if operands:
         # Found src/dst assignment for NUM_OPERANDS
         if not any(['r' in x and 'w' in x for x in operands]):
@@ -388,6 +403,7 @@ def _check_sanity_arch_db(arch_mm, isa_mm, internet_check=True):
         # instr forms with less than 3 operands might need an ISA DB entry due to src_reg operands
         if (
             len(instr_form['operands']) < 3
+            and len(instr_form['operands']) > 1
             and 'mov' not in instr_form['name'].lower()
             and not instr_form['name'].lower().startswith('j')
             and instr_form not in suspicious_instructions
