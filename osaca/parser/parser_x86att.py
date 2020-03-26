@@ -109,6 +109,8 @@ class ParserX86ATT(BaseParser):
         ).setResultsName(self.MEMORY_ID)
 
         # Directive
+        # parameter can be any quoted string or sequence of characters besides '#' (for comments)
+        # or ',' (parameter delimiter)
         directive_parameter = (
             pp.quotedString
             ^ (
@@ -120,7 +122,6 @@ class ParserX86ATT(BaseParser):
         self.directive = pp.Group(
             pp.Literal('.')
             + pp.Word(pp.alphanums + '_').setResultsName('name')
-            # + pp.ZeroOrMore(directive_parameter).setResultsName('parameters')
             + pp.ZeroOrMore(directive_parameter).setResultsName('parameters')
             + pp.Optional(self.comment)
         ).setResultsName(self.DIRECTIVE_ID)
