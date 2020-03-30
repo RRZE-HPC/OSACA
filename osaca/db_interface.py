@@ -384,6 +384,7 @@ def _check_sanity_arch_db(arch_mm, isa_mm, internet_check=True):
     missing_port_pressure = []
     suspicious_instructions = []
     duplicate_instr_arch = []
+    duplicate_strings = []
 
     for instr_form in arch_mm['instruction_forms']:
         # check value in DB entry
@@ -422,9 +423,10 @@ def _check_sanity_arch_db(arch_mm, isa_mm, internet_check=True):
             duplicate_instr_arch.append(instr_form)
     # every entry exists twice --> uniquify
     tmp_list = []
-    for i in range(0, len(duplicate_instr_arch)):
+    for _ in range(0, len(duplicate_instr_arch)):
         tmp = duplicate_instr_arch.pop()
-        if tmp not in duplicate_instr_arch:
+        if _get_full_instruction_name(tmp).lower() not in duplicate_strings:
+            duplicate_strings.append(_get_full_instruction_name(tmp).lower())
             tmp_list.append(tmp)
     duplicate_instr_arch = tmp_list
     return (
