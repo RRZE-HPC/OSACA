@@ -25,16 +25,6 @@ instruction_forms:
           name: "gpr"
           source: true
           destination: true
-    - name: adc
-      operands:
-        - class: "register"
-          name: "gpr"
-          source: true
-          destination: false
-        - class: "register"
-          name: "gpr"
-          source: true
-          destination: true
     - name: add
       operands:
         - class: "immediate"
@@ -191,7 +181,7 @@ instruction_forms:
           name: "xmm"
           source: true
           destination: false
-    - name: addss
+    - name: [addss, addps, addpd]
       operands:
         - class: "register"
           name: "xmm"
@@ -201,6 +191,26 @@ instruction_forms:
           name: "xmm"
           source: true
           destination: false
+    - name: [addsubps, addsubpd]
+      operands:
+        - class: "register"
+          name: "xmm"
+          source: true
+          destination: false
+        - class: "register"
+          name: "xmm"
+          source: true
+          destination: true
+    - name: [aesdec, aesdeclast, aesenc, aesenclast]
+      operands:
+        - class: "register"
+          name: "xmm"
+          source: true
+          destination: false
+        - class: "register"
+          name: "xmm"
+          source: true
+          destination: true
     - name: and
       operands:
         - class: "immediate"
@@ -261,6 +271,21 @@ instruction_forms:
           name: "gpr"
           source: false
           destination: true
+    - name: [blendvps, blendvpd]
+      operands:
+        - class: "register"
+          name: "xmm"
+          source: true
+          destination: false
+        - class: "register"
+          name: "xmm"
+          source: true
+          destination: true
+      hidden_operands:
+        - class: "register"
+          name: "xmm0"
+          source: true
+          destination: false
     - name: blsr
       operands:
         - class: "register"
@@ -2494,6 +2519,16 @@ instruction_forms:
           source: true
           destination: false
       # TODO sets MXCSR
+    - name: [maxpd, maxps, maxsd, maxss, minpd, minps, minsd, minss]
+      operands:
+        - class: "register"
+          name: "xmm"
+          source: true
+          destination: false
+        - class: "register"
+          name: "xmm"
+          source: true
+          destination: true
     - name: mulsd
       operands:
         - class: "register"
@@ -2515,6 +2550,16 @@ instruction_forms:
           source: true
           destination: true
     - name: mulpd
+      operands:
+        - class: "register"
+          name: "xmm"
+          source: true
+          destination: false
+        - class: "register"
+          name: "xmm"
+          source: true
+          destination: true
+    - name: [pand, por, pxor]
       operands:
         - class: "register"
           name: "xmm"
@@ -2763,6 +2808,16 @@ instruction_forms:
           name: "CF"
           source: false
           destination: true
+    - name: [subss, subps]
+      operands:
+        - class: "register"
+          name: "xmm"
+          source: true
+          destination: false
+        - class: "register"
+          name: "xmm"
+          source: true
+          destination: true
     - name: test
       operands:
         - class: "register"
@@ -2955,6 +3010,90 @@ instruction_forms:
           name: "*"
           source: true
           destination: true
+    - name: [vfmsub132pd, vfmsub213pd, vfmsub231pd]
+      operands:
+        - class: "register"
+          name: "*"
+          source: true
+          destination: false
+        - class: "register"
+          name: "*"
+          source: true
+          destination: false
+        - class: "register"
+          name: "*"
+          source: true
+          destination: true
+    - name: [vfmsub132ps, vfmsub213ps, vfmsub231ps]
+      operands:
+        - class: "register"
+          name: "*"
+          source: true
+          destination: false
+        - class: "register"
+          name: "*"
+          source: true
+          destination: false
+        - class: "register"
+          name: "*"
+          source: true
+          destination: true
+    - name: [vfmsub132sd, vfmsub213sd, vfmsub231sd]
+      operands:
+        - class: "register"
+          name: "xmm"
+          source: true
+          destination: false
+        - class: "register"
+          name: "xmm"
+          source: true
+          destination: false
+        - class: "register"
+          name: "xmm"
+          source: true
+          destination: true
+    - name: [vfmsub132ss, vfmsub213ss, vfmsub231ss]
+      operands:
+        - class: "register"
+          name: "xmm"
+          source: true
+          destination: false
+        - class: "register"
+          name: "xmm"
+          source: true
+          destination: false
+        - class: "register"
+          name: "xmm"
+          source: true
+          destination: true
+    - name: [vfmsubadd132pd, vfmsubadd213pd, vfmsubadd231pd]
+      operands:
+        - class: "register"
+          name: "*"
+          source: true
+          destination: false
+        - class: "register"
+          name: "*"
+          source: true
+          destination: false
+        - class: "register"
+          name: "*"
+          source: true
+          destination: true
+    - name: [vfmsubadd132ps, vfmsubadd213ps, vfmsubadd231ps]
+      operands:
+        - class: "register"
+          name: "*"
+          source: true
+          destination: false
+        - class: "register"
+          name: "*"
+          source: true
+          destination: false
+        - class: "register"
+          name: "*"
+          source: true
+          destination: true
     - name: vextractf128
       operands:
         - class: "immediate"
@@ -3121,4 +3260,24 @@ instruction_forms:
         - class: "register"
           name: "ymm15"
           source: false
+          destination: true
+    - name: [unpckhps, unpckhpd]
+      operands:
+        - class: "register"
+          name: "xmm"
+          source: true
+          destination: false
+        - class: "register"
+          name: "xmm"
+          source: true
+          destination: true
+    - name: [andps, andpd, andnps, andnpd, orps, orpd, xorps, xorpd]
+      operands:
+        - class: "register"
+          name: "xmm"
+          source: true
+          destination: false
+        - class: "register"
+          name: "xmm"
+          source: true
           destination: true
