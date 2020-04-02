@@ -124,6 +124,18 @@ class TestDBInterface(unittest.TestCase):
         with self.assertRaises(AssertionError):
             dbi.import_benchmark_output('csx', 'ibench', 'invalid_file')
 
+    def test_online_scraping(self):
+        # addpd -- suspicious instruction, normal URL
+        instr_1 = ['addpd', (True, '(r) (r,w)')]
+        self.assertEqual(dbi._scrape_from_felixcloutier(instr_1[0]), instr_1[1])
+        # movpd -- not suspicious,
+        instr_2 = ['movapd', (False, '(r) (w)')]
+        self.assertEqual(dbi._scrape_from_felixcloutier(instr_2[0]), instr_2[1])
+        # vfmadd132pd -- only in combined view with 213/231.
+        # No 2-operand version, therefore, empty string
+        instr_3 = ['vfmadd132pd', (True, '')]
+        self.assertEqual(dbi._scrape_from_felixcloutier(instr_3[0]), instr_3[1])
+
     ##################
     # Helper functions
     ##################
