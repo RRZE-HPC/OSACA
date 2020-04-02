@@ -85,7 +85,7 @@ class MOVEntryBuilder:
 class MOVEntryBuilderIntelNoPort7AGU(MOVEntryBuilder):
     # for SNB and IVB
     def build_description(
-            self, instruction_name, operand_types, 
+            self, instruction_name, operand_types,
             port_pressure=[], latency=0):
         load, store = self.classify(operand_types)
 
@@ -107,7 +107,7 @@ class MOVEntryBuilderIntelWithPort7AGU(MOVEntryBuilder):
     # for HSW, BDW, SKX and CSX
 
     def build_description(
-            self, instruction_name, operand_types, 
+            self, instruction_name, operand_types,
             port_pressure=[], latency=0):
         load, store = self.classify(operand_types)
 

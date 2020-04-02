@@ -8,6 +8,7 @@ python:
 before_install: 
 #  - pip install tox-travis
   - pip install codecov
+  - pip install bs4
   - pip install pygraphviz
   - pip install kerncraft
 install:
