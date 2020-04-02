@@ -328,9 +328,8 @@ def _scrape_from_felixcloutier(mnemonic):
     return (suspicious, ' '.join(operands))
 
 
-def _get_src_dst_from_table(table):
+def _get_src_dst_from_table(table, num_operands=2):
     """Prettify bs4 table object to string for user"""
-    NUM_OPERANDS = 2
     # Parse table
     header = [''.join(x.string.lower().split()) for x in table.find('tr').findAll('td')]
     data = table.findAll('tr')[1:]
@@ -342,10 +341,10 @@ def _get_src_dst_from_table(table):
                 data_dict[i][header[j]] = col.string
     # Get only the instruction forms with 2 operands
     num_ops = [_get_number_of_operands(row) for _, row in data_dict.items()]
-    if NUM_OPERANDS in num_ops:
-        row = data_dict[num_ops.index(NUM_OPERANDS)]
+    if num_operands in num_ops:
+        row = data_dict[num_ops.index(num_operands)]
         reads_writes = []
-        for i in range(1, NUM_OPERANDS + 1):
+        for i in range(1, num_operands + 1):
             m = re.search(r'(\([^\(\)]+\))', row['operand{}'.format(i)])
             if not m:
                 # no parentheses (probably immediate operand), assume READ
