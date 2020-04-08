@@ -725,6 +725,39 @@ instruction_forms:
   throughput: 1.0
   latency: 0  # 	1*p89+1*p10D
   port_pressure: [[1, '89'], [1, [10D]]]
+- name: vmovdqu
+  operands:
+  - class: memory
+    base: gpr
+    offset: "*"
+    index: ~
+    scale: 1
+  - class: register
+    name: "*"
+  throughput: 0.5
+  latency: 4.0  # 	1*p8910+1*p8D9D
+  port_pressure: [[1, ['8','9','10']], [1, [8D,9D]]]
+- name: vmovdqu
+  operands:
+  - class: memory
+    base: gpr
+    offset: "*"
+    index: gpr
+    scale: "*"
+  - class: register
+    name: "*"
+  throughput: 0.5
+  latency: 4.0  # 	1*p8910+1*p8D9D
+  port_pressure: [[1, ['8','9']], [1, [8D,9D]]]
+- name: vmovdqu
+  operands:
+  - class: register
+    name: "*"
+  - class: register
+    name: "*"
+  throughput: 0.0
+  latency: 0.0
+  port_pressure: []
 - name: add
   operands:
   - class: immediate
@@ -1080,6 +1113,16 @@ instruction_forms:
   throughput: 0.5
   latency: 3.0  # 	1*p01
   port_pressure: [[1, '01']]
+  uops: 1
+- name: [shl, shr]
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: gpr
+  throughput: 0.25
+  latency: 1.0  # 	1*p4567
+  port_pressure: [[1, '4567']]
   uops: 1
 - name: UNPCKHPS                        # model_importer.py ./model_importer.py
   operands:                             # model_importer.py ./model_importer.py
