@@ -319,7 +319,12 @@ class Frontend(object):
                 continue
             left_len = len(str(float(ports[i])).split('.')[0])
             substr = '{:' + str(left_len) + '.' + str(max(port_len[i] - left_len - 1, 0)) + 'f}'
-            string_result += substr.format(ports[i]) + ' {} '.format(separator[i])
+            substr = substr.format(ports[i])
+            string_result += (
+                substr + ' {} '.format(separator[i])
+                if '.' in substr
+                else '{:.1f}{} '.format(ports[i], separator[i])
+            )
         return string_result[:-1]
 
     def _get_node_by_lineno(self, lineno, kernel):
