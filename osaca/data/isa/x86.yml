@@ -2549,7 +2549,7 @@ instruction_forms:
           name: "xmm"
           source: true
           destination: true
-    - name: mulpd
+    - name: [mulpd, mulps]
       operands:
         - class: "register"
           name: "xmm"
@@ -2559,7 +2559,597 @@ instruction_forms:
           name: "xmm"
           source: true
           destination: true
-    - name: [pand, por, pxor]
+    - name: [packssdw, packsswb, packusdw, packuswb]
+      operands:
+        - class: "register"
+          name: "xmm"
+          source: true
+          destination: false
+        - class: "register"
+          name: "xmm"
+          source: true
+          destination: true
+    - name: [packssdw, packsswb, packusdw, packuswb]
+      operands:
+        - class: "register"
+          name: "mm"
+          source: true
+          destination: false
+        - class: "register"
+          name: "mm"
+          source: true
+          destination: true
+    - name: [paddb, paddw, paddd, paddq, paddsb, paddsw, paddusb, paddusw]
+      operands:
+        - class: "register"
+          name: "xmm"
+          source: true
+          destination: false
+        - class: "register"
+          name: "xmm"
+          source: true
+          destination: true
+    - name: [paddb, paddw, paddd, paddq, paddsb, paddsw, paddusb, paddusw]
+      operands:
+        - class: "register"
+          name: "mm"
+          source: true
+          destination: false
+        - class: "register"
+          name: "mm"
+          source: true
+          destination: true
+    - name: [pand, por, pxor, pandn]
+      operands:
+        - class: "register"
+          name: "xmm"
+          source: true
+          destination: false
+        - class: "register"
+          name: "xmm"
+          source: true
+          destination: true
+    - name: [pand, por, pxor, pandn]
+      operands:
+        - class: "register"
+          name: "mm"
+          source: true
+          destination: false
+        - class: "register"
+          name: "mm"
+          source: true
+          destination: true
+    - name: [pavgb, pavgw]
+      operands:
+        - class: "register"
+          name: "xmm"
+          source: true
+          destination: false
+        - class: "register"
+          name: "xmm"
+          source: true
+          destination: true
+    - name: [pavgb, pavgw]
+      operands:
+        - class: "register"
+          name: "mm"
+          source: true
+          destination: false
+        - class: "register"
+          name: "mm"
+          source: true
+          destination: true
+    - name: [pcmpeqb, pcmpeqw, pcmpeqd, pcmpeqq]
+      operands:
+        - class: "register"
+          name: "xmm"
+          source: true
+          destination: false
+        - class: "register"
+          name: "xmm"
+          source: true
+          destination: true
+    - name: [pcmpeqb, pcmpeqw, pcmpeqd, pcmpeqq]
+      operands:
+        - class: "register"
+          name: "mm"
+          source: true
+          destination: false
+        - class: "register"
+          name: "mm"
+          source: true
+          destination: true
+    - name: [pcmpgtb, pcmpgtw, pcmpgtd, pcmpgtq]
+      operands:
+        - class: "register"
+          name: "xmm"
+          source: true
+          destination: false
+        - class: "register"
+          name: "xmm"
+          source: true
+          destination: true
+    - name: [pcmpgtb, pcmpgtw, pcmpgtd, pcmpgtq]
+      operands:
+        - class: "register"
+          name: "mm"
+          source: true
+          destination: false
+        - class: "register"
+          name: "mm"
+          source: true
+          destination: true
+    - name: pmaddubsw
+      operands:
+        - class: "register"
+          name: "xmm"
+          source: true
+          destination: false
+        - class: "register"
+          name: "xmm"
+          source: true
+          destination: true
+    - name: pmaddubsw
+      operands:
+        - class: "register"
+          name: "mm"
+          source: true
+          destination: false
+        - class: "register"
+          name: "mm"
+          source: true
+          destination: true
+    - name: pmaddwd
+      operands:
+        - class: "register"
+          name: "xmm"
+          source: true
+          destination: false
+        - class: "register"
+          name: "xmm"
+          source: true
+          destination: true
+    - name: pmaddwd
+      operands:
+        - class: "register"
+          name: "mm"
+          source: true
+          destination: false
+        - class: "register"
+          name: "mm"
+          source: true
+          destination: true
+    - name: [pmaxsb, pmaxsw, pmaxsd, pmaxsq]
+      operands:
+        - class: "register"
+          name: "xmm"
+          source: true
+          destination: false
+        - class: "register"
+          name: "xmm"
+          source: true
+          destination: true
+    - name: [pmaxsb, pmaxsw, pmaxsd, pmaxsq]
+      operands:
+        - class: "register"
+          name: "mm"
+          source: true
+          destination: false
+        - class: "register"
+          name: "mm"
+          source: true
+          destination: true
+    - name: [pmaxub, pmaxuw, pmaxud, pmaxuq]
+      operands:
+        - class: "register"
+          name: "xmm"
+          source: true
+          destination: false
+        - class: "register"
+          name: "xmm"
+          source: true
+          destination: true
+    - name: [pmaxub, pmaxuw]
+      operands:
+        - class: "register"
+          name: "mm"
+          source: true
+          destination: false
+        - class: "register"
+          name: "mm"
+          source: true
+          destination: true
+    - name: [pminsb, pminsw, pminsd, pminsq]
+      operands:
+        - class: "register"
+          name: "xmm"
+          source: true
+          destination: false
+        - class: "register"
+          name: "xmm"
+          source: true
+          destination: true
+    - name: [pminsb, pminsw, pminsd, pminsq]
+      operands:
+        - class: "register"
+          name: "mm"
+          source: true
+          destination: false
+        - class: "register"
+          name: "mm"
+          source: true
+          destination: true
+    - name: [pminub, pminuw, pminud, pminuq]
+      operands:
+        - class: "register"
+          name: "xmm"
+          source: true
+          destination: false
+        - class: "register"
+          name: "xmm"
+          source: true
+          destination: true
+    - name: [pminub, pminuw]
+      operands:
+        - class: "register"
+          name: "mm"
+          source: true
+          destination: false
+        - class: "register"
+          name: "mm"
+          source: true
+          destination: true
+    - name: pmuldq
+      operands:
+        - class: "register"
+          name: "xmm"
+          source: true
+          destination: false
+        - class: "register"
+          name: "xmm"
+          source: true
+          destination: true
+    - name: [pmulhrsw, pmulhuw, pmulhw, pmullw]
+      operands:
+        - class: "register"
+          name: "xmm"
+          source: true
+          destination: false
+        - class: "register"
+          name: "xmm"
+          source: true
+          destination: true
+    - name: [pmulhrsw, pmulhuw, pmulhw, pmullw]
+      operands:
+        - class: "register"
+          name: "mm"
+          source: true
+          destination: false
+        - class: "register"
+          name: "mm"
+          source: true
+          destination: true
+    - name: pmuludq
+      operands:
+        - class: "register"
+          name: "xmm"
+          source: true
+          destination: false
+        - class: "register"
+          name: "xmm"
+          source: true
+          destination: true
+    - name: pmuludq
+      operands:
+        - class: "register"
+          name: "mm"
+          source: true
+          destination: false
+        - class: "register"
+          name: "mm"
+          source: true
+          destination: true
+    - name: psadbw
+      operands:
+        - class: "register"
+          name: "xmm"
+          source: true
+          destination: false
+        - class: "register"
+          name: "xmm"
+          source: true
+          destination: true
+    - name: psadbw
+      operands:
+        - class: "register"
+          name: "mm"
+          source: true
+          destination: false
+        - class: "register"
+          name: "mm"
+          source: true
+          destination: true
+    - name: pshufb
+      operands:
+        - class: "register"
+          name: "xmm"
+          source: true
+          destination: false
+        - class: "register"
+          name: "xmm"
+          source: true
+          destination: true
+    - name: pshufb
+      operands:
+        - class: "register"
+          name: "mm"
+          source: true
+          destination: false
+        - class: "register"
+          name: "mm"
+          source: true
+          destination: true
+    - name: [psignb, psignw, psignd]
+      operands:
+        - class: "register"
+          name: "xmm"
+          source: true
+          destination: false
+        - class: "register"
+          name: "xmm"
+          source: true
+          destination: true
+    - name: [psignb, psignw, psignd]
+      operands:
+        - class: "register"
+          name: "mm"
+          source: true
+          destination: false
+        - class: "register"
+          name: "mm"
+          source: true
+          destination: true
+    - name: [psllw, pslld, psllq]
+      operands:
+        - class: "register"
+          name: "xmm"
+          source: true
+          destination: false
+        - class: "register"
+          name: "xmm"
+          source: true
+          destination: true
+    - name: [psllw, pslld, psllq]
+      operands:
+        - class: "register"
+          name: "mm"
+          source: true
+          destination: false
+        - class: "register"
+          name: "mm"
+          source: true
+          destination: true
+    - name: [psllw, pslld, psllq]
+      operands:
+        - class: "immediate"
+          imd: "int"
+          source: true
+          destination: false
+        - class: "register"
+          name: "xmm"
+          source: true
+          destination: true
+    - name: [psllw, pslld, psllq]
+      operands:
+        - class: "immediate"
+          imd: "int"
+          source: true
+          destination: false
+        - class: "register"
+          name: "mm"
+          source: true
+          destination: true
+    - name: pslldq
+      operands:
+        - class: "immediate"
+          imd: "int"
+          source: true
+          destination: false
+        - class: "register"
+          name: "xmm"
+          source: true
+          destination: true
+    - name: [psraw, psrad, psraq]
+      operands:
+        - class: "register"
+          name: "xmm"
+          source: true
+          destination: false
+        - class: "register"
+          name: "xmm"
+          source: true
+          destination: true
+    - name: [psraw, psrad, psraq]
+      operands:
+        - class: "register"
+          name: "mm"
+          source: true
+          destination: false
+        - class: "register"
+          name: "mm"
+          source: true
+          destination: true
+    - name: [psraw, psrad, psraq]
+      operands:
+        - class: "immediate"
+          imd: "int"
+          source: true
+          destination: false
+        - class: "register"
+          name: "xmm"
+          source: true
+          destination: true
+    - name: [psraw, psrad, psraq]
+      operands:
+        - class: "immediate"
+          imd: "int"
+          source: true
+          destination: false
+        - class: "register"
+          name: "mm"
+          source: true
+          destination: true
+    - name: [psrlw, psrld, psrlq]
+      operands:
+        - class: "register"
+          name: "xmm"
+          source: true
+          destination: false
+        - class: "register"
+          name: "xmm"
+          source: true
+          destination: true
+    - name: [psrlw, psrld, psrlq]
+      operands:
+        - class: "register"
+          name: "mm"
+          source: true
+          destination: false
+        - class: "register"
+          name: "mm"
+          source: true
+          destination: true
+    - name: [psrlw, psrld, psrlq]
+      operands:
+        - class: "immediate"
+          imd: "int"
+          source: true
+          destination: false
+        - class: "register"
+          name: "xmm"
+          source: true
+          destination: true
+    - name: [psrlw, psrld, psrlq]
+      operands:
+        - class: "immediate"
+          imd: "int"
+          source: true
+          destination: false
+        - class: "register"
+          name: "mm"
+          source: true
+          destination: true
+    - name: psrldq
+      operands:
+        - class: "immediate"
+          imd: "int"
+          source: true
+          destination: false
+        - class: "register"
+          name: "xmm"
+          source: true
+          destination: true
+    - name: [psubb, psubw, psubd, psubq]
+      operands:
+        - class: "register"
+          name: "xmm"
+          source: true
+          destination: false
+        - class: "register"
+          name: "xmm"
+          source: true
+          destination: true
+    - name: [psubb, psubw, psubd, psubq]
+      operands:
+        - class: "register"
+          name: "mm"
+          source: true
+          destination: false
+        - class: "register"
+          name: "mm"
+          source: true
+          destination: true
+    - name: [psubsb, psubsw]
+      operands:
+        - class: "register"
+          name: "xmm"
+          source: true
+          destination: false
+        - class: "register"
+          name: "xmm"
+          source: true
+          destination: true
+    - name: [psubsb, psubsw]
+      operands:
+        - class: "register"
+          name: "mm"
+          source: true
+          destination: false
+        - class: "register"
+          name: "mm"
+          source: true
+          destination: true
+    - name: [psubusb, psubusw]
+      operands:
+        - class: "register"
+          name: "xmm"
+          source: true
+          destination: false
+        - class: "register"
+          name: "xmm"
+          source: true
+          destination: true
+    - name: [psubusb, psubusw]
+      operands:
+        - class: "register"
+          name: "mm"
+          source: true
+          destination: false
+        - class: "register"
+          name: "mm"
+          source: true
+          destination: true
+    - name: [punpckhbw, punpckhwd, punpckhdq, punpckhqdq]
+      operands:
+        - class: "register"
+          name: "xmm"
+          source: true
+          destination: false
+        - class: "register"
+          name: "xmm"
+          source: true
+          destination: true
+    - name: [punpckhbw, punpckhwd, punpckhdq, punpckhqdq]
+      operands:
+        - class: "register"
+          name: "mm"
+          source: true
+          destination: false
+        - class: "register"
+          name: "mm"
+          source: true
+          destination: true
+    - name: [punpcklbw, punpcklwd, punpckldq, punpcklqdq]
+      operands:
+        - class: "register"
+          name: "xmm"
+          source: true
+          destination: false
+        - class: "register"
+          name: "xmm"
+          source: true
+          destination: true
+    - name: [punpcklbw, punpcklwd, punpckldq, punpcklqdq]
+      operands:
+        - class: "register"
+          name: "mm"
+          source: true
+          destination: false
+        - class: "register"
+          name: "mm"
+          source: true
+          destination: true
+    - name: [sha1msg2, sha1nexte]
       operands:
         - class: "register"
           name: "xmm"
@@ -2808,6 +3398,16 @@ instruction_forms:
           name: "CF"
           source: false
           destination: true
+    - name: [subsd, subpd]
+      operands:
+        - class: "register"
+          name: "xmm"
+          source: true
+          destination: false
+        - class: "register"
+          name: "xmm"
+          source: true
+          destination: true
     - name: [subss, subps]
       operands:
         - class: "register"
@@ -2830,6 +3430,10 @@ instruction_forms:
           destination: false
       hidden_operands:
         - class: "flag"
+          name: "AF"
+          source: false
+          destination: true
+        - class: "flag"
           name: "SF"
           source: false
           destination: true
@@ -2855,6 +3459,10 @@ instruction_forms:
           source: true
           destination: false
       hidden_operands:
+        - class: "flag"
+          name: "AF"
+          source: false
+          destination: true
         - class: "flag"
           name: "SF"
           source: false
@@ -2882,6 +3490,10 @@ instruction_forms:
           destination: false
       hidden_operands:
         - class: "flag"
+          name: "AF"
+          source: false
+          destination: true
+        - class: "flag"
           name: "SF"
           source: false
           destination: true
@@ -2905,6 +3517,10 @@ instruction_forms:
           destination: false
       hidden_operands:
         - class: "flag"
+          name: "AF"
+          source: false
+          destination: true
+        - class: "flag"
           name: "SF"
           source: false
           destination: true
@@ -2915,6 +3531,16 @@ instruction_forms:
         - class: "flag"
           name: "PF"
           source: false
+          destination: true
+    - name: [unpcklps, unpcklpd]
+      operands:
+        - class: "register"
+          name: "xmm"
+          source: true
+          destination: false
+        - class: "register"
+          name: "xmm"
+          source: true
           destination: true
     - name: vldmxcsr
       operands:
@@ -3125,6 +3751,60 @@ instruction_forms:
           scale: "*"
           source: true
           destination: true
+    - name: [vptest, ptest]
+      operands:
+        - class: "register"
+          name: "xmm"
+          source: true
+          destination: false
+        - class: "register"
+          name: "xmm"
+          source: true
+          destination: false
+      hidden_operands:
+        - class: "flag"
+          name: "AF"
+          source: false
+          destination: true
+        - class: "flag"
+          name: "SF"
+          source: false
+          destination: true
+        - class: "flag"
+          name: "ZF"
+          source: false
+          destination: true
+        - class: "flag"
+          name: "PF"
+          source: false
+          destination: true
+    - name: vptest
+      operands:
+        - class: "register"
+          name: "ymm"
+          source: true
+          destination: false
+        - class: "register"
+          name: "ymm"
+          source: true
+          destination: false
+      hidden_operands:
+        - class: "flag"
+          name: "AF"
+          source: false
+          destination: true
+        - class: "flag"
+          name: "SF"
+          source: false
+          destination: true
+        - class: "flag"
+          name: "ZF"
+          source: false
+          destination: true
+        - class: "flag"
+          name: "PF"
+          source: false
+          destination: true
     - name: vzeroall
       operands: []
       hidden_operands:
@@ -3281,3 +3961,14 @@ instruction_forms:
           name: "xmm"
           source: true
           destination: true
+    - name: [shl, shr, shlq, shrq]
+      operands:
+        - class: "immediate"
+          imd: "int"
+          source: true
+          destination: false
+        - class: "register"
+          name: "gpr"
+          source: true
+          destination: true
+
