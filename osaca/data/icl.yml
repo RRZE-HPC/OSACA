@@ -108,7 +108,7 @@ instruction_forms:
 ##########################################
 # assume all register mov's 0 for now
 # TODO add mov instructions
-- name: [vmovupd, vmovups, movupd, movups, movapd, vmovapd, movsd, vmovsd, movss, vmovss]
+- name: [vmovupd, vmovups, movupd, movups, movapd, vmovapd, movsd, vmovsd, movss, vmovss, movzb, movzx, movz]
   operands:
   - class: register
     name: '*'
@@ -31039,6 +31039,16 @@ instruction_forms:
   port_pressure: [[1, '06']]                                         # model_importer.py instructions.xml ICL
   throughput: 0.5                                                    # model_importer.py instructions.xml ICL
   uops: 1                                                            # model_importer.py instructions.xml ICL
+- name: ADD
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: 1
+  port_pressure: [[1, '0156']]
+  throughput: 0.25
+  uops: 1
 - name: ADD                                                          # model_importer.py instructions.xml ICL
   operands:                                                          # model_importer.py instructions.xml ICL
   - class: immediate                                                 # model_importer.py instructions.xml ICL
