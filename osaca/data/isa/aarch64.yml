@@ -5,48 +5,31 @@ isa: "AArch64"
 #   mnemonic op1 ... opN
 # means that op1 is the only destination operand and op2 to op(N) are source operands.
 instruction_forms:
-    - name: "fmla"
+    - name: fmla
       operands:
         - class: "register"
-          prefix: "v"
-          shape: "s"
+          prefix: "*"
+          shape: "*"
           source: true
           destination: true
         - class: "register"
-          prefix: "v"
-          shape: "s"
+          prefix: "*"
+          shape: "*"
           source: true
           destination: false
         - class: "register"
-          prefix: "v"
-          shape: "s"
+          prefix: "*"
+          shape: "*"
           source: true
           destination: false
-    - name: "fmla"
+    - name: ldp
       operands:
         - class: "register"
-          prefix: "v"
-          shape: "d"
-          source: true
-          destination: true
-        - class: "register"
-          prefix: "v"
-          shape: "d"
-          source: true
-          destination: false
-        - class: "register"
-          prefix: "v"
-          shape: "d"
-          source: true
-          destination: false
-    - name: "ldp"
-      operands:
-        - class: "register"
-          prefix: "d"
+          prefix: "*"
           source: false
           destination: true
         - class: "register"
-          prefix: "d"
+          prefix: "*"
           source: false
           destination: true
         - class: "memory"
@@ -58,52 +41,14 @@ instruction_forms:
           post-indexed: false
           source: true
           destination: false
-    - name: "ldp"
+    - name: ldp
       operands:
         - class: "register"
-          prefix: "q"
+          prefix: "*"
           source: false
           destination: true
         - class: "register"
-          prefix: "q"
-          source: false
-          destination: true
-        - class: "memory"
-          base: "*"
-          offset: "*"
-          index: "*"
-          scale: "*"
-          pre-indexed: false
-          post-indexed: false
-          source: true
-          destination: false
-    - name: "ldp"
-      operands:
-        - class: "register"
-          prefix: "q"
-          source: false
-          destination: true
-        - class: "register"
-          prefix: "q"
-          source: false
-          destination: true
-        - class: "memory"
-          base: "*"
-          offset: "*"
-          index: "*"
-          scale: "*"
-          pre-indexed: true
-          post-indexed: false
-          source: true
-          destination: true
-    - name: "ldp"
-      operands:
-        - class: "register"
-          prefix: "q"
-          source: false
-          destination: true
-        - class: "register"
-          prefix: "q"
+          prefix: "*"
           source: false
           destination: true
         - class: "memory"
@@ -115,14 +60,63 @@ instruction_forms:
           post-indexed: true
           source: true
           destination: true
-    - name: "stp"
+    - name: ldp
       operands:
         - class: "register"
-          prefix: "d"
+          prefix: "*"
+          source: false
+          destination: true
+        - class: "register"
+          prefix: "*"
+          source: false
+          destination: true
+        - class: "memory"
+          base: "*"
+          offset: "*"
+          index: "*"
+          scale: "*"
+          pre-indexed: true
+          post-indexed: false
+          source: true
+          destination: true
+    - name: [ldr, ldur]
+      operands:
+        - class: "register"
+          prefix: "*"
+          source: false
+          destination: true
+        - class: "memory"
+          base: "*"
+          offset: "*"
+          index: "*"
+          scale: "*"
+          pre-indexed: false
+          post-indexed: true
+          source: true
+          destination: true
+    - name: [ldr, ldur]
+      operands:
+        - class: "register"
+          prefix: "*"
+          source: false
+          destination: true
+        - class: "memory"
+          base: "*"
+          offset: "*"
+          index: "*"
+          scale: "*"
+          pre-indexed: true
+          post-indexed: false
+          source: true
+          destination: true
+    - name: stp
+      operands:
+        - class: "register"
+          prefix: "*"
           source: true
           destination: false
         - class: "register"
-          prefix: "d"
+          prefix: "*"
           source: true
           destination: false
         - class: "memory"
@@ -134,14 +128,33 @@ instruction_forms:
           post-indexed: false
           source: false
           destination: true   
-    - name: "stp"
+    - name: stp
       operands:
         - class: "register"
-          prefix: "q"
+          prefix: "*"
           source: true
           destination: false
         - class: "register"
-          prefix: "q"
+          prefix: "*"
+          source: true
+          destination: false
+        - class: "memory"
+          base: "*"
+          offset: "*"
+          index: "*"
+          scale: "*"
+          pre-indexed: true
+          post-indexed: false
+          source: false
+          destination: true
+    - name: stp
+      operands:
+        - class: "register"
+          prefix: "*"
+          source: true
+          destination: false
+        - class: "register"
+          prefix: "*"
           source: true
           destination: false
         - class: "memory"
@@ -150,73 +163,13 @@ instruction_forms:
           index: "*"
           scale: "*"
           pre-indexed: false
-          post-indexed: false
+          post-indexed: true
           source: false
           destination: true
-    - name: "str"
+    - name: [str, stur]
       operands:
         - class: "register"
-          prefix: "x"
-          source: true
-          destination: false
-        - class: "memory"
-          base: "*"
-          offset: "*"
-          index: "*"
-          scale: "*"
-          pre-indexed: "*"
-          post-indexed: "*"
-          source: false
-          destination: true
-    - name: "str"
-      operands:
-        - class: "register"
-          prefix: "d"
-          source: true
-          destination: false
-        - class: "memory"
-          base: "*"
-          offset: "*"
-          index: "*"
-          scale: "*"
-          pre-indexed: "*"
-          post-indexed: "*"
-          source: false
-          destination: true
-    - name: "str"
-      operands:
-        - class: "register"
-          prefix: "q"
-          source: true
-          destination: false
-        - class: "memory"
-          base: "*"
-          offset: "*"
-          index: "*"
-          scale: "*"
-          pre-indexed: "*"
-          post-indexed: "*"
-          source: false
-          destination: true
-    - name: "stur"
-      operands:
-        - class: "register"
-          prefix: "q"
-          source: true
-          destination: false
-        - class: "memory"
-          base: "*"
-          offset: "*"
-          index: "*"
-          scale: "*"
-          pre-indexed: "*"
-          post-indexed: "*"
-          source: false
-          destination: true
-    - name: "stur"
-      operands:
-        - class: "register"
-          prefix: "d"
+          prefix: "*"
           source: true
           destination: false
         - class: "memory"
