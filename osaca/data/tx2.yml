@@ -267,6 +267,34 @@ instruction_forms:
   throughput: 0.5
   latency: 6.0  # 	1*p01
   port_pressure: [[1, '01']]
+- name: frecpe
+  operands:
+  - class: register
+    prefix: v
+    shape: s
+  - class: register
+    prefix: v
+    shape: s
+  - class: register
+    prefix: v
+    shape: s
+  throughput: 0.5
+  latency: 5.0  # 	1*p01
+  port_pressure: [[1, '01']]
+- name: frecpe
+  operands:
+  - class: register
+    prefix: v
+    shape: d
+  - class: register
+    prefix: v
+    shape: d
+  - class: register
+    prefix: v
+    shape: d
+  throughput: 0.5
+  latency: 5.0  # 	1*p01
+  port_pressure: [[1, '01']]
 - name: fsub
   operands:
   - class: register
