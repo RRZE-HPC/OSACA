@@ -240,6 +240,7 @@ class MachineModel(object):
     def get_isa_for_arch(arch):
         """Return ISA for given micro-arch ``arch``."""
         arch_dict = {
+            'a64fx': 'aarch64',
             'tx2': 'aarch64',
             'zen1': 'x86',
             'zen+': 'x86',
