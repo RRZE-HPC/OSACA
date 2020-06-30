@@ -241,6 +241,7 @@ class MachineModel(object):
         """Return ISA for given micro-arch ``arch``."""
         arch_dict = {
             'tx2': 'aarch64',
+            'n1': 'aarch64',
             'zen1': 'x86',
             'zen+': 'x86',
             'zen2': 'x86',
