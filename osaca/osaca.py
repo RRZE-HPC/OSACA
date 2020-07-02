@@ -17,7 +17,7 @@ MODULE_DATA_DIR = os.path.join(
 )
 LOCAL_OSACA_DIR = os.path.join(os.path.expanduser('~') + '/.osaca/')
 DATA_DIR = os.path.join(LOCAL_OSACA_DIR, 'data/')
-SUPPORTED_ARCHS = ['SNB', 'IVB', 'HSW', 'BDW', 'SKX', 'CSX', 'ZEN1', 'ZEN2', 'TX2']
+SUPPORTED_ARCHS = ['SNB', 'IVB', 'HSW', 'BDW', 'SKX', 'CSX', 'ZEN1', 'ZEN2', 'TX2', 'N1']
 
 
 # Stolen from pip
@@ -71,7 +71,7 @@ def create_parser(parser=None):
     parser.add_argument(
         '--arch',
         type=str,
-        help='Define architecture (SNB, IVB, HSW, BDW, SKX, CSX, ZEN1, ZEN2, TX2).',
+        help='Define architecture (SNB, IVB, HSW, BDW, SKX, CSX, ZEN1, ZEN2, TX2, N1).',
     )
     parser.add_argument(
         '--fixed',
