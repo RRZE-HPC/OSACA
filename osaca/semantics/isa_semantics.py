@@ -52,7 +52,6 @@ class ISASemantics(object):
             return
         # check if instruction form is in ISA yaml, otherwise apply standard operand assignment
         # (one dest, others source)
-        # import pdb; pdb.set_trace()
         isa_data = self._isa_model.get_instruction(
             instruction_form['instruction'], instruction_form['operands']
         )
