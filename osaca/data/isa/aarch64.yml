@@ -5,6 +5,16 @@ isa: "AArch64"
 #   mnemonic op1 ... opN
 # means that op1 is the only destination operand and op2 to op(N) are source operands.
 instruction_forms:
+    - name: "cmp"
+      operands:
+        - class: "register"
+          prefix: "x"
+          source: true
+          destination: false
+        - class: "register"
+          prefix: "x"
+          source: true
+          destination: false
     - name: "fmla"
       operands:
         - class: "register"
