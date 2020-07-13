@@ -651,7 +651,7 @@ instruction_forms:
     post-indexed: false
   throughput: 2.0
   latency: 0  # 	2*p56+2*p0
-  port_pressure: [[2, '56'], [2, '1']]
+  port_pressure: [[2, '56'], [2, '0']]
 - name: stur # JL: assumed from str
   operands:
   - class: register
@@ -735,7 +735,7 @@ instruction_forms:
     post-indexed: false
   throughput: 1.0
   latency: 0  # 	1*p56+1*p0
-  port_pressure: [[2, '56'], [1, '0']]
+  port_pressure: [[1, '56'], [1, '0']]
 - name: str
   operands:
   - class: register
@@ -772,9 +772,9 @@ instruction_forms:
     prefix: x
   - class: immediate
     imd: int
-  throughput: 0.25
+  throughput: 0.5
   latency: 1.0  # 	1*p3456
-  port_pressure: [[1, '3456']]
+  port_pressure: [[1, '34']]
 - name: sub
   operands:
   - class: register
