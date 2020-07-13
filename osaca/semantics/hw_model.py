@@ -242,6 +242,7 @@ class MachineModel(object):
         arch_dict = {
             'a64fx': 'aarch64',
             'tx2': 'aarch64',
+            'n1': 'aarch64',
             'zen1': 'x86',
             'zen+': 'x86',
             'zen2': 'x86',
