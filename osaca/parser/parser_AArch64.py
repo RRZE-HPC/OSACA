@@ -6,7 +6,7 @@ import pyparsing as pp
 from osaca.parser import AttrDict, BaseParser
 
 
-class ParserAArch64v81(BaseParser):
+class ParserAArch64(BaseParser):
     def __init__(self):
         super().__init__()
         self.isa = 'aarch64'
