@@ -5,25 +5,25 @@ isa: AArch64
 ROB_size: 48
 retired_uOps_per_cycle: 4
 scheduler_size: 79
-hidden_loads: false
+hidden_loads: false 
 load_latency: {w: 5.0, x: 5.0, b: 5.0, h: 5.0, s: 5.0, d: 8.0, q: 8.0, v: 8.0, z: 11.0}
 load_throughput:
-- {base: x, index: ~, offset: ~, scale: 1, pre-indexed: false, post-indexed: false, port_pressure:   [[1, '56']]}
-- {base: x, index: ~, offset: imd, scale: 1, pre-indexed: false, post-indexed: true, port_pressure:  [[1, '56'], [1, '']]}
-- {base: x, index: ~, offset: imd, scale: 1, pre-indexed: false, post-indexed: false, port_pressure: [[1, '56']]}
-- {base: x, index: ~, offset: imd, scale: 1, pre-indexed: true, post-indexed: true, port_pressure:   [[1, '56'], [1, '']]}
-- {base: x, index: ~, offset: imd, scale: 1, pre-indexed: true, post-indexed: false, port_pressure:  [[1, '56'], [1, '']]}
-- {base: x, index: x, offset: ~, scale: 1, pre-indexed: false, post-indexed: true, port_pressure:    [[1, '56'], [1, '']]}
-- {base: x, index: x, offset: ~, scale: 1, pre-indexed: false, post-indexed: false, port_pressure:   [[1, '56']]}
-- {base: x, index: x, offset: ~, scale: 1, pre-indexed: true, post-indexed: true, port_pressure:     [[1, '56'], [1, '']]}
-- {base: x, index: x, offset: ~, scale: 1, pre-indexed: true, post-indexed: false, port_pressure:    [[1, '56'], [1, '']]}
-- {base: x, index: x, offset: imd, scale: 1, pre-indexed: false, post-indexed: true, port_pressure:  [[1, '56'], [1, '']]}
-- {base: x, index: x, offset: imd, scale: 1, pre-indexed: false, post-indexed: false, port_pressure: [[1, '56']]}
-- {base: x, index: x, offset: imd, scale: 1, pre-indexed: true, post-indexed: true, port_pressure:   [[1, '56'], [1, '']]}
-- {base: x, index: x, offset: imd, scale: 1, pre-indexed: true, post-indexed: false, port_pressure:  [[1, '56'], [1, '']]}
+- {base: x, index: ~, offset: ~, scale: 1, pre-indexed: false, post-indexed: false, port_pressure:   [[1, '56'], [1, ['5D', '6D']]]}
+- {base: x, index: ~, offset: imd, scale: 1, pre-indexed: false, post-indexed: true, port_pressure:  [[1, '56'], [1, ['5D', '6D']], [1, '3456']]}
+- {base: x, index: ~, offset: imd, scale: 1, pre-indexed: false, post-indexed: false, port_pressure: [[1, '56'], [1, ['5D', '6D']]]}
+- {base: x, index: ~, offset: imd, scale: 1, pre-indexed: true, post-indexed: true, port_pressure:   [[1, '56'], [1, ['5D', '6D']], [1, '3456']]}
+- {base: x, index: ~, offset: imd, scale: 1, pre-indexed: true, post-indexed: false, port_pressure:  [[1, '56'], [1, ['5D', '6D']], [1, '3456']]}
+- {base: x, index: x, offset: ~, scale: 1, pre-indexed: false, post-indexed: true, port_pressure:    [[1, '56'], [1, ['5D', '6D']], [1, '3456']]}
+- {base: x, index: x, offset: ~, scale: 1, pre-indexed: false, post-indexed: false, port_pressure:   [[1, '56'], [1, ['5D', '6D']]]}
+- {base: x, index: x, offset: ~, scale: 1, pre-indexed: true, post-indexed: true, port_pressure:     [[1, '56'], [1, ['5D', '6D']], [1, '3456']]}
+- {base: x, index: x, offset: ~, scale: 1, pre-indexed: true, post-indexed: false, port_pressure:    [[1, '56'], [1, ['5D', '6D']], [1, '3456']]}
+- {base: x, index: x, offset: imd, scale: 1, pre-indexed: false, post-indexed: true, port_pressure:  [[1, '56'], [1, ['5D', '6D']], [1, '3456']]}
+- {base: x, index: x, offset: imd, scale: 1, pre-indexed: false, post-indexed: false, port_pressure: [[1, '56'], [1, ['5D', '6D']]]}
+- {base: x, index: x, offset: imd, scale: 1, pre-indexed: true, post-indexed: true, port_pressure:   [[1, '56'], [1, ['5D', '6D']], [1, '3456']]}
+- {base: x, index: x, offset: imd, scale: 1, pre-indexed: true, post-indexed: false, port_pressure:  [[1, '56'], [1, ['5D', '6D']], [1, '3456']]}
 load_throughput_default: [[1, '56'], [1, ['5D', '6D']]]
 store_throughput: []
-store_throughput_default: [[1, '56'], [1, '7']]
+store_throughput_default: [[1, '56'], [1, '0']]
 ports: ['0', 0DV, '1', '2', '3', '4', '5', 5D, '6', 6D, '7']
 port_model_scheme: |
   +---------------------------------------------------------------------------------+
@@ -403,8 +403,8 @@ instruction_forms:
     pre-indexed: false
     post-indexed: true
   throughput: 1.0
-  latency: 8.0  # 	2*p56+2*p5D6D+1*p3456
-  port_pressure: [[2, '56'], [2, ['5D', '6D']], [1, '3456']]
+  latency: 8.0  # 	2*p56+2*p5D6D+1*p0234
+  port_pressure: [[2, '56'], [2, ['5D', '6D']], [1, '0234']]
 - name: ldp
   operands:
   - class: register
@@ -435,8 +435,8 @@ instruction_forms:
     pre-indexed: false
     post-indexed: true
   throughput: 1.0
-  latency: 8.0  # 	2*p56+2*p5D6D+1*p3456
-  port_pressure: [[2, '56'], [2, ['5D', '6D']], [1, '3456']]
+  latency: 8.0  # 	2*p56+2*p5D6D+1*p0234
+  port_pressure: [[2, '56'], [2, ['5D', '6D']], [1, '0234']]
 - name: ldp
   operands:
   - class: register
@@ -467,8 +467,8 @@ instruction_forms:
     pre-indexed: true
     post-indexed: false
   throughput: 1.0
-  latency: 8.0  # 	2*p56+2*p5D6D+1*p3456
-  port_pressure: [[2, '56'], [2, ['5D', '6D']], [1, '3456']]
+  latency: 8.0  # 	2*p56+2*p5D6D+1*p0234
+  port_pressure: [[2, '56'], [2, ['5D', '6D']], [1, '0234']]
 - name: ldp
   operands:
   - class: register
@@ -483,8 +483,8 @@ instruction_forms:
     pre-indexed: false
     post-indexed: true
   throughput: 1.0
-  latency: 8.0  # 	2*p56+2*p5D6D+1*p3456
-  port_pressure: [[2, '56'], [2, ['5D', '6D']], [1, '3456']]
+  latency: 8.0  # 	2*p56+2*p5D6D+1*p0234
+  port_pressure: [[2, '56'], [2, ['5D', '6D']], [1, '0234']]
 - name: ldur    # JL: assumed from ldr
   operands:
   - class: register
@@ -589,8 +589,8 @@ instruction_forms:
   - class: register
     prefix: x
   throughput: 0.25
-  latency: 1.0  # 	1*p3456
-  port_pressure: [[1, '3456']]
+  latency: 1.0  # 	1*p0234
+  port_pressure: [[1, '0234']]
 - name: mov
   operands:
   - class: register
@@ -634,8 +634,8 @@ instruction_forms:
     pre-indexed: false
     post-indexed: true
   throughput: 2.0
-  latency: 0  # 	2*p56+2*p0+1*3456
-  port_pressure: [[2, '56'], [2, '0'], [1, '3456']]
+  latency: 0  # 	2*p56+2*p0+1*0234
+  port_pressure: [[2, '56'], [2, '0'], [1, '0234']]
 - name: stp
   operands:
   - class: register
@@ -720,8 +720,8 @@ instruction_forms:
     pre-indexed: false
     post-indexed: true
   throughput: 1.0
-  latency: 0  # 	1*p56+1*p0+1*p3456
-  port_pressure: [[1, '56'], [1, '0'], [1, '3456']]
+  latency: 0  # 	1*p56+1*p0+1*p0234
+  port_pressure: [[1, '56'], [1, '0'], [1, '0234']]
 - name: str
   operands:
   - class: register
@@ -748,8 +748,8 @@ instruction_forms:
     pre-indexed: false
     post-indexed: true
   throughput: 1.0
-  latency: 0  # 	1*p56+1*p0+1*3456
-  port_pressure: [[1, '56'], [1, '0'], [1, '3456']]
+  latency: 0  # 	1*p56+1*p0+1*0234
+  port_pressure: [[1, '56'], [1, '0'], [1, '0234']]
 - name: str
   operands:
   - class: register
@@ -762,8 +762,8 @@ instruction_forms:
     pre-indexed: false
     post-indexed: true
   throughput: 1.0
-  latency: 0  # 	1*p56+1*p3+1*p3456
-  port_pressure: [[1, '56'], [1, '3'], [1, '3456']]
+  latency: 0  # 	1*p56+1*p3+1*p0234
+  port_pressure: [[1, '56'], [1, '3'], [1, '0234']]
 - name: subs
   operands:
   - class: register
@@ -773,7 +773,7 @@ instruction_forms:
   - class: immediate
     imd: int
   throughput: 0.5
-  latency: 1.0  # 	1*p3456
+  latency: 1.0  # 	1*p34
   port_pressure: [[1, '34']]
 - name: sub
   operands:
@@ -784,5 +784,5 @@ instruction_forms:
   - class: immediate
     imd: int
   throughput: 0.25
-  latency: 1.0  # 	1*p3456
-  port_pressure: [[1, '3456']]
+  latency: 1.0  # 	1*p0234
+  port_pressure: [[1, '0234']]
