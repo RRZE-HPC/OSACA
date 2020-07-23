@@ -8,7 +8,7 @@ import sys
 
 from osaca.db_interface import import_benchmark_output, sanity_check
 from osaca.frontend import Frontend
-from osaca.parser import BaseParser, ParserAArch64v81, ParserX86ATT
+from osaca.parser import BaseParser, ParserAArch64, ParserX86ATT
 from osaca.semantics import (INSTR_FLAGS, ArchSemantics, KernelDG,
                              MachineModel, reduce_to_section)
 
@@ -306,7 +306,7 @@ def get_asm_parser(arch) -> BaseParser:
     if isa == 'x86':
         return ParserX86ATT()
     elif isa == 'aarch64':
-        return ParserAArch64v81()
+        return ParserAArch64()
 
 
 def get_unmatched_instruction_ratio(kernel):

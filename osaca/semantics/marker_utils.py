@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 from collections import OrderedDict
 
-from osaca.parser import ParserAArch64v81, ParserX86ATT, get_parser
+from osaca.parser import ParserAArch64, ParserX86ATT, get_parser
 
 COMMENT_MARKER = {'start': 'OSACA-BEGIN', 'end': 'OSACA-END'}
 
@@ -38,7 +38,7 @@ def find_marked_kernel_AArch64(lines):
     nop_bytes = ['213', '3', '32', '31']
     return find_marked_section(
         lines,
-        ParserAArch64v81(),
+        ParserAArch64(),
         ['mov'],
         'x1',
         [111, 222],

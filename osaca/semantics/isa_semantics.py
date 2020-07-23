@@ -2,7 +2,7 @@
 from itertools import chain
 
 from osaca import utils
-from osaca.parser import AttrDict, ParserAArch64v81, ParserX86ATT
+from osaca.parser import AttrDict, ParserAArch64, ParserX86ATT
 
 from .hw_model import MachineModel
 
@@ -31,7 +31,7 @@ class ISASemantics(object):
         if self._isa == 'x86':
             self._parser = ParserX86ATT()
         elif self._isa == 'aarch64':
-            self._parser = ParserAArch64v81()
+            self._parser = ParserAArch64()
 
     def process(self, instruction_forms):
         """Process a list of instruction forms."""

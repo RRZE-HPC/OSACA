@@ -72,7 +72,8 @@ class ArchSemantics(ISASemantics):
                                 min_port_idx = port_sums.index(min(port_sums))
                                 instr_ports[min_port_idx] += min(instr_ports)
                                 differences[min_port_idx] += min(instr_ports)
-                                # we don't need to decrease difference for other port, just delete it
+                                # we don't need to decrease difference for other port, just
+                                # delete it
                                 del differences[instr_ports.index(min(instr_ports))]
                                 self._itemsetter(*indices)(
                                     instruction_form['port_pressure'], *instr_ports
@@ -90,7 +91,8 @@ class ArchSemantics(ISASemantics):
                             instr_ports = self._to_list(
                                 itemgetter(*indices)(instruction_form['port_pressure'])
                             )
-                        # never remove more than the fixed utilization per uop and port, i.e., cycles/len(ports)
+                        # never remove more than the fixed utilization per uop and port, i.e., 
+                        # cycles/len(ports)
                         if round(min(differences), 2) <= 0:
                             # don't worry if port_pressure isn't exactly 0 and just
                             # remove from further balancing
@@ -98,6 +100,7 @@ class ArchSemantics(ISASemantics):
                             instr_ports = self._to_list(
                                  itemgetter(*indices)(instruction_form['port_pressure'])
                             )
+                            del differences[differences.index(min(differences))]
                         port_sums = self._to_list(
                             itemgetter(*indices)(self.get_throughput_sum(kernel))
                         )
