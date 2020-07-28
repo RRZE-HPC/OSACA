@@ -56,6 +56,9 @@ class ArchSemantics(ISASemantics):
                     # init list for keeping track of the current change
                     differences = [cycles / len(ports)  for p in ports]
                     for _ in range(int(cycles * (1 / INC))):
+                        if len(instr_ports) == 1:
+                            # no balancing possible anymore
+                            break
                         max_port_idx = port_sums.index(max(port_sums))
                         min_port_idx = port_sums.index(min(port_sums))
                         instr_ports[max_port_idx] -= INC
@@ -95,8 +98,9 @@ class ArchSemantics(ISASemantics):
                         # cycles/len(ports)
                         if round(min(differences), 2) <= 0:
                             # don't worry if port_pressure isn't exactly 0 and just
-                            # remove from further balancing
-                            indices = [p for p in indices if differences[indices.index(p)] > 0]
+                            # remove from further balancing by deleting index since
+                            # pressure is not 0
+                            del indices[differences.index(min(differences))]
                             instr_ports = self._to_list(
                                  itemgetter(*indices)(instruction_form['port_pressure'])
                             )
