@@ -277,6 +277,11 @@ def find_basic_loop_bodies(lines):
             current_block.append(line)
             # Find end of block by searching for references to valid jump labels
             if line['instruction'] and line['operands']:
+                # Ignore `b.none` instructions (relevant von ARM SVE code)
+                # This branch instruction is often present _within_ inner loop blocks, but usually 
+                # do not terminate
+                if line['instruction'] == 'b.none':
+                    continue
                 for operand in [o for o in line['operands'] if 'identifier' in o]:
                     if operand['identifier']['name'] in valid_jump_labels:
                         if operand['identifier']['name'] == label:
