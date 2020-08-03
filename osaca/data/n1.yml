@@ -1,4 +1,4 @@
-osaca_version: 0.3.3
+osaca_version: 0.3.4
 micro_architecture: Arm Neoverse N1 
 arch_code: n1
 isa: AArch64
