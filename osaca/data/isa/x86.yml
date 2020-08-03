@@ -1,4 +1,4 @@
-osaca_version: 0.3.0
+osaca_version: 0.3.4
 isa: "x86"
 # Contains all operand-irregular instruction forms OSACA supports for x86.
 # Operand-regular for a x86 AT&T instruction form with N operands in the shape of
