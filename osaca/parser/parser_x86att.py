@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 
-import re
 import string
 
 import pyparsing as pp
@@ -35,7 +34,7 @@ class ParserX86ATT(BaseParser):
         ).setResultsName('identifier')
         # Label
         numeric_identifier = pp.Group(
-            pp.Word(pp.nums).setResultsName('name') + pp.Optional(pp.oneOf('b f', caseless=True))
+            pp.Word(pp.nums).setResultsName('name') + pp.Optional(pp.oneOf('b f', caseless=True).setResultsName('suffix'))
         ).setResultsName('identifier')
         self.label = pp.Group(
             (identifier | numeric_identifier).setResultsName('name')
