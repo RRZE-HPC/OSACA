@@ -44,7 +44,7 @@ class ParserX86ATT(BaseParser):
             + pp.Optional(pp.Literal('(') + pp.Word(pp.nums) + pp.Literal(')'))
             + pp.Optional(
                 pp.Literal('{')
-                + pp.Literal('%')
+                + pp.Optional(pp.Suppress(pp.Literal('%')))
                 + pp.Word(pp.alphanums).setResultsName('mask')
                 + pp.Literal('}')
                 + pp.Optional(
@@ -99,7 +99,7 @@ class ParserX86ATT(BaseParser):
                 + pp.Literal(')')
                 + pp.Optional(
                     pp.Literal('{')
-                    + pp.Literal('%')
+                    + pp.Optional(pp.Suppress(pp.Literal('%')))
                     + pp.Word(pp.alphanums).setResultsName('mask')
                     + pp.Literal('}')
                 )
