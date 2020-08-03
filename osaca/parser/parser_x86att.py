@@ -25,7 +25,7 @@ class ParserX86ATT(BaseParser):
         # Define x86 assembly identifier
         relocation = pp.Combine(pp.Literal('@') + pp.Word(pp.alphas))
         id_offset = pp.Word(pp.nums) + pp.Suppress(pp.Literal('+'))
-        first = pp.Word(pp.alphanums + '_.', exact=1)
+        first = pp.Word(pp.alphas + '_.', exact=1)
         rest = pp.Word(pp.alphanums + '$_.+-')
         identifier = pp.Group(
             pp.Optional(id_offset).setResultsName('offset')
@@ -34,7 +34,8 @@ class ParserX86ATT(BaseParser):
         ).setResultsName('identifier')
         # Label
         numeric_identifier = pp.Group(
-            pp.Word(pp.nums).setResultsName('name') + pp.Optional(pp.oneOf('b f', caseless=True).setResultsName('suffix'))
+            pp.Word(pp.nums).setResultsName('name')
+            + pp.Optional(pp.oneOf('b f', caseless=True).setResultsName('suffix'))
         ).setResultsName('identifier')
         self.label = pp.Group(
             (identifier | numeric_identifier).setResultsName('name')
@@ -136,7 +137,9 @@ class ParserX86ATT(BaseParser):
             pp.alphanums
         ).setResultsName('mnemonic')
         # Combine to instruction form
-        operand_first = pp.Group(self.register ^ immediate ^ memory ^ identifier ^ numeric_identifier)
+        operand_first = pp.Group(
+            self.register ^ immediate ^ memory ^ identifier ^ numeric_identifier
+        )
         operand_rest = pp.Group(self.register ^ immediate ^ memory)
         self.instruction_parser = (
             mnemonic
