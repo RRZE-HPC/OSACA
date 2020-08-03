@@ -310,10 +310,7 @@ class ParserX86ATT(BaseParser):
     def process_label(self, label):
         """Post-process label asm line"""
         # remove duplicated 'name' level due to identifier
-        if 'name' in label['name'][0]:
-            label['name'] = label['name'][0]['name']
-        else:
-            label['name'] = label['name'][0]
+        label['name'] = label['name'][0]['name']
         return AttrDict({self.LABEL_ID: label})
 
     def process_immediate(self, immediate):
