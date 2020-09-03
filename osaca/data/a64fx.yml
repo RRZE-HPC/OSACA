@@ -544,7 +544,7 @@ instruction_forms:
     post-indexed: false
   throughput: 2.0
   latency: 11.0  # 	1*p0+1*p3+4*p56+1*p5D6D
-  port_pressure: [[1, '0'],[1, '3'],[4, '56'], [1, ['5D', '6D']]] # not sure if we also have 4 data accesses
+  port_pressure: [[1, '0'],[1, '3'],[4, '56'], [4, ['5D', '6D']]] # not sure if we also have 4 data accesses
 - name: ldp
   operands:
   - class: register
