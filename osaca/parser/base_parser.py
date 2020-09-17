@@ -8,6 +8,7 @@ class BaseParser(object):
     DIRECTIVE_ID = 'directive'
     IMMEDIATE_ID = 'immediate'
     LABEL_ID = 'label'
+    IDENTIFIER_ID = 'identifier'
     MEMORY_ID = 'memory'
     REGISTER_ID = 'register'
     SEGMENT_EXT_ID = 'segment_extension'
