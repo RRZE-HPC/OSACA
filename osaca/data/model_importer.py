@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
-import os.path
 import argparse
+import os.path
 import sys
 import xml.etree.ElementTree as ET
 from distutils.version import StrictVersion
@@ -8,8 +8,23 @@ from distutils.version import StrictVersion
 from osaca.parser import get_parser
 from osaca.semantics import MachineModel
 
-intel_archs = ['CON', 'WOL', 'NHM', 'WSM', 'SNB', 'IVB', 'HSW', 'BDW', 'SKL', 'SKX', 'KBL', 'CFL', 
-               'CNL', 'ICL']
+intel_archs = [
+    'CON',
+    'WOL',
+    'NHM',
+    'WSM',
+    'SNB',
+    'IVB',
+    'HSW',
+    'BDW',
+    'SKL',
+    'SKX',
+    'KBL',
+    'CFL',
+    'CNL',
+    'ICL',
+]
+amd_archs = ['ZEN1', 'ZEN+', 'ZEN2']
 
 
 def port_pressure_from_tag_attributes(attrib):
@@ -19,6 +34,7 @@ def port_pressure_from_tag_attributes(attrib):
     for p in attrib['ports'].split('+'):
         cycles, ports = p.split('*')
         ports = ports.lstrip('p')
+        ports = ports.lstrip('FP')
         port_occupation.append([int(cycles), ports])
 
     # Also consider div on DIV pipeline
@@ -88,10 +104,10 @@ def extract_paramters(instruction_tag, parser, isa):
     return parameters
 
 
-def extract_model(tree, arch):
+def extract_model(tree, arch, skip_mem=True):
     try:
         isa = MachineModel.get_isa_for_arch(arch)
-    except:
+    except Exception:
         print("Skipping...", file=sys.stderr)
         return None
     mm = MachineModel(isa=isa)
@@ -101,6 +117,7 @@ def extract_model(tree, arch):
         ignore = False
 
         mnemonic = instruction_tag.attrib['asm']
+        iform = instruction_tag.attrib['iform']
         # skip any mnemonic which contain spaces (e.g., "REX CRC32")
         if ' ' in mnemonic:
             continue
@@ -117,6 +134,26 @@ def extract_model(tree, arch):
         port_pressure, throughput, latency, uops = [], None, None, None
         arch_tag = instruction_tag.find('architecture[@name="' + arch.upper() + '"]')
         if arch_tag is None:
+            continue
+        # skip any instructions without port utilization
+        if not any(['ports' in x.attrib for x in arch_tag.findall('measurement')]):
+            print("Couldn't find port utilization, skip: ", iform, file=sys.stderr)
+            continue
+        # skip if computed and measured TP don't match
+        if not [x.attrib['TP_ports'] == x.attrib['TP'] for x in arch_tag.findall('measurement')][
+            0
+        ]:
+            print(
+                "Calculated TP from port utilization doesn't match TP, skip: ",
+                iform,
+                file=sys.stderr,
+            )
+            continue
+        # skip if instruction contains memory operand
+        if skip_mem and any(
+            [x.attrib['type'] == 'mem' for x in instruction_tag.findall('operand')]
+        ):
+            print("Contains memory operand, skip: ", iform, file=sys.stderr)
             continue
         # We collect all measurement and IACA information and compare them later
         for measurement_tag in arch_tag.iter('measurement'):
@@ -143,10 +180,14 @@ def extract_model(tree, arch):
                     if 'max_cycles' in l_tag.attrib
                 ]
             if latencies[1:] != latencies[:-1]:
-                print("Contradicting latencies found, using first:", mnemonic, latencies,
-                      file=sys.stderr)
+                print(
+                    "Contradicting latencies found, using smallest:",
+                    iform,
+                    latencies,
+                    file=sys.stderr,
+                )
             if latencies:
-                latency = latencies[0]
+                latency = min(latencies)
         if ignore:
             continue
 
@@ -160,16 +201,14 @@ def extract_model(tree, arch):
         # Check if all are equal
         if port_pressure:
             if port_pressure[1:] != port_pressure[:-1]:
-                print(
-                    "Contradicting port occupancies, using latest IACA:",
-                    mnemonic, file=sys.stderr)
+                print("Contradicting port occupancies, using latest IACA:", iform, file=sys.stderr)
             port_pressure = port_pressure[-1]
         else:
             # print("No data available for this architecture:", mnemonic, file=sys.stderr)
             continue
-        
+
         # Adding Intel's 2D and 3D pipelines on Intel µarchs, without Ice Lake:
-        if arch.upper() in intel_archs and not arch.upper() in ['ICL']:  
+        if arch.upper() in intel_archs and not arch.upper() in ['ICL']:
             if any([p['class'] == 'memory' for p in parameters]):
                 # We have a memory parameter, if ports 2 & 3 are present, also add 2D & 3D
                 # TODO remove port7 on 'hsw' onward and split entries depending on addressing mode
@@ -183,7 +222,7 @@ def extract_model(tree, arch):
                 # Add (1, ['2D', '3D']) if load ports (2 & 3) are used, but not the store port (4)
                 if port_23 and not port_4:
                     port_pressure.append((1, ['2D', '3D']))
-        
+
         # Add missing ports:
         for ports in [pp[1] for pp in port_pressure]:
             for p in ports:
@@ -201,7 +240,7 @@ def rhs_comment(uncommented_string, comment):
 
     commented_string = ""
     for l in uncommented_string.split('\n'):
-        commented_string += ("{:<"+str(max_length)+"}  # {}\n").format(l, comment)
+        commented_string += ("{:<" + str(max_length) + "}  # {}\n").format(l, comment)
     return commented_string
 
 
@@ -218,21 +257,33 @@ def main():
         help='architecture to extract, use IACA abbreviations (e.g., SNB). '
         'if not given, all will be extracted and saved to file in CWD.',
     )
+    parser.add_argument(
+        '--mem',
+        dest='skip_mem',
+        action='store_false',
+        help='add instruction forms including memory addressing operands, which are '
+        'skipped by default'
+    )
     args = parser.parse_args()
     basename = os.path.basename(__file__)
 
     tree = ET.parse(args.xml)
-    print('Available architectures:', ', '.join(architectures(tree)))
+    print('# Available architectures:', ', '.join(architectures(tree)))
     if args.arch:
-        model = extract_model(tree, args.arch)
+        print('# Chosen architecture: {}'.format(args.arch))
+        model = extract_model(tree, args.arch, args.skip_mem)
         if model is not None:
-            print(rhs_comment(model.dump(), basename+" "+sys.argv[0]))
+            print(
+                rhs_comment(
+                    model.dump(), basename + " " + args.xml.split('/')[-1] + " " + args.arch
+                )
+            )
     else:
         for arch in architectures(tree):
             print(arch, end='')
-            model = extract_model(tree, arch.lower())
+            model = extract_model(tree, arch.lower(), args.skip_mem)
             if model:
-                model_string = rhs_comment(model.dump(), basename+" "+arch)
+                model_string = rhs_comment(model.dump(), basename + " " + arch)
 
                 with open('{}.yml'.format(arch.lower()), 'w') as f:
                     f.write(model_string)
