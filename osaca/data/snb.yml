@@ -1,4 +1,4 @@
-osaca_version: 0.3.2
+osaca_version: 0.3.4
 micro_architecture: Intel Sandy Bridge
 arch_code: SNB
 isa: x86
