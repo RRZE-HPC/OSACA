@@ -3281,3 +3281,13 @@ instruction_forms:
           name: "xmm"
           source: true
           destination: true
+    - name: [shl, shr]
+      operands:
+        - class: "immediate"
+          imd: "int"
+          source: true
+          destination: false
+        - class: "register"
+          name: "gpr"
+          source: true
+          destination: true
