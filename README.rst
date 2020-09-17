@@ -57,8 +57,12 @@ Additional requirements are:
 
 -  `Python3 <https://www.python.org/>`__
 -  `Graphviz <https://www.graphviz.org/>`__ for dependency graph creation (minimal dependency is `libgraphviz-dev` on Ubuntu)
+
+Optional requirements are:
+
 -  `Kerncraft <https://github.com/RRZE-HPC/kerncraft>`__ >=v0.8.4 for marker insertion
 -   `ibench <https://github.com/RRZE-HPC/ibench>`__ or `asmbench <https://github.com/RRZE-HPC/asmbench/>`__ for throughput/latency measurements
+- `BeautifulSoup4 <https://www.crummy.com/software/BeautifulSoup/bs4/doc/>`__ for scraping instruction form information for the x86 ISA (experimental)
 
 Design
 ======
