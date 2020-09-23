@@ -785,6 +785,17 @@ instruction_forms:
 - name: mov
   operands:
   - class: register
+    prefix: z
+    shape: '*'
+  - class: register
+    prefix: z
+    shape: '*'
+  throughput: 0.5
+  latency: 4.0  # 	1*p02
+  port_pressure: [[1, '02']]
+- name: mov
+  operands:
+  - class: register
     prefix: v
     shape: b
     width: '*'
