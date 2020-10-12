@@ -216,24 +216,6 @@ class TestMarkerUtils(unittest.TestCase):
         kernel_start = len(list(filter(None, (prologue + mov_start + bytes_line).split('\n'))))
         self.assertEqual(test_kernel, [])
 
-        # no start marker
-        code_no_start = prologue + bytes_line + kernel + mov_end + bytes_line + epilogue
-        no_start_parsed = self.parser_AArch.parse_file(code_no_start)
-        with self.assertRaises(LookupError):
-            reduce_to_section(no_start_parsed, 'AArch64')
-
-        # no end marker
-        code_no_end = prologue + mov_start + bytes_line + kernel + mov_end + epilogue
-        no_end_parsed = self.parser_AArch.parse_file(code_no_end)
-        with self.assertRaises(LookupError):
-            reduce_to_section(no_end_parsed, 'AArch64')
-
-        # no marker at all
-        code_no_marker = prologue + kernel + epilogue
-        no_marker_parsed = self.parser_AArch.parse_file(code_no_marker)
-        with self.assertRaises(LookupError):
-            reduce_to_section(no_marker_parsed, 'AArch64')
-
     def test_marker_special_cases_x86(self):
         bytes_line = '.byte     100\n.byte     103\n.byte     144\n'
         mov_start = 'movl     $111, %ebx\n'
