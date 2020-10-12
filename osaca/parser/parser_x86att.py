@@ -26,19 +26,25 @@ class ParserX86ATT(BaseParser):
         relocation = pp.Combine(pp.Literal('@') + pp.Word(pp.alphas))
         id_offset = pp.Word(pp.nums) + pp.Suppress(pp.Literal('+'))
         first = pp.Word(pp.alphas + '_.', exact=1)
-        rest = pp.Word(pp.alphanums + '$_.+-()')
+        rest = pp.Word(pp.alphanums + '$_.+-')
         identifier = pp.Group(
             pp.Optional(id_offset).setResultsName('offset')
             + pp.Combine(first + pp.Optional(rest)).setResultsName('name')
             + pp.Optional(relocation).setResultsName('relocation')
         ).setResultsName('identifier')
         # Label
+        rest = pp.Word(pp.alphanums + '$_.+-()')
+        label_identifier = pp.Group(
+            pp.Optional(id_offset).setResultsName('offset')
+            + pp.Combine(first + pp.Optional(rest)).setResultsName('name')
+            + pp.Optional(relocation).setResultsName('relocation')
+        ).setResultsName('identifier')
         numeric_identifier = pp.Group(
             pp.Word(pp.nums).setResultsName('name')
             + pp.Optional(pp.oneOf('b f', caseless=True).setResultsName('suffix'))
         ).setResultsName('identifier')
         self.label = pp.Group(
-            (identifier | numeric_identifier).setResultsName('name')
+            (label_identifier | numeric_identifier).setResultsName('name')
             + pp.Literal(':')
             + pp.Optional(self.comment)
         ).setResultsName(self.LABEL_ID)
