@@ -26,7 +26,7 @@ class ParserX86ATT(BaseParser):
         relocation = pp.Combine(pp.Literal('@') + pp.Word(pp.alphas))
         id_offset = pp.Word(pp.nums) + pp.Suppress(pp.Literal('+'))
         first = pp.Word(pp.alphas + '_.', exact=1)
-        rest = pp.Word(pp.alphanums + '$_.+-')
+        rest = pp.Word(pp.alphanums + '$_.+-()')
         identifier = pp.Group(
             pp.Optional(id_offset).setResultsName('offset')
             + pp.Combine(first + pp.Optional(rest)).setResultsName('name')
