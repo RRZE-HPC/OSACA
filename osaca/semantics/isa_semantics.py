@@ -103,14 +103,14 @@ class ISASemantics(object):
                 if ('post_indexed' in operand['memory'] and operand['memory']['post_indexed']) or (
                     'pre_indexed' in operand['memory'] and operand['memory']['pre_indexed']
                 ):
-                    op_dict['source'].remove(operand)
-                    op_dict['src_dst'].append(operand)
+                    op_dict['src_dst'].append(AttrDict.convert_dict(
+                        {'register': operand['memory']['base']}))
             for operand in [op for op in op_dict['destination'] if 'memory' in op]:
                 if ('post_indexed' in operand['memory'] and operand['memory']['post_indexed']) or (
                     'pre_indexed' in operand['memory'] and operand['memory']['pre_indexed']
                 ):
-                    op_dict['destination'].remove(operand)
-                    op_dict['src_dst'].append(operand)
+                    op_dict['src_dst'].append(AttrDict.convert_dict(
+                        {'register': operand['memory']['base']}))
         # store operand list in dict and reassign operand key/value pair
         instruction_form['semantic_operands'] = AttrDict.convert_dict(op_dict)
         # assign LD/ST flags
