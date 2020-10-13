@@ -219,9 +219,15 @@ def extract_model(tree, arch, skip_mem=True):
                         port_23 = True
                     if '4' in pp[1]:
                         port_4 = True
-                # Add (1, ['2D', '3D']) if load ports (2 & 3) are used, but not the store port (4)
+                # Add (X, ['2D', '3D']) if load ports (2 & 3) are used, but not the store port (4)
+                # X = 2 on SNB and IVB IFF used in combination with ymm register, otherwise X = 1
+                if arch.upper() in ['SNB', 'IVB'] and \
+                    any([p['class'] == 'register' and p['name'] == 'ymm' for p in parameters]):
+                    data_port_throughput = 2
+                else:
+                    data_port_throughput = 1
                 if port_23 and not port_4:
-                    port_pressure.append((1, ['2D', '3D']))
+                    port_pressure.append((data_port_throughput, ['2D', '3D']))
 
         # Add missing ports:
         for ports in [pp[1] for pp in port_pressure]:
@@ -275,7 +281,7 @@ def main():
         if model is not None:
             print(
                 rhs_comment(
-                    model.dump(), basename + " " + args.xml.split('/')[-1] + " " + args.arch
+                    model.dump(), "uops.info import"
                 )
             )
     else:
