@@ -257,24 +257,6 @@ class TestMarkerUtils(unittest.TestCase):
         kernel_start = len(list(filter(None, (prologue + mov_start + bytes_line).split('\n'))))
         self.assertEqual(test_kernel, [])
 
-        # no start marker
-        code_no_start = prologue + bytes_line + kernel + mov_end + bytes_line + epilogue
-        no_start_parsed = self.parser_x86.parse_file(code_no_start)
-        with self.assertRaises(LookupError):
-            reduce_to_section(no_start_parsed, 'x86')
-
-        # no end marker
-        code_no_end = prologue + mov_start + bytes_line + kernel + mov_end + epilogue
-        no_end_parsed = self.parser_x86.parse_file(code_no_end)
-        with self.assertRaises(LookupError):
-            reduce_to_section(no_end_parsed, 'x86')
-
-        # no marker at all
-        code_no_marker = prologue + kernel + epilogue
-        no_marker_parsed = self.parser_x86.parse_file(code_no_marker)
-        with self.assertRaises(LookupError):
-            reduce_to_section(no_marker_parsed, 'x86')
-
     def test_find_jump_labels(self):
         self.assertEqual(find_jump_labels(self.parsed_x86),
                          OrderedDict([('.LFB24', 10), ('.L4', 65), ('.L3', 79), ('.L2', 102),
