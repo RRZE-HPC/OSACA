@@ -22,9 +22,9 @@ def reduce_to_section(kernel, isa):
     else:
         raise ValueError('ISA not supported.')
     if start == -1:
-        raise LookupError('Could not find START MARKER. Make sure it is inserted!')
+        start = 0
     if end == -1:
-        raise LookupError('Could not find END MARKER. Make sure it is inserted!')
+        end = len(kernel)
     return kernel[start:end]
 
 

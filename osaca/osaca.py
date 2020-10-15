@@ -143,6 +143,12 @@ def create_parser(parser=None):
         '--verbose', '-v', action='count', default=0, help='Increases verbosity level.'
     )
     parser.add_argument(
+        '--out', '-o',
+        default=sys.stdout,
+        type=argparse.FileType('w'),
+        help='Write analysis to this file (default to stdout).'
+    )
+    parser.add_argument(
         'file', type=argparse.FileType('r'), help='Path to object (ASM or instruction file).'
     )
 
@@ -326,7 +332,7 @@ def main():
     parser = create_parser()
     args = parser.parse_args()
     check_arguments(args, parser)
-    run(args)
+    run(args, output_file=args.out)
 
 
 if __name__ == '__main__':
