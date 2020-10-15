@@ -181,3 +181,29 @@ instruction_forms:
           post-indexed: "*"
           source: false
           destination: true
+    - name: cmp
+      operands:
+        - class: "register"
+          prefix: "*"
+          source: true
+          destination: false
+        - class: "register"
+          prefix: "*"
+          source: true
+          destination: false
+    - name: cmp
+      operands:
+        - class: "register"
+          prefix: "*"
+          source: true
+          destination: false
+        - class: "memory"
+          prefix: "*"
+          base: "*"
+          offset: "*"
+          index: "*"
+          scale: "*"
+          pre-indexed: "*"
+          post-indexed: "*"
+          source: true
+          destination: false
