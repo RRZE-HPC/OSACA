@@ -493,6 +493,7 @@ class MachineModel(object):
         if 'class' in operand:
             # compare two DB entries
             return self._compare_db_entries(i_operand, operand)
+        # TODO support class wildcards
         # register
         if 'register' in operand:
             if i_operand['class'] != 'register':
@@ -504,12 +505,14 @@ class MachineModel(object):
                 return False
             return self._is_AArch64_mem_type(i_operand, operand['memory'])
         # immediate
+        # TODO support wildcards
         if 'value' in operand or ('immediate' in operand and 'value' in operand['immediate']):
             return i_operand['class'] == 'immediate' and i_operand['imd'] == 'int'
         if 'float' in operand or ('immediate' in operand and 'float' in operand['immediate']):
             return i_operand['class'] == 'immediate' and i_operand['imd'] == 'float'
         if 'double' in operand or ('immediate' in operand and 'double' in operand['immediate']):
             return i_operand['class'] == 'immediate' and i_operand['imd'] == 'double'
+        # identifier
         if 'identifier' in operand or (
             'immediate' in operand and 'identifier' in operand['immediate']
         ):
