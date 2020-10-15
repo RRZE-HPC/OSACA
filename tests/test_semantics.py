@@ -11,7 +11,7 @@ from subprocess import call
 import networkx as nx
 
 from osaca.osaca import get_unmatched_instruction_ratio
-from osaca.parser import AttrDict, ParserAArch64v81, ParserX86ATT
+from osaca.parser import AttrDict, ParserAArch64, ParserX86ATT
 from osaca.semantics import (INSTR_FLAGS, ArchSemantics, KernelDG,
                              MachineModel, reduce_to_section)
 
@@ -30,7 +30,7 @@ class TestSemanticTools(unittest.TestCase):
             call(['cp', '-r', self.MODULE_DATA_DIR, self.USER_DATA_DIR])
         # set up parser and kernels
         self.parser_x86 = ParserX86ATT()
-        self.parser_AArch64 = ParserAArch64v81()
+        self.parser_AArch64 = ParserAArch64()
         with open(self._find_file('kernel_x86.s')) as f:
             self.code_x86 = f.read()
         with open(self._find_file('kernel_aarch64.s')) as f:
