@@ -1,4 +1,4 @@
-osaca_version: 0.3.0
+osaca_version: 0.3.4
 isa: "x86"
 # Contains all operand-irregular instruction forms OSACA supports for x86.
 # Operand-regular for a x86 AT&T instruction form with N operands in the shape of
@@ -3167,7 +3167,7 @@ instruction_forms:
           destination: false
       hidden_operands:
         - class: "memory"
-          base: "gpr"
+          base: {name: 'rsp'}
           offset: ~
           index: ~
           scale: 1
@@ -3177,11 +3177,29 @@ instruction_forms:
           name: "rsp"
           source: true
           destination: true
+    - name: pop
+      operands:
+        - class: "register"
+          name: "gpr"
+          source: false
+          destination: true
+      hidden_operands:
+        - class: "memory"
+          base: {name: 'rsp'}
+          offset: ~
+          index: ~
+          scale: 1
+          source: true
+          destination: false
+        - class: "register"
+          name: "rsp"
+          source: true
+          destination: true
     - name: pushfq
       operands: []
       hidden_operands:
         - class: "memory"
-          base: "gpr"
+          base: {name: 'rsp'}
           offset: ~
           index: ~
           scale: 1
@@ -3971,4 +3989,3 @@ instruction_forms:
           name: "gpr"
           source: true
           destination: true
-

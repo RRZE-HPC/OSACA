@@ -178,120 +178,115 @@ class TestMarkerUtils(unittest.TestCase):
 
     def test_marker_special_cases_AArch(self):
         bytes_line = '.byte     213,3,32,31\n'
-        mov_start = 'mov      x1, #111\n'
-        mov_end = 'mov      x1, #222\n'
-        prologue = 'dup v0.2d, x14\n' + '    neg x9, x9\n' + '    .p2align    6\n'
+        start_marker = 'mov      x1, #111\n' + bytes_line
+        end_marker = 'mov      x1, #222\n' + bytes_line
+        prologue = (
+            'dup v0.2d, x14\n'
+            'neg x9, x9\n'
+            '.p2align    6\n')
         kernel = (
             '.LBB0_28:\n'
             + 'fmul    v7.2d, v7.2d, v19.2d\n'
             + 'stp q0, q1, [x10, #-32]\n'
-            + 'b.ne    .LBB0_28\n'
-        )
-        epilogue = '.LBB0_29:   //   Parent Loop BB0_20 Depth=1\n' + 'bl    dummy\n'
-        kernel_length = len(list(filter(None, kernel.split('\n'))))
+            + 'b.ne    .LBB0_28\n')
+        epilogue = (
+            '.LBB0_29:   //   Parent Loop BB0_20 Depth=1\n'
+            'bl    dummy\n')
 
-        # marker directly at the beginning
-        code_beginning = mov_start + bytes_line + kernel + mov_end + bytes_line + epilogue
-        beginning_parsed = self.parser_AArch.parse_file(code_beginning)
-        test_kernel = reduce_to_section(beginning_parsed, 'AArch64')
-        self.assertEqual(len(test_kernel), kernel_length)
-        kernel_start = len(list(filter(None, (mov_start + bytes_line).split('\n'))))
-        parsed_kernel = self.parser_AArch.parse_file(kernel, start_line=kernel_start)
-        self.assertEqual(test_kernel, parsed_kernel)
+        samples = [
+            # (test name,
+            #  ignored prologue, section to be extraced, ignored epilogue)
+            ("markers",
+             prologue + start_marker, kernel, end_marker + epilogue),
+            ("marker at file start",
+             start_marker, kernel, end_marker + epilogue),
+            ("no start marker",
+             '', prologue + kernel, end_marker + epilogue),
+            ("marker at file end",
+             prologue + start_marker, kernel, end_marker),
+            ("no end marker",
+             prologue + start_marker, kernel + epilogue, ''),
+            ("empty kernel",
+             prologue + start_marker, '', end_marker + epilogue),
+        ]
 
-        # marker at the end
-        code_end = prologue + mov_start + bytes_line + kernel + mov_end + bytes_line + epilogue
-        end_parsed = self.parser_AArch.parse_file(code_end)
-        test_kernel = reduce_to_section(end_parsed, 'AArch64')
-        self.assertEqual(len(test_kernel), kernel_length)
-        kernel_start = len(list(filter(None, (prologue + mov_start + bytes_line).split('\n'))))
-        parsed_kernel = self.parser_AArch.parse_file(kernel, start_line=kernel_start)
-        self.assertEqual(test_kernel, parsed_kernel)
-
-        # no kernel
-        code_empty = prologue + mov_start + bytes_line + mov_end + bytes_line + epilogue
-        empty_parsed = self.parser_AArch.parse_file(code_empty)
-        test_kernel = reduce_to_section(empty_parsed, 'AArch64')
-        self.assertEqual(len(test_kernel), 0)
-        kernel_start = len(list(filter(None, (prologue + mov_start + bytes_line).split('\n'))))
-        self.assertEqual(test_kernel, [])
-
-        # no start marker
-        code_no_start = prologue + bytes_line + kernel + mov_end + bytes_line + epilogue
-        no_start_parsed = self.parser_AArch.parse_file(code_no_start)
-        with self.assertRaises(LookupError):
-            reduce_to_section(no_start_parsed, 'AArch64')
-
-        # no end marker
-        code_no_end = prologue + mov_start + bytes_line + kernel + mov_end + epilogue
-        no_end_parsed = self.parser_AArch.parse_file(code_no_end)
-        with self.assertRaises(LookupError):
-            reduce_to_section(no_end_parsed, 'AArch64')
-
-        # no marker at all
-        code_no_marker = prologue + kernel + epilogue
-        no_marker_parsed = self.parser_AArch.parse_file(code_no_marker)
-        with self.assertRaises(LookupError):
-            reduce_to_section(no_marker_parsed, 'AArch64')
+        for test_name, pro, kernel, epi in samples:
+            code = pro + kernel + epi
+            parsed = self.parser_AArch.parse_file(code)
+            test_kernel = reduce_to_section(parsed, 'AArch64')
+            if kernel:
+                kernel_length = len(kernel.strip().split('\n'))
+            else:
+                kernel_length = 0
+            self.assertEqual(
+                len(test_kernel), kernel_length,
+                msg="Invalid exctracted kernel length on {!r} sample".format(test_name))
+            if pro:
+                kernel_start = len((pro).strip().split('\n'))
+            else:
+                kernel_start = 0
+            parsed_kernel = self.parser_AArch.parse_file(kernel, start_line=kernel_start)
+            self.assertEqual(
+                test_kernel, parsed_kernel,
+                msg="Invalid exctracted kernel on {!r}".format(test_name))
 
     def test_marker_special_cases_x86(self):
-        bytes_line = '.byte     100\n.byte     103\n.byte     144\n'
-        mov_start = 'movl     $111, %ebx\n'
-        mov_end = 'movl     $222, %ebx\n'
-        prologue = 'movl    -88(%rbp), %r10d\n' + 'xorl    %r11d, %r11d\n' + '.p2align 4,,10\n'
+        bytes_line = (
+            '.byte     100\n'
+            '.byte     103\n'
+            '.byte     144\n')
+        start_marker = 'movl     $111, %ebx\n' + bytes_line
+        end_marker = 'movl     $222, %ebx\n' + bytes_line
+        prologue = (
+            'movl    -88(%rbp), %r10d\n'
+            'xorl    %r11d, %r11d\n'
+            '.p2align 4,,10\n')
         kernel = (
             '.L3: #L3\n'
-            + 'vmovsd  .LC1(%rip), %xmm0\n'
-            + 'vmovsd  %xmm0, (%r15,%rcx,8)\n'
-            + 'cmpl    %ecx, %ebx\n'
-            + 'jle .L3\n'
-        )
-        epilogue = 'leaq    -56(%rbp), %rsi\n' + 'movl    %r10d, -88(%rbp)\n' + 'call    timing\n'
-        kernel_length = len(list(filter(None, kernel.split('\n'))))
+            'vmovsd  .LC1(%rip), %xmm0\n'
+            'vmovsd  %xmm0, (%r15,%rcx,8)\n'
+            'cmpl    %ecx, %ebx\n'
+            'jle .L3\n')
+        epilogue = (
+            'leaq    -56(%rbp), %rsi\n'
+            'movl    %r10d, -88(%rbp)\n'
+            'call    timing\n')
+        samples = [
+            # (test name,
+            #  ignored prologue, section to be extraced, ignored epilogue)
+            ("markers",
+             prologue + start_marker, kernel, end_marker + epilogue),
+            ("marker at file start",
+             start_marker, kernel, end_marker + epilogue),
+            ("no start marker",
+             '', prologue + kernel, end_marker + epilogue),
+            ("marker at file end",
+             prologue + start_marker, kernel, end_marker),
+            ("no end marker",
+             prologue + start_marker, kernel + epilogue, ''),
+            ("empty kernel",
+             prologue + start_marker, '', end_marker + epilogue),
+        ]
 
-        # marker directly at the beginning
-        code_beginning = mov_start + bytes_line + kernel + mov_end + bytes_line + epilogue
-        beginning_parsed = self.parser_x86.parse_file(code_beginning)
-        test_kernel = reduce_to_section(beginning_parsed, 'x86')
-        self.assertEqual(len(test_kernel), kernel_length)
-        kernel_start = len(list(filter(None, (mov_start + bytes_line).split('\n'))))
-        parsed_kernel = self.parser_x86.parse_file(kernel, start_line=kernel_start)
-        self.assertEqual(test_kernel, parsed_kernel)
-
-        # marker at the end
-        code_end = prologue + mov_start + bytes_line + kernel + mov_end + bytes_line + epilogue
-        end_parsed = self.parser_x86.parse_file(code_end)
-        test_kernel = reduce_to_section(end_parsed, 'x86')
-        self.assertEqual(len(test_kernel), kernel_length)
-        kernel_start = len(list(filter(None, (prologue + mov_start + bytes_line).split('\n'))))
-        parsed_kernel = self.parser_x86.parse_file(kernel, start_line=kernel_start)
-        self.assertEqual(test_kernel, parsed_kernel)
-
-        # no kernel
-        code_empty = prologue + mov_start + bytes_line + mov_end + bytes_line + epilogue
-        empty_parsed = self.parser_x86.parse_file(code_empty)
-        test_kernel = reduce_to_section(empty_parsed, 'x86')
-        self.assertEqual(len(test_kernel), 0)
-        kernel_start = len(list(filter(None, (prologue + mov_start + bytes_line).split('\n'))))
-        self.assertEqual(test_kernel, [])
-
-        # no start marker
-        code_no_start = prologue + bytes_line + kernel + mov_end + bytes_line + epilogue
-        no_start_parsed = self.parser_x86.parse_file(code_no_start)
-        with self.assertRaises(LookupError):
-            reduce_to_section(no_start_parsed, 'x86')
-
-        # no end marker
-        code_no_end = prologue + mov_start + bytes_line + kernel + mov_end + epilogue
-        no_end_parsed = self.parser_x86.parse_file(code_no_end)
-        with self.assertRaises(LookupError):
-            reduce_to_section(no_end_parsed, 'x86')
-
-        # no marker at all
-        code_no_marker = prologue + kernel + epilogue
-        no_marker_parsed = self.parser_x86.parse_file(code_no_marker)
-        with self.assertRaises(LookupError):
-            reduce_to_section(no_marker_parsed, 'x86')
+        for test_name, pro, kernel, epi in samples:
+            code = pro + kernel + epi
+            parsed = self.parser_x86.parse_file(code)
+            test_kernel = reduce_to_section(parsed, 'x86')
+            if kernel:
+                kernel_length = len(kernel.strip().split('\n'))
+            else:
+                kernel_length = 0
+            self.assertEqual(
+                len(test_kernel), kernel_length,
+                msg="Invalid exctracted kernel length on {!r} sample".format(test_name))
+            if pro:
+                kernel_start = len((pro).strip().split('\n'))
+            else:
+                kernel_start = 0
+            parsed_kernel = self.parser_x86.parse_file(kernel, start_line=kernel_start)
+            self.assertEqual(
+                test_kernel, parsed_kernel,
+                msg="Invalid exctracted kernel on {!r}".format(test_name))
 
     def test_find_jump_labels(self):
         self.assertEqual(find_jump_labels(self.parsed_x86),

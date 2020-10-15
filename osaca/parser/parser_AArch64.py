@@ -19,22 +19,23 @@ class ParserAArch64(BaseParser):
             pp.ZeroOrMore(pp.Word(pp.printables))
         ).setResultsName(self.COMMENT_ID)
         # Define ARM assembly identifier
+        decimal_number = pp.Combine(
+            pp.Optional(pp.Literal('-')) + pp.Word(pp.nums)
+        ).setResultsName('value')
+        hex_number = pp.Combine(pp.Literal('0x') + pp.Word(pp.hexnums)).setResultsName('value')
         relocation = pp.Combine(pp.Literal(':') + pp.Word(pp.alphanums + '_') + pp.Literal(':'))
         first = pp.Word(pp.alphas + '_.', exact=1)
         rest = pp.Word(pp.alphanums + '_.')
         identifier = pp.Group(
             pp.Optional(relocation).setResultsName('relocation')
             + pp.Combine(first + pp.Optional(rest)).setResultsName('name')
-        ).setResultsName('identifier')
+            + pp.Optional(pp.Suppress(pp.Literal('+')) + (hex_number | decimal_number).setResultsName('offset'))
+        ).setResultsName(self.IDENTIFIER_ID)
         # Label
         self.label = pp.Group(
             identifier.setResultsName('name') + pp.Literal(':') + pp.Optional(self.comment)
         ).setResultsName(self.LABEL_ID)
         # Directive
-        decimal_number = pp.Combine(
-            pp.Optional(pp.Literal('-')) + pp.Word(pp.nums)
-        ).setResultsName('value')
-        hex_number = pp.Combine(pp.Literal('0x') + pp.Word(pp.hexnums)).setResultsName('value')
         directive_option = pp.Combine(
             pp.Word(pp.alphas + '#@.%', exact=1)
             + pp.Optional(pp.Word(pp.printables + ' ', excludeChars=','))
@@ -341,6 +342,8 @@ class ParserAArch64(BaseParser):
             return self.process_immediate(operand[self.IMMEDIATE_ID])
         if self.LABEL_ID in operand:
             return self.process_label(operand[self.LABEL_ID])
+        if self.IDENTIFIER_ID in operand:
+            return self.process_identifier(operand[self.IDENTIFIER_ID])
         return operand
 
     def process_memory_address(self, memory_address):
@@ -423,6 +426,13 @@ class ParserAArch64(BaseParser):
         # remove duplicated 'name' level due to identifier
         label['name'] = label['name']['name']
         return AttrDict({self.LABEL_ID: label})
+
+    def process_identifier(self, identifier):
+        """Post-process identifier operand"""
+        # remove value if it consists of symbol+offset
+        if 'value' in identifier:
+            del identifier['value']
+        return AttrDict({self.IDENTIFIER_ID: identifier})
 
     def get_full_reg_name(self, register):
         """Return one register name string including all attributes"""

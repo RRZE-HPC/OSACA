@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 
-import re
 import string
 
 import pyparsing as pp
@@ -34,8 +33,20 @@ class ParserX86ATT(BaseParser):
             + pp.Optional(relocation).setResultsName('relocation')
         ).setResultsName('identifier')
         # Label
+        rest = pp.Word(pp.alphanums + '$_.+-()')
+        label_identifier = pp.Group(
+            pp.Optional(id_offset).setResultsName('offset')
+            + pp.Combine(first + pp.Optional(rest)).setResultsName('name')
+            + pp.Optional(relocation).setResultsName('relocation')
+        ).setResultsName('identifier')
+        numeric_identifier = pp.Group(
+            pp.Word(pp.nums).setResultsName('name')
+            + pp.Optional(pp.oneOf('b f', caseless=True).setResultsName('suffix'))
+        ).setResultsName('identifier')
         self.label = pp.Group(
-            identifier.setResultsName('name') + pp.Literal(':') + pp.Optional(self.comment)
+            (label_identifier | numeric_identifier).setResultsName('name')
+            + pp.Literal(':')
+            + pp.Optional(self.comment)
         ).setResultsName(self.LABEL_ID)
         # Register: pp.Regex('^%[0-9a-zA-Z]+{}{z},?')
         self.register = pp.Group(
@@ -44,7 +55,7 @@ class ParserX86ATT(BaseParser):
             + pp.Optional(pp.Literal('(') + pp.Word(pp.nums) + pp.Literal(')'))
             + pp.Optional(
                 pp.Literal('{')
-                + pp.Literal('%')
+                + pp.Optional(pp.Suppress(pp.Literal('%')))
                 + pp.Word(pp.alphanums).setResultsName('mask')
                 + pp.Literal('}')
                 + pp.Optional(
@@ -99,7 +110,7 @@ class ParserX86ATT(BaseParser):
                 + pp.Literal(')')
                 + pp.Optional(
                     pp.Literal('{')
-                    + pp.Literal('%')
+                    + pp.Optional(pp.Suppress(pp.Literal('%')))
                     + pp.Word(pp.alphanums).setResultsName('mask')
                     + pp.Literal('}')
                 )
@@ -132,7 +143,9 @@ class ParserX86ATT(BaseParser):
             pp.alphanums
         ).setResultsName('mnemonic')
         # Combine to instruction form
-        operand_first = pp.Group(self.register ^ immediate ^ memory ^ identifier)
+        operand_first = pp.Group(
+            self.register ^ immediate ^ memory ^ identifier ^ numeric_identifier
+        )
         operand_rest = pp.Group(self.register ^ immediate ^ memory)
         self.instruction_parser = (
             mnemonic
@@ -305,7 +318,7 @@ class ParserX86ATT(BaseParser):
     def process_label(self, label):
         """Post-process label asm line"""
         # remove duplicated 'name' level due to identifier
-        label['name'] = label['name']['name']
+        label['name'] = label['name'][0]['name']
         return AttrDict({self.LABEL_ID: label})
 
     def process_immediate(self, immediate):

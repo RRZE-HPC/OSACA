@@ -1,4 +1,4 @@
-osaca_version: 0.3.0
+osaca_version: 0.3.4
 isa: "AArch64"
 # Contains all operand-irregular instruction forms OSACA supports for AArch64.
 # Operand-regular for a AArch64 instruction form with N operands in the shape of
@@ -191,3 +191,73 @@ instruction_forms:
           post-indexed: "*"
           source: false
           destination: true
+    - name: cmp
+      operands:
+        - class: "register"
+          prefix: "*"
+          source: true
+          destination: false
+        - class: "register"
+          prefix: "*"
+          source: true
+          destination: false
+    - name: cmp
+      operands:
+        - class: "register"
+          prefix: "*"
+          source: true
+          destination: false
+        - class: "immediate"
+          imd: "int"
+          source: true
+          destination: false
+    - name: cmn
+      operands:
+        - class: "register"
+          prefix: "*"
+          source: true
+          destination: false
+        - class: "register"
+          prefix: "*"
+          source: true
+          destination: false
+    - name: cmn
+      operands:
+        - class: "register"
+          prefix: "*"
+          source: true
+          destination: false
+        - class: "immediate"
+          imd: "int"
+          source: true
+          destination: false
+    - name: fcmp
+      operands:
+        - class: "register"
+          prefix: "*"
+          source: true
+          destination: false
+        - class: "register"
+          prefix: "*"
+          source: true
+          destination: false
+    - name: fcmp
+      operands:
+        - class: "register"
+          prefix: "*"
+          source: true
+          destination: false
+        - class: "immediate"
+          imd: "double"
+          source: true
+          destination: false
+    - name: fcmp
+      operands:
+        - class: "register"
+          prefix: "*"
+          source: true
+          destination: false
+        - class: "immediate"
+          imd: "float"
+          source: true
+          destination: false
