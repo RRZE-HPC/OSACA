@@ -23,6 +23,8 @@ def reduce_to_section(kernel, isa):
         raise ValueError('ISA not supported.')
     if start == -1:
         start = 0
+    if end == -1:
+        end = len(kernel)
     return kernel[start:end]
 
 
