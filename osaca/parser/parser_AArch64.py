@@ -347,6 +347,8 @@ class ParserAArch64(BaseParser):
         """Post-process memory address operand"""
         # Remove unnecessarily created dictionary entries during parsing
         offset = None if 'offset' not in memory_address else memory_address['offset']
+        if isinstance(offset, list) and len(offset) == 1:
+            offset = offset[0]
         base = None if 'base' not in memory_address else memory_address['base']
         index = None if 'index' not in memory_address else memory_address['index']
         scale = 1

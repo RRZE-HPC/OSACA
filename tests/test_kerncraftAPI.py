@@ -9,7 +9,7 @@ import unittest
 from collections import OrderedDict
 
 from osaca.api import KerncraftAPI
-from osaca.parser import ParserAArch64v81, ParserX86ATT
+from osaca.parser import ParserAArch64, ParserX86ATT
 
 
 class TestKerncraftAPI(unittest.TestCase):
@@ -17,7 +17,7 @@ class TestKerncraftAPI(unittest.TestCase):
     def setUpClass(self):
         # set up parser and kernels
         self.parser_x86 = ParserX86ATT()
-        self.parser_AArch64 = ParserAArch64v81()
+        self.parser_AArch64 = ParserAArch64()
         with open(self._find_file('triad_x86_iaca.s')) as f:
             self.code_x86 = f.read()
         with open(self._find_file('triad_arm_iaca.s')) as f:
