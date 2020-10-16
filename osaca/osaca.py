@@ -8,7 +8,7 @@ import sys
 
 from osaca.db_interface import import_benchmark_output, sanity_check
 from osaca.frontend import Frontend
-from osaca.parser import BaseParser, ParserAArch64v81, ParserX86ATT
+from osaca.parser import BaseParser, ParserAArch64, ParserX86ATT
 from osaca.semantics import (INSTR_FLAGS, ArchSemantics, KernelDG,
                              MachineModel, reduce_to_section)
 
@@ -17,7 +17,20 @@ MODULE_DATA_DIR = os.path.join(
 )
 LOCAL_OSACA_DIR = os.path.join(os.path.expanduser('~') + '/.osaca/')
 DATA_DIR = os.path.join(LOCAL_OSACA_DIR, 'data/')
-SUPPORTED_ARCHS = ['SNB', 'IVB', 'HSW', 'BDW', 'SKX', 'CSX', 'ZEN1', 'ZEN2', 'TX2', 'N1']
+SUPPORTED_ARCHS = [
+    'SNB',
+    'IVB',
+    'HSW',
+    'BDW',
+    'SKX',
+    'CSX',
+    'ICL',
+    'ZEN1',
+    'ZEN2',
+    'TX2',
+    'N1',
+    'A64FX',
+]
 
 
 # Stolen from pip
@@ -71,7 +84,8 @@ def create_parser(parser=None):
     parser.add_argument(
         '--arch',
         type=str,
-        help='Define architecture (SNB, IVB, HSW, BDW, SKX, CSX, ZEN1, ZEN2, TX2, N1).',
+        help='Define architecture (SNB, IVB, HSW, BDW, SKX, CSX, ICL, ZEN1, ZEN2, TX2, N1, '
+        'A64FX).',
     )
     parser.add_argument(
         '--fixed',
@@ -298,7 +312,7 @@ def get_asm_parser(arch) -> BaseParser:
     if isa == 'x86':
         return ParserX86ATT()
     elif isa == 'aarch64':
-        return ParserAArch64v81()
+        return ParserAArch64()
 
 
 def get_unmatched_instruction_ratio(kernel):

@@ -6,7 +6,7 @@ import pyparsing as pp
 from osaca.parser import AttrDict, BaseParser
 
 
-class ParserAArch64v81(BaseParser):
+class ParserAArch64(BaseParser):
     def __init__(self):
         super().__init__()
         self.isa = 'aarch64'
@@ -92,30 +92,48 @@ class ParserAArch64v81(BaseParser):
             ^ pp.CaselessLiteral('ror')
             ^ pp.CaselessLiteral('sxtw')
             ^ pp.CaselessLiteral('uxtw')
+            ^ pp.CaselessLiteral('mul vl')
         )
         arith_immediate = pp.Group(
             immediate.setResultsName('base_immediate')
             + pp.Suppress(pp.Literal(','))
             + shift_op.setResultsName('shift_op')
-            + immediate.setResultsName('shift')
+            + pp.Optional(immediate).setResultsName('shift')
         ).setResultsName(self.IMMEDIATE_ID)
         # Register:
-        # scalar: [XWBHSDQ][0-9]{1,2}  |   vector: V[0-9]{1,2}\.[12468]{1,2}[BHSD]()?
-        # define SP and ZR register aliases as regex, due to pyparsing does not support
+        # scalar: [XWBHSDQ][0-9]{1,2}  |   vector: [VZ][0-9]{1,2}(\.[12468]{1,2}[BHSD])?
+        #  | predicate: P[0-9]{1,2}(/[ZM])?
+        # ignore vector len control ZCR_EL[123] for now
+        # define SP, ZR register aliases as regex, due to pyparsing does not support
         # proper lookahead
         alias_r31_sp = pp.Regex('(?P<prefix>[a-zA-Z])?(?P<name>(sp|SP))')
         alias_r31_zr = pp.Regex('(?P<prefix>[a-zA-Z])?(?P<name>(zr|ZR))')
-        scalar = pp.Word(pp.alphas, exact=1).setResultsName('prefix') + pp.Word(
+        scalar = pp.Word('xwbhsdqXWBHSDQ', exact=1).setResultsName('prefix') + pp.Word(
             pp.nums
         ).setResultsName('name')
         index = pp.Literal('[') + pp.Word(pp.nums).setResultsName('index') + pp.Literal(']')
         vector = (
-            pp.CaselessLiteral('v').setResultsName('prefix')
+            pp.oneOf('v z', caseless=True).setResultsName('prefix')
             + pp.Word(pp.nums).setResultsName('name')
             + pp.Literal('.')
             + pp.Optional(pp.Word('12468')).setResultsName('lanes')
             + pp.Word(pp.alphas, exact=1).setResultsName('shape')
             + pp.Optional(index)
+        )
+        predicate = (
+            pp.CaselessLiteral('p').setResultsName('prefix')
+            + pp.Word(pp.nums).setResultsName('name')
+            + pp.Optional(
+                (
+                    pp.Suppress(pp.Literal('/'))
+                    + pp.oneOf('z m', caseless=True).setResultsName('predication')
+                )
+                | (
+                    pp.Literal('.')
+                    + pp.Optional(pp.Word('12468')).setResultsName('lanes')
+                    + pp.Word(pp.alphas, exact=1).setResultsName('shape')
+                )
+            )
         )
         self.list_element = vector ^ scalar
         register_list = (
@@ -130,7 +148,8 @@ class ParserAArch64v81(BaseParser):
             + pp.Optional(index)
         )
         register = pp.Group(
-            (alias_r31_sp | alias_r31_zr | vector | scalar | register_list)
+            (alias_r31_sp | alias_r31_zr | vector | scalar | predicate | register_list)
+            #(alias_r31_sp | alias_r31_zr | vector | scalar | predicate | register_list)
             + pp.Optional(
                 pp.Suppress(pp.Literal(','))
                 + shift_op.setResultsName('shift_op')
@@ -145,7 +164,7 @@ class ParserAArch64v81(BaseParser):
             pp.Literal('[')
             + pp.Optional(register.setResultsName('base'))
             + pp.Optional(pp.Suppress(pp.Literal(',')))
-            + pp.Optional(register_index ^ immediate.setResultsName('offset'))
+            + pp.Optional(register_index ^ (immediate ^ arith_immediate).setResultsName('offset'))
             + pp.Literal(']')
             + pp.Optional(
                 pp.Literal('!').setResultsName('pre_indexed')
@@ -178,6 +197,11 @@ class ParserAArch64v81(BaseParser):
             + pp.Optional(self.comment)
         )
 
+        # for testing
+        self.predicate = predicate
+        self.vector = vector
+        self.register = register
+
     def parse_line(self, line, line_number=None):
         """
         Parse line and return instruction form.
@@ -194,7 +218,7 @@ class ParserAArch64v81(BaseParser):
                 self.DIRECTIVE_ID: None,
                 self.COMMENT_ID: None,
                 self.LABEL_ID: None,
-                'line': line.strip(),
+                'line': line,
                 'line_number': line_number,
             }
         )
@@ -325,9 +349,11 @@ class ParserAArch64v81(BaseParser):
     def process_memory_address(self, memory_address):
         """Post-process memory address operand"""
         # Remove unnecessarily created dictionary entries during parsing
-        offset = None if 'offset' not in memory_address else memory_address['offset']
-        base = None if 'base' not in memory_address else memory_address['base']
-        index = None if 'index' not in memory_address else memory_address['index']
+        offset = memory_address.get('offset', None)
+        if isinstance(offset, list) and len(offset) == 1:
+            offset = offset[0]
+        base = memory_address.get('base', None)
+        index = memory_address.get('index', None)
         scale = 1
         if base is not None and 'name' in base and base['name'] == 'sp':
             base['prefix'] = 'x'
@@ -354,18 +380,20 @@ class ParserAArch64v81(BaseParser):
     def process_register_list(self, register_list):
         """Post-process register lists (e.g., {r0,r3,r5}) and register ranges (e.g., {r0-r7})"""
         # Remove unnecessarily created dictionary entries during parsing
-        vlist = []
+        rlist = []
         dict_name = ''
         if 'list' in register_list:
             dict_name = 'list'
         if 'range' in register_list:
             dict_name = 'range'
-        for v in register_list[dict_name]:
-            vlist.append(
-                AttrDict.convert_dict(self.list_element.parseString(v, parseAll=True).asDict())
+        for r in register_list[dict_name]:
+            rlist.append(
+                AttrDict.convert_dict(self.list_element.parseString(r, parseAll=True).asDict())
             )
-        index = None if 'index' not in register_list else register_list['index']
-        new_dict = AttrDict({dict_name: vlist, 'index': index})
+        index = register_list.get('index', None)
+        new_dict = AttrDict({dict_name: rlist, 'index': index})
+        if len(new_dict[dict_name]) == 1:
+            return AttrDict({self.REGISTER_ID: new_dict[dict_name][0]})
         return AttrDict({self.REGISTER_ID: new_dict})
 
     def process_immediate(self, immediate):
@@ -450,7 +478,7 @@ class ParserAArch64v81(BaseParser):
 
     def is_vector_register(self, register):
         """Check if register is a vector register"""
-        if register['prefix'] in 'bhsdqv':
+        if register['prefix'] in 'bhsdqvz':
             return True
         return False
 
@@ -465,7 +493,7 @@ class ParserAArch64v81(BaseParser):
     def is_reg_dependend_of(self, reg_a, reg_b):
         """Check if ``reg_a`` is dependent on ``reg_b``"""
         prefixes_gpr = 'wx'
-        prefixes_vec = 'bhsdqv'
+        prefixes_vec = 'bhsdqvz'
         if reg_a['name'] == reg_b['name']:
             if reg_a['prefix'].lower() in prefixes_gpr and reg_b['prefix'].lower() in prefixes_gpr:
                 return True

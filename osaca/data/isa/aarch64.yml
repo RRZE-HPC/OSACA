@@ -1,4 +1,4 @@
-osaca_version: 0.3.4
+osaca_version: 0.3.7
 isa: "AArch64"
 # Contains all operand-irregular instruction forms OSACA supports for AArch64.
 # Operand-regular for a AArch64 instruction form with N operands in the shape of

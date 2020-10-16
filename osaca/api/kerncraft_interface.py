@@ -5,7 +5,7 @@ import sys
 from io import StringIO
 
 from osaca.frontend import Frontend
-from osaca.parser import ParserAArch64v81, ParserX86ATT
+from osaca.parser import ParserAArch64, ParserX86ATT
 from osaca.semantics import (INSTR_FLAGS, KernelDG, MachineModel,
                              ArchSemantics, reduce_to_section)
 
@@ -29,7 +29,7 @@ class KerncraftAPI(object):
         self.semantics = ArchSemantics(self.machine_model)
         isa = self.machine_model.get_ISA().lower()
         if isa == 'aarch64':
-            self.parser = ParserAArch64v81()
+            self.parser = ParserAArch64()
         elif isa == 'x86':
             self.parser = ParserX86ATT()
 

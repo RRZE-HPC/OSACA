@@ -7,7 +7,7 @@ import os
 import unittest
 
 from osaca.frontend import Frontend
-from osaca.parser import ParserAArch64v81, ParserX86ATT
+from osaca.parser import ParserAArch64, ParserX86ATT
 from osaca.semantics import ArchSemantics, KernelDG, MachineModel
 
 
@@ -20,7 +20,7 @@ class TestFrontend(unittest.TestCase):
     def setUpClass(self):
         # set up parser and kernels
         self.parser_x86 = ParserX86ATT()
-        self.parser_AArch64 = ParserAArch64v81()
+        self.parser_AArch64 = ParserAArch64()
         with open(self._find_file('kernel_x86.s')) as f:
             code_x86 = f.read()
         with open(self._find_file('kernel_aarch64.s')) as f:

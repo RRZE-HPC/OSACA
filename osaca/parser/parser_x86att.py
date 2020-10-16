@@ -184,7 +184,7 @@ class ParserX86ATT(BaseParser):
                 self.DIRECTIVE_ID: None,
                 self.COMMENT_ID: None,
                 self.LABEL_ID: None,
-                'line': line.strip(),
+                'line': line,
                 'line_number': line_number,
             }
         )
@@ -303,9 +303,9 @@ class ParserX86ATT(BaseParser):
     def process_memory_address(self, memory_address):
         """Post-process memory address operand"""
         # Remove unecessarily created dictionary entries during memory address parsing
-        offset = None if 'offset' not in memory_address else memory_address['offset']
-        base = None if 'base' not in memory_address else memory_address['base']
-        index = None if 'index' not in memory_address else memory_address['index']
+        offset = memory_address.get('offset', None)
+        base = memory_address.get('base', None)
+        index = memory_address.get('index', None)
         scale = 1 if 'scale' not in memory_address else int(memory_address['scale'])
         if isinstance(offset, str) and base is None and index is None:
             offset = {'value': offset}
