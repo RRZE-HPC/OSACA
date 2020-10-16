@@ -349,11 +349,11 @@ class ParserAArch64(BaseParser):
     def process_memory_address(self, memory_address):
         """Post-process memory address operand"""
         # Remove unnecessarily created dictionary entries during parsing
-        offset = None if 'offset' not in memory_address else memory_address['offset']
+        offset = memory_address.get('offset', None)
         if isinstance(offset, list) and len(offset) == 1:
             offset = offset[0]
-        base = None if 'base' not in memory_address else memory_address['base']
-        index = None if 'index' not in memory_address else memory_address['index']
+        base = memory_address.get('base', None)
+        index = memory_address.get('index', None)
         scale = 1
         if base is not None and 'name' in base and base['name'] == 'sp':
             base['prefix'] = 'x'
@@ -390,7 +390,7 @@ class ParserAArch64(BaseParser):
             rlist.append(
                 AttrDict.convert_dict(self.list_element.parseString(r, parseAll=True).asDict())
             )
-        index = None if 'index' not in register_list else register_list['index']
+        index = register_list.get('index', None)
         new_dict = AttrDict({dict_name: rlist, 'index': index})
         if len(new_dict[dict_name]) == 1:
             return AttrDict({self.REGISTER_ID: new_dict[dict_name][0]})
