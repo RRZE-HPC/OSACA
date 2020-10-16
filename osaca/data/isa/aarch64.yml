@@ -1,21 +1,11 @@
-osaca_version: 0.3.4
+osaca_version: 0.3.7
 isa: "AArch64"
 # Contains all operand-irregular instruction forms OSACA supports for AArch64.
 # Operand-regular for a AArch64 instruction form with N operands in the shape of
 #   mnemonic op1 ... opN
 # means that op1 is the only destination operand and op2 to op(N) are source operands.
 instruction_forms:
-    - name: "cmp"
-      operands:
-        - class: "register"
-          prefix: "x"
-          source: true
-          destination: false
-        - class: "register"
-          prefix: "x"
-          source: true
-          destination: false
-    - name: "fmla"
+    - name: fmla
       operands:
         - class: "register"
           prefix: "*"
