@@ -156,8 +156,8 @@ class TestParserX86ATT(unittest.TestCase):
     def test_parse_line(self):
         line_comment = '# -- Begin  main'
         line_label = '..B1.7:                         # Preds ..B1.6'
-        line_directive = '\t\t.quad   .2.3_2__kmpc_loc_pack.2 #qed'
-        line_instruction = '\t\tlea       2(%rax,%rax), %ecx #12.9'
+        line_directive = '.quad   .2.3_2__kmpc_loc_pack.2 #qed'
+        line_instruction = 'lea       2(%rax,%rax), %ecx #12.9'
 
         instruction_form_1 = {
             'instruction': None,

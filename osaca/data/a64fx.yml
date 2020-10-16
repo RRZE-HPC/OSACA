@@ -1,0 +1,1031 @@
+osaca_version: 0.3.3
+micro_architecture: Fujitsu A64FX
+arch_code: a64fx
+isa: AArch64
+ROB_size: 48
+retired_uOps_per_cycle: 4
+scheduler_size: 79
+hidden_loads: false 
+load_latency: {w: 5.0, x: 5.0, b: 5.0, h: 5.0, s: 5.0, d: 8.0, q: 8.0, v: 8.0, z: 11.0}
+load_throughput:
+- {base: x, index: ~, offset: ~, scale: 1, pre-indexed: false, post-indexed: false, port_pressure:   [[1, '56'], [1, ['5D', '6D']]]}
+- {base: x, index: ~, offset: imd, scale: 1, pre-indexed: false, post-indexed: true, port_pressure:  [[1, '56'], [1, ['5D', '6D']], [1, '3456']]}
+- {base: x, index: ~, offset: imd, scale: 1, pre-indexed: false, post-indexed: false, port_pressure: [[1, '56'], [1, ['5D', '6D']]]}
+- {base: x, index: ~, offset: imd, scale: 1, pre-indexed: true, post-indexed: true, port_pressure:   [[1, '56'], [1, ['5D', '6D']], [1, '3456']]}
+- {base: x, index: ~, offset: imd, scale: 1, pre-indexed: true, post-indexed: false, port_pressure:  [[1, '56'], [1, ['5D', '6D']], [1, '3456']]}
+- {base: x, index: x, offset: ~, scale: 1, pre-indexed: false, post-indexed: true, port_pressure:    [[1, '56'], [1, ['5D', '6D']], [1, '3456']]}
+- {base: x, index: x, offset: ~, scale: 1, pre-indexed: false, post-indexed: false, port_pressure:   [[1, '56'], [1, ['5D', '6D']]]}
+- {base: x, index: x, offset: ~, scale: 1, pre-indexed: true, post-indexed: true, port_pressure:     [[1, '56'], [1, ['5D', '6D']], [1, '3456']]}
+- {base: x, index: x, offset: ~, scale: 1, pre-indexed: true, post-indexed: false, port_pressure:    [[1, '56'], [1, ['5D', '6D']], [1, '3456']]}
+- {base: x, index: x, offset: imd, scale: 1, pre-indexed: false, post-indexed: true, port_pressure:  [[1, '56'], [1, ['5D', '6D']], [1, '3456']]}
+- {base: x, index: x, offset: imd, scale: 1, pre-indexed: false, post-indexed: false, port_pressure: [[1, '56'], [1, ['5D', '6D']]]}
+- {base: x, index: x, offset: imd, scale: 1, pre-indexed: true, post-indexed: true, port_pressure:   [[1, '56'], [1, ['5D', '6D']], [1, '3456']]}
+- {base: x, index: x, offset: imd, scale: 1, pre-indexed: true, post-indexed: false, port_pressure:  [[1, '56'], [1, ['5D', '6D']], [1, '3456']]}
+load_throughput_default: [[1, '56'], [1, ['5D', '6D']]]
+store_throughput: []
+store_throughput_default: [[1, '56'], [1, '0']]
+ports: ['0', 0DV, '1', '2', '3', '4', '5', 5D, '6', 6D, '7']
+port_model_scheme: |
+  +---------------------------------------------------------------------------------+
+  |                2 * 10 entry RSA0/1, 2 * 20 entry RSE0/1, 19 entry RSBR          |
+  +---------------------------------------------------------------------------------+
+    0 |FLA    1 |PR      2 |FLB   3 |EXA    4 |EXB     5 |EAGA   6 |EAGB    7 |BR
+      \/        \/         \/       \/        \/         \/        \/         \/
+   +-------+ +-------+ +-------+ +-------+ +-------+  +-------+ +-------+  +------+
+   |INT ALU| |Predic.| |Int ALU| |Int ALU| |Int ALU|  |Int ALU| |Int ALU|  |Branch|
+   +-------+ | manip.| +-------+ +-------+ +-------+  +-------+ +-------+  +------+
+   +-------+ +-------+ +-------+ +-------+ +-------+  +-------+ +-------+
+   | FP ALU|           | FP ALU| |  MUL  | |  DIV  |  |  AGU  | |  AGU  |
+   +-------+           +-------+ +-------+ +-------+  +-------+ +-------+
+   +-------+           +-------+ +-------+ +-------+  +-------+ +-------+
+   |  FMA  |           |  FMA  | | SHIFT | | SHIFT |  |  LOAD | |  LOAD |
+   +-------+           +-------+ +-------+ +-------+  +-------+ +-------+
+   +-------+           +-------+ +-------+
+   | FP DIV|           | SHIFT | | INT ST|
+   +-------+           +-------+ +-------+
+   +-------+
+   | SHIFT |
+   +-------+
+   +-------+
+   | CRYPTO|
+   +-------+
+   +-------+
+   | FP ST |
+   +-------+
+   +--------+
+   |VEC ADDR|
+   |  CALC  |
+   +--------+
+instruction_forms:
+- name: add
+  operands:
+  - class: register
+    prefix: x
+  - class: register
+    prefix: x
+  - class: register
+    prefix: x
+  throughput: 0.25
+  latency: 1.0  # 	1*p0234
+  port_pressure: [[1, '0234']]
+- name: add
+  operands:
+  - class: register
+    prefix: x
+  - class: register
+    prefix: x
+  - class: immediate
+    imd: int
+  throughput: 0.25
+  latency: 1.0  # 	1*p0234
+  port_pressure: [[1, '0234']]
+- name: addpl
+  operands:
+  - class: register
+    prefix: x
+  - class: register
+    prefix: x
+  - class: immediate
+    imd: int
+  throughput: 0.5
+  latency: 1.0  # 	1*p34
+  port_pressure: [[1, '34']]
+- name: adds
+  operands:
+  - class: register
+    prefix: x 
+  - class: register
+    prefix: x
+  - class: immediate
+    imd: int
+  throughput: 0.5
+  latency: 1.0  # 	1*p34
+  port_pressure: [[1, '34']]
+- name: b.ne
+  operands:
+  - class: identifier
+  throughput: 1.0
+  latency: 0.0
+  port_pressure: [[1, '7']]
+- name: b.any
+  operands:
+  - class: identifier
+  throughput: 1.0
+  latency: 0.0
+  port_pressure: [[1, '7']]
+- name: b.none
+  operands:
+  - class: identifier
+  throughput: 1.0
+  latency: 0.0
+  port_pressure: [[1, '7']]
+- name: b.gt
+  operands:
+  - class: identifier
+  throughput: 1.0
+  latency: 0.0
+  port_pressure: [[1, '7']]
+- name: bne
+  operands:
+  - class: identifier
+  throughput: 1.0
+  latency: 0.0
+  port_pressure: [[1, '7']]
+- name: beq
+  operands:
+  - class: identifier
+  throughput: 1.0
+  latency: 0.0
+  port_pressure: [[1, '7']]
+- name: cmp
+  operands:
+  - class: register
+    prefix: w
+  - class: immediate
+    imd: int
+  throughput: 0.5
+  latency: 1.0  # 	1*p34
+  port_pressure: [[1, '34']]
+- name: cmp
+  operands:
+  - class: register
+    prefix: x
+  - class: register
+    prefix: x
+  throughput: 0.5
+  latency: 1.0  # 	1*p34
+  port_pressure: [[1, '34']]
+- name: dup
+  operands:
+  - class: register
+    prefix: d
+  - class: register
+    prefix: v
+    shape: d
+    width: '*'
+  throughput: 1.0
+  latency: 6.0  # 	1*p0
+  port_pressure: [[1, '0']]
+- name: fadd
+  operands:
+  - class: register
+    prefix: z
+    shape: d
+    width: '*'
+  - class: register
+    prefix: p
+  - class: register
+    prefix: z
+    shape: d
+    width: '*'
+  - class: register
+    prefix: z
+    shape: d
+    width: '*'
+  throughput: 0.5
+  latency: 9.0  # 	1*p02
+  port_pressure: [[1, '02']]
+- name: fadd
+  operands:
+  - class: register
+    prefix: z
+    shape: d
+    width: '*'
+  - class: register
+    prefix: z
+    shape: d
+    width: '*'
+  - class: register
+    prefix: z
+    shape: d
+    width: '*'
+  throughput: 0.5
+  latency: 9.0  # 	1*p02
+  port_pressure: [[1, '02']]
+- name: fadda
+  operands:
+  - class: register
+    prefix: d
+  - class: register
+    prefix: p
+  - class: register
+    prefix: d
+  - class: register
+    prefix: z
+    shape: d
+    width: '512'
+  throughput: 18.5
+  latency: 72.0  # 	18*p0+19*p02
+  port_pressure: [[18, '0'], [19, '02']]
+- name: faddv
+  operands:
+  - class: register
+    prefix: d
+  - class: register
+    prefix: p
+  - class: register
+    prefix: z
+    shape: d
+    width: '512'
+  throughput: 11.5
+  latency: 49.0  # 	11*p0+12*p02
+  port_pressure: [[10, '0'], [12, '02']]
+- name: fadd
+  operands:
+  - class: register
+    prefix: v
+    shape: s
+    width: '*'
+  - class: register
+    prefix: v
+    shape: s
+    width: '*'
+  - class: register
+    prefix: v
+    shape: s
+    width: '*'
+  throughput: 0.5
+  latency: 9.0  # 	1*p02
+  port_pressure: [[1, '02']]
+- name: fadd
+  operands:
+  - class: register
+    prefix: d
+    width: '*'
+  - class: register
+    prefix: d
+    width: '*'
+  - class: register
+    prefix: d
+    width: '*'
+  throughput: 0.5
+  latency: 9.0  # 	1*p02
+  port_pressure: [[1, '02']]
+- name: fadd
+  operands:
+  - class: register
+    prefix: v
+    shape: d
+    width: '*'
+  - class: register
+    prefix: v
+    shape: d
+    width: '*'
+  - class: register
+    prefix: v
+    shape: d
+    width: '*'
+  throughput: 0.5
+  latency: 9.0  # 	1*p02
+  port_pressure: [[1, '02']]
+- name: fdiv
+  operands:
+  - class: register
+    prefix: v
+    shape: s
+    width: 128
+  - class: register
+    prefix: v
+    shape: s
+    width: 128
+  - class: register
+    prefix: v
+    shape: s
+    width: 128
+  throughput: 29.0
+  latency: 29.0  # 	1*p0+29*p0DV
+  port_pressure: [[1, '0'], [29.0, [0DV]]]
+- name: fdiv
+  operands:
+  - class: register
+    prefix: v
+    shape: d
+    width: 128
+  - class: register
+    prefix: v
+    shape: d
+    width: 128
+  - class: register
+    prefix: v
+    shape: d
+    width: 128
+  throughput: 43.0
+  latency: 43.0  # 	1*p0+43*p0DV
+  port_pressure: [[1, '0'], [43.0, [0DV]]]
+- name: [fmad, fmla]
+  operands:
+  - class: register
+    prefix: z
+    shape: d
+    width: '*'
+  - class: register
+    prefix: p
+    predication: m
+  - class: register
+    prefix: z
+    shape: d
+    width: '*'
+  - class: register
+    prefix: z
+    shape: d
+    width: '*'
+  throughput: 0.5
+  latency: 9.0  # 	1*p02
+  port_pressure: [[1, '02']]
+- name: fmla
+  operands:
+  - class: register
+    prefix: v
+    shape: s
+    width: '*'
+  - class: register
+    prefix: v
+    shape: s
+    width: '*'
+  - class: register
+    prefix: v
+    shape: s
+    width: '*'
+  throughput: 0.5
+  latency: 9.0  # 	1*p02
+  port_pressure: [[1, '02']]
+- name: fmla
+  operands:
+  - class: register
+    prefix: v
+    shape: d
+    width: '*'
+  - class: register
+    prefix: v
+    shape: d
+    width: '*'
+  - class: register
+    prefix: v
+    shape: d
+    width: '*'
+  throughput: 0.5
+  latency: 9.0  # 	1*p02
+  port_pressure: [[1, '02']]
+- name: fmov
+  operands:
+  - {class: register, prefix: s}
+  - {class: immediate, imd: double}
+  latency: ~  # 	1*p0
+  port_pressure: [[1, '0']]
+  throughput: 1.0
+- name: fmul
+  operands:
+  - class: register
+    prefix: z
+    shape: d
+    width: '*'
+  - class: register
+    prefix: z
+    shape: d
+    width: '*'
+  - class: register
+    prefix: z
+    shape: d
+    width: '*'
+  throughput: 0.5
+  latency: 9.0  # 	1*p02
+  port_pressure: [[1, '02']]
+- name: fmul
+  operands:
+  - class: register
+    prefix: v
+    shape: s
+    width: '*'
+  - class: register
+    prefix: v
+    shape: s
+    width: '*'
+  - class: register
+    prefix: v
+    shape: s
+    width: '*'
+  throughput: 0.5
+  latency: 9.0  # 	1*p02
+  port_pressure: [[1, '02']]
+- name: fmul
+  operands:
+  - class: register
+    prefix: v
+    shape: d
+    width: '*'
+  - class: register
+    prefix: v
+    shape: d
+    width: '*'
+  - class: register
+    prefix: v
+    shape: d
+    width: '*'
+  throughput: 0.5
+  latency: 9.0  # 	1*p02
+  port_pressure: [[1, '02']]
+- name: fmul
+  operands:
+  - class: register
+    prefix: d
+  - class: register
+    prefix: d
+  - class: register
+    prefix: d
+  throughput: 0.5
+  latency: 9.0  # 	1*p02
+  port_pressure: [[1, '02']]
+- name: frecpe
+  operands:
+  - class: register
+    prefix: v
+    shape: s
+    width: '*'
+  - class: register
+    prefix: v
+    shape: s
+    width: '*'
+  - class: register
+    prefix: v
+    shape: s
+    width: '*'
+  throughput: 0.5
+  latency: 4.0  # 	1*p02
+  port_pressure: [[1, '02']]
+- name: frecpe
+  operands:
+  - class: register
+    prefix: v
+    shape: d
+    width: '*'
+  - class: register
+    prefix: v
+    shape: d
+    width: '*'
+  - class: register
+    prefix: v
+    shape: d
+    width: '*'
+  throughput: 0.5
+  latency: 4.0  # 	1*p02
+  port_pressure: [[1, '02']]
+- name: fsub
+  operands:
+  - class: register
+    prefix: v
+    shape: s
+    width: '*'
+  - class: register
+    prefix: v
+    shape: s
+    width: '*'
+  - class: register
+    prefix: v
+    shape: s
+    width: '*'
+  throughput: 0.5
+  latency: 9.0  # 	1*p02
+  port_pressure: [[1, '02']]
+- name: fsub
+  operands:
+  - class: register
+    prefix: v
+    shape: d
+    width: '*'
+  - class: register
+    prefix: v
+    shape: d
+    width: '*'
+  - class: register
+    prefix: v
+    shape: d
+    width: '*'
+  throughput: 0.5
+  latency: 9.0  # 	1*p02
+  port_pressure: [[1, '02']]
+- name: incd
+  operands:
+  - class: register
+    prefix: x
+  throughput: 0.5
+  latency: 1.0  # 	1*p34
+  port_pressure: [[1, '34']]
+- name: ld1d
+  operands:
+  - class: register
+    prefix: z
+    shape: d
+  - class: register
+    prefix: p
+    predication: '*'
+  - class: memory
+    base: x
+    offset: ~
+    index: ~
+    scale: ~
+    pre-indexed: false
+    post-indexed: false
+  throughput: 0.5
+  latency: 8.0  # 	1*p56+1*p5D6D
+  port_pressure: [[1, '56'], [1, ['5D', '6D']]]
+- name: ld1d
+  operands:
+  - class: register
+    prefix: z
+    shape: d
+  - class: register
+    prefix: p
+    predication: '*'
+  - class: memory
+    base: x
+    offset: ~
+    index: x
+    scale: '*'
+    pre-indexed: false
+    post-indexed: false
+  throughput: 0.5
+  latency: 8.0  # 	1*p56+1*p5D6D
+  port_pressure: [[1, '56'], [1, ['5D', '6D']]]
+- name: ld1d
+  operands:
+  - class: register
+    prefix: z
+    shape: d
+  - class: register
+    prefix: p
+    predication: '*'
+  - class: memory
+    base: x
+    offset: ~
+    index: z
+    scale: '*'
+    pre-indexed: false
+    post-indexed: false
+  throughput: 2.0
+  latency: 11.0  # 	1*p0+1*p3+4*p56+1*p5D6D
+  port_pressure: [[1, '0'],[1, '3'],[4, '56'], [4, ['5D', '6D']]] # not sure if we also have 4 data accesses
+- name: ldp
+  operands:
+  - class: register
+    prefix: d
+  - class: register
+    prefix: d
+  - class: memory
+    base: x
+    offset: imd
+    index: ~
+    scale: 1
+    pre-indexed: false
+    post-indexed: false
+  throughput: 1.0
+  latency: 8.0  # 	2*p56+2*p5D6D
+  port_pressure: [[2, '56'], [2, ['5D', '6D']]]
+- name: ldp
+  operands:
+  - class: register
+    prefix: d
+  - class: register
+    prefix: d
+  - class: memory
+    base: x
+    offset: imd
+    index: ~
+    scale: 1
+    pre-indexed: false
+    post-indexed: true
+  throughput: 1.0
+  latency: 8.0  # 	2*p56+2*p5D6D+1*p0234
+  port_pressure: [[2, '56'], [2, ['5D', '6D']], [1, '0234']]
+- name: ldp
+  operands:
+  - class: register
+    prefix: q
+  - class: register
+    prefix: q
+  - class: memory
+    base: x
+    offset: '*'
+    index: '*'
+    scale: 1
+    pre-indexed: false
+    post-indexed: false
+  throughput: 1.0
+  latency: 8.0  # 	2*p56+2*p5D6D
+  port_pressure: [[2, '56'], [2, ['5D', '6D']]]
+- name: ldp
+  operands:
+  - class: register
+    prefix: q
+  - class: register
+    prefix: q
+  - class: memory
+    base: x
+    offset: ~
+    index: ~
+    scale: 1
+    pre-indexed: false
+    post-indexed: true
+  throughput: 1.0
+  latency: 8.0  # 	2*p56+2*p5D6D+1*p0234
+  port_pressure: [[2, '56'], [2, ['5D', '6D']], [1, '0234']]
+- name: ldp
+  operands:
+  - class: register
+    prefix: q
+  - class: register
+    prefix: q
+  - class: memory
+    base: x
+    offset: '*'
+    index: '*'
+    scale: '*'
+    pre-indexed: false
+    post-indexed: false
+  throughput: 1.0
+  latency: 8.0  # 	2*p56+2*p5D6D
+  port_pressure: [[2, '56'], [2, ['5D', '6D']]]
+- name: ldp
+  operands:
+  - class: register
+    prefix: q
+  - class: register
+    prefix: q
+  - class: memory
+    base: x
+    offset: '*'
+    index: '*'
+    scale: '*'
+    pre-indexed: true
+    post-indexed: false
+  throughput: 1.0
+  latency: 8.0  # 	2*p56+2*p5D6D+1*p0234
+  port_pressure: [[2, '56'], [2, ['5D', '6D']], [1, '0234']]
+- name: ldp
+  operands:
+  - class: register
+    prefix: d
+  - class: register
+    prefix: d
+  - class: memory
+    base: x
+    offset: '*'
+    index: '*'
+    scale: '*'
+    pre-indexed: false
+    post-indexed: true
+  throughput: 1.0
+  latency: 8.0  # 	2*p56+2*p5D6D+1*p0234
+  port_pressure: [[2, '56'], [2, ['5D', '6D']], [1, '0234']]
+- name: ldur    # JL: assumed from ldr
+  operands:
+  - class: register
+    prefix: q
+  - class: memory
+    base: x
+    offset: '*'
+    index: '*'
+    scale: '*'
+    post-indexed: false
+    pre-indexed: false
+  throughput: 0.5
+  latency: 5.0  # 	1*p56+1*p5D6D
+  port_pressure: [[1, '56'], [1, ['5D', '6D']]]
+- name: ldr
+  operands:
+  - class: register
+    prefix: q
+  - class: memory
+    base: x
+    offset: '*'
+    index: '*'
+    scale: '*'
+    post-indexed: false
+    pre-indexed: false
+  throughput: 0.5
+  latency: 5.0  # 	2*p56+2*p5D6D
+  port_pressure: [[1, '56'], [1, ['5D', '6D']]]
+- name: ldr
+  operands:
+  - class: register
+    prefix: d
+  - class: memory
+    base: x
+    offset: '*'
+    index: '*'
+    scale: '*'
+    post-indexed: false
+    pre-indexed: false
+  throughput: 0.5
+  latency: 5.0  # 	1*p56+1*p5D6D
+  port_pressure: [[1, '56'], [1, ['5D', '6D']]]
+- name: ldr
+  operands:
+  - class: register
+    prefix: d
+  - class: memory
+    base: x
+    offset: imd
+    index: '*'
+    scale: '*'
+    post-indexed: false
+    pre-indexed: false
+  throughput: 0.5
+  latency: 5.0  # 	1*p56+1*p5D6D
+  port_pressure: [[1, '56'], [1, ['5D', '6D']]]
+- name: ldr
+  operands:
+  - class: register
+    prefix: d
+  - class: memory
+    base: x
+    offset: '*'
+    index: '*'
+    scale: '*'
+    post-indexed: false
+    pre-indexed: false
+  throughput: 0.5
+  latency: 5.0  # 	2*p56+2*p5D6D
+  port_pressure: [[1, '56'], [1, ['5D', '6D']]]
+- name: ldr
+  operands:
+  - class: register
+    prefix: x
+  - class: register
+    prefix: x
+  throughput: 0.0
+  latency: 0.0
+  port_pressure: []
+- name: ldr
+  operands:
+  - class: register
+    prefix: q
+  - class: register
+    prefix: q
+  throughput: 0.0
+  latency: 0.0
+  port_pressure: []
+- name: ldr
+  operands:
+  - class: register
+    prefix: d
+  - class: register
+    prefix: d
+  throughput: 0.0
+  latency: 0.0
+  port_pressure: []
+- name: mov
+  operands:
+  - class: register
+    prefix: x
+  - class: register
+    prefix: x
+  throughput: 0.25
+  latency: 1.0  # 	1*p0234
+  port_pressure: [[1, '0234']]
+- name: mov
+  operands:
+  - class: register
+    prefix: z
+    shape: '*'
+  - class: register
+    prefix: z
+    shape: '*'
+  throughput: 0.5
+  latency: 4.0  # 	1*p02
+  port_pressure: [[1, '02']]
+- name: mov
+  operands:
+  - class: register
+    prefix: v
+    shape: b
+    width: '*'
+  - class: register
+    prefix: v
+    shape: b
+    width: '*'
+  throughput: 0.5
+  latency: 4.0  # 	1*p02
+  port_pressure: [[1, '02']]
+- name: stp
+  operands:
+  - class: register
+    prefix: d
+  - class: register
+    prefix: d
+  - class: memory
+    base: x
+    offset: '*'
+    index: '*'
+    scale: '*'
+    pre-indexed: false
+    post-indexed: false
+  throughput: 2.0
+  latency: 0  # 	2*p56+2*p0
+  port_pressure: [[2, '56'], [2, '0']]
+- name: stp
+  operands:
+  - class: register
+    prefix: q
+  - class: register
+    prefix: q
+  - class: memory
+    base: x
+    offset: '*'
+    index: '*'
+    scale: '*'
+    pre-indexed: false
+    post-indexed: true
+  throughput: 2.0
+  latency: 0  # 	2*p56+2*p0+1*0234
+  port_pressure: [[2, '56'], [2, '0'], [1, '0234']]
+- name: stp
+  operands:
+  - class: register
+    prefix: q
+  - class: register
+    prefix: q
+  - class: memory
+    base: x
+    offset: '*'
+    index: '*'
+    scale: '*'
+    pre-indexed: false
+    post-indexed: false
+  throughput: 2.0
+  latency: 0  # 	2*p56+2*p0
+  port_pressure: [[2, '56'], [2, '0']]
+- name: stur # JL: assumed from str
+  operands:
+  - class: register
+    prefix: d
+  - class: memory
+    base: x
+    offset: '*'
+    index: '*'
+    scale: '*'
+    pre-indexed: false
+    post-indexed: false
+  throughput: 1.0
+  latency: 0  # 	1*p56+1*p0
+  port_pressure: [[1, '56'], [1, '0']]
+- name: stur # JL: assumed from str
+  operands:
+  - class: register
+    prefix: q
+  - class: memory
+    base: x
+    offset: '*'
+    index: '*'
+    scale: '*'
+    pre-indexed: false
+    post-indexed: false
+  throughput: 1.0
+  latency: 0  # 	1*p56+1*p0
+  port_pressure: [[1, '56'], [1, '0']]
+- name: str
+  operands:
+  - class: register
+    prefix: x
+  - class: memory
+    base: x
+    offset: '*'
+    index: '*'
+    scale: '*'
+    pre-indexed: false
+    post-indexed: false
+  throughput: 1.0
+  latency: 0  # 	1*p56+1*p0
+  port_pressure: [[1, '56'], [1, '0']]
+- name: str
+  operands:
+  - class: register
+    prefix: d
+  - class: memory
+    base: x
+    offset: '*'
+    index: '*'
+    scale: '*'
+    pre-indexed: false
+    post-indexed: false
+  throughput: 1.0
+  latency: 0  # 	1*p56+1*p0
+  port_pressure: [[1, '56'], [1, '0']]
+- name: str
+  operands:
+  - class: register
+    prefix: d
+  - class: memory
+    base: x
+    offset: '*'
+    index: '*'
+    scale: '*'
+    pre-indexed: false
+    post-indexed: true
+  throughput: 1.0
+  latency: 0  # 	1*p56+1*p0+1*p0234
+  port_pressure: [[1, '56'], [1, '0'], [1, '0234']]
+- name: str
+  operands:
+  - class: register
+    prefix: q
+  - class: memory
+    base: x
+    offset: '*'
+    index: '*'
+    scale: 1
+    pre-indexed: false
+    post-indexed: false
+  throughput: 1.0
+  latency: 0  # 	1*p56+1*p0
+  port_pressure: [[1, '56'], [1, '0']]
+- name: str
+  operands:
+  - class: register
+    prefix: q
+  - class: memory
+    base: x
+    offset: '*'
+    index: '*'
+    scale: '*'
+    pre-indexed: false
+    post-indexed: true
+  throughput: 1.0
+  latency: 0  # 	1*p56+1*p0+1*0234
+  port_pressure: [[1, '56'], [1, '0'], [1, '0234']]
+- name: str
+  operands:
+  - class: register
+    prefix: x
+  - class: memory
+    base: x
+    offset: '*'
+    index: '*'
+    scale: '*'
+    pre-indexed: false
+    post-indexed: true
+  throughput: 1.0
+  latency: 0  # 	1*p56+1*p3+1*p0234
+  port_pressure: [[1, '56'], [1, '3'], [1, '0234']]
+- name: st1d
+  operands:
+  - class: register
+    prefix: z
+    shape: d
+  - class: register
+    prefix: p
+  - class: memory
+    base: x
+    offset: ~
+    index: '*'
+    scale: '*'
+    pre-indexed: false
+    post-indexed: false
+  throughput: 1.0
+  latency: 0  # 	1*p5+1*p6+1*p0
+  port_pressure: [[1, '5'], [1, '6'], [1, '0']]
+- name: sub
+  operands:
+  - class: register
+    prefix: x
+  - class: register
+    prefix: x
+  - class: immediate
+    imd: int
+  throughput: 0.5
+  latency: 1.0  # 	1*p34
+  port_pressure: [[1, '34']]
+- name: subs
+  operands:
+  - class: register
+    prefix: x
+  - class: register
+    prefix: x
+  - class: immediate
+    imd: int
+  throughput: 0.5
+  latency: 1.0  # 	1*p34
+  port_pressure: [[1, '34']]
+- name: sub
+  operands:
+  - class: register
+    prefix: w
+  - class: register
+    prefix: w
+  - class: immediate
+    imd: int
+  throughput: 0.25
+  latency: 1.0  # 	1*p0234
+  port_pressure: [[1, '0234']]
+- name: [whilele, whilelo, whilels, whilelt]
+  operands:
+  - class: register
+    prefix: p
+    shape: d
+  - class: register
+    prefix: '*'
+  - class: register
+    prefix: '*'
+  throughput: 1.0
+  latency: 1.0  # 	1*p1+1*p3
+  port_pressure: [[1, '1'], [1, '3']]
+

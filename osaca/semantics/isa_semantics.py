@@ -2,7 +2,7 @@
 from itertools import chain
 
 from osaca import utils
-from osaca.parser import AttrDict, ParserAArch64v81, ParserX86ATT
+from osaca.parser import AttrDict, ParserAArch64, ParserX86ATT
 
 from .hw_model import MachineModel
 
@@ -31,7 +31,7 @@ class ISASemantics(object):
         if self._isa == 'x86':
             self._parser = ParserX86ATT()
         elif self._isa == 'aarch64':
-            self._parser = ParserAArch64v81()
+            self._parser = ParserAArch64()
 
     def process(self, instruction_forms):
         """Process a list of instruction forms."""
@@ -52,7 +52,6 @@ class ISASemantics(object):
             return
         # check if instruction form is in ISA yaml, otherwise apply standard operand assignment
         # (one dest, others source)
-        # import pdb; pdb.set_trace()
         isa_data = self._isa_model.get_instruction(
             instruction_form['instruction'], instruction_form['operands']
         )

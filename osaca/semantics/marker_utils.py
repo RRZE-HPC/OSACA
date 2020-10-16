@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 from collections import OrderedDict
 
-from osaca.parser import ParserAArch64v81, ParserX86ATT, get_parser
+from osaca.parser import ParserAArch64, ParserX86ATT, get_parser
 
 COMMENT_MARKER = {'start': 'OSACA-BEGIN', 'end': 'OSACA-END'}
 
@@ -38,7 +38,7 @@ def find_marked_kernel_AArch64(lines):
     nop_bytes = ['213', '3', '32', '31']
     return find_marked_section(
         lines,
-        ParserAArch64v81(),
+        ParserAArch64(),
         ['mov'],
         'x1',
         [111, 222],
@@ -277,6 +277,11 @@ def find_basic_loop_bodies(lines):
             current_block.append(line)
             # Find end of block by searching for references to valid jump labels
             if line['instruction'] and line['operands']:
+                # Ignore `b.none` instructions (relevant von ARM SVE code)
+                # This branch instruction is often present _within_ inner loop blocks, but usually 
+                # do not terminate
+                if line['instruction'] == 'b.none':
+                    continue
                 for operand in [o for o in line['operands'] if 'identifier' in o]:
                     if operand['identifier']['name'] in valid_jump_labels:
                         if operand['identifier']['name'] == label:

@@ -76,7 +76,7 @@ class Frontend(object):
                 self._get_flag_symbols(instruction_form['flags'])
                 if instruction_form['instruction'] is not None
                 else ' ',
-                instruction_form['line'].strip(),
+                instruction_form['line'].strip().replace('\t', ' '),
             )
             line = line if show_lineno else col_sep + col_sep.join(line.split(col_sep)[1:])
             if show_cmnts is False and self._is_comment(instruction_form):
@@ -138,7 +138,7 @@ class Frontend(object):
                 separator,
                 sum([instr_form['latency_lcd'] for instr_form in dep_dict[dep]['dependencies']]),
                 separator,
-                dep_dict[dep]['root']['line'],
+                dep_dict[dep]['root']['line'].strip(),
                 separator,
                 [node['line_number'] for node in dep_dict[dep]['dependencies']],
             )
@@ -246,7 +246,7 @@ class Frontend(object):
                 self._get_flag_symbols(instruction_form['flags'])
                 if instruction_form['instruction'] is not None
                 else ' ',
-                instruction_form['line'].strip(),
+                instruction_form['line'].strip().replace('\t', ' '),
             )
         s += '\n'
         # check for unknown instructions and throw warning if called without --ignore-unknown

@@ -8,13 +8,13 @@ import unittest
 
 from pyparsing import ParseException
 
-from osaca.parser import AttrDict, ParserAArch64v81
+from osaca.parser import AttrDict, ParserAArch64
 
 
-class TestParserAArch64v81(unittest.TestCase):
+class TestParserAArch64(unittest.TestCase):
     @classmethod
     def setUpClass(self):
-        self.parser = ParserAArch64v81()
+        self.parser = ParserAArch64()
         with open(self._find_file('triad_arm_iaca.s')) as f:
             self.triad_code = f.read()
 
@@ -146,8 +146,8 @@ class TestParserAArch64v81(unittest.TestCase):
     def test_parse_line(self):
         line_comment = '// -- Begin  main'
         line_label = '.LBB0_1:              // =>This Inner Loop Header: Depth=1'
-        line_directive = '\t.cfi_def_cfa w29, -16'
-        line_instruction = '\tldr s0, [x11, w10, sxtw #2]\t\t// = <<2'
+        line_directive = '.cfi_def_cfa w29, -16'
+        line_instruction = 'ldr s0, [x11, w10, sxtw #2]    // = <<2'
         line_prefetch = 'prfm    pldl1keep, [x26, #2048] //HPL'
         line_preindexed = 'stp x29, x30, [sp, #-16]!'
         line_postindexed = 'ldp q2, q3, [x11], #64'
@@ -201,7 +201,7 @@ class TestParserAArch64v81(unittest.TestCase):
             'directive': None,
             'comment': '= <<2',
             'label': None,
-            'line': 'ldr s0, [x11, w10, sxtw #2]\t\t// = <<2',
+            'line': 'ldr s0, [x11, w10, sxtw #2]    // = <<2',
             'line_number': 4,
         }
         instruction_form_5 = {
@@ -309,23 +309,23 @@ class TestParserAArch64v81(unittest.TestCase):
         self.assertEqual(self.parser.normalize_imd(identifier), identifier)
 
     def test_multiple_regs(self):
-        instr_range = 'PUSH {r5-r7}'
+        instr_range = 'PUSH {x5-x7}'
         reg_range = AttrDict({
             'register': {
                 'range': [
-                    {'prefix': 'r', 'name': '5'},
-                    {'prefix': 'r', 'name': '7'}
+                    {'prefix': 'x', 'name': '5'},
+                    {'prefix': 'x', 'name': '7'}
                 ],
                 'index': None
             }
         })
-        instr_list = 'POP {r5, r7, r9}'
+        instr_list = 'POP {x5, x7, x9}'
         reg_list = AttrDict({
             'register': {
                 'list': [
-                    {'prefix': 'r', 'name': '5'},
-                    {'prefix': 'r', 'name': '7'},
-                    {'prefix': 'r', 'name': '9'}
+                    {'prefix': 'x', 'name': '5'},
+                    {'prefix': 'x', 'name': '7'},
+                    {'prefix': 'x', 'name': '9'}
                 ],
                 'index': None
             }
@@ -411,5 +411,5 @@ class TestParserAArch64v81(unittest.TestCase):
 
 
 if __name__ == '__main__':
-    suite = unittest.TestLoader().loadTestsFromTestCase(TestParserAArch64v81)
+    suite = unittest.TestLoader().loadTestsFromTestCase(TestParserAArch64)
     unittest.TextTestRunner(verbosity=2).run(suite)
