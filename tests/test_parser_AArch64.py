@@ -146,8 +146,8 @@ class TestParserAArch64(unittest.TestCase):
     def test_parse_line(self):
         line_comment = '// -- Begin  main'
         line_label = '.LBB0_1:              // =>This Inner Loop Header: Depth=1'
-        line_directive = '\t.cfi_def_cfa w29, -16'
-        line_instruction = '\tldr s0, [x11, w10, sxtw #2]    // = <<2'
+        line_directive = '.cfi_def_cfa w29, -16'
+        line_instruction = 'ldr s0, [x11, w10, sxtw #2]    // = <<2'
         line_prefetch = 'prfm    pldl1keep, [x26, #2048] //HPL'
         line_preindexed = 'stp x29, x30, [sp, #-16]!'
         line_postindexed = 'ldp q2, q3, [x11], #64'

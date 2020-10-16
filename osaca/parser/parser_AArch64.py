@@ -218,7 +218,7 @@ class ParserAArch64(BaseParser):
                 self.DIRECTIVE_ID: None,
                 self.COMMENT_ID: None,
                 self.LABEL_ID: None,
-                'line': line.strip().replace('\t','  '),
+                'line': line,
                 'line_number': line_number,
             }
         )
