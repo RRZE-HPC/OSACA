@@ -406,7 +406,9 @@ class ParserAArch64(BaseParser):
             # normal integer value, nothing to do
             return AttrDict({self.IMMEDIATE_ID: immediate})
         if 'base_immediate' in immediate:
-            # arithmetic immediate, nothing to do
+            # arithmetic immediate, add calculated value as value
+            immediate['shift'] = immediate['shift'][0]
+            immediate['value'] = int(immediate['base_immediate']['value']) << int(immediate['shift']['value'])
             return AttrDict({self.IMMEDIATE_ID: immediate})
         if 'float' in immediate:
             dict_name = 'float'
