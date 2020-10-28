@@ -33,7 +33,7 @@ class TestFrontend(unittest.TestCase):
             path_to_yaml=os.path.join(self.MODULE_DATA_DIR, 'csx.yml')
         )
         self.machine_model_tx2 = MachineModel(
-            path_to_yaml=os.path.join(self.MODULE_DATA_DIR, 'tx2.yml')
+            arch='tx2.yml'
         )
         self.semantics_csx = ArchSemantics(
             self.machine_model_csx, path_to_yaml=os.path.join(self.MODULE_DATA_DIR, 'isa/x86.yml')
