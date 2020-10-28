@@ -2,11 +2,14 @@
 
 # Always prefer setuptools over distutils
 from setuptools import setup, find_packages
+from setuptools.command.install import install as _install
+from setuptools.command.sdist import sdist as _sdist
 # To use a consistent encoding
 from codecs import open
 import os
 import io
 import re
+import sys
 
 here = os.path.abspath(os.path.dirname(__file__))
 
@@ -25,6 +28,27 @@ def find_version(*file_paths):
     if version_match:
         return version_match.group(1)
     raise RuntimeError("Unable to find version string.")
+
+
+def _run_build_cache(dir):
+    from subprocess import check_call
+    # This is run inside the install staging directory (that had no .pyc files)
+    # We don't want to generate any.
+    # https://github.com/eliben/pycparser/pull/135
+    check_call([sys.executable, '-B', '_build_cache.py'],
+               cwd=os.path.join(dir, 'osaca', 'data'))
+
+
+class install(_install):
+    def run(self):
+        _install.run(self)
+        self.execute(_run_build_cache, (self.install_lib,), msg="Build ISA and architecture cache")
+
+
+class sdist(_sdist):
+    def make_release_tree(self, basedir, files):
+        _sdist.make_release_tree(self, basedir, files)
+        self.execute(_run_build_cache, (basedir,), msg="Build ISA and architecture cache")
 
 
 # Get the long description from the README file
@@ -124,4 +148,7 @@ setup(
             'osaca=osaca.osaca:main',
         ],
     },
+
+    # Overwriting install and sdist to enforce cache distribution with package
+    cmdclass={'install': install, 'sdist': sdist},
 )
