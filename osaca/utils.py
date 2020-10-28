@@ -1,10 +1,7 @@
 #!/usr/bin/env python3
 import os.path
-from pathlib import Path
-import hashlib
 
-DATA_DIRS = [os.path.expanduser('~/.osaca/data'),
-             os.path.join(os.path.dirname(__file__), 'data')]
+DATA_DIRS = [os.path.expanduser('~/.osaca/data'), os.path.join(os.path.dirname(__file__), 'data')]
 CACHE_DIR = os.path.expanduser('~/.osaca/cache')
 
 
