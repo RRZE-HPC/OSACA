@@ -26,7 +26,7 @@ class ISASemantics(object):
 
     def __init__(self, isa, path_to_yaml=None):
         self._isa = isa.lower()
-        path = utils.find_file('isa/' + self._isa + '.yml') if not path_to_yaml else path_to_yaml
+        path = path_to_yaml or utils.find_datafile('isa/' + self._isa + '.yml')
         self._isa_model = MachineModel(path_to_yaml=path)
         if self._isa == 'x86':
             self._parser = ParserX86ATT()

@@ -12,11 +12,7 @@ from osaca.parser import BaseParser, ParserAArch64, ParserX86ATT
 from osaca.semantics import (INSTR_FLAGS, ArchSemantics, KernelDG,
                              MachineModel, reduce_to_section)
 
-MODULE_DATA_DIR = os.path.join(
-    os.path.dirname(os.path.split(os.path.abspath(__file__))[0]), 'osaca/data/'
-)
-LOCAL_OSACA_DIR = os.path.join(os.path.expanduser('~') + '/.osaca/')
-DATA_DIR = os.path.join(LOCAL_OSACA_DIR, 'data/')
+
 SUPPORTED_ARCHS = [
     'SNB',
     'IVB',

@@ -20,48 +20,43 @@ class TestSemanticTools(unittest.TestCase):
     MODULE_DATA_DIR = os.path.join(
         os.path.dirname(os.path.split(os.path.abspath(__file__))[0]), 'osaca/data/'
     )
-    USER_DATA_DIR = os.path.join(os.path.expanduser('~'), '.osaca/')
 
     @classmethod
-    def setUpClass(self):
-        # copy db files in user directory
-        if not os.path.isdir(os.path.join(self.USER_DATA_DIR, 'data')):
-            os.makedirs(os.path.join(self.USER_DATA_DIR, 'data'))
-            call(['cp', '-r', self.MODULE_DATA_DIR, self.USER_DATA_DIR])
+    def setUpClass(cls):
         # set up parser and kernels
-        self.parser_x86 = ParserX86ATT()
-        self.parser_AArch64 = ParserAArch64()
-        with open(self._find_file('kernel_x86.s')) as f:
-            self.code_x86 = f.read()
-        with open(self._find_file('kernel_aarch64.s')) as f:
-            self.code_AArch64 = f.read()
-        self.kernel_x86 = reduce_to_section(self.parser_x86.parse_file(self.code_x86), 'x86')
-        self.kernel_AArch64 = reduce_to_section(
-            self.parser_AArch64.parse_file(self.code_AArch64), 'aarch64'
+        cls.parser_x86 = ParserX86ATT()
+        cls.parser_AArch64 = ParserAArch64()
+        with open(cls._find_file('kernel_x86.s')) as f:
+            cls.code_x86 = f.read()
+        with open(cls._find_file('kernel_aarch64.s')) as f:
+            cls.code_AArch64 = f.read()
+        cls.kernel_x86 = reduce_to_section(cls.parser_x86.parse_file(cls.code_x86), 'x86')
+        cls.kernel_AArch64 = reduce_to_section(
+            cls.parser_AArch64.parse_file(cls.code_AArch64), 'aarch64'
         )
 
         # set up machine models
-        self.machine_model_csx = MachineModel(
-            path_to_yaml=os.path.join(self.MODULE_DATA_DIR, 'csx.yml')
+        cls.machine_model_csx = MachineModel(
+            path_to_yaml=os.path.join(cls.MODULE_DATA_DIR, 'csx.yml')
         )
-        self.machine_model_tx2 = MachineModel(
-            path_to_yaml=os.path.join(self.MODULE_DATA_DIR, 'tx2.yml')
+        cls.machine_model_tx2 = MachineModel(
+            path_to_yaml=os.path.join(cls.MODULE_DATA_DIR, 'tx2.yml')
         )
-        self.semantics_csx = ArchSemantics(
-            self.machine_model_csx, path_to_yaml=os.path.join(self.MODULE_DATA_DIR, 'isa/x86.yml')
+        cls.semantics_csx = ArchSemantics(
+            cls.machine_model_csx, path_to_yaml=os.path.join(cls.MODULE_DATA_DIR, 'isa/x86.yml')
         )
-        self.semantics_tx2 = ArchSemantics(
-            self.machine_model_tx2,
-            path_to_yaml=os.path.join(self.MODULE_DATA_DIR, 'isa/aarch64.yml'),
+        cls.semantics_tx2 = ArchSemantics(
+            cls.machine_model_tx2,
+            path_to_yaml=os.path.join(cls.MODULE_DATA_DIR, 'isa/aarch64.yml'),
         )
-        self.machine_model_zen = MachineModel(arch='zen1')
+        cls.machine_model_zen = MachineModel(arch='zen1')
 
-        for i in range(len(self.kernel_x86)):
-            self.semantics_csx.assign_src_dst(self.kernel_x86[i])
-            self.semantics_csx.assign_tp_lt(self.kernel_x86[i])
-        for i in range(len(self.kernel_AArch64)):
-            self.semantics_tx2.assign_src_dst(self.kernel_AArch64[i])
-            self.semantics_tx2.assign_tp_lt(self.kernel_AArch64[i])
+        for i in range(len(cls.kernel_x86)):
+            cls.semantics_csx.assign_src_dst(cls.kernel_x86[i])
+            cls.semantics_csx.assign_tp_lt(cls.kernel_x86[i])
+        for i in range(len(cls.kernel_AArch64)):
+            cls.semantics_tx2.assign_src_dst(cls.kernel_AArch64[i])
+            cls.semantics_tx2.assign_tp_lt(cls.kernel_AArch64[i])
 
     ###########
     # Tests
