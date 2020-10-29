@@ -3,9 +3,9 @@ language: python
 python:
     - "3.5"
     - "3.6"
-# Python 3.7 not working yet
     - "3.7"
     - "3.8"
+    - "3.9"
 before_install: 
 #  - pip install tox-travis
   - pip install codecov

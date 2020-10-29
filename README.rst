@@ -10,8 +10,8 @@ Open Source Architecture Code Analyzer
 
 For an innermost loop kernel in assembly, this tool allows automatic instruction fetching of assembly code and automatic runtime prediction including throughput analysis and detection for critical path and loop-carried dependencies.
 
-.. image:: https://travis-ci.org/RRZE-HPC/OSACA.svg?branch=master
-    :target: https://travis-ci.org/RRZE-HPC/OSACA
+.. image:: https://travis-ci.com/RRZE-HPC/OSACA.svg?branch=master
+    :target: https://travis-ci.com/github/RRZE-HPC/OSACA
     :alt: Build Status
 
 .. image:: https://codecov.io/github/RRZE-HPC/OSACA/coverage.svg?branch=master

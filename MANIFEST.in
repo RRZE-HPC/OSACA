@@ -2,6 +2,8 @@ include README.rst
 include LICENSE
 include tox.ini
 recursive-include osaca/data/ *.yml
+recursive-include osaca/data/ *.pickle
+include osaca/data/_build_cache.py
 include examples/*
 recursive-include tests *.py *.out
 recursive-include tests/testfiles/ *
