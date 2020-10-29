@@ -31,6 +31,10 @@ SUPPORTED_ARCHS = [
     'N1',
     'A64FX',
 ]
+DEFAULT_ARCHS = {
+    'aarch64': 'A64FX',
+    'x86': 'ICL',
+}
 
 
 # Stolen from pip
@@ -85,7 +89,7 @@ def create_parser(parser=None):
         '--arch',
         type=str,
         help='Define architecture (SNB, IVB, HSW, BDW, SKX, CSX, ICL, ZEN1, ZEN2, TX2, N1, '
-        'A64FX).',
+        'A64FX). If no architecture is given, OSACA assumes a default uarch for x86/AArch64.',
     )
     parser.add_argument(
         '--fixed',
@@ -164,7 +168,12 @@ def check_arguments(args, parser):
     """
     supported_import_files = ['ibench', 'asmbench']
 
-    if 'arch' in args and (args.arch is None or args.arch.upper() not in SUPPORTED_ARCHS):
+    if args.arch is None and (args.check_db or 'import_data' in args):
+        parser.error(
+            'DB check and data import cannot work with a default microarchitecture. '
+            'Please see --help for all valid architecture codes.'
+        )
+    elif args.arch is not None and args.arch.upper() not in SUPPORTED_ARCHS:
         parser.error(
             'Microarchitecture not supported. Please see --help for all valid architecture codes.'
         )
@@ -241,13 +250,15 @@ def inspect(args, output_file=sys.stdout):
     :param output_file: Define the stream for output, defaults to :class:`sys.stdout`
     :type output_file: stream, optional
     """
-    arch = args.arch
+    # Read file
+    code = args.file.read()
+
+    # Detect ISA if necessary
+    arch = args.arch if args.arch is not None else DEFAULT_ARCHS[BaseParser.detect_ISA(code)]
     isa = MachineModel.get_isa_for_arch(arch)
     verbose = args.verbose
     ignore_unknown = args.ignore_unknown
 
-    # Read file
-    code = args.file.read()
     # Parse file
     parser = get_asm_parser(arch)
     parsed_code = parser.parse_file(code)

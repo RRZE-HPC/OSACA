@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Parser superclass of specific parsers."""
-
+import operator
+import re
 
 class BaseParser(object):
     # Identifiers for operand types
@@ -17,6 +18,23 @@ class BaseParser(object):
 
     def __init__(self):
         self.construct_parser()
+
+    @staticmethod
+    def detect_ISA(file_content):
+        """Detect the ISA of the assembly based on the used registers and return the ISA code."""
+        # Check for the amount of registers in the code to determine the ISA
+        # 1) Check for xmm, ymm, zmm, rax, rbx, rcx, and rdx registers in x86
+        heuristics_x86ATT = [r'%[xyz]mm[0-9]', r'%r[abcd]x[0-9]']
+        # 2) check for v and z vector registers and x/w general-purpose registers
+        heuristics_aarch64 = [r'[vz][0-9][0-9]?\.[0-9][0-9]?[bhsd]', r'[wx][0-9]']
+        matches = {'x86': 0, 'aarch64': 0}
+
+        for h in heuristics_x86ATT:
+            matches['x86'] += len(re.findall(h, file_content))
+        for h in heuristics_aarch64:
+            matches['aarch64'] += len(re.findall(h, file_content))
+
+        return max(matches.items(), key=operator.itemgetter(1))[0]
 
     def parse_file(self, file_content, start_line=0):
         """
