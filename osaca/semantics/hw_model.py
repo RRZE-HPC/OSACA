@@ -345,7 +345,7 @@ class MachineModel(object):
         p = Path(filepath)
         # 1. companion cachefile: same location, with '.' prefix and '.pickle' suffix
         companion_cachefile = p.with_name('.' + p.name).with_suffix('.pickle')
-        if os.access(companion_cachefile.parent, os.W_OK):
+        if os.access(str(companion_cachefile.parent), os.W_OK):
             with companion_cachefile.open('wb') as f:
                 pickle.dump(data, f)
                 return
@@ -358,7 +358,7 @@ class MachineModel(object):
         except OSError:
             return
         home_cachefile = (cache_dir / hexhash).with_suffix('.pickle')
-        if os.access(home_cachefile.parent, os.W_OK):
+        if os.access(str(home_cachefile.parent), os.W_OK):
             with home_cachefile.open('wb') as f:
                 pickle.dump(data, f)
 
