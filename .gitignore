@@ -1,5 +1,5 @@
 # OSACA specific files and folders
-osaca/taxCalc/
+*.*.pickle
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
