@@ -153,6 +153,20 @@ class TestCLI(unittest.TestCase):
                 output = StringIO()
                 osaca.run(args, output_file=output)
 
+    def test_without_arch(self):
+        # Run test kernels without --arch flag
+        parser = osaca.create_parser()
+        # x86
+        kernel_x86 = 'kernel_x86.s'
+        args = parser.parse_args([self._find_test_file(kernel_x86)])
+        output = StringIO()
+        osaca.run(args, output_file=output)
+        # AArch64
+        kernel_aarch64 = 'kernel_aarch64.s'
+        args = parser.parse_args([self._find_test_file(kernel_aarch64)])
+        osaca.run(args, output_file=output)
+
+
     ##################
     # Helper functions
     ##################
