@@ -1,12 +1,13 @@
 #!/usr/bin/env python3
 
-import base64
 import os
 import pickle
 import re
 import string
 from copy import deepcopy
 from itertools import product
+import hashlib
+from pathlib import Path
 
 import ruamel.yaml
 from ruamel.yaml.compat import StringIO
@@ -49,7 +50,7 @@ class MachineModel(object):
             yaml = self._create_yaml_object()
             if arch:
                 self._arch = arch.lower()
-                self._path = utils.find_file(self._arch + '.yml')
+                self._path = utils.find_datafile(self._arch + '.yml')
             # check if file is cached
             cached = self._get_cached(self._path) if not lazy else False
             if cached:
@@ -314,18 +315,22 @@ class MachineModel(object):
         :type filepath: str
         :returns: cached DB if existing, `False` otherwise
         """
-        hashname = self._get_hashname(filepath)
-        cachepath = utils.exists_cached_file(hashname + '.pickle')
-        if cachepath:
-            # Check if modification date of DB is older than cached version
-            if os.path.getmtime(filepath) < os.path.getmtime(cachepath):
-                # load cached version
-                with open(cachepath, 'rb') as f:
-                    cached_db = pickle.load(f)
-                return cached_db
-            else:
-                # DB newer than cached version --> delete cached file and return False
-                os.remove(cachepath)
+        p = Path(filepath)
+        # 1. companion cachefile: same location, with '.' prefix and '.pickle' suffix
+        companion_cachefile = p.with_name('.' + p.name).with_suffix('.pickle')
+        if companion_cachefile.exists():
+            if companion_cachefile.stat().st_mtime > p.stat().st_mtime:
+                # companion file up-to-date
+                with companion_cachefile.open('rb') as f:
+                    return pickle.load(f)
+
+        # 2. home cachefile: ~/.osaca/cache/<sha512hash>.pickle
+        hexhash = hashlib.sha256(p.read_bytes()).hexdigest()
+        home_cachefile = (Path(utils.CACHE_DIR) / hexhash).with_suffix('.pickle')
+        if home_cachefile.exists():
+            # home file (must be up-to-date, due to equal hash)
+            with home_cachefile.open('rb') as f:
+                return pickle.load(f)
         return False
 
     def _write_in_cache(self, filepath, data):
@@ -337,14 +342,25 @@ class MachineModel(object):
         :param data: :class:`MachineModel` to store
         :type data: :class:`dict`
         """
-        hashname = self._get_hashname(filepath)
-        filepath = os.path.join(utils.CACHE_DIR, hashname + '.pickle')
-        with open(filepath, 'wb') as f:
-            pickle.dump(data, f)
+        p = Path(filepath)
+        # 1. companion cachefile: same location, with '.' prefix and '.pickle' suffix
+        companion_cachefile = p.with_name('.' + p.name).with_suffix('.pickle')
+        if os.access(str(companion_cachefile.parent), os.W_OK):
+            with companion_cachefile.open('wb') as f:
+                pickle.dump(data, f)
+                return
 
-    def _get_hashname(self, name):
-        """Returns unique hashname for machine model"""
-        return base64.b64encode(name.encode()).decode()
+        # 2. home cachefile: ~/.osaca/cache/<sha512hash>.pickle
+        hexhash = hashlib.sha256(p.read_bytes()).hexdigest()
+        cache_dir = Path(utils.CACHE_DIR)
+        try:
+            os.makedirs(cache_dir, exist_ok=True)
+        except OSError:
+            return
+        home_cachefile = (cache_dir / hexhash).with_suffix('.pickle')
+        if os.access(str(home_cachefile.parent), os.W_OK):
+            with home_cachefile.open('wb') as f:
+                pickle.dump(data, f)
 
     def _get_key(self, name, operands):
         """Get unique instruction form key for dict DB."""
