@@ -5,6 +5,7 @@ import io
 import os
 import re
 import sys
+import traceback
 
 from osaca.db_interface import import_benchmark_output, sanity_check
 from osaca.frontend import Frontend
@@ -29,7 +30,7 @@ SUPPORTED_ARCHS = [
 ]
 DEFAULT_ARCHS = {
     'aarch64': 'A64FX',
-    'x86': 'ICL',
+    'x86': 'SKX',
 }
 
 
@@ -257,7 +258,19 @@ def inspect(args, output_file=sys.stdout):
 
     # Parse file
     parser = get_asm_parser(arch)
-    parsed_code = parser.parse_file(code)
+    try:
+        parsed_code = parser.parse_file(code)
+    except:
+        # probably the wrong parser based on heuristic
+        if args.arch is None:
+            # change ISA and try again
+            arch = DEFAULT_ARCHS['x86'] if BaseParser.detect_ISA(code) == 'aarch64' else DEFAULT_ARCHS['aarch64']
+            isa = MachineModel.get_isa_for_arch(arch)
+            parser = get_asm_parser(arch)
+            parsed_code = parser.parse_file(code)
+        else:
+            traceback.print_exc(file=sys.stderr)
+            sys.exit(1)
 
     # Reduce to marked kernel and add semantics
     kernel = reduce_to_section(parsed_code, isa)

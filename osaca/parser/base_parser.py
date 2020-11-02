@@ -24,7 +24,7 @@ class BaseParser(object):
         """Detect the ISA of the assembly based on the used registers and return the ISA code."""
         # Check for the amount of registers in the code to determine the ISA
         # 1) Check for xmm, ymm, zmm, rax, rbx, rcx, and rdx registers in x86
-        heuristics_x86ATT = [r'%[xyz]mm[0-9]', r'%r[abcd]x[0-9]']
+        heuristics_x86ATT = [r'%[xyz]mm[0-9]', r'%[er][abcd]x[0-9]']
         # 2) check for v and z vector registers and x/w general-purpose registers
         heuristics_aarch64 = [r'[vz][0-9][0-9]?\.[0-9][0-9]?[bhsd]', r'[wx][0-9]']
         matches = {'x86': 0, 'aarch64': 0}
