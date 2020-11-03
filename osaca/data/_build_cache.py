@@ -4,7 +4,14 @@ import os.path
 import sys
 sys.path[0:0] = ['../..']
 
-from osaca.semantics.hw_model import MachineModel
+failed = False
+try:
+    from osaca.semantics.hw_model import MachineModel
+except ModuleNotFoundError:
+    print("Unable to import MachineModel, probably some dependency is not yet installed. SKIPPING. "
+          "First run of OSACA may take a while to build caches, subsequent runs will be as fast as "
+          "ever.")
+    sys.exit()
 
 print('Building cache: ', end='')
 sys.stdout.flush()
