@@ -287,8 +287,8 @@ def inspect(args, output_file=sys.stdout):
         print_length_warning = False
     else:
         kernel = reduce_to_section(parsed_code, isa)
-        # Print warning if kernel is larger than threshold
-        print_length_warning = True if len(kernel) > 200 else False
+        # Print warning if kernel has no markers and is larger than threshold (100)
+        print_length_warning = True if len(kernel) == len(parsed_code) and len(kernel) > 100 else False
     machine_model = MachineModel(arch=arch)
     semantics = ArchSemantics(machine_model)
     semantics.add_semantics(kernel)
