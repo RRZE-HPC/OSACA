@@ -166,6 +166,31 @@ class TestCLI(unittest.TestCase):
         args = parser.parse_args([self._find_test_file(kernel_aarch64)])
         osaca.run(args, output_file=output)
 
+    def test_lines_arg(self):
+        # Run tests with --lines option
+        parser = osaca.create_parser()
+        kernel_x86 = 'triad_x86_iaca.s'
+        args_base = parser.parse_args(
+            ['--arch', 'csx', self._find_test_file(kernel_x86)]
+        )
+        output_base = StringIO()
+        osaca.run(args_base, output_file=output_base)
+        output_base = output_base.getvalue().split('\n')[8:]
+        args = []
+        args.append(parser.parse_args(
+            ['--lines', '146-154', '--arch', 'csx', self._find_test_file(kernel_x86)]
+        ))
+        args.append(parser.parse_args(
+            ['--lines', '146:154', '--arch', 'csx', self._find_test_file(kernel_x86)]
+        ))
+        args.append(parser.parse_args(
+            ['--lines', '146,147:148,149-154', '--arch', 'csx', self._find_test_file(kernel_x86)]
+        ))
+        for a in args:
+            with self.subTest(params=a):
+                output = StringIO()
+                osaca.run(a, output_file=output)
+                self.assertEqual(output.getvalue().split('\n')[8:], output_base)
 
     ##################
     # Helper functions
