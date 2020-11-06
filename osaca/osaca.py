@@ -95,6 +95,13 @@ def create_parser(parser=None):
         'instruction. Otherwise, OSACA will print the optimal port utilization for the kernel.',
     )
     parser.add_argument(
+        '--lines',
+        type=str,
+        help='Define lines that should be included in the analysis. This option overwrites any'
+        ' range defined by markers in the assembly. Add either single lines or ranges defined by'
+        ' "-" or ":", each entry separated by commas, e.g.: --lines 1,2,8-18,20:24',
+    )
+    parser.add_argument(
         '--db-check',
         dest='check_db',
         action='store_true',
@@ -272,8 +279,12 @@ def inspect(args, output_file=sys.stdout):
             traceback.print_exc(file=sys.stderr)
             sys.exit(1)
 
-    # Reduce to marked kernel and add semantics
-    kernel = reduce_to_section(parsed_code, isa)
+    # Reduce to marked kernel or chosen section and add semantics
+    if args.lines:
+        line_range = get_line_range(args.lines)
+        kernel = [line for line in parsed_code if line['line_number'] in line_range]
+    else:
+        kernel = reduce_to_section(parsed_code, isa)
     machine_model = MachineModel(arch=arch)
     semantics = ArchSemantics(machine_model)
     semantics.add_semantics(kernel)
@@ -346,6 +357,19 @@ def get_unmatched_instruction_ratio(kernel):
             unmatched_counter += 1
     return unmatched_counter / len(kernel)
 
+def get_line_range(line_str):
+    line_str = line_str.replace(':', '-')
+    lines = line_str.split(',')
+    lines_int = []
+    for l in lines:
+        if '-' in l:
+            start = int(l.split('-')[0])
+            end = int(l.split('-')[1])
+            rnge = list(range(start, end+1))
+            lines_int += rnge
+        else:
+            lines_int.append(int(l))
+    return lines_int
 
 def main():
     """Initialize and run command line interface."""
