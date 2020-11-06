@@ -144,7 +144,7 @@ class Frontend(object):
             )
         return s
 
-    def full_analysis(self, kernel, kernel_dg: KernelDG, ignore_unknown=False, verbose=False):
+    def full_analysis(self, kernel, kernel_dg: KernelDG, ignore_unknown=False, arch_warning=False, length_warning=False, verbose=False):
         """
         Build the full analysis report including header, the symbol map, the combined TP/CP/LCD
         view and the list based LCD view.
@@ -156,11 +156,16 @@ class Frontend(object):
         :param ignore_unknown: flag for ignore warning if performance data is missing, defaults to
             `False`
         :type ignore_unknown: boolean, optional
+        :param print_arch_warning: flag for additional user warning to specify micro-arch 
+        :type print_arch_warning: boolean, optional
+        :param print_length_warning: flag for additional user warning to specify kernel length with --lines
+        :type print_length_warning: boolean, optional
         :param verbose: flag for verbosity level, defaults to False
         :type verbose: boolean, optional
         """
         return (
             self._header_report()
+            + self._user_warnings(arch_warning, length_warning)
             + self._symbol_map()
             + self.combined_view(
                 kernel,
@@ -284,6 +289,27 @@ class Frontend(object):
             '----------------{}\n'
         ).format(amount, '-' * len(str(amount)))
         return s
+
+    def _user_warnings(self, arch_warning, length_warning):
+        """Returns warning texts for giving the user more insight in what he is doing."""
+        arch_text = (
+                    'WARNING: No micro-architecture was specified and a default uarch was used.\n'
+                    '         Specify the uarch with --arch. See --help for more information.\n'
+        )
+        length_text = (
+                    'WARNING: You are analyzing a large amount of instruction forms. Analyses '
+                    'across loops/block boundaries often do not make much sense.\n'
+                    '         Specify the kernel length with --length. See --help for more '
+                    'information.\n'
+                    '         If this is intentional, you can safely ignore this message.\n'
+        )
+
+        warnings = ''
+        warnings += arch_text if arch_warning else ''
+        warnings += length_text if length_warning else ''
+        warnings += '\n'
+        return warnings
+
 
     def _get_separator_list(self, separator, separator_2=' '):
         """Creates column view for seperators in the TP/combined view."""

@@ -165,6 +165,25 @@ class TestCLI(unittest.TestCase):
         kernel_aarch64 = 'kernel_aarch64.s'
         args = parser.parse_args([self._find_test_file(kernel_aarch64)])
         osaca.run(args, output_file=output)
+    
+    def test_user_warnings(self):
+        parser = osaca.create_parser()
+        kernel = 'triad_x86_unmarked.s'
+        args = parser.parse_args(
+            ['--arch', 'csx', '--ignore-unknown', self._find_test_file(kernel)]
+        )
+        output = StringIO()
+        osaca.run(args, output_file=output)
+        # WARNING for length
+        self.assertTrue(output.getvalue().count('WARNING') == 1)
+        args = parser.parse_args(
+            ['--lines', '100-299', '--ignore-unknown', self._find_test_file(kernel)]
+        )
+        output = StringIO()
+        osaca.run(args, output_file=output)
+        # WARNING for arch
+        self.assertTrue(output.getvalue().count('WARNING') == 1)
+
 
     def test_lines_arg(self):
         # Run tests with --lines option

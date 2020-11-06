@@ -601,6 +601,10 @@ class MachineModel(object):
     def _is_x86_reg_type(self, i_reg, reg, consider_masking=False):
         """Check if register type match."""
         i_reg_name = i_reg['name'] if i_reg and 'name' in i_reg else i_reg
+        if reg is None:
+            if i_reg is None:
+                return True
+            return False
         # check for wildcards
         if i_reg_name == self.WILDCARD or reg['name'] == self.WILDCARD:
             return True
