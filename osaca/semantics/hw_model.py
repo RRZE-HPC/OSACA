@@ -316,17 +316,17 @@ class MachineModel(object):
         :returns: cached DB if existing, `False` otherwise
         """
         p = Path(filepath)
-        # 1. companion cachefile: same location, with '.' prefix and '.pickle' suffix
-        companion_cachefile = p.with_name('.' + p.name).with_suffix('.pickle')
-        if companion_cachefile.exists():
-            if companion_cachefile.stat().st_mtime > p.stat().st_mtime:
-                # companion file up-to-date
-                with companion_cachefile.open('rb') as f:
-                    return pickle.load(f)
-
-        # 2. home cachefile: ~/.osaca/cache/<sha512hash>.pickle
         hexhash = hashlib.sha256(p.read_bytes()).hexdigest()
-        home_cachefile = (Path(utils.CACHE_DIR) / hexhash).with_suffix('.pickle')
+
+        # 1. companion cachefile: same location, with '.<name>_<sha512hash>.pickle'
+        companion_cachefile = p.with_name('.' + p.stem + '_' + hexhash).with_suffix('.pickle')
+        if companion_cachefile.exists():
+            # companion file (must be up-to-date, due to equal hash)
+            with companion_cachefile.open('rb') as f:
+                return pickle.load(f)
+
+        # 2. home cachefile: ~/.osaca/cache/<name>_<sha512hash>.pickle
+        home_cachefile = (Path(utils.CACHE_DIR) / (p.stem + '_' + hexhash)).with_suffix('.pickle')
         if home_cachefile.exists():
             # home file (must be up-to-date, due to equal hash)
             with home_cachefile.open('rb') as f:
@@ -343,21 +343,21 @@ class MachineModel(object):
         :type data: :class:`dict`
         """
         p = Path(filepath)
-        # 1. companion cachefile: same location, with '.' prefix and '.pickle' suffix
-        companion_cachefile = p.with_name('.' + p.name).with_suffix('.pickle')
+        hexhash = hashlib.sha256(p.read_bytes()).hexdigest()
+        # 1. companion cachefile: same location, with '.<name>_<sha512hash>.pickle'
+        companion_cachefile = p.with_name('.' + p.stem + '_' + hexhash).with_suffix('.pickle')
         if os.access(str(companion_cachefile.parent), os.W_OK):
             with companion_cachefile.open('wb') as f:
                 pickle.dump(data, f)
                 return
 
-        # 2. home cachefile: ~/.osaca/cache/<sha512hash>.pickle
-        hexhash = hashlib.sha256(p.read_bytes()).hexdigest()
+        # 2. home cachefile: ~/.osaca/cache/<name>_<sha512hash>.pickle
         cache_dir = Path(utils.CACHE_DIR)
         try:
             os.makedirs(cache_dir, exist_ok=True)
         except OSError:
             return
-        home_cachefile = (cache_dir / hexhash).with_suffix('.pickle')
+        home_cachefile = (cache_dir / (p.stem + '_' + hexhash)).with_suffix('.pickle')
         if os.access(str(home_cachefile.parent), os.W_OK):
             with home_cachefile.open('wb') as f:
                 pickle.dump(data, f)
