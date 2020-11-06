@@ -259,6 +259,7 @@ def inspect(args, output_file=sys.stdout):
 
     # Detect ISA if necessary
     arch = args.arch if args.arch is not None else DEFAULT_ARCHS[BaseParser.detect_ISA(code)]
+    print_arch_warning = False if args.arch else True
     isa = MachineModel.get_isa_for_arch(arch)
     verbose = args.verbose
     ignore_unknown = args.ignore_unknown
@@ -283,8 +284,11 @@ def inspect(args, output_file=sys.stdout):
     if args.lines:
         line_range = get_line_range(args.lines)
         kernel = [line for line in parsed_code if line['line_number'] in line_range]
+        print_length_warning = False
     else:
         kernel = reduce_to_section(parsed_code, isa)
+        # Print warning if kernel is larger than threshold
+        print_length_warning = True if len(kernel) > 200 else False
     machine_model = MachineModel(arch=arch)
     semantics = ArchSemantics(machine_model)
     semantics.add_semantics(kernel)
@@ -300,7 +304,12 @@ def inspect(args, output_file=sys.stdout):
     frontend = Frontend(args.file.name, arch=arch)
     print(
         frontend.full_analysis(
-            kernel, kernel_graph, ignore_unknown=ignore_unknown, verbose=verbose
+            kernel,
+            kernel_graph,
+            ignore_unknown=ignore_unknown,
+            arch_warning=print_arch_warning,
+            length_warning=print_length_warning,
+            verbose=verbose
         ),
         file=output_file,
     )
