@@ -177,7 +177,7 @@ class TestCLI(unittest.TestCase):
         # WARNING for length
         self.assertTrue(output.getvalue().count('WARNING') == 1)
         args = parser.parse_args(
-            ['--lines', '100-299', '--ignore-unknown', self._find_test_file(kernel)]
+            ['--lines', '100-199', '--ignore-unknown', self._find_test_file(kernel)]
         )
         output = StringIO()
         osaca.run(args, output_file=output)
