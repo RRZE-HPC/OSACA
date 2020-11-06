@@ -47,7 +47,7 @@ class ParserAArch64(BaseParser):
         self.directive = pp.Group(
             pp.Literal('.')
             + pp.Word(pp.alphanums + '_').setResultsName('name')
-            + commaSeparatedList.setResultsName('parameters')
+            + (pp.OneOrMore(directive_parameter) ^ commaSeparatedList).setResultsName('parameters')
             + pp.Optional(self.comment)
         ).setResultsName(self.DIRECTIVE_ID)
         # LLVM-MCA markers
