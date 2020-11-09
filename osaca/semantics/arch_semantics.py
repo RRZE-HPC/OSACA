@@ -418,6 +418,7 @@ class ArchSemantics(ISASemantics):
         """Get the overall throughput sum separated by port of all instructions of a kernel."""
         port_pressures = [instr['port_pressure'] for instr in kernel]
         # Essentially summing up each columns of port_pressures, where each column is one port
+        # and each row is one line of the kernel
         # round is necessary to ensure termination of ArchsSemantics.assign_optimal_throughput
         tp_sum = [round(sum(col), 2) for col in zip(*port_pressures)]
         return tp_sum
