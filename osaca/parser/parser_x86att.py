@@ -8,6 +8,14 @@ from osaca.parser import AttrDict, BaseParser
 
 
 class ParserX86ATT(BaseParser):
+    _instance = None
+
+    # Singelton pattern, as this is created very many times
+    def __new__(cls):
+        if cls._instance is None:
+            cls._instance = super(ParserX86ATT, cls).__new__(cls)
+        return cls._instance
+
     def __init__(self):
         super().__init__()
         self.isa = 'x86'

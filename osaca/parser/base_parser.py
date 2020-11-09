@@ -15,9 +15,12 @@ class BaseParser(object):
     SEGMENT_EXT_ID = 'segment_extension'
     INSTRUCTION_ID = 'instruction'
     OPERANDS_ID = 'operands'
+    _parser_constructed = False
 
     def __init__(self):
-        self.construct_parser()
+        if not self._parser_constructed:
+            self.construct_parser()
+            self._parser_constructed = True
 
     @staticmethod
     def detect_ISA(file_content):
