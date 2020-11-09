@@ -83,28 +83,21 @@ class TestSemanticTools(unittest.TestCase):
         self.assertIsNone(test_mm_x86.get_instruction(None, []))
         self.assertIsNone(test_mm_arm.get_instruction(None, []))
 
-        # test dict DB creation
-        test_mm_x86._data['instruction_dict'] = test_mm_x86._convert_to_dict(
-            test_mm_x86._data['instruction_forms']
-        )
-        test_mm_arm._data['instruction_dict'] = test_mm_arm._convert_to_dict(
-            test_mm_arm._data['instruction_forms']
-        )
-        # test get_instruction from dict DB
-        self.assertIsNone(test_mm_x86.get_instruction_from_dict(None, []))
-        self.assertIsNone(test_mm_arm.get_instruction_from_dict(None, []))
-        self.assertIsNone(test_mm_x86.get_instruction_from_dict('NOT_IN_DB', []))
-        self.assertIsNone(test_mm_arm.get_instruction_from_dict('NOT_IN_DB', []))
+        # test get_instruction from DB
+        self.assertIsNone(test_mm_x86.get_instruction(None, []))
+        self.assertIsNone(test_mm_arm.get_instruction(None, []))
+        self.assertIsNone(test_mm_x86.get_instruction('NOT_IN_DB', []))
+        self.assertIsNone(test_mm_arm.get_instruction('NOT_IN_DB', []))
         name_x86_1 = 'vaddpd'
         operands_x86_1 = [
             {'class': 'register', 'name': 'xmm'},
             {'class': 'register', 'name': 'xmm'},
             {'class': 'register', 'name': 'xmm'},
         ]
-        instr_form_x86_1 = test_mm_x86.get_instruction_from_dict(name_x86_1, operands_x86_1)
+        instr_form_x86_1 = test_mm_x86.get_instruction(name_x86_1, operands_x86_1)
         self.assertEqual(instr_form_x86_1, test_mm_x86.get_instruction(name_x86_1, operands_x86_1))
         self.assertEqual(
-            test_mm_x86.get_instruction_from_dict('jg', [{'class': 'identifier'}]),
+            test_mm_x86.get_instruction('jg', [{'class': 'identifier'}]),
             test_mm_x86.get_instruction('jg', [{'class': 'identifier'}]),
         )
         name_arm_1 = 'fadd'
@@ -113,10 +106,10 @@ class TestSemanticTools(unittest.TestCase):
             {'class': 'register', 'prefix': 'v', 'shape': 's'},
             {'class': 'register', 'prefix': 'v', 'shape': 's'},
         ]
-        instr_form_arm_1 = test_mm_arm.get_instruction_from_dict(name_arm_1, operands_arm_1)
+        instr_form_arm_1 = test_mm_arm.get_instruction(name_arm_1, operands_arm_1)
         self.assertEqual(instr_form_arm_1, test_mm_arm.get_instruction(name_arm_1, operands_arm_1))
         self.assertEqual(
-            test_mm_arm.get_instruction_from_dict('b.ne', [{'class': 'identifier'}]),
+            test_mm_arm.get_instruction('b.ne', [{'class': 'identifier'}]),
             test_mm_arm.get_instruction('b.ne', [{'class': 'identifier'}]),
         )
 
