@@ -8,6 +8,7 @@ from copy import deepcopy
 from itertools import product
 import hashlib
 from pathlib import Path
+from collections import defaultdict
 
 import ruamel.yaml
 from ruamel.yaml.compat import StringIO
@@ -18,6 +19,7 @@ from osaca.parser import ParserX86ATT
 
 class MachineModel(object):
     WILDCARD = '*'
+    INTERNAL_VERSION = 1  # increase whenever self._data format changes to invalidate cache!
 
     def __init__(self, arch=None, path_to_yaml=None, isa=None, lazy=False):
         if not arch and not path_to_yaml:
@@ -40,7 +42,7 @@ class MachineModel(object):
                 'load_throughput_default': [],
                 'ports': [],
                 'port_model_scheme': None,
-                'instruction_forms': [],
+                'instruction_forms': []
             }
         else:
             if arch and path_to_yaml:
@@ -60,8 +62,6 @@ class MachineModel(object):
                 with open(self._path, 'r') as f:
                     if not lazy:
                         self._data = yaml.load(f)
-                        # cache file for next call
-                        self._write_in_cache(self._path, self._data)
                     else:
                         file_content = ''
                         line = f.readline()
@@ -70,21 +70,26 @@ class MachineModel(object):
                             line = f.readline()
                         self._data = yaml.load(file_content)
                         self._data['instruction_forms'] = []
-            # separate multi-alias instruction forms
-            for entry in [
-                x for x in self._data['instruction_forms'] if isinstance(x['name'], list)
-            ]:
-                for name in entry['name']:
-                    new_entry = {'name': name}
-                    for k in [x for x in entry.keys() if x != 'name']:
-                        new_entry[k] = entry[k]
-                    self._data['instruction_forms'].append(new_entry)
-                # remove old entry
-                self._data['instruction_forms'].remove(entry)
-            # For use with dict instead of list as DB
-            # self._data['instruction_dict'] = (
-            #     self._convert_to_dict(self._data['instruction_forms'])
-            # )
+                # separate multi-alias instruction forms
+                for entry in [x for x in self._data['instruction_forms']
+                              if isinstance(x['name'], list)]:
+                    for name in entry['name']:
+                        new_entry = {'name': name}
+                        for k in [x for x in entry.keys() if x != 'name']:
+                            new_entry[k] = entry[k]
+                        self._data['instruction_forms'].append(new_entry)
+                    # remove old entry
+                    self._data['instruction_forms'].remove(entry)
+                # Normalize instruction_form names (to UPPERCASE) and build dict for faster access:
+                self._data['instruction_forms_dict'] = defaultdict(list)
+                for iform in self._data['instruction_forms']:
+                    iform['name'] = iform['name'].upper()
+                    self._data['instruction_forms_dict'][iform['name']].append(iform)
+                self._data['internal_version'] = self.INTERNAL_VERSION
+
+                if not lazy:
+                    # cache internal representation for future use
+                    self._write_in_cache(self._path)
 
     def __getitem__(self, key):
         """Return configuration entry."""
@@ -99,35 +104,20 @@ class MachineModel(object):
     def get_instruction(self, name, operands):
         """Find and return instruction data from name and operands."""
         # For use with dict instead of list as DB
-        # return self.get_instruction_from_dict(name, operands)
         if name is None:
             return None
+        name_matched_iforms = self._data['instruction_forms_dict'].get(name.upper(), [])
         try:
             return next(
                 instruction_form
-                for instruction_form in self._data['instruction_forms']
-                if instruction_form['name'].upper() == name.upper()
-                and self._match_operands(
+                for instruction_form in name_matched_iforms if self._match_operands(
                     instruction_form['operands'] if 'operands' in instruction_form else [],
-                    operands,
-                )
-            )
+                    operands))
         except StopIteration:
             return None
         except TypeError as e:
             print('\nname: {}\noperands: {}'.format(name, operands))
             raise TypeError from e
-
-    def get_instruction_from_dict(self, name, operands):
-        """Find and return instruction data from name and operands stored in dictionary."""
-        if name is None:
-            return None
-        try:
-            # Check if key is in dict
-            instruction_form = self._data['instruction_dict'][self._get_key(name, operands)]
-            return instruction_form
-        except KeyError:
-            return None
 
     def average_port_pressure(self, port_pressure):
         """Construct average port pressure list from instruction data."""
@@ -295,7 +285,7 @@ class MachineModel(object):
             {
                 k: v
                 for k, v in self._data.items()
-                if k not in ['instruction_forms', 'load_throughput']
+                if k not in ['instruction_forms', 'load_throughput', 'internal_version']
             },
             stream,
         )
@@ -323,24 +313,26 @@ class MachineModel(object):
         if companion_cachefile.exists():
             # companion file (must be up-to-date, due to equal hash)
             with companion_cachefile.open('rb') as f:
-                return pickle.load(f)
+                data = pickle.load(f)
+            if data.get('internal_version') == self.INTERNAL_VERSION:
+                return data
 
         # 2. home cachefile: ~/.osaca/cache/<name>_<sha512hash>.pickle
         home_cachefile = (Path(utils.CACHE_DIR) / (p.stem + '_' + hexhash)).with_suffix('.pickle')
         if home_cachefile.exists():
             # home file (must be up-to-date, due to equal hash)
             with home_cachefile.open('rb') as f:
-                return pickle.load(f)
+                data = pickle.load(f)
+            if data.get('internal_version') == self.INTERNAL_VERSION:
+                return data
         return False
 
-    def _write_in_cache(self, filepath, data):
+    def _write_in_cache(self, filepath):
         """
         Write machine model to cache
 
         :param filepath: path to store DB
         :type filepath: str
-        :param data: :class:`MachineModel` to store
-        :type data: :class:`dict`
         """
         p = Path(filepath)
         hexhash = hashlib.sha256(p.read_bytes()).hexdigest()
@@ -348,7 +340,7 @@ class MachineModel(object):
         companion_cachefile = p.with_name('.' + p.stem + '_' + hexhash).with_suffix('.pickle')
         if os.access(str(companion_cachefile.parent), os.W_OK):
             with companion_cachefile.open('wb') as f:
-                pickle.dump(data, f)
+                pickle.dump(self._data, f)
                 return
 
         # 2. home cachefile: ~/.osaca/cache/<name>_<sha512hash>.pickle
@@ -360,7 +352,7 @@ class MachineModel(object):
         home_cachefile = (cache_dir / (p.stem + '_' + hexhash)).with_suffix('.pickle')
         if os.access(str(home_cachefile.parent), os.W_OK):
             with home_cachefile.open('wb') as f:
-                pickle.dump(data, f)
+                pickle.dump(self._data, f)
 
     def _get_key(self, name, operands):
         """Get unique instruction form key for dict DB."""
@@ -369,18 +361,6 @@ class MachineModel(object):
             return key_string[:-1]
         key_string += '_'.join([self._get_operand_hash(op) for op in operands])
         return key_string
-
-    def _convert_to_dict(self, instruction_forms):
-        """Convert list DB to dict DB"""
-        instruction_dict = {}
-        for instruction_form in instruction_forms:
-            instruction_dict[
-                self._get_key(
-                    instruction_form['name'],
-                    instruction_form['operands'] if 'operands' in instruction_form else None,
-                )
-            ] = instruction_form
-        return instruction_dict
 
     def _get_operand_hash(self, operand):
         """Get unique key for operand for dict DB"""
