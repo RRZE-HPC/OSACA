@@ -391,13 +391,13 @@ class ParserX86ATT(BaseParser):
             if self.is_basic_gpr(reg_b):
                 for dep_group in gpr_groups.values():
                     if reg_a_name in dep_group:
-                        if reg_b['name'] in dep_group:
+                        if reg_b_name in dep_group:
                             return True
             return False
 
         # Check other GPRs
         ma = re.match(r'R([0-9]+)[DWB]?', reg_a_name)
-        mb = re.match(r'R([0-9]+)[DWB]?', reg_a_name)
+        mb = re.match(r'R([0-9]+)[DWB]?', reg_b_name)
         if ma and mb and ma.group(1) == mb.group(1):
             return True
 
