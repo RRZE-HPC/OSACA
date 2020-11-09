@@ -398,9 +398,7 @@ class ArchSemantics(ISASemantics):
 
             def g(obj, value):
                 obj[item] = value
-
         else:
-
             def g(obj, *values):
                 for item, value in zip(items, values):
                     obj[item] = value
@@ -416,7 +414,9 @@ class ArchSemantics(ISASemantics):
     @staticmethod
     def get_throughput_sum(kernel):
         """Get the overall throughput sum separated by port of all instructions of a kernel."""
-        port_pressures = [instr['port_pressure'] for instr in kernel]
+        # ignoring all lines with throughput == 0.0, because there won't be anything to sum up
+        # typically comment, label and non-instruction lines
+        port_pressures = [instr['port_pressure'] for instr in kernel if instr['throughput'] != 0.0]
         # Essentially summing up each columns of port_pressures, where each column is one port
         # and each row is one line of the kernel
         # round is necessary to ensure termination of ArchsSemantics.assign_optimal_throughput

@@ -225,7 +225,7 @@ class MachineModel(object):
                 for y in list(filter(lambda x: True if x != 'class' else False, op))
             ]
             operands.append('{}({})'.format(op['class'], ','.join(op_attrs)))
-        return '{}  {}'.format(instruction_form['name'], ','.join(operands))
+        return '{}  {}'.format(instruction_form['name'].lower(), ','.join(operands))
 
     @staticmethod
     def get_isa_for_arch(arch):
@@ -285,7 +285,8 @@ class MachineModel(object):
             {
                 k: v
                 for k, v in self._data.items()
-                if k not in ['instruction_forms', 'load_throughput', 'internal_version']
+                if k not in ['instruction_forms', 'instruction_forms_dict', 'load_throughput',
+                             'internal_version']
             },
             stream,
         )

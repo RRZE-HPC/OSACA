@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import string
+import re
 
 import pyparsing as pp
 
@@ -362,45 +363,44 @@ class ParserX86ATT(BaseParser):
 
     def is_reg_dependend_of(self, reg_a, reg_b):
         """Check if ``reg_a`` is dependent on ``reg_b``"""
+        # Normalize name
+        reg_a_name = reg_a['name'].upper()
+        reg_b_name = reg_b['name'].upper()
+
         # Check if they are the same registers
-        if reg_a.name == reg_b.name:
+        if reg_a_name == reg_b_name:
             return True
         # Check vector registers first
         if self.is_vector_register(reg_a):
             if self.is_vector_register(reg_b):
-                if reg_a.name[1:] == reg_b.name[1:]:
+                if reg_a_name[1:] == reg_b_name[1:]:
                     # Registers in the same vector space
                     return True
             return False
         # Check basic GPRs
-        a_dep = ['RAX', 'EAX', 'AX', 'AH', 'AL']
-        b_dep = ['RBX', 'EBX', 'BX', 'BH', 'BL']
-        c_dep = ['RCX', 'ECX', 'CX', 'CH', 'CL']
-        d_dep = ['RDX', 'EDX', 'DX', 'DH', 'DL']
-        sp_dep = ['RSP', 'ESP', 'SP', 'SPL']
-        src_dep = ['RSI', 'ESI', 'SI', 'SIL']
-        dst_dep = ['RDI', 'EDI', 'DI', 'DIL']
-        basic_gprs = [a_dep, b_dep, c_dep, d_dep, sp_dep, src_dep, dst_dep]
+        gpr_groups = {
+            'A': ['RAX', 'EAX', 'AX', 'AH', 'AL'],
+            'B': ['RBX', 'EBX', 'BX', 'BH', 'BL'],
+            'C': ['RCX', 'ECX', 'CX', 'CH', 'CL'],
+            'D': ['RDX', 'EDX', 'DX', 'DH', 'DL'],
+            'SP': ['RSP', 'ESP', 'SP', 'SPL'],
+            'SRC': ['RSI', 'ESI', 'SI', 'SIL'],
+            'DST': ['RDI', 'EDI', 'DI', 'DIL']
+        }
         if self.is_basic_gpr(reg_a):
             if self.is_basic_gpr(reg_b):
-                for dep_group in basic_gprs:
-                    if reg_a['name'].upper() in dep_group:
-                        if reg_b['name'].upper() in dep_group:
+                for dep_group in gpr_groups.values():
+                    if reg_a_name in dep_group:
+                        if reg_b['name'] in dep_group:
                             return True
             return False
+
         # Check other GPRs
-        gpr_parser = (
-            pp.CaselessLiteral('R')
-            + pp.Word(pp.nums).setResultsName('id')
-            + pp.Optional(pp.Word('dwbDWB', exact=1))
-        )
-        try:
-            id_a = gpr_parser.parseString(reg_a['name'], parseAll=True).asDict()['id']
-            id_b = gpr_parser.parseString(reg_b['name'], parseAll=True).asDict()['id']
-            if id_a == id_b:
-                return True
-        except pp.ParseException:
-            return False
+        ma = re.match(r'R([0-9]+)[DWB]?', reg_a_name)
+        mb = re.match(r'R([0-9]+)[DWB]?', reg_a_name)
+        if ma and mb and ma.group(1) == mb.group(1):
+            return True
+
         # No dependencies
         return False
 
@@ -414,19 +414,11 @@ class ParserX86ATT(BaseParser):
         """Check if register is a general purpose register"""
         if register is None:
             return False
-        gpr_parser = (
-            pp.CaselessLiteral('R')
-            + pp.Word(pp.nums).setResultsName('id')
-            + pp.Optional(pp.Word('dwbDWB', exact=1))
-        )
+
         if self.is_basic_gpr(register):
             return True
-        else:
-            try:
-                gpr_parser.parseString(register['name'], parseAll=True)
-                return True
-            except pp.ParseException:
-                return False
+
+        return re.match(r'R([0-9]+)[DWB]?', register['name'], re.IGNORECASE)
 
     def is_vector_register(self, register):
         """Check if register is a vector register"""
