@@ -297,7 +297,7 @@ class Frontend(object):
                     '         Specify the uarch with --arch. See --help for more information.\n'
         )
         length_text = (
-                    'WARNING: You are analyzing a large amount of instruction forms. Analyses '
+                    'WARNING: You are analyzing a large amount of instruction forms. Analysis '
                     'across loops/block boundaries often do not make much sense.\n'
                     '         Specify the kernel length with --length. See --help for more '
                     'information.\n'
