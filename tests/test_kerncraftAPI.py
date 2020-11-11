@@ -59,11 +59,11 @@ class TestKerncraftAPI(unittest.TestCase):
         self.assertEqual(kapi.get_unmatched_instruction_ratio(), 0.0)
         port_occupation = OrderedDict(
             [
-                ('0', 34.0),
+                ('0', 32.0),
                 ('0DV', 0.0),
-                ('1', 34.0),
+                ('1', 32.0),
                 ('1DV', 0.0),
-                ('2', 2.0),
+                ('2', 7.0),
                 ('3', 64.0),
                 ('4', 64.0),
                 ('5', 32.0),
