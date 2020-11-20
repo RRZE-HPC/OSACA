@@ -416,7 +416,12 @@ class ParserAArch64(BaseParser):
         if 'base_immediate' in immediate:
             # arithmetic immediate, add calculated value as value
             immediate['shift'] = immediate['shift'][0]
-            immediate['value'] = int(immediate['base_immediate']['value']) << int(immediate['shift']['value'])
+            immediate['value'] = (
+                int(
+                    immediate['base_immediate']['value'],
+                    16 if immediate['base_immediate']['value'].lower().startswith('0x') else 10
+                ) << int(immediate['shift']['value'])
+            )
             return AttrDict({self.IMMEDIATE_ID: immediate})
         if 'float' in immediate:
             dict_name = 'float'
