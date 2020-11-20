@@ -80,6 +80,39 @@ instruction_forms:
   throughput: 0.33333333
   latency: 1.0  # 	1*p012
   port_pressure: [[1, '012']]
+- name: add
+  operands:
+  - class: register
+    prefix: w
+  - class: register
+    prefix: w
+  - class: register
+    prefix: w
+  throughput: 0.33333333
+  latency: 1.0  # 	1*p012
+  port_pressure: [[1, '012']]
+- name: add
+  operands:
+  - class: register
+    prefix: w
+  - class: register
+    prefix: w
+  - class: immediate
+    imd: int
+  throughput: 0.33333333
+  latency: 1.0  # 	1*p012
+  port_pressure: [[1, '012']]
+- name: adds
+  operands:
+  - class: register
+    prefix: w
+  - class: register
+    prefix: w
+  - class: immediate
+    imd: int
+  throughput: 0.33333333
+  latency: 1.0  # 	1*p012
+  port_pressure: [[1, '012']]
 - name: and
   operands:
   - class: register
@@ -212,6 +245,15 @@ instruction_forms:
     prefix: x
   - class: register
     prefix: x
+  throughput: 0.33333333
+  latency: 1.0  # 	1*p012
+  port_pressure: [[1, '012']]
+- name: cmp
+  operands:
+  - class: register
+    prefix: w
+  - class: register
+    prefix: w
   throughput: 0.33333333
   latency: 1.0  # 	1*p012
   port_pressure: [[1, '012']]
