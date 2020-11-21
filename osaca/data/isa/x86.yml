@@ -3738,37 +3738,6 @@ instruction_forms:
           name: "*"
           source: true
           destination: true
-    - name: vextractf128
-      operands:
-        - class: "immediate"
-          imd: "int"
-          source: true
-          destination: false
-        - class: "register"
-          name: "ymm"
-          source: true
-          destination: false
-        - class: "register"
-          name: "xmm"
-          source: true
-          destination: true
-    - name: vextractf128
-      operands:
-        - class: "immediate"
-          imd: "int"
-          source: true
-          destination: false
-        - class: "register"
-          name: "ymm"
-          source: true
-          destination: false
-        - class: "memory"
-          base: "*"
-          offset: "*"
-          index: "*"
-          scale: "*"
-          source: true
-          destination: true
     - name: [vptest, ptest]
       operands:
         - class: "register"
