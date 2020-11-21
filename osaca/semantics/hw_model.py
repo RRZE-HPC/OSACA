@@ -187,8 +187,8 @@ class MachineModel(object):
         """Return load thorughput for given register type."""
         ld_tp = [m for m in self._data['load_throughput'] if self._match_mem_entries(memory, m)]
         if len(ld_tp) > 0:
-            return ld_tp[0]['port_pressure']
-        return self._data['load_throughput_default']
+            return ld_tp[0]['port_pressure'].copy()
+        return self._data['load_throughput_default'].copy()
 
     def get_store_latency(self, reg_type):
         """Return store latency for given register type."""
@@ -199,8 +199,8 @@ class MachineModel(object):
         """Return store throughput for given register type."""
         st_tp = [m for m in self._data['store_throughput'] if self._match_mem_entries(memory, m)]
         if len(st_tp) > 0:
-            return st_tp[0]['port_pressure']
-        return self._data['store_throughput_default']
+            return st_tp[0]['port_pressure'].copy()
+        return self._data['store_throughput_default'].copy()
 
     def _match_mem_entries(self, mem, i_mem):
         """Check if memory addressing ``mem`` and ``i_mem`` are of the same type."""

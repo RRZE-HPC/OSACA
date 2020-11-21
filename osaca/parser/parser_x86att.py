@@ -406,7 +406,10 @@ class ParserX86ATT(BaseParser):
 
     def is_basic_gpr(self, register):
         """Check if register is a basic general purpose register (ebi, rax, ...)"""
-        if any(char.isdigit() for char in register['name']):
+        if (
+            any(char.isdigit() for char in register['name'])
+            or any(register['name'].lower().startswith(x) for x in ['mm', 'xmm', 'ymm', 'zmm'])
+        ):
             return False
         return True
 
@@ -414,10 +417,8 @@ class ParserX86ATT(BaseParser):
         """Check if register is a general purpose register"""
         if register is None:
             return False
-
         if self.is_basic_gpr(register):
             return True
-
         return re.match(r'R([0-9]+)[DWB]?', register['name'], re.IGNORECASE)
 
     def is_vector_register(self, register):
@@ -429,7 +430,7 @@ class ParserX86ATT(BaseParser):
         return False
 
     def get_reg_type(self, register):
-        """Ger register type"""
+        """Get register type"""
         if register is None:
             return False
         if self.is_gpr(register):
