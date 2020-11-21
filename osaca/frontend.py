@@ -2,10 +2,23 @@
 """
 Frontend interface for OSACA. Does everything necessary for analysis report generation.
 """
+import io
+import os
 import re
 from datetime import datetime as dt
 
 from osaca.semantics import INSTR_FLAGS, ArchSemantics, KernelDG, MachineModel
+
+def _get_version(*file_paths):
+    """Searches for a version attribute in the given file(s)"""
+    with io.open(
+        os.path.join(os.path.dirname(__file__), *file_paths), encoding='utf-8'
+    ) as fp:
+        version_file = fp.read()
+    version_match = re.search(r"^__version__ = ['\"]([^'\"]*)['\"]", version_file, re.M)
+    if version_match:
+        return version_match.group(1)
+    return '?.?.?' 
 
 
 class Frontend(object):
@@ -389,12 +402,12 @@ class Frontend(object):
 
     def _header_report(self):
         """Prints header information"""
-        version = 'v0.3'
+        version = _get_version('__init__.py')
         adjust = 20
         header = ''
         header += 'Open Source Architecture Code Analyzer (OSACA) - {}\n'.format(version)
         header += 'Analyzed file:'.ljust(adjust) + '{}\n'.format(self._filename)
-        header += 'Architecture:'.ljust(adjust) + '{}\n'.format(self._arch)
+        header += 'Architecture:'.ljust(adjust) + '{}\n'.format(self._arch.upper())
         header += 'Timestamp:'.ljust(adjust) + '{}\n'.format(
             dt.utcnow().strftime('%Y-%m-%d %H:%M:%S')
         )
@@ -412,8 +425,7 @@ class Frontend(object):
         symbol_map = ''
         for flag in sorted(symbol_dict.keys()):
             symbol_map += ' {} - {}\n'.format(self._get_flag_symbols([flag]), symbol_dict[flag])
-
         return symbol_map
-
+    
     def _port_binding_summary(self):
         raise NotImplementedError
