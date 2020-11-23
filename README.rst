@@ -32,6 +32,9 @@ For an innermost loop kernel in assembly, this tool allows automatic instruction
 
 Getting started
 ===============
+OSACA is as a python module with a command line interface.
+
+OSACA is also integrated into the `Compiler Explorer at godbolt.org <https://godbolt.org>`_, which allows using OSACA from a browser without any installation. To analyze an assembly snippet, go to https://godbolt.org change language to "Analysis", insert an AArch64 or AT&T(!) x86 assembly code and make sure OSACA is selected in the corresponding analysis panel, e.g., https://godbolt.org/z/shK4f8. When analyzing a high-level language code, use the "Add tool..." menu in the compiler output panel to add OSACA analysis, e.g. https://godbolt.org/z/hbMoPn. To change the micro architecture model, add ``--arch`` and µarch shortname (e.g., ``SKX`` for Skylake, ``ZEN2``, ``N1`` for ARM Neoverse) to the "Compiler options..." (when using "Analysis" mode) or "Arguments" (when analyzing compiler output of a high-level code).
 
 Installation
 ------------
@@ -82,6 +85,7 @@ The usage of OSACA can be listed as:
     osaca [-h] [-V] [--arch ARCH] [--fixed] [--db-check] 
     	  [--import MICROBENCH] [--insert-marker] 
 	  [--export-graph GRAPHNAME] [--ignore-unknown] [--verbose]
+	  [--out OUT]
 	  FILEPATH
 
 -h, --help
@@ -90,8 +94,8 @@ The usage of OSACA can be listed as:
   shows the program’s version number.
 --arch ARCH
   needs to be replaced with the target architecture abbreviation.
-  Possible options are ``SNB``, ``IVB``, ``HSW``, ``BDW``, ``SKX`` and ``CSX`` for the latest Intel micro architectures starting from Intel Sandy Bridge and ``ZEN1``, ``ZEN2`` for AMD Zen architectures.
-  Furthermore, ``TX2`` for Marvell`s ARM-based ThunderX2 architecture is available.
+  Possible options are ``SNB``, ``IVB``, ``HSW``, ``BDW``, ``SKX``, ``CSX`` and ``ICL`` for the latest Intel micro architectures starting from Intel Sandy Bridge and ``ZEN1``, ``ZEN2`` for AMD Zen architectures.
+  Furthermore, ``TX2`` for Marvell`s ARM-based ThunderX2 , ``N1`` for ARM's Neoverse  and ``A64FX`` for Fujitsu's HPC ARM architecture are available.
 --fixed
   Run the throughput analysis with fixed port utilization for all suitable ports per instruction.
   Otherwise, OSACA will print out the optimal port utilization for the kernel.
@@ -112,8 +116,10 @@ The usage of OSACA can be listed as:
   If not specified, a warning will be printed instead if one ore more isntruction form is unknown to OSACA.
 -v, --verbose
   Increases verbosity level
+-o OUT, --out OUT
+  Write analysis to this file (default to stdout)
 
-The **FILEPATH** describes the filepath to the file to work with and is always necessary
+The **FILEPATH** describes the filepath to the file to work with and is always necessary, use "-" to read from stdin.
 
 ______________________
 
