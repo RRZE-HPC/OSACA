@@ -151,6 +151,7 @@ class TestParserAArch64(unittest.TestCase):
         line_prefetch = 'prfm    pldl1keep, [x26, #2048] //HPL'
         line_preindexed = 'stp x29, x30, [sp, #-16]!'
         line_postindexed = 'ldp q2, q3, [x11], #64'
+        line_5_operands = 'fcmla z26.d, p0/m, z29.d, z21.d, #90'
 
         instruction_form_1 = {
             'instruction': None,
@@ -265,6 +266,22 @@ class TestParserAArch64(unittest.TestCase):
             'line': 'ldp q2, q3, [x11], #64',
             'line_number': 7,
         }
+        instruction_form_8 = {
+            'instruction': 'fcmla',
+            'operands': [
+                {'register': {'prefix': 'z', 'name': '26', 'shape': 'd'}},
+                {'register': {'prefix': 'p', 'name': '0', 'predication': 'm'}},
+                {'register': {'prefix': 'z', 'name': '29', 'shape': 'd'}},
+                {'register': {'prefix': 'z', 'name': '21', 'shape': 'd'}},
+                {'immediate': {'value': '90'}},
+            ],
+            'directive': None,
+            'comment': None,
+            'label': None,
+            'line': 'fcmla z26.d, p0/m, z29.d, z21.d, #90',
+            'line_number': 8,
+        }
+
         parsed_1 = self.parser.parse_line(line_comment, 1)
         parsed_2 = self.parser.parse_line(line_label, 2)
         parsed_3 = self.parser.parse_line(line_directive, 3)
@@ -272,6 +289,7 @@ class TestParserAArch64(unittest.TestCase):
         parsed_5 = self.parser.parse_line(line_prefetch, 5)
         parsed_6 = self.parser.parse_line(line_preindexed, 6)
         parsed_7 = self.parser.parse_line(line_postindexed, 7)
+        parsed_8 = self.parser.parse_line(line_5_operands, 8)
 
         self.assertEqual(parsed_1, instruction_form_1)
         self.assertEqual(parsed_2, instruction_form_2)
@@ -280,6 +298,7 @@ class TestParserAArch64(unittest.TestCase):
         self.assertEqual(parsed_5, instruction_form_5)
         self.assertEqual(parsed_6, instruction_form_6)
         self.assertEqual(parsed_7, instruction_form_7)
+        self.assertEqual(parsed_8, instruction_form_8)
 
     def test_parse_file(self):
         parsed = self.parser.parse_file(self.triad_code)
