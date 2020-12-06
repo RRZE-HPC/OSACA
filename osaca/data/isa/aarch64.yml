@@ -5,34 +5,62 @@ isa: "AArch64"
 #   mnemonic op1 ... opN
 # means that op1 is the only destination operand and op2 to op(N) are source operands.
 instruction_forms:
+    - name: [incb, incd]
+      operands:
+      - class: register
+        prefix: x
+        source: true
+        destination: true
+      throughput: 0.5
+      latency: 1.0  # 	1*p34
+      port_pressure: [[1, '34']]
+    - name: [incb, incd]
+      operands:
+      - class: register
+        prefix: x
+        source: true
+        destination: true
+      - class: identifier
+        source: false 
+        destination: false
+      - class: identifier
+        source: false 
+        destination: false
+      - class: immediate
+        imd: int
+        source: false 
+        destination: false
+      throughput: 0.5
+      latency: 1.0  # 	1*p34
+      port_pressure: [[1, '34']]
     - name: fmla
       operands:
-        - class: "register"
+        - class: register
           prefix: "*"
           shape: "*"
           source: true
           destination: true
-        - class: "register"
+        - class: register
           prefix: "*"
           shape: "*"
           source: true
           destination: false
-        - class: "register"
+        - class: register
           prefix: "*"
           shape: "*"
           source: true
           destination: false
     - name: ldp
       operands:
-        - class: "register"
+        - class: register
           prefix: "*"
           source: false
           destination: true
-        - class: "register"
+        - class: register
           prefix: "*"
           source: false
           destination: true
-        - class: "memory"
+        - class: memory
           base: "*"
           offset: "*"
           index: "*"
@@ -43,11 +71,11 @@ instruction_forms:
           destination: false
     - name: [ldr, ldur]
       operands:
-        - class: "register"
+        - class: register
           prefix: "*"
           source: false
           destination: true
-        - class: "memory"
+        - class: memory
           base: "*"
           offset: "*"
           index: "*"
@@ -58,15 +86,15 @@ instruction_forms:
           destination: false
     - name: stp
       operands:
-        - class: "register"
+        - class: register
           prefix: "*"
           source: true
           destination: false
-        - class: "register"
+        - class: register
           prefix: "*"
           source: true
           destination: false
-        - class: "memory"
+        - class: memory
           base: "*"
           offset: "*"
           index: "*"
@@ -77,11 +105,11 @@ instruction_forms:
           destination: true
     - name: [str, stur]
       operands:
-        - class: "register"
+        - class: register
           prefix: "*"
           source: true
           destination: false
-        - class: "memory"
+        - class: memory
           base: "*"
           offset: "*"
           index: "*"
@@ -92,71 +120,71 @@ instruction_forms:
           destination: true
     - name: cmp
       operands:
-        - class: "register"
+        - class: register
           prefix: "*"
           source: true
           destination: false
-        - class: "register"
+        - class: register
           prefix: "*"
           source: true
           destination: false
     - name: cmp
       operands:
-        - class: "register"
+        - class: register
           prefix: "*"
           source: true
           destination: false
-        - class: "immediate"
+        - class: immediate
           imd: "int"
           source: true
           destination: false
     - name: cmn
       operands:
-        - class: "register"
+        - class: register
           prefix: "*"
           source: true
           destination: false
-        - class: "register"
+        - class: register
           prefix: "*"
           source: true
           destination: false
     - name: cmn
       operands:
-        - class: "register"
+        - class: register
           prefix: "*"
           source: true
           destination: false
-        - class: "immediate"
+        - class: immediate
           imd: "int"
           source: true
           destination: false
     - name: fcmp
       operands:
-        - class: "register"
+        - class: register
           prefix: "*"
           source: true
           destination: false
-        - class: "register"
+        - class: register
           prefix: "*"
           source: true
           destination: false
     - name: fcmp
       operands:
-        - class: "register"
+        - class: register
           prefix: "*"
           source: true
           destination: false
-        - class: "immediate"
-          imd: "double"
+        - class: immediate
+          imd: double
           source: true
           destination: false
     - name: fcmp
       operands:
-        - class: "register"
+        - class: register
           prefix: "*"
           source: true
           destination: false
-        - class: "immediate"
-          imd: "float"
+        - class: immediate
+          imd: float
           source: true
           destination: false
