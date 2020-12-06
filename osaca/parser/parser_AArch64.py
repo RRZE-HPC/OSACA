@@ -202,6 +202,8 @@ class ParserAArch64(BaseParser):
             + pp.Optional(operand_rest.setResultsName('operand3'))
             + pp.Optional(pp.Suppress(pp.Literal(',')))
             + pp.Optional(operand_rest.setResultsName('operand4'))
+            + pp.Optional(pp.Suppress(pp.Literal(',')))
+            + pp.Optional(operand_rest.setResultsName('operand5'))
             + pp.Optional(self.comment)
         )
 
@@ -320,6 +322,9 @@ class ParserAArch64(BaseParser):
         # Check fourth operand
         if 'operand4' in result:
             operands.append(self.process_operand(result['operand4']))
+        # Check fifth operand
+        if 'operand5' in result:
+            operands.append(self.process_operand(result['operand5']))
 
         return_dict = AttrDict(
             {
