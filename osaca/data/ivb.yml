@@ -12,14 +12,14 @@ load_latency: {}                                                                
 load_throughput_default: []                                                                                   # uops.info import
 ports:                                                                                                        # uops.info import
 - '0'                                                                                                         # uops.info import
-- '1'                                                                                                         # uops.info import
-- '5'                                                                                                         # uops.info import
-- '2'                                                                                                         # uops.info import
-- '3'                                                                                                         # uops.info import
-- 2D                                                                                                          # uops.info import
-- 3D                                                                                                          # uops.info import
 - DIV                                                                                                         # uops.info import
+- '1'                                                                                                         # uops.info import
+- '2'                                                                                                         # uops.info import
+- 2D                                                                                                          # uops.info import
+- '3'                                                                                                         # uops.info import
+- 3D                                                                                                          # uops.info import
 - '4'                                                                                                         # uops.info import
+- '5'                                                                                                         # uops.info import
 port_model_scheme: ~                                                                                          # uops.info import
 load_throughput:                                                                                              # uops.info import
 - {base: gpr, index: gpr, offset: imd, scale: 1, port_pressure: []}                                           # uops.info import
@@ -8278,6 +8278,16 @@ instruction_forms:                                                              
   port_pressure: [[1, '015'], [1, '23'], [1, [2D, 3D]]]                                                       # uops.info import
   throughput: 0.5                                                                                             # uops.info import
   uops: 2                                                                                                     # uops.info import
+- name: CMP                                                                                                   # uops.info import
+  operands:                                                                                                   # uops.info import
+  - class: register                                                                                           # uops.info import
+    name: gpr                                                                                                 # uops.info import
+  - class: register                                                                                           # uops.info import
+    name: gpr                                                                                                 # uops.info import
+  latency: 1                                                                                                  # uops.info import
+  port_pressure: [[1, '015']]                                                                                 # uops.info import
+  throughput: 0.3333333333333333                                                                              # uops.info import
+  uops: 1                                                                                                     # uops.info import
 - name: CMP                                                                                                   # uops.info import
   operands:                                                                                                   # uops.info import
   - class: immediate                                                                                          # uops.info import
@@ -16783,5 +16793,27 @@ instruction_forms:                                                              
   port_pressure: [[1, '15']]                                                                                  # uops.info import
   throughput: 0.5                                                                                             # uops.info import
   uops: 1                                                                                                     # uops.info import
-                                                                                                              # uops.info import
-
+- name: [jo, jno, js, jns, jp, jpe, jnp, jpo]
+  operands:
+  - class: identifier
+  throughput: 0.0
+  latency: 0.0
+  port_pressure: []
+- name: [jc, jb, jae, jnb, jna, jbe, ja, jnbe]
+  operands:
+  - class: identifier
+  throughput: 0.0
+  latency: 0.0
+  port_pressure: []
+- name: [je, jz, jne, jnz, jl, jnge]
+  operands:
+  - class: identifier
+  throughput: 0.0
+  latency: 0.0
+  port_pressure: []
+- name: [jge, jnl, jle, jng, jg, jnle]
+  operands:
+  - class: identifier
+  throughput: 0.0
+  latency: 0.0
+  port_pressure: []
