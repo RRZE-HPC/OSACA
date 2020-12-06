@@ -123,10 +123,12 @@ class ParserAArch64(BaseParser):
         vector = (
             pp.oneOf('v z', caseless=True).setResultsName('prefix')
             + pp.Word(pp.nums).setResultsName('name')
-            + pp.Literal('.')
-            + pp.Optional(pp.Word('12468')).setResultsName('lanes')
-            + pp.Word(pp.alphas, exact=1).setResultsName('shape')
-            + pp.Optional(index)
+            + pp.Optional(
+                pp.Literal('.')
+                + pp.Optional(pp.Word('12468')).setResultsName('lanes')
+                + pp.Word(pp.alphas, exact=1).setResultsName('shape')
+                + pp.Optional(index)
+            )
         )
         predicate = (
             pp.CaselessLiteral('p').setResultsName('prefix')
