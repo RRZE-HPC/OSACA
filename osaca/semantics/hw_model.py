@@ -574,7 +574,10 @@ class MachineModel(object):
         if reg['prefix'] != i_reg['prefix']:
             return False
         if 'shape' in reg:
-            if 'shape' in i_reg and reg['shape'] == i_reg['shape']:
+            if 'shape' in i_reg and (
+                    reg['shape'] == i_reg['shape'] 
+                    or self.WILDCARD in (reg['shape'] + i_reg['shape'])
+            ):
                 return True
             return False
         return True
