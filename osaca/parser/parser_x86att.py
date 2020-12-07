@@ -38,14 +38,18 @@ class ParserX86ATT(BaseParser):
         rest = pp.Word(pp.alphanums + '$_.+-')
         identifier = pp.Group(
             pp.Optional(id_offset).setResultsName('offset')
-            + pp.Combine(first + pp.Optional(rest)).setResultsName('name')
+            + pp.Combine(pp.delimitedList(
+                pp.Combine(first + pp.Optional(rest)), delim='::'), joinString='::'
+            ).setResultsName('name')
             + pp.Optional(relocation).setResultsName('relocation')
         ).setResultsName('identifier')
         # Label
-        rest = pp.Word(pp.alphanums + '$_.+-()')
+        label_rest = pp.Word(pp.alphanums + '$_.+-()')
         label_identifier = pp.Group(
             pp.Optional(id_offset).setResultsName('offset')
-            + pp.Combine(first + pp.Optional(rest)).setResultsName('name')
+            + pp.Combine(pp.delimitedList(
+                pp.Combine(first + pp.Optional(label_rest)), delim='::'), joinString='::'
+            ).setResultsName('name')
             + pp.Optional(relocation).setResultsName('relocation')
         ).setResultsName('identifier')
         numeric_identifier = pp.Group(
