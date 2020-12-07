@@ -256,6 +256,15 @@ instruction_forms:
 - name: cmp
   operands:
   - class: register
+    prefix: w
+  - class: register
+    prefix: w
+  throughput: 0.5
+  latency: 1.0  # 	1*p34
+  port_pressure: [[1, '34']]
+- name: cmp
+  operands:
+  - class: register
     prefix: x
   - class: register
     prefix: x
