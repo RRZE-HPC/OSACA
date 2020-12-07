@@ -106,6 +106,10 @@ class ParserX86ATT(BaseParser):
             + segment_extension.setResultsName(self.SEGMENT_EXT_ID)
         )
         # Memory: offset | seg:seg_ext | offset(base, index, scale){mask}
+        memory_abs = (
+            pp.Suppress(pp.Literal('*'))
+            + (offset | self.register).setResultsName('offset')
+        )
         memory = pp.Group(
             (
                 pp.Optional(pp.Suppress(pp.Literal('*')))
@@ -124,6 +128,7 @@ class ParserX86ATT(BaseParser):
                     + pp.Literal('}')
                 )
             )
+            | memory_abs
             | memory_segmentation
             | (hex_number | pp.Word(pp.nums)).setResultsName('offset')
         ).setResultsName(self.MEMORY_ID)
