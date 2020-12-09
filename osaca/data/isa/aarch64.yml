@@ -5,15 +5,17 @@ isa: "AArch64"
 #   mnemonic op1 ... opN
 # means that op1 is the only destination operand and op2 to op(N) are source operands.
 instruction_forms:
+    - name: [b, bcc, bcs, b.ne, b.any, b.none, b.lt, b.eq, b.hs, b.gt, bne, beq]
+      operands:
+      - class: identifier
+        source: false
+        destination: false
     - name: [incb, incd]
       operands:
       - class: register
         prefix: x
         source: true
         destination: true
-      throughput: 0.5
-      latency: 1.0  # 	1*p34
-      port_pressure: [[1, '34']]
     - name: [incb, incd]
       operands:
       - class: register
@@ -30,9 +32,6 @@ instruction_forms:
         imd: int
         source: false 
         destination: false
-      throughput: 0.5
-      latency: 1.0  # 	1*p34
-      port_pressure: [[1, '34']]
     - name: fmla
       operands:
         - class: register

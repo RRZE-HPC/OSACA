@@ -173,6 +173,12 @@ instruction_forms:
   throughput: 1.0
   latency: 0.0
   port_pressure: [[1, '7']]
+- name: [bcc, bcs]
+  operands:
+  - class: identifier
+  throughput: 1.0
+  latency: 0.0
+  port_pressure: [[1, '7']]
 - name: b.ne
   operands:
   - class: identifier
@@ -543,7 +549,17 @@ instruction_forms:
   operands:
   - {class: register, prefix: s}
   - {class: immediate, imd: double}
-  latency: ~  # 	1*p0
+  latency: 1  # 	1*p0
+  port_pressure: [[1, '0']]
+  throughput: 1.0
+- name: fmov
+  operands:
+  - class: register
+    prefix: z
+    shape: d
+  - class: immediate
+    imd: double
+  latency: 1  # 	1*p0
   port_pressure: [[1, '0']]
   throughput: 1.0
 - name: fmul
@@ -741,7 +757,7 @@ instruction_forms:
     predication: '*'
   - class: memory
     base: x
-    offset: ~
+    offset: '*'
     index: ~
     scale: '*'
     pre-indexed: false
@@ -759,7 +775,7 @@ instruction_forms:
     predication: '*'
   - class: memory
     base: x
-    offset: ~
+    offset: '*'
     index: x
     scale: '*'
     pre-indexed: false
@@ -1184,6 +1200,22 @@ instruction_forms:
   throughput: 0.0
   latency: 0
   port_pressure: []
+- name: prfd
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    prefix: p
+  - class: memory
+    base: x
+    offset: '*'
+    index: '*'
+    scale: '*'
+    pre-indexed: false
+    post-indexed: false
+  throughput: 0.0
+  latency: 0
+  port_pressure: []
 - name: ret
   operands: []
   throughput: 0.5
@@ -1463,7 +1495,7 @@ instruction_forms:
     prefix: p
   - class: memory
     base: x
-    offset: ~
+    offset: '*'
     index: '*'
     scale: '*'
     pre-indexed: false
