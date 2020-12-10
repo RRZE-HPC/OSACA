@@ -82,7 +82,7 @@ The usage of OSACA can be listed as:
 
 .. code:: bash
 
-    osaca [-h] [-V] [--arch ARCH] [--fixed] [--db-check] 
+    osaca [-h] [-V] [--arch ARCH] [--fixed] [--lines LINES] [--db-check] 
     	  [--import MICROBENCH] [--insert-marker] 
 	  [--export-graph GRAPHNAME] [--ignore-unknown] [--verbose]
 	  [--out OUT]
@@ -96,9 +96,13 @@ The usage of OSACA can be listed as:
   needs to be replaced with the target architecture abbreviation.
   Possible options are ``SNB``, ``IVB``, ``HSW``, ``BDW``, ``SKX``, ``CSX`` and ``ICL`` for the latest Intel micro architectures starting from Intel Sandy Bridge and ``ZEN1``, ``ZEN2`` for AMD Zen architectures.
   Furthermore, ``TX2`` for Marvell`s ARM-based ThunderX2 , ``N1`` for ARM's Neoverse  and ``A64FX`` for Fujitsu's HPC ARM architecture are available.
+  If no micro-architecture is given, OSACA assumes a default architecture for x86/AArch64.
 --fixed
   Run the throughput analysis with fixed port utilization for all suitable ports per instruction.
   Otherwise, OSACA will print out the optimal port utilization for the kernel.
+--lines
+  Define lines that should be included in the analysis. This option overwrites any range defined by markers in the assembly. Add either single lines or ranges defined
+  by "-" or ":", each entry separated by commas, e.g.: ``--lines 1,2,8-18,20:24``
 --db-check
   Run a sanity check on the by "--arch" specified database.
   The output depends on the verbosity level.
@@ -158,8 +162,9 @@ graph.pdf`` to generate a PDF document.
 
 Marker insertion
 ----------------
-For extracting the right kernel, one has to mark it in beforehand.
+For extracting the right kernel, one can mark it in beforehand.
 Currently, only the detection of markers in the assembly code and therefore the analysis of assembly files is supported by OSACA.
+If OSACA cannot find any markers in the given input file, all lines will be evaluated.
 
 Marking a kernel means to insert the byte markers in the assembly file in before and after the loop.
 For this, the start marker has to be inserted right in front of the loop label and the end marker directly after the jump instruction.
