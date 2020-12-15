@@ -33,6 +33,7 @@ jobs:
         python setup.py build sdist
   
   publish:
+    runs-on: ubuntu-latest
     if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
     needs: jobs
     steps:
@@ -43,7 +44,7 @@ jobs:
         python-version: ${{ matrix.python-version }}
     - name: Build package
       run: |
-        python setup.py build sdist
+        python setup.py build sdist wheel
     - name: Publish to PyPI
       uses: pypa/gh-action-pypi-publish@master
       with:
