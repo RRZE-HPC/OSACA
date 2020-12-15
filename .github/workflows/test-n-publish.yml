@@ -20,6 +20,7 @@ jobs:
         python -m pip install --upgrade pip
         python -m pip install codecov requests
         python -m pip install bs4
+        sudo apt-get install graphviz
         python -m pip install pygraphviz
         python -m pip install kerncraft
         python -m pip install -e .
