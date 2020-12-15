@@ -3,7 +3,7 @@ name: test-n-publish
 on: [push, pull_request]
 
 jobs:
-  test:
+  test-n-publish:
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -30,22 +30,9 @@ jobs:
     - uses: codecov/codecov-action@v1
     - name: Build package
       run: |
-        python setup.py build sdist
-  
-  publish:
-    runs-on: ubuntu-latest
-    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
-    needs: jobs
-    steps:
-    - uses: actions/checkout@v2
-    - uses: actions/setup-python@v2
-      name: Set up Python ${{ matrix.python-version }}
-      with:
-        python-version: ${{ matrix.python-version }}
-    - name: Build package
-      run: |
         python setup.py build sdist wheel
     - name: Publish to PyPI
+      if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
       uses: pypa/gh-action-pypi-publish@master
       with:
         skip_existing: true
