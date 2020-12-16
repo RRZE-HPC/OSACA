@@ -27,6 +27,7 @@ SUPPORTED_ARCHS = [
     'TX2',
     'N1',
     'A64FX',
+    'A72',
 ]
 DEFAULT_ARCHS = {
     'aarch64': 'A64FX',
@@ -86,7 +87,7 @@ def create_parser(parser=None):
         '--arch',
         type=str,
         help='Define architecture (SNB, IVB, HSW, BDW, SKX, CSX, ICL, ZEN1, ZEN2, TX2, N1, '
-        'A64FX). If no architecture is given, OSACA assumes a default uarch for x86/AArch64.',
+        'A64FX, A72). If no architecture is given, OSACA assumes a default uarch for x86/AArch64.',
     )
     parser.add_argument(
         '--fixed',
