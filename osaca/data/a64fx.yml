@@ -173,6 +173,12 @@ instruction_forms:
   throughput: 1.0
   latency: 0.0
   port_pressure: [[1, '7']]
+- name: bl
+  operands:
+  - class: identifier
+  throughput: 1.0
+  latency: 0.0
+  port_pressure: [[1, '7']]
 - name: [bcc, bcs]
   operands:
   - class: identifier
@@ -511,7 +517,7 @@ instruction_forms:
   throughput: 0.5
   latency: 9.0  # 	1*p02
   port_pressure: [[1, '02']]
-- name: fmla
+- name: [fmla, fmls]
   operands:
   - class: register
     prefix: v
@@ -528,7 +534,7 @@ instruction_forms:
   throughput: 0.5
   latency: 9.0  # 	1*p02
   port_pressure: [[1, '02']]
-- name: fmla
+- name: [fmla, fmls]
   operands:
   - class: register
     prefix: v
@@ -562,6 +568,26 @@ instruction_forms:
   latency: 1  # 	1*p0
   port_pressure: [[1, '0']]
   throughput: 1.0
+- name: [fmsb, fmls]
+  operands:
+  - class: register
+    prefix: z
+    shape: d
+    width: '*'
+  - class: register
+    prefix: p
+    predication: m
+  - class: register
+    prefix: z
+    shape: d
+    width: '*'
+  - class: register
+    prefix: z
+    shape: d
+    width: '*'
+  throughput: 0.5
+  latency: 9.0  # 	1*p02
+  port_pressure: [[1, '02']]
 - name: fmul
   operands:
   - class: register
@@ -623,6 +649,21 @@ instruction_forms:
     prefix: d
   throughput: 0.5
   latency: 9.0  # 	1*p02
+  port_pressure: [[1, '02']]
+- name: fneg
+  operands:
+  - class: register
+    prefix: z
+    shape: d
+    width: '*'
+  - class: register
+    prefix: p
+  - class: register
+    prefix: z
+    shape: d
+    width: '*'
+  throughput: 0.5
+  latency: 4.0  # 	1*p02
   port_pressure: [[1, '02']]
 - name: frecpe
   operands:
@@ -1015,6 +1056,15 @@ instruction_forms:
   throughput: 0.5
   latency: 5.0  # 	2*p56+2*p5D6D
   port_pressure: [[1, '56'], [1, ['5D', '6D']]]
+- name: ldrsw
+  operands:
+  - class: register
+    prefix: x
+  - class: register
+    prefix: x
+  throughput: 0.0
+  latency: 0.0
+  port_pressure: []
 - name: ldr
   operands:
   - class: register
@@ -1216,6 +1266,23 @@ instruction_forms:
   throughput: 0.0
   latency: 0
   port_pressure: []
+- name: ptrue
+  operands:
+  - class: register
+    prefix: p
+  throughput: 1.0
+  latency: 3
+  port_pressure: [[1, '1']]
+- name: ptrue
+  operands:
+  - class: register
+    prefix: p
+    shape: '*'
+  - class: identifier
+  throughput: 1.0
+  latency: 3
+  port_pressure: [[1, '1']]
+
 - name: ret
   operands: []
   throughput: 0.5
