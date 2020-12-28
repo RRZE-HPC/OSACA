@@ -26,7 +26,7 @@ class ParserX86ATT(BaseParser):
         decimal_number = pp.Combine(
             pp.Optional(pp.Literal('-')) + pp.Word(pp.nums)
         ).setResultsName('value')
-        hex_number = pp.Combine(pp.Literal('0x') + pp.Word(pp.hexnums)).setResultsName('value')
+        hex_number = pp.Combine(pp.Optional(pp.Literal('-')) + pp.Literal('0x') + pp.Word(pp.hexnums)).setResultsName('value')
         # Comment - either '#' or '//' (icc)
         self.comment = (pp.Literal('#') | pp.Literal('//')) + pp.Group(
             pp.ZeroOrMore(pp.Word(pp.printables))
