@@ -158,7 +158,7 @@ class ParserX86ATT(BaseParser):
         # Instructions
         # Mnemonic
         mnemonic = pp.ZeroOrMore(pp.Literal('data16') | pp.Literal('data32')) + pp.Word(
-            pp.alphanums
+            pp.alphanums + ','
         ).setResultsName('mnemonic')
         # Combine to instruction form
         operand_first = pp.Group(
