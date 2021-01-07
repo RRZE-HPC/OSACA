@@ -288,7 +288,7 @@ class ParserX86ATT(BaseParser):
             operands.append(self.process_operand(result['operand4']))
         return_dict = AttrDict(
             {
-                self.INSTRUCTION_ID: result['mnemonic'],
+                self.INSTRUCTION_ID: result['mnemonic'].split(',')[0],
                 self.OPERANDS_ID: operands,
                 self.COMMENT_ID: ' '.join(result[self.COMMENT_ID])
                 if self.COMMENT_ID in result
