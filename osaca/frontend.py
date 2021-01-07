@@ -278,6 +278,9 @@ class Frontend(object):
         else:
             # lcd_sum already calculated before
             tp_sum = ArchSemantics.get_throughput_sum(kernel)
+            # if ALL instructions are unknown, take a line of 0s
+            if not tp_sum:
+                tp_sum = kernel[0]['port_pressure']
             cp_sum = sum([x['latency_cp'] for x in cp_kernel])
             s += (
                 lineno_filler
