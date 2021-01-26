@@ -608,6 +608,26 @@ instruction_forms:
 - name: fmul
   operands:
   - class: register
+    prefix: z
+    shape: d
+    width: '*'
+  - class: register
+    prefix: p
+    predication: m
+  - class: register
+    prefix: z
+    shape: d
+    width: '*'
+  - class: register
+    prefix: z
+    shape: d
+    width: '*'
+  throughput: 0.5
+  latency: 9.0  # 	1*p02
+  port_pressure: [[1, '02']]
+- name: fmul
+  operands:
+  - class: register
     prefix: v
     shape: s
     width: '*'
@@ -735,7 +755,6 @@ instruction_forms:
   throughput: 0.5
   latency: 9.0  # 	1*p02
   port_pressure: [[1, '02']]
-
 - name: fsub
   operands:
   - class: register
@@ -1229,9 +1248,9 @@ instruction_forms:
     scale: '*'
     pre-indexed: false
     post-indexed: false
-  throughput: 0.0
+  throughput: 0.5
   latency: 0
-  port_pressure: []
+  port_pressure: [[1, '56']]
 - name: prfd
   operands:
   - class: prfop
@@ -1247,9 +1266,9 @@ instruction_forms:
     scale: '*'
     pre-indexed: false
     post-indexed: false
-  throughput: 0.0
+  throughput: 0.5
   latency: 0
-  port_pressure: []
+  port_pressure: [[1, '56']]
 - name: prfd
   operands:
   - class: immediate
@@ -1263,9 +1282,9 @@ instruction_forms:
     scale: '*'
     pre-indexed: false
     post-indexed: false
-  throughput: 0.0
+  throughput: 0.5
   latency: 0
-  port_pressure: []
+  port_pressure: [[1, '56']]
 - name: ptrue
   operands:
   - class: register
@@ -1282,7 +1301,6 @@ instruction_forms:
   throughput: 1.0
   latency: 3
   port_pressure: [[1, '1']]
-
 - name: ret
   operands: []
   throughput: 0.5
