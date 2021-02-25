@@ -163,9 +163,10 @@ class ParserAArch64(BaseParser):
             + pp.Optional(
                 pp.Suppress(pp.Literal(','))
                 + shift_op.setResultsName('shift_op')
-                + immediate.setResultsName('shift')
+                + pp.Optional(immediate).setResultsName('shift')
             )
         ).setResultsName(self.REGISTER_ID)
+        self.register = register
         # Memory
         register_index = register.setResultsName('index') + pp.Optional(
             pp.Literal(',') + pp.Word(pp.alphas) + immediate.setResultsName('scale')
@@ -378,7 +379,7 @@ class ParserAArch64(BaseParser):
         if 'index' in memory_address:
             if 'shift' in memory_address['index']:
                 if memory_address['index']['shift_op'].lower() in valid_shift_ops:
-                    scale = 2 ** int(memory_address['index']['shift']['value'])
+                    scale = 2 ** int(memory_address['index']['shift'][0]['value'])
         new_dict = AttrDict({'offset': offset, 'base': base, 'index': index, 'scale': scale})
         if 'pre_indexed' in memory_address:
             new_dict['pre_indexed'] = True

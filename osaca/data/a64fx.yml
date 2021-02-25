@@ -101,6 +101,28 @@ instruction_forms:
   throughput: 0.25
   latency: 1.0  # 	1*p0234
   port_pressure: [[1, '0234']]
+- name: addvl
+  operands:
+  - class: register
+    prefix: x
+  - class: register
+    prefix: x
+  - class: immediate
+    imd: int
+  throughput: 0.5
+  latency: 1.0  # 	1*p34
+  port_pressure: [[1, '34']]
+- name: add
+  operands:
+  - class: register
+    prefix: x
+  - class: register
+    prefix: x
+  - class: register
+    prefix: w
+  throughput: 0.25
+  latency: 1.0  # 	1*p0234
+  port_pressure: [[1, '0234']]
 - name: addpl
   operands:
   - class: register
@@ -185,6 +207,12 @@ instruction_forms:
   throughput: 1.0
   latency: 0.0
   port_pressure: [[1, '7']]
+- name: b.lo
+  operands:
+  - class: identifier
+  throughput: 1.0
+  latency: 0.0
+  port_pressure: [[1, '7']]
 - name: b.ne
   operands:
   - class: identifier
@@ -227,6 +255,12 @@ instruction_forms:
   throughput: 1.0
   latency: 0.0
   port_pressure: [[1, '7']]
+- name: b.hi
+  operands:
+  - class: identifier
+  throughput: 1.0
+  latency: 0.0
+  port_pressure: [[1, '7']]
 - name: bne
   operands:
   - class: identifier
@@ -239,10 +273,60 @@ instruction_forms:
   throughput: 1.0
   latency: 0.0
   port_pressure: [[1, '7']]
-- name: cbz
+- name: bfi
+  operands:
+  - class: register
+    prefix: x
+  - class: register
+    prefix: x
+  - class: immediate
+    imd: int
+  - class: immediate
+    imd: int
+  throughput: 4.0
+  latency: 5.0  # 	4*p34
+  port_pressure: [[4, '34']]
+- name: sbfiz
+  operands:
+  - class: register
+    prefix: x
+  - class: register
+    prefix: x
+  - class: immediate
+    imd: int
+  - class: immediate
+    imd: int
+  throughput: 1.0
+  latency: 3.0  # 	2*p34
+  port_pressure: [[2, '34']]
+- name: [cbz, cbnz]
   operands:
   - class: register
     prefix: '*'
+  - class: identifier
+  throughput: 0.5
+  latency: 1.0  # 	1*p34
+  port_pressure: [[1, '34']]
+- name: csel
+  operands:
+  - class: register
+    prefix: x
+  - class: register
+    prefix: x
+  - class: register
+    prefix: x
+  - class: identifier
+  throughput: 0.5
+  latency: 1.0  # 	1*p34
+  port_pressure: [[1, '34']]
+- name: csel
+  operands:
+  - class: register
+    prefix: w
+  - class: register
+    prefix: w
+  - class: register
+    prefix: w
   - class: identifier
   throughput: 0.5
   latency: 1.0  # 	1*p34
@@ -796,6 +880,18 @@ instruction_forms:
   throughput: 0.5
   latency: 1.0  # 	1*p34
   port_pressure: [[1, '34']]
+- name: index
+  operands:
+  - class: register
+    prefix: z
+    shape: d
+  - class: immediate
+    imd: int
+  - class: immediate
+    imd: int
+  throughput: 1.0
+  latency: 1.0  # 	1*p0
+  port_pressure: [[1, '0']]
 - name: [incb, incd]
   operands:
   - class: register
@@ -1019,6 +1115,15 @@ instruction_forms:
   throughput: 0.5
   latency: 5.0  # 	1*p56+1*p5D6D
   port_pressure: [[1, '56'], [1, ['5D', '6D']]]
+- name: [ldur, ldursb, ldursw, ldursh]
+  operands:
+  - class: register
+    prefix: x
+  - class: register
+    prefix: x
+  throughput: 0.0
+  latency: 0.0
+  port_pressure: []
 - name: ldr     # JL: assumed from manual
   operands:
   - class: register
@@ -1142,6 +1247,32 @@ instruction_forms:
   throughput: 0.25
   latency: 1.0  # 	1*p0234
   port_pressure: [[1, '0234']]
+- name: madd
+  operands:
+  - class: register
+    prefix: x
+  - class: register
+    prefix: x
+  - class: register
+    prefix: x
+  - class: register
+    prefix: x
+  throughput: 2.5
+  latency: 6.0  # 	5*p34
+  port_pressure: [[5, '34']]
+- name: madd
+  operands:
+  - class: register
+    prefix: w
+  - class: register
+    prefix: w
+  - class: register
+    prefix: w
+  - class: register
+    prefix: w
+  throughput: 2.5
+  latency: 6.0  # 	5*p34
+  port_pressure: [[5, '34']]
 - name: mov
   operands:
   - class: register
@@ -1178,6 +1309,16 @@ instruction_forms:
   throughput: 0.25
   latency: 1.0  # 	1*p0234
   port_pressure: [[1, '0234']]
+- name: mov
+  operands:
+  - class: register
+    prefix: z
+    shape: '*'
+  - class: immediate
+    imd: int
+  throughput: 0.5
+  latency: 4.0  # 	1*p02
+  port_pressure: [[1, '02']]
 - name: mov
   operands:
   - class: register
@@ -1235,6 +1376,28 @@ instruction_forms:
   throughput: 1.0
   latency: 5.0  # 	1*p3
   port_pressure: [[1, '3']]
+- name: orr
+  operands:
+  - class: register
+    prefix: '*'
+  - class: register
+    prefix: '*'
+  - class: register
+    prefix: '*'
+  throughput: 0.25
+  latency: 1.0  # 	1*p3456
+  port_pressure: [[1, '3456']]
+- name: orr
+  operands:
+  - class: register
+    prefix: '*'
+  - class: register
+    prefix: '*'
+  - class: immediate
+    imd: int
+  throughput: 0.25
+  latency: 1.0  # 	1*p3456
+  port_pressure: [[1, '3456']]
 - name: prfm
   operands:
   - class: prfop
@@ -1306,6 +1469,15 @@ instruction_forms:
   throughput: 0.5
   latency: ~  #     1*p56
   port_pressure: [[1, '56']]
+- name: rdvl
+  operands:
+  - class: register
+    prefix: x
+  - class: immediate
+    imd: int
+  throughput: 0.5
+  latency: 1.0  # 	1*p34
+  port_pressure: [[1, '34']]
 - name: smaddl
   operands:
   - class: register
