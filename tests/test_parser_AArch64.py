@@ -193,7 +193,8 @@ class TestParserAArch64(unittest.TestCase):
                             'prefix': 'w',
                             'name': '10',
                             'shift_op': 'sxtw',
-                            'shift': {'value': '2'},
+                            'immediate': {'value': '2'},
+                            'shift': [{'value': '2'}],
                         },
                         'scale': 4,
                     }
