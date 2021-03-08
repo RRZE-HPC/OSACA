@@ -268,7 +268,7 @@ def inspect(args, output_file=sys.stdout):
     parser = get_asm_parser(arch)
     try:
         parsed_code = parser.parse_file(code)
-    except:
+    except Exception as e:
         # probably the wrong parser based on heuristic
         if args.arch is None:
             # change ISA and try again
@@ -277,8 +277,7 @@ def inspect(args, output_file=sys.stdout):
             parser = get_asm_parser(arch)
             parsed_code = parser.parse_file(code)
         else:
-            traceback.print_exc(file=sys.stderr)
-            sys.exit(1)
+            raise e
 
     # Reduce to marked kernel or chosen section and add semantics
     if args.lines:

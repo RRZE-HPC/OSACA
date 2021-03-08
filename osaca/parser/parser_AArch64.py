@@ -290,12 +290,10 @@ class ParserAArch64(BaseParser):
         if result is None:
             try:
                 result = self.parse_instruction(line)
-            except (pp.ParseException, KeyError):
-                print(
-                    '\n\n*-*-*-*-*-*-*-*-*-*-\n{}: {}\n*-*-*-*-*-*-*-*-*-*-\n\n'.format(
-                        line_number, line
-                    )
-                )
+            except (pp.ParseException, KeyError) as e:
+                raise e
+                raise ValueError(
+                    'Unable to parse {!r} on line {}'.format(line, line_number)) from e
             instruction_form[self.INSTRUCTION_ID] = result[self.INSTRUCTION_ID]
             instruction_form[self.OPERANDS_ID] = result[self.OPERANDS_ID]
             instruction_form[self.COMMENT_ID] = result[self.COMMENT_ID]
