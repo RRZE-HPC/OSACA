@@ -98,7 +98,7 @@ instruction_forms:
 - name: [cmp, cmpeqpd, cmpltpd, cmplepd, cmpunordpd, cmpneqpd, cmpnltpd, cmpnlepd, cmpordpd, cmpltps, cmpleps, cmpunordps, cmpneqps, cmpnltps, cmpnleps, cmpordps]
   operands:
   - class: immediate
-    name: int
+    imd: int
   - class: register
     name: '*'
   latency: 1.0
