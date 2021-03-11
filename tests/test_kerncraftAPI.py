@@ -18,9 +18,9 @@ class TestKerncraftAPI(unittest.TestCase):
         # set up parser and kernels
         self.parser_x86 = ParserX86ATT()
         self.parser_AArch64 = ParserAArch64()
-        with open(self._find_file('triad_x86_iaca.s')) as f:
+        with open(self._find_file("triad_x86_iaca.s")) as f:
             self.code_x86 = f.read()
-        with open(self._find_file('triad_arm_iaca.s')) as f:
+        with open(self._find_file("triad_arm_iaca.s")) as f:
             self.code_AArch64 = f.read()
 
     ###########
@@ -28,23 +28,23 @@ class TestKerncraftAPI(unittest.TestCase):
     ###########
 
     def test_kerncraft_API_x86(self):
-        kapi = KerncraftAPI('csx', self.code_x86)
+        kapi = KerncraftAPI("csx", self.code_x86)
 
         kapi.create_output()
         self.assertEqual(kapi.get_unmatched_instruction_ratio(), 0.0)
         port_occupation = OrderedDict(
             [
-                ('0', 1.25),
-                ('0DV', 0.0),
-                ('1', 1.25),
-                ('2', 2.0),
-                ('2D', 1.5),
-                ('3', 2.0),
-                ('3D', 1.5),
-                ('4', 1.0),
-                ('5', 0.75),
-                ('6', 0.75),
-                ('7', 0.0),
+                ("0", 1.25),
+                ("0DV", 0.0),
+                ("1", 1.25),
+                ("2", 2.0),
+                ("2D", 1.5),
+                ("3", 2.0),
+                ("3D", 1.5),
+                ("4", 1.0),
+                ("5", 0.75),
+                ("6", 0.75),
+                ("7", 0.0),
             ]
         )
         self.assertEqual(kapi.get_port_occupation_cycles(), port_occupation)
@@ -53,20 +53,20 @@ class TestKerncraftAPI(unittest.TestCase):
         self.assertEqual(kapi.get_latency(), (1.0, 8.0))
 
     def test_kerncraft_API_AArch64(self):
-        kapi = KerncraftAPI('tx2', self.code_AArch64)
+        kapi = KerncraftAPI("tx2", self.code_AArch64)
 
         kapi.create_output()
         self.assertEqual(kapi.get_unmatched_instruction_ratio(), 0.0)
         port_occupation = OrderedDict(
             [
-                ('0', 34.0),
-                ('0DV', 0.0),
-                ('1', 34.0),
-                ('1DV', 0.0),
-                ('2', 3.0),
-                ('3', 64.0),
-                ('4', 64.0),
-                ('5', 32.0),
+                ("0", 34.0),
+                ("0DV", 0.0),
+                ("1", 34.0),
+                ("1DV", 0.0),
+                ("2", 3.0),
+                ("3", 64.0),
+                ("4", 64.0),
+                ("5", 32.0),
             ]
         )
         self.assertEqual(kapi.get_port_occupation_cycles(), port_occupation)
@@ -81,11 +81,11 @@ class TestKerncraftAPI(unittest.TestCase):
     @staticmethod
     def _find_file(name):
         testdir = os.path.dirname(__file__)
-        name = os.path.join(testdir, 'test_files', name)
+        name = os.path.join(testdir, "test_files", name)
         assert os.path.exists(name)
         return name
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     suite = unittest.TestLoader().loadTestsFromTestCase(TestKerncraftAPI)
     unittest.TextTestRunner(verbosity=2).run(suite)
