@@ -26,6 +26,7 @@ def sanity_check(arch: str, verbose=False, internet_check=False, output_file=sys
     :param output_file: output stream specifying where to write output, defaults to :class:`sys.stdout`
     :type output_file: stream, optional
 
+    :return: True if everything checked out
     """
     # load arch machine model
     arch_mm = MachineModel(arch=arch)
@@ -42,6 +43,7 @@ def sanity_check(arch: str, verbose=False, internet_check=False, output_file=sys
         missing_port_pressure,
         suspicious_instructions,
         duplicate_instr_arch,
+        bad_operand,
     ) = _check_sanity_arch_db(arch_mm, isa_mm, internet_check=internet_check)
     # check ISA DB entries
     duplicate_instr_isa, only_in_isa = _check_sanity_isa_db(arch_mm, isa_mm)
@@ -55,10 +57,13 @@ def sanity_check(arch: str, verbose=False, internet_check=False, output_file=sys
         duplicate_instr_arch,
         duplicate_instr_isa,
         only_in_isa,
+        bad_operand,
         verbose=verbose,
         colors=True if output_file == sys.stdout else False,
     )
     print(report, file=output_file)
+
+    return not any([missing_port_pressure, bad_operand])
 
 
 def import_benchmark_output(arch, bench_type, filepath, output=sys.stdout):
@@ -384,6 +389,7 @@ def _check_sanity_arch_db(arch_mm, isa_mm, internet_check=True):
     suspicious_instructions = []
     duplicate_instr_arch = []
     duplicate_strings = []
+    bad_operand = []
 
     for instr_form in arch_mm['instruction_forms']:
         # check value in DB entry
@@ -420,6 +426,24 @@ def _check_sanity_arch_db(arch_mm, isa_mm, internet_check=True):
         # check for duplicates in DB
         if arch_mm._check_for_duplicate(instr_form['name'], instr_form['operands']):
             duplicate_instr_arch.append(instr_form)
+        
+        # Check operands
+        for operand in instr_form['operands']:
+            if operand['class'] == 'register' and not (
+                    'name' in operand or
+                    'prefix' in operand):
+                # Missing 'name' key
+                bad_operand.append(instr_form)
+            elif operand['class'] == 'memory' and (
+                    'base' not in operand or
+                    'offset' not in operand or
+                    'index' not in operand or
+                    'scale' not in operand):
+                # Missing at least one key necessary for memory operands
+                bad_operand.append(instr_form)
+            elif operand['class'] == 'immediate' and 'imd' not in operand:
+                # Missing 'imd' key
+                bad_operand.append(instr_form)
     # every entry exists twice --> uniquify
     tmp_list = []
     for _ in range(0, len(duplicate_instr_arch)):
@@ -434,6 +458,7 @@ def _check_sanity_arch_db(arch_mm, isa_mm, internet_check=True):
         missing_port_pressure,
         suspicious_instructions,
         duplicate_instr_arch,
+        bad_operand,
     )
 
 
@@ -461,9 +486,8 @@ def _check_sanity_isa_db(arch_mm, isa_mm):
     return duplicate_instr_isa, only_in_isa
 
 
-def _get_sanity_report(
-    total, m_tp, m_l, m_pp, suspic_instr, dup_arch, dup_isa, only_isa, verbose=False, colors=False
-):
+def _get_sanity_report(total, m_tp, m_l, m_pp, suspic_instr, dup_arch, dup_isa, only_isa,
+                       bad_operands, verbose=False, colors=False):
     """Get sanity summary report."""
     s = ''
     # non-verbose summary
@@ -486,18 +510,19 @@ def _get_sanity_report(
         '{} instruction forms in ISA DB are not referenced by instruction '.format(len(only_isa))
         + 'forms in uarch DB.\n'
     )
+    s += '{} bad operands found in uarch DB\n'.format(len(bad_operands))
     s += '----------------------\n'
     # verbose version
     if verbose:
         s += _get_sanity_report_verbose(
-            total, m_tp, m_l, m_pp, suspic_instr, dup_arch, dup_isa, only_isa, colors=colors
+            total, m_tp, m_l, m_pp, suspic_instr, dup_arch, dup_isa, only_isa, bad_operands,
+            colors=colors
         )
     return s
 
 
-def _get_sanity_report_verbose(
-    total, m_tp, m_l, m_pp, suspic_instr, dup_arch, dup_isa, only_isa, colors=False
-):
+def _get_sanity_report_verbose(total, m_tp, m_l, m_pp, suspic_instr, dup_arch, dup_isa, only_isa,
+                               bad_operands, colors=False):
     """Get the verbose part of the sanity report with all missing instruction forms."""
     BRIGHT_CYAN = '\033[1;36;1m' if colors else ''
     BRIGHT_BLUE = '\033[1;34;1m' if colors else ''
@@ -508,17 +533,16 @@ def _get_sanity_report_verbose(
     YELLOW = '\033[33m' if colors else ''
     WHITE = '\033[0m' if colors else ''
 
-    s = ''
-    s += 'Instruction forms without throughput value:\n' if len(m_tp) != 0 else ''
+    s = 'Instruction forms without throughput value:\n' if m_tp else ''
     for instr_form in sorted(m_tp, key=lambda i: i['name']):
         s += '{}{}{}\n'.format(BRIGHT_BLUE, _get_full_instruction_name(instr_form), WHITE)
-    s += 'Instruction forms without latency value:\n' if len(m_l) != 0 else ''
+    s += 'Instruction forms without latency value:\n' if m_l else ''
     for instr_form in sorted(m_l, key=lambda i: i['name']):
         s += '{}{}{}\n'.format(BRIGHT_RED, _get_full_instruction_name(instr_form), WHITE)
-    s += 'Instruction forms without port pressure assignment:\n' if len(m_pp) != 0 else ''
+    s += 'Instruction forms without port pressure assignment:\n' if m_pp else ''
     for instr_form in sorted(m_pp, key=lambda i: i['name']):
         s += '{}{}{}\n'.format(BRIGHT_MAGENTA, _get_full_instruction_name(instr_form), WHITE)
-    s += 'Instruction forms which might miss an ISA DB entry:\n' if len(suspic_instr) != 0 else ''
+    s += 'Instruction forms which might miss an ISA DB entry:\n' if suspic_instr else ''
     for instr_form in sorted(suspic_instr, key=lambda i: i['name']):
         s += '{}{}{}{}\n'.format(
             BRIGHT_CYAN,
@@ -526,17 +550,18 @@ def _get_sanity_report_verbose(
             ' -- ' + instr_form['note'] if 'note' in instr_form else '',
             WHITE,
         )
-    s += 'Duplicate instruction forms in uarch DB:\n' if len(dup_arch) != 0 else ''
+    s += 'Duplicate instruction forms in uarch DB:\n' if dup_arch else ''
     for instr_form in sorted(dup_arch, key=lambda i: i['name']):
         s += '{}{}{}\n'.format(YELLOW, _get_full_instruction_name(instr_form), WHITE)
-    s += 'Duplicate instruction forms in ISA DB:\n' if len(dup_isa) != 0 else ''
+    s += 'Duplicate instruction forms in ISA DB:\n' if dup_isa else ''
     for instr_form in sorted(dup_isa, key=lambda i: i['name']):
         s += '{}{}{}\n'.format(BRIGHT_YELLOW, _get_full_instruction_name(instr_form), WHITE)
-    s += (
-        'Instruction forms existing in ISA DB but not in uarch DB:\n' if len(only_isa) != 0 else ''
-    )
+    s += 'Instruction forms existing in ISA DB but not in uarch DB:\n' if only_isa else ''
     for instr_form in sorted(only_isa, key=lambda i: i['name']):
         s += '{}{}{}\n'.format(CYAN, _get_full_instruction_name(instr_form), WHITE)
+    s += '{} bad operands found in uarch DB:\n'.format(len(bad_operands)) if bad_operands else ''
+    for instr_form in sorted(bad_operands, key=lambda i: i['name']):
+        s += '{}{}{}\n'.format(BRIGHT_RED, _get_full_instruction_name(instr_form), WHITE)
     return s
 
 

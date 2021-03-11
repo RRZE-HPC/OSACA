@@ -40,6 +40,8 @@ class MachineModel(object):
                     for b, i, o, s in product(['gpr'], ['gpr', None], ['imd', None], [1, 8])
                 ],
                 'load_throughput_default': [],
+                'store_throughput': [],
+                'store_throughput_default': [],
                 'ports': [],
                 'port_model_scheme': None,
                 'instruction_forms': []
