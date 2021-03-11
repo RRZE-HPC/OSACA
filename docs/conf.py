@@ -7,9 +7,8 @@
 import os
 import sys
 
-
 sys.path.insert(0, os.path.abspath("."))
-from version_from_src import get_version
+from version_from_src import get_version  # noqa: E402
 
 # -- Project information -----------------------------------------------------
 
