@@ -3,7 +3,7 @@ from collections import OrderedDict
 
 from osaca.parser import ParserAArch64, ParserX86ATT, get_parser
 
-COMMENT_MARKER = {'start': 'OSACA-BEGIN', 'end': 'OSACA-END'}
+COMMENT_MARKER = {"start": "OSACA-BEGIN", "end": "OSACA-END"}
 
 
 def reduce_to_section(kernel, isa):
@@ -15,12 +15,12 @@ def reduce_to_section(kernel, isa):
     :returns: `list` -- marked section of kernel as list of instruction forms
     """
     isa = isa.lower()
-    if isa == 'x86':
+    if isa == "x86":
         start, end = find_marked_kernel_x86ATT(kernel)
-    elif isa == 'aarch64':
+    elif isa == "aarch64":
         start, end = find_marked_kernel_AArch64(kernel)
     else:
-        raise ValueError('ISA not supported.')
+        raise ValueError("ISA not supported.")
     if start == -1:
         start = 0
     if end == -1:
@@ -35,12 +35,12 @@ def find_marked_kernel_AArch64(lines):
     :param list lines: kernel
     :returns: `tuple of int` -- start and end line of marked section
     """
-    nop_bytes = ['213', '3', '32', '31']
+    nop_bytes = ["213", "3", "32", "31"]
     return find_marked_section(
         lines,
         ParserAArch64(),
-        ['mov'],
-        'x1',
+        ["mov"],
+        "x1",
         [111, 222],
         nop_bytes,
         reverse=True,
@@ -55,12 +55,12 @@ def find_marked_kernel_x86ATT(lines):
     :param list lines: kernel
     :returns: `tuple of int` -- start and end line of marked section
     """
-    nop_bytes = ['100', '103', '144']
+    nop_bytes = ["100", "103", "144"]
     return find_marked_section(
         lines,
         ParserX86ATT(),
-        ['mov', 'movl'],
-        'ebx',
+        ["mov", "movl"],
+        "ebx",
         [111, 222],
         nop_bytes,
         comments=COMMENT_MARKER,
@@ -70,32 +70,32 @@ def find_marked_kernel_x86ATT(lines):
 def get_marker(isa, comment=""):
     """Return tuple of start and end marker lines."""
     isa = isa.lower()
-    if isa == 'x86':
+    if isa == "x86":
         start_marker_raw = (
-            'movl      $111, %ebx # OSACA START MARKER\n'
-            '.byte     100        # OSACA START MARKER\n'
-            '.byte     103        # OSACA START MARKER\n'
-            '.byte     144        # OSACA START MARKER\n'
+            "movl      $111, %ebx # OSACA START MARKER\n"
+            ".byte     100        # OSACA START MARKER\n"
+            ".byte     103        # OSACA START MARKER\n"
+            ".byte     144        # OSACA START MARKER\n"
         )
         if comment:
             start_marker_raw += "# {}\n".format(comment)
         end_marker_raw = (
-            'movl      $222, %ebx # OSACA END MARKER\n'
-            '.byte     100        # OSACA END MARKER\n'
-            '.byte     103        # OSACA END MARKER\n'
-            '.byte     144        # OSACA END MARKER\n'
+            "movl      $222, %ebx # OSACA END MARKER\n"
+            ".byte     100        # OSACA END MARKER\n"
+            ".byte     103        # OSACA END MARKER\n"
+            ".byte     144        # OSACA END MARKER\n"
         )
-    elif isa == 'aarch64':
+    elif isa == "aarch64":
         start_marker_raw = (
-            'mov       x1, #111    // OSACA START MARKER\n'
-            '.byte     213,3,32,31 // OSACA START MARKER\n'
+            "mov       x1, #111    // OSACA START MARKER\n"
+            ".byte     213,3,32,31 // OSACA START MARKER\n"
         )
         if comment:
             start_marker_raw += "// {}\n".format(comment)
         # After loop
         end_marker_raw = (
-            'mov       x1, #222    // OSACA END MARKER\n'
-            '.byte     213,3,32,31 // OSACA END MARKER\n'
+            "mov       x1, #222    // OSACA END MARKER\n"
+            ".byte     213,3,32,31 // OSACA END MARKER\n"
         )
 
     parser = get_parser(isa)
@@ -134,18 +134,18 @@ def find_marked_section(
     for i, line in enumerate(lines):
         try:
             if line.instruction is None and comments is not None and line.comment is not None:
-                if comments['start'] == line.comment:
+                if comments["start"] == line.comment:
                     index_start = i + 1
-                elif comments['end'] == line.comment:
+                elif comments["end"] == line.comment:
                     index_end = i
             elif line.instruction in mov_instr and lines[i + 1].directive is not None:
                 source = line.operands[0 if not reverse else 1]
                 destination = line.operands[1 if not reverse else 0]
                 # instruction pair matches, check for operands
                 if (
-                    'immediate' in source
+                    "immediate" in source
                     and parser.normalize_imd(source.immediate) == mov_vals[0]
-                    and 'register' in destination
+                    and "register" in destination
                     and parser.get_full_reg_name(destination.register) == mov_reg
                 ):
                     # operands of first instruction match start, check for second one
@@ -154,9 +154,9 @@ def find_marked_section(
                         # return first line after the marker
                         index_start = i + 1 + line_count
                 elif (
-                    'immediate' in source
+                    "immediate" in source
                     and parser.normalize_imd(source.immediate) == mov_vals[1]
-                    and 'register' in destination
+                    and "register" in destination
                     and parser.get_full_reg_name(destination.register) == mov_reg
                 ):
                     # operand of first instruction match end, check for second one
@@ -179,7 +179,7 @@ def match_bytes(lines, index, byte_list):
     while (
         index < len(lines)
         and lines[index].directive is not None
-        and lines[index].directive.name == 'byte'
+        and lines[index].directive.name == "byte"
     ):
         line_count += 1
         extracted_bytes += lines[index].directive.parameters
@@ -199,14 +199,14 @@ def find_jump_labels(lines):
     labels = OrderedDict()
     current_label = None
     for i, line in enumerate(lines):
-        if line['label'] is not None:
+        if line["label"] is not None:
             # When a new label is found, add to blocks dict
-            labels[line['label']] = (i,)
+            labels[line["label"]] = (i,)
             # End previous block at previous line
             if current_label is not None:
                 labels[current_label] = (labels[current_label][0], i)
             # Update current block name
-            current_label = line['label']
+            current_label = line["label"]
         elif current_label is None:
             # If no block has been started, skip end detection
             continue
@@ -218,9 +218,9 @@ def find_jump_labels(lines):
     for label in list(labels):
         if all(
             [
-                l['instruction'].startswith('.')
+                l["instruction"].startswith(".")
                 for l in lines[labels[label][0] : labels[label][1]]
-                if l['instruction'] is not None
+                if l["instruction"] is not None
             ]
         ):
             del labels[label]
@@ -247,11 +247,11 @@ def find_basic_blocks(lines):
             terminate = False
             blocks[label].append(line)
             # Find end of block by searching for references to valid jump labels
-            if line['instruction'] and line['operands']:
-                for operand in [o for o in line['operands'] if 'identifier' in o]:
-                    if operand['identifier']['name'] in valid_jump_labels:
+            if line["instruction"] and line["operands"]:
+                for operand in [o for o in line["operands"] if "identifier" in o]:
+                    if operand["identifier"]["name"] in valid_jump_labels:
                         terminate = True
-            elif line['label'] is not None:
+            elif line["label"] is not None:
                 terminate = True
             if terminate:
                 break
@@ -276,15 +276,15 @@ def find_basic_loop_bodies(lines):
             terminate = False
             current_block.append(line)
             # Find end of block by searching for references to valid jump labels
-            if line['instruction'] and line['operands']:
+            if line["instruction"] and line["operands"]:
                 # Ignore `b.none` instructions (relevant von ARM SVE code)
-                # This branch instruction is often present _within_ inner loop blocks, but usually 
+                # This branch instruction is often present _within_ inner loop blocks, but usually
                 # do not terminate
-                if line['instruction'] == 'b.none':
+                if line["instruction"] == "b.none":
                     continue
-                for operand in [o for o in line['operands'] if 'identifier' in o]:
-                    if operand['identifier']['name'] in valid_jump_labels:
-                        if operand['identifier']['name'] == label:
+                for operand in [o for o in line["operands"] if "identifier" in o]:
+                    if operand["identifier"]["name"] in valid_jump_labels:
+                        if operand["identifier"]["name"] == label:
                             loop_bodies[label] = current_block
                         terminate = True
                         break
