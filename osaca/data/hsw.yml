@@ -552,7 +552,7 @@ instruction_forms:
 - name: XOR
   operands:
   - class: register
-    imd: gpr
+    name: gpr
   - class: register
     name: gpr
   latency: 1

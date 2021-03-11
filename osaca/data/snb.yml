@@ -8,8 +8,6 @@ ROB_size: ~                                                                # uop
 retired_uOps_per_cycle: ~                                                  # uops.info import
 scheduler_size: ~                                                          # uops.info import
 hidden_loads: ~                                                            # uops.info import
-load_latency: {}                                                           # uops.info import
-load_throughput_default: []                                                # uops.info import
 ports:                                                                     # uops.info import
 - '0'                                                                      # uops.info import
 - '1'                                                                      # uops.info import
@@ -20,15 +18,11 @@ ports:                                                                     # uop
 - 3D                                                                       # uops.info import
 - '4'                                                                      # uops.info import
 port_model_scheme: ~                                                       # uops.info import
-load_throughput:                                                           # uops.info import
-- {base: gpr, index: gpr, offset: imd, scale: 1, port_pressure: []}        # uops.info import
-- {base: gpr, index: gpr, offset: imd, scale: 8, port_pressure: []}        # uops.info import
-- {base: gpr, index: gpr, offset: ~, scale: 1, port_pressure: []}          # uops.info import
-- {base: gpr, index: gpr, offset: ~, scale: 8, port_pressure: []}          # uops.info import
-- {base: gpr, index: ~, offset: imd, scale: 1, port_pressure: []}          # uops.info import
-- {base: gpr, index: ~, offset: imd, scale: 8, port_pressure: []}          # uops.info import
-- {base: gpr, index: ~, offset: ~, scale: 1, port_pressure: []}            # uops.info import
-- {base: gpr, index: ~, offset: ~, scale: 8, port_pressure: []}            # uops.info import
+load_throughput: []
+load_latency: {gpr: 4.0, mm: 4.0, xmm: 4.0, ymm: 4.0}
+load_throughput_default: [[1, '23'], [1, ['2D', '3D']]]
+store_throughput: []
+store_throughput_default: [[1, '23'], [1, '4']]
 instruction_forms:                                                         # uops.info import
 - name: AESDEC                                                             # uops.info import
   operands:                                                                # uops.info import
