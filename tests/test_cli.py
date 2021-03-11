@@ -153,7 +153,6 @@ class TestCLI(unittest.TestCase):
                 osaca.run(args, output_file=output)
 
     def test_architectures_sanity(self):
-        parser = osaca.create_parser()
         # Run sanity check for all architectures
         archs = osaca.SUPPORTED_ARCHS
         for arch in archs:

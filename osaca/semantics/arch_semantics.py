@@ -2,7 +2,6 @@
 """Semantics opbject responsible for architecture specific semantic operations"""
 
 import warnings
-from functools import reduce
 from itertools import chain
 from operator import itemgetter
 
@@ -293,7 +292,8 @@ class ArchSemantics(ISASemantics):
                         #     and self._isa == 'aarch64'
                         #     and any(
                         #         [
-                        #             'post_indexed' in op['memory'] or 'pre_indexed' in op['memory']
+                        #             'post_indexed' in op['memory'] or
+                        #             'pre_indexed' in op['memory']
                         #             for op in instruction_form['operands']
                         #             if 'memory' in op
                         #         ]

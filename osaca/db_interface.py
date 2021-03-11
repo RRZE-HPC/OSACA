@@ -21,9 +21,11 @@ def sanity_check(arch: str, verbose=False, internet_check=False, output_file=sys
     :type arch: str
     :param verbose: verbose output flag, defaults to `False`
     :type verbose: bool, optional
-    :param internet_check: indicates if OSACA should try to look up the src/dst distribution in the internet, defaults to False
+    :param internet_check: indicates if OSACA should try to look up the src/dst distribution in the
+                           internet, defaults to False
     :type internet_check: boolean, optional
-    :param output_file: output stream specifying where to write output, defaults to :class:`sys.stdout`
+    :param output_file: output stream specifying where to write output,
+                        defaults to :class:`sys.stdout`
     :type output_file: stream, optional
 
     :return: True if everything checked out

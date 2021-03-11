@@ -6,7 +6,6 @@ Unit tests for Semantic Analysis
 import os
 import unittest
 from copy import deepcopy
-from subprocess import call
 
 import networkx as nx
 

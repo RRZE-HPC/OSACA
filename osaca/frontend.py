@@ -176,9 +176,10 @@ class Frontend(object):
         :param ignore_unknown: flag for ignore warning if performance data is missing, defaults to
             `False`
         :type ignore_unknown: boolean, optional
-        :param print_arch_warning: flag for additional user warning to specify micro-arch 
+        :param print_arch_warning: flag for additional user warning to specify micro-arch
         :type print_arch_warning: boolean, optional
-        :param print_length_warning: flag for additional user warning to specify kernel length with --lines
+        :param print_length_warning: flag for additional user warning to specify kernel length with
+                                     --lines
         :type print_length_warning: boolean, optional
         :param verbose: flag for verbosity level, defaults to False
         :type verbose: boolean, optional

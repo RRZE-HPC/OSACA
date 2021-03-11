@@ -184,7 +184,7 @@ def match_bytes(lines, index, byte_list):
         line_count += 1
         extracted_bytes += lines[index].directive.parameters
         index += 1
-    if extracted_bytes[0 : len(byte_list)] == byte_list:
+    if extracted_bytes[0:len(byte_list)] == byte_list:
         return True, line_count
     return False, -1
 
@@ -218,14 +218,14 @@ def find_jump_labels(lines):
     for label in list(labels):
         if all(
             [
-                l["instruction"].startswith(".")
-                for l in lines[labels[label][0] : labels[label][1]]
-                if l["instruction"] is not None
+                line["instruction"].startswith(".")
+                for line in lines[labels[label][0]:labels[label][1]]
+                if line["instruction"] is not None
             ]
         ):
             del labels[label]
 
-    return OrderedDict([(l, v[0]) for l, v in labels.items()])
+    return OrderedDict([(label, v[0]) for label, v in labels.items()])
 
 
 def find_basic_blocks(lines):
@@ -243,7 +243,7 @@ def find_basic_blocks(lines):
     blocks = OrderedDict()
     for label, label_line_idx in valid_jump_labels.items():
         blocks[label] = [lines[label_line_idx]]
-        for line in lines[label_line_idx + 1 :]:
+        for line in lines[label_line_idx + 1:]:
             terminate = False
             blocks[label].append(line)
             # Find end of block by searching for references to valid jump labels
@@ -272,7 +272,7 @@ def find_basic_loop_bodies(lines):
     loop_bodies = OrderedDict()
     for label, label_line_idx in valid_jump_labels.items():
         current_block = [lines[label_line_idx]]
-        for line in lines[label_line_idx + 1 :]:
+        for line in lines[label_line_idx + 1:]:
             terminate = False
             current_block.append(line)
             # Find end of block by searching for references to valid jump labels

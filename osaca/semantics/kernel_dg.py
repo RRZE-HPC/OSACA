@@ -48,7 +48,7 @@ class KernelDG(nx.DiGraph):
                     instruction_form["line_number"],
                     latency=instruction_form["latency"] - instruction_form["latency_wo_load"],
                 )
-            for dep in self.find_depending(instruction_form, kernel[i + 1 :]):
+            for dep in self.find_depending(instruction_form, kernel[i + 1:]):
                 edge_weight = (
                     instruction_form["latency"]
                     if "latency_wo_load" not in instruction_form
@@ -174,9 +174,11 @@ class KernelDG(nx.DiGraph):
 
         :param dict instruction_form: instruction form to check for dependencies
         :param list kernel: kernel containing the instructions to check
-        :param include_write: indicating if instruction ending the dependency chain should be included, defaults to `False`
+        :param include_write: indicating if instruction ending the dependency chain should be
+                              included, defaults to `False`
         :type include_write: boolean, optional
-        :param flag_dependencies: indicating if dependencies of flags should be considered, defaults to `False`
+        :param flag_dependencies: indicating if dependencies of flags should be considered,
+                                  defaults to `False`
         :type flag_dependencies: boolean, optional
         :returns: iterator if all directly dependent instruction forms
         """

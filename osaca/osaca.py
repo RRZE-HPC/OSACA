@@ -5,7 +5,6 @@ import io
 import os
 import re
 import sys
-import traceback
 
 from osaca.db_interface import import_benchmark_output, sanity_check
 from osaca.frontend import Frontend
@@ -200,7 +199,8 @@ def import_data(benchmark_type, arch, filepath, output_file=sys.stdout):
     :type arch: str
     :param filepath: filepath of the output file"
     :type filepath: str
-    :param output_file: output stream specifying where to write output, defaults to :class:`sys.stdout`
+    :param output_file: output stream specifying where to write output,
+                        defaults to :class:`sys.stdout`
     :type output_file: stream, optional
     """
     if benchmark_type.lower() == "ibench":
@@ -376,14 +376,14 @@ def get_line_range(line_str):
     line_str = line_str.replace(":", "-")
     lines = line_str.split(",")
     lines_int = []
-    for l in lines:
-        if "-" in l:
-            start = int(l.split("-")[0])
-            end = int(l.split("-")[1])
+    for line in lines:
+        if "-" in line:
+            start = int(line.split("-")[0])
+            end = int(line.split("-")[1])
             rnge = list(range(start, end + 1))
             lines_int += rnge
         else:
-            lines_int.append(int(l))
+            lines_int.append(int(line))
     return lines_int
 
 

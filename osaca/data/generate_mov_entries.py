@@ -769,11 +769,12 @@ def get_description(arch, rhs_comment=None):
     description = descriptions[arch]
 
     if rhs_comment is not None:
-        max_length = max([len(l) for l in descriptions[arch].split("\n")])
+        max_length = max([len(line) for line in descriptions[arch].split("\n")])
 
         commented_description = ""
-        for l in descriptions[arch].split("\n"):
-            commented_description += ("{:<" + str(max_length) + "}  # {}\n").format(l, rhs_comment)
+        for line in descriptions[arch].split("\n"):
+            commented_description += ("{:<" + str(max_length) + "}  # {}\n").format(
+                line, rhs_comment)
         description = commented_description
 
     return description

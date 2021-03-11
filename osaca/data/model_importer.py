@@ -239,11 +239,11 @@ def extract_model(tree, arch, skip_mem=True):
 
 
 def rhs_comment(uncommented_string, comment):
-    max_length = max([len(l) for l in uncommented_string.split("\n")])
+    max_length = max([len(line) for line in uncommented_string.split("\n")])
 
     commented_string = ""
-    for l in uncommented_string.split("\n"):
-        commented_string += ("{:<" + str(max_length) + "}  # {}\n").format(l, comment)
+    for line in uncommented_string.split("\n"):
+        commented_string += ("{:<" + str(max_length) + "}  # {}\n").format(line, comment)
     return commented_string
 
 
