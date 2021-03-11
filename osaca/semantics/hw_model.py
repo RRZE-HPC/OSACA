@@ -181,7 +181,7 @@ class MachineModel(object):
 
     def get_load_latency(self, reg_type):
         """Return load latency for given register type."""
-        return self._data['load_latency'][reg_type]
+        return self._data['load_latency'][reg_type] if self._data['load_latency'][reg_type] else 0
 
     def get_load_throughput(self, memory):
         """Return load thorughput for given register type."""
