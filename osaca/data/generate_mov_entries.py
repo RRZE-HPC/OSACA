@@ -774,7 +774,8 @@ def get_description(arch, rhs_comment=None):
         commented_description = ""
         for line in descriptions[arch].split("\n"):
             commented_description += ("{:<" + str(max_length) + "}  # {}\n").format(
-                line, rhs_comment)
+                line, rhs_comment
+            )
         description = commented_description
 
     return description
