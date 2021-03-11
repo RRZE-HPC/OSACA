@@ -11,6 +11,7 @@ from shutil import copyfile
 from unittest.mock import patch
 
 import osaca.osaca as osaca
+from osaca.db_interface import sanity_check
 from osaca.parser import ParserAArch64, ParserX86ATT
 from osaca.semantics import MachineModel
 
@@ -153,6 +154,16 @@ class TestCLI(unittest.TestCase):
                 output = StringIO()
                 osaca.run(args, output_file=output)
 
+    def test_architectures_sanity(self):
+        parser = osaca.create_parser()
+        # Run sanity check for all architectures
+        archs = osaca.SUPPORTED_ARCHS
+        for arch in archs:
+            with self.subTest(micro_arch=arch):
+                out = io.StringIO()
+                sanity = sanity_check(arch, verbose=2, output=out)
+                self.assertTrue(sanity, msg=output)
+
     def test_without_arch(self):
         # Run test kernels without --arch flag
         parser = osaca.create_parser()
@@ -239,4 +250,4 @@ class TestCLI(unittest.TestCase):
 
 if __name__ == '__main__':
     suite = unittest.TestLoader().loadTestsFromTestCase(TestCLI)
-    unittest.TextTestRunner(verbosity=2).run(suite)
+    unittest.TextTestRunner(verbosity=2, buffer=True).run(suite)
