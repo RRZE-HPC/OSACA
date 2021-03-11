@@ -158,9 +158,9 @@ class TestCLI(unittest.TestCase):
         archs = osaca.SUPPORTED_ARCHS
         for arch in archs:
             with self.subTest(micro_arch=arch):
-                out = io.StringIO()
-                sanity = sanity_check(arch, verbose=2, output=out)
-                self.assertTrue(sanity, msg=output)
+                out = StringIO()
+                sanity = sanity_check(arch, verbose=2, output_file=out)
+                self.assertTrue(sanity, msg=out)
 
     def test_without_arch(self):
         # Run test kernels without --arch flag
