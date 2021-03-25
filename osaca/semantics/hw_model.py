@@ -536,7 +536,7 @@ class MachineModel(object):
         if "register" in operand:
             if i_operand["class"] != "register":
                 return False
-            return self._is_x86_reg_type(i_operand, operand["register"], consider_masking=True)
+            return self._is_x86_reg_type(i_operand, operand["register"], consider_masking=False)
         # memory
         if "memory" in operand:
             if i_operand["class"] != "memory":
