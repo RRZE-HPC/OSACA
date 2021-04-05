@@ -131,7 +131,10 @@ class MachineModel(object):
         average_pressure = [0.0] * len(port_list)
         for cycles, ports in port_pressure:
             for p in ports:
-                average_pressure[port_list.index(p)] += cycles / len(ports)
+                try:
+                    average_pressure[port_list.index(p)] += cycles / len(ports)
+                except ValueError as e:
+                    raise KeyError("Port {!r} not in port list.".format(p)) from e
         return average_pressure
 
     def set_instruction(
