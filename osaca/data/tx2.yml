@@ -317,6 +317,19 @@ instruction_forms:
   throughput: 0.5
   latency: 6.0  # 	1*p01
   port_pressure: [[1, '01']]
+- name: fmadd  # JH: assumed from other floating point instructions
+  operands:
+  - class: register
+    prefix: d
+  - class: register
+    prefix: d
+  - class: register
+    prefix: d
+  - class: register
+    prefix: d
+  throughput: 0.5
+  latency: 6.0  # 	1*p01
+  port_pressure: [[1, '01']]
 - name: fdiv
   operands:
   - class: register
@@ -629,6 +642,20 @@ instruction_forms:
   operands:
   - class: register
     prefix: q
+  - class: memory
+    base: x
+    offset: '*'
+    index: '*'
+    scale: '*'
+    post-indexed: false
+    pre-indexed: false
+  throughput: 0.5
+  latency: 4.0  # 	1*p34
+  port_pressure: [[1.0, '34']]
+- name: ldur    # JH: assumed from ldr
+  operands:
+  - class: register
+    prefix: d
   - class: memory
     base: x
     offset: '*'
@@ -966,6 +993,20 @@ instruction_forms:
 - name: str
   operands:
   - class: register
+    prefix: d
+  - class: memory
+    base: x
+    offset: '*'
+    index: '*'
+    scale: '*'
+    pre-indexed: true
+    post-indexed: false
+  throughput: 1.0
+  latency: 0  # 	1*p34+1*p5
+  port_pressure: [[1.0, '34'], [1.0, '5'], [1, '012']]
+- name: str
+  operands:
+  - class: register
     prefix: q
   - class: memory
     base: x
@@ -1068,6 +1109,28 @@ instruction_forms:
     prefix: x
   - class: register
     prefix: x
+  throughput: 0.33333333
+  latency: 1.0  # 	1*p012
+  port_pressure: [[1, '012']]
+- name: sbfiz  # JH: educated guess
+  operands:
+  - class: register
+    prefix: x
+  - class: register
+    prefix: x
+  - class: immediate
+    imd: int
+  - class: immediate
+    imd: int
+  throughput: 0.33333333
+  latency: 1.0  # 	1*p012
+  port_pressure: [[1, '012']]
+- name: sxtw  # JH: educated guess
+  operands:
+  - class: register
+    prefix: x
+  - class: register
+    prefix: w
   throughput: 0.33333333
   latency: 1.0  # 	1*p012
   port_pressure: [[1, '012']]

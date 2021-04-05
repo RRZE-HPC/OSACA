@@ -486,6 +486,23 @@ instruction_forms:
   throughput: 0.5
   latency: 9.0  # 	1*p02
   port_pressure: [[1, '02']]
+- name: fmadd
+  operands:
+  - class: register
+    prefix: d
+    width: '*'
+  - class: register
+    prefix: d
+    width: '*'
+  - class: register
+    prefix: d
+    width: '*'
+  - class: register
+    prefix: d
+    width: '*'
+  throughput: 0.5
+  latency: 9.0  # 	1*p02
+  port_pressure: [[1, '02']]
 - name: fadd
   operands:
   - class: register
@@ -1115,6 +1132,20 @@ instruction_forms:
   throughput: 0.5
   latency: 5.0  # 	1*p56+1*p5D6D
   port_pressure: [[1, '56'], [1, ['5D', '6D']]]
+- name: ldur    # JH: assumed from ldur with q
+  operands:
+  - class: register
+    prefix: d
+  - class: memory
+    base: x
+    offset: '*'
+    index: '*'
+    scale: '*'
+    post-indexed: false
+    pre-indexed: false
+  throughput: 0.5
+  latency: 5.0  # 	1*p56+1*p5D6D
+  port_pressure: [[1, '56'], [1, ['5D', '6D']]]
 - name: [ldur, ldursb, ldursw, ldursh]
   operands:
   - class: register
@@ -1321,6 +1352,37 @@ instruction_forms:
   port_pressure: [[1, '02']]
 - name: mov
   operands:
+  - class: register
+    prefix: z
+    shape: '*'
+  - class: register
+    prefix: z
+    shape: '*'
+  throughput: 0.5
+  latency: 4.0  # 	1*p02
+  port_pressure: [[1, '02']]
+- name: mov
+  operands:
+  - class: register
+    prefix: z
+    shape: '*'
+  - class: register
+    prefix: p
+    predication: '*'
+  - class: register
+    prefix: z
+    shape: '*'
+  throughput: 0.5
+  latency: 4.0  # 	1*p02
+  port_pressure: [[1, '02']]
+- name: [mov, sel]
+  operands:
+  - class: register
+    prefix: z
+    shape: '*'
+  - class: register
+    prefix: p
+    predication: '*'
   - class: register
     prefix: z
     shape: '*'

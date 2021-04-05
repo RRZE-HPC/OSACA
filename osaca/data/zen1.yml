@@ -93,7 +93,19 @@ instruction_forms:
   throughput: 0.25
   latency: 1.0  # 	1*p4567
   port_pressure: [[1, '4567']]
-- name: incq
+- name: [CWDE, CWTL]  # JH: should actually be TP=0.5, but unclear which ALU to assign to
+  operands: []
+  latency: 1
+  port_pressure: [[1, '4567']]
+  throughput: 0.25
+  uops: 1
+- name: [CDQE, CLTQ]  # JH: should actually be TP=0.5, but unclear which ALU to assign to
+  operands: []
+  latency: 1
+  port_pressure: [[1, '4567']]
+  throughput: 0.25
+  uops: 1
+- name: inc
   operands:
   - class: register
     name: gpr
@@ -136,7 +148,19 @@ instruction_forms:
   throughput: 0.5
   latency: 1.0  # 	1*p89
   port_pressure: [[1, '89']]
-- name: movl
+- name: lea
+  operands:
+  - class: memory
+    base: gpr
+    offset: '*'
+    index: gpr
+    scale: '*'
+  - class: register
+    name: gpr
+  throughput: 0.5
+  latency: 1.0  # 	1*p8.9
+  port_pressure: [[1, '89']]
+- name: mov
   operands:
   - class: register
     name: gpr
@@ -145,6 +169,15 @@ instruction_forms:
   throughput: 0.0
   latency: 0.0
   port_pressure: []
+- name: [movsxd, movslq]  # JH: assumed from agner and port model
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  throughput: 0.25
+  latency: 1.0
+  port_pressure: [[1, '4567']]
 - name: mulsd
   operands:
   - class: register
@@ -466,8 +499,32 @@ instruction_forms:
   port_pressure: [[1, '89'], [1, [8D, 9D]]]
 - name: vmovups
   operands:
+  - class: memory
+    base: gpr
+    offset: "*"
+    index: "*"
+    scale: "*"
+  - class: register
+    name: ymm
+  throughput: 0.5
+  latency: 4.0  # 	1*p89+1*p8D9D
+  port_pressure: [[1, '89'], [1, [8D, 9D]]]
+- name: vmovups
+  operands:
   - class: register
     name: xmm
+  - class: memory
+    base: gpr
+    offset: "*"
+    index: "*"
+    scale: "*"
+  throughput: 1.0
+  latency: 0  # 	1*p89+1*pST
+  port_pressure: [[1, '89'], [1, [ST]]]
+- name: vmovups
+  operands:
+  - class: register
+    name: ymm
   - class: memory
     base: gpr
     offset: "*"
@@ -602,3 +659,35 @@ instruction_forms:
   throughput: 1.0
   latency: 0  # 	1*p89+1*pST
   port_pressure: [[1, '89'], [1, [ST]]]
+- name: POP
+  operands:
+  - class: register
+    name: gpr
+  latency: ~
+  port_pressure: [[1, '89'], [1, ['8D','9D']]]
+  throughput: 0.5
+  uops:
+- name: VFMADD213SD  # JH: assumed from ZEN2
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 5
+  port_pressure: [[1, '01']]
+  throughput: 0.5
+  uops: 1
+- name: VFMADD132SD  # JH: assumed from ZEN2
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 5
+  port_pressure: [[1, '01']]
+  throughput: 0.5
+  uops: 1
