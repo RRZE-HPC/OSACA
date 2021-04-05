@@ -380,7 +380,7 @@ instruction_forms:
           name: "ax"
           source: false
           destination: true
-    - name: cwtl
+    - name: [cwtl, cwde]
       operands: []
       hidden_operands:
         - class: "register"
@@ -421,7 +421,7 @@ instruction_forms:
           name: "eax"
           source: false
           destination: true
-    - name: cltq
+    - name: [cltq, cdqe]
       operands: []
       hidden_operands:
         - class: "register"

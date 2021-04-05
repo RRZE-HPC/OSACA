@@ -1859,7 +1859,7 @@ instruction_forms:
   port_pressure: [[1, '0156']]
   throughput: 0.25
   uops: 1
-- name: CWDE
+- name: [CWDE, CWTL]
   operands: []
   latency: 1
   port_pressure: [[1, '0156']]
@@ -4461,7 +4461,7 @@ instruction_forms:
   port_pressure: [[1, '0156'], [1, '23']]
   throughput: 0.5
   uops: 2
-- name: CDQE
+- name: [CDQE, CLTQ]
   operands: []
   latency: 1
   port_pressure: [[1, '0156']]
