@@ -45,6 +45,7 @@ class MachineModel(object):
                 "ports": [],
                 "port_model_scheme": None,
                 "instruction_forms": [],
+                "instruction_forms_dict": defaultdict(list),
             }
         else:
             if arch and path_to_yaml:
@@ -142,6 +143,7 @@ class MachineModel(object):
         if instr_data is None:
             instr_data = {}
             self._data["instruction_forms"].append(instr_data)
+            self._data["instruction_forms_dict"][name].append(instr_data)
 
         instr_data["name"] = name
         instr_data["operands"] = operands
