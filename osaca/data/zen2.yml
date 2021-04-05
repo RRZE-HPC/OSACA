@@ -792,6 +792,13 @@ instruction_forms:
   throughput: 0.25
   latency: 1.0  # 	1*p4567     
   port_pressure: [[1, '4567']]
+- name: dec
+  operands:
+  - class: register
+    name: gpr
+  throughput: 0.25
+  latency: 1.0  # 	1*p4567     
+  port_pressure: [[1, '4567']]
 - name: [jo, jno, js, jns, jp, jpe, jnp, jpo]
   operands:
   - class: identifier
@@ -810,6 +817,18 @@ instruction_forms:
   throughput: 0.0
   latency: 0
   port_pressure: []
+- name: [CWDE, CWTL]  # JH: should actually be TP=0.5, but unclear which ALU to assign to
+  operands: []
+  latency: 1
+  port_pressure: [[1, '4567']]
+  throughput: 0.25
+  uops: 1
+- name: [CDQE, CLTQ]  # JH: should actually be TP=0.5, but unclear which ALU to assign to
+  operands: []
+  latency: 1
+  port_pressure: [[1, '4567']]
+  throughput: 0.25
+  uops: 1
 - name: lea
   operands:
   - class: memory
@@ -822,6 +841,18 @@ instruction_forms:
   throughput: 0.33333
   latency: 1.0  # 	1*p8.9.10
   port_pressure: [[1, ['8','9','10']]]
+- name: lea
+  operands:
+  - class: memory
+    base: gpr
+    offset: '*'
+    index: gpr
+    scale: '*'
+  - class: register
+    name: gpr
+  throughput: 0.5
+  latency: 1.0  # 	1*p8.9
+  port_pressure: [[1, ['8','9']]]
 - name: mov
   operands:
   - class: register
@@ -831,6 +862,15 @@ instruction_forms:
   throughput: 0.0
   latency: 0.0
   port_pressure: []
+- name: [movsxd, movslq]  # JH: assumed from agner and port model
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  throughput: 0.25
+  latency: 1.0
+  port_pressure: [[1, '4567']]
 - name: mulsd
   operands:
   - class: register
