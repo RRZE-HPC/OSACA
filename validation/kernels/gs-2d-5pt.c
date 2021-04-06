@@ -50,7 +50,7 @@ int main(int argc, char *argv[]) {
     //SETUP
     DTYPE* a = malloc(maxproduct*sizeof(DTYPE));
     for(int i=0; i<maxproduct; i++) {
-        a[i] = i;
+        a[i] = rand();
     }
 
     likwid_markerInit();
