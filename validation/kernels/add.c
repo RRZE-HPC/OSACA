@@ -44,9 +44,9 @@ int main(int argc, char *argv[]) {
     DTYPE* b = malloc(maxelements*sizeof(DTYPE));
     DTYPE* c = malloc(maxelements*sizeof(DTYPE));
     for(int i=0; i<maxelements; i++) {
-        a[i] = i;
-        b[i] = maxelements-i;
-        c[i] = 12.34;
+        a[i] = rand();
+        b[i] = rand();
+        c[i] = rand();
     }
 
     likwid_markerInit();
