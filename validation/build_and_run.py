@@ -11,6 +11,7 @@ from pathlib import Path
 from pprint import pprint
 import socket
 import pickle
+from copy import deepcopy
 
 import numpy as np
 import pandas as pd
@@ -43,6 +44,7 @@ hosts_arch_map = {r"skylakesp2": "SKX",
 
 arch_info = {
     'SKX': {
+        'prepare': ['likwid-setFrequencies -f 2.4 -t 0'.split()],
         'IACA': 'SKX',
         'OSACA': 'SKX',
         'LLVM-MCA': '-mcpu=skylake-avx512',
@@ -71,6 +73,7 @@ arch_info = {
         },
     },
     'IVB': {
+        'prepare': ['likwid-setFrequencies -f 3.0 -t 0'.split()],
         'IACA': 'IVB',
         'OSACA': 'IVB',
         'LLVM-MCA': '-mcpu=ivybridge',
@@ -98,6 +101,7 @@ arch_info = {
         },
     },
     'ZEN': {
+        'prepare': ['likwid-setFrequencies -f 2.3 -t 0'.split()],
         'IACA': None,
         'OSACA': 'ZEN1',
         'LLVM-MCA': '-mcpu=znver1',
@@ -125,6 +129,7 @@ arch_info = {
         },
     },
     'ZEN2': {
+        'prepare': ['likwid-setFrequencies -f 2.35 -t 0'.split()],
         'IACA': None,
         'OSACA': 'ZEN2',
         'LLVM-MCA': '-mcpu=znver2',
@@ -152,6 +157,7 @@ arch_info = {
         },
     },
     'TX2': {
+        'Clock [MHz]': 2200,  # reading out via perf. counters is not supported
         'IACA': None,
         'OSACA': 'TX2',
         'LLVM-MCA': '-mcpu=thunderx2t99 -march=aarch64',
@@ -247,8 +253,12 @@ def build_mark_run_all_kernels(measurements=True, osaca=True, iaca=True, llvm_mc
         arches = arch_info.keys()
         islocal = False
     else:
-        arches = [arch]
         islocal = True
+        arches = [arch]
+        ainfo = arch_info.get(arch)
+        if 'prepare' in ainfo:
+            for cmd in ainfo['prepare']:
+                check_call(cmd)
     for arch in arches:
         ainfo = arch_info.get(arch)
         print(arch)
@@ -258,6 +268,7 @@ def build_mark_run_all_kernels(measurements=True, osaca=True, iaca=True, llvm_mc
                 data = pickle.load(f)
         else:
             data = []
+        data_lastsaved = deepcopy(data)
         for compiler, compiler_cflags in ainfo['cflags'].items():
             if not shutil.which(compiler) and islocal:
                 print(compiler, "not found in path! Skipping...")
@@ -272,6 +283,7 @@ def build_mark_run_all_kernels(measurements=True, osaca=True, iaca=True, llvm_mc
                     if row:
                         row = row[0]
                     else:
+                        orig_row = None
                         row = {
                             'arch': arch,
                             'kernel': kernel,
@@ -284,22 +296,37 @@ def build_mark_run_all_kernels(measurements=True, osaca=True, iaca=True, llvm_mc
                     # Build
                     print("build", end="", flush=True)
                     asm_path, exec_path, overwrite = build_kernel(
-                        kernel, arch, compiler, cflags, cflags_name, dontbuild=islocal)
+                        kernel, arch, compiler, cflags, cflags_name, dontbuild=not islocal)
+
+                    if overwrite:
+                        # clear all measurment information
+                        row['best_length'] = None
+                        row['best_runtime'] = None
+                        row['L2_traffic'] = None
+                        row['allruns'] = None
+                        row['perfevents'] = None
 
                     # Mark for IACA, OSACA and LLVM-MCA
                     print("mark", end="", flush=True)
                     try:
-                        marked_asmfile, marked_objfile, row['pointer_increment'] = mark(
+                        marked_asmfile, marked_objfile, row['pointer_increment'], overwrite = mark(
                             asm_path, compiler, cflags, isa=ainfo['isa'], overwrite=overwrite)
+                        row['marking_error'] = None
                     except ValueError as e:
                         row['marking_error'] = str(e)
                         print(":", e)
                         continue
 
+                    if overwrite:
+                        # clear all model generated information
+                        for model in ['IACA', 'OSACA', 'LLVM-MCA']:
+                            for k in ['ports', 'prediction', 'throughput', 'cp', 'lcd', 'raw']:
+                                row[model+'_'+k] = None
+
                     # Analyze with IACA, if requested and configured
                     if iaca and ainfo['IACA'] is not None:
                         print("IACA", end="", flush=True)
-                        if not row.get('IACA_ports') or overwrite:
+                        if not row.get('IACA_ports'):
                             row['IACA_raw'] = iaca_analyse_instrumented_binary(
                                 marked_objfile, micro_architecture=ainfo['IACA'])
                             row['IACA_ports'] = \
@@ -315,7 +342,7 @@ def build_mark_run_all_kernels(measurements=True, osaca=True, iaca=True, llvm_mc
                     # Analyze with OSACA, if requested
                     if osaca:
                         print("OSACA", end="", flush=True)
-                        if ainfo['OSACA'] is not None and (not row.get('OSACA_ports') or overwrite):
+                        if not row.get('OSACA_ports'):
                             row['OSACA_raw'] = osaca_analyse_instrumented_assembly(
                                 marked_asmfile, micro_architecture=ainfo['OSACA'])
                             row['OSACA_ports'] = \
@@ -333,7 +360,7 @@ def build_mark_run_all_kernels(measurements=True, osaca=True, iaca=True, llvm_mc
                     # Analyze with LLVM-MCA, if requested and configured
                     if llvm_mca and ainfo['LLVM-MCA'] is not None:
                         print("LLVM-MCA", end="", flush=True)
-                        if not row.get('LLVM-MCA_ports') or overwrite:
+                        if not row.get('LLVM-MCA_ports'):
                             row['LLVM-MCA_raw'] = llvm_mca_analyse_instrumented_assembly(
                                 marked_asmfile,
                                 micro_architecture=ainfo['LLVM-MCA'],
@@ -353,7 +380,7 @@ def build_mark_run_all_kernels(measurements=True, osaca=True, iaca=True, llvm_mc
                     if measurements and islocal:
                         # run measurements if on same hardware
                         print("scale", end="", flush=True)
-                        if not row.get('best_length') or overwrite:
+                        if not row.get('best_length'):
                             # find best length with concurrent L2 measurement
                             scaling_runs, best = scalingrun(exec_path)
                             row['best_length'] = best[0]
@@ -366,16 +393,18 @@ def build_mark_run_all_kernels(measurements=True, osaca=True, iaca=True, llvm_mc
 
                         # TODO measure all events on best length
                         print("perf", end="", flush=True)
-                        if not row.get('perfevents') or overwrite:
+                        if not row.get('perfevents'):
                             print("???", end="", flush=True)
                         else:
                             print("! ", end="", flush=True)
 
                     print()
-                    # dump to file
+                # dump to file
+                if data != data_lastsaved:
                     with data_path.open('wb') as f:
                         try:
                             pickle.dump(data, f)
+                            data_lastsaved = deepcopy(data)
                         except KeyboardInterrupt:
                             f.seek(0)
                             pickle.dump(data, f)
@@ -414,7 +443,7 @@ def scalingrun(kernel_exec, total_iterations=25000000, lengths=range(8, 4*1024+1
             clock_hz = arch_info[get_current_arch()]['Clock [MHz]']*1e6
         cyperit = mmetrics['Runtime (RDTSC) [s]'] * clock_hz / total_iterations
         # TODO use arch specific events and grooup
-        if 'L2D loaad data volume [GBytes]' in mmetrics:
+        if 'L2D load data volume [GBytes]' in mmetrics:
             l2perit = (mmetrics['L2D load data volume [GBytes]'] +
                        mmetrics.get('L2D evict data volume [GBytes]', 0))*1e9 / total_iterations
         else:
@@ -431,6 +460,7 @@ def mark(asm_path, compiler, cflags, isa, overwrite=False):
     # Mark assembly for IACA, OSACA and LLVM-MCA
     marked_asm_path = Path(asm_path).with_suffix(".marked.s")
     if not marked_asm_path.exists() or overwrite:
+        overwrite = True
         with open(asm_path) as fa, open(marked_asm_path, 'w') as fm:
             try:
                 _, pointer_increment = asm_instrumentation(fa, fm, isa=isa)
@@ -456,7 +486,7 @@ def mark(asm_path, compiler, cflags, isa, overwrite=False):
     if not marked_obj.exists():
         check_call([compiler] + ['-c', str(marked_asm_path), '-o', str(marked_obj)])
     
-    return str(marked_asm_path), str(marked_obj), pointer_increment
+    return str(marked_asm_path), str(marked_obj), pointer_increment, overwrite
 
 
 def build_kernel(kernel, architecture, compiler, cflags, cflags_name, overwrite=False,
