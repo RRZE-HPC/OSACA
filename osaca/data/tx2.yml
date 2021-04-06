@@ -179,6 +179,12 @@ instruction_forms:
   throughput: 1.0
   latency: 4.0  # 	1*p1
   port_pressure: [[1, '1']]
+- name: [bcc, bcs, bgt, bhi]
+  operands:
+  - class: identifier
+  throughput: 1.0
+  latency: 0.0
+  port_pressure: [[1, '2']]
 - name: b.ne
   operands:
   - class: identifier

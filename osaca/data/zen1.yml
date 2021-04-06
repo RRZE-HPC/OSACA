@@ -105,7 +105,7 @@ instruction_forms:
   port_pressure: [[1, '4567']]
   throughput: 0.25
   uops: 1
-- name: inc
+- name: [inc, dec]
   operands:
   - class: register
     name: gpr
@@ -136,30 +136,18 @@ instruction_forms:
   throughput: 0.0
   latency: 0
   port_pressure: []
-- name: leaq
-  operands:
-  - class: memory
-    base: gpr
-    offset: imd
-    index: ~
-    scale: 1
-  - class: register
-    name: gpr
-  throughput: 0.5
-  latency: 1.0  # 	1*p89
-  port_pressure: [[1, '89']]
 - name: lea
   operands:
   - class: memory
     base: gpr
     offset: '*'
-    index: gpr
+    index: '*'
     scale: '*'
   - class: register
     name: gpr
   throughput: 0.5
-  latency: 1.0  # 	1*p8.9
-  port_pressure: [[1, '89']]
+  latency: 1.0  # 	1*p4567
+  port_pressure: [[1, '4567']]
 - name: mov
   operands:
   - class: register
@@ -691,3 +679,21 @@ instruction_forms:
   port_pressure: [[1, '01']]
   throughput: 0.5
   uops: 1
+- name: [jo, jno, js, jns, jp, jpe, jnp, jpo]  # JH: assumed from ZEN2
+  operands:
+  - class: identifier
+  throughput: 0.0
+  latency: 0
+  port_pressure: []
+- name: [jc, jb, jae, jnb, jna, jbe, ja, jnbe]  # JH: assumed from ZEN2
+  operands:
+  - class: identifier
+  throughput: 0.0
+  latency: 0
+  port_pressure: []
+- name: [je, jz, jne, jnz, jl, jnge]  # JH: assumed from ZEN2
+  operands:
+  - class: identifier
+  throughput: 0.0
+  latency: 0
+  port_pressure: []
