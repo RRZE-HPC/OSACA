@@ -15,7 +15,7 @@ void kernel(DTYPE* a, DTYPE* b, const int repeat, const int cur_elementsz, const
         for(int z=3; z<cur_elementsz-3; z++) {
             for(int y=3; y<cur_elementsy-3; y++) {
                 for(int x=1; x<cur_elementsx-1; x++) {
-                    a[z*cur_elementsy*cur_elementsx+y*cur_elementsx+x] =
+                    a[z*cur_elementsy*cur_elementsx+y*cur_elementsx+x] = 1.0234 * (
                         b[(z+3)*cur_elementsy*cur_elementsx+y*cur_elementsx+x] +
                         b[(z+1)*cur_elementsy*cur_elementsx+y*cur_elementsx+x] +
                         b[z*cur_elementsy*cur_elementsx+(y-3)*cur_elementsx+x] + 
@@ -25,7 +25,7 @@ void kernel(DTYPE* a, DTYPE* b, const int repeat, const int cur_elementsz, const
                         b[z*cur_elementsy*cur_elementsx+(y+1)*cur_elementsx+x] +
                         b[z*cur_elementsy*cur_elementsx+(y+3)*cur_elementsx+x] +
                         b[(z-1)*cur_elementsy*cur_elementsx+y*cur_elementsx+x] +
-                        b[(z-3)*cur_elementsy*cur_elementsx+y*cur_elementsx+x];
+                        b[(z-3)*cur_elementsy*cur_elementsx+y*cur_elementsx+x]);
                 }
             }
         }

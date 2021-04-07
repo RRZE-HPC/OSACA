@@ -419,7 +419,7 @@ def build_mark_run_all_kernels(measurements=True, osaca=True, iaca=True, llvm_mc
 
 
 
-def scalingrun(kernel_exec, total_iterations=25000000, lengths=range(8, 4*1024+1)):
+def scalingrun(kernel_exec, total_iterations=25000000, lengths=range(8, 1*1024+1)):
     #print('{:>8} {:>10} {:>10}'.format("x", "cy/it", "L2 B/it"))
     parameters = chain(*[[total_iterations//i, i] for i in lengths])
     # TODO use arch specific events and grooup

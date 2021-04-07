@@ -14,11 +14,11 @@ void kernel(DTYPE* a, const int repeat, const int cur_elementsy, const int cur_e
     for(int r=0; r < repeat; r++) {
         for(int y=1; y<cur_elementsy-1; y++) {
             for(int x=1; x<cur_elementsx-1; x++) {
-                a[y*cur_elementsx+x] =
+                a[y*cur_elementsx+x] = 1.0234 * (
                     a[(y-1)*cur_elementsx+x] + 
                     a[y*cur_elementsx+x-1] +
                     a[y*cur_elementsx+x+1] +
-                    a[(y+1)*cur_elementsx+x];
+                    a[(y+1)*cur_elementsx+x]);
             }
         }
         // prevent subsequent kernel executions to overlap:
