@@ -154,7 +154,7 @@ instruction_forms:
     scale: "*"
   throughput: 1.0
   latency: 0  # 	1*p89+1*p10D
-  port_pressure: [[1, '89'], [1, [10D]]]
+  port_pressure: [[1, ['8', '9', '10']], [1, [10D]]]
 - name: vmovupd
   operands:
   - class: register
@@ -268,7 +268,7 @@ instruction_forms:
     scale: "*"
   throughput: 1.0
   latency: 0  # 	1*p89+1*p10D
-  port_pressure: [[1, '89'], [1, [10D]]]
+  port_pressure: [[1, ['8', '9', '10']], [1, [10D]]]
 - name: vmovaps
   operands:
   - class: register
@@ -382,7 +382,7 @@ instruction_forms:
     scale: "*"
   throughput: 1.0
   latency: 0  # 	1*p89+1*p10D
-  port_pressure: [[1, '89'], [1, [10D]]]
+  port_pressure: [[1, ['8', '9', '10']], [1, [10D]]]
 - name: vmovups
   operands:
   - class: register
@@ -496,7 +496,7 @@ instruction_forms:
     scale: "*"
   throughput: 1.0
   latency: 0  # 	1*p89+1*p10D
-  port_pressure: [[1, '89'], [1, [10D]]]
+  port_pressure: [[1, ['8', '9', '10']], [1, [10D]]]
 - name: vmovsd
   operands:
   - class: register
@@ -610,7 +610,7 @@ instruction_forms:
     scale: "*"
   throughput: 1.0
   latency: 0  # 	1*p89+1*p10D
-  port_pressure: [[1, '89'], [1, [10D]]]
+  port_pressure: [[1, ['8', '9', '10']], [1, [10D]]]
 - name: vmovss
   operands:
   - class: register

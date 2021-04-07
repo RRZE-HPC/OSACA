@@ -4175,7 +4175,7 @@ instruction_forms:
   - class: register                                                                                                         # uops.info import
     name: xmm                                                                                                               # uops.info import
   latency: 20                                                                                                               # uops.info import
-  port_pressure: [[1, '0'], [14, [DIV]]]                                                                                    # uops.info import
+  port_pressure: [[1, '0'], [14, ['0DV']]]                                                                                    # uops.info import
   throughput: 14.0                                                                                                          # uops.info import
   uops: 1                                                                                                                   # uops.info import
 - name: VDIVPD                                                                                                              # uops.info import
@@ -4187,7 +4187,7 @@ instruction_forms:
   - class: register                                                                                                         # uops.info import
     name: ymm                                                                                                               # uops.info import
   latency: 35                                                                                                               # uops.info import
-  port_pressure: [[2, '0'], [1, '05'], [28, [DIV]]]                                                                         # uops.info import
+  port_pressure: [[2, '0'], [1, '05'], [28, ['0DV']]]                                                                         # uops.info import
   throughput: 28.0                                                                                                          # uops.info import
   uops: 3                                                                                                                   # uops.info import
 - name: VDIVPS                                                                                                              # uops.info import
@@ -4199,7 +4199,7 @@ instruction_forms:
   - class: register                                                                                                         # uops.info import
     name: xmm                                                                                                               # uops.info import
   latency: 13                                                                                                               # uops.info import
-  port_pressure: [[1, '0'], [7, [DIV]]]                                                                                     # uops.info import
+  port_pressure: [[1, '0'], [7, ['0DV']]]                                                                                     # uops.info import
   throughput: 7.0                                                                                                           # uops.info import
   uops: 1                                                                                                                   # uops.info import
 - name: VDIVPS                                                                                                              # uops.info import
@@ -4211,7 +4211,7 @@ instruction_forms:
   - class: register                                                                                                         # uops.info import
     name: ymm                                                                                                               # uops.info import
   latency: 21                                                                                                               # uops.info import
-  port_pressure: [[2, '0'], [14, [DIV]]]                                                                                    # uops.info import
+  port_pressure: [[2, '0'], [14, ['0DV']]]                                                                                    # uops.info import
   throughput: 14.0                                                                                                          # uops.info import
   uops: 3                                                                                                                   # uops.info import
 - name: VDIVSD                                                                                                              # uops.info import
@@ -4223,7 +4223,7 @@ instruction_forms:
   - class: register                                                                                                         # uops.info import
     name: xmm                                                                                                               # uops.info import
   latency: 20                                                                                                               # uops.info import
-  port_pressure: [[1, '0'], [14, [DIV]]]                                                                                    # uops.info import
+  port_pressure: [[1, '0'], [14, ['0DV']]]                                                                                    # uops.info import
   throughput: 14.0                                                                                                          # uops.info import
   uops: 1                                                                                                                   # uops.info import
 - name: VDIVSS                                                                                                              # uops.info import
@@ -4235,7 +4235,7 @@ instruction_forms:
   - class: register                                                                                                         # uops.info import
     name: xmm                                                                                                               # uops.info import
   latency: 13                                                                                                               # uops.info import
-  port_pressure: [[1, '0'], [7, [DIV]]]                                                                                     # uops.info import
+  port_pressure: [[1, '0'], [7, ['0DV']]]                                                                                     # uops.info import
   throughput: 7.0                                                                                                           # uops.info import
   uops: 1                                                                                                                   # uops.info import
 - name: VDPPD                                                                                                               # uops.info import
@@ -6779,7 +6779,7 @@ instruction_forms:
   - class: register                                                                                                         # uops.info import
     name: xmm                                                                                                               # uops.info import
   latency: 20                                                                                                               # uops.info import
-  port_pressure: [[1, '0'], [14, [DIV]]]                                                                                    # uops.info import
+  port_pressure: [[1, '0'], [14, ['0DV']]]                                                                                    # uops.info import
   throughput: 14.0                                                                                                          # uops.info import
   uops: 1                                                                                                                   # uops.info import
 - name: VSQRTPD                                                                                                             # uops.info import
@@ -6789,7 +6789,7 @@ instruction_forms:
   - class: register                                                                                                         # uops.info import
     name: ymm                                                                                                               # uops.info import
   latency: 35                                                                                                               # uops.info import
-  port_pressure: [[2, '0'], [1, '05'], [28, [DIV]]]                                                                         # uops.info import
+  port_pressure: [[2, '0'], [1, '05'], [28, ['0DV']]]                                                                         # uops.info import
   throughput: 28.0                                                                                                          # uops.info import
   uops: 3                                                                                                                   # uops.info import
 - name: VSQRTPS                                                                                                             # uops.info import
@@ -6799,7 +6799,7 @@ instruction_forms:
   - class: register                                                                                                         # uops.info import
     name: xmm                                                                                                               # uops.info import
   latency: 13                                                                                                               # uops.info import
-  port_pressure: [[1, '0'], [7, [DIV]]]                                                                                     # uops.info import
+  port_pressure: [[1, '0'], [7, ['0DV']]]                                                                                     # uops.info import
   throughput: 7.0                                                                                                           # uops.info import
   uops: 1                                                                                                                   # uops.info import
 - name: VSQRTPS                                                                                                             # uops.info import
@@ -6809,7 +6809,7 @@ instruction_forms:
   - class: register                                                                                                         # uops.info import
     name: ymm                                                                                                               # uops.info import
   latency: 21                                                                                                               # uops.info import
-  port_pressure: [[2, '0'], [14, [DIV]]]                                                                                    # uops.info import
+  port_pressure: [[2, '0'], [14, ['0DV']]]                                                                                    # uops.info import
   throughput: 14.0                                                                                                          # uops.info import
   uops: 3                                                                                                                   # uops.info import
 - name: VSQRTSD                                                                                                             # uops.info import
@@ -6821,7 +6821,7 @@ instruction_forms:
   - class: register                                                                                                         # uops.info import
     name: xmm                                                                                                               # uops.info import
   latency: 20                                                                                                               # uops.info import
-  port_pressure: [[1, '0'], [14, [DIV]]]                                                                                    # uops.info import
+  port_pressure: [[1, '0'], [14, ['0DV']]]                                                                                    # uops.info import
   throughput: 14.0                                                                                                          # uops.info import
   uops: 1                                                                                                                   # uops.info import
 - name: VSQRTSS                                                                                                             # uops.info import
@@ -6833,7 +6833,7 @@ instruction_forms:
   - class: register                                                                                                         # uops.info import
     name: xmm                                                                                                               # uops.info import
   latency: 13                                                                                                               # uops.info import
-  port_pressure: [[1, '0'], [7, [DIV]]]                                                                                     # uops.info import
+  port_pressure: [[1, '0'], [7, ['0DV']]]                                                                                     # uops.info import
   throughput: 7.0                                                                                                           # uops.info import
   uops: 1                                                                                                                   # uops.info import
 - name: VSUBPD                                                                                                              # uops.info import
@@ -7613,7 +7613,7 @@ instruction_forms:
   - class: register                                                                                                         # uops.info import
     name: gpr                                                                                                               # uops.info import
   latency: 78                                                                                                               # uops.info import
-  port_pressure: [[2, '0'], [4, '01'], [10, '015'], [2, '05'], [3, '1'], [11, '5'], [11, [DIV]]]                            # uops.info import
+  port_pressure: [[2, '0'], [4, '01'], [10, '015'], [2, '05'], [3, '1'], [11, '5'], [11, ['0DV']]]                            # uops.info import
   throughput: 15.333333333333334                                                                                            # uops.info import
   uops: 32                                                                                                                  # uops.info import
 - name: IDIV                                                                                                                # uops.info import
@@ -7621,7 +7621,7 @@ instruction_forms:
   - class: register                                                                                                         # uops.info import
     name: gpr                                                                                                               # uops.info import
   latency: 97                                                                                                               # uops.info import
-  port_pressure: [[2, '0'], [18, '01'], [12, '05'], [4, '1'], [6, '15'], [18, '5'], [11, [DIV]]]                            # uops.info import
+  port_pressure: [[2, '0'], [18, '01'], [12, '05'], [4, '1'], [6, '15'], [18, '5'], [11, ['0DV']]]                            # uops.info import
   throughput: 27.0                                                                                                          # uops.info import
   uops: 57                                                                                                                  # uops.info import
 - name: IMUL                                                                                                                # uops.info import
@@ -9458,7 +9458,7 @@ instruction_forms:
   - class: register                                                                                                         # uops.info import
     name: xmm                                                                                                               # uops.info import
   latency: 13                                                                                                               # uops.info import
-  port_pressure: [[1, '0'], [7, [DIV]]]                                                                                     # uops.info import
+  port_pressure: [[1, '0'], [7, ['0DV']]]                                                                                     # uops.info import
   throughput: 7.0                                                                                                           # uops.info import
   uops: 1                                                                                                                   # uops.info import
 - name: DIVSS                                                                                                               # uops.info import
@@ -9468,7 +9468,7 @@ instruction_forms:
   - class: register                                                                                                         # uops.info import
     name: xmm                                                                                                               # uops.info import
   latency: 13                                                                                                               # uops.info import
-  port_pressure: [[1, '0'], [7, [DIV]]]                                                                                     # uops.info import
+  port_pressure: [[1, '0'], [7, ['0DV']]]                                                                                     # uops.info import
   throughput: 7.0                                                                                                           # uops.info import
   uops: 1                                                                                                                   # uops.info import
 - name: MAXPS                                                                                                               # uops.info import
@@ -9646,7 +9646,7 @@ instruction_forms:
   - class: register                                                                                                         # uops.info import
     name: xmm                                                                                                               # uops.info import
   latency: 13                                                                                                               # uops.info import
-  port_pressure: [[1, '0'], [7, [DIV]]]                                                                                     # uops.info import
+  port_pressure: [[1, '0'], [7, ['0DV']]]                                                                                     # uops.info import
   throughput: 7.0                                                                                                           # uops.info import
   uops: 1                                                                                                                   # uops.info import
 - name: SQRTSS                                                                                                              # uops.info import
@@ -9656,7 +9656,7 @@ instruction_forms:
   - class: register                                                                                                         # uops.info import
     name: xmm                                                                                                               # uops.info import
   latency: 13                                                                                                               # uops.info import
-  port_pressure: [[1, '0'], [7, [DIV]]]                                                                                     # uops.info import
+  port_pressure: [[1, '0'], [7, ['0DV']]]                                                                                     # uops.info import
   throughput: 7.0                                                                                                           # uops.info import
   uops: 1                                                                                                                   # uops.info import
 - name: SUBPS                                                                                                               # uops.info import
@@ -9960,7 +9960,7 @@ instruction_forms:
   - class: register                                                                                                         # uops.info import
     name: xmm                                                                                                               # uops.info import
   latency: 20                                                                                                               # uops.info import
-  port_pressure: [[1, '0'], [14, [DIV]]]                                                                                    # uops.info import
+  port_pressure: [[1, '0'], [14, ['0DV']]]                                                                                    # uops.info import
   throughput: 14.0                                                                                                          # uops.info import
   uops: 1                                                                                                                   # uops.info import
 - name: DIVSD                                                                                                               # uops.info import
@@ -9970,7 +9970,7 @@ instruction_forms:
   - class: register                                                                                                         # uops.info import
     name: xmm                                                                                                               # uops.info import
   latency: 20                                                                                                               # uops.info import
-  port_pressure: [[1, '0'], [14, [DIV]]]                                                                                    # uops.info import
+  port_pressure: [[1, '0'], [14, ['0DV']]]                                                                                    # uops.info import
   throughput: 14.0                                                                                                          # uops.info import
   uops: 1                                                                                                                   # uops.info import
 - name: MAXPD                                                                                                               # uops.info import
@@ -10928,7 +10928,7 @@ instruction_forms:
   - class: register                                                                                                         # uops.info import
     name: xmm                                                                                                               # uops.info import
   latency: 20                                                                                                               # uops.info import
-  port_pressure: [[1, '0'], [14, [DIV]]]                                                                                    # uops.info import
+  port_pressure: [[1, '0'], [14, ['0DV']]]                                                                                    # uops.info import
   throughput: 14.0                                                                                                          # uops.info import
   uops: 1                                                                                                                   # uops.info import
 - name: SQRTSD                                                                                                              # uops.info import
@@ -10938,7 +10938,7 @@ instruction_forms:
   - class: register                                                                                                         # uops.info import
     name: xmm                                                                                                               # uops.info import
   latency: 20                                                                                                               # uops.info import
-  port_pressure: [[1, '0'], [14, [DIV]]]                                                                                    # uops.info import
+  port_pressure: [[1, '0'], [14, ['0DV']]]                                                                                    # uops.info import
   throughput: 14.0                                                                                                          # uops.info import
   uops: 1                                                                                                                   # uops.info import
 - name: SUBPD                                                                                                               # uops.info import
