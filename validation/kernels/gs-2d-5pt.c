@@ -21,7 +21,8 @@ void kernel(DTYPE* a, const int repeat, const int cur_elementsy, const int cur_e
                     a[(y+1)*cur_elementsx+x];
             }
         }
-        a[1] = a[cur_elementsx*(cur_elementsy-1)+cur_elementsx-1]; // to prevent subsequent kernel executions to overlap
+        // prevent subsequent kernel executions to overlap:
+        a[1] = a[cur_elementsx*(cur_elementsy-2)+cur_elementsx-2];
         dummy((void*)a);
     }
 }
