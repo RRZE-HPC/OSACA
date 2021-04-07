@@ -16,6 +16,7 @@ void kernel(DTYPE* a, const int repeat, const int cur_elements)
         for(int i=0; i<cur_elements; i++) {
             s += a[i];
         }
+        a[0] = s; // to prevent subsequent kernel executions to overlap
         dummy((void*)&s);
     }
 }
