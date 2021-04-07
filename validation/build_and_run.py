@@ -351,8 +351,10 @@ def build_mark_run_all_kernels(measurements=True, osaca=True, iaca=True, llvm_mc
                             row['OSACA_prediction'] = row['OSACA_raw']['throughput']/(
                                 row['pointer_increment']/row['element_size'])
                             row['OSACA_throughput'] = max(row['OSACA_ports'].values())
-                            row['OSACA_cp'] = row['OSACA_raw']['cp_latency']
-                            row['OSACA_lcd'] = row['OSACA_raw']['lcd']
+                            row['OSACA_cp'] = row['OSACA_raw']['cp_latency']/(
+                                row['pointer_increment']/row['element_size'])
+                            row['OSACA_lcd'] = row['OSACA_raw']['lcd']/(
+                                row['pointer_increment']/row['element_size'])
                             print(". ", end="", flush=True)
                         else:
                             print("! ", end="", flush=True)
@@ -371,8 +373,10 @@ def build_mark_run_all_kernels(measurements=True, osaca=True, iaca=True, llvm_mc
                             row['LLVM-MCA_prediction'] =row['LLVM-MCA_raw']['throughput']/(
                                 row['pointer_increment']/row['element_size'])
                             row['LLVM-MCA_throughput'] = max(row['LLVM-MCA_ports'].values())
-                            row['LLVM-MCA_cp'] = row['LLVM-MCA_raw']['cp_latency']
-                            row['LLVM-MCA_lcd'] = row['LLVM-MCA_raw']['lcd']
+                            row['LLVM-MCA_cp'] = row['LLVM-MCA_raw']['cp_latency']/(
+                                row['pointer_increment']/row['element_size'])
+                            row['LLVM-MCA_lcd'] = row['LLVM-MCA_raw']['lcd']/(
+                                row['pointer_increment']/row['element_size'])
                             print(". ", end="", flush=True)
                         else:
                             print("! ", end="", flush=True)
@@ -380,7 +384,7 @@ def build_mark_run_all_kernels(measurements=True, osaca=True, iaca=True, llvm_mc
                     if measurements and islocal:
                         # run measurements if on same hardware
                         print("scale", end="", flush=True)
-                        if not row.get('best_length'):
+                        if not row.get('allruns'):
                             # find best length with concurrent L2 measurement
                             scaling_runs, best = scalingrun(exec_path)
                             row['best_length'] = best[0]
@@ -401,15 +405,18 @@ def build_mark_run_all_kernels(measurements=True, osaca=True, iaca=True, llvm_mc
                     print()
                 # dump to file
                 if data != data_lastsaved:
+                    print('saving... ', end="", flush=True)
                     with data_path.open('wb') as f:
                         try:
                             pickle.dump(data, f)
                             data_lastsaved = deepcopy(data)
+                            print('saved!')
                         except KeyboardInterrupt:
                             f.seek(0)
                             pickle.dump(data, f)
+                            print('saved!')
                             sys.exit()
-                        
+
 
 
 def scalingrun(kernel_exec, total_iterations=25000000, lengths=range(8, 4*1024+1)):
