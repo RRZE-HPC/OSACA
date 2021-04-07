@@ -126,6 +126,9 @@ class ISASemantics(object):
         Create operand dictionary containing src/dst operands out of the ISA data entry and
         the oeprands of an instruction form
 
+        If breaks_pedendency_on_equal_operands is True (configuted per instruction in ISA db)
+        and all operands are equal, place operand into destination only.
+
         :param dict isa_data: ISA DB entry
         :param list operands: operands of the instruction form
         :returns: `dict` -- operands dictionary with src/dst assignment
@@ -134,6 +137,17 @@ class ISASemantics(object):
         op_dict["source"] = []
         op_dict["destination"] = []
         op_dict["src_dst"] = []
+
+        # handle dependency breaking instructions
+        if "breaks_pedendency_on_equal_operands" in isa_data and operands[1:] == operands[:-1]:
+            op_dict["destination"] += operands
+            if "hidden_operands" in isa_data:
+                op_dict["destination"] += [
+                    AttrDict.convert_dict(
+                        {hop["class"]: {k: hop[k] for k in ["class", "source", "destination"]}})
+                     for hop in isa_data["hidden_operands"]]
+            return op_dict
+
         for i, op in enumerate(isa_data["operands"]):
             if op["source"] and op["destination"]:
                 op_dict["src_dst"].append(operands[i])

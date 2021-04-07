@@ -2599,7 +2599,7 @@ instruction_forms:
           name: "mm"
           source: true
           destination: true
-    - name: [pand, por, pxor, pandn]
+    - name: [pand, por, pandn]
       operands:
         - class: "register"
           name: "xmm"
@@ -2609,7 +2609,29 @@ instruction_forms:
           name: "xmm"
           source: true
           destination: true
-    - name: [pand, por, pxor, pandn]
+    - name: [pxor]
+      breaks_pedendency_on_equal_operands: true
+      operands:
+        - class: "register"
+          name: "xmm"
+          source: true
+          destination: false
+        - class: "register"
+          name: "xmm"
+          source: true
+          destination: true
+    - name: [pand, por, pandn]
+      operands:
+        - class: "register"
+          name: "mm"
+          source: true
+          destination: false
+        - class: "register"
+          name: "mm"
+          source: true
+          destination: true
+    - name: [pxor]
+      breaks_pedendency_on_equal_operands: true
       operands:
         - class: "register"
           name: "mm"
@@ -3306,6 +3328,7 @@ instruction_forms:
           source: false
           destination: true
     - name: sub
+      breaks_pedendency_on_equal_operands: true
       operands:
         - class: "register"
           name: "gpr"
@@ -3793,6 +3816,7 @@ instruction_forms:
           source: false
           destination: true
     - name: vzeroall
+      breaks_pedendency_on_equal_operands: true
       operands: []
       hidden_operands:
         - class: "register"
@@ -3938,7 +3962,18 @@ instruction_forms:
           name: "xmm"
           source: true
           destination: true
-    - name: [andps, andpd, andnps, andnpd, orps, orpd, xorps, xorpd]
+    - name: [andps, andpd, andnps, andnpd, orps, orpd]
+      operands:
+        - class: "register"
+          name: "xmm"
+          source: true
+          destination: false
+        - class: "register"
+          name: "xmm"
+          source: true
+          destination: true
+    - name: [xorps, xorpd]
+      breaks_pedendency_on_equal_operands: true
       operands:
         - class: "register"
           name: "xmm"
@@ -3952,6 +3987,32 @@ instruction_forms:
       operands:
         - class: "immediate"
           imd: "int"
+          source: true
+          destination: false
+        - class: "register"
+          name: "gpr"
+          source: true
+          destination: true
+    - name: [vxorpd, vxorps]
+      breaks_pedendency_on_equal_operands: true
+      operands:
+        - class: "register"
+          name: "*"
+          source: true
+          destination: false
+        - class: "register"
+          name: "*"
+          source: true
+          destination: false
+        - class: "register"
+          name: "*"
+          source: false
+          destination: true
+    - name: xor
+      breaks_pedendency_on_equal_operands: true
+      operands:
+        - class: "register"
+          name: "gpr"
           source: true
           destination: false
         - class: "register"
