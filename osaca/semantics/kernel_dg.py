@@ -55,7 +55,7 @@ class KernelDG(nx.DiGraph):
                     else instruction_form["latency_wo_load"]
                 )
                 if "storeload_dep" in dep_flags:
-                    edge_weight += self.model['store_to_load_forward_latency'] or 0
+                    edge_weight += self.model.get('store_to_load_forward_latency', 0)
                 dg.add_edge(
                     instruction_form["line_number"], dep["line_number"], latency=edge_weight
                 )
@@ -155,7 +155,7 @@ class KernelDG(nx.DiGraph):
                     and "storeload_dep" in node
                     and self.dg.has_edge(node["storeload_dep"]["line_number"], line_number)
                 ):
-                    node["latency_cp"] += self.model['store_to_load_forward_latency'] or 0
+                    node["latency_cp"] += self.model.get('store_to_load_forward_latency', 0)
                 else:
                     node["latency_cp"] += (
                         node["latency"]

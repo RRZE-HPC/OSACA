@@ -96,6 +96,10 @@ class MachineModel(object):
                     # cache internal representation for future use
                     self._write_in_cache(self._path)
 
+    def get(self, key, default=None):
+        """Return config entry for key or default/None."""
+        return self._data.get(key, default)
+
     def __getitem__(self, key):
         """Return configuration entry."""
         return self._data[key]

@@ -72,6 +72,6 @@ class KerncraftAPI(object):
         lcd_dict = kernel_graph.get_loopcarried_dependencies()
         lcd = 0.0
         for dep in lcd_dict:
-            lcd_tmp = sum([x["latency_lcd"] for x in lcd_dict[dep]["dependencies"]])
+            lcd_tmp = lcd_dict[dep]["latency"]
             lcd = lcd_tmp if lcd_tmp > lcd else lcd
         return lcd
