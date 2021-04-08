@@ -259,6 +259,31 @@ class TestSemanticTools(unittest.TestCase):
         self.assertEqual(next(dg.get_dependent_instruction_forms(line_number=5)), 9)
         self.assertEqual(len(list(dg.get_dependent_instruction_forms(line_number=6))), 1)
         self.assertEqual(next(dg.get_dependent_instruction_forms(line_number=6)), 7)
+        self.assertEqual(list(dg.get_dependent_instruction_forms(line_number=7)), [])
+        self.assertEqual(list(dg.get_dependent_instruction_forms(line_number=8)), [])
+        with self.assertRaises(ValueError):
+            dg.get_dependent_instruction_forms()
+        # test dot creation
+        dg.export_graph(filepath="/dev/null")
+
+    def test_memdependency_x86(self):
+        #
+        #  4
+        #   \___>6__>7
+        #   /
+        #  3
+        #     5_______>9
+        #
+        dg = KernelDG(self.kernel_x86, self.parser_x86, self.machine_model_csx)
+        self.assertTrue(nx.algorithms.dag.is_directed_acyclic_graph(dg.dg))
+        self.assertEqual(len(list(dg.get_dependent_instruction_forms(line_number=3))), 1)
+        self.assertEqual(next(dg.get_dependent_instruction_forms(line_number=3)), 6)
+        self.assertEqual(len(list(dg.get_dependent_instruction_forms(line_number=4))), 1)
+        self.assertEqual(next(dg.get_dependent_instruction_forms(line_number=4)), 6)
+        self.assertEqual(len(list(dg.get_dependent_instruction_forms(line_number=5))), 1)
+        self.assertEqual(next(dg.get_dependent_instruction_forms(line_number=5)), 9)
+        self.assertEqual(len(list(dg.get_dependent_instruction_forms(line_number=6))), 1)
+        self.assertEqual(next(dg.get_dependent_instruction_forms(line_number=6)), 7)
         self.assertEqual(len(list(dg.get_dependent_instruction_forms(line_number=7))), 0)
         self.assertEqual(len(list(dg.get_dependent_instruction_forms(line_number=8))), 0)
         with self.assertRaises(ValueError):
@@ -271,7 +296,7 @@ class TestSemanticTools(unittest.TestCase):
         self.assertTrue(nx.algorithms.dag.is_directed_acyclic_graph(dg.dg))
         self.assertEqual(set(dg.get_dependent_instruction_forms(line_number=3)), {7, 8})
         self.assertEqual(set(dg.get_dependent_instruction_forms(line_number=4)), {9, 10})
-        self.assertEqual(set(dg.get_dependent_instruction_forms(line_number=5)), {6, 7, 8})
+        self.assertEqual(set(dg.get_dependent_instruction_forms(line_number=5)), {7, 8})
         self.assertEqual(set(dg.get_dependent_instruction_forms(line_number=6)), {9, 10})
         self.assertEqual(next(dg.get_dependent_instruction_forms(line_number=7)), 13)
         self.assertEqual(next(dg.get_dependent_instruction_forms(line_number=8)), 14)

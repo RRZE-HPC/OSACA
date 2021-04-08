@@ -51,13 +51,15 @@ class KernelDG(nx.DiGraph):
             for dep, dep_flags in self.find_depending(instruction_form, kernel[i + 1 :]):
                 edge_weight = (
                     instruction_form["latency"]
-                    if "latency_wo_load" not in instruction_form
+                    if "mem_dep" not in dep_flags or "latency_wo_load" not in instruction_form
                     else instruction_form["latency_wo_load"]
                 )
                 if "storeload_dep" in dep_flags:
                     edge_weight += self.model.get('store_to_load_forward_latency', 0)
                 dg.add_edge(
-                    instruction_form["line_number"], dep["line_number"], latency=edge_weight
+                    instruction_form["line_number"],
+                    dep["line_number"],
+                    latency=edge_weight,
                 )
                 dg.nodes[dep["line_number"]]["instruction_form"] = dep
         return dg
@@ -93,7 +95,7 @@ class KernelDG(nx.DiGraph):
             lat_sum = 0.0
             # extend path by edge bound latencies (e.g., store-to-load latency)
             lat_path = []
-            for i, (s, d) in enumerate(nx.utils.pairwise(path)):
+            for s, d in nx.utils.pairwise(path):
                 edge_lat = dg.edges[s, d]['latency']
                 # map source node back to original line numbers
                 if s >= offset:
@@ -120,7 +122,6 @@ class KernelDG(nx.DiGraph):
                 "dependencies": [(self._get_node_by_lineno(ln), lat) for ln, lat in involved_lines],
                 "latency": lat_sum
             }
-
         return loopcarried_deps_dict
 
     def _get_node_by_lineno(self, lineno, kernel=None, all=False):
@@ -139,29 +140,10 @@ class KernelDG(nx.DiGraph):
             longest_path = nx.algorithms.dag.dag_longest_path(self.dg, weight="latency")
             for line_number in longest_path:
                 self._get_node_by_lineno(int(line_number))["latency_cp"] = 0
-            # add LD latency to instruction
-            for line_number in longest_path:
-                node = self._get_node_by_lineno(int(line_number))
-                if line_number != int(line_number) and int(line_number) in longest_path:
-                    node["latency_cp"] += self.dg.edges[(line_number, int(line_number))]["latency"]
-                elif (
-                    line_number == int(line_number)
-                    and "mem_dep" in node
-                    and self.dg.has_edge(node["mem_dep"]["line_number"], line_number)
-                ):
-                    node["latency_cp"] += node["latency"]
-                elif (
-                    line_number == int(line_number)
-                    and "storeload_dep" in node
-                    and self.dg.has_edge(node["storeload_dep"]["line_number"], line_number)
-                ):
-                    node["latency_cp"] += self.model.get('store_to_load_forward_latency', 0)
-                else:
-                    node["latency_cp"] += (
-                        node["latency"]
-                        if "latency_wo_load" not in node
-                        else node["latency_wo_load"]
-                    )
+            # set cp latency to instruction
+            for s, d in nx.utils.pairwise(longest_path):
+                node = self._get_node_by_lineno(int(s))
+                node["latency_cp"] = self.dg.edges[(s, d)]["latency"]
             return [x for x in self.kernel if x["line_number"] in longest_path]
         else:
             # split to DAG
@@ -198,7 +180,6 @@ class KernelDG(nx.DiGraph):
         ):
             # Check for sources, until overwritten
             for i, instr_form in enumerate(instructions):
-                # TODO detect dependency breaking instructions
                 if "register" in dst:
                     # read of register
                     if self.is_read(dst.register, instr_form):
@@ -215,13 +196,17 @@ class KernelDG(nx.DiGraph):
                         break
                 if "memory" in dst:
                     # base register is altered during memory access
-                    if "pre_indexed" in dst.memory or "post_indexed" in dst.memory:
+                    if "pre_indexed" in dst.memory:
+                        if self.is_writt(dst.memory.base, instr_form):
+                            break
+                    #if dst.memory.base:
+                    #    if self.is_read(dst.memory.base, instr_form):
+                    #        yield instr_form, []
+                    #if dst.memory.index:
+                    #    if self.is_read(dst.memory.index, instr_form):
+                    #        yield instr_form, []
+                    if "post_indexed" in dst.memory:
                         # Check for read of base register until overwrite
-                        if self.is_read(dst.memory.base, instr_form):
-                            instr_form["mem_dep"] = instruction_form
-                            yield instr_form, ["mem_dep"]
-                            if self.is_written(dst.memory.base, instr_form):
-                                break
                         if self.is_written(dst.memory.base, instr_form):
                             break
                     # TODO record register changes
@@ -229,7 +214,6 @@ class KernelDG(nx.DiGraph):
                     #      and pass to is_memload and is_memstore to consider relevance.
                     # load from same location (presumed)
                     if self.is_memload(dst.memory, instr_form):
-                        instr_form["storeload_dep"] = instruction_form
                         yield instr_form, ["storeload_dep"]
                     # store to same location (presumed)
                     if self.is_memstore(dst.memory, instr_form):
@@ -255,24 +239,11 @@ class KernelDG(nx.DiGraph):
             instruction_form.semantic_operands.source, instruction_form.semantic_operands.src_dst
         ):
             if "register" in src:
-                is_read = self.parser.is_reg_dependend_of(register, src.register) or is_read
+                is_read = ((self.parser.is_reg_dependend_of(register, src.register) and 
+                            not (src.get("post_indexed", False) or src.get("post_indexed", False)))
+                           or is_read)
             if "flag" in src:
                 is_read = self.parser.is_flag_dependend_of(register, src.flag) or is_read
-            if "memory" in src:
-                if src.memory.base is not None:
-                    is_read = self.parser.is_reg_dependend_of(register, src.memory.base) or is_read
-                if src.memory.index is not None:
-                    is_read = self.parser.is_reg_dependend_of(register, src.memory.index) or is_read
-        # Check also if read in destination memory address
-        for dst in chain(
-            instruction_form.semantic_operands.destination,
-            instruction_form.semantic_operands.src_dst,
-        ):
-            if "memory" in dst:
-                if dst.memory.base is not None:
-                    is_read = self.parser.is_reg_dependend_of(register, dst.memory.base) or is_read
-                if dst.memory.index is not None:
-                    is_read = self.parser.is_reg_dependend_of(register, dst.memory.index) or is_read
         return is_read
 
     def is_memload(self, mem, instruction_form):

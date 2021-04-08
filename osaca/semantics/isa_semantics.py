@@ -99,18 +99,28 @@ class ISASemantics(object):
         # post-process pre- and post-indexing for aarch64 memory operands
         if self._isa == "aarch64":
             for operand in [op for op in op_dict["source"] if "memory" in op]:
-                if ("post_indexed" in operand["memory"] and operand["memory"]["post_indexed"]) or (
-                    "pre_indexed" in operand["memory"] and operand["memory"]["pre_indexed"]
-                ):
+                post_indexed = ("post_indexed" in operand["memory"] and 
+                                operand["memory"]["post_indexed"])
+                pre_indexed = ("pre_indexed" in operand["memory"] and
+                               operand["memory"]["pre_indexed"])
+                if post_indexed or pre_indexed:
                     op_dict["src_dst"].append(
-                        AttrDict.convert_dict({"register": operand["memory"]["base"]})
+                        AttrDict.convert_dict({
+                            "register": operand["memory"]["base"],
+                            "pre_indexed": pre_indexed,
+                            "post_indexed": post_indexed})
                     )
             for operand in [op for op in op_dict["destination"] if "memory" in op]:
-                if ("post_indexed" in operand["memory"] and operand["memory"]["post_indexed"]) or (
-                    "pre_indexed" in operand["memory"] and operand["memory"]["pre_indexed"]
-                ):
+                post_indexed = ("post_indexed" in operand["memory"] and 
+                                operand["memory"]["post_indexed"])
+                pre_indexed = ("pre_indexed" in operand["memory"] and
+                               operand["memory"]["pre_indexed"])
+                if post_indexed or pre_indexed:
                     op_dict["src_dst"].append(
-                        AttrDict.convert_dict({"register": operand["memory"]["base"]})
+                        AttrDict.convert_dict({
+                            "register": operand["memory"]["base"],
+                            "pre_indexed": pre_indexed,
+                            "post_indexed": post_indexed})
                     )
         # store operand list in dict and reassign operand key/value pair
         instruction_form["semantic_operands"] = AttrDict.convert_dict(op_dict)
