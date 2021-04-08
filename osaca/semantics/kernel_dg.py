@@ -51,7 +51,7 @@ class KernelDG(nx.DiGraph):
             for dep, dep_flags in self.find_depending(instruction_form, kernel[i + 1 :]):
                 edge_weight = (
                     instruction_form["latency"]
-                    if "mem_dep" not in dep_flags or "latency_wo_load" not in instruction_form
+                    if "mem_dep" in dep_flags or "latency_wo_load" not in instruction_form
                     else instruction_form["latency_wo_load"]
                 )
                 if "storeload_dep" in dep_flags:
@@ -136,15 +136,22 @@ class KernelDG(nx.DiGraph):
 
     def get_critical_path(self):
         """Find and return critical path after the creation of a directed graph."""
+        max_latency_instr = max(self.kernel, key=lambda k: k["latency"])
         if nx.algorithms.dag.is_directed_acyclic_graph(self.dg):
             longest_path = nx.algorithms.dag.dag_longest_path(self.dg, weight="latency")
             for line_number in longest_path:
                 self._get_node_by_lineno(int(line_number))["latency_cp"] = 0
             # set cp latency to instruction
+            path_latency = 0.0
             for s, d in nx.utils.pairwise(longest_path):
                 node = self._get_node_by_lineno(int(s))
                 node["latency_cp"] = self.dg.edges[(s, d)]["latency"]
-            return [x for x in self.kernel if x["line_number"] in longest_path]
+                path_latency += node["latency_cp"]
+            if max_latency_instr["latency"] > path_latency:
+                max_latency_instr["latency_cp"] = float(max_latency_instr["latency"])
+                return [max_latency_instr]
+            else:
+                return [x for x in self.kernel if x["line_number"] in longest_path]
         else:
             # split to DAG
             raise NotImplementedError("Kernel is cyclic.")
@@ -197,7 +204,7 @@ class KernelDG(nx.DiGraph):
                 if "memory" in dst:
                     # base register is altered during memory access
                     if "pre_indexed" in dst.memory:
-                        if self.is_writt(dst.memory.base, instr_form):
+                        if self.is_written(dst.memory.base, instr_form):
                             break
                     #if dst.memory.base:
                     #    if self.is_read(dst.memory.base, instr_form):
