@@ -148,11 +148,11 @@ class Frontend(object):
             s += "{:4d} {} {:4.1f} {} {:36}{} {}\n".format(
                 dep,
                 separator,
-                sum([instr_form["latency_lcd"] for instr_form in dep_dict[dep]["dependencies"]]),
+                dep_dict[dep]["latency"],
                 separator,
                 dep_dict[dep]["root"]["line"].strip(),
                 separator,
-                [node["line_number"] for node in dep_dict[dep]["dependencies"]],
+                [node["line_number"] for node, lat in dep_dict[dep]["dependencies"]],
             )
         return s
 
@@ -231,16 +231,13 @@ class Frontend(object):
         headline_str = "{{:^{}}}".format(len(separator))
         # Prepare CP/LCD variable
         cp_lines = [x["line_number"] for x in cp_kernel]
-        sums = {}
-        for dep in dep_dict:
-            sums[dep] = sum(
-                [instr_form["latency_lcd"] for instr_form in dep_dict[dep]["dependencies"]]
-            )
-        lcd_sum = max(sums.values()) if len(sums) > 0 else 0.0
+        lcd_sum = 0.0
         lcd_lines = []
-        if len(dep_dict) > 0:
-            longest_lcd = [line_no for line_no in sums if sums[line_no] == lcd_sum][0]
-            lcd_lines = [d["line_number"] for d in dep_dict[longest_lcd]["dependencies"]]
+        if dep_dict:
+            longest_lcd = max(dep_dict, key=lambda ln: dep_dict[ln]['latency'])
+            lcd_sum = dep_dict[longest_lcd]['latency']
+            lcd_lines = {instr["line_number"]: lat
+                           for instr, lat in dep_dict[longest_lcd]["dependencies"]}
 
         s += headline_str.format(headline) + "\n"
         s += (
@@ -267,7 +264,7 @@ class Frontend(object):
                 self._get_lcd_cp_ports(
                     instruction_form["line_number"],
                     cp_kernel if line_number in cp_lines else None,
-                    dep_dict[longest_lcd] if line_number in lcd_lines else None,
+                    lcd_lines.get(line_number),
                 ),
                 self._get_flag_symbols(instruction_form["flags"])
                 if instruction_form["instruction"] is not None
@@ -381,15 +378,13 @@ class Frontend(object):
         nodes = [instr for instr in kernel if instr["line_number"] == lineno]
         return nodes[0] if len(nodes) > 0 else None
 
-    def _get_lcd_cp_ports(self, line_number, cp_dg, dependency, separator="|"):
+    def _get_lcd_cp_ports(self, line_number, cp_dg, dep_lat, separator="|"):
         """Returns the CP and LCD line for one instruction."""
         lat_cp = lat_lcd = ""
         if cp_dg:
             lat_cp = float(self._get_node_by_lineno(line_number, cp_dg)["latency_cp"])
-        if dependency:
-            lat_lcd = float(
-                self._get_node_by_lineno(line_number, dependency["dependencies"])["latency_lcd"]
-            )
+        if dep_lat is not None:
+            lat_lcd = float(dep_lat)
         return "{} {:>4} {} {:>4} {}".format(separator, lat_cp, separator, lat_lcd, separator)
 
     def _get_max_port_len(self, kernel):

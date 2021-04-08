@@ -335,7 +335,8 @@ class TestSemanticTools(unittest.TestCase):
         )
         self.assertEqual(len(lc_deps[lcd_id]["dependencies"]), 1)
         self.assertEqual(
-            lc_deps[lcd_id]["dependencies"][0], dg.dg.nodes(data=True)[lcd_id]["instruction_form"]
+            lc_deps[lcd_id]["dependencies"][0][0],
+            dg.dg.nodes(data=True)[lcd_id]["instruction_form"]
         )
         # w/  flag dependencies: ID 9 w/ len=2
         # w/o flag dependencies: ID 5 w/ len=1
@@ -345,7 +346,7 @@ class TestSemanticTools(unittest.TestCase):
         )
         self.assertEqual(len(lc_deps[lcd_id2]["dependencies"]), 1)
         self.assertEqual(
-            lc_deps[lcd_id2]["dependencies"][0],
+            lc_deps[lcd_id2]["dependencies"][0][0],
             dg.dg.nodes(data=True)[lcd_id2]["instruction_form"],
         )
 

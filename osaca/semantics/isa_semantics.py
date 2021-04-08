@@ -125,7 +125,7 @@ class ISASemantics(object):
         """
         Create operand dictionary containing src/dst operands out of the ISA data entry and
         the oeprands of an instruction form
-
+        
         If breaks_pedendency_on_equal_operands is True (configuted per instruction in ISA db)
         and all operands are equal, place operand into destination only.
 

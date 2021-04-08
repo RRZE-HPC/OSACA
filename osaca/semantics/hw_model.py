@@ -42,6 +42,7 @@ class MachineModel(object):
                 "load_throughput_default": [],
                 "store_throughput": [],
                 "store_throughput_default": [],
+                "store_to_load_forward_latency": None,
                 "ports": [],
                 "port_model_scheme": None,
                 "instruction_forms": [],
