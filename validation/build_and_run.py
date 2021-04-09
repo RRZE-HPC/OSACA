@@ -13,11 +13,15 @@ import socket
 import pickle
 from copy import deepcopy
 
+import requests
 import numpy as np
 import pandas as pd
 
+from osaca.osaca import reduce_to_section
+
 from kerncraft.models import benchmark
 from kerncraft.incore_model import (
+    parse_asm,
     asm_instrumentation,
     iaca_analyse_instrumented_binary,
     osaca_analyse_instrumented_assembly,
@@ -48,6 +52,7 @@ arch_info = {
         'IACA': 'SKX',
         'OSACA': 'SKX',
         'LLVM-MCA': '-mcpu=skylake-avx512',
+        'ithemal': 'skl',
         'isa': 'x86',
         'perfevents': [],
         "cflags": {
@@ -77,6 +82,7 @@ arch_info = {
         'IACA': 'IVB',
         'OSACA': 'IVB',
         'LLVM-MCA': '-mcpu=ivybridge',
+        'ithemal': 'ivb',
         'isa': 'x86',
         'perfevents': [],
         "cflags": {
@@ -105,6 +111,7 @@ arch_info = {
         'IACA': None,
         'OSACA': 'ZEN1',
         'LLVM-MCA': '-mcpu=znver1',
+        'ithemal': None,
         'isa': 'x86',
         'perfevents': [],
         "cflags": {
@@ -133,6 +140,7 @@ arch_info = {
         'IACA': None,
         'OSACA': 'ZEN2',
         'LLVM-MCA': '-mcpu=znver2',
+        'ithemal': None,
         'isa': 'x86',
         'perfevents': [],
         "cflags": {
@@ -161,6 +169,7 @@ arch_info = {
         'IACA': None,
         'OSACA': 'TX2',
         'LLVM-MCA': '-mcpu=thunderx2t99 -march=aarch64',
+        'ithemal': None,
         'isa': 'aarch64',
         'perfevents': [],
         "cflags": {
@@ -184,6 +193,7 @@ arch_info = {
         'IACA': None,
         'OSACA': 'A64FX',
         'LLVM-MCA': '-mcpu=a64fx -march=aarch64',
+        'ithemal': None,
         'isa': 'aarch64',
         'perfevents': [],
         "cflags": {
@@ -319,8 +329,13 @@ def build_mark_run_all_kernels(measurements=True, osaca=True, iaca=True, llvm_mc
 
                     if overwrite:
                         # clear all model generated information
-                        for model in ['IACA', 'OSACA', 'LLVM-MCA']:
+                        for model in ['IACA', 'OSACA', 'LLVM-MCA', 'ithemal']:
                             for k in ['ports', 'prediction', 'throughput', 'cp', 'lcd', 'raw']:
+                                row[model+'_'+k] = None
+                    
+                    for model in ['IACA', 'OSACA', 'LLVM-MCA', 'ithemal']:
+                        for k in ['ports', 'prediction', 'throughput', 'cp', 'lcd', 'raw']:
+                            if model+'_'+k not in row:
                                 row[model+'_'+k] = None
 
                     # Analyze with IACA, if requested and configured
@@ -377,6 +392,19 @@ def build_mark_run_all_kernels(measurements=True, osaca=True, iaca=True, llvm_mc
                                 row['pointer_increment']/row['element_size'])
                             row['LLVM-MCA_lcd'] = row['LLVM-MCA_raw']['lcd']/(
                                 row['pointer_increment']/row['element_size'])
+                            print(". ", end="", flush=True)
+                        else:
+                            print("! ", end="", flush=True)
+                    
+                    # Analyze with Ithemal, if not running local and configured
+                    if ainfo['ithemal'] is not None and not islocal:
+                        print("Ithemal", end="", flush=True)
+                        if not row.get('ithemal_prediction'):
+                            with open(marked_asmfile) as f:
+                                parsed_code = parse_asm(f.read(), ainfo['isa'])
+                            kernel = reduce_to_section(parsed_code, ainfo['isa'])
+                            row['ithemal_prediction'] = get_ithemal_prediction(
+                                kernel, model=ainfo['ithemal'])
                             print(". ", end="", flush=True)
                         else:
                             print("! ", end="", flush=True)
@@ -630,6 +658,28 @@ def perfctr(cmd, cores, group='MEM', code_markers=True, verbose=0):
             continue
     results[cur_region_name] = cur_region_data
     return results, output
+
+
+def remove_html_tags(text):
+    return re.sub('<.*?>', '', text)
+
+
+def get_ithemal_prediction(code, model='skl'):
+    url = "http://3.18.198.23/predict"
+    assert model in ['skl', 'hsw', 'ivb']
+    r = requests.post(url, {'code': code, 'model': model})
+    raw_text = remove_html_tags(r.text)
+    m = re.search("Could not generate a prediction: (.*)", raw_text)
+    if m:
+        print("Found error:", m.group(1).strip())
+        return
+    m = re.search("Prediction: ([0-9\.]+) cycles per iteration", raw_text)
+    if m:
+        return float(m.group(1))
+    else:
+        print("Coudn't find result.")
+        print(raw_text)
+        return None
 
 
 def main():
