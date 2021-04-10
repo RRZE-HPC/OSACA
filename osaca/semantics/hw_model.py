@@ -519,13 +519,21 @@ class MachineModel(object):
                 return False
             return self._is_AArch64_mem_type(i_operand, operand["memory"])
         # immediate
-        # TODO support wildcards
-        if "value" in operand or ("immediate" in operand and "value" in operand["immediate"]):
-            return i_operand["class"] == "immediate" and i_operand["imd"] == "int"
-        if "float" in operand or ("immediate" in operand and "float" in operand["immediate"]):
-            return i_operand["class"] == "immediate" and i_operand["imd"] == "float"
-        if "double" in operand or ("immediate" in operand and "double" in operand["immediate"]):
-            return i_operand["class"] == "immediate" and i_operand["imd"] == "double"
+        if i_operand["class"] == "immediate" and i_operand["imd"] == self.WILDCARD:
+            return "value" in operand or \
+                ("immediate" in operand and "value" in operand["immediate"]) 
+        if i_operand["class"] == "immediate" and i_operand["imd"] == "int":
+            return ("value" in operand and operand.get("type", None) == "int") or \
+                ("immediate" in operand and "value" in operand["immediate"] and
+                 operand["immediate"].get("type", None) == "int")
+        if i_operand["class"] == "immediate" and i_operand["imd"] == "float":
+            return ("value" in operand and operand.get("type", None) == "float") or \
+                ("immediate" in operand and "value" in operand["immediate"] and
+                 operand["immediate"].get("type", None) == "float")
+        if i_operand["class"] == "immediate" and i_operand["imd"] == "double":
+            return ("value" in operand and operand.get("type", None) == "double") or \
+                ("immediate" in operand and "value" in operand["immediate"] and
+                 operand["immediate"].get("type", None) == "double")
         # identifier
         if "identifier" in operand or (
             "immediate" in operand and "identifier" in operand["immediate"]
