@@ -11,7 +11,9 @@ import networkx as nx
 
 from osaca.osaca import get_unmatched_instruction_ratio
 from osaca.parser import AttrDict, ParserAArch64, ParserX86ATT
-from osaca.semantics import INSTR_FLAGS, ArchSemantics, KernelDG, MachineModel, reduce_to_section
+from osaca.semantics import (
+    INSTR_FLAGS, ArchSemantics, KernelDG, MachineModel, reduce_to_section, ISASemantics
+)
 
 
 class TestSemanticTools(unittest.TestCase):
@@ -26,12 +28,19 @@ class TestSemanticTools(unittest.TestCase):
         cls.parser_AArch64 = ParserAArch64()
         with open(cls._find_file("kernel_x86.s")) as f:
             cls.code_x86 = f.read()
+        with open(cls._find_file("kernel_x86_memdep.s")) as f:
+            cls.code_x86_memdep = f.read()
+        with open(cls._find_file("kernel_aarch64_memdep.s")) as f:
+            cls.code_aarch64_memdep = f.read()
         with open(cls._find_file("kernel_aarch64.s")) as f:
             cls.code_AArch64 = f.read()
         cls.kernel_x86 = reduce_to_section(cls.parser_x86.parse_file(cls.code_x86), "x86")
+        cls.kernel_x86_memdep = reduce_to_section(
+            cls.parser_x86.parse_file(cls.code_x86_memdep), "x86")
         cls.kernel_AArch64 = reduce_to_section(
-            cls.parser_AArch64.parse_file(cls.code_AArch64), "aarch64"
-        )
+            cls.parser_AArch64.parse_file(cls.code_AArch64), "aarch64")
+        cls.kernel_aarch64_memdep = reduce_to_section(
+            cls.parser_AArch64.parse_file(cls.code_aarch64_memdep), "aarch64")
 
         # set up machine models
         cls.machine_model_csx = MachineModel(
@@ -40,9 +49,11 @@ class TestSemanticTools(unittest.TestCase):
         cls.machine_model_tx2 = MachineModel(
             path_to_yaml=os.path.join(cls.MODULE_DATA_DIR, "tx2.yml")
         )
+        cls.semantics_x86 = ISASemantics("x86")
         cls.semantics_csx = ArchSemantics(
             cls.machine_model_csx, path_to_yaml=os.path.join(cls.MODULE_DATA_DIR, "isa/x86.yml")
         )
+        cls.semantics_aarch64 = ISASemantics("aarch64")
         cls.semantics_tx2 = ArchSemantics(
             cls.machine_model_tx2,
             path_to_yaml=os.path.join(cls.MODULE_DATA_DIR, "isa/aarch64.yml"),
@@ -52,9 +63,15 @@ class TestSemanticTools(unittest.TestCase):
         for i in range(len(cls.kernel_x86)):
             cls.semantics_csx.assign_src_dst(cls.kernel_x86[i])
             cls.semantics_csx.assign_tp_lt(cls.kernel_x86[i])
+        for i in range(len(cls.kernel_x86_memdep)):
+            cls.semantics_csx.assign_src_dst(cls.kernel_x86_memdep[i])
+            cls.semantics_csx.assign_tp_lt(cls.kernel_x86_memdep[i])
         for i in range(len(cls.kernel_AArch64)):
             cls.semantics_tx2.assign_src_dst(cls.kernel_AArch64[i])
             cls.semantics_tx2.assign_tp_lt(cls.kernel_AArch64[i])
+        for i in range(len(cls.kernel_aarch64_memdep)):
+            cls.semantics_tx2.assign_src_dst(cls.kernel_aarch64_memdep[i])
+            cls.semantics_tx2.assign_tp_lt(cls.kernel_aarch64_memdep[i])
 
     ###########
     # Tests
@@ -249,7 +266,7 @@ class TestSemanticTools(unittest.TestCase):
         #  3
         #     5_______>9
         #
-        dg = KernelDG(self.kernel_x86, self.parser_x86, self.machine_model_csx)
+        dg = KernelDG(self.kernel_x86, self.parser_x86, self.machine_model_csx, self.semantics_csx)
         self.assertTrue(nx.algorithms.dag.is_directed_acyclic_graph(dg.dg))
         self.assertEqual(len(list(dg.get_dependent_instruction_forms(line_number=3))), 1)
         self.assertEqual(next(dg.get_dependent_instruction_forms(line_number=3)), 6)
@@ -267,32 +284,19 @@ class TestSemanticTools(unittest.TestCase):
         dg.export_graph(filepath="/dev/null")
 
     def test_memdependency_x86(self):
-        #
-        #  4
-        #   \___>6__>7
-        #   /
-        #  3
-        #     5_______>9
-        #
-        dg = KernelDG(self.kernel_x86, self.parser_x86, self.machine_model_csx)
+        dg = KernelDG(self.kernel_x86_memdep, self.parser_x86, self.machine_model_csx,
+                      self.semantics_csx)
         self.assertTrue(nx.algorithms.dag.is_directed_acyclic_graph(dg.dg))
-        self.assertEqual(len(list(dg.get_dependent_instruction_forms(line_number=3))), 1)
-        self.assertEqual(next(dg.get_dependent_instruction_forms(line_number=3)), 6)
-        self.assertEqual(len(list(dg.get_dependent_instruction_forms(line_number=4))), 1)
-        self.assertEqual(next(dg.get_dependent_instruction_forms(line_number=4)), 6)
-        self.assertEqual(len(list(dg.get_dependent_instruction_forms(line_number=5))), 1)
-        self.assertEqual(next(dg.get_dependent_instruction_forms(line_number=5)), 9)
-        self.assertEqual(len(list(dg.get_dependent_instruction_forms(line_number=6))), 1)
-        self.assertEqual(next(dg.get_dependent_instruction_forms(line_number=6)), 7)
-        self.assertEqual(len(list(dg.get_dependent_instruction_forms(line_number=7))), 0)
-        self.assertEqual(len(list(dg.get_dependent_instruction_forms(line_number=8))), 0)
+        self.assertEqual(set(dg.get_dependent_instruction_forms(line_number=3)), {6, 8})
+        self.assertEqual(set(dg.get_dependent_instruction_forms(line_number=5)), {10, 12})
         with self.assertRaises(ValueError):
             dg.get_dependent_instruction_forms()
         # test dot creation
         dg.export_graph(filepath="/dev/null")
 
     def test_kernelDG_AArch64(self):
-        dg = KernelDG(self.kernel_AArch64, self.parser_AArch64, self.machine_model_tx2)
+        dg = KernelDG(self.kernel_AArch64, self.parser_AArch64, self.machine_model_tx2,
+                      self.semantics_tx2)
         self.assertTrue(nx.algorithms.dag.is_directed_acyclic_graph(dg.dg))
         self.assertEqual(set(dg.get_dependent_instruction_forms(line_number=3)), {7, 8})
         self.assertEqual(set(dg.get_dependent_instruction_forms(line_number=4)), {9, 10})
@@ -339,7 +343,7 @@ class TestSemanticTools(unittest.TestCase):
         self.assertEqual(num_hidden_loads_3, 1)
 
     def test_cyclic_dag(self):
-        dg = KernelDG(self.kernel_x86, self.parser_x86, self.machine_model_csx)
+        dg = KernelDG(self.kernel_x86, self.parser_x86, self.machine_model_csx, self.semantics_csx)
         dg.dg.add_edge(100, 101, latency=1.0)
         dg.dg.add_edge(101, 102, latency=2.0)
         dg.dg.add_edge(102, 100, latency=3.0)
@@ -348,10 +352,20 @@ class TestSemanticTools(unittest.TestCase):
         with self.assertRaises(NotImplementedError):
             dg.get_loopcarried_dependencies()
 
+    def test_loop_carried_dependency_aarch64(self):
+        dg = KernelDG(self.kernel_aarch64_memdep, self.parser_AArch64, self.machine_model_tx2,
+                      self.semantics_tx2)
+        lc_deps = dg.get_loopcarried_dependencies()
+        self.assertEqual(len(lc_deps), 2)
+        # based on line 6
+        self.assertEqual(lc_deps[6]["latency"], 28.0)
+        self.assertEqual([(iform.line_number, lat) for iform, lat in lc_deps[6]['dependencies']],
+                         [(6, 4.0), (10, 6.0), (11, 6.0), (12, 6.0), (13, 6.0), (14, 0)])
+
     def test_loop_carried_dependency_x86(self):
         lcd_id = 8
         lcd_id2 = 5
-        dg = KernelDG(self.kernel_x86, self.parser_x86, self.machine_model_csx)
+        dg = KernelDG(self.kernel_x86, self.parser_x86, self.machine_model_csx, self.semantics_csx)
         lc_deps = dg.get_loopcarried_dependencies()
         self.assertEqual(len(lc_deps), 2)
         # ID 8
@@ -377,7 +391,7 @@ class TestSemanticTools(unittest.TestCase):
 
     def test_is_read_is_written_x86(self):
         # independent form HW model
-        dag = KernelDG(self.kernel_x86, self.parser_x86, None)
+        dag = KernelDG(self.kernel_x86, self.parser_x86, None, None)
         reg_rcx = AttrDict({"name": "rcx"})
         reg_ymm1 = AttrDict({"name": "ymm1"})
 
@@ -410,7 +424,7 @@ class TestSemanticTools(unittest.TestCase):
 
     def test_is_read_is_written_AArch64(self):
         # independent form HW model
-        dag = KernelDG(self.kernel_AArch64, self.parser_AArch64, None)
+        dag = KernelDG(self.kernel_AArch64, self.parser_AArch64, None, None)
         reg_x1 = AttrDict({"prefix": "x", "name": "1"})
         reg_w1 = AttrDict({"prefix": "w", "name": "1"})
         reg_d1 = AttrDict({"prefix": "d", "name": "1"})

@@ -2,18 +2,19 @@
 
 import copy
 from itertools import chain, product
+from collections import defaultdict
 
 import networkx as nx
 
 from osaca.parser import AttrDict
-from osaca.semantics import INSTR_FLAGS, MachineModel
-
+from osaca.semantics import INSTR_FLAGS, MachineModel, ArchSemantics
 
 class KernelDG(nx.DiGraph):
-    def __init__(self, parsed_kernel, parser, hw_model: MachineModel):
+    def __init__(self, parsed_kernel, parser, hw_model: MachineModel, semantics: ArchSemantics):
         self.kernel = parsed_kernel
         self.parser = parser
         self.model = hw_model
+        self.arch_sem = semantics
         self.dg = self.create_DG(self.kernel)
         self.loopcarried_deps = self.check_for_loopcarried_dep(self.kernel)
 
@@ -185,11 +186,18 @@ class KernelDG(nx.DiGraph):
             instruction_form.semantic_operands.destination,
             instruction_form.semantic_operands.src_dst,
         ):
-            # Check for sources, until overwritten
+            # TODO instructions before must be considered as well, if they update registers
+            # not used by insruction_form. E.g., validation/build/A64FX/gcc/O1/gs-2d-5pt.marked.s
+            register_changes = self._update_reg_changes(instruction_form)
+            #print("FROM", instruction_form.line, register_changes)
             for i, instr_form in enumerate(instructions):
+                self._update_reg_changes(instr_form, register_changes)
+                #print("  TO", instr_form.line, register_changes)
                 if "register" in dst:
                     # read of register
-                    if self.is_read(dst.register, instr_form):
+                    if self.is_read(dst.register, instr_form) and not (
+                            dst.get("pre_indexed", False) or
+                            dst.get("post_indexed", False)):
                         yield instr_form, []
                     # write to register -> abort
                     if self.is_written(dst.register, instr_form):
@@ -220,11 +228,35 @@ class KernelDG(nx.DiGraph):
                     #      (e.g., mov, leaadd, sub, inc, dec) in instructions[:i] 
                     #      and pass to is_memload and is_memstore to consider relevance.
                     # load from same location (presumed)
-                    if self.is_memload(dst.memory, instr_form):
+                    if self.is_memload(dst.memory, instr_form, register_changes):
                         yield instr_form, ["storeload_dep"]
                     # store to same location (presumed)
-                    if self.is_memstore(dst.memory, instr_form):
+                    if self.is_memstore(dst.memory, instr_form, register_changes):
                         break
+                self._update_reg_changes(instr_form, register_changes, only_postindexed=True)
+
+    def _update_reg_changes(self, iform, reg_state=None, only_postindexed=False):
+        if self.arch_sem is None:
+            # This analysis requires semenatics to be available
+            return {}
+        if reg_state is None:
+            reg_state = {}
+        for reg, change in self.arch_sem.get_reg_changes(iform, only_postindexed).items():
+            if change is None or reg_state.get(reg, {}) is None:
+                reg_state[reg] = None
+            else:
+                reg_state.setdefault(reg, {'name': reg, 'value': 0})
+                if change['name'] != reg:
+                    # renaming occured, ovrwrite value with up-to-now change of source register
+                    reg_state[reg]['name'] = change['name']
+                    src_reg_state = reg_state.get(change['name'], {'value': 0})
+                    if src_reg_state is None:
+                        # original register's state was changed beyond reconstruction
+                        reg_state[reg] = None
+                        continue
+                    reg_state[reg]['value'] = src_reg_state['value']
+                reg_state[reg]['value'] += change['value']
+        return reg_state
 
     def get_dependent_instruction_forms(self, instr_form=None, line_number=None):
         """
@@ -246,24 +278,79 @@ class KernelDG(nx.DiGraph):
             instruction_form.semantic_operands.source, instruction_form.semantic_operands.src_dst
         ):
             if "register" in src:
-                is_read = ((self.parser.is_reg_dependend_of(register, src.register) and 
-                            not (src.get("post_indexed", False) or src.get("post_indexed", False)))
-                           or is_read)
+                is_read = self.parser.is_reg_dependend_of(register, src.register) or is_read
             if "flag" in src:
                 is_read = self.parser.is_flag_dependend_of(register, src.flag) or is_read
+            if "memory" in src:
+                if src.memory.base is not None:
+                    is_read = self.parser.is_reg_dependend_of(register, src.memory.base) or is_read
+                if src.memory.index is not None:
+                    is_read = self.parser.is_reg_dependend_of(register, src.memory.index) or is_read
+        # Check also if read in destination memory address
+        for dst in chain(
+            instruction_form.semantic_operands.destination,
+            instruction_form.semantic_operands.src_dst,
+        ):
+            if "memory" in dst:
+                if dst.memory.base is not None:
+                    is_read = self.parser.is_reg_dependend_of(register, dst.memory.base) or is_read
+                if dst.memory.index is not None:
+                    is_read = self.parser.is_reg_dependend_of(register, dst.memory.index) or is_read
         return is_read
 
-    def is_memload(self, mem, instruction_form):
-        """Check if instruction form loads from given location, assuming unchanged registers"""
-        is_load = False
+    def is_memload(self, mem, instruction_form, register_changes={}):
+        """Check if instruction form loads from given location, assuming register_changes"""
         if instruction_form.semantic_operands is None:
-            return is_load
+            return False
         for src in chain(
             instruction_form.semantic_operands.source, instruction_form.semantic_operands.src_dst
         ):
-            if "memory" in src:
-                is_load = mem == src["memory"] or is_load
-        return is_load
+            # Here we check for mem dependecies only
+            if "memory" not in src:
+                continue
+            src = src.memory
+
+            # determine absolute address change
+            addr_change = 0
+            if src.offset:
+                addr_change += int(src.offset.value)
+            if mem.offset:
+                addr_change -= int(mem.offset.value)
+            if mem.base and src.base:
+                base_change = register_changes.get(
+                    src.base.get('prefix', '')+src.base.name,
+                    {'name': src.base.get('prefix', '')+src.base.name, 'value': 0})
+                if base_change is None:
+                    # Unknown change occurred
+                    continue
+                if mem.base.get('prefix', '')+mem.base['name'] != base_change['name']:
+                    # base registers do not match
+                    continue
+                addr_change += base_change['value']
+            elif mem.base or src.base:
+                    # base registers do not match
+                    continue
+            if mem.index and src.index:
+                index_change = register_changes.get(
+                    src.index.get('prefix', '')+src.index.name,
+                    {'name': src.index.get('prefix', '')+src.index.name, 'value': 0})
+                if index_change is None:
+                    # Unknown change occurred
+                    continue
+                if mem.scale != src.scale:
+                    # scale factors do not match
+                    continue
+                if mem.index.get('prefix', '')+mem.index['name'] != index_change['name']:
+                    # index registers do not match
+                    continue
+                addr_change += index_change['value'] * src.scale
+            elif mem.index or src.index:
+                    # index registers do not match
+                    continue
+            #if instruction_form.line_number == 3:
+            if addr_change == 0:
+                return True
+        return False
 
     def is_written(self, register, instruction_form):
         """Check if instruction form writes in given register"""
@@ -294,7 +381,7 @@ class KernelDG(nx.DiGraph):
                     )
         return is_written
 
-    def is_memstore(self, mem, instruction_form):
+    def is_memstore(self, mem, instruction_form, register_changes={}):
         """Check if instruction form stores to given location, assuming unchanged registers"""
         is_store = False
         if instruction_form.semantic_operands is None:

@@ -232,7 +232,7 @@ class Frontend(object):
         # Prepare CP/LCD variable
         cp_lines = [x["line_number"] for x in cp_kernel]
         lcd_sum = 0.0
-        lcd_lines = []
+        lcd_lines = {}
         if dep_dict:
             longest_lcd = max(dep_dict, key=lambda ln: dep_dict[ln]['latency'])
             lcd_sum = dep_dict[longest_lcd]['latency']

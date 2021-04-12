@@ -302,7 +302,7 @@ def inspect(args, output_file=sys.stdout):
         semantics.assign_optimal_throughput(kernel)
 
     # Create DiGrahps
-    kernel_graph = KernelDG(kernel, parser, machine_model)
+    kernel_graph = KernelDG(kernel, parser, machine_model, semantics)
     if args.dotpath is not None:
         kernel_graph.export_graph(args.dotpath if args.dotpath != "." else None)
     # Print analysis
