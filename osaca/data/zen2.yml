@@ -41,7 +41,79 @@ port_model_scheme: |
              |  SSE  |
              |  SHUF |
              +-------+
-instruction_forms: 
+
+instruction_forms:
+- name: vmovdqa
+  operands:
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  throughput: 0.0
+  latency: 0.0
+  port_pressure: []
+- name: vfmadd231sd
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  throughput: 0.5
+  latency: 5.0
+  port_pressure: [[1, '01']]
+- name: vcvtsi2sd
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  throughput: 1.0
+  latency: 4.0
+  port_pressure: [[1, '5'], [1, '3']]
+- name: vdivpd
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  throughput: 5.0
+  latency: 13.0
+  port_pressure: [[1, '3'], [5, ['3DV']]]
+- name: vdivpd
+  operands:
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  throughput: 5.0
+  latency: 13.0
+  port_pressure: [[1, '3'], [5, ['3DV']]]
+- name: vcvtdq2pd
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  throughput: 1.0
+  latency: 3.0
+  port_pressure: [[1, '12'], [1, '3']]
+- name: vcvtdq2pd
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: ymm
+  throughput: 2.0
+  latency: 4.0
+  port_pressure: [[2, '12'], [2, '3']]
 - name: vmovapd
   operands:
   - class: register

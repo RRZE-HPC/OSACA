@@ -40,7 +40,114 @@ port_model_scheme: |
              |  SHUF |                                                        +-------------+
              +-------+                                                        |    STORE    |
                                                                               +-------------+
+
 instruction_forms:
+- name: VPSHUFD
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '12']]
+  throughput: 0.5
+  uops: 1
+- name: vmovaps
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  throughput: 0.0
+  latency: 0.0
+  port_pressure: []
+- name: vmovaps
+  operands:
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  throughput: 0.0
+  latency: 0.0
+  port_pressure: []
+- name: VXORPD
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '0123']]
+  throughput: 0.25
+  uops: 1
+- name: VXORPD
+  operands:
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  latency: 1
+  port_pressure: [[1, '0123']]
+  throughput: 0.25
+  uops: 1
+- name: VPADDD
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '013']]
+  throughput: 0.3333333333333333 
+  uops: 1
+- name: vfmadd231sd
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  throughput: 0.5
+  latency: 5.0
+  port_pressure: [[1, '01']]
+- name: vcvtsi2sd
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  throughput: 1.0
+  latency: 7.0
+  port_pressure: [[1, '5'], [1, '3']]
+- name: vcvtdq2pd
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  throughput: 1.0
+  latency: 7.0
+  port_pressure: [[1, '12'], [1, '3']]
+- name: vcvtdq2pd
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: ymm
+  throughput: 2.0
+  latency: 7.0
+  port_pressure: [[2, '12'], [2, '3']]
 - name: add
   operands:
   - class: immediate
@@ -297,6 +404,28 @@ instruction_forms:
   throughput: 3.0
   latency: 10.0
   port_pressure: [[1, '3'], [3.0, [3DV]]]
+- name: vdivpd
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  throughput: 4.0
+  latency: 8.0
+  port_pressure: [[1, '3'], [4, ['3DV']]]
+- name: vdivpd
+  operands:
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  throughput: 8.0
+  latency: 8.0
+  port_pressure: [[1, '3'], [8, ['3DV']]]
 - name: vfmadd213pd
   operands:
   - class: register

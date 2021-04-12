@@ -60,6 +60,7 @@ instruction_forms:
           name: "CF"
           source: false
           destination: true
+      operation: "op2['value'] += op1['value']"
     - name: add
       operands:
         - class: "register"
@@ -2381,6 +2382,7 @@ instruction_forms:
           name: "PF"
           source: false
           destination: true
+      operation: "op1['value'] -= 1"
     - name: dec
       operands:
         - class: "memory"
@@ -2479,6 +2481,7 @@ instruction_forms:
           name: "PF"
           source: false
           destination: true
+      operation: "op1['value'] += 1"
     - name: inc
       operands:
         - class: "memory"
@@ -2509,6 +2512,21 @@ instruction_forms:
           name: "PF"
           source: false
           destination: true
+    - name: lea
+      operands:
+        - class: "memory"
+          base: "*"
+          offset: "*"
+          index: "*"
+          scale: "*"
+          source: true
+          destination: false
+        - class: register
+          name: "gpr"
+          source: false
+          destination: true
+      # TODO
+      #operation: "op2['value'] = None if None in [op1['offset'], op1['base']] else op1['offset'] + op1['base'] + op1['index'] * op1['scale']"
     - name: ldmxcsr
       operands:
         - class: "memory"
@@ -2519,6 +2537,17 @@ instruction_forms:
           source: true
           destination: false
       # TODO sets MXCSR
+    - name: mov
+      operands:
+        - class: "register"
+          name: "gpr"
+          source: true
+          destination: false
+        - class: "register"
+          name: "gpr"
+          source: false
+          destination: true
+      operation: "op2['name'] = op1['name']"
     - name: [maxpd, maxps, maxsd, maxss, minpd, minps, minsd, minss]
       operands:
         - class: "register"
@@ -3327,6 +3356,7 @@ instruction_forms:
           name: "CF"
           source: false
           destination: true
+      operation: "op2['value'] -= op1['value']"
     - name: sub
       breaks_pedendency_on_equal_operands: true
       operands:
