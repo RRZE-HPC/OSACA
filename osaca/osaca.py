@@ -5,6 +5,7 @@ import io
 import os
 import re
 import sys
+from functools import lru_cache
 
 from osaca.db_interface import import_benchmark_output, sanity_check
 from osaca.frontend import Frontend
@@ -345,6 +346,7 @@ def run(args, output_file=sys.stdout):
         inspect(args, output_file=output_file)
 
 
+@lru_cache()
 def get_asm_parser(arch) -> BaseParser:
     """
     Helper function to create the right parser for a specific architecture.

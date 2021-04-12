@@ -20,6 +20,7 @@ from osaca.parser import ParserX86ATT
 class MachineModel(object):
     WILDCARD = "*"
     INTERNAL_VERSION = 1  # increase whenever self._data format changes to invalidate cache!
+    _runtime_cache = {}
 
     def __init__(self, arch=None, path_to_yaml=None, isa=None, lazy=False):
         if not arch and not path_to_yaml:
@@ -53,15 +54,18 @@ class MachineModel(object):
                 raise ValueError("Only one of arch and path_to_yaml is allowed.")
             self._path = path_to_yaml
             self._arch = arch
-            yaml = self._create_yaml_object()
             if arch:
                 self._arch = arch.lower()
                 self._path = utils.find_datafile(self._arch + ".yml")
+            # Check runtime cache
+            if self._path in MachineModel._runtime_cache and not lazy:
+                self._data = MachineModel._runtime_cache[self._path]
             # check if file is cached
             cached = self._get_cached(self._path) if not lazy else False
             if cached:
                 self._data = cached
             else:
+                yaml = self._create_yaml_object()
                 # otherwise load
                 with open(self._path, "r") as f:
                     if not lazy:
@@ -95,6 +99,9 @@ class MachineModel(object):
                 if not lazy:
                     # cache internal representation for future use
                     self._write_in_cache(self._path)
+            # Store in runtime cache
+            if not lazy:
+                MachineModel._runtime_cache[self._path] = self._data
 
     def get(self, key, default=None):
         """Return config entry for key or default/None."""
@@ -527,12 +534,12 @@ class MachineModel(object):
                 ("immediate" in operand and "value" in operand["immediate"] and
                  operand["immediate"].get("type", None) == "int")
         if i_operand["class"] == "immediate" and i_operand["imd"] == "float":
-            return ("value" in operand and operand.get("type", None) == "float") or \
-                ("immediate" in operand and "value" in operand["immediate"] and
+            return ("float" in operand and operand.get("type", None) == "float") or \
+                ("immediate" in operand and "float" in operand["immediate"] and
                  operand["immediate"].get("type", None) == "float")
         if i_operand["class"] == "immediate" and i_operand["imd"] == "double":
-            return ("value" in operand and operand.get("type", None) == "double") or \
-                ("immediate" in operand and "value" in operand["immediate"] and
+            return ("double" in operand and operand.get("type", None) == "double") or \
+                ("immediate" in operand and "double" in operand["immediate"] and
                  operand["immediate"].get("type", None) == "double")
         # identifier
         if "identifier" in operand or (

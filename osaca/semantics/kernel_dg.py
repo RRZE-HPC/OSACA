@@ -312,7 +312,7 @@ class KernelDG(nx.DiGraph):
 
             # determine absolute address change
             addr_change = 0
-            if src.offset:
+            if src.offset and "value" in src.offset:
                 addr_change += int(src.offset.value)
             if mem.offset:
                 addr_change -= int(mem.offset.value)

@@ -165,6 +165,7 @@ class ISASemantics(object):
                         'name': o.memory.base.get('prefix', '')+o.memory.base.name,
                         'value': int(o.memory.post_indexed.value)
                     }}
+            return {}
 
         reg_operand_names = {}  # e.g., {'rax': 'op1'}
         operand_state = {}  # e.g., {'op1': {'name': 'rax', 'value': 0}}  0 means unchanged
