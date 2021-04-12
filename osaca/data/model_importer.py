@@ -220,9 +220,18 @@ def extract_model(tree, arch, skip_mem=True):
                         port_23 = True
                     if "4" in pp[1]:
                         port_4 = True
-                # Add (1, ['2D', '3D']) if load ports (2 & 3) are used, but not the store port (4)
+                # Add (x, ['2D', '3D']) if load ports (2 & 3) are used, but not the store port (4)
                 if port_23 and not port_4:
-                    port_pressure.append((1, ["2D", "3D"]))
+                    if arch.upper() in ["SNB", "IVB"] and any(
+                            [p.get('name', '') == 'ymm' for p in parameters]) and \
+                            not '128' in mnemonic:
+                        # x = 2 if SNB or IVB and ymm regiser in any operand and not '128' in 
+                        # instruction name
+                        port2D3D_pressure = 2
+                    else:
+                        # otherwiese x = 1
+                        port2D3D_pressure = 1
+                    port_pressure.append((port2D3D_pressure, ["2D", "3D"]))
 
         # Add missing ports:
         for ports in [pp[1] for pp in port_pressure]:
