@@ -52,7 +52,7 @@ arch_info = {
         'IACA': 'SKX',
         'OSACA': 'SKX',
         'LLVM-MCA': '-mcpu=skylake-avx512',
-        'ithemal': 'skl',
+        'Ithemal': 'skl',
         'isa': 'x86',
         'perfevents': [],
         "cflags": {
@@ -82,7 +82,7 @@ arch_info = {
         'IACA': 'IVB',
         'OSACA': 'IVB',
         'LLVM-MCA': '-mcpu=ivybridge',
-        'ithemal': 'ivb',
+        'Ithemal': 'ivb',
         'isa': 'x86',
         'perfevents': [],
         "cflags": {
@@ -111,7 +111,7 @@ arch_info = {
         'IACA': None,
         'OSACA': 'ZEN1',
         'LLVM-MCA': '-mcpu=znver1',
-        'ithemal': None,
+        'Ithemal': None,
         'isa': 'x86',
         'perfevents': [],
         "cflags": {
@@ -140,7 +140,7 @@ arch_info = {
         'IACA': None,
         'OSACA': 'ZEN2',
         'LLVM-MCA': '-mcpu=znver2',
-        'ithemal': None,
+        'Ithemal': None,
         'isa': 'x86',
         'perfevents': [],
         "cflags": {
@@ -168,8 +168,9 @@ arch_info = {
         'Clock [MHz]': 2200,  # reading out via perf. counters is not supported
         'IACA': None,
         'OSACA': 'TX2',
+        'assign_optimal_throughput': True,
         'LLVM-MCA': '-mcpu=thunderx2t99 -march=aarch64',
-        'ithemal': None,
+        'Ithemal': None,
         'isa': 'aarch64',
         'perfevents': [],
         "cflags": {
@@ -192,8 +193,9 @@ arch_info = {
         'L2_volume_metric': 'L1<->L2 data volume [GBytes]',
         'IACA': None,
         'OSACA': 'A64FX',
+        'assign_optimal_throughput': False,
         'LLVM-MCA': '-mcpu=a64fx -march=aarch64',
-        'ithemal': None,
+        'Ithemal': None,
         'isa': 'aarch64',
         'perfevents': [],
         "cflags": {
@@ -329,11 +331,11 @@ def build_mark_run_all_kernels(measurements=True, osaca=True, iaca=True, llvm_mc
 
                     if overwrite:
                         # clear all model generated information
-                        for model in ['IACA', 'OSACA', 'LLVM-MCA', 'ithemal']:
+                        for model in ['IACA', 'OSACA', 'LLVM-MCA', 'Ithemal']:
                             for k in ['ports', 'prediction', 'throughput', 'cp', 'lcd', 'raw']:
                                 row[model+'_'+k] = None
                     
-                    for model in ['IACA', 'OSACA', 'LLVM-MCA', 'ithemal']:
+                    for model in ['IACA', 'OSACA', 'LLVM-MCA', 'Ithemal']:
                         for k in ['ports', 'prediction', 'throughput', 'cp', 'lcd', 'raw']:
                             if model+'_'+k not in row:
                                 row[model+'_'+k] = None
@@ -359,7 +361,9 @@ def build_mark_run_all_kernels(measurements=True, osaca=True, iaca=True, llvm_mc
                         print("OSACA", end="", flush=True)
                         if not row.get('OSACA_ports'):
                             row['OSACA_raw'] = osaca_analyse_instrumented_assembly(
-                                marked_asmfile, micro_architecture=ainfo['OSACA'])
+                                marked_asmfile, micro_architecture=ainfo['OSACA'],
+                                assign_optimal_throughput=ainfo.get('assign_optimal_throughput',
+                                                                    True))
                             row['OSACA_ports'] = \
                                 {k: v/(row['pointer_increment']/row['element_size'])
                                 for k,v in row['OSACA_raw']['port cycles'].items()}
@@ -397,14 +401,14 @@ def build_mark_run_all_kernels(measurements=True, osaca=True, iaca=True, llvm_mc
                             print("! ", end="", flush=True)
                     
                     # Analyze with Ithemal, if not running local and configured
-                    if ainfo['ithemal'] is not None and not islocal:
+                    if ainfo['Ithemal'] is not None and not islocal:
                         print("Ithemal", end="", flush=True)
-                        if not row.get('ithemal_prediction'):
+                        if not row.get('Ithemal_prediction') or True:
                             with open(marked_asmfile) as f:
                                 parsed_code = parse_asm(f.read(), ainfo['isa'])
                             kernel = reduce_to_section(parsed_code, ainfo['isa'])
-                            row['ithemal_prediction'] = get_ithemal_prediction(
-                                kernel, model=ainfo['ithemal'])
+                            row['Ithemal_prediction'] = get_ithemal_prediction(
+                                get_intel_style_code(marked_objfile), model=ainfo['Ithemal'])
                             print(". ", end="", flush=True)
                         else:
                             print("! ", end="", flush=True)
@@ -431,6 +435,7 @@ def build_mark_run_all_kernels(measurements=True, osaca=True, iaca=True, llvm_mc
                             print("! ", end="", flush=True)
 
                     print()
+
                 # dump to file
                 if data != data_lastsaved:
                     print('saving... ', end="", flush=True)
@@ -664,6 +669,21 @@ def remove_html_tags(text):
     return re.sub('<.*?>', '', text)
 
 
+def get_intel_style_code(marked_objfile):
+    # Disassembl with Intel syntax
+    cmd = ("objdump -d --demangle --no-leading-addr --no-leading-headers --no-show-raw-insn "
+           "--x86-asm-syntax=intel").split(" ") + [marked_objfile]
+    asm_raw = check_output(cmd).decode()
+    asm_raw = '\n'.join([l.strip() for l in asm_raw.split('\n')])
+    kernel_raw = asm_raw[
+        asm_raw.index('mov\tebx, 111\nnop')+len('mov\tebx, 111\nnop') : 
+        asm_raw.index('mov\tebx, 222\nnop')
+    ]
+    kernel_lines = kernel_raw.split('\n')
+    # Ignore label and jump
+    return '\n'.join(kernel_lines[:-2])
+
+
 def get_ithemal_prediction(code, model='skl'):
     url = "http://3.18.198.23/predict"
     assert model in ['skl', 'hsw', 'ivb']
@@ -671,23 +691,16 @@ def get_ithemal_prediction(code, model='skl'):
     raw_text = remove_html_tags(r.text)
     m = re.search("Could not generate a prediction: (.*)", raw_text)
     if m:
-        print("Found error:", m.group(1).strip())
+        print(" error:", m.group(1).strip(), end=' ')
         return
     m = re.search("Prediction: ([0-9\.]+) cycles per iteration", raw_text)
     if m:
         return float(m.group(1))
     else:
-        print("Coudn't find result.")
-        print(raw_text)
         return None
 
 
 def main():
-    # Build and mark all kernels (that can be build)
-    #for r in zip(*[scalingrun('build/SKX/icc/Ofast/3d-r3-11pt') for i in range(10)]):
-    #    print("\n".join(["{} {} {} {:.2f} {:.2f}".format(*e) for e in r]))
-    #    print()
-    
     # Check for correct LLVM-MCA version
     try:
         llvm_mca = 'LLVM version 12.0.0' in check_output(['llvm-mca', '-version']).decode()
