@@ -24,7 +24,7 @@ load_throughput:
 load_throughput_default: [[1, '34'], [1, '012']]
 store_throughput: []
 store_throughput_default: [[1, '34'], [1, '5']]
-ports: ['0', 0DV, '1', 1DV, '2', '3', '4', '5']
+ports: ['0', '1', '2', '3', '4', '5']
 port_model_scheme: |
   +-----------------------------------------------------------+
   |                  60 entry unified scheduler               |
@@ -339,6 +339,17 @@ instruction_forms:
 - name: fdiv
   operands:
   - class: register
+    prefix: d
+  - class: register
+    prefix: d
+  - class: register
+    prefix: d
+  throughput: 6.0
+  latency: 23.0
+  port_pressure: [[12.0, '01']]
+- name: fdiv
+  operands:
+  - class: register
     prefix: v
     shape: s
   - class: register
@@ -348,8 +359,8 @@ instruction_forms:
     prefix: v
     shape: s
   throughput: 8.5
-  latency: 16.0  # 	1*p01+17*p0DV1DV
-  port_pressure: [[1, '01'], [17.0, [0DV, 1DV]]]
+  latency: 16.0
+  port_pressure: [[17.0, '01']]
 - name: fdiv
   operands:
   - class: register
@@ -362,8 +373,8 @@ instruction_forms:
     prefix: v
     shape: d
   throughput: 12.0
-  latency: 23.0  # 	1*p01+24*p0DV1DV
-  port_pressure: [[1, '01'], [24.0, [0DV, 1DV]]]
+  latency: 23.0
+  port_pressure: [[24.0, '01']]
 - name: fmla
   operands:
   - class: register
@@ -376,7 +387,7 @@ instruction_forms:
     prefix: v
     shape: s
   throughput: 0.5
-  latency: 6.0  # 	1*p01
+  latency: 6.0
   port_pressure: [[1, '01']]
 - name: fmla
   operands:
@@ -1153,4 +1164,54 @@ instruction_forms:
     shape: s
   throughput: 0.5
   latency: 6.0  # 	1*p01
+  port_pressure: [[1, '01']]
+- name: scvtf
+  operands:
+  - class: register
+    prefix: z
+    shape: '*'
+  - class: register
+    prefix: p
+  - class: register
+    prefix: z
+    shape: '*'
+  throughput: 1.0
+  latency: 13.0
+  port_pressure: [[1, '01'], [1, '01']]
+- name: scvtf
+  operands:
+  - class: register
+    prefix: d
+  - class: register
+    prefix: w
+  throughput: 1.0
+  latency: 13.0
+  port_pressure: [[1, '01'], [1, '01']]
+- name: scvtf
+  operands:
+  - class: register
+    prefix: v
+    shape: '*'
+    width: '*'
+  - class: register
+    prefix: v
+    shape: '*'
+    width: '*'
+  throughput: 1.0
+  latency: 9.0
+  port_pressure: [[1, '01']]
+- name: [sshll, sshll2, sxtl, sxtl2]
+  operands:
+  - class: register
+    prefix: v
+    shape: '*'
+    width: '*'
+  - class: register
+    prefix: v
+    shape: '*'
+    width: '*'
+  - class: immediate
+    imd: int
+  throughput: 1.0
+  latency: 6.0
   port_pressure: [[1, '01']]

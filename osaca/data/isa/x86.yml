@@ -2547,7 +2547,7 @@ instruction_forms:
           name: "gpr"
           source: false
           destination: true
-      operation: "op2['name'] = op1['name']"
+      operation: "op2['name'] = op1['name']; op2['value'] = op1['value']"
     - name: [maxpd, maxps, maxsd, maxss, minpd, minps, minsd, minss]
       operands:
         - class: "register"

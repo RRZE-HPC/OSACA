@@ -470,7 +470,7 @@ instruction_forms:
     shape: d
     width: '*'
   - class: immediate
-    imd: 'double'
+    imd: '*'
   throughput: 0.5
   latency: 9.0  # 	1*p02
   port_pressure: [[1, '02']]
@@ -623,21 +623,21 @@ instruction_forms:
   - class: register
     prefix: z
     shape: d
-    width: '*'
+    width: 128
   - class: register
     prefix: p
     predication: '*'
   - class: register
     prefix: z
     shape: d
-    width: '*'
+    width: 128
   - class: register
     prefix: z
     shape: d
-    width: '*'
-  throughput: 43.0
-  latency: 43.0  # 	1*p0+43*p0DV
-  port_pressure: [[1, '0'], [43.0, [0DV]]]
+    width: 128
+  throughput: 38.0  # JH assuming 38 from ('A64FX','gcc', 'Ofast','pi') results
+  latency: 43.0
+  port_pressure: [[1, '0'], [38.0, [0DV]]]  
 - name: fcmla
   operands:
   - class: register
