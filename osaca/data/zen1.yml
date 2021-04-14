@@ -16,6 +16,7 @@ load_throughput:
 load_throughput_default: [[1, '89'], [1, ['8D', '9D']]]
 store_throughput: []
 store_throughput_default: [[1, '89'], [1,[ST]]]
+store_throughput_multiplier: {gpr: 1.0, xmm: 1.0, ymm: 2.0}
 store_to_load_forward_latency: 0.0  # JH: according to Agner Fog "little or no penalty"
 
 hidden_loads: false
@@ -516,20 +517,6 @@ instruction_forms:
   port_pressure: [[1, '01']]
 - name: vmulpd
   operands:
-  - class: memory
-    base: gpr
-    offset: ~
-    index: gpr
-    scale: 1
-  - class: register
-    name: xmm
-  - class: register
-    name: xmm
-  throughput: 0.5
-  latency: 4.0  # 	1*p01+1*p89+1*p8D9D
-  port_pressure: [[1, '01'], [1, '89'], [1, [8D, 9D]]]
-- name: vmulpd
-  operands:
   - class: register
     name: xmm
   - class: register
@@ -562,144 +549,48 @@ instruction_forms:
 - name: vmovapd
   operands:
   - class: register
-    name: xmm
-  - class: memory
-    base: gpr
-    offset: ~
-    index: gpr
-    scale: 1
-  throughput: 1.0
-  latency: 0  # 	1*p89+1*pST
-  port_pressure: [[1, '89'], [1, [ST]]]
-- name: vmovapd
-  operands:
-  - class: register
     name: ymm
   - class: register
     name: ymm
   throughput: 0.0
   latency: 0.0
   port_pressure: []
-- name: vmovapd
-  operands:
-  - class: register
-    name: ymm
-  - class: memory
-    base: gpr
-    offset: ~
-    index: gpr
-    scale: 1
-  throughput: 2.0
-  latency: 0  # 	2*p89+2*pST
-  port_pressure: [[2, '89'], [2, [ST]]]
-- name: vmovapd
-  operands:
-  - class: register
-    name: ymm
-  - class: memory
-    base: gpr
-    offset: imd
-    index: gpr
-    scale: 1
-  throughput: 2.0
-  latency: 0  # 	2*p89+2*pST
-  port_pressure: [[2, '89'], [2, [ST]]]
-- name: vmovups
-  operands:
-  - class: memory
-    base: gpr
-    offset: "*"
-    index: "*"
-    scale: "*"
-  - class: register
-    name: xmm
-  throughput: 0.5
-  latency: 4.0  # 	1*p89+1*p8D9D
-  port_pressure: [[1, '89'], [1, [8D, 9D]]]
-- name: vmovups
-  operands:
-  - class: memory
-    base: gpr
-    offset: "*"
-    index: "*"
-    scale: "*"
-  - class: register
-    name: ymm
-  throughput: 0.5
-  latency: 4.0  # 	1*p89+1*p8D9D
-  port_pressure: [[1, '89'], [1, [8D, 9D]]]
-- name: vmovups
-  operands:
-  - class: register
-    name: xmm
-  - class: memory
-    base: gpr
-    offset: "*"
-    index: "*"
-    scale: "*"
-  throughput: 1.0
-  latency: 0  # 	1*p89+1*pST
-  port_pressure: [[1, '89'], [1, [ST]]]
-- name: vmovups
-  operands:
-  - class: register
-    name: ymm
-  - class: memory
-    base: gpr
-    offset: "*"
-    index: "*"
-    scale: "*"
-  throughput: 1.0
-  latency: 0  # 	1*p89+1*pST
-  port_pressure: [[1, '89'], [1, [ST]]]
 - name: vmovaps
   operands:
   - class: register
     name: xmm
-  - class: memory
-    base: gpr
-    offset: "*"
-    index: "*"
-    scale: "*"
-  throughput: 1.0
-  latency: 0  # 	1*p89+1*pST
-  port_pressure: [[1, '89'], [1, [ST]]]
-- name: vmovupd
+  - class: register
+    name: xmm
+  throughput: 0.0
+  latency: 0
+  port_pressure: []
+- name: vmovaps
   operands:
   - class: register
     name: ymm
-  - class: memory
-    base: gpr
-    offset: ~
-    index: gpr
-    scale: 1
-  throughput: 2.0
-  latency: 0  # 	2*p89+2*pST
-  port_pressure: [[2, '89'], [2, [ST]]]
-- name: vmovupd
+  - class: register
+    name: ymm
+  throughput: 0.0
+  latency: 0
+  port_pressure: []
+- name: vmovups
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  throughput: 0.0
+  latency: 0
+  port_pressure: []
+- name: vmovups
   operands:
   - class: register
     name: ymm
-  - class: memory
-    base: gpr
-    offset: imd
-    index: gpr
-    scale: 1
-  throughput: 2.0
-  latency: 0  # 	2*p89+2*pST
-  port_pressure: [[2, '89'], [2, [ST]]]
-- name: vmovupd
-  operands:
   - class: register
     name: ymm
-  - class: memory
-    base: gpr
-    offset: ~
-    index: gpr
-    scale: 1
-  throughput: 2.0
-  latency: 0  # 	2*p89+2*pST
-  port_pressure: [[2, '89'], [2, [ST]]]
+  throughput: 0.0
+  latency: 0
+  port_pressure: []
 - name: vmovupd
   operands:
   - class: register
@@ -709,19 +600,7 @@ instruction_forms:
   throughput: 0.0
   latency: 0.0
   port_pressure: []
-- name: vmovsd
-  operands:
-  - class: memory
-    base: gpr
-    offset: imd
-    index: gpr
-    scale: 1
-  - class: register
-    name: xmm
-  throughput: 0.5
-  latency: 4.0  # 	1*p89+1*p8D9D
-  port_pressure: [[1, '89'], [1, [8D, 9D]]]
-- name: vmovsd
+- name: vmovupd
   operands:
   - class: register
     name: xmm
@@ -734,50 +613,11 @@ instruction_forms:
   operands:
   - class: register
     name: xmm
-  - class: memory
-    base: gpr
-    offset: ~
-    index: ~
-    scale: 1
-  throughput: 1.0
-  latency: 0  # 	1*p89+1*pST
-  port_pressure: [[1, '89'], [1, [ST]]]
-- name: vmovsd
-  operands:
   - class: register
     name: xmm
-  - class: memory
-    base: gpr
-    offset: imd
-    index: ~
-    scale: 1
-  throughput: 1.0
-  latency: 0  # 	1*p89+1*pST
-  port_pressure: [[1, '89'], [1, [ST]]]
-- name: vmovsd
-  operands:
-  - class: register
-    name: xmm
-  - class: memory
-    base: gpr
-    offset: ~
-    index: gpr
-    scale: 1
-  throughput: 1.0
-  latency: 0  # 	1*p89+1*pST
-  port_pressure: [[1, '89'], [1, [ST]]]
-- name: vmovsd
-  operands:
-  - class: register
-    name: xmm
-  - class: memory
-    base: gpr
-    offset: imd
-    index: gpr
-    scale: 1
-  throughput: 1.0
-  latency: 0  # 	1*p89+1*pST
-  port_pressure: [[1, '89'], [1, [ST]]]
+  throughput: 0.0
+  latency: 0.0
+  port_pressure: []
 - name: POP
   operands:
   - class: register
