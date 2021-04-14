@@ -57,10 +57,10 @@ arch_info = {
         'perfevents': [],
         "cflags": {
             'icc': {
-                "Ofast": "-Ofast -fno-alias -xCORE-AVX512 -qopt-zmm-usage=high -nolib-inline -ffreestanding".split(),
-                "O3": "-O3 -fno-alias -xCORE-AVX512 -qopt-zmm-usage=high -nolib-inline -ffreestanding".split(),
-                "O2": "-O2 -fno-alias -xCORE-AVX512 -qopt-zmm-usage=high -nolib-inline -ffreestanding".split(),
-                "O1": "-O1 -fno-alias -xCORE-AVX512 -qopt-zmm-usage=high -nolib-inline -ffreestanding".split(),
+                "Ofast": "-Ofast -fno-alias -xCORE-AVX512 -qopt-zmm-usage=high -nolib-inline -ffreestanding -falign-loops".split(),
+                "O3": "-O3 -fno-alias -xCORE-AVX512 -qopt-zmm-usage=high -nolib-inline -ffreestanding -falign-loops".split(),
+                "O2": "-O2 -fno-alias -xCORE-AVX512 -qopt-zmm-usage=high -nolib-inline -ffreestanding -falign-loops".split(),
+                "O1": "-O1 -fno-alias -xCORE-AVX512 -qopt-zmm-usage=high -nolib-inline -ffreestanding -falign-loops".split(),
             },
             'clang': {
                 "Ofast": "-Ofast -march=skylake-avx512 -ffreestanding".split(),
@@ -70,10 +70,10 @@ arch_info = {
                 
             },
             'gcc': {
-                "Ofast": "-Ofast -march=skylake-avx512 -lm -ffreestanding".split(),
-                "O3": "-O3 -march=skylake-avx512 -lm -ffreestanding".split(),
-                "O2": "-O2 -march=skylake-avx512 -lm -ffreestanding".split(),
-                "O1": "-O1 -march=skylake-avx512 -lm -ffreestanding".split(),
+                "Ofast": "-Ofast -march=skylake-avx512 -lm -ffreestanding -falign-loops=16".split(),
+                "O3": "-O3 -march=skylake-avx512 -lm -ffreestanding -falign-loops=16".split(),
+                "O2": "-O2 -march=skylake-avx512 -lm -ffreestanding -falign-loops=16".split(),
+                "O1": "-O1 -march=skylake-avx512 -lm -ffreestanding -falign-loops=16".split(),
             },
         },
     },
@@ -87,10 +87,10 @@ arch_info = {
         'perfevents': [],
         "cflags": {
             "icc": {
-                "Ofast": "-Ofast -xAVX -fno-alias -nolib-inline -ffreestanding".split(),
-                "O3": "-O3 -xAVX -fno-alias -nolib-inline -ffreestanding".split(),
-                "O2": "-O2 -xAVX -fno-alias -nolib-inline -ffreestanding".split(),
-                "O1": "-O1 -xAVX -fno-alias -nolib-inline -ffreestanding".split(),
+                "Ofast": "-Ofast -xAVX -fno-alias -nolib-inline -ffreestanding -falign-loops".split(),
+                "O3": "-O3 -xAVX -fno-alias -nolib-inline -ffreestanding -falign-loops".split(),
+                "O2": "-O2 -xAVX -fno-alias -nolib-inline -ffreestanding -falign-loops".split(),
+                "O1": "-O1 -xAVX -fno-alias -nolib-inline -ffreestanding -falign-loops".split(),
             },
             "clang": {
                 "Ofast": "-Ofast -mavx -ffreestanding".split(),
@@ -99,10 +99,10 @@ arch_info = {
                 "O1": "-O1 -mavx -ffreestanding".split(),
             },
             "gcc": {
-                "Ofast": "-Ofast -march=corei7-avx -lm -ffreestanding".split(),
-                "O3": "-O3 -march=corei7-avx -lm -ffreestanding".split(),
-                "O2": "-O2 -march=corei7-avx -lm -ffreestanding".split(),
-                "O1": "-O1 -march=corei7-avx -lm -ffreestanding".split(),
+                "Ofast": "-Ofast -march=corei7-avx -lm -ffreestanding -falign-loops=16".split(),
+                "O3": "-O3 -march=corei7-avx -lm -ffreestanding -falign-loops=16".split(),
+                "O2": "-O2 -march=corei7-avx -lm -ffreestanding -falign-loops=16".split(),
+                "O1": "-O1 -march=corei7-avx -lm -ffreestanding -falign-loops=16".split(),
             },
         },
     },
@@ -122,16 +122,16 @@ arch_info = {
                 "O1": "-O1 -march=znver1 -ffreestanding".split(),
             },
             "gcc": {
-                "Ofast": "-Ofast -march=znver1 -ffreestanding".split(),
-                "O3": "-O3 -march=znver1 -ffreestanding".split(),
-                "O2": "-O2 -march=znver1 -ffreestanding".split(),
-                "O1": "-O1 -march=znver1 -ffreestanding".split(),
+                "Ofast": "-Ofast -march=znver1 -ffreestanding -falign-loops=16".split(),
+                "O3": "-O3 -march=znver1 -ffreestanding -falign-loops=16".split(),
+                "O2": "-O2 -march=znver1 -ffreestanding -falign-loops=16".split(),
+                "O1": "-O1 -march=znver1 -ffreestanding -falign-loops=16".split(),
             },
             "icc": {
-                "Ofast": "-Ofast -xAVX2 -fno-alias -nolib-inline -ffreestanding".split(),
-                "O3": "-O3 -xAVX2 -fno-alias -nolib-inline -ffreestanding".split(),
-                "O2": "-O2 -xAVX2 -fno-alias -nolib-inline -ffreestanding".split(),
-                "O1": "-O1 -xAVX2 -fno-alias -nolib-inline -ffreestanding".split(),
+                "Ofast": "-Ofast -xAVX2 -fno-alias -nolib-inline -ffreestanding -falign-loops".split(),
+                "O3": "-O3 -xAVX2 -fno-alias -nolib-inline -ffreestanding -falign-loops".split(),
+                "O2": "-O2 -xAVX2 -fno-alias -nolib-inline -ffreestanding -falign-loops".split(),
+                "O1": "-O1 -xAVX2 -fno-alias -nolib-inline -ffreestanding -falign-loops".split(),
             },
         },
     },
@@ -151,16 +151,16 @@ arch_info = {
                 "O1": "-O1 -march=znver2 -ffreestanding".split(),
             },
             "gcc": {
-                "Ofast": "-Ofast -march=znver2 -ffreestanding".split(),
-                "O3": "-O3 -march=znver2 -ffreestanding".split(),
-                "O2": "-O2 -march=znver2 -ffreestanding".split(),
-                "O1": "-O1 -march=znver2 -ffreestanding".split(),
+                "Ofast": "-Ofast -march=znver2 -ffreestanding -falign-loops=16".split(),
+                "O3": "-O3 -march=znver2 -ffreestanding -falign-loops=16".split(),
+                "O2": "-O2 -march=znver2 -ffreestanding -falign-loops=16".split(),
+                "O1": "-O1 -march=znver2 -ffreestanding -falign-loops=16".split(),
             },
             "icc": {
-                "Ofast": "-Ofast -xAVX2 -fno-alias -nolib-inline -ffreestanding".split(),
-                "O3": "-O3 -xAVX2 -fno-alias -nolib-inline -ffreestanding".split(),
-                "O2": "-O2 -xAVX2 -fno-alias -nolib-inline -ffreestanding".split(),
-                "O1": "-O1 -xAVX2 -fno-alias -nolib-inline -ffreestanding".split(),
+                "Ofast": "-Ofast -xAVX2 -fno-alias -nolib-inline -ffreestanding -falign-loops".split(),
+                "O3": "-O3 -xAVX2 -fno-alias -nolib-inline -ffreestanding -falign-loops".split(),
+                "O2": "-O2 -xAVX2 -fno-alias -nolib-inline -ffreestanding -falign-loops".split(),
+                "O1": "-O1 -xAVX2 -fno-alias -nolib-inline -ffreestanding -falign-loops".split(),
             },
         },
     },
@@ -359,7 +359,7 @@ def build_mark_run_all_kernels(measurements=True, osaca=True, iaca=True, llvm_mc
                     # Analyze with OSACA, if requested
                     if osaca:
                         print("OSACA", end="", flush=True)
-                        if not row.get('OSACA_ports'):
+                        if not row.get('OSACA_ports') or arch == 'TX2':
                             row['OSACA_raw'] = osaca_analyse_instrumented_assembly(
                                 marked_asmfile, micro_architecture=ainfo['OSACA'],
                                 assign_optimal_throughput=ainfo.get('assign_optimal_throughput',
@@ -403,7 +403,7 @@ def build_mark_run_all_kernels(measurements=True, osaca=True, iaca=True, llvm_mc
                     # Analyze with Ithemal, if not running local and configured
                     if ainfo['Ithemal'] is not None and not islocal:
                         print("Ithemal", end="", flush=True)
-                        if not row.get('Ithemal_prediction') or True:
+                        if not row.get('Ithemal_prediction'):
                             with open(marked_asmfile) as f:
                                 parsed_code = parse_asm(f.read(), ainfo['isa'])
                             kernel = reduce_to_section(parsed_code, ainfo['isa'])
@@ -426,13 +426,6 @@ def build_mark_run_all_kernels(measurements=True, osaca=True, iaca=True, llvm_mc
                             print(f"({best[0]}). ", end="", flush=True)
                         else:
                             print(f"({row.get('best_length', None)})! ", end="", flush=True)
-
-                        # TODO measure all events on best length
-                        print("perf", end="", flush=True)
-                        if not row.get('perfevents'):
-                            print("???", end="", flush=True)
-                        else:
-                            print("! ", end="", flush=True)
 
                     print()
 
@@ -692,12 +685,12 @@ def get_ithemal_prediction(code, model='skl'):
     m = re.search("Could not generate a prediction: (.*)", raw_text)
     if m:
         print(" error:", m.group(1).strip(), end=' ')
-        return
+        return float('nan')
     m = re.search("Prediction: ([0-9\.]+) cycles per iteration", raw_text)
     if m:
         return float(m.group(1))
     else:
-        return None
+        return float('nan')
 
 
 def main():

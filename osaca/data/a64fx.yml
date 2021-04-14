@@ -7,6 +7,7 @@ retired_uOps_per_cycle: 4
 scheduler_size: 79
 hidden_loads: false 
 load_latency: {w: 5.0, x: 5.0, b: 5.0, h: 5.0, s: 5.0, d: 8.0, q: 8.0, v: 8.0, z: 11.0}
+#load_throughput_multiplier: {w: 1.0, x: 1.0, b: 1.0, h: 1.0, s: 1.0, d: 1.0, q: 1.0, v: 2.0, z: 2.0}
 load_throughput:
 - {base: x, index: ~, offset: ~, scale: 1, pre-indexed: false, post-indexed: false, port_pressure:   [[1, '56'], [1, ['5D', '6D']]]}
 - {base: x, index: ~, offset: imd, scale: 1, pre-indexed: false, post-indexed: true, port_pressure:  [[1, '56'], [1, ['5D', '6D']], [1, '3456']]}
@@ -23,7 +24,8 @@ load_throughput:
 - {base: x, index: x, offset: imd, scale: 1, pre-indexed: true, post-indexed: false, port_pressure:  [[1, '56'], [1, ['5D', '6D']], [1, '3456']]}
 load_throughput_default: [[1, '56'], [1, ['5D', '6D']]]
 store_throughput: []
-store_throughput_default: [[1, '56'], [1, '0']]
+store_throughput_default: [[1, '5'], [1, '6']]
+#store_throughput_multiplier: {w: 1.0, x: 1.0, b: 1.0, h: 1.0, s: 1.0, d: 1.0, q: 1.0, v: 2.0, z: 2.0}
 ports: ['0', 0DV, '1', '2', '3', '4', '5', 5D, '6', 6D, '7']
 port_model_scheme: |
   +---------------------------------------------------------------------------------+
@@ -1093,7 +1095,7 @@ instruction_forms:
     post-indexed: false
   throughput: 0.5
   latency: 8.0  # 	1*p56+1*p5D6D
-  port_pressure: [[1, '56'], [1, ['5D', '6D']]]
+  port_pressure: [[1, '56'], [2, ['5D', '6D']]]
 - name: ld1d
   operands:
   - class: register
@@ -1111,7 +1113,7 @@ instruction_forms:
     post-indexed: false
   throughput: 0.5
   latency: 8.0  # 	1*p56+1*p5D6D
-  port_pressure: [[1, '56'], [1, ['5D', '6D']]]
+  port_pressure: [[1, '56'], [2, ['5D', '6D']]]
 - name: ld1d
   operands:
   - class: register
@@ -1324,7 +1326,7 @@ instruction_forms:
     pre-indexed: false
   throughput: 1.0
   latency: 11.0  # 	1*p5+1*p5D
-  port_pressure: [[1, '5'], [1, ['5D',]]]
+  port_pressure: [[1, '56'], [2, ['5D','6D']]]
 - name: ldr
   operands:
   - class: register
@@ -1724,7 +1726,7 @@ instruction_forms:
     post-indexed: false
   throughput: 2.0
   latency: 0  # 	2*p56+2*p0
-  port_pressure: [[2, '56'], [2, '0']]
+  port_pressure: [[2, '5'], [2,'6'], [2, '0']]
 - name: stp
   operands:
   - class: register
@@ -1740,7 +1742,7 @@ instruction_forms:
     post-indexed: true
   throughput: 2.0
   latency: 0  # 	2*p56+2*p0+1*0234
-  port_pressure: [[2, '56'], [2, '0'], [1, '0234']]
+  port_pressure: [[2, '5'], [2,'6'], [2, '0'], [1, '0234']]
 - name: stp
   operands:
   - class: register
@@ -1756,7 +1758,7 @@ instruction_forms:
     post-indexed: false
   throughput: 2.0
   latency: 0  # 	2*p56+2*p0
-  port_pressure: [[2, '56'], [2, '0']]
+  port_pressure: [[2, '5'], [2,'6'], [2, '0']]
 - name: stp
   operands:
   - class: register
@@ -1772,7 +1774,7 @@ instruction_forms:
     post-indexed: true
   throughput: 2.0
   latency: 0  # 	2*p56+2*p0+1*0234
-  port_pressure: [[2, '56'], [2, '0'], [1, '0234']]
+  port_pressure: [[2, '5'], [2,'6'], [2, '0'], [1, '0234']]
 - name: stp
   operands:
   - class: register
@@ -1788,7 +1790,7 @@ instruction_forms:
     post-indexed: false
   throughput: 2.0
   latency: 0  # 	2*p56+2*p0
-  port_pressure: [[2, '56'], [2, '0']]
+  port_pressure: [[2, '5'], [2,'6'], [2, '0']]
 - name: stp
   operands:
   - class: register
@@ -1804,7 +1806,7 @@ instruction_forms:
     post-indexed: true
   throughput: 2.0
   latency: 0  # 	2*p56+2*p0+1*0234
-  port_pressure: [[2, '56'], [2, '0'], [1, '0234']]
+  port_pressure: [[2, '5'], [2,'6'], [2, '0'], [1, '0234']]
 - name: stp
   operands:
   - class: register
@@ -1820,7 +1822,7 @@ instruction_forms:
     post-indexed: false
   throughput: 2.0
   latency: 0  # 	2*p56+2*p0
-  port_pressure: [[2, '56'], [2, '0']]
+  port_pressure: [[2, '5'], [2,'6'], [2, '0']]
 - name: stur # JL: assumed from str
   operands:
   - class: register
@@ -1834,7 +1836,7 @@ instruction_forms:
     post-indexed: false
   throughput: 1.0
   latency: 0  # 	1*p56+1*p0
-  port_pressure: [[1, '56'], [1, '0']]
+  port_pressure: [[1, '5'], [1,'6'], [1, '0']]
 - name: stur # JL: assumed from str
   operands:
   - class: register
@@ -1848,7 +1850,7 @@ instruction_forms:
     post-indexed: false
   throughput: 1.0
   latency: 0  # 	1*p56+1*p0
-  port_pressure: [[1, '56'], [1, '0']]
+  port_pressure: [[1, '5'], [1,'6'], [1, '0']]
 - name: str
   operands:
   - class: register
@@ -1862,7 +1864,7 @@ instruction_forms:
     post-indexed: false
   throughput: 1.0
   latency: 0  # 	1*p56+1*p0
-  port_pressure: [[1, '56'], [1, '0']]
+  port_pressure: [[1, '5'], [1,'6'], [1, '0']]
 - name: str
   operands:
   - class: register
@@ -1876,7 +1878,7 @@ instruction_forms:
     post-indexed: false
   throughput: 1.0
   latency: 0  # 	1*p56+1*p0
-  port_pressure: [[1, '56'], [1, '0']]
+  port_pressure: [[1, '5'], [1,'6'], [1, '0']]
 - name: str
   operands:
   - class: register
@@ -1890,7 +1892,7 @@ instruction_forms:
     post-indexed: false
   throughput: 1.0
   latency: 0  # 	1*p56+1*p0
-  port_pressure: [[1, '56'], [1, '0']]
+  port_pressure: [[1, '5'], [1,'6'], [1, '0']]
 - name: str
   operands:
   - class: register
@@ -1904,7 +1906,7 @@ instruction_forms:
     post-indexed: true
   throughput: 1.0
   latency: 0  # 	1*p56+1*p0+1*p0234
-  port_pressure: [[1, '56'], [1, '0'], [1, '0234']]
+  port_pressure: [[1, '5'], [1,'6'], [1, '0'], [1, '0234']]
 - name: str
   operands:
   - class: register
@@ -1918,7 +1920,7 @@ instruction_forms:
     post-indexed: false
   throughput: 1.0
   latency: 0  # 	1*p56+1*p0
-  port_pressure: [[1, '56'], [1, '0']]
+  port_pressure: [[1, '5'], [1,'6'], [1, '0']]
 - name: str
   operands:
   - class: register
@@ -1932,7 +1934,7 @@ instruction_forms:
     post-indexed: true
   throughput: 1.0
   latency: 0  # 	1*p56+1*p0+1*0234
-  port_pressure: [[1, '56'], [1, '0'], [1, '0234']]
+  port_pressure: [[1, '5'], [1,'6'], [1, '0'], [1, '0234']]
 - name: str
   operands:
   - class: register
@@ -1946,7 +1948,7 @@ instruction_forms:
     post-indexed: true
   throughput: 1.0
   latency: 0  # 	1*p56+1*p3+1*p0234
-  port_pressure: [[1, '56'], [1, '3'], [1, '0234']]
+  port_pressure: [[1, '5'], [1,'6'], [1, '3'], [1, '0234']]
 - name: str
   operands:
   - class: register

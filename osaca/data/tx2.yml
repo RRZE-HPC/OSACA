@@ -24,7 +24,7 @@ load_throughput:
 load_throughput_default: [[1, '34'], [1, '012']]
 store_throughput: []
 store_throughput_default: [[1, '34'], [1, '5']]
-ports: ['0', '1', '2', '3', '4', '5']
+ports: ['0', 'DV', '1', '2', '3', '4', '5']
 port_model_scheme: |
   +-----------------------------------------------------------+
   |                  60 entry unified scheduler               |
@@ -344,9 +344,9 @@ instruction_forms:
     prefix: d
   - class: register
     prefix: d
-  throughput: 6.0
+  throughput: 12.0
   latency: 23.0
-  port_pressure: [[12.0, '01']]
+  port_pressure: [[1, '01'], [12, ['DV']]]
 - name: fdiv
   operands:
   - class: register
@@ -360,7 +360,7 @@ instruction_forms:
     shape: s
   throughput: 8.5
   latency: 16.0
-  port_pressure: [[17.0, '01']]
+  port_pressure: [[1, '01'], [17.0, ['DV']]]
 - name: fdiv
   operands:
   - class: register
@@ -374,7 +374,7 @@ instruction_forms:
     shape: d
   throughput: 12.0
   latency: 23.0
-  port_pressure: [[24.0, '01']]
+  port_pressure: [[1, '01'], [24.0, ['DV']]]
 - name: fmla
   operands:
   - class: register
