@@ -359,7 +359,7 @@ def build_mark_run_all_kernels(measurements=True, osaca=True, iaca=True, llvm_mc
                     # Analyze with OSACA, if requested
                     if osaca:
                         print("OSACA", end="", flush=True)
-                        if not row.get('OSACA_ports') or arch == 'TX2':
+                        if not row.get('OSACA_ports'):
                             row['OSACA_raw'] = osaca_analyse_instrumented_assembly(
                                 marked_asmfile, micro_architecture=ainfo['OSACA'],
                                 assign_optimal_throughput=ainfo.get('assign_optimal_throughput',
