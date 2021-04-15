@@ -63,14 +63,15 @@ class TestFrontend(unittest.TestCase):
         Frontend(arch="zen1")
 
     def test_frontend_x86(self):
-        dg = KernelDG(self.kernel_x86, self.parser_x86, self.machine_model_csx)
+        dg = KernelDG(self.kernel_x86, self.parser_x86, self.machine_model_csx, self.semantics_csx)
         fe = Frontend(path_to_yaml=os.path.join(self.MODULE_DATA_DIR, "csx.yml"))
         fe.throughput_analysis(self.kernel_x86, show_cmnts=False)
         fe.latency_analysis(dg.get_critical_path())
         # TODO compare output with checked string
 
     def test_frontend_AArch64(self):
-        dg = KernelDG(self.kernel_AArch64, self.parser_AArch64, self.machine_model_tx2)
+        dg = KernelDG(
+            self.kernel_AArch64, self.parser_AArch64, self.machine_model_tx2, self.semantics_tx2)
         fe = Frontend(path_to_yaml=os.path.join(self.MODULE_DATA_DIR, "tx2.yml"))
         fe.full_analysis(self.kernel_AArch64, dg, verbose=True)
         # TODO compare output with checked string

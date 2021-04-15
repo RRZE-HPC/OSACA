@@ -270,7 +270,7 @@ class TestParserAArch64(unittest.TestCase):
                 {"register": {"prefix": "p", "name": "0", "predication": "m"}},
                 {"register": {"prefix": "z", "name": "29", "shape": "d"}},
                 {"register": {"prefix": "z", "name": "21", "shape": "d"}},
-                {"immediate": {"value": "90"}},
+                {"immediate": {"value": "90", "type": "int"}},
             ],
             "directive": None,
             "comment": None,

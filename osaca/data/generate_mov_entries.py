@@ -88,11 +88,19 @@ class MOVEntryBuilderIntelNoPort7AGU(MOVEntryBuilder):
 
         comment = None
         if load:
-            port_pressure += [[1, "23"], [1, ["2D", "3D"]]]
+            if 'ymm' in operand_types:
+                port2D3D_pressure = 2
+            else:
+                port2D3D_pressure = 1
+            port_pressure += [[1, "23"], [port2D3D_pressure, ["2D", "3D"]]]
             latency += 4
             comment = "with load"
         if store:
-            port_pressure += [[1, "23"], [1, "4"]]
+            if 'ymm' in operand_types:
+                port4_pressure = 2
+            else:
+                port4_pressure = 1
+            port_pressure += [[1, "23"], [port4_pressure, "4"]]
             latency += 0
             comment = "with store"
 
@@ -708,12 +716,14 @@ skx_mov_instructions = list(
             # ('movapd xmm xmm', ('1*p5', 1)),
             # ('vmovapd xmm xmm', ('1*p5', 1)),
             # ('vmovapd ymm ymm', ('1*p5', 1)),
+            ('vmovapd zmm zmm', ('', 0)),
             # https://www.felixcloutier.com/x86/movaps
             # TODO with masking!
             # TODO the following may eliminate or be bound to 1*p0156:
             # ('movaps xmm xmm', ('1*p5', 1)),
             # ('vmovaps xmm xmm', ('1*p5', 1)),
             # ('vmovaps ymm ymm', ('1*p5', 1)),
+            ('vmovaps zmm zmm', ('', 0)),
             # https://www.felixcloutier.com/x86/movbe
             ("movbe gpr mem", ("1*p15", 4)),
             ("movbe mem gpr", ("1*p15", 4)),
