@@ -118,9 +118,9 @@ def extract_model(tree, arch, skip_mem=True):
 
         mnemonic = instruction_tag.attrib["asm"]
         iform = instruction_tag.attrib["iform"]
-        # skip any mnemonic which contain spaces (e.g., "REX CRC32")
+        # reduce to second part if mnemonic contain space (e.g., "REX CRC32")
         if " " in mnemonic:
-            continue
+            mnemonic = mnemonic.split(" ", 1)[1]
 
         # Extract parameter components
         try:
@@ -139,14 +139,15 @@ def extract_model(tree, arch, skip_mem=True):
         if not any(["ports" in x.attrib for x in arch_tag.findall("measurement")]):
             print("Couldn't find port utilization, skip: ", iform, file=sys.stderr)
             continue
-        # skip if computed and measured TP don't match
-        if not [x.attrib["TP_ports"] == x.attrib["TP"] for x in arch_tag.findall("measurement")][0]:
+        # skip if measured TP is smaller than computed
+        if [float(x.attrib["TP_ports"]) > min(float(x.attrib["TP_loop"]),
+                                              float(x.attrib["TP_unrolled"]))
+                for x in arch_tag.findall("measurement")][0]:
             print(
-                "Calculated TP from port utilization doesn't match TP, skip: ",
+                "Calculated TP is greater than measured TP.",
                 iform,
                 file=sys.stderr,
             )
-            continue
         # skip if instruction contains memory operand
         if skip_mem and any(
             [x.attrib["type"] == "mem" for x in instruction_tag.findall("operand")]
@@ -156,11 +157,15 @@ def extract_model(tree, arch, skip_mem=True):
         # We collect all measurement and IACA information and compare them later
         for measurement_tag in arch_tag.iter("measurement"):
             if "TP_ports" in measurement_tag.attrib:
-                throughput = measurement_tag.attrib["TP_ports"]
+                throughput = float(measurement_tag.attrib["TP_ports"])
             else:
-                throughput = (
-                    measurement_tag.attrib["TP"] if "TP" in measurement_tag.attrib else None
+                throughput = min(
+                    measurement_tag.attrib.get("TP_loop", float('inf')),
+                    measurement_tag.attrib.get("TP_unroll", float('inf')),
+                    measurement_tag.attrib.get("TP", float('inf')),
                 )
+                if throughput == float('inf'):
+                    throughput = None
             uops = int(measurement_tag.attrib["uops"]) if "uops" in measurement_tag.attrib else None
             if "ports" in measurement_tag.attrib:
                 port_pressure.append(port_pressure_from_tag_attributes(measurement_tag.attrib))
@@ -215,16 +220,18 @@ def extract_model(tree, arch, skip_mem=True):
                         port_23 = True
                     if "4" in pp[1]:
                         port_4 = True
-                # Add (X, ['2D', '3D']) if load ports (2 & 3) are used, but not the store port (4)
-                # X = 2 on SNB and IVB IFF used in combination with ymm register, otherwise X = 1
-                if arch.upper() in ["SNB", "IVB"] and any(
-                    [p["class"] == "register" and p["name"] == "ymm" for p in parameters]
-                ):
-                    data_port_throughput = 2
-                else:
-                    data_port_throughput = 1
+                # Add (x, ['2D', '3D']) if load ports (2 & 3) are used, but not the store port (4)
                 if port_23 and not port_4:
-                    port_pressure.append((data_port_throughput, ["2D", "3D"]))
+                    if arch.upper() in ["SNB", "IVB"] and any(
+                            [p.get('name', '') == 'ymm' for p in parameters]) and \
+                            not '128' in mnemonic:
+                        # x = 2 if SNB or IVB and ymm regiser in any operand and not '128' in 
+                        # instruction name
+                        port2D3D_pressure = 2
+                    else:
+                        # otherwiese x = 1
+                        port2D3D_pressure = 1
+                    port_pressure.append((port2D3D_pressure, ["2D", "3D"]))
 
         # Add missing ports:
         for ports in [pp[1] for pp in port_pressure]:
@@ -232,7 +239,6 @@ def extract_model(tree, arch, skip_mem=True):
                 mm.add_port(p)
 
         throughput = max(mm.average_port_pressure(port_pressure))
-
         mm.set_instruction(mnemonic, parameters, latency, port_pressure, throughput, uops)
     # TODO eliminate entries which could be covered by automatic load / store expansion
     return mm

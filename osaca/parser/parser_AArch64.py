@@ -417,7 +417,8 @@ class ParserAArch64(BaseParser):
             # actually an identifier, change declaration
             return immediate
         if "value" in immediate:
-            # normal integer value, nothing to do
+            # normal integer value
+            immediate["type"] = "int"
             return AttrDict({self.IMMEDIATE_ID: immediate})
         if "base_immediate" in immediate:
             # arithmetic immediate, add calculated value as value
@@ -425,18 +426,21 @@ class ParserAArch64(BaseParser):
             immediate["value"] = int(immediate["base_immediate"]["value"], 0) << int(
                 immediate["shift"]["value"]
             )
+            immediate["type"] = "int"
             return AttrDict({self.IMMEDIATE_ID: immediate})
         if "float" in immediate:
             dict_name = "float"
         if "double" in immediate:
             dict_name = "double"
         if "exponent" in immediate[dict_name]:
-            # nothing to do
+            immediate["type"] = dict_name
             return AttrDict({self.IMMEDIATE_ID: immediate})
         else:
             # change 'mantissa' key to 'value'
-            return AttrDict(
-                {self.IMMEDIATE_ID: AttrDict({"value": immediate[dict_name]["mantissa"]})}
+            return AttrDict({
+                self.IMMEDIATE_ID: AttrDict({
+                    "value": immediate[dict_name]["mantissa"],
+                    "type": dict_name})}
             )
 
     def process_label(self, label):

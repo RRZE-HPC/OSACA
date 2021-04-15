@@ -2,18 +2,19 @@
 
 import copy
 from itertools import chain, product
+from collections import defaultdict
 
 import networkx as nx
 
 from osaca.parser import AttrDict
-from osaca.semantics import INSTR_FLAGS, MachineModel
-
+from osaca.semantics import INSTR_FLAGS, MachineModel, ArchSemantics
 
 class KernelDG(nx.DiGraph):
-    def __init__(self, parsed_kernel, parser, hw_model: MachineModel):
+    def __init__(self, parsed_kernel, parser, hw_model: MachineModel, semantics: ArchSemantics):
         self.kernel = parsed_kernel
         self.parser = parser
         self.model = hw_model
+        self.arch_sem = semantics
         self.dg = self.create_DG(self.kernel)
         self.loopcarried_deps = self.check_for_loopcarried_dep(self.kernel)
 
@@ -48,14 +49,18 @@ class KernelDG(nx.DiGraph):
                     instruction_form["line_number"],
                     latency=instruction_form["latency"] - instruction_form["latency_wo_load"],
                 )
-            for dep in self.find_depending(instruction_form, kernel[i + 1 :]):
+            for dep, dep_flags in self.find_depending(instruction_form, kernel[i + 1 :]):
                 edge_weight = (
                     instruction_form["latency"]
-                    if "latency_wo_load" not in instruction_form
+                    if "mem_dep" in dep_flags or "latency_wo_load" not in instruction_form
                     else instruction_form["latency_wo_load"]
                 )
+                if "storeload_dep" in dep_flags:
+                    edge_weight += self.model.get('store_to_load_forward_latency', 0)
                 dg.add_edge(
-                    instruction_form["line_number"], dep["line_number"], latency=edge_weight
+                    instruction_form["line_number"],
+                    dep["line_number"],
+                    latency=edge_weight,
                 )
                 dg.nodes[dep["line_number"]]["instruction_form"] = dep
         return dg
@@ -68,90 +73,86 @@ class KernelDG(nx.DiGraph):
         :type kernel: list
         :returns: `dict` -- dependency dictionary with all cyclic LCDs
         """
-        multiplier = len(kernel) + 1
         # increase line number for second kernel loop
-        kernel_length = len(kernel)
+        offset = max(1000, max([i.line_number for i in kernel]))
         first_line_no = kernel[0].line_number
-        kernel_copy = [AttrDict.convert_dict(d) for d in copy.deepcopy(kernel)]
-        tmp_kernel = kernel + kernel_copy
-        for i, instruction_form in enumerate(tmp_kernel[kernel_length:]):
-            tmp_kernel[i + kernel_length].line_number = instruction_form.line_number * multiplier
+        tmp_kernel = [] + kernel
+        for orig_iform in kernel:
+            temp_iform = copy.copy(orig_iform)
+            temp_iform['line_number'] += offset
+            tmp_kernel.append(temp_iform)
         # get dependency graph
         dg = self.create_DG(tmp_kernel)
 
         # build cyclic loop-carried dependencies
-        loopcarried_deps = [
-            (node, list(nx.algorithms.simple_paths.all_simple_paths(dg, node, node * multiplier)))
-            for node in dg.nodes
-            if node < first_line_no * multiplier and node == int(node)
-        ]
-        # filter others and create graph
-        loopcarried_deps = list(
-            chain.from_iterable(
-                [list(product([dep_chain[0]], dep_chain[1])) for dep_chain in loopcarried_deps]
-            )
-        )
-        # adjust line numbers, filter duplicates
-        # and add reference to kernel again
-        loopcarried_deps_dict = {}
-        tmp_list = []
-        for i, dep in enumerate(loopcarried_deps):
-            nodes = [int(n / multiplier) for n in dep[1] if n >= first_line_no * multiplier]
-            loopcarried_deps[i] = (dep[0], nodes)
-        for dep in loopcarried_deps:
-            is_subset = False
-            for other_dep in [x for x in loopcarried_deps if x[0] != dep[0]]:
-                if set(dep[1]).issubset(set(other_dep[1])) and dep[0] in other_dep[1]:
-                    is_subset = True
-            if not is_subset:
-                tmp_list.append(dep)
-        loopcarried_deps = tmp_list
-        for dep in loopcarried_deps:
-            nodes = []
-            for n in dep[1]:
-                self._get_node_by_lineno(int(n))["latency_lcd"] = 0
-            for n in dep[1]:
-                node = self._get_node_by_lineno(int(n))
-                if int(n) != n and int(n) in dep[1]:
-                    node["latency_lcd"] += node["latency"] - node["latency_wo_load"]
-                else:
-                    node["latency_lcd"] += node["latency_wo_load"]
-                nodes.append(node)
-            loopcarried_deps_dict[dep[0]] = {
-                "root": self._get_node_by_lineno(dep[0]),
-                "dependencies": nodes,
-            }
+        loopcarried_deps = []
+        paths = []
+        for instr in kernel:
+            paths += list(nx.algorithms.simple_paths.all_simple_paths(
+                dg, instr.line_number, instr.line_number + offset))
 
+        paths_set = set()
+        for path in paths:
+            lat_sum = 0.0
+            # extend path by edge bound latencies (e.g., store-to-load latency)
+            lat_path = []
+            for s, d in nx.utils.pairwise(path):
+                edge_lat = dg.edges[s, d]['latency']
+                # map source node back to original line numbers
+                if s >= offset:
+                    s -= offset
+                lat_path.append((s, edge_lat))
+                lat_sum += edge_lat
+            if d >= offset:
+                d -= offset
+            lat_path.sort()
+
+            # Ignore duplicate paths which differ only in the root node
+            if tuple(lat_path) in paths_set:
+                continue
+            paths_set.add(tuple(lat_path))
+
+            loopcarried_deps.append((lat_sum, lat_path))
+        loopcarried_deps.sort(reverse=True)
+
+        # map lcd back to nodes
+        loopcarried_deps_dict = {}
+        for lat_sum, involved_lines in loopcarried_deps:
+            loopcarried_deps_dict[involved_lines[0][0]] = {
+                "root": self._get_node_by_lineno(involved_lines[0][0]),
+                "dependencies": [(self._get_node_by_lineno(ln), lat) for ln, lat in involved_lines],
+                "latency": lat_sum
+            }
         return loopcarried_deps_dict
 
-    def _get_node_by_lineno(self, lineno):
+    def _get_node_by_lineno(self, lineno, kernel=None, all=False):
         """Return instruction form with line number ``lineno`` from  kernel"""
-        return [instr for instr in self.kernel if instr.line_number == lineno][0]
+        if kernel is None:
+            kernel = self.kernel
+        result = [instr for instr in kernel if instr.line_number == lineno]
+        if not all:
+            return result[0]
+        else:
+            return result
 
     def get_critical_path(self):
         """Find and return critical path after the creation of a directed graph."""
+        max_latency_instr = max(self.kernel, key=lambda k: k["latency"])
         if nx.algorithms.dag.is_directed_acyclic_graph(self.dg):
             longest_path = nx.algorithms.dag.dag_longest_path(self.dg, weight="latency")
             for line_number in longest_path:
                 self._get_node_by_lineno(int(line_number))["latency_cp"] = 0
-            # add LD latency to instruction
-            for line_number in longest_path:
-                node = self._get_node_by_lineno(int(line_number))
-                if line_number != int(line_number) and int(line_number) in longest_path:
-                    node["latency_cp"] += self.dg.edges[(line_number, int(line_number))]["latency"]
-                elif (
-                    line_number == int(line_number)
-                    and "mem_dep" in node
-                    and self.dg.has_edge(node["mem_dep"]["line_number"], line_number)
-                ):
-                    node["latency_cp"] += node["latency"]
-                else:
-                    node["latency_cp"] += (
-                        node["latency"]
-                        if "latency_wo_load" not in node
-                        else node["latency_wo_load"]
-                    )
-            return [x for x in self.kernel if x["line_number"] in longest_path]
+            # set cp latency to instruction
+            path_latency = 0.0
+            for s, d in nx.utils.pairwise(longest_path):
+                node = self._get_node_by_lineno(int(s))
+                node["latency_cp"] = self.dg.edges[(s, d)]["latency"]
+                path_latency += node["latency_cp"]
+            if max_latency_instr["latency"] > path_latency:
+                max_latency_instr["latency_cp"] = float(max_latency_instr["latency"])
+                return [max_latency_instr]
+            else:
+                return [x for x in self.kernel if x["line_number"] in longest_path]
         else:
             # split to DAG
             raise NotImplementedError("Kernel is cyclic.")
@@ -167,20 +168,17 @@ class KernelDG(nx.DiGraph):
             raise NotImplementedError("Kernel is cyclic.")
 
     def find_depending(
-        self, instruction_form, kernel, include_write=False, flag_dependencies=False
+        self, instruction_form, instructions, flag_dependencies=False
     ):
         """
-        Find instructions in kernel depending on a given instruction form.
+        Find instructions in `instructions` depending on a given instruction form's results.
 
         :param dict instruction_form: instruction form to check for dependencies
-        :param list kernel: kernel containing the instructions to check
-        :param include_write: indicating if instruction ending the dependency chain should be
-                              included, defaults to `False`
-        :type include_write: boolean, optional
+        :param list instructions: instructions to check
         :param flag_dependencies: indicating if dependencies of flags should be considered,
                                   defaults to `False`
         :type flag_dependencies: boolean, optional
-        :returns: iterator if all directly dependent instruction forms
+        :returns: iterator if all directly dependent instruction forms and according flags
         """
         if instruction_form.semantic_operands is None:
             return
@@ -188,53 +186,77 @@ class KernelDG(nx.DiGraph):
             instruction_form.semantic_operands.destination,
             instruction_form.semantic_operands.src_dst,
         ):
-            if "register" in dst:
-                # Check for read of register until overwrite
-                for instr_form in kernel:
-                    if self.is_read(dst.register, instr_form):
-                        yield instr_form
-                        if self.is_written(dst.register, instr_form):
-                            # operand in src_dst list
-                            if include_write:
-                                yield instr_form
-                            break
-                    elif self.is_written(dst.register, instr_form):
-                        if include_write:
-                            yield instr_form
+            # TODO instructions before must be considered as well, if they update registers
+            # not used by insruction_form. E.g., validation/build/A64FX/gcc/O1/gs-2d-5pt.marked.s
+            register_changes = self._update_reg_changes(instruction_form)
+            #print("FROM", instruction_form.line, register_changes)
+            for i, instr_form in enumerate(instructions):
+                self._update_reg_changes(instr_form, register_changes)
+                #print("  TO", instr_form.line, register_changes)
+                if "register" in dst:
+                    # read of register
+                    if self.is_read(dst.register, instr_form) and not (
+                            dst.get("pre_indexed", False) or
+                            dst.get("post_indexed", False)):
+                        yield instr_form, []
+                    # write to register -> abort
+                    if self.is_written(dst.register, instr_form):
                         break
-            if "flag" in dst and flag_dependencies:
-                # Check for read of flag until overwrite
-                for instr_form in kernel:
+                if "flag" in dst and flag_dependencies:
+                    # read of flag
                     if self.is_read(dst.flag, instr_form):
-                        yield instr_form
-                        if self.is_written(dst.flag, instr_form):
-                            # operand in src_dst list
-                            if include_write:
-                                yield instr_form
-                            break
-                    elif self.is_written(dst.flag, instr_form):
-                        if include_write:
-                            yield instr_form
+                        yield instr_form, []
+                    # write to flag -> abort
+                    if self.is_written(dst.flag, instr_form):
                         break
-            elif "memory" in dst:
-                # Check if base register is altered during memory access
-                if "pre_indexed" in dst.memory or "post_indexed" in dst.memory:
-                    # Check for read of base register until overwrite
-                    for instr_form in kernel:
-                        if self.is_read(dst.memory.base, instr_form):
-                            instr_form["mem_dep"] = instruction_form
-                            yield instr_form
-                            if self.is_written(dst.memory.base, instr_form):
-                                # operand in src_dst list
-                                if include_write:
-                                    instr_form["mem_dep"] = instruction_form
-                                    yield instr_form
-                                break
-                        elif self.is_written(dst.memory.base, instr_form):
-                            if include_write:
-                                instr_form["mem_dep"] = instruction_form
-                                yield instr_form
+                if "memory" in dst:
+                    # base register is altered during memory access
+                    if "pre_indexed" in dst.memory:
+                        if self.is_written(dst.memory.base, instr_form):
                             break
+                    #if dst.memory.base:
+                    #    if self.is_read(dst.memory.base, instr_form):
+                    #        yield instr_form, []
+                    #if dst.memory.index:
+                    #    if self.is_read(dst.memory.index, instr_form):
+                    #        yield instr_form, []
+                    if "post_indexed" in dst.memory:
+                        # Check for read of base register until overwrite
+                        if self.is_written(dst.memory.base, instr_form):
+                            break
+                    # TODO record register changes
+                    #      (e.g., mov, leaadd, sub, inc, dec) in instructions[:i] 
+                    #      and pass to is_memload and is_memstore to consider relevance.
+                    # load from same location (presumed)
+                    if self.is_memload(dst.memory, instr_form, register_changes):
+                        yield instr_form, ["storeload_dep"]
+                    # store to same location (presumed)
+                    if self.is_memstore(dst.memory, instr_form, register_changes):
+                        break
+                self._update_reg_changes(instr_form, register_changes, only_postindexed=True)
+
+    def _update_reg_changes(self, iform, reg_state=None, only_postindexed=False):
+        if self.arch_sem is None:
+            # This analysis requires semenatics to be available
+            return {}
+        if reg_state is None:
+            reg_state = {}
+        for reg, change in self.arch_sem.get_reg_changes(iform, only_postindexed).items():
+            if change is None or reg_state.get(reg, {}) is None:
+                reg_state[reg] = None
+            else:
+                reg_state.setdefault(reg, {'name': reg, 'value': 0})
+                if change['name'] != reg:
+                    # renaming occured, ovrwrite value with up-to-now change of source register
+                    reg_state[reg]['name'] = change['name']
+                    src_reg_state = reg_state.get(change['name'], {'value': 0})
+                    if src_reg_state is None:
+                        # original register's state was changed beyond reconstruction
+                        reg_state[reg] = None
+                        continue
+                    reg_state[reg]['value'] = src_reg_state['value']
+                reg_state[reg]['value'] += change['value']
+        return reg_state
 
     def get_dependent_instruction_forms(self, instr_form=None, line_number=None):
         """
@@ -276,6 +298,60 @@ class KernelDG(nx.DiGraph):
                     is_read = self.parser.is_reg_dependend_of(register, dst.memory.index) or is_read
         return is_read
 
+    def is_memload(self, mem, instruction_form, register_changes={}):
+        """Check if instruction form loads from given location, assuming register_changes"""
+        if instruction_form.semantic_operands is None:
+            return False
+        for src in chain(
+            instruction_form.semantic_operands.source, instruction_form.semantic_operands.src_dst
+        ):
+            # Here we check for mem dependecies only
+            if "memory" not in src:
+                continue
+            src = src.memory
+
+            # determine absolute address change
+            addr_change = 0
+            if src.offset and "value" in src.offset:
+                addr_change += int(src.offset.value)
+            if mem.offset:
+                addr_change -= int(mem.offset.value)
+            if mem.base and src.base:
+                base_change = register_changes.get(
+                    src.base.get('prefix', '')+src.base.name,
+                    {'name': src.base.get('prefix', '')+src.base.name, 'value': 0})
+                if base_change is None:
+                    # Unknown change occurred
+                    continue
+                if mem.base.get('prefix', '')+mem.base['name'] != base_change['name']:
+                    # base registers do not match
+                    continue
+                addr_change += base_change['value']
+            elif mem.base or src.base:
+                    # base registers do not match
+                    continue
+            if mem.index and src.index:
+                index_change = register_changes.get(
+                    src.index.get('prefix', '')+src.index.name,
+                    {'name': src.index.get('prefix', '')+src.index.name, 'value': 0})
+                if index_change is None:
+                    # Unknown change occurred
+                    continue
+                if mem.scale != src.scale:
+                    # scale factors do not match
+                    continue
+                if mem.index.get('prefix', '')+mem.index['name'] != index_change['name']:
+                    # index registers do not match
+                    continue
+                addr_change += index_change['value'] * src.scale
+            elif mem.index or src.index:
+                    # index registers do not match
+                    continue
+            #if instruction_form.line_number == 3:
+            if addr_change == 0:
+                return True
+        return False
+
     def is_written(self, register, instruction_form):
         """Check if instruction form writes in given register"""
         is_written = False
@@ -305,6 +381,19 @@ class KernelDG(nx.DiGraph):
                     )
         return is_written
 
+    def is_memstore(self, mem, instruction_form, register_changes={}):
+        """Check if instruction form stores to given location, assuming unchanged registers"""
+        is_store = False
+        if instruction_form.semantic_operands is None:
+            return is_store
+        for dst in chain(
+            instruction_form.semantic_operands.destination,
+            instruction_form.semantic_operands.src_dst,
+        ):
+            if "memory" in dst:
+                is_store = mem == dst["memory"] or is_store
+        return is_store
+
     def export_graph(self, filepath=None):
         """
         Export graph with highlighted CP and LCDs as DOT file. Writes it to 'osaca_dg.dot'
@@ -319,7 +408,7 @@ class KernelDG(nx.DiGraph):
         lcd = self.get_loopcarried_dependencies()
         lcd_line_numbers = {}
         for dep in lcd:
-            lcd_line_numbers[dep] = [x["line_number"] for x in lcd[dep]["dependencies"]]
+            lcd_line_numbers[dep] = [x["line_number"] for x, lat in lcd[dep]["dependencies"]]
         # add color scheme
         graph.graph["node"] = {"colorscheme": "accent8"}
         graph.graph["edge"] = {"colorscheme": "accent8"}
@@ -330,8 +419,8 @@ class KernelDG(nx.DiGraph):
             max_line_number = max(lcd_line_numbers[dep])
             graph.add_edge(max_line_number, min_line_number)
             graph.edges[max_line_number, min_line_number]["latency"] = [
-                x for x in lcd[dep]["dependencies"] if x["line_number"] == max_line_number
-            ][0]["latency_lcd"]
+                lat for x, lat in lcd[dep]["dependencies"] if x["line_number"] == max_line_number
+            ]
 
         # add label to edges
         for e in graph.edges:

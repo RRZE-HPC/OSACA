@@ -265,6 +265,12 @@ class ArchSemantics(ISASemantics):
                             st_data_port_pressure = self._machine_model.average_port_pressure(
                                 st_data_port_uops
                             )
+                            if "store_throughput_multiplier" in self._machine_model:
+                                multiplier = self._machine_model["store_throughput_multiplier"][
+                                    reg_type
+                                ]
+                                st_data_port_pressure = [
+                                    pp * multiplier for pp in st_data_port_pressure]
                             data_port_pressure = [
                                 sum(x) for x in zip(data_port_pressure, st_data_port_pressure)
                             ]

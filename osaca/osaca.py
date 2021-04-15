@@ -5,6 +5,7 @@ import io
 import os
 import re
 import sys
+from functools import lru_cache
 
 from osaca.db_interface import import_benchmark_output, sanity_check
 from osaca.frontend import Frontend
@@ -302,7 +303,7 @@ def inspect(args, output_file=sys.stdout):
         semantics.assign_optimal_throughput(kernel)
 
     # Create DiGrahps
-    kernel_graph = KernelDG(kernel, parser, machine_model)
+    kernel_graph = KernelDG(kernel, parser, machine_model, semantics)
     if args.dotpath is not None:
         kernel_graph.export_graph(args.dotpath if args.dotpath != "." else None)
     # Print analysis
@@ -345,6 +346,7 @@ def run(args, output_file=sys.stdout):
         inspect(args, output_file=output_file)
 
 
+@lru_cache()
 def get_asm_parser(arch) -> BaseParser:
     """
     Helper function to create the right parser for a specific architecture.
