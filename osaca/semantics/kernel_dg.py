@@ -88,31 +88,32 @@ class KernelDG(nx.DiGraph):
         loopcarried_deps = []
         paths = []
         for instr in kernel:
-            paths += list(nx.algorithms.simple_paths.all_simple_paths(
+            paths.append(nx.algorithms.simple_paths.all_simple_paths(
                 dg, instr.line_number, instr.line_number + offset))
 
         paths_set = set()
-        for path in paths:
-            lat_sum = 0.0
-            # extend path by edge bound latencies (e.g., store-to-load latency)
-            lat_path = []
-            for s, d in nx.utils.pairwise(path):
-                edge_lat = dg.edges[s, d]['latency']
-                # map source node back to original line numbers
-                if s >= offset:
-                    s -= offset
-                lat_path.append((s, edge_lat))
-                lat_sum += edge_lat
-            if d >= offset:
-                d -= offset
-            lat_path.sort()
+        for path_gen in paths:
+            for path in path_gen:
+                lat_sum = 0.0
+                # extend path by edge bound latencies (e.g., store-to-load latency)
+                lat_path = []
+                for s, d in nx.utils.pairwise(path):
+                    edge_lat = dg.edges[s, d]['latency']
+                    # map source node back to original line numbers
+                    if s >= offset:
+                        s -= offset
+                    lat_path.append((s, edge_lat))
+                    lat_sum += edge_lat
+                if d >= offset:
+                    d -= offset
+                lat_path.sort()
 
-            # Ignore duplicate paths which differ only in the root node
-            if tuple(lat_path) in paths_set:
-                continue
-            paths_set.add(tuple(lat_path))
+                # Ignore duplicate paths which differ only in the root node
+                if tuple(lat_path) in paths_set:
+                    continue
+                paths_set.add(tuple(lat_path))
 
-            loopcarried_deps.append((lat_sum, lat_path))
+                loopcarried_deps.append((lat_sum, lat_path))
         loopcarried_deps.sort(reverse=True)
 
         # map lcd back to nodes
