@@ -147,6 +147,15 @@ def create_parser(parser=None):
         help="Ignore if instructions cannot be found in the data file and print analysis anyway.",
     )
     parser.add_argument(
+        "--lcd-timeout",
+        dest="lcd_timeout",
+        metavar="SECONDS",
+        type=int,
+        default=10,
+        help="Set timeout in seconds for LCD analysis. After timeout, OSACA will continue"
+        " its analysis with the dependency paths found up to this point. Defaults to 10.",
+    )
+    parser.add_argument(
         "--verbose", "-v", action="count", default=0, help="Increases verbosity level."
     )
     parser.add_argument(
@@ -303,7 +312,7 @@ def inspect(args, output_file=sys.stdout):
         semantics.assign_optimal_throughput(kernel)
 
     # Create DiGrahps
-    kernel_graph = KernelDG(kernel, parser, machine_model, semantics)
+    kernel_graph = KernelDG(kernel, parser, machine_model, semantics, args.lcd_timeout)
     if args.dotpath is not None:
         kernel_graph.export_graph(args.dotpath if args.dotpath != "." else None)
     # Print analysis
@@ -315,6 +324,7 @@ def inspect(args, output_file=sys.stdout):
             ignore_unknown=ignore_unknown,
             arch_warning=print_arch_warning,
             length_warning=print_length_warning,
+            lcd_warning=kernel_graph.timed_out,
             verbose=verbose,
         ),
         file=output_file,
