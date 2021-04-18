@@ -20,7 +20,6 @@ SUPPORTED_ARCHS = [
     "BDW",
     "SKX",
     "CSX",
-    "CLX",
     "ICL",
     "ZEN1",
     "ZEN2",
@@ -182,6 +181,9 @@ def check_arguments(args, parser):
     """
     supported_import_files = ["ibench", "asmbench"]
 
+    # manually set CLX to CSX to support both abbreviations
+    if args.arch.upper() == "CLX":
+        args.arch = "CSX"
     if args.arch is None and (args.check_db or "import_data" in args):
         parser.error(
             "DB check and data import cannot work with a default microarchitecture. "
@@ -191,9 +193,6 @@ def check_arguments(args, parser):
         parser.error(
             "Microarchitecture not supported. Please see --help for all valid architecture codes."
         )
-    # manually set CLX to CSX to support both abbreviations
-    if args.arch.upper() == "CLX":
-        args.arch = "CSX"
     if "import_data" in args and args.import_data not in supported_import_files:
         parser.error(
             "Microbenchmark not supported for data import. Please see --help for all valid "
