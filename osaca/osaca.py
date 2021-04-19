@@ -153,7 +153,8 @@ def create_parser(parser=None):
         type=int,
         default=10,
         help="Set timeout in seconds for LCD analysis. After timeout, OSACA will continue"
-        " its analysis with the dependency paths found up to this point. Defaults to 10.",
+        " its analysis with the dependency paths found up to this point. Defaults to 10."
+        " Set to -1 for no timeout.",
     )
     parser.add_argument(
         "--verbose", "-v", action="count", default=0, help="Increases verbosity level."

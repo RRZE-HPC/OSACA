@@ -2,12 +2,10 @@
 
 import copy
 import time
-from collections import defaultdict
-from itertools import accumulate, chain, product
+from itertools import chain
 from multiprocessing import Manager, Process, cpu_count
 
 import networkx as nx
-from osaca.parser import AttrDict
 from osaca.semantics import INSTR_FLAGS, ArchSemantics, MachineModel
 
 
@@ -123,22 +121,27 @@ class KernelDG(nx.DiGraph):
                 ]
                 for p in processes:
                     p.start()
-                start_time = time.time()
-                while time.time() - start_time <= timeout:
-                    if any(p.is_alive() for p in processes):
-                        time.sleep(0.2)
-                    else:
-                        # all procs done
-                        for p in processes:
-                            p.join()
-                        break
-                else:
-                    self.timed_out = True
-                    # terminate running processes
+                if (timeout == -1):
+                    # no timeout
                     for p in processes:
-                        if p.is_alive():
-                            p.kill()
                         p.join()
+                else:
+                    start_time = time.time()
+                    while time.time() - start_time <= timeout:
+                        if any(p.is_alive() for p in processes):
+                            time.sleep(0.2)
+                        else:
+                            # all procs done
+                            for p in processes:
+                                p.join()
+                            break
+                    else:
+                        self.timed_out = True
+                        # terminate running processes
+                        for p in processes:
+                            if p.is_alive():
+                                p.kill()
+                            p.join()
                 all_paths = list(all_paths)
         else:
             # sequential execution to avoid overhead when analyzing smaller kernels
