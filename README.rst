@@ -377,8 +377,8 @@ Citations
 =========
 If you use OSACA for scientific work you can cite us as  (for the Bibtex, see the `Wiki <https://github.com/RRZE-HPC/OSACA/wiki#acknowledgement>`_):
 
-* `Automated Instruction Stream Throughput Prediction for Intel and AMD Microarchitectures <https://doi.org/10.1109/PMBS.2018.8641578>`_ (`Pre-print <https://arxiv.org/abs/1809.00912>`_)
-* `Automatic Throughput and Critical Path Analysis of x86 and ARM Assembly Kernels <https://doi.org/10.1109/PMBS49563.2019.00006>`_ (`Pre-print <https://arxiv.org/abs/1910.00214>`_)
+* `Automated Instruction Stream Throughput Prediction for Intel and AMD Microarchitectures <https://doi.org/10.1109/PMBS.2018.8641578>`_ (`Pre-print PMBS18 <https://arxiv.org/abs/1809.00912>`_)
+* `Automatic Throughput and Critical Path Analysis of x86 and ARM Assembly Kernels <https://doi.org/10.1109/PMBS49563.2019.00006>`_ (`Pre-print PMBS19 <https://arxiv.org/abs/1910.00214>`_)
 
 Credits
 =======
