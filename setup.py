@@ -91,7 +91,6 @@ setup(
         # Specify the Python versions you support here. In particular, ensure
         # that you indicate wheter you support Python2, Python 3 or both.
         "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.5",
         "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
@@ -107,7 +106,7 @@ setup(
     # requirements files see:
     # https://packaging.python.org/en/latest/requirements.html
     install_requires=["networkx", "pyparsing>=2.3.1", "ruamel.yaml>=0.15.71"],
-    python_requires=">=3.5",
+    python_requires=">=3.6",
     # List additional groups of dependencies here (e.g. development
     # dependencies). You can install these using the following syntax,
     # for example:
