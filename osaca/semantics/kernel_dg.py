@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 
 import copy
+import os
+import signal
 import time
 from itertools import chain
 from multiprocessing import Manager, Process, cpu_count
@@ -140,7 +142,9 @@ class KernelDG(nx.DiGraph):
                         # terminate running processes
                         for p in processes:
                             if p.is_alive():
-                                p.kill()
+                                # Python 3.6 does not support Process.kill().
+                                # Can be changed to `p.kill()` after EoL (01/22) of Py3.6
+                                os.kill(p.pid, signal.SIGKILL)
                             p.join()
                 all_paths = list(all_paths)
         else:

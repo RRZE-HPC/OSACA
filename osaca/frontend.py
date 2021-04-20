@@ -351,9 +351,9 @@ class Frontend(object):
         lcd_text = (
             "-------------------------------- WARNING: LCD analysis timed out "
             "-------------------------------\n         While searching for all dependency chains"
-            " the analysis timed out.\n         Decrease the number of instructions or set the "
-            "timeout threshold with --lcd-timeout.\n         See --help for more "
-            "information.\n" + dashed_line
+            " the analysis timed out and might be\n         incomplete. Decrease the number of "
+            "instructions or set the timeout threshold\n         with --lcd-timeout. See --help"
+            " for more information.\n" + dashed_line
         )
         warnings = "\n"
         warnings += lcd_text if lcd_warning else ""
