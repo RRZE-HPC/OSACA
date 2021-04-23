@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 from itertools import chain
+from copy import deepcopy
 
 from osaca import utils
 from osaca.parser import AttrDict, ParserAArch64, ParserX86ATT
@@ -122,6 +123,7 @@ class ISASemantics(object):
                             "pre_indexed": pre_indexed,
                             "post_indexed": post_indexed})
                     )
+            
         # store operand list in dict and reassign operand key/value pair
         instruction_form["semantic_operands"] = AttrDict.convert_dict(op_dict)
         # assign LD/ST flags
@@ -130,6 +132,7 @@ class ISASemantics(object):
             instruction_form["flags"] += [INSTR_FLAGS.HAS_LD]
         if self._has_store(instruction_form):
             instruction_form["flags"] += [INSTR_FLAGS.HAS_ST]
+        
 
     def get_reg_changes(self, instruction_form, only_postindexed=False):
         """
