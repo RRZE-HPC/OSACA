@@ -326,32 +326,17 @@ class TestParserAArch64(unittest.TestCase):
 
     def test_multiple_regs(self):
         instr_range = "PUSH {x5-x7}"
-        reg_range = AttrDict(
-            {
-                "register": {
-                    "range": [{"prefix": "x", "name": "5"}, {"prefix": "x", "name": "7"}],
-                    "index": None,
-                }
-            }
-        )
-        instr_list = "POP {x5, x7, x9}"
-        reg_list = AttrDict(
-            {
-                "register": {
-                    "list": [
-                        {"prefix": "x", "name": "5"},
-                        {"prefix": "x", "name": "7"},
-                        {"prefix": "x", "name": "9"},
-                    ],
-                    "index": None,
-                }
-            }
-        )
+        instr_list = "POP {x5, x6, x7}"
+        reg_list = [
+            AttrDict({"register": {"prefix": "x", "name": "5"}}),
+            AttrDict({"register": {"prefix": "x", "name": "6"}}),
+            AttrDict({"register": {"prefix": "x", "name": "7"}}),
+        ]
         prange = self.parser.parse_line(instr_range)
         plist = self.parser.parse_line(instr_list)
 
-        self.assertEqual(prange.operands[0], reg_range)
-        self.assertEqual(plist.operands[0], reg_list)
+        self.assertEqual(prange.operands, reg_list)
+        self.assertEqual(plist.operands, reg_list)
 
     def test_reg_dependency(self):
         reg_1_1 = AttrDict({"prefix": "b", "name": "1"})
@@ -405,18 +390,18 @@ class TestParserAArch64(unittest.TestCase):
     def _get_comment(self, parser, comment):
         return " ".join(
             AttrDict.convert_dict(
-                parser.process_operand(parser.comment.parseString(comment, parseAll=True).asDict())
+                parser.process_operand(parser.comment.parseString(comment, parseAll=True).asDict())[0]
             ).comment
         )
 
     def _get_label(self, parser, label):
         return AttrDict.convert_dict(
-            parser.process_operand(parser.label.parseString(label, parseAll=True).asDict())
+            parser.process_operand(parser.label.parseString(label, parseAll=True).asDict())[0]
         ).label
 
     def _get_directive(self, parser, directive):
         return AttrDict.convert_dict(
-            parser.process_operand(parser.directive.parseString(directive, parseAll=True).asDict())
+            parser.process_operand(parser.directive.parseString(directive, parseAll=True).asDict())[0]
         ).directive
 
     @staticmethod
