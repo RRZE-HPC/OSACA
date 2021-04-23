@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-
-
+from copy import deepcopy
 import pyparsing as pp
 
 from osaca.parser import AttrDict, BaseParser
@@ -240,7 +239,7 @@ class ParserAArch64(BaseParser):
 
         # 1. Parse comment
         try:
-            result = self.process_operand(self.comment.parseString(line, parseAll=True).asDict())
+            result = self.process_operand(self.comment.parseString(line, parseAll=True).asDict())[0]
             result = AttrDict.convert_dict(result)
             instruction_form[self.COMMENT_ID] = " ".join(result[self.COMMENT_ID])
         except pp.ParseException:
@@ -249,7 +248,7 @@ class ParserAArch64(BaseParser):
         try:
             result = self.process_operand(
                 self.llvm_markers.parseString(line, parseAll=True).asDict()
-            )
+            )[0]
             result = AttrDict.convert_dict(result)
             instruction_form[self.COMMENT_ID] = " ".join(result[self.COMMENT_ID])
         except pp.ParseException:
@@ -257,7 +256,7 @@ class ParserAArch64(BaseParser):
         # 2. Parse label
         if result is None:
             try:
-                result = self.process_operand(self.label.parseString(line, parseAll=True).asDict())
+                result = self.process_operand(self.label.parseString(line, parseAll=True).asDict())[0]
                 result = AttrDict.convert_dict(result)
                 instruction_form[self.LABEL_ID] = result[self.LABEL_ID].name
                 if self.COMMENT_ID in result[self.LABEL_ID]:
@@ -272,7 +271,7 @@ class ParserAArch64(BaseParser):
             try:
                 result = self.process_operand(
                     self.directive.parseString(line, parseAll=True).asDict()
-                )
+                )[0]
                 result = AttrDict.convert_dict(result)
                 instruction_form[self.DIRECTIVE_ID] = AttrDict(
                     {
@@ -292,7 +291,6 @@ class ParserAArch64(BaseParser):
             try:
                 result = self.parse_instruction(line)
             except (pp.ParseException, KeyError) as e:
-                raise e
                 raise ValueError("Unable to parse {!r} on line {}".format(line, line_number)) from e
             instruction_form[self.INSTRUCTION_ID] = result[self.INSTRUCTION_ID]
             instruction_form[self.OPERANDS_ID] = result[self.OPERANDS_ID]
@@ -313,19 +311,19 @@ class ParserAArch64(BaseParser):
         # Add operands to list
         # Check first operand
         if "operand1" in result:
-            operands.append(self.process_operand(result["operand1"]))
+            operands += self.process_operand(result["operand1"])
         # Check second operand
         if "operand2" in result:
-            operands.append(self.process_operand(result["operand2"]))
+            operands += self.process_operand(result["operand2"])
         # Check third operand
         if "operand3" in result:
-            operands.append(self.process_operand(result["operand3"]))
+            operands += self.process_operand(result["operand3"])
         # Check fourth operand
         if "operand4" in result:
-            operands.append(self.process_operand(result["operand4"]))
+            operands += self.process_operand(result["operand4"])
         # Check fifth operand
         if "operand5" in result:
-            operands.append(self.process_operand(result["operand5"]))
+            operands += self.process_operand(result["operand5"])
 
         return_dict = AttrDict(
             {
@@ -342,23 +340,23 @@ class ParserAArch64(BaseParser):
         """Post-process operand"""
         # structure memory addresses
         if self.MEMORY_ID in operand:
-            return self.process_memory_address(operand[self.MEMORY_ID])
+            return [self.process_memory_address(operand[self.MEMORY_ID])]
         # structure register lists
         if self.REGISTER_ID in operand and (
             "list" in operand[self.REGISTER_ID] or "range" in operand[self.REGISTER_ID]
         ):
-            # TODO: discuss if ranges should be converted to lists
-            return self.process_register_list(operand[self.REGISTER_ID])
+            # resolve ranges and lists
+            return self.resolve_range_list(self.process_register_list(operand[self.REGISTER_ID]))
         if self.REGISTER_ID in operand and operand[self.REGISTER_ID]["name"] == "sp":
-            return self.process_sp_register(operand[self.REGISTER_ID])
+            return [self.process_sp_register(operand[self.REGISTER_ID])]
         # add value attribute to floating point immediates without exponent
         if self.IMMEDIATE_ID in operand:
-            return self.process_immediate(operand[self.IMMEDIATE_ID])
+            return [self.process_immediate(operand[self.IMMEDIATE_ID])]
         if self.LABEL_ID in operand:
-            return self.process_label(operand[self.LABEL_ID])
+            return [self.process_label(operand[self.LABEL_ID])]
         if self.IDENTIFIER_ID in operand:
-            return self.process_identifier(operand[self.IDENTIFIER_ID])
-        return operand
+            return [self.process_identifier(operand[self.IDENTIFIER_ID])]
+        return [operand]
 
     def process_memory_address(self, memory_address):
         """Post-process memory address operand"""
@@ -390,6 +388,36 @@ class ParserAArch64(BaseParser):
         reg = register
         reg["prefix"] = "x"
         return AttrDict({self.REGISTER_ID: reg})
+
+    def resolve_range_list(self, operand):
+        """
+        Resolve range or list register operand to list of registers.
+        
+        Returns None if neither list nor range
+        """
+        if 'register' in operand:
+            if 'list' in operand.register:
+                index = operand.register.get('index')
+                l = []
+                for reg in operand.register.list:
+                    reg = deepcopy(reg)
+                    if index is not None:
+                        reg.index = index
+                    l.append(AttrDict({self.REGISTER_ID: reg}))
+                return l
+            elif 'range' in operand.register:
+                base_register = operand.register.range[0]
+                index = operand.register.get('index')
+                l = []
+                start_name = base_register.name
+                end_name = operand.register.range[1].name
+                for name in range(int(start_name), int(end_name)+1):
+                    reg = deepcopy(base_register)
+                    if index is not None:
+                        reg['index'] = operand.register.range.index
+                    reg['name'] = str(name)
+                    l.append(AttrDict({self.REGISTER_ID: reg}))
+                return l
 
     def process_register_list(self, register_list):
         """Post-process register lists (e.g., {r0,r3,r5}) and register ranges (e.g., {r0-r7})"""

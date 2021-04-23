@@ -1132,6 +1132,27 @@ instruction_forms:
   throughput: 2.0
   latency: 11.0  # 	1*p0+1*p3+4*p56+1*p5D6D
   port_pressure: [[1, '0'],[1, '3'],[4, '56'], [4, ['5D', '6D']]] # not sure if we also have 4 data accesses
+- name: ld2d
+  operands:
+  - class: register
+    prefix: 'z'
+    shape: 'd'
+  - class: register
+    prefix: 'z'
+    shape: 'd'
+  - class: register
+    prefix: p
+    predication: '*'
+  - class: memory
+    base: x
+    offset: '*'
+    index: '*'
+    scale: '*'
+    pre-indexed: false
+    post-indexed: false
+  throughput: 2.0
+  latency: 11.0  # 	1*p0+1*p3+4*p56+1*p5D6D
+  port_pressure: [[2, '56'], [4, ['5D', '6D']]]
 - name: ldp
   operands:
   - class: register
@@ -1970,6 +1991,27 @@ instruction_forms:
     shape: d
   - class: register
     prefix: p
+  - class: memory
+    base: x
+    offset: '*'
+    index: '*'
+    scale: '*'
+    pre-indexed: false
+    post-indexed: false
+  throughput: 1.0
+  latency: 0  # 	1*p5+1*p6+1*p0
+  port_pressure: [[1, '5'], [1, '6'], [1, '0']]
+- name: st2d
+  operands:
+  - class: register
+    prefix: 'z'
+    shape: 'd'
+  - class: register
+    prefix: 'z'
+    shape: 'd'
+  - class: register
+    prefix: p
+    predication: '*'
   - class: memory
     base: x
     offset: '*'

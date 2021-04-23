@@ -34,6 +34,8 @@ class TestSemanticTools(unittest.TestCase):
             cls.code_aarch64_memdep = f.read()
         with open(cls._find_file("kernel_aarch64.s")) as f:
             cls.code_AArch64 = f.read()
+        with open(cls._find_file("kernel_aarch64_sve.s")) as f:
+            cls.code_AArch64_SVE = f.read()
         cls.kernel_x86 = reduce_to_section(cls.parser_x86.parse_file(cls.code_x86), "x86")
         cls.kernel_x86_memdep = reduce_to_section(
             cls.parser_x86.parse_file(cls.code_x86_memdep), "x86")
@@ -41,6 +43,8 @@ class TestSemanticTools(unittest.TestCase):
             cls.parser_AArch64.parse_file(cls.code_AArch64), "aarch64")
         cls.kernel_aarch64_memdep = reduce_to_section(
             cls.parser_AArch64.parse_file(cls.code_aarch64_memdep), "aarch64")
+        cls.kernel_aarch64_SVE = reduce_to_section(
+            cls.parser_AArch64.parse_file(cls.code_AArch64_SVE), "aarch64")
 
         # set up machine models
         cls.machine_model_csx = MachineModel(
@@ -49,6 +53,9 @@ class TestSemanticTools(unittest.TestCase):
         cls.machine_model_tx2 = MachineModel(
             path_to_yaml=os.path.join(cls.MODULE_DATA_DIR, "tx2.yml")
         )
+        cls.machine_model_a64fx = MachineModel(
+            path_to_yaml=os.path.join(cls.MODULE_DATA_DIR, "a64fx.yml")
+        )
         cls.semantics_x86 = ISASemantics("x86")
         cls.semantics_csx = ArchSemantics(
             cls.machine_model_csx, path_to_yaml=os.path.join(cls.MODULE_DATA_DIR, "isa/x86.yml")
@@ -56,6 +63,10 @@ class TestSemanticTools(unittest.TestCase):
         cls.semantics_aarch64 = ISASemantics("aarch64")
         cls.semantics_tx2 = ArchSemantics(
             cls.machine_model_tx2,
+            path_to_yaml=os.path.join(cls.MODULE_DATA_DIR, "isa/aarch64.yml"),
+        )
+        cls.semantics_a64fx = ArchSemantics(
+            cls.machine_model_a64fx,
             path_to_yaml=os.path.join(cls.MODULE_DATA_DIR, "isa/aarch64.yml"),
         )
         cls.machine_model_zen = MachineModel(arch="zen1")
@@ -72,6 +83,9 @@ class TestSemanticTools(unittest.TestCase):
         for i in range(len(cls.kernel_aarch64_memdep)):
             cls.semantics_tx2.assign_src_dst(cls.kernel_aarch64_memdep[i])
             cls.semantics_tx2.assign_tp_lt(cls.kernel_aarch64_memdep[i])
+        for i in range(len(cls.kernel_aarch64_SVE)):
+            cls.semantics_a64fx.assign_src_dst(cls.kernel_aarch64_SVE[i])
+            cls.semantics_a64fx.assign_tp_lt(cls.kernel_aarch64_SVE[i])
 
     ###########
     # Tests
@@ -320,6 +334,11 @@ class TestSemanticTools(unittest.TestCase):
             dg.get_dependent_instruction_forms()
         # test dot creation
         dg.export_graph(filepath="/dev/null")
+    
+    def test_kernelDG_SVE(self):
+        dg = KernelDG(self.kernel_aarch64_SVE, self.parser_AArch64, self.machine_model_a64fx,
+                      self.semantics_a64fx)
+        # TODO check for correct analysis
 
     def test_hidden_load(self):
         machine_model_hld = MachineModel(
@@ -421,6 +440,7 @@ class TestSemanticTools(unittest.TestCase):
         self.assertTrue(dag.is_written(reg_ymm1, instr_form_rw_ymm_1))
         self.assertTrue(dag.is_written(reg_ymm1, instr_form_rw_ymm_2))
         self.assertFalse(dag.is_written(reg_ymm1, instr_form_r_ymm))
+        
 
     def test_is_read_is_written_AArch64(self):
         # independent form HW model
