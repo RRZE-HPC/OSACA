@@ -1435,6 +1435,22 @@ instruction_forms:
   throughput: 0.0
   latency: 0.0
   port_pressure: []
+- name: ld2
+  operands:
+  - class: register
+    prefix: v
+  - class: register
+    prefix: v
+  - class: memory
+    base: x
+    offset: '*'
+    index: '*'
+    scale: '*'
+    post-indexed: false
+    pre-indexed: false
+  throughput: 1.0
+  latency: 11.0  # 	1*p56+2*p5D6D
+  port_pressure: [[1, '56'], [2, ['5D','6D']]]
 - name: lsl
   operands:
   - class: register
@@ -2022,6 +2038,22 @@ instruction_forms:
   throughput: 1.0
   latency: 0  # 	1*p5+1*p6+1*p0
   port_pressure: [[1, '5'], [1, '6'], [1, '0']]
+- name: st2
+  operands:
+  - class: register
+    prefix: v
+  - class: register
+    prefix: v
+  - class: memory
+    base: x
+    offset: '*'
+    index: '*'
+    scale: '*'
+    post-indexed: false
+    pre-indexed: false
+  throughput: 1.0
+  latency: 11.0  # 	1*p56+2*p5D6D
+  port_pressure: [[1, '5'], [1, ['6']], [1, '0']]
 - name: sub
   operands:
   - class: register
