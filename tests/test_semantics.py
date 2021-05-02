@@ -5,15 +5,14 @@ Unit tests for Semantic Analysis
 
 import os
 import unittest
+import time
 from copy import deepcopy
 
 import networkx as nx
-
 from osaca.osaca import get_unmatched_instruction_ratio
 from osaca.parser import AttrDict, ParserAArch64, ParserX86ATT
-from osaca.semantics import (
-    INSTR_FLAGS, ArchSemantics, KernelDG, MachineModel, reduce_to_section, ISASemantics
-)
+from osaca.semantics import (INSTR_FLAGS, ArchSemantics, ISASemantics,
+                             KernelDG, MachineModel, reduce_to_section)
 
 
 class TestSemanticTools(unittest.TestCase):
@@ -30,6 +29,8 @@ class TestSemanticTools(unittest.TestCase):
             cls.code_x86 = f.read()
         with open(cls._find_file("kernel_x86_memdep.s")) as f:
             cls.code_x86_memdep = f.read()
+        with open(cls._find_file("kernel_x86_long_LCD.s")) as f:
+            cls.code_x86_long_LCD = f.read()
         with open(cls._find_file("kernel_aarch64_memdep.s")) as f:
             cls.code_aarch64_memdep = f.read()
         with open(cls._find_file("kernel_aarch64.s")) as f:
@@ -38,13 +39,20 @@ class TestSemanticTools(unittest.TestCase):
             cls.code_AArch64_SVE = f.read()
         cls.kernel_x86 = reduce_to_section(cls.parser_x86.parse_file(cls.code_x86), "x86")
         cls.kernel_x86_memdep = reduce_to_section(
-            cls.parser_x86.parse_file(cls.code_x86_memdep), "x86")
+            cls.parser_x86.parse_file(cls.code_x86_memdep), "x86"
+        )
+        cls.kernel_x86_long_LCD = reduce_to_section(
+            cls.parser_x86.parse_file(cls.code_x86_long_LCD), "x86"
+        )
         cls.kernel_AArch64 = reduce_to_section(
-            cls.parser_AArch64.parse_file(cls.code_AArch64), "aarch64")
+            cls.parser_AArch64.parse_file(cls.code_AArch64), "aarch64"
+        )
         cls.kernel_aarch64_memdep = reduce_to_section(
-            cls.parser_AArch64.parse_file(cls.code_aarch64_memdep), "aarch64")
+            cls.parser_AArch64.parse_file(cls.code_aarch64_memdep), "aarch64"
+        )
         cls.kernel_aarch64_SVE = reduce_to_section(
-            cls.parser_AArch64.parse_file(cls.code_AArch64_SVE), "aarch64")
+            cls.parser_AArch64.parse_file(cls.code_AArch64_SVE), "aarch64"
+        )
 
         # set up machine models
         cls.machine_model_csx = MachineModel(
@@ -77,6 +85,9 @@ class TestSemanticTools(unittest.TestCase):
         for i in range(len(cls.kernel_x86_memdep)):
             cls.semantics_csx.assign_src_dst(cls.kernel_x86_memdep[i])
             cls.semantics_csx.assign_tp_lt(cls.kernel_x86_memdep[i])
+        for i in range(len(cls.kernel_x86_long_LCD)):
+            cls.semantics_csx.assign_src_dst(cls.kernel_x86_long_LCD[i])
+            cls.semantics_csx.assign_tp_lt(cls.kernel_x86_long_LCD[i])
         for i in range(len(cls.kernel_AArch64)):
             cls.semantics_tx2.assign_src_dst(cls.kernel_AArch64[i])
             cls.semantics_tx2.assign_tp_lt(cls.kernel_AArch64[i])
@@ -298,8 +309,9 @@ class TestSemanticTools(unittest.TestCase):
         dg.export_graph(filepath="/dev/null")
 
     def test_memdependency_x86(self):
-        dg = KernelDG(self.kernel_x86_memdep, self.parser_x86, self.machine_model_csx,
-                      self.semantics_csx)
+        dg = KernelDG(
+            self.kernel_x86_memdep, self.parser_x86, self.machine_model_csx, self.semantics_csx
+        )
         self.assertTrue(nx.algorithms.dag.is_directed_acyclic_graph(dg.dg))
         self.assertEqual(set(dg.get_dependent_instruction_forms(line_number=3)), {6, 8})
         self.assertEqual(set(dg.get_dependent_instruction_forms(line_number=5)), {10, 12})
@@ -309,8 +321,9 @@ class TestSemanticTools(unittest.TestCase):
         dg.export_graph(filepath="/dev/null")
 
     def test_kernelDG_AArch64(self):
-        dg = KernelDG(self.kernel_AArch64, self.parser_AArch64, self.machine_model_tx2,
-                      self.semantics_tx2)
+        dg = KernelDG(
+            self.kernel_AArch64, self.parser_AArch64, self.machine_model_tx2, self.semantics_tx2
+        )
         self.assertTrue(nx.algorithms.dag.is_directed_acyclic_graph(dg.dg))
         self.assertEqual(set(dg.get_dependent_instruction_forms(line_number=3)), {7, 8})
         self.assertEqual(set(dg.get_dependent_instruction_forms(line_number=4)), {9, 10})
@@ -334,10 +347,14 @@ class TestSemanticTools(unittest.TestCase):
             dg.get_dependent_instruction_forms()
         # test dot creation
         dg.export_graph(filepath="/dev/null")
-    
+
     def test_kernelDG_SVE(self):
-        dg = KernelDG(self.kernel_aarch64_SVE, self.parser_AArch64, self.machine_model_a64fx,
-                      self.semantics_a64fx)
+        KernelDG(
+            self.kernel_aarch64_SVE,
+            self.parser_AArch64,
+            self.machine_model_a64fx,
+            self.semantics_a64fx,
+        )
         # TODO check for correct analysis
 
     def test_hidden_load(self):
@@ -372,14 +389,20 @@ class TestSemanticTools(unittest.TestCase):
             dg.get_loopcarried_dependencies()
 
     def test_loop_carried_dependency_aarch64(self):
-        dg = KernelDG(self.kernel_aarch64_memdep, self.parser_AArch64, self.machine_model_tx2,
-                      self.semantics_tx2)
+        dg = KernelDG(
+            self.kernel_aarch64_memdep,
+            self.parser_AArch64,
+            self.machine_model_tx2,
+            self.semantics_tx2,
+        )
         lc_deps = dg.get_loopcarried_dependencies()
         self.assertEqual(len(lc_deps), 2)
         # based on line 6
         self.assertEqual(lc_deps[6]["latency"], 28.0)
-        self.assertEqual([(iform.line_number, lat) for iform, lat in lc_deps[6]['dependencies']],
-                         [(6, 4.0), (10, 6.0), (11, 6.0), (12, 6.0), (13, 6.0), (14, 0)])
+        self.assertEqual(
+            [(iform.line_number, lat) for iform, lat in lc_deps[6]['dependencies']],
+            [(6, 4.0), (10, 6.0), (11, 6.0), (12, 6.0), (13, 6.0), (14, 0)],
+        )
 
     def test_loop_carried_dependency_x86(self):
         lcd_id = 8
@@ -394,7 +417,7 @@ class TestSemanticTools(unittest.TestCase):
         self.assertEqual(len(lc_deps[lcd_id]["dependencies"]), 1)
         self.assertEqual(
             lc_deps[lcd_id]["dependencies"][0][0],
-            dg.dg.nodes(data=True)[lcd_id]["instruction_form"]
+            dg.dg.nodes(data=True)[lcd_id]["instruction_form"],
         )
         # w/  flag dependencies: ID 9 w/ len=2
         # w/o flag dependencies: ID 5 w/ len=1
@@ -407,6 +430,31 @@ class TestSemanticTools(unittest.TestCase):
             lc_deps[lcd_id2]["dependencies"][0][0],
             dg.dg.nodes(data=True)[lcd_id2]["instruction_form"],
         )
+
+    def test_timeout_during_loop_carried_dependency(self):
+        start_time = time.perf_counter()
+        KernelDG(
+            self.kernel_x86_long_LCD,
+            self.parser_x86,
+            self.machine_model_csx,
+            self.semantics_x86,
+            timeout=10
+        )
+        end_time = time.perf_counter()
+        time_10 = end_time - start_time
+        start_time = time.perf_counter()
+        KernelDG(
+            self.kernel_x86_long_LCD,
+            self.parser_x86,
+            self.machine_model_csx,
+            self.semantics_x86,
+            timeout=2
+        )
+        end_time = time.perf_counter()
+        time_2 = end_time - start_time
+        self.assertTrue(time_10 > 10)
+        self.assertTrue(2 < time_2)
+        self.assertTrue(time_2 < (time_10 - 7))
 
     def test_is_read_is_written_x86(self):
         # independent form HW model
@@ -440,7 +488,6 @@ class TestSemanticTools(unittest.TestCase):
         self.assertTrue(dag.is_written(reg_ymm1, instr_form_rw_ymm_1))
         self.assertTrue(dag.is_written(reg_ymm1, instr_form_rw_ymm_2))
         self.assertFalse(dag.is_written(reg_ymm1, instr_form_r_ymm))
-        
 
     def test_is_read_is_written_AArch64(self):
         # independent form HW model

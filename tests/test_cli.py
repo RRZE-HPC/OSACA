@@ -183,14 +183,38 @@ class TestCLI(unittest.TestCase):
         output = StringIO()
         osaca.run(args, output_file=output)
         # WARNING for length
-        self.assertTrue(output.getvalue().count("WARNING") == 1)
+        self.assertTrue(
+            output.getvalue().count(
+                "WARNING: You are analyzing a large amount of instruction forms"
+            )
+            == 1
+        )
+        # WARNING for arch
         args = parser.parse_args(
             ["--lines", "100-199", "--ignore-unknown", self._find_test_file(kernel)]
         )
         output = StringIO()
         osaca.run(args, output_file=output)
-        # WARNING for arch
-        self.assertTrue(output.getvalue().count("WARNING") == 1)
+        self.assertTrue(
+            output.getvalue().count("WARNING: No micro-architecture was specified") == 1
+        )
+        # WARNING for timeout
+        args = parser.parse_args(
+            ["--ignore-unknown", "--lcd-timeout", "0", self._find_test_file(kernel)]
+        )
+        output = StringIO()
+        osaca.run(args, output_file=output)
+        self.assertTrue(
+            output.getvalue().count("WARNING: LCD analysis timed out") == 1
+        )
+        args = parser.parse_args(
+            ["--ignore-unknown", "--lcd-timeout", "-1", self._find_test_file(kernel)]
+        )
+        output = StringIO()
+        osaca.run(args, output_file=output)
+        self.assertTrue(
+            output.getvalue().count("WARNING: LCD analysis timed out") == 0
+        )
 
     def test_lines_arg(self):
         # Run tests with --lines option
