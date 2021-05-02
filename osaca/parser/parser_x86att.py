@@ -108,7 +108,8 @@ class ParserX86ATT(BaseParser):
             )
         )
         memory_segmentation = (
-            self.register.setResultsName("base")
+            pp.Optional(pp.Suppress(pp.Literal("*")))
+            + self.register.setResultsName("base")
             + pp.Literal(":")
             + segment_extension.setResultsName(self.SEGMENT_EXT_ID)
         )
