@@ -256,7 +256,9 @@ class ParserAArch64(BaseParser):
         # 2. Parse label
         if result is None:
             try:
-                result = self.process_operand(self.label.parseString(line, parseAll=True).asDict())[0]
+                result = self.process_operand(
+                    self.label.parseString(line, parseAll=True).asDict()
+                )[0]
                 result = AttrDict.convert_dict(result)
                 instruction_form[self.LABEL_ID] = result[self.LABEL_ID].name
                 if self.COMMENT_ID in result[self.LABEL_ID]:
@@ -364,6 +366,8 @@ class ParserAArch64(BaseParser):
         offset = memory_address.get("offset", None)
         if isinstance(offset, list) and len(offset) == 1:
             offset = offset[0]
+        if offset is not None and "value" in offset:
+            offset["value"] = int(offset["value"], 0)
         base = memory_address.get("base", None)
         index = memory_address.get("index", None)
         scale = 1
@@ -380,7 +384,12 @@ class ParserAArch64(BaseParser):
         if "pre_indexed" in memory_address:
             new_dict["pre_indexed"] = True
         if "post_indexed" in memory_address:
-            new_dict["post_indexed"] = memory_address["post_indexed"]
+            if "value" in memory_address["post_indexed"]:
+                new_dict["post_indexed"] = {"value": int(
+                    memory_address["post_indexed"]["value"], 0
+                )}
+            else:
+                new_dict["post_indexed"] = memory_address["post_indexed"]
         return AttrDict({self.MEMORY_ID: new_dict})
 
     def process_sp_register(self, register):
@@ -392,32 +401,31 @@ class ParserAArch64(BaseParser):
     def resolve_range_list(self, operand):
         """
         Resolve range or list register operand to list of registers.
-        
         Returns None if neither list nor range
         """
         if 'register' in operand:
             if 'list' in operand.register:
                 index = operand.register.get('index')
-                l = []
+                range_list = []
                 for reg in operand.register.list:
                     reg = deepcopy(reg)
                     if index is not None:
-                        reg.index = index
-                    l.append(AttrDict({self.REGISTER_ID: reg}))
-                return l
+                        reg['index'] = int(index, 0)
+                    range_list.append(AttrDict({self.REGISTER_ID: reg}))
+                return range_list
             elif 'range' in operand.register:
                 base_register = operand.register.range[0]
                 index = operand.register.get('index')
-                l = []
+                range_list = []
                 start_name = base_register.name
                 end_name = operand.register.range[1].name
-                for name in range(int(start_name), int(end_name)+1):
+                for name in range(int(start_name), int(end_name) + 1):
                     reg = deepcopy(base_register)
                     if index is not None:
-                        reg['index'] = operand.register.range.index
+                        reg['index'] = int(index, 0)
                     reg['name'] = str(name)
-                    l.append(AttrDict({self.REGISTER_ID: reg}))
-                return l
+                    range_list.append(AttrDict({self.REGISTER_ID: reg}))
+                return range_list
 
     def process_register_list(self, register_list):
         """Post-process register lists (e.g., {r0,r3,r5}) and register ranges (e.g., {r0-r7})"""
@@ -447,11 +455,13 @@ class ParserAArch64(BaseParser):
         if "value" in immediate:
             # normal integer value
             immediate["type"] = "int"
+            # convert hex/bin immediates to dec
+            immediate["value"] = self.normalize_imd(immediate)
             return AttrDict({self.IMMEDIATE_ID: immediate})
         if "base_immediate" in immediate:
             # arithmetic immediate, add calculated value as value
             immediate["shift"] = immediate["shift"][0]
-            immediate["value"] = int(immediate["base_immediate"]["value"], 0) << int(
+            immediate["value"] = self.normalize_imd(immediate["base_immediate"]) << int(
                 immediate["shift"]["value"]
             )
             immediate["type"] = "int"
@@ -499,10 +509,11 @@ class ParserAArch64(BaseParser):
     def normalize_imd(self, imd):
         """Normalize immediate to decimal based representation"""
         if "value" in imd:
-            if imd["value"].lower().startswith("0x"):
-                # hex, return decimal
-                return int(imd["value"], 16)
-            return int(imd["value"], 10)
+            if isinstance(imd["value"], str):
+                # hex or bin, return decimal
+                return int(imd["value"], 0)
+            else:
+                return imd["value"]
         elif "float" in imd:
             return self.ieee_to_float(imd["float"])
         elif "double" in imd:

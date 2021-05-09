@@ -327,9 +327,14 @@ class ParserX86ATT(BaseParser):
         offset = memory_address.get("offset", None)
         base = memory_address.get("base", None)
         index = memory_address.get("index", None)
-        scale = 1 if "scale" not in memory_address else int(memory_address["scale"])
+        scale = 1 if "scale" not in memory_address else int(memory_address["scale"], 0)
         if isinstance(offset, str) and base is None and index is None:
-            offset = {"value": offset}
+            try:
+                offset = {"value": int(offset, 0)}
+            except ValueError:
+                offset = {"value": offset}
+        elif offset is not None and "value" in offset:
+            offset["value"] = int(offset["value"], 0)
         new_dict = AttrDict({"offset": offset, "base": base, "index": index, "scale": scale})
         # Add segmentation extension if existing
         if self.SEGMENT_EXT_ID in memory_address:
@@ -347,7 +352,8 @@ class ParserX86ATT(BaseParser):
         if "identifier" in immediate:
             # actually an identifier, change declaration
             return immediate
-        # otherwise nothing to do
+        # otherwise just make sure the immediate is a decimal
+        immediate["value"] = int(immediate["value"], 0)
         return AttrDict({self.IMMEDIATE_ID: immediate})
 
     def get_full_reg_name(self, register):
@@ -358,10 +364,11 @@ class ParserX86ATT(BaseParser):
     def normalize_imd(self, imd):
         """Normalize immediate to decimal based representation"""
         if "value" in imd:
-            if imd["value"].lower().startswith("0x"):
-                # hex, return decimal
-                return int(imd["value"], 16)
-            return int(imd["value"], 10)
+            if isinstance(imd["value"], str):
+                # return decimal
+                return int(imd["value"], 0)
+            else:
+                return imd["value"]
         # identifier
         return imd
 
