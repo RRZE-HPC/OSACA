@@ -120,12 +120,12 @@ class TestParserX86ATT(unittest.TestCase):
         self.assertIsNone(parsed_2.comment)
 
         self.assertEqual(parsed_3.instruction, "movl")
-        self.assertEqual(parsed_3.operands[0].immediate.value, "222")
+        self.assertEqual(parsed_3.operands[0].immediate.value, 222)
         self.assertEqual(parsed_3.operands[1].register.name, "ebx")
         self.assertEqual(parsed_3.comment, "IACA END")
 
         self.assertEqual(parsed_4.instruction, "vmovss")
-        self.assertEqual(parsed_4.operands[1].memory.offset.value, "-4")
+        self.assertEqual(parsed_4.operands[1].memory.offset.value, -4)
         self.assertEqual(parsed_4.operands[1].memory.base.name, "rsp")
         self.assertEqual(parsed_4.operands[1].memory.index.name, "rax")
         self.assertEqual(parsed_4.operands[1].memory.scale, 8)
@@ -146,7 +146,7 @@ class TestParserX86ATT(unittest.TestCase):
         self.assertEqual(parsed_6.operands[0].memory.scale, 8)
         self.assertEqual(parsed_6.operands[1].register.name, "rbx")
 
-        self.assertEqual(parsed_7.operands[0].immediate.value, "0x1")
+        self.assertEqual(parsed_7.operands[0].immediate.value, 0x1)
         self.assertEqual(parsed_7.operands[1].register.name, "xmm0")
         self.assertEqual(parsed_7.operands[2].register.name, "ymm1")
         self.assertEqual(parsed_7.operands[3].register.name, "ymm1")
@@ -189,7 +189,7 @@ class TestParserX86ATT(unittest.TestCase):
             "operands": [
                 {
                     "memory": {
-                        "offset": {"value": "2"},
+                        "offset": {"value": 2},
                         "base": {"name": "rax"},
                         "index": {"name": "rax"},
                         "scale": 1,
@@ -240,7 +240,7 @@ class TestParserX86ATT(unittest.TestCase):
         imd_decimal_1 = {"value": "79"}
         imd_hex_1 = {"value": "0x4f"}
         imd_decimal_2 = {"value": "8"}
-        imd_hex_2 = {"value": "0x8"}
+        imd_hex_2 = {"value": "8"}
         self.assertEqual(
             self.parser.normalize_imd(imd_decimal_1), self.parser.normalize_imd(imd_hex_1)
         )

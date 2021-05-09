@@ -163,16 +163,16 @@ class ISASemantics(object):
         if only_postindexed:
             for o in instruction_form.operands:
                 if 'post_indexed' in o.get('memory', {}):
-                    base_name = o.memory.base.get('prefix', '')+o.memory.base.name
+                    base_name = o.memory.base.get('prefix', '') + o.memory.base.name
                     return {base_name: {
-                        'name': o.memory.base.get('prefix', '')+o.memory.base.name,
-                        'value': int(o.memory.post_indexed.value)
+                        'name': o.memory.base.get('prefix', '') + o.memory.base.name,
+                        'value': o.memory.post_indexed.value
                     }}
             return {}
 
         reg_operand_names = {}  # e.g., {'rax': 'op1'}
         operand_state = {}  # e.g., {'op1': {'name': 'rax', 'value': 0}}  0 means unchanged
-        
+
         for o in instruction_form.operands:
             if 'pre_indexed' in o.get('memory', {}):
                 # Assuming no isa_data.operation
@@ -180,24 +180,24 @@ class ISASemantics(object):
                     raise ValueError(
                         "ISA information for pre-indexed instruction {!r} has operation set."
                         "This is currently not supprted.".format(instruction_form.line))
-                base_name = o.memory.base.get('prefix', '')+o.memory.base.name
+                base_name = o.memory.base.get('prefix', '') + o.memory.base.name
                 reg_operand_names = {base_name: 'op1'}
                 operand_state = {'op1': {
                     'name': base_name,
-                    'value': int(o.memory.offset.value)
+                    'value': o.memory.offset.value
                 }}
 
         if isa_data is not None and 'operation' in isa_data:
             for i, o in enumerate(instruction_form.operands):
-                operand_name = "op{}".format(i+1)
+                operand_name = "op{}".format(i + 1)
                 if "register" in o:
-                    o_reg_name = o["register"].get('prefix', '')+o["register"]["name"]
+                    o_reg_name = o["register"].get('prefix', '') + o["register"]["name"]
                     reg_operand_names[o_reg_name] = operand_name
                     operand_state[operand_name] = {
                         'name': o_reg_name,
                         'value': 0}
                 elif "immediate" in o:
-                    operand_state[operand_name] = {'value': int(o["immediate"]["value"])}
+                    operand_state[operand_name] = {'value': o["immediate"]["value"]}
                 elif "memory" in o:
                     # TODO lea needs some thinking about
                     pass
@@ -212,7 +212,7 @@ class ISASemantics(object):
         """
         Create operand dictionary containing src/dst operands out of the ISA data entry and
         the oeprands of an instruction form
-        
+
         If breaks_pedendency_on_equal_operands is True (configuted per instruction in ISA db)
         and all operands are equal, place operand into destination only.
 

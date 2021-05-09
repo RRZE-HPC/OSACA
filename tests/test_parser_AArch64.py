@@ -102,7 +102,7 @@ class TestParserAArch64(unittest.TestCase):
         self.assertEqual(parsed_3.instruction, "mov")
         self.assertEqual(parsed_3.operands[0].register.name, "2")
         self.assertEqual(parsed_3.operands[0].register.prefix, "x")
-        self.assertEqual(parsed_3.operands[1].immediate.value, "0x222")
+        self.assertEqual(parsed_3.operands[1].immediate.value, int("0x222", 0))
         self.assertEqual(parsed_3.comment, "NOT IACA END")
 
         self.assertEqual(parsed_4.instruction, "str")
@@ -208,7 +208,7 @@ class TestParserAArch64(unittest.TestCase):
                 {"prfop": {"type": ["PLD"], "target": ["L1"], "policy": ["KEEP"]}},
                 {
                     "memory": {
-                        "offset": {"value": "2048"},
+                        "offset": {"value": 2048},
                         "base": {"prefix": "x", "name": "26"},
                         "index": None,
                         "scale": 1,
@@ -228,7 +228,7 @@ class TestParserAArch64(unittest.TestCase):
                 {"register": {"prefix": "x", "name": "30"}},
                 {
                     "memory": {
-                        "offset": {"value": "-16"},
+                        "offset": {"value": -16},
                         "base": {"name": "sp", "prefix": "x"},
                         "index": None,
                         "scale": 1,
@@ -253,7 +253,7 @@ class TestParserAArch64(unittest.TestCase):
                         "base": {"prefix": "x", "name": "11"},
                         "index": None,
                         "scale": 1,
-                        "post_indexed": {"value": "64"},
+                        "post_indexed": {"value": 64},
                     }
                 },
             ],
@@ -270,7 +270,7 @@ class TestParserAArch64(unittest.TestCase):
                 {"register": {"prefix": "p", "name": "0", "predication": "m"}},
                 {"register": {"prefix": "z", "name": "29", "shape": "d"}},
                 {"register": {"prefix": "z", "name": "21", "shape": "d"}},
-                {"immediate": {"value": "90", "type": "int"}},
+                {"immediate": {"value": 90, "type": "int"}},
             ],
             "directive": None,
             "comment": None,
@@ -327,16 +327,28 @@ class TestParserAArch64(unittest.TestCase):
     def test_multiple_regs(self):
         instr_range = "PUSH {x5-x7}"
         instr_list = "POP {x5, x6, x7}"
+        instr_range_with_index = "ld4 {v0.S - v3.S}[2]"
+        instr_list_with_index = "ld4 {v0.S, v1.S, v2.S, v3.S}[2]"
         reg_list = [
             AttrDict({"register": {"prefix": "x", "name": "5"}}),
             AttrDict({"register": {"prefix": "x", "name": "6"}}),
             AttrDict({"register": {"prefix": "x", "name": "7"}}),
         ]
+        reg_list_idx = [
+            AttrDict({"register": {"prefix": "v", "name": "0", "shape": "S", "index": 2}}),
+            AttrDict({"register": {"prefix": "v", "name": "1", "shape": "S", "index": 2}}),
+            AttrDict({"register": {"prefix": "v", "name": "2", "shape": "S", "index": 2}}),
+            AttrDict({"register": {"prefix": "v", "name": "3", "shape": "S", "index": 2}}),
+        ]
         prange = self.parser.parse_line(instr_range)
         plist = self.parser.parse_line(instr_list)
+        p_idx_range = self.parser.parse_line(instr_range_with_index)
+        p_idx_list = self.parser.parse_line(instr_list_with_index)
 
         self.assertEqual(prange.operands, reg_list)
         self.assertEqual(plist.operands, reg_list)
+        self.assertEqual(p_idx_range.operands, reg_list_idx)
+        self.assertEqual(p_idx_list.operands, reg_list_idx)
 
     def test_reg_dependency(self):
         reg_1_1 = AttrDict({"prefix": "b", "name": "1"})
