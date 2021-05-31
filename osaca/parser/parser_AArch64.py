@@ -239,7 +239,7 @@ class ParserAArch64(BaseParser):
 
         # 1. Parse comment
         try:
-            result = self.process_operand(self.comment.parseString(line, parseAll=True).asDict())[0]
+            result = self.process_operand(self.comment.parseString(line, parseAll=True).asDict())
             result = AttrDict.convert_dict(result)
             instruction_form[self.COMMENT_ID] = " ".join(result[self.COMMENT_ID])
         except pp.ParseException:
@@ -248,7 +248,7 @@ class ParserAArch64(BaseParser):
         try:
             result = self.process_operand(
                 self.llvm_markers.parseString(line, parseAll=True).asDict()
-            )[0]
+            )
             result = AttrDict.convert_dict(result)
             instruction_form[self.COMMENT_ID] = " ".join(result[self.COMMENT_ID])
         except pp.ParseException:
@@ -258,7 +258,7 @@ class ParserAArch64(BaseParser):
             try:
                 result = self.process_operand(
                     self.label.parseString(line, parseAll=True).asDict()
-                )[0]
+                )
                 result = AttrDict.convert_dict(result)
                 instruction_form[self.LABEL_ID] = result[self.LABEL_ID].name
                 if self.COMMENT_ID in result[self.LABEL_ID]:
@@ -273,7 +273,7 @@ class ParserAArch64(BaseParser):
             try:
                 result = self.process_operand(
                     self.directive.parseString(line, parseAll=True).asDict()
-                )[0]
+                )
                 result = AttrDict.convert_dict(result)
                 instruction_form[self.DIRECTIVE_ID] = AttrDict(
                     {
@@ -313,19 +313,24 @@ class ParserAArch64(BaseParser):
         # Add operands to list
         # Check first operand
         if "operand1" in result:
-            operands += self.process_operand(result["operand1"])
+            operand = self.process_operand(result["operand1"])
+            operands.extend(operand) if isinstance(operand, list) else operands.append(operand)
         # Check second operand
         if "operand2" in result:
-            operands += self.process_operand(result["operand2"])
+            operand = self.process_operand(result["operand2"])
+            operands.extend(operand) if isinstance(operand, list) else operands.append(operand)
         # Check third operand
         if "operand3" in result:
-            operands += self.process_operand(result["operand3"])
+            operand = self.process_operand(result["operand3"])
+            operands.extend(operand) if isinstance(operand, list) else operands.append(operand)
         # Check fourth operand
         if "operand4" in result:
-            operands += self.process_operand(result["operand4"])
+            operand = self.process_operand(result["operand4"])
+            operands.extend(operand) if isinstance(operand, list) else operands.append(operand)
         # Check fifth operand
         if "operand5" in result:
-            operands += self.process_operand(result["operand5"])
+            operand = self.process_operand(result["operand5"])
+            operands.extend(operand) if isinstance(operand, list) else operands.append(operand)
 
         return_dict = AttrDict(
             {
@@ -342,7 +347,7 @@ class ParserAArch64(BaseParser):
         """Post-process operand"""
         # structure memory addresses
         if self.MEMORY_ID in operand:
-            return [self.process_memory_address(operand[self.MEMORY_ID])]
+            return self.process_memory_address(operand[self.MEMORY_ID])
         # structure register lists
         if self.REGISTER_ID in operand and (
             "list" in operand[self.REGISTER_ID] or "range" in operand[self.REGISTER_ID]
@@ -350,15 +355,15 @@ class ParserAArch64(BaseParser):
             # resolve ranges and lists
             return self.resolve_range_list(self.process_register_list(operand[self.REGISTER_ID]))
         if self.REGISTER_ID in operand and operand[self.REGISTER_ID]["name"] == "sp":
-            return [self.process_sp_register(operand[self.REGISTER_ID])]
+            return self.process_sp_register(operand[self.REGISTER_ID])
         # add value attribute to floating point immediates without exponent
         if self.IMMEDIATE_ID in operand:
-            return [self.process_immediate(operand[self.IMMEDIATE_ID])]
+            return self.process_immediate(operand[self.IMMEDIATE_ID])
         if self.LABEL_ID in operand:
-            return [self.process_label(operand[self.LABEL_ID])]
+            return self.process_label(operand[self.LABEL_ID])
         if self.IDENTIFIER_ID in operand:
-            return [self.process_identifier(operand[self.IDENTIFIER_ID])]
-        return [operand]
+            return self.process_identifier(operand[self.IDENTIFIER_ID])
+        return operand
 
     def process_memory_address(self, memory_address):
         """Post-process memory address operand"""
@@ -426,6 +431,8 @@ class ParserAArch64(BaseParser):
                     reg['name'] = str(name)
                     range_list.append(AttrDict({self.REGISTER_ID: reg}))
                 return range_list
+        # neither register list nor range, return unmodified
+        return operand
 
     def process_register_list(self, register_list):
         """Post-process register lists (e.g., {r0,r3,r5}) and register ranges (e.g., {r0-r7})"""
