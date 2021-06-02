@@ -64,6 +64,28 @@ instruction_forms:
         destination: false
     - name: fmla
       operands:
+      - class: register
+        prefix: "*"
+        shape: "*"
+        source: true
+        destination: true
+      - class: register
+        prefix: "*"
+        shape: "*"
+        source: true
+        destination: false
+      - class: register
+        prefix: "*"
+        shape: "*"
+        source: true
+        destination: false
+      - class: register
+        prefix: "*"
+        shape: "*"
+        source: true
+        destination: false
+    - name: fmla
+      operands:
         - class: register
           prefix: "*"
           shape: "*"

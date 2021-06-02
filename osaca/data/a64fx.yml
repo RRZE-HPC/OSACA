@@ -520,7 +520,7 @@ instruction_forms:
     width: '512'
   throughput: 11.5
   latency: 49.0  # 	11*p0+12*p02
-  port_pressure: [[10, '0'], [12, '02']]
+  port_pressure: [[9, '0'], [14, '02']]
 - name: fadd
   operands:
   - class: register
@@ -1095,7 +1095,7 @@ instruction_forms:
     post-indexed: false
   throughput: 0.5
   latency: 8.0  # 	1*p56+1*p5D6D
-  port_pressure: [[1, '56'], [2, ['5D', '6D']]]
+  port_pressure: [[1, '56'], [1, ['5D', '6D']]]
 - name: ld1d
   operands:
   - class: register
@@ -1113,7 +1113,7 @@ instruction_forms:
     post-indexed: false
   throughput: 0.5
   latency: 8.0  # 	1*p56+1*p5D6D
-  port_pressure: [[1, '56'], [2, ['5D', '6D']]]
+  port_pressure: [[1, '56'], [1, ['5D', '6D']]]
 - name: ld1d
   operands:
   - class: register
