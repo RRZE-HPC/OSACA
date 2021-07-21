@@ -1132,6 +1132,330 @@ instruction_forms:
   throughput: 2.0
   latency: 11.0  # 	1*p0+1*p3+4*p56+1*p5D6D
   port_pressure: [[1, '0'],[1, '3'],[4, '56'], [4, ['5D', '6D']]] # not sure if we also have 4 data accesses
+- name: ld1w
+  operands:
+  - class: register
+    prefix: z
+    shape: d
+  - class: register
+    prefix: p
+    predication: '*'
+  - class: memory
+    base: x
+    offset: '*'
+    index: ~
+    scale: '*'
+    pre-indexed: false
+    post-indexed: false
+  throughput: 0.5
+  latency: 8.0  # 	1*p56+1*p5D6D
+  port_pressure: [[1, '56'], [1, ['5D', '6D']]]
+- name: ld1w
+  operands:
+  - class: register
+    prefix: z
+    shape: d
+  - class: register
+    prefix: p
+    predication: '*'
+  - class: memory
+    base: x
+    offset: '*'
+    index: x
+    scale: '*'
+    pre-indexed: false
+    post-indexed: false
+  throughput: 0.5
+  latency: 8.0  # 	1*p56+1*p5D6D
+  port_pressure: [[1, '56'], [1, ['5D', '6D']]]
+- name: ld1w
+  operands:
+  - class: register
+    prefix: z
+    shape: d
+  - class: register
+    prefix: p
+    predication: '*'
+  - class: memory
+    base: x
+    offset: ~
+    index: z
+    scale: '*'
+    pre-indexed: false
+    post-indexed: false
+  throughput: 2.0
+  latency: 11.0  # 	1*p0+1*p3+4*p56+1*p5D6D
+  port_pressure: [[1, '0'],[1, '3'],[4, '56'], [4, ['5D', '6D']]] # not sure if we also have 4 data accesses
+- name: ld1h
+  operands:
+  - class: register
+    prefix: z
+    shape: d
+  - class: register
+    prefix: p
+    predication: '*'
+  - class: memory
+    base: x
+    offset: '*'
+    index: ~
+    scale: '*'
+    pre-indexed: false
+    post-indexed: false
+  throughput: 0.5
+  latency: 8.0  # 	1*p56+1*p5D6D
+  port_pressure: [[1, '56'], [1, ['5D', '6D']]]
+- name: ld1h
+  operands:
+  - class: register
+    prefix: z
+    shape: d
+  - class: register
+    prefix: p
+    predication: '*'
+  - class: memory
+    base: x
+    offset: '*'
+    index: x
+    scale: '*'
+    pre-indexed: false
+    post-indexed: false
+  throughput: 0.5
+  latency: 8.0  # 	1*p56+1*p5D6D
+  port_pressure: [[1, '56'], [1, ['5D', '6D']]]
+- name: ld1h
+  operands:
+  - class: register
+    prefix: z
+    shape: d
+  - class: register
+    prefix: p
+    predication: '*'
+  - class: memory
+    base: x
+    offset: ~
+    index: z
+    scale: '*'
+    pre-indexed: false
+    post-indexed: false
+  throughput: 2.0
+  latency: 11.0  # 	1*p0+1*p3+4*p56+1*p5D6D
+  port_pressure: [[1, '0'],[1, '3'],[4, '56'], [4, ['5D', '6D']]] # not sure if we also have 4 data accesses
+- name: ld1b
+  operands:
+  - class: register
+    prefix: z
+    shape: d
+  - class: register
+    prefix: p
+    predication: '*'
+  - class: memory
+    base: x
+    offset: '*'
+    index: ~
+    scale: '*'
+    pre-indexed: false
+    post-indexed: false
+  throughput: 0.5
+  latency: 8.0  # 	1*p56+1*p5D6D
+  port_pressure: [[1, '56'], [1, ['5D', '6D']]]
+- name: ld1b
+  operands:
+  - class: register
+    prefix: z
+    shape: d
+  - class: register
+    prefix: p
+    predication: '*'
+  - class: memory
+    base: x
+    offset: '*'
+    index: x
+    scale: '*'
+    pre-indexed: false
+    post-indexed: false
+  throughput: 0.5
+  latency: 8.0  # 	1*p56+1*p5D6D
+  port_pressure: [[1, '56'], [1, ['5D', '6D']]]
+- name: ld1b
+  operands:
+  - class: register
+    prefix: z
+    shape: d
+  - class: register
+    prefix: p
+    predication: '*'
+  - class: memory
+    base: x
+    offset: ~
+    index: z
+    scale: '*'
+    pre-indexed: false
+    post-indexed: false
+  throughput: 2.0
+  latency: 11.0  # 	1*p0+1*p3+4*p56+1*p5D6D
+  port_pressure: [[1, '0'],[1, '3'],[4, '56'], [4, ['5D', '6D']]] # not sure if we also have 4 data accesses
+- name: ld1sw
+  operands:
+  - class: register
+    prefix: z
+    shape: d
+  - class: register
+    prefix: p
+    predication: '*'
+  - class: memory
+    base: x
+    offset: '*'
+    index: ~
+    scale: '*'
+    pre-indexed: false
+    post-indexed: false
+  throughput: 0.5
+  latency: 8.0  # 	1*p56+1*p5D6D
+  port_pressure: [[1, '56'], [1, ['5D', '6D']]]
+- name: ld1sw
+  operands:
+  - class: register
+    prefix: z
+    shape: d
+  - class: register
+    prefix: p
+    predication: '*'
+  - class: memory
+    base: x
+    offset: '*'
+    index: x
+    scale: '*'
+    pre-indexed: false
+    post-indexed: false
+  throughput: 0.5
+  latency: 8.0  # 	1*p56+1*p5D6D
+  port_pressure: [[1, '56'], [1, ['5D', '6D']]]
+- name: ld1sw
+  operands:
+  - class: register
+    prefix: z
+    shape: d
+  - class: register
+    prefix: p
+    predication: '*'
+  - class: memory
+    base: x
+    offset: ~
+    index: z
+    scale: '*'
+    pre-indexed: false
+    post-indexed: false
+  throughput: 2.0
+  latency: 11.0  # 	1*p0+1*p3+4*p56+1*p5D6D
+  port_pressure: [[1, '0'],[1, '3'],[4, '56'], [4, ['5D', '6D']]] # not sure if we also have 4 data accesses
+- name: ld1sh
+  operands:
+  - class: register
+    prefix: z
+    shape: d
+  - class: register
+    prefix: p
+    predication: '*'
+  - class: memory
+    base: x
+    offset: '*'
+    index: ~
+    scale: '*'
+    pre-indexed: false
+    post-indexed: false
+  throughput: 0.5
+  latency: 8.0  # 	1*p56+1*p5D6D
+  port_pressure: [[1, '56'], [1, ['5D', '6D']]]
+- name: ld1sh
+  operands:
+  - class: register
+    prefix: z
+    shape: d
+  - class: register
+    prefix: p
+    predication: '*'
+  - class: memory
+    base: x
+    offset: '*'
+    index: x
+    scale: '*'
+    pre-indexed: false
+    post-indexed: false
+  throughput: 0.5
+  latency: 8.0  # 	1*p56+1*p5D6D
+  port_pressure: [[1, '56'], [1, ['5D', '6D']]]
+- name: ld1sh
+  operands:
+  - class: register
+    prefix: z
+    shape: d
+  - class: register
+    prefix: p
+    predication: '*'
+  - class: memory
+    base: x
+    offset: ~
+    index: z
+    scale: '*'
+    pre-indexed: false
+    post-indexed: false
+  throughput: 2.0
+  latency: 11.0  # 	1*p0+1*p3+4*p56+1*p5D6D
+  port_pressure: [[1, '0'],[1, '3'],[4, '56'], [4, ['5D', '6D']]] # not sure if we also have 4 data accesses
+- name: ld1sb
+  operands:
+  - class: register
+    prefix: z
+    shape: d
+  - class: register
+    prefix: p
+    predication: '*'
+  - class: memory
+    base: x
+    offset: '*'
+    index: ~
+    scale: '*'
+    pre-indexed: false
+    post-indexed: false
+  throughput: 0.5
+  latency: 8.0  # 	1*p56+1*p5D6D
+  port_pressure: [[1, '56'], [1, ['5D', '6D']]]
+- name: ld1sb
+  operands:
+  - class: register
+    prefix: z
+    shape: d
+  - class: register
+    prefix: p
+    predication: '*'
+  - class: memory
+    base: x
+    offset: '*'
+    index: x
+    scale: '*'
+    pre-indexed: false
+    post-indexed: false
+  throughput: 0.5
+  latency: 8.0  # 	1*p56+1*p5D6D
+  port_pressure: [[1, '56'], [1, ['5D', '6D']]]
+- name: ld1sb
+  operands:
+  - class: register
+    prefix: z
+    shape: d
+  - class: register
+    prefix: p
+    predication: '*'
+  - class: memory
+    base: x
+    offset: ~
+    index: z
+    scale: '*'
+    pre-indexed: false
+    post-indexed: false
+  throughput: 2.0
+  latency: 11.0  # 	1*p0+1*p3+4*p56+1*p5D6D
+  port_pressure: [[1, '0'],[1, '3'],[4, '56'], [4, ['5D', '6D']]] # not sure if we also have 4 data accesses
 - name: ld2d
   operands:
   - class: register
