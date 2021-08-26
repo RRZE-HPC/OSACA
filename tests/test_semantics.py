@@ -11,8 +11,14 @@ from copy import deepcopy
 import networkx as nx
 from osaca.osaca import get_unmatched_instruction_ratio
 from osaca.parser import AttrDict, ParserAArch64, ParserX86ATT
-from osaca.semantics import (INSTR_FLAGS, ArchSemantics, ISASemantics,
-                             KernelDG, MachineModel, reduce_to_section)
+from osaca.semantics import (
+    INSTR_FLAGS,
+    ArchSemantics,
+    ISASemantics,
+    KernelDG,
+    MachineModel,
+    reduce_to_section,
+)
 
 
 class TestSemanticTools(unittest.TestCase):
@@ -66,7 +72,8 @@ class TestSemanticTools(unittest.TestCase):
         )
         cls.semantics_x86 = ISASemantics("x86")
         cls.semantics_csx = ArchSemantics(
-            cls.machine_model_csx, path_to_yaml=os.path.join(cls.MODULE_DATA_DIR, "isa/x86.yml")
+            cls.machine_model_csx,
+            path_to_yaml=os.path.join(cls.MODULE_DATA_DIR, "isa/x86.yml"),
         )
         cls.semantics_aarch64 = ISASemantics("aarch64")
         cls.semantics_tx2 = ArchSemantics(
@@ -173,7 +180,12 @@ class TestSemanticTools(unittest.TestCase):
         )
         self.assertEqual(
             test_mm_x86.get_store_throughput(
-                {"base": {"prefix": "NOT_IN_DB"}, "offset": None, "index": "NOT_NONE", "scale": 1}
+                {
+                    "base": {"prefix": "NOT_IN_DB"},
+                    "offset": None,
+                    "index": "NOT_NONE",
+                    "scale": 1,
+                }
             ),
             [[1, "23"], [1, "4"]],
         )
@@ -185,7 +197,12 @@ class TestSemanticTools(unittest.TestCase):
         )
         self.assertEqual(
             test_mm_arm.get_store_throughput(
-                {"base": {"prefix": "NOT_IN_DB"}, "offset": None, "index": None, "scale": 1}
+                {
+                    "base": {"prefix": "NOT_IN_DB"},
+                    "offset": None,
+                    "index": None,
+                    "scale": 1,
+                }
             ),
             [[1, "34"], [1, "5"]],
         )
@@ -310,7 +327,10 @@ class TestSemanticTools(unittest.TestCase):
 
     def test_memdependency_x86(self):
         dg = KernelDG(
-            self.kernel_x86_memdep, self.parser_x86, self.machine_model_csx, self.semantics_csx
+            self.kernel_x86_memdep,
+            self.parser_x86,
+            self.machine_model_csx,
+            self.semantics_csx,
         )
         self.assertTrue(nx.algorithms.dag.is_directed_acyclic_graph(dg.dg))
         self.assertEqual(set(dg.get_dependent_instruction_forms(line_number=3)), {6, 8})
@@ -322,7 +342,10 @@ class TestSemanticTools(unittest.TestCase):
 
     def test_kernelDG_AArch64(self):
         dg = KernelDG(
-            self.kernel_AArch64, self.parser_AArch64, self.machine_model_tx2, self.semantics_tx2
+            self.kernel_AArch64,
+            self.parser_AArch64,
+            self.machine_model_tx2,
+            self.semantics_tx2,
         )
         self.assertTrue(nx.algorithms.dag.is_directed_acyclic_graph(dg.dg))
         self.assertEqual(set(dg.get_dependent_instruction_forms(line_number=3)), {7, 8})
@@ -400,7 +423,7 @@ class TestSemanticTools(unittest.TestCase):
         # based on line 6
         self.assertEqual(lc_deps[6]["latency"], 28.0)
         self.assertEqual(
-            [(iform.line_number, lat) for iform, lat in lc_deps[6]['dependencies']],
+            [(iform.line_number, lat) for iform, lat in lc_deps[6]["dependencies"]],
             [(6, 4.0), (10, 6.0), (11, 6.0), (12, 6.0), (13, 6.0), (14, 0)],
         )
 
@@ -423,7 +446,8 @@ class TestSemanticTools(unittest.TestCase):
         # w/o flag dependencies: ID 5 w/ len=1
         # TODO discuss
         self.assertEqual(
-            lc_deps[lcd_id2]["root"], dg.dg.nodes(data=True)[lcd_id2]["instruction_form"]
+            lc_deps[lcd_id2]["root"],
+            dg.dg.nodes(data=True)[lcd_id2]["instruction_form"],
         )
         self.assertEqual(len(lc_deps[lcd_id2]["dependencies"]), 1)
         self.assertEqual(
@@ -438,7 +462,7 @@ class TestSemanticTools(unittest.TestCase):
             self.parser_x86,
             self.machine_model_csx,
             self.semantics_x86,
-            timeout=10
+            timeout=10,
         )
         end_time = time.perf_counter()
         time_10 = end_time - start_time
@@ -448,7 +472,7 @@ class TestSemanticTools(unittest.TestCase):
             self.parser_x86,
             self.machine_model_csx,
             self.semantics_x86,
-            timeout=2
+            timeout=2,
         )
         end_time = time.perf_counter()
         time_2 = end_time - start_time

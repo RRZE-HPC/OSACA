@@ -33,7 +33,13 @@ class TestCLI(unittest.TestCase):
         with self.assertRaises(ValueError):
             osaca.check_arguments(args, parser)
         args = parser.parse_args(
-            ["--arch", "csx", "--import", "WRONG_BENCH", self._find_file("gs", "csx", "gcc")]
+            [
+                "--arch",
+                "csx",
+                "--import",
+                "WRONG_BENCH",
+                self._find_file("gs", "csx", "gcc"),
+            ]
         )
         with self.assertRaises(ValueError):
             osaca.check_arguments(args, parser)
@@ -65,7 +71,13 @@ class TestCLI(unittest.TestCase):
     def test_check_db(self):
         parser = osaca.create_parser(parser=ErrorRaisingArgumentParser())
         args = parser.parse_args(
-            ["--arch", "tx2", "--db-check", "--verbose", self._find_test_file("triad_x86_iaca.s")]
+            [
+                "--arch",
+                "tx2",
+                "--db-check",
+                "--verbose",
+                self._find_test_file("triad_x86_iaca.s"),
+            ]
         )
         output = StringIO()
         osaca.run(args, output_file=output)
@@ -134,7 +146,13 @@ class TestCLI(unittest.TestCase):
                 for c in comps[a]:
                     with self.subTest(kernel=k, arch=a, comp=c):
                         args = parser.parse_args(
-                            ["--arch", a, self._find_file(k, a, c), "--export-graph", "/dev/null"]
+                            [
+                                "--arch",
+                                a,
+                                self._find_file(k, a, c),
+                                "--export-graph",
+                                "/dev/null",
+                            ]
                         )
                         output = StringIO()
                         osaca.run(args, output_file=output)
@@ -204,17 +222,13 @@ class TestCLI(unittest.TestCase):
         )
         output = StringIO()
         osaca.run(args, output_file=output)
-        self.assertTrue(
-            output.getvalue().count("WARNING: LCD analysis timed out") == 1
-        )
+        self.assertTrue(output.getvalue().count("WARNING: LCD analysis timed out") == 1)
         args = parser.parse_args(
             ["--ignore-unknown", "--lcd-timeout", "-1", self._find_test_file(kernel)]
         )
         output = StringIO()
         osaca.run(args, output_file=output)
-        self.assertTrue(
-            output.getvalue().count("WARNING: LCD analysis timed out") == 0
-        )
+        self.assertTrue(output.getvalue().count("WARNING: LCD analysis timed out") == 0)
 
     def test_lines_arg(self):
         # Run tests with --lines option
@@ -227,12 +241,24 @@ class TestCLI(unittest.TestCase):
         args = []
         args.append(
             parser.parse_args(
-                ["--lines", "146-154", "--arch", "csx", self._find_test_file(kernel_x86)]
+                [
+                    "--lines",
+                    "146-154",
+                    "--arch",
+                    "csx",
+                    self._find_test_file(kernel_x86),
+                ]
             )
         )
         args.append(
             parser.parse_args(
-                ["--lines", "146:154", "--arch", "csx", self._find_test_file(kernel_x86)]
+                [
+                    "--lines",
+                    "146:154",
+                    "--arch",
+                    "csx",
+                    self._find_test_file(kernel_x86),
+                ]
             )
         )
         args.append(

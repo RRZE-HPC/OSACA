@@ -34,7 +34,8 @@ class TestFrontend(unittest.TestCase):
         )
         self.machine_model_tx2 = MachineModel(arch="tx2")
         self.semantics_csx = ArchSemantics(
-            self.machine_model_csx, path_to_yaml=os.path.join(self.MODULE_DATA_DIR, "isa/x86.yml")
+            self.machine_model_csx,
+            path_to_yaml=os.path.join(self.MODULE_DATA_DIR, "isa/x86.yml"),
         )
         self.semantics_tx2 = ArchSemantics(
             self.machine_model_tx2,
@@ -71,7 +72,11 @@ class TestFrontend(unittest.TestCase):
 
     def test_frontend_AArch64(self):
         dg = KernelDG(
-            self.kernel_AArch64, self.parser_AArch64, self.machine_model_tx2, self.semantics_tx2)
+            self.kernel_AArch64,
+            self.parser_AArch64,
+            self.machine_model_tx2,
+            self.semantics_tx2,
+        )
         fe = Frontend(path_to_yaml=os.path.join(self.MODULE_DATA_DIR, "tx2.yml"))
         fe.full_analysis(self.kernel_AArch64, dg, verbose=True)
         # TODO compare output with checked string

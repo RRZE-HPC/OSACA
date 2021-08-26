@@ -16,7 +16,12 @@ class KernelDG(nx.DiGraph):
     INSTRUCTION_THRESHOLD = 50
 
     def __init__(
-        self, parsed_kernel, parser, hw_model: MachineModel, semantics: ArchSemantics, timeout=10
+        self,
+        parsed_kernel,
+        parser,
+        hw_model: MachineModel,
+        semantics: ArchSemantics,
+        timeout=10,
     ):
         self.timed_out = False
         self.kernel = parsed_kernel
@@ -73,7 +78,7 @@ class KernelDG(nx.DiGraph):
                     else instruction_form["latency_wo_load"]
                 )
                 if "storeload_dep" in dep_flags:
-                    edge_weight += self.model.get('store_to_load_forward_latency', 0)
+                    edge_weight += self.model.get("store_to_load_forward_latency", 0)
                 dg.add_edge(
                     instruction_form["line_number"],
                     dep["line_number"],
@@ -98,7 +103,7 @@ class KernelDG(nx.DiGraph):
         tmp_kernel = [] + kernel
         for orig_iform in kernel:
             temp_iform = copy.copy(orig_iform)
-            temp_iform['line_number'] += offset
+            temp_iform["line_number"] += offset
             tmp_kernel.append(temp_iform)
         # get dependency graph
         dg = self.create_DG(tmp_kernel)
@@ -118,12 +123,15 @@ class KernelDG(nx.DiGraph):
             with Manager() as manager:
                 all_paths = manager.list()
                 processes = [
-                    Process(target=self._extend_path, args=(all_paths, instr_section, dg, offset))
+                    Process(
+                        target=self._extend_path,
+                        args=(all_paths, instr_section, dg, offset),
+                    )
                     for instr_section in instrs
                 ]
                 for p in processes:
                     p.start()
-                if (timeout == -1):
+                if timeout == -1:
                     # no timeout
                     for p in processes:
                         p.join()
@@ -162,7 +170,7 @@ class KernelDG(nx.DiGraph):
             # extend path by edge bound latencies (e.g., store-to-load latency)
             lat_path = []
             for s, d in nx.utils.pairwise(path):
-                edge_lat = dg.edges[s, d]['latency']
+                edge_lat = dg.edges[s, d]["latency"]
                 # map source node back to original line numbers
                 if s >= offset:
                     s -= offset
@@ -310,17 +318,17 @@ class KernelDG(nx.DiGraph):
             if change is None or reg_state.get(reg, {}) is None:
                 reg_state[reg] = None
             else:
-                reg_state.setdefault(reg, {'name': reg, 'value': 0})
-                if change['name'] != reg:
+                reg_state.setdefault(reg, {"name": reg, "value": 0})
+                if change["name"] != reg:
                     # renaming occured, ovrwrite value with up-to-now change of source register
-                    reg_state[reg]['name'] = change['name']
-                    src_reg_state = reg_state.get(change['name'], {'value': 0})
+                    reg_state[reg]["name"] = change["name"]
+                    src_reg_state = reg_state.get(change["name"], {"value": 0})
                     if src_reg_state is None:
                         # original register's state was changed beyond reconstruction
                         reg_state[reg] = None
                         continue
-                    reg_state[reg]['value'] = src_reg_state['value']
-                reg_state[reg]['value'] += change['value']
+                    reg_state[reg]["value"] = src_reg_state["value"]
+                reg_state[reg]["value"] += change["value"]
         return reg_state
 
     def get_dependent_instruction_forms(self, instr_form=None, line_number=None):
@@ -340,7 +348,8 @@ class KernelDG(nx.DiGraph):
         if instruction_form.semantic_operands is None:
             return is_read
         for src in chain(
-            instruction_form.semantic_operands.source, instruction_form.semantic_operands.src_dst
+            instruction_form.semantic_operands.source,
+            instruction_form.semantic_operands.src_dst,
         ):
             if "register" in src:
                 is_read = self.parser.is_reg_dependend_of(register, src.register) or is_read
@@ -372,7 +381,8 @@ class KernelDG(nx.DiGraph):
         if instruction_form.semantic_operands is None:
             return False
         for src in chain(
-            instruction_form.semantic_operands.source, instruction_form.semantic_operands.src_dst
+            instruction_form.semantic_operands.source,
+            instruction_form.semantic_operands.src_dst,
         ):
             # Here we check for mem dependecies only
             if "memory" not in src:
@@ -387,23 +397,23 @@ class KernelDG(nx.DiGraph):
                 addr_change -= mem.offset.value
             if mem.base and src.base:
                 base_change = register_changes.get(
-                    src.base.get('prefix', '') + src.base.name,
-                    {'name': src.base.get('prefix', '') + src.base.name, 'value': 0},
+                    src.base.get("prefix", "") + src.base.name,
+                    {"name": src.base.get("prefix", "") + src.base.name, "value": 0},
                 )
                 if base_change is None:
                     # Unknown change occurred
                     continue
-                if mem.base.get('prefix', '') + mem.base['name'] != base_change['name']:
+                if mem.base.get("prefix", "") + mem.base["name"] != base_change["name"]:
                     # base registers do not match
                     continue
-                addr_change += base_change['value']
+                addr_change += base_change["value"]
             elif mem.base or src.base:
                 # base registers do not match
                 continue
             if mem.index and src.index:
                 index_change = register_changes.get(
-                    src.index.get('prefix', '') + src.index.name,
-                    {'name': src.index.get('prefix', '') + src.index.name, 'value': 0},
+                    src.index.get("prefix", "") + src.index.name,
+                    {"name": src.index.get("prefix", "") + src.index.name, "value": 0},
                 )
                 if index_change is None:
                     # Unknown change occurred
@@ -411,10 +421,10 @@ class KernelDG(nx.DiGraph):
                 if mem.scale != src.scale:
                     # scale factors do not match
                     continue
-                if mem.index.get('prefix', '') + mem.index['name'] != index_change['name']:
+                if mem.index.get("prefix", "") + mem.index["name"] != index_change["name"]:
                     # index registers do not match
                     continue
-                addr_change += index_change['value'] * src.scale
+                addr_change += index_change["value"] * src.scale
             elif mem.index or src.index:
                 # index registers do not match
                 continue
@@ -443,7 +453,8 @@ class KernelDG(nx.DiGraph):
                     )
         # Check also for possible pre- or post-indexing in memory addresses
         for src in chain(
-            instruction_form.semantic_operands.source, instruction_form.semantic_operands.src_dst
+            instruction_form.semantic_operands.source,
+            instruction_form.semantic_operands.src_dst,
         ):
             if "memory" in src:
                 if "pre_indexed" in src.memory or "post_indexed" in src.memory:

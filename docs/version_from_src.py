@@ -7,7 +7,8 @@ import re
 def __read(*names, **kwargs):
     """Reads in file"""
     with io.open(
-        os.path.join(os.path.dirname(__file__), *names), encoding=kwargs.get("encoding", "utf8")
+        os.path.join(os.path.dirname(__file__), *names),
+        encoding=kwargs.get("encoding", "utf8"),
     ) as fp:
         return fp.read()
 

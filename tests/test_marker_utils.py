@@ -109,7 +109,8 @@ class TestMarkerUtils(unittest.TestCase):
                             kernel_start = len(
                                 list(
                                     filter(
-                                        None, (prologue + mov_start_var + bytes_var_1).split("\n")
+                                        None,
+                                        (prologue + mov_start_var + bytes_var_1).split("\n"),
                                     )
                                 )
                             )
@@ -142,7 +143,12 @@ class TestMarkerUtils(unittest.TestCase):
         epilogue = ".LE9:\t\t#12.2\n" "call    dummy\n"
         kernel_length = len(list(filter(None, kernel.split("\n"))))
 
-        bytes_variations = [bytes_1_line, bytes_2_lines_1, bytes_2_lines_2, bytes_3_lines]
+        bytes_variations = [
+            bytes_1_line,
+            bytes_2_lines_1,
+            bytes_2_lines_2,
+            bytes_3_lines,
+        ]
         mov_start_variations = [mov_start_1, mov_start_2]
         mov_end_variations = [mov_end_1, mov_end_2]
         # actual tests
@@ -171,7 +177,8 @@ class TestMarkerUtils(unittest.TestCase):
                             kernel_start = len(
                                 list(
                                     filter(
-                                        None, (prologue + mov_start_var + bytes_var_1).split("\n")
+                                        None,
+                                        (prologue + mov_start_var + bytes_var_1).split("\n"),
                                     )
                                 )
                             )

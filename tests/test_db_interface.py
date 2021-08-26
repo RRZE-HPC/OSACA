@@ -17,7 +17,13 @@ class TestDBInterface(unittest.TestCase):
         sample_entry = {
             "name": "DoItRightAndDoItFast",
             "operands": [
-                {"class": "memory", "offset": "imd", "base": "gpr", "index": "gpr", "scale": 8},
+                {
+                    "class": "memory",
+                    "offset": "imd",
+                    "base": "gpr",
+                    "index": "gpr",
+                    "scale": 8,
+                },
                 {"class": "register", "name": "xmm"},
             ],
             "throughput": 1.25,
@@ -35,7 +41,12 @@ class TestDBInterface(unittest.TestCase):
         del self.entry_tx2["operands"][1]["name"]
         self.entry_tx2["operands"][1]["prefix"] = "x"
         # self.entry_zen1['port_pressure'] = [1, 1, 1, 1, 0, 1, 0, 0, 0, 0.5, 1, 0.5, 1]
-        self.entry_zen1["port_pressure"] = [[4, "0123"], [1, "4"], [1, "89"], [2, ["8D", "9D"]]]
+        self.entry_zen1["port_pressure"] = [
+            [4, "0123"],
+            [1, "4"],
+            [1, "89"],
+            [2, ["8D", "9D"]],
+        ]
 
     ###########
     # Tests

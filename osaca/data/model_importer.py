@@ -140,9 +140,11 @@ def extract_model(tree, arch, skip_mem=True):
             print("Couldn't find port utilization, skip: ", iform, file=sys.stderr)
             continue
         # skip if measured TP is smaller than computed
-        if [float(x.attrib["TP_ports"]) > min(float(x.attrib["TP_loop"]),
-                                              float(x.attrib["TP_unrolled"]))
-                for x in arch_tag.findall("measurement")][0]:
+        if [
+            float(x.attrib["TP_ports"])
+            > min(float(x.attrib["TP_loop"]), float(x.attrib["TP_unrolled"]))
+            for x in arch_tag.findall("measurement")
+        ][0]:
             print(
                 "Calculated TP is greater than measured TP.",
                 iform,
@@ -160,13 +162,15 @@ def extract_model(tree, arch, skip_mem=True):
                 throughput = float(measurement_tag.attrib["TP_ports"])
             else:
                 throughput = min(
-                    measurement_tag.attrib.get("TP_loop", float('inf')),
-                    measurement_tag.attrib.get("TP_unroll", float('inf')),
-                    measurement_tag.attrib.get("TP", float('inf')),
+                    measurement_tag.attrib.get("TP_loop", float("inf")),
+                    measurement_tag.attrib.get("TP_unroll", float("inf")),
+                    measurement_tag.attrib.get("TP", float("inf")),
                 )
-                if throughput == float('inf'):
+                if throughput == float("inf"):
                     throughput = None
-            uops = int(measurement_tag.attrib["uops"]) if "uops" in measurement_tag.attrib else None
+            uops = (
+                int(measurement_tag.attrib["uops"]) if "uops" in measurement_tag.attrib else None
+            )
             if "ports" in measurement_tag.attrib:
                 port_pressure.append(port_pressure_from_tag_attributes(measurement_tag.attrib))
             latencies = [
@@ -202,7 +206,11 @@ def extract_model(tree, arch, skip_mem=True):
         # Check if all are equal
         if port_pressure:
             if port_pressure[1:] != port_pressure[:-1]:
-                print("Contradicting port occupancies, using latest IACA:", iform, file=sys.stderr)
+                print(
+                    "Contradicting port occupancies, using latest IACA:",
+                    iform,
+                    file=sys.stderr,
+                )
             port_pressure = port_pressure[-1]
         else:
             # print("No data available for this architecture:", mnemonic, file=sys.stderr)
@@ -222,10 +230,12 @@ def extract_model(tree, arch, skip_mem=True):
                         port_4 = True
                 # Add (x, ['2D', '3D']) if load ports (2 & 3) are used, but not the store port (4)
                 if port_23 and not port_4:
-                    if arch.upper() in ["SNB", "IVB"] and any(
-                            [p.get('name', '') == 'ymm' for p in parameters]) and \
-                            not '128' in mnemonic:
-                        # x = 2 if SNB or IVB and ymm regiser in any operand and not '128' in 
+                    if (
+                        arch.upper() in ["SNB", "IVB"]
+                        and any([p.get("name", "") == "ymm" for p in parameters])
+                        and not ("128" in mnemonic)
+                    ):
+                        # x = 2 if SNB or IVB and ymm regiser in any operand and not '128' in
                         # instruction name
                         port2D3D_pressure = 2
                     else:

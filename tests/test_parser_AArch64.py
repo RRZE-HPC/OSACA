@@ -24,7 +24,9 @@ class TestParserAArch64(unittest.TestCase):
 
     def test_comment_parser(self):
         self.assertEqual(self._get_comment(self.parser, "// some comments"), "some comments")
-        self.assertEqual(self._get_comment(self.parser, "\t\t//AA BB CC \t end \t"), "AA BB CC end")
+        self.assertEqual(
+            self._get_comment(self.parser, "\t\t//AA BB CC \t end \t"), "AA BB CC end"
+        )
         self.assertEqual(
             self._get_comment(self.parser, "\t//// comment //// comment"),
             "// comment //// comment",
@@ -36,7 +38,8 @@ class TestParserAArch64(unittest.TestCase):
         self.assertEqual(self._get_label(self.parser, ".2.3_2_pack.3:").name, ".2.3_2_pack.3")
         self.assertEqual(self._get_label(self.parser, ".L1:\t\t\t//label1").name, ".L1")
         self.assertEqual(
-            " ".join(self._get_label(self.parser, ".L1:\t\t\t//label1").comment), "label1"
+            " ".join(self._get_label(self.parser, ".L1:\t\t\t//label1").comment),
+            "label1",
         )
         with self.assertRaises(ParseException):
             self._get_label(self.parser, "\t.cfi_startproc")
@@ -316,7 +319,8 @@ class TestParserAArch64(unittest.TestCase):
         value1 = self.parser.normalize_imd(imd_decimal_1)
         self.assertEqual(value1, self.parser.normalize_imd(imd_hex_1))
         self.assertEqual(
-            self.parser.normalize_imd(imd_decimal_2), self.parser.normalize_imd(imd_hex_2)
+            self.parser.normalize_imd(imd_decimal_2),
+            self.parser.normalize_imd(imd_hex_2),
         )
         self.assertEqual(self.parser.normalize_imd(imd_float_11), value1)
         self.assertEqual(self.parser.normalize_imd(imd_float_12), value1)

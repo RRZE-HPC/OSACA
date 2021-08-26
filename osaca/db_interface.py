@@ -125,7 +125,10 @@ def _get_asmbench_output(input_data, isa):
     db_entries = {}
     for i in range(0, len(input_data), 4):
         if input_data[i + 3].strip() != "":
-            print("asmbench output not in the correct format! Format must be: ", file=sys.stderr)
+            print(
+                "asmbench output not in the correct format! Format must be: ",
+                file=sys.stderr,
+            )
             print(
                 "-------------\nMNEMONIC[-OP1[_OP2][...]]\nLatency: X cycles\n"
                 "Throughput: Y cycles\n\n-------------",
@@ -540,7 +543,16 @@ def _get_sanity_report(
 
 
 def _get_sanity_report_verbose(
-    total, m_tp, m_l, m_pp, suspic_instr, dup_arch, dup_isa, only_isa, bad_operands, colors=False
+    total,
+    m_tp,
+    m_l,
+    m_pp,
+    suspic_instr,
+    dup_arch,
+    dup_isa,
+    only_isa,
+    bad_operands,
+    colors=False,
 ):
     """Get the verbose part of the sanity report with all missing instruction forms."""
     BRIGHT_CYAN = "\033[1;36;1m" if colors else ""

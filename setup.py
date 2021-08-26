@@ -18,7 +18,8 @@ here = os.path.abspath(os.path.dirname(__file__))
 # Stolen from pip
 def read(*names, **kwargs):
     with io.open(
-        os.path.join(os.path.dirname(__file__), *names), encoding=kwargs.get("encoding", "utf8")
+        os.path.join(os.path.dirname(__file__), *names),
+        encoding=kwargs.get("encoding", "utf8"),
     ) as fp:
         return fp.read()
 
@@ -38,13 +39,20 @@ def _run_build_cache(dir):
     # This is run inside the install staging directory (that had no .pyc files)
     # We don't want to generate any.
     # https://github.com/eliben/pycparser/pull/135
-    check_call([sys.executable, "-B", "_build_cache.py"], cwd=os.path.join(dir, "osaca", "data"))
+    check_call(
+        [sys.executable, "-B", "_build_cache.py"],
+        cwd=os.path.join(dir, "osaca", "data"),
+    )
 
 
 class install(_install):
     def run(self):
         _install.run(self)
-        self.execute(_run_build_cache, (self.install_lib,), msg="Build ISA and architecture cache")
+        self.execute(
+            _run_build_cache,
+            (self.install_lib,),
+            msg="Build ISA and architecture cache",
+        )
 
 
 class sdist(_sdist):
