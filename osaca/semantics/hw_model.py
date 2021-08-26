@@ -1,20 +1,19 @@
 #!/usr/bin/env python3
 
+import hashlib
 import os
 import pickle
 import re
 import string
+from collections import defaultdict
 from copy import deepcopy
 from itertools import product
-import hashlib
 from pathlib import Path
-from collections import defaultdict
 
 import ruamel.yaml
-from ruamel.yaml.compat import StringIO
-
 from osaca import __version__, utils
 from osaca.parser import ParserX86ATT
+from ruamel.yaml.compat import StringIO
 
 
 class MachineModel(object):
@@ -37,7 +36,13 @@ class MachineModel(object):
                 "hidden_loads": None,
                 "load_latency": {},
                 "load_throughput": [
-                    {"base": b, "index": i, "offset": o, "scale": s, "port_pressure": []}
+                    {
+                        "base": b,
+                        "index": i,
+                        "offset": o,
+                        "scale": s,
+                        "port_pressure": [],
+                    }
                     for b, i, o, s in product(["gpr"], ["gpr", None], ["imd", None], [1, 8])
                 ],
                 "load_throughput_default": [],
@@ -128,7 +133,8 @@ class MachineModel(object):
                 instruction_form
                 for instruction_form in name_matched_iforms
                 if self._match_operands(
-                    instruction_form["operands"] if "operands" in instruction_form else [], operands
+                    instruction_form["operands"] if "operands" in instruction_form else [],
+                    operands,
                 )
             )
         except StopIteration:
@@ -150,7 +156,13 @@ class MachineModel(object):
         return average_pressure
 
     def set_instruction(
-        self, name, operands=None, latency=None, port_pressure=None, throughput=None, uops=None
+        self,
+        name,
+        operands=None,
+        latency=None,
+        port_pressure=None,
+        throughput=None,
+        uops=None,
     ):
         """Import instruction form information."""
         # If it already exists. Overwrite information.
@@ -500,7 +512,11 @@ class MachineModel(object):
         """Check if the types of operand ``i_operand`` and ``operand`` match."""
         # check for wildcard
         if self.WILDCARD in operand:
-            if "class" in i_operand and i_operand["class"] == "register" or "register" in i_operand:
+            if (
+                "class" in i_operand
+                and i_operand["class"] == "register"
+                or "register" in i_operand
+            ):
                 return True
             else:
                 return False
@@ -527,20 +543,27 @@ class MachineModel(object):
             return self._is_AArch64_mem_type(i_operand, operand["memory"])
         # immediate
         if i_operand["class"] == "immediate" and i_operand["imd"] == self.WILDCARD:
-            return "value" in operand or \
-                ("immediate" in operand and "value" in operand["immediate"]) 
+            return "value" in operand or (
+                "immediate" in operand and "value" in operand["immediate"]
+            )
         if i_operand["class"] == "immediate" and i_operand["imd"] == "int":
-            return ("value" in operand and operand.get("type", None) == "int") or \
-                ("immediate" in operand and "value" in operand["immediate"] and
-                 operand["immediate"].get("type", None) == "int")
+            return ("value" in operand and operand.get("type", None) == "int") or (
+                "immediate" in operand
+                and "value" in operand["immediate"]
+                and operand["immediate"].get("type", None) == "int"
+            )
         if i_operand["class"] == "immediate" and i_operand["imd"] == "float":
-            return ("float" in operand and operand.get("type", None) == "float") or \
-                ("immediate" in operand and "float" in operand["immediate"] and
-                 operand["immediate"].get("type", None) == "float")
+            return ("float" in operand and operand.get("type", None) == "float") or (
+                "immediate" in operand
+                and "float" in operand["immediate"]
+                and operand["immediate"].get("type", None) == "float"
+            )
         if i_operand["class"] == "immediate" and i_operand["imd"] == "double":
-            return ("double" in operand and operand.get("type", None) == "double") or \
-                ("immediate" in operand and "double" in operand["immediate"] and
-                 operand["immediate"].get("type", None) == "double")
+            return ("double" in operand and operand.get("type", None) == "double") or (
+                "immediate" in operand
+                and "double" in operand["immediate"]
+                and operand["immediate"].get("type", None) == "double"
+            )
         # identifier
         if "identifier" in operand or (
             "immediate" in operand and "identifier" in operand["immediate"]
@@ -577,7 +600,10 @@ class MachineModel(object):
     def _compare_db_entries(self, operand_1, operand_2):
         """Check if operand types in DB format (i.e., not parsed) match."""
         operand_attributes = list(
-            filter(lambda x: True if x != "source" and x != "destination" else False, operand_1)
+            filter(
+                lambda x: True if x != "source" and x != "destination" else False,
+                operand_1,
+            )
         )
         for key in operand_attributes:
             try:

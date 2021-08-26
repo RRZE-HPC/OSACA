@@ -26,7 +26,8 @@ class TestParserX86ATT(unittest.TestCase):
         self.assertEqual(self._get_comment(self.parser, "# some comments"), "some comments")
         self.assertEqual(self._get_comment(self.parser, "\t\t#AA BB CC \t end \t"), "AA BB CC end")
         self.assertEqual(
-            self._get_comment(self.parser, "\t## comment ## comment"), "# comment ## comment"
+            self._get_comment(self.parser, "\t## comment ## comment"),
+            "# comment ## comment",
         )
 
     def test_label_parser(self):
@@ -35,7 +36,8 @@ class TestParserX86ATT(unittest.TestCase):
         self.assertEqual(self._get_label(self.parser, ".2.3_2_pack.3:").name, ".2.3_2_pack.3")
         self.assertEqual(self._get_label(self.parser, ".L1:\t\t\t#label1").name, ".L1")
         self.assertEqual(
-            " ".join(self._get_label(self.parser, ".L1:\t\t\t#label1").comment), "label1"
+            " ".join(self._get_label(self.parser, ".L1:\t\t\t#label1").comment),
+            "label1",
         )
         with self.assertRaises(ParseException):
             self._get_label(self.parser, "\t.cfi_startproc")
@@ -47,7 +49,8 @@ class TestParserX86ATT(unittest.TestCase):
         self.assertEqual(len(self._get_directive(self.parser, "\t.align\t16,0x90").parameters), 2)
         self.assertEqual(len(self._get_directive(self.parser, ".text").parameters), 0)
         self.assertEqual(
-            len(self._get_directive(self.parser, '.file\t1 "path/to/file.c"').parameters), 2
+            len(self._get_directive(self.parser, '.file\t1 "path/to/file.c"').parameters),
+            2,
         )
         self.assertEqual(
             self._get_directive(self.parser, '.file\t1 "path/to/file.c"').parameters[1],
@@ -62,7 +65,12 @@ class TestParserX86ATT(unittest.TestCase):
                 self.parser,
                 "\t.section __TEXT,__eh_frame,coalesced,no_toc+strip_static_syms+live_support",
             ).parameters,
-            ["__TEXT", "__eh_frame", "coalesced", "no_toc+strip_static_syms+live_support"],
+            [
+                "__TEXT",
+                "__eh_frame",
+                "coalesced",
+                "no_toc+strip_static_syms+live_support",
+            ],
         )
         self.assertEqual(
             self._get_directive(
@@ -74,7 +82,9 @@ class TestParserX86ATT(unittest.TestCase):
             self._get_directive(self.parser, "\t.align\t16,0x90").parameters[1], "0x90"
         )
         self.assertEqual(
-            self._get_directive(self.parser, "        .byte 100,103,144       #IACA START")["name"],
+            self._get_directive(self.parser, "        .byte 100,103,144       #IACA START")[
+                "name"
+            ],
             "byte",
         )
         self.assertEqual(
@@ -242,10 +252,12 @@ class TestParserX86ATT(unittest.TestCase):
         imd_decimal_2 = {"value": "8"}
         imd_hex_2 = {"value": "8"}
         self.assertEqual(
-            self.parser.normalize_imd(imd_decimal_1), self.parser.normalize_imd(imd_hex_1)
+            self.parser.normalize_imd(imd_decimal_1),
+            self.parser.normalize_imd(imd_hex_1),
         )
         self.assertEqual(
-            self.parser.normalize_imd(imd_decimal_2), self.parser.normalize_imd(imd_hex_2)
+            self.parser.normalize_imd(imd_decimal_2),
+            self.parser.normalize_imd(imd_hex_2),
         )
 
     def test_reg_dependency(self):

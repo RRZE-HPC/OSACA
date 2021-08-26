@@ -47,7 +47,9 @@ class ArchSemantics(ISASemantics):
                 indices = [port_list.index(p) for p in ports]
                 # check if port sum of used ports for uop are unbalanced
                 port_sums = self._to_list(itemgetter(*indices)(self.get_throughput_sum(kernel)))
-                instr_ports = self._to_list(itemgetter(*indices)(instruction_form["port_pressure"]))
+                instr_ports = self._to_list(
+                    itemgetter(*indices)(instruction_form["port_pressure"])
+                )
                 if len(set(port_sums)) > 1:
                     # balance ports
                     # init list for keeping track of the current change
@@ -270,7 +272,8 @@ class ArchSemantics(ISASemantics):
                                     reg_type
                                 ]
                                 st_data_port_pressure = [
-                                    pp * multiplier for pp in st_data_port_pressure]
+                                    pp * multiplier for pp in st_data_port_pressure
+                                ]
                             data_port_pressure = [
                                 sum(x) for x in zip(data_port_pressure, st_data_port_pressure)
                             ]
@@ -343,7 +346,9 @@ class ArchSemantics(ISASemantics):
     def _handle_instruction_found(self, instruction_data, port_number, instruction_form, flags):
         """Apply performance data to instruction if it was found in the archDB"""
         throughput = instruction_data["throughput"]
-        port_pressure = self._machine_model.average_port_pressure(instruction_data["port_pressure"])
+        port_pressure = self._machine_model.average_port_pressure(
+            instruction_data["port_pressure"]
+        )
         instruction_form["port_uops"] = instruction_data["port_pressure"]
         try:
             assert isinstance(port_pressure, list)

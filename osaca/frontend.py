@@ -202,7 +202,12 @@ class Frontend(object):
         )
 
     def combined_view(
-        self, kernel, cp_kernel: KernelDG, dep_dict, ignore_unknown=False, show_cmnts=True
+        self,
+        kernel,
+        cp_kernel: KernelDG,
+        dep_dict,
+        ignore_unknown=False,
+        show_cmnts=True,
     ):
         """
         Build combined view of kernel including port pressure (TP), a CP column and a
@@ -238,8 +243,8 @@ class Frontend(object):
         lcd_sum = 0.0
         lcd_lines = {}
         if dep_dict:
-            longest_lcd = max(dep_dict, key=lambda ln: dep_dict[ln]['latency'])
-            lcd_sum = dep_dict[longest_lcd]['latency']
+            longest_lcd = max(dep_dict, key=lambda ln: dep_dict[ln]["latency"])
+            lcd_sum = dep_dict[longest_lcd]["latency"]
             lcd_lines = {
                 instr["line_number"]: lat for instr, lat in dep_dict[longest_lcd]["dependencies"]
             }

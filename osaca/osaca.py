@@ -10,7 +10,13 @@ from functools import lru_cache
 from osaca.db_interface import import_benchmark_output, sanity_check
 from osaca.frontend import Frontend
 from osaca.parser import BaseParser, ParserAArch64, ParserX86ATT
-from osaca.semantics import INSTR_FLAGS, ArchSemantics, KernelDG, MachineModel, reduce_to_section
+from osaca.semantics import (
+    INSTR_FLAGS,
+    ArchSemantics,
+    KernelDG,
+    MachineModel,
+    reduce_to_section,
+)
 
 
 SUPPORTED_ARCHS = [
@@ -37,7 +43,8 @@ DEFAULT_ARCHS = {
 def __read(*names, **kwargs):
     """Reads in file"""
     with io.open(
-        os.path.join(os.path.dirname(__file__), *names), encoding=kwargs.get("encoding", "utf8")
+        os.path.join(os.path.dirname(__file__), *names),
+        encoding=kwargs.get("encoding", "utf8"),
     ) as fp:
         return fp.read()
 
@@ -79,7 +86,10 @@ def create_parser(parser=None):
 
     # Add arguments
     parser.add_argument(
-        "-V", "--version", action="version", version="%(prog)s " + __find_version("__init__.py")
+        "-V",
+        "--version",
+        action="version",
+        version="%(prog)s " + __find_version("__init__.py"),
     )
     parser.add_argument(
         "--arch",
@@ -167,7 +177,9 @@ def create_parser(parser=None):
         help="Write analysis to this file (default to stdout).",
     )
     parser.add_argument(
-        "file", type=argparse.FileType("r"), help="Path to object (ASM or instruction file)."
+        "file",
+        type=argparse.FileType("r"),
+        help="Path to object (ASM or instruction file).",
     )
 
     return parser
@@ -347,7 +359,10 @@ def run(args, output_file=sys.stdout):
         # Sanity check on DB
         verbose = True if args.verbose > 0 else False
         sanity_check(
-            args.arch, verbose=verbose, internet_check=args.internet_check, output_file=output_file
+            args.arch,
+            verbose=verbose,
+            internet_check=args.internet_check,
+            output_file=output_file,
         )
     elif "import_data" in args:
         # Import microbench output file into DB

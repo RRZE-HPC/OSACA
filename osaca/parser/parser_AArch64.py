@@ -26,9 +26,9 @@ class ParserAArch64(BaseParser):
             pp.ZeroOrMore(pp.Word(pp.printables))
         ).setResultsName(self.COMMENT_ID)
         # Define ARM assembly identifier
-        decimal_number = pp.Combine(pp.Optional(pp.Literal("-")) + pp.Word(pp.nums)).setResultsName(
-            "value"
-        )
+        decimal_number = pp.Combine(
+            pp.Optional(pp.Literal("-")) + pp.Word(pp.nums)
+        ).setResultsName("value")
         hex_number = pp.Combine(pp.Literal("0x") + pp.Word(pp.hexnums)).setResultsName("value")
         relocation = pp.Combine(pp.Literal(":") + pp.Word(pp.alphanums + "_") + pp.Literal(":"))
         first = pp.Word(pp.alphas + "_.", exact=1)
@@ -152,7 +152,9 @@ class ParserAArch64(BaseParser):
             pp.Literal("{")
             + (
                 pp.delimitedList(pp.Combine(self.list_element), delim=",").setResultsName("list")
-                ^ pp.delimitedList(pp.Combine(self.list_element), delim="-").setResultsName("range")
+                ^ pp.delimitedList(pp.Combine(self.list_element), delim="-").setResultsName(
+                    "range"
+                )
             )
             + pp.Literal("}")
             + pp.Optional(index)
@@ -256,9 +258,7 @@ class ParserAArch64(BaseParser):
         # 2. Parse label
         if result is None:
             try:
-                result = self.process_operand(
-                    self.label.parseString(line, parseAll=True).asDict()
-                )
+                result = self.process_operand(self.label.parseString(line, parseAll=True).asDict())
                 result = AttrDict.convert_dict(result)
                 instruction_form[self.LABEL_ID] = result[self.LABEL_ID].name
                 if self.COMMENT_ID in result[self.LABEL_ID]:
@@ -293,7 +293,9 @@ class ParserAArch64(BaseParser):
             try:
                 result = self.parse_instruction(line)
             except (pp.ParseException, KeyError) as e:
-                raise ValueError("Unable to parse {!r} on line {}".format(line, line_number)) from e
+                raise ValueError(
+                    "Unable to parse {!r} on line {}".format(line, line_number)
+                ) from e
             instruction_form[self.INSTRUCTION_ID] = result[self.INSTRUCTION_ID]
             instruction_form[self.OPERANDS_ID] = result[self.OPERANDS_ID]
             instruction_form[self.COMMENT_ID] = result[self.COMMENT_ID]
@@ -390,9 +392,9 @@ class ParserAArch64(BaseParser):
             new_dict["pre_indexed"] = True
         if "post_indexed" in memory_address:
             if "value" in memory_address["post_indexed"]:
-                new_dict["post_indexed"] = {"value": int(
-                    memory_address["post_indexed"]["value"], 0
-                )}
+                new_dict["post_indexed"] = {
+                    "value": int(memory_address["post_indexed"]["value"], 0)
+                }
             else:
                 new_dict["post_indexed"] = memory_address["post_indexed"]
         return AttrDict({self.MEMORY_ID: new_dict})
@@ -408,27 +410,27 @@ class ParserAArch64(BaseParser):
         Resolve range or list register operand to list of registers.
         Returns None if neither list nor range
         """
-        if 'register' in operand:
-            if 'list' in operand.register:
-                index = operand.register.get('index')
+        if "register" in operand:
+            if "list" in operand.register:
+                index = operand.register.get("index")
                 range_list = []
                 for reg in operand.register.list:
                     reg = deepcopy(reg)
                     if index is not None:
-                        reg['index'] = int(index, 0)
+                        reg["index"] = int(index, 0)
                     range_list.append(AttrDict({self.REGISTER_ID: reg}))
                 return range_list
-            elif 'range' in operand.register:
+            elif "range" in operand.register:
                 base_register = operand.register.range[0]
-                index = operand.register.get('index')
+                index = operand.register.get("index")
                 range_list = []
                 start_name = base_register.name
                 end_name = operand.register.range[1].name
                 for name in range(int(start_name), int(end_name) + 1):
                     reg = deepcopy(base_register)
                     if index is not None:
-                        reg['index'] = int(index, 0)
-                    reg['name'] = str(name)
+                        reg["index"] = int(index, 0)
+                    reg["name"] = str(name)
                     range_list.append(AttrDict({self.REGISTER_ID: reg}))
                 return range_list
         # neither register list nor range, return unmodified
@@ -482,10 +484,12 @@ class ParserAArch64(BaseParser):
             return AttrDict({self.IMMEDIATE_ID: immediate})
         else:
             # change 'mantissa' key to 'value'
-            return AttrDict({
-                self.IMMEDIATE_ID: AttrDict({
-                    "value": immediate[dict_name]["mantissa"],
-                    "type": dict_name})}
+            return AttrDict(
+                {
+                    self.IMMEDIATE_ID: AttrDict(
+                        {"value": immediate[dict_name]["mantissa"], "type": dict_name}
+                    )
+                }
             )
 
     def process_label(self, label):

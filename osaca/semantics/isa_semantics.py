@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 from itertools import chain
-from copy import deepcopy
 
 from osaca import utils
 from osaca.parser import AttrDict, ParserAArch64, ParserX86ATT
@@ -100,53 +99,68 @@ class ISASemantics(object):
         # post-process pre- and post-indexing for aarch64 memory operands
         if self._isa == "aarch64":
             for operand in [op for op in op_dict["source"] if "memory" in op]:
-                post_indexed = ("post_indexed" in operand["memory"] and 
-                                operand["memory"]["post_indexed"])
-                pre_indexed = ("pre_indexed" in operand["memory"] and
-                               operand["memory"]["pre_indexed"])
+                post_indexed = (
+                    "post_indexed" in operand["memory"] and operand["memory"]["post_indexed"]
+                )
+                pre_indexed = (
+                    "pre_indexed" in operand["memory"] and operand["memory"]["pre_indexed"]
+                )
                 if post_indexed or pre_indexed:
                     op_dict["src_dst"].append(
-                        AttrDict.convert_dict({
-                            "register": operand["memory"]["base"],
-                            "pre_indexed": pre_indexed,
-                            "post_indexed": post_indexed})
+                        AttrDict.convert_dict(
+                            {
+                                "register": operand["memory"]["base"],
+                                "pre_indexed": pre_indexed,
+                                "post_indexed": post_indexed,
+                            }
+                        )
                     )
             for operand in [op for op in op_dict["destination"] if "memory" in op]:
-                post_indexed = ("post_indexed" in operand["memory"] and 
-                                operand["memory"]["post_indexed"])
-                pre_indexed = ("pre_indexed" in operand["memory"] and
-                               operand["memory"]["pre_indexed"])
+                post_indexed = (
+                    "post_indexed" in operand["memory"] and operand["memory"]["post_indexed"]
+                )
+                pre_indexed = (
+                    "pre_indexed" in operand["memory"] and operand["memory"]["pre_indexed"]
+                )
                 if post_indexed or pre_indexed:
                     op_dict["src_dst"].append(
-                        AttrDict.convert_dict({
-                            "register": operand["memory"]["base"],
-                            "pre_indexed": pre_indexed,
-                            "post_indexed": post_indexed})
+                        AttrDict.convert_dict(
+                            {
+                                "register": operand["memory"]["base"],
+                                "pre_indexed": pre_indexed,
+                                "post_indexed": post_indexed,
+                            }
+                        )
                     )
-            
+
         # store operand list in dict and reassign operand key/value pair
         instruction_form["semantic_operands"] = AttrDict.convert_dict(op_dict)
         # assign LD/ST flags
-        instruction_form["flags"] = instruction_form["flags"] if "flags" in instruction_form else []
+        instruction_form["flags"] = (
+            instruction_form["flags"] if "flags" in instruction_form else []
+        )
         if self._has_load(instruction_form):
             instruction_form["flags"] += [INSTR_FLAGS.HAS_LD]
         if self._has_store(instruction_form):
             instruction_form["flags"] += [INSTR_FLAGS.HAS_ST]
-        
 
     def get_reg_changes(self, instruction_form, only_postindexed=False):
         """
         Returns register changes, as dict, for insruction_form, based on operation defined in isa.
-        
+
         Empty dict if no changes of registers occured. None for registers with unknown changes.
         If only_postindexed is True, only considers changes due to post_indexed memory references.
         """
-        if instruction_form.get('instruction') is None:
+        if instruction_form.get("instruction") is None:
             return {}
-        dest_reg_names = [op.register.get('prefix', '') + op.register.name
-                          for op in chain(instruction_form.semantic_operands.destination,
-                                          instruction_form.semantic_operands.src_dst)
-                          if 'register' in op]
+        dest_reg_names = [
+            op.register.get("prefix", "") + op.register.name
+            for op in chain(
+                instruction_form.semantic_operands.destination,
+                instruction_form.semantic_operands.src_dst,
+            )
+            if "register" in op
+        ]
         isa_data = self._isa_model.get_instruction(
             instruction_form["instruction"], instruction_form["operands"]
         )
@@ -162,50 +176,50 @@ class ISASemantics(object):
 
         if only_postindexed:
             for o in instruction_form.operands:
-                if 'post_indexed' in o.get('memory', {}):
-                    base_name = o.memory.base.get('prefix', '') + o.memory.base.name
-                    return {base_name: {
-                        'name': o.memory.base.get('prefix', '') + o.memory.base.name,
-                        'value': o.memory.post_indexed.value
-                    }}
+                if "post_indexed" in o.get("memory", {}):
+                    base_name = o.memory.base.get("prefix", "") + o.memory.base.name
+                    return {
+                        base_name: {
+                            "name": o.memory.base.get("prefix", "") + o.memory.base.name,
+                            "value": o.memory.post_indexed.value,
+                        }
+                    }
             return {}
 
         reg_operand_names = {}  # e.g., {'rax': 'op1'}
         operand_state = {}  # e.g., {'op1': {'name': 'rax', 'value': 0}}  0 means unchanged
 
         for o in instruction_form.operands:
-            if 'pre_indexed' in o.get('memory', {}):
+            if "pre_indexed" in o.get("memory", {}):
                 # Assuming no isa_data.operation
                 if isa_data.get("operation", None) is not None:
                     raise ValueError(
                         "ISA information for pre-indexed instruction {!r} has operation set."
-                        "This is currently not supprted.".format(instruction_form.line))
-                base_name = o.memory.base.get('prefix', '') + o.memory.base.name
-                reg_operand_names = {base_name: 'op1'}
-                operand_state = {'op1': {
-                    'name': base_name,
-                    'value': o.memory.offset.value
-                }}
+                        "This is currently not supprted.".format(instruction_form.line)
+                    )
+                base_name = o.memory.base.get("prefix", "") + o.memory.base.name
+                reg_operand_names = {base_name: "op1"}
+                operand_state = {"op1": {"name": base_name, "value": o.memory.offset.value}}
 
-        if isa_data is not None and 'operation' in isa_data:
+        if isa_data is not None and "operation" in isa_data:
             for i, o in enumerate(instruction_form.operands):
                 operand_name = "op{}".format(i + 1)
                 if "register" in o:
-                    o_reg_name = o["register"].get('prefix', '') + o["register"]["name"]
+                    o_reg_name = o["register"].get("prefix", "") + o["register"]["name"]
                     reg_operand_names[o_reg_name] = operand_name
-                    operand_state[operand_name] = {
-                        'name': o_reg_name,
-                        'value': 0}
+                    operand_state[operand_name] = {"name": o_reg_name, "value": 0}
                 elif "immediate" in o:
-                    operand_state[operand_name] = {'value': o["immediate"]["value"]}
+                    operand_state[operand_name] = {"value": o["immediate"]["value"]}
                 elif "memory" in o:
                     # TODO lea needs some thinking about
                     pass
 
-            operand_changes = exec(isa_data['operation'], {}, operand_state)
+            exec(isa_data["operation"], {}, operand_state)
 
-        change_dict = {reg_name: operand_state.get(reg_operand_names.get(reg_name))
-                       for reg_name in dest_reg_names}
+        change_dict = {
+            reg_name: operand_state.get(reg_operand_names.get(reg_name))
+            for reg_name in dest_reg_names
+        }
         return change_dict
 
     def _apply_found_ISA_data(self, isa_data, operands):
@@ -231,8 +245,10 @@ class ISASemantics(object):
             if "hidden_operands" in isa_data:
                 op_dict["destination"] += [
                     AttrDict.convert_dict(
-                        {hop["class"]: {k: hop[k] for k in ["class", "source", "destination"]}})
-                     for hop in isa_data["hidden_operands"]]
+                        {hop["class"]: {k: hop[k] for k in ["class", "source", "destination"]}}
+                    )
+                    for hop in isa_data["hidden_operands"]
+                ]
             return op_dict
 
         for i, op in enumerate(isa_data["operands"]):

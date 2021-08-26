@@ -23,9 +23,9 @@ class ParserX86ATT(BaseParser):
 
     def construct_parser(self):
         """Create parser for ARM AArch64 ISA."""
-        decimal_number = pp.Combine(pp.Optional(pp.Literal("-")) + pp.Word(pp.nums)).setResultsName(
-            "value"
-        )
+        decimal_number = pp.Combine(
+            pp.Optional(pp.Literal("-")) + pp.Word(pp.nums)
+        ).setResultsName("value")
         hex_number = pp.Combine(
             pp.Optional(pp.Literal("-")) + pp.Literal("0x") + pp.Word(pp.hexnums)
         ).setResultsName("value")
@@ -41,7 +41,8 @@ class ParserX86ATT(BaseParser):
         identifier = pp.Group(
             pp.Optional(id_offset).setResultsName("offset")
             + pp.Combine(
-                pp.delimitedList(pp.Combine(first + pp.Optional(rest)), delim="::"), joinString="::"
+                pp.delimitedList(pp.Combine(first + pp.Optional(rest)), delim="::"),
+                joinString="::",
             ).setResultsName("name")
             + pp.Optional(relocation).setResultsName("relocation")
         ).setResultsName("identifier")
@@ -443,7 +444,12 @@ class ParserX86ATT(BaseParser):
         """Check if register is a vector register"""
         if register is None:
             return False
-        if register["name"].rstrip(string.digits).lower() in ["mm", "xmm", "ymm", "zmm"]:
+        if register["name"].rstrip(string.digits).lower() in [
+            "mm",
+            "xmm",
+            "ymm",
+            "zmm",
+        ]:
             return True
         return False
 
