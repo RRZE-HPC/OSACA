@@ -422,6 +422,17 @@ instruction_forms:
           name: "eax"
           source: false
           destination: true
+    - name: [cqo, cqto]
+      operands: []
+      hidden_operands:
+        - class: "register"
+          name: "rax"
+          source: true
+          destination: false
+        - class: "register"
+          name: "rdx"
+          source: false
+          destination: true
     - name: [cltq, cdqe]
       operands: []
       hidden_operands:
@@ -2639,7 +2650,7 @@ instruction_forms:
           source: true
           destination: true
     - name: [pxor]
-      breaks_pedendency_on_equal_operands: true
+      breaks_dependency_on_equal_operands: true
       operands:
         - class: "register"
           name: "xmm"
@@ -2660,7 +2671,7 @@ instruction_forms:
           source: true
           destination: true
     - name: [pxor]
-      breaks_pedendency_on_equal_operands: true
+      breaks_dependency_on_equal_operands: true
       operands:
         - class: "register"
           name: "mm"
@@ -3321,6 +3332,42 @@ instruction_forms:
           name: "ID"
           source: true
           destination: false
+    - name: sbb
+      operands:
+        - class: "register"
+          name: "gpr"
+          source: true
+          destination: false
+        - class: "register"
+          name: "gpr"
+          source: true
+          destination: true
+      hidden_operands:
+        - class: "flag"
+          name: "OF"
+          source: false
+          destination: true
+        - class: "flag"
+          name: "SF"
+          source: false
+          destination: true
+        - class: "flag"
+          name: "ZF"
+          source: false
+          destination: true
+        - class: "flag"
+          name: "AF"
+          source: false
+          destination: true
+        - class: "flag"
+          name: "PF"
+          source: false
+          destination: true
+        - class: "flag"
+          name: "CF"
+          source: true
+          destination: true
+      operation: "op2['value'] -= (op1['value'])" # + CF['value'])" TODO
     - name: sub
       operands:
         - class: "immediate"
@@ -3358,7 +3405,7 @@ instruction_forms:
           destination: true
       operation: "op2['value'] -= op1['value']"
     - name: sub
-      breaks_pedendency_on_equal_operands: true
+      breaks_dependency_on_equal_operands: true
       operands:
         - class: "register"
           name: "gpr"
@@ -3846,7 +3893,7 @@ instruction_forms:
           source: false
           destination: true
     - name: vzeroall
-      breaks_pedendency_on_equal_operands: true
+      breaks_dependency_on_equal_operands: true
       operands: []
       hidden_operands:
         - class: "register"
@@ -4003,7 +4050,7 @@ instruction_forms:
           source: true
           destination: true
     - name: [xorps, xorpd]
-      breaks_pedendency_on_equal_operands: true
+      breaks_dependency_on_equal_operands: true
       operands:
         - class: "register"
           name: "xmm"
@@ -4024,7 +4071,7 @@ instruction_forms:
           source: true
           destination: true
     - name: [vxorpd, vxorps]
-      breaks_pedendency_on_equal_operands: true
+      breaks_dependency_on_equal_operands: true
       operands:
         - class: "register"
           name: "*"
@@ -4039,7 +4086,7 @@ instruction_forms:
           source: false
           destination: true
     - name: xor
-      breaks_pedendency_on_equal_operands: true
+      breaks_dependency_on_equal_operands: true
       operands:
         - class: "register"
           name: "gpr"
