@@ -227,7 +227,7 @@ class ISASemantics(object):
         Create operand dictionary containing src/dst operands out of the ISA data entry and
         the oeprands of an instruction form
 
-        If breaks_pedendency_on_equal_operands is True (configuted per instruction in ISA db)
+        If breaks_dependency_on_equal_operands is True (configuted per instruction in ISA db)
         and all operands are equal, place operand into destination only.
 
         :param dict isa_data: ISA DB entry
@@ -240,12 +240,12 @@ class ISASemantics(object):
         op_dict["src_dst"] = []
 
         # handle dependency breaking instructions
-        if "breaks_pedendency_on_equal_operands" in isa_data and operands[1:] == operands[:-1]:
+        if "breaks_dependency_on_equal_operands" in isa_data and operands[1:] == operands[:-1]:
             op_dict["destination"] += operands
             if "hidden_operands" in isa_data:
                 op_dict["destination"] += [
                     AttrDict.convert_dict(
-                        {hop["class"]: {k: hop[k] for k in ["class", "source", "destination"]}}
+                        {hop["class"]: {k: hop[k] for k in ["name", "class", "source", "destination"]}}
                     )
                     for hop in isa_data["hidden_operands"]
                 ]

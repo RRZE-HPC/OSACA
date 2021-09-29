@@ -22,7 +22,7 @@ class ParserX86ATT(BaseParser):
         self.isa = "x86"
 
     def construct_parser(self):
-        """Create parser for ARM AArch64 ISA."""
+        """Create parser for x86 AT&T ISA."""
         decimal_number = pp.Combine(
             pp.Optional(pp.Literal("-")) + pp.Word(pp.nums)
         ).setResultsName("value")
@@ -36,7 +36,7 @@ class ParserX86ATT(BaseParser):
         # Define x86 assembly identifier
         relocation = pp.Combine(pp.Literal("@") + pp.Word(pp.alphas))
         id_offset = pp.Word(pp.nums) + pp.Suppress(pp.Literal("+"))
-        first = pp.Word(pp.alphas + "_.", exact=1)
+        first = pp.Word(pp.alphas + "-_.", exact=1)
         rest = pp.Word(pp.alphanums + "$_.+-")
         identifier = pp.Group(
             pp.Optional(id_offset).setResultsName("offset")
@@ -89,7 +89,7 @@ class ParserX86ATT(BaseParser):
         ).setResultsName(self.IMMEDIATE_ID)
 
         # Memory preparations
-        offset = pp.Group(identifier | hex_number | decimal_number).setResultsName(
+        offset = pp.Group(hex_number | decimal_number | identifier).setResultsName(
             self.IMMEDIATE_ID
         )
         scale = pp.Word("1248", exact=1)
