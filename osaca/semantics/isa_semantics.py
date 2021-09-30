@@ -45,7 +45,10 @@ class ISASemantics(object):
     def assign_src_dst(self, instruction_form):
         """Update instruction form dictionary with source, destination and flag information."""
         # if the instruction form doesn't have operands or is None, there's nothing to do
-        if instruction_form["operands"] is None or instruction_form["instruction"] is None:
+        if (
+            instruction_form["operands"] is None
+            or instruction_form["instruction"] is None
+        ):
             instruction_form["semantic_operands"] = AttrDict(
                 {"source": [], "destination": [], "src_dst": []}
             )
@@ -94,16 +97,20 @@ class ISASemantics(object):
         if assign_default:
             # no irregular operand structure, apply default
             op_dict["source"] = self._get_regular_source_operands(instruction_form)
-            op_dict["destination"] = self._get_regular_destination_operands(instruction_form)
+            op_dict["destination"] = self._get_regular_destination_operands(
+                instruction_form
+            )
             op_dict["src_dst"] = []
         # post-process pre- and post-indexing for aarch64 memory operands
         if self._isa == "aarch64":
             for operand in [op for op in op_dict["source"] if "memory" in op]:
                 post_indexed = (
-                    "post_indexed" in operand["memory"] and operand["memory"]["post_indexed"]
+                    "post_indexed" in operand["memory"]
+                    and operand["memory"]["post_indexed"]
                 )
                 pre_indexed = (
-                    "pre_indexed" in operand["memory"] and operand["memory"]["pre_indexed"]
+                    "pre_indexed" in operand["memory"]
+                    and operand["memory"]["pre_indexed"]
                 )
                 if post_indexed or pre_indexed:
                     op_dict["src_dst"].append(
@@ -117,10 +124,12 @@ class ISASemantics(object):
                     )
             for operand in [op for op in op_dict["destination"] if "memory" in op]:
                 post_indexed = (
-                    "post_indexed" in operand["memory"] and operand["memory"]["post_indexed"]
+                    "post_indexed" in operand["memory"]
+                    and operand["memory"]["post_indexed"]
                 )
                 pre_indexed = (
-                    "pre_indexed" in operand["memory"] and operand["memory"]["pre_indexed"]
+                    "pre_indexed" in operand["memory"]
+                    and operand["memory"]["pre_indexed"]
                 )
                 if post_indexed or pre_indexed:
                     op_dict["src_dst"].append(
@@ -180,14 +189,17 @@ class ISASemantics(object):
                     base_name = o.memory.base.get("prefix", "") + o.memory.base.name
                     return {
                         base_name: {
-                            "name": o.memory.base.get("prefix", "") + o.memory.base.name,
+                            "name": o.memory.base.get("prefix", "")
+                            + o.memory.base.name,
                             "value": o.memory.post_indexed.value,
                         }
                     }
             return {}
 
         reg_operand_names = {}  # e.g., {'rax': 'op1'}
-        operand_state = {}  # e.g., {'op1': {'name': 'rax', 'value': 0}}  0 means unchanged
+        operand_state = (
+            {}
+        )  # e.g., {'op1': {'name': 'rax', 'value': 0}}  0 means unchanged
 
         for o in instruction_form.operands:
             if "pre_indexed" in o.get("memory", {}):
@@ -199,7 +211,9 @@ class ISASemantics(object):
                     )
                 base_name = o.memory.base.get("prefix", "") + o.memory.base.name
                 reg_operand_names = {base_name: "op1"}
-                operand_state = {"op1": {"name": base_name, "value": o.memory.offset.value}}
+                operand_state = {
+                    "op1": {"name": base_name, "value": o.memory.offset.value}
+                }
 
         if isa_data is not None and "operation" in isa_data:
             for i, o in enumerate(instruction_form.operands):
@@ -240,12 +254,20 @@ class ISASemantics(object):
         op_dict["src_dst"] = []
 
         # handle dependency breaking instructions
-        if "breaks_dependency_on_equal_operands" in isa_data and operands[1:] == operands[:-1]:
+        if (
+            "breaks_dependency_on_equal_operands" in isa_data
+            and operands[1:] == operands[:-1]
+        ):
             op_dict["destination"] += operands
             if "hidden_operands" in isa_data:
                 op_dict["destination"] += [
                     AttrDict.convert_dict(
-                        {hop["class"]: {k: hop[k] for k in ["name", "class", "source", "destination"]}}
+                        {
+                            hop["class"]: {
+                                k: hop[k]
+                                for k in ["name", "class", "source", "destination"]
+                            }
+                        }
                     )
                     for hop in isa_data["hidden_operands"]
                 ]
@@ -329,7 +351,9 @@ class ISASemantics(object):
 
     def substitute_mem_address(self, operands):
         """Create memory wildcard for all memory operands"""
-        return [self._create_reg_wildcard() if "memory" in op else op for op in operands]
+        return [
+            self._create_reg_wildcard() if "memory" in op else op for op in operands
+        ]
 
     def _create_reg_wildcard(self):
         """Wildcard constructor"""
