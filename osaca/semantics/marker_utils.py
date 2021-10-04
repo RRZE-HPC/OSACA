@@ -133,7 +133,11 @@ def find_marked_section(
     index_end = -1
     for i, line in enumerate(lines):
         try:
-            if line.instruction is None and comments is not None and line.comment is not None:
+            if (
+                line.instruction is None
+                and comments is not None
+                and line.comment is not None
+            ):
                 if comments["start"] == line.comment:
                     index_start = i + 1
                 elif comments["end"] == line.comment:
