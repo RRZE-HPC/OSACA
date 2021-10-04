@@ -46,7 +46,9 @@ class ArchSemantics(ISASemantics):
                 ports = list(uop[1])
                 indices = [port_list.index(p) for p in ports]
                 # check if port sum of used ports for uop are unbalanced
-                port_sums = self._to_list(itemgetter(*indices)(self.get_throughput_sum(kernel)))
+                port_sums = self._to_list(
+                    itemgetter(*indices)(self.get_throughput_sum(kernel))
+                )
                 instr_ports = self._to_list(
                     itemgetter(*indices)(instruction_form["port_pressure"])
                 )
@@ -65,7 +67,9 @@ class ArchSemantics(ISASemantics):
                         differences[max_port_idx] -= INC
                         differences[min_port_idx] += INC
                         # instr_ports = [round(p, 2) for p in instr_ports]
-                        self._itemsetter(*indices)(instruction_form["port_pressure"], *instr_ports)
+                        self._itemsetter(*indices)(
+                            instruction_form["port_pressure"], *instr_ports
+                        )
                         # check if min port is zero
                         if round(min(instr_ports), 2) <= 0:
                             # if port_pressure is not exactly 0.00, add the residual to
@@ -83,12 +87,15 @@ class ArchSemantics(ISASemantics):
                                 zero_index = [
                                     p
                                     for p in indices
-                                    if round(instruction_form["port_pressure"][p], 2) == 0
+                                    if round(instruction_form["port_pressure"][p], 2)
+                                    == 0
                                 ][0]
                                 instruction_form["port_pressure"][zero_index] = 0.0
                             # Remove from further balancing
                             indices = [
-                                p for p in indices if instruction_form["port_pressure"][p] > 0
+                                p
+                                for p in indices
+                                if instruction_form["port_pressure"][p] > 0
                             ]
                             instr_ports = self._to_list(
                                 itemgetter(*indices)(instruction_form["port_pressure"])
@@ -141,9 +148,11 @@ class ArchSemantics(ISASemantics):
                         if INSTR_FLAGS.HIDDEN_LD not in load_instr["flags"]
                     ]
                 )
-                load = [instr for instr in kernel if instr["line_number"] == min_distance_load[1]][
-                    0
-                ]
+                load = [
+                    instr
+                    for instr in kernel
+                    if instr["line_number"] == min_distance_load[1]
+                ][0]
                 # Hide load
                 load["flags"] += [INSTR_FLAGS.HIDDEN_LD]
                 load["port_pressure"] = self._nullify_data_ports(load["port_pressure"])
@@ -221,27 +230,39 @@ class ArchSemantics(ISASemantics):
                             data_port_uops = self._machine_model.get_load_throughput(
                                 [
                                     x["memory"]
-                                    for x in instruction_form["semantic_operands"]["source"]
+                                    for x in instruction_form["semantic_operands"][
+                                        "source"
+                                    ]
                                     + instruction_form["semantic_operands"]["src_dst"]
                                     if "memory" in x
                                 ][0]
                             )
-                            data_port_pressure = self._machine_model.average_port_pressure(
-                                data_port_uops
+                            data_port_pressure = (
+                                self._machine_model.average_port_pressure(
+                                    data_port_uops
+                                )
                             )
                             if "load_throughput_multiplier" in self._machine_model:
-                                multiplier = self._machine_model["load_throughput_multiplier"][
-                                    reg_type
+                                multiplier = self._machine_model[
+                                    "load_throughput_multiplier"
+                                ][reg_type]
+                                data_port_pressure = [
+                                    pp * multiplier for pp in data_port_pressure
                                 ]
-                                data_port_pressure = [pp * multiplier for pp in data_port_pressure]
                         if INSTR_FLAGS.HAS_ST in instruction_form["flags"]:
                             # STORE performance data
                             destinations = (
                                 instruction_form["semantic_operands"]["destination"]
                                 + instruction_form["semantic_operands"]["src_dst"]
                             )
-                            st_data_port_uops = self._machine_model.get_store_throughput(
-                                [x["memory"] for x in destinations if "memory" in x][0]
+                            st_data_port_uops = (
+                                self._machine_model.get_store_throughput(
+                                    [
+                                        x["memory"]
+                                        for x in destinations
+                                        if "memory" in x
+                                    ][0]
+                                )
                             )
                             # zero data port pressure and remove HAS_ST flag if
                             #   - no mem operand in dst &&
@@ -250,12 +271,16 @@ class ArchSemantics(ISASemantics):
                             if (
                                 self._isa == "aarch64"
                                 and "memory"
-                                not in instruction_form["semantic_operands"]["destination"]
+                                not in instruction_form["semantic_operands"][
+                                    "destination"
+                                ]
                                 and all(
                                     [
                                         "post_indexed" in op["memory"]
                                         or "pre_indexed" in op["memory"]
-                                        for op in instruction_form["semantic_operands"]["src_dst"]
+                                        for op in instruction_form["semantic_operands"][
+                                            "src_dst"
+                                        ]
                                         if "memory" in op
                                     ]
                                 )
@@ -264,18 +289,21 @@ class ArchSemantics(ISASemantics):
                                 instruction_form["flags"].remove(INSTR_FLAGS.HAS_ST)
 
                             # sum up all data ports in case for LOAD and STORE
-                            st_data_port_pressure = self._machine_model.average_port_pressure(
-                                st_data_port_uops
+                            st_data_port_pressure = (
+                                self._machine_model.average_port_pressure(
+                                    st_data_port_uops
+                                )
                             )
                             if "store_throughput_multiplier" in self._machine_model:
-                                multiplier = self._machine_model["store_throughput_multiplier"][
-                                    reg_type
-                                ]
+                                multiplier = self._machine_model[
+                                    "store_throughput_multiplier"
+                                ][reg_type]
                                 st_data_port_pressure = [
                                     pp * multiplier for pp in st_data_port_pressure
                                 ]
                             data_port_pressure = [
-                                sum(x) for x in zip(data_port_pressure, st_data_port_pressure)
+                                sum(x)
+                                for x in zip(data_port_pressure, st_data_port_pressure)
                             ]
                             data_port_uops += st_data_port_uops
                         throughput = max(
@@ -327,7 +355,9 @@ class ArchSemantics(ISASemantics):
                     throughput = 0.0
                     latency = 0.0
                     latency_wo_load = latency
-                    instruction_form["port_pressure"] = [0.0 for i in range(port_number)]
+                    instruction_form["port_pressure"] = [
+                        0.0 for i in range(port_number)
+                    ]
                     instruction_form["port_uops"] = []
                     flags += [INSTR_FLAGS.TP_UNKWN, INSTR_FLAGS.LT_UNKWN]
         # flatten flag list
@@ -343,7 +373,9 @@ class ArchSemantics(ISASemantics):
         instruction_form["latency_cp"] = 0
         instruction_form["latency_lcd"] = 0
 
-    def _handle_instruction_found(self, instruction_data, port_number, instruction_form, flags):
+    def _handle_instruction_found(
+        self, instruction_data, port_number, instruction_form, flags
+    ):
         """Apply performance data to instruction if it was found in the archDB"""
         throughput = instruction_data["throughput"]
         port_pressure = self._machine_model.average_port_pressure(
@@ -425,7 +457,9 @@ class ArchSemantics(ISASemantics):
         """Get the overall throughput sum separated by port of all instructions of a kernel."""
         # ignoring all lines with throughput == 0.0, because there won't be anything to sum up
         # typically comment, label and non-instruction lines
-        port_pressures = [instr["port_pressure"] for instr in kernel if instr["throughput"] != 0.0]
+        port_pressures = [
+            instr["port_pressure"] for instr in kernel if instr["throughput"] != 0.0
+        ]
         # Essentially summing up each columns of port_pressures, where each column is one port
         # and each row is one line of the kernel
         # round is necessary to ensure termination of ArchsSemantics.assign_optimal_throughput
