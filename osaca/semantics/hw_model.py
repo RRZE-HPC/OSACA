@@ -18,9 +18,7 @@ from ruamel.yaml.compat import StringIO
 
 class MachineModel(object):
     WILDCARD = "*"
-    INTERNAL_VERSION = (
-        1  # increase whenever self._data format changes to invalidate cache!
-    )
+    INTERNAL_VERSION = 1  # increase whenever self._data format changes to invalidate cache!
     _runtime_cache = {}
 
     def __init__(self, arch=None, path_to_yaml=None, isa=None, lazy=False):
@@ -45,9 +43,7 @@ class MachineModel(object):
                         "scale": s,
                         "port_pressure": [],
                     }
-                    for b, i, o, s in product(
-                        ["gpr"], ["gpr", None], ["imd", None], [1, 8]
-                    )
+                    for b, i, o, s in product(["gpr"], ["gpr", None], ["imd", None], [1, 8])
                 ],
                 "load_throughput_default": [],
                 "store_throughput": [],
@@ -89,9 +85,7 @@ class MachineModel(object):
                         self._data["instruction_forms"] = []
                 # separate multi-alias instruction forms
                 for entry in [
-                    x
-                    for x in self._data["instruction_forms"]
-                    if isinstance(x["name"], list)
+                    x for x in self._data["instruction_forms"] if isinstance(x["name"], list)
                 ]:
                     for name in entry["name"]:
                         new_entry = {"name": name}
@@ -139,9 +133,7 @@ class MachineModel(object):
                 instruction_form
                 for instruction_form in name_matched_iforms
                 if self._match_operands(
-                    instruction_form["operands"]
-                    if "operands" in instruction_form
-                    else [],
+                    instruction_form["operands"] if "operands" in instruction_form else [],
                     operands,
                 )
             )
@@ -223,19 +215,11 @@ class MachineModel(object):
 
     def get_load_latency(self, reg_type):
         """Return load latency for given register type."""
-        return (
-            self._data["load_latency"][reg_type]
-            if self._data["load_latency"][reg_type]
-            else 0
-        )
+        return self._data["load_latency"][reg_type] if self._data["load_latency"][reg_type] else 0
 
     def get_load_throughput(self, memory):
         """Return load thorughput for given register type."""
-        ld_tp = [
-            m
-            for m in self._data["load_throughput"]
-            if self._match_mem_entries(memory, m)
-        ]
+        ld_tp = [m for m in self._data["load_throughput"] if self._match_mem_entries(memory, m)]
         if len(ld_tp) > 0:
             return ld_tp[0]["port_pressure"].copy()
         return self._data["load_throughput_default"].copy()
@@ -247,11 +231,7 @@ class MachineModel(object):
 
     def get_store_throughput(self, memory):
         """Return store throughput for given register type."""
-        st_tp = [
-            m
-            for m in self._data["store_throughput"]
-            if self._match_mem_entries(memory, m)
-        ]
+        st_tp = [m for m in self._data["store_throughput"] if self._match_mem_entries(memory, m)]
         if len(st_tp) > 0:
             return st_tp[0]["port_pressure"].copy()
         return self._data["store_throughput_default"].copy()
@@ -319,9 +299,7 @@ class MachineModel(object):
         formatted_instruction_forms = deepcopy(self._data["instruction_forms"])
         for instruction_form in formatted_instruction_forms:
             if instruction_form["port_pressure"] is not None:
-                cs = ruamel.yaml.comments.CommentedSeq(
-                    instruction_form["port_pressure"]
-                )
+                cs = ruamel.yaml.comments.CommentedSeq(instruction_form["port_pressure"])
                 cs.fa.set_flow_style()
                 instruction_form["port_pressure"] = cs
 
@@ -371,9 +349,7 @@ class MachineModel(object):
         hexhash = hashlib.sha256(p.read_bytes()).hexdigest()
 
         # 1. companion cachefile: same location, with '.<name>_<sha512hash>.pickle'
-        companion_cachefile = p.with_name("." + p.stem + "_" + hexhash).with_suffix(
-            ".pickle"
-        )
+        companion_cachefile = p.with_name("." + p.stem + "_" + hexhash).with_suffix(".pickle")
         if companion_cachefile.exists():
             # companion file (must be up-to-date, due to equal hash)
             with companion_cachefile.open("rb") as f:
@@ -382,9 +358,7 @@ class MachineModel(object):
                 return data
 
         # 2. home cachefile: ~/.osaca/cache/<name>_<sha512hash>.pickle
-        home_cachefile = (Path(utils.CACHE_DIR) / (p.stem + "_" + hexhash)).with_suffix(
-            ".pickle"
-        )
+        home_cachefile = (Path(utils.CACHE_DIR) / (p.stem + "_" + hexhash)).with_suffix(".pickle")
         if home_cachefile.exists():
             # home file (must be up-to-date, due to equal hash)
             with home_cachefile.open("rb") as f:
@@ -403,9 +377,7 @@ class MachineModel(object):
         p = Path(filepath)
         hexhash = hashlib.sha256(p.read_bytes()).hexdigest()
         # 1. companion cachefile: same location, with '.<name>_<sha512hash>.pickle'
-        companion_cachefile = p.with_name("." + p.stem + "_" + hexhash).with_suffix(
-            ".pickle"
-        )
+        companion_cachefile = p.with_name("." + p.stem + "_" + hexhash).with_suffix(".pickle")
         if os.access(str(companion_cachefile.parent), os.W_OK):
             with companion_cachefile.open("wb") as f:
                 pickle.dump(self._data, f)
@@ -449,9 +421,7 @@ class MachineModel(object):
                 operand_string += operand["prefix"]
                 operand_string += operand["shape"] if "shape" in operand else ""
             elif "name" in operand:
-                operand_string += (
-                    "r" if operand["name"] == "gpr" else operand["name"][0]
-                )
+                operand_string += "r" if operand["name"] == "gpr" else operand["name"][0]
         elif opclass == "memory":
             # Memory
             operand_string += "m"
@@ -614,9 +584,7 @@ class MachineModel(object):
         if "register" in operand:
             if i_operand["class"] != "register":
                 return False
-            return self._is_x86_reg_type(
-                i_operand, operand["register"], consider_masking=False
-            )
+            return self._is_x86_reg_type(i_operand, operand["register"], consider_masking=False)
         # memory
         if "memory" in operand:
             if i_operand["class"] != "memory":
@@ -664,8 +632,7 @@ class MachineModel(object):
             return False
         if "shape" in reg:
             if "shape" in i_reg and (
-                reg["shape"] == i_reg["shape"]
-                or self.WILDCARD in (reg["shape"] + i_reg["shape"])
+                reg["shape"] == i_reg["shape"] or self.WILDCARD in (reg["shape"] + i_reg["shape"])
             ):
                 return True
             return False
@@ -695,8 +662,7 @@ class MachineModel(object):
                         if (
                             (
                                 "mask" in reg
-                                and reg["mask"].rstrip(string.digits).lower()
-                                == i_reg.get("mask")
+                                and reg["mask"].rstrip(string.digits).lower() == i_reg.get("mask")
                             )
                             or reg.get("mask") == self.WILDCARD
                             or i_reg.get("mask") == self.WILDCARD
