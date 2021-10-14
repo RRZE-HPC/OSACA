@@ -7,7 +7,8 @@ import re
 def __read(*names, **kwargs):
     """Reads in file"""
     with io.open(
-        os.path.join(os.path.dirname(__file__), *names), encoding=kwargs.get("encoding", "utf8")
+        os.path.join(os.path.dirname(__file__), *names),
+        encoding=kwargs.get("encoding", "utf8"),
     ) as fp:
         return fp.read()
 
@@ -19,7 +20,7 @@ def __find_version(*file_paths):
     version_match = re.search(r"^__version__ = ['\"]([^'\"]*)['\"]", version_file, re.M)
     if version_match:
         return version_match.group(1)
-    raise RuntimeError('Unable to find version string.')
+    raise RuntimeError("Unable to find version string.")
 
 
 def get_version():
@@ -28,4 +29,4 @@ def get_version():
 
     :returns: str -- the version string.
     """
-    return __find_version('../osaca/__init__.py')
+    return __find_version("../osaca/__init__.py")

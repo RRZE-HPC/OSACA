@@ -60,6 +60,7 @@ instruction_forms:
           name: "CF"
           source: false
           destination: true
+      operation: "op2['value'] += op1['value']"
     - name: add
       operands:
         - class: "register"
@@ -380,7 +381,7 @@ instruction_forms:
           name: "ax"
           source: false
           destination: true
-    - name: cwtl
+    - name: [cwtl, cwde]
       operands: []
       hidden_operands:
         - class: "register"
@@ -421,7 +422,18 @@ instruction_forms:
           name: "eax"
           source: false
           destination: true
-    - name: cltq
+    - name: [cqo, cqto]
+      operands: []
+      hidden_operands:
+        - class: "register"
+          name: "rax"
+          source: true
+          destination: false
+        - class: "register"
+          name: "rdx"
+          source: false
+          destination: true
+    - name: [cltq, cdqe]
       operands: []
       hidden_operands:
         - class: "register"
@@ -2381,6 +2393,7 @@ instruction_forms:
           name: "PF"
           source: false
           destination: true
+      operation: "op1['value'] -= 1"
     - name: dec
       operands:
         - class: "memory"
@@ -2479,6 +2492,7 @@ instruction_forms:
           name: "PF"
           source: false
           destination: true
+      operation: "op1['value'] += 1"
     - name: inc
       operands:
         - class: "memory"
@@ -2509,6 +2523,21 @@ instruction_forms:
           name: "PF"
           source: false
           destination: true
+    - name: lea
+      operands:
+        - class: "memory"
+          base: "*"
+          offset: "*"
+          index: "*"
+          scale: "*"
+          source: true
+          destination: false
+        - class: register
+          name: "gpr"
+          source: false
+          destination: true
+      # TODO
+      #operation: "op2['value'] = None if None in [op1['offset'], op1['base']] else op1['offset'] + op1['base'] + op1['index'] * op1['scale']"
     - name: ldmxcsr
       operands:
         - class: "memory"
@@ -2519,6 +2548,17 @@ instruction_forms:
           source: true
           destination: false
       # TODO sets MXCSR
+    - name: mov
+      operands:
+        - class: "register"
+          name: "gpr"
+          source: true
+          destination: false
+        - class: "register"
+          name: "gpr"
+          source: false
+          destination: true
+      operation: "op2['name'] = op1['name']; op2['value'] = op1['value']"
     - name: [maxpd, maxps, maxsd, maxss, minpd, minps, minsd, minss]
       operands:
         - class: "register"
@@ -2599,7 +2639,7 @@ instruction_forms:
           name: "mm"
           source: true
           destination: true
-    - name: [pand, por, pxor, pandn]
+    - name: [pand, por, pandn]
       operands:
         - class: "register"
           name: "xmm"
@@ -2609,7 +2649,29 @@ instruction_forms:
           name: "xmm"
           source: true
           destination: true
-    - name: [pand, por, pxor, pandn]
+    - name: [pxor]
+      breaks_dependency_on_equal_operands: true
+      operands:
+        - class: "register"
+          name: "xmm"
+          source: true
+          destination: false
+        - class: "register"
+          name: "xmm"
+          source: true
+          destination: true
+    - name: [pand, por, pandn]
+      operands:
+        - class: "register"
+          name: "mm"
+          source: true
+          destination: false
+        - class: "register"
+          name: "mm"
+          source: true
+          destination: true
+    - name: [pxor]
+      breaks_dependency_on_equal_operands: true
       operands:
         - class: "register"
           name: "mm"
@@ -3270,6 +3332,42 @@ instruction_forms:
           name: "ID"
           source: true
           destination: false
+    - name: sbb
+      operands:
+        - class: "register"
+          name: "gpr"
+          source: true
+          destination: false
+        - class: "register"
+          name: "gpr"
+          source: true
+          destination: true
+      hidden_operands:
+        - class: "flag"
+          name: "OF"
+          source: false
+          destination: true
+        - class: "flag"
+          name: "SF"
+          source: false
+          destination: true
+        - class: "flag"
+          name: "ZF"
+          source: false
+          destination: true
+        - class: "flag"
+          name: "AF"
+          source: false
+          destination: true
+        - class: "flag"
+          name: "PF"
+          source: false
+          destination: true
+        - class: "flag"
+          name: "CF"
+          source: true
+          destination: true
+      operation: "op2['value'] -= (op1['value'])" # + CF['value'])" TODO
     - name: sub
       operands:
         - class: "immediate"
@@ -3305,7 +3403,9 @@ instruction_forms:
           name: "CF"
           source: false
           destination: true
+      operation: "op2['value'] -= op1['value']"
     - name: sub
+      breaks_dependency_on_equal_operands: true
       operands:
         - class: "register"
           name: "gpr"
@@ -3793,6 +3893,7 @@ instruction_forms:
           source: false
           destination: true
     - name: vzeroall
+      breaks_dependency_on_equal_operands: true
       operands: []
       hidden_operands:
         - class: "register"
@@ -3938,7 +4039,18 @@ instruction_forms:
           name: "xmm"
           source: true
           destination: true
-    - name: [andps, andpd, andnps, andnpd, orps, orpd, xorps, xorpd]
+    - name: [andps, andpd, andnps, andnpd, orps, orpd]
+      operands:
+        - class: "register"
+          name: "xmm"
+          source: true
+          destination: false
+        - class: "register"
+          name: "xmm"
+          source: true
+          destination: true
+    - name: [xorps, xorpd]
+      breaks_dependency_on_equal_operands: true
       operands:
         - class: "register"
           name: "xmm"
@@ -3952,6 +4064,32 @@ instruction_forms:
       operands:
         - class: "immediate"
           imd: "int"
+          source: true
+          destination: false
+        - class: "register"
+          name: "gpr"
+          source: true
+          destination: true
+    - name: [vxorpd, vxorps]
+      breaks_dependency_on_equal_operands: true
+      operands:
+        - class: "register"
+          name: "*"
+          source: true
+          destination: false
+        - class: "register"
+          name: "*"
+          source: true
+          destination: false
+        - class: "register"
+          name: "*"
+          source: false
+          destination: true
+    - name: xor
+      breaks_dependency_on_equal_operands: true
+      operands:
+        - class: "register"
+          name: "gpr"
           source: true
           destination: false
         - class: "register"

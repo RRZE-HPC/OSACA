@@ -1,8 +1,11 @@
 #!/usr/bin/env python3
 import os.path
 
-DATA_DIRS = [os.path.expanduser('~/.osaca/data'), os.path.join(os.path.dirname(__file__), 'data')]
-CACHE_DIR = os.path.expanduser('~/.osaca/cache')
+DATA_DIRS = [
+    os.path.expanduser("~/.osaca/data"),
+    os.path.join(os.path.dirname(__file__), "data"),
+]
+CACHE_DIR = os.path.expanduser("~/.osaca/cache")
 
 
 def find_datafile(name):

@@ -5,6 +5,36 @@ isa: "AArch64"
 #   mnemonic op1 ... opN
 # means that op1 is the only destination operand and op2 to op(N) are source operands.
 instruction_forms:
+    - name: [add, adds]
+      operands:
+      - class: register
+        prefix: x
+        source: false
+        destination: true
+      - class: register
+        prefix: x
+        source: true
+        destination: false
+      - class: immediate
+        imd: 'int'
+        source: true
+        destination: false
+      operation: "op1['value'] = op2['value'] + op3['value']; op1['name'] = op2['name']"
+    - name: [sub, subs]
+      operands:
+      - class: register
+        prefix: x
+        source: false
+        destination: true
+      - class: register
+        prefix: x
+        source: true
+        destination: false
+      - class: immediate
+        imd: 'int'
+        source: true
+        destination: false
+      operation: "op1['value'] = op2['value'] - op3['value']; op1['name'] = op2['name']"
     - name: [b, bcc, bcs, b.ne, b.any, b.none, b.lt, b.eq, b.hs, b.gt, bne, beq]
       operands:
       - class: identifier
@@ -31,6 +61,28 @@ instruction_forms:
       - class: immediate
         imd: int
         source: false 
+        destination: false
+    - name: fmla
+      operands:
+      - class: register
+        prefix: "*"
+        shape: "*"
+        source: true
+        destination: true
+      - class: register
+        prefix: "*"
+        shape: "*"
+        source: true
+        destination: false
+      - class: register
+        prefix: "*"
+        shape: "*"
+        source: true
+        destination: false
+      - class: register
+        prefix: "*"
+        shape: "*"
+        source: true
         destination: false
     - name: fmla
       operands:
@@ -83,6 +135,17 @@ instruction_forms:
           post-indexed: "*"
           source: true
           destination: false
+    - name: mov
+      operands:
+      - class: register
+        prefix: x
+        source: false
+        destination: true
+      - class: register
+        prefix: x
+        source: true
+        destination: false
+      operation: "op1['name'] = op2['name']; op1['value'] = op2['value']"
     - name: stp
       operands:
         - class: register

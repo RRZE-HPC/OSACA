@@ -10,8 +10,8 @@ Open Source Architecture Code Analyzer
 
 For an innermost loop kernel in assembly, this tool allows automatic instruction fetching of assembly code and automatic runtime prediction including throughput analysis and detection for critical path and loop-carried dependencies.
 
-.. image:: https://travis-ci.com/RRZE-HPC/OSACA.svg?branch=master
-    :target: https://travis-ci.com/github/RRZE-HPC/OSACA
+.. image:: https://github.com/RRZE-HPC/OSACA/workflows/test-n-publish/badge.svg?branch=master&event=push
+    :target: https://github.com/RRZE-HPC/OSACA/actions
     :alt: Build Status
 
 .. image:: https://codecov.io/github/RRZE-HPC/OSACA/coverage.svg?branch=master
@@ -82,10 +82,10 @@ The usage of OSACA can be listed as:
 
 .. code:: bash
 
-    osaca [-h] [-V] [--arch ARCH] [--fixed] [--lines LINES] [--db-check] 
-    	  [--import MICROBENCH] [--insert-marker] 
-	  [--export-graph GRAPHNAME] [--ignore-unknown] [--verbose]
-	  [--out OUT]
+    osaca [-h] [-V] [--arch ARCH] [--fixed] [--lines LINES]
+    	  [--ignore-unknown] [--lcd-timeout SECONDS]
+    	  [--db-check] [--import MICROBENCH] [--insert-marker]
+	  [--export-graph GRAPHNAME] [--out OUT] [--verbose]
 	  FILEPATH
 
 -h, --help
@@ -118,6 +118,9 @@ The usage of OSACA can be listed as:
 --ignore-unknown
   Force OSACA to apply a throughput and latency of 0.0 cy for all unknown instruction forms.
   If not specified, a warning will be printed instead if one ore more isntruction form is unknown to OSACA.
+--lcd-timeout SECONDS
+  Set timeout in seconds for LCD analysis. After timeout, OSACA will continue its analysis with the dependency paths found up to this point.
+  Defaults to `10`.
 -v, --verbose
   Increases verbosity level
 -o OUT, --out OUT
@@ -370,9 +373,16 @@ In the bottom, all loop-carried dependencies are shown, each with a list of line
 
 You can find more (already marked) examples and sample outputs for various architectures in the `examples <examples/>`__ directory.
 
+Citations
+=========
+If you use OSACA for scientific work you can cite us as  (for the Bibtex, see the `Wiki <https://github.com/RRZE-HPC/OSACA/wiki#acknowledgement>`_):
+
+* `Automated Instruction Stream Throughput Prediction for Intel and AMD Microarchitectures <https://doi.org/10.1109/PMBS.2018.8641578>`_ (`Pre-print PMBS18 <https://arxiv.org/abs/1809.00912>`_)
+* `Automatic Throughput and Critical Path Analysis of x86 and ARM Assembly Kernels <https://doi.org/10.1109/PMBS49563.2019.00006>`_ (`Pre-print PMBS19 <https://arxiv.org/abs/1910.00214>`_)
+
 Credits
 =======
-Implementation: Jan Laukemann
+Implementation: Jan Laukemann, Julian Hammer
 
 License
 =======
