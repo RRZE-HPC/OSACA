@@ -265,29 +265,29 @@ class MachineModel(object):
     def get_isa_for_arch(arch):
         """Return ISA for given micro-arch ``arch``."""
         arch_dict = {
-            'a64fx': 'aarch64',
-            'a72': 'aarch64',
-            'tx2': 'aarch64',
-            'n1': 'aarch64',
-            'zen1': 'x86',
-            'zen+': 'x86',
-            'zen2': 'x86',
-            'icl': 'x86',
-            'con': 'x86',  # Intel Conroe
-            'wol': 'x86',  # Intel Wolfdale
-            'snb': 'x86',
-            'ivb': 'x86',
-            'hsw': 'x86',
-            'bdw': 'x86',
-            'skl': 'x86',
-            'skx': 'x86',
-            'csx': 'x86',
-            'wsm': 'x86',
-            'nhm': 'x86',
-            'kbl': 'x86',
-            'cnl': 'x86',
-            'cfl': 'x86',
-            'icl': 'x86',
+            "a64fx": "aarch64",
+            "a72": "aarch64",
+            "tx2": "aarch64",
+            "n1": "aarch64",
+            "zen1": "x86",
+            "zen+": "x86",
+            "zen2": "x86",
+            "icl": "x86",
+            "con": "x86",  # Intel Conroe
+            "wol": "x86",  # Intel Wolfdale
+            "snb": "x86",
+            "ivb": "x86",
+            "hsw": "x86",
+            "bdw": "x86",
+            "skl": "x86",
+            "skx": "x86",
+            "csx": "x86",
+            "wsm": "x86",
+            "nhm": "x86",
+            "kbl": "x86",
+            "cnl": "x86",
+            "cfl": "x86",
+            "icl": "x86",
         }
         arch = arch.lower()
         if arch in arch_dict:
