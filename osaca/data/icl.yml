@@ -98,7 +98,7 @@ instruction_forms:
 - name: [cmp, cmpeqpd, cmpltpd, cmplepd, cmpunordpd, cmpneqpd, cmpnltpd, cmpnlepd, cmpordpd, cmpltps, cmpleps, cmpunordps, cmpneqps, cmpnltps, cmpnleps, cmpordps]
   operands:
   - class: immediate
-    name: int
+    imd: int
   - class: register
     name: '*'
   latency: 1.0
@@ -31397,55 +31397,6 @@ instruction_forms:
   port_pressure: [[1, '0156']]                                       # model_importer.py instructions.xml ICL
   throughput: 0.25                                                   # model_importer.py instructions.xml ICL
   uops: 1                                                            # model_importer.py instructions.xml ICL
-- name: JB                                                           # model_importer.py instructions.xml ICL
-  operands:                                                          # model_importer.py instructions.xml ICL
-  - class: identifier                                                # model_importer.py instructions.xml ICL
-  latency: ~                                                         # model_importer.py instructions.xml ICL
-  port_pressure: [[1, '06']]                                         # model_importer.py instructions.xml ICL
-  throughput: 0.5                                                    # model_importer.py instructions.xml ICL
-  uops: 1                                                            # model_importer.py instructions.xml ICL
-- name: JBE                                                          # model_importer.py instructions.xml ICL
-  operands:                                                          # model_importer.py instructions.xml ICL
-  - class: identifier                                                # model_importer.py instructions.xml ICL
-  latency: ~                                                         # model_importer.py instructions.xml ICL
-  port_pressure: [[1, '06']]                                         # model_importer.py instructions.xml ICL
-  throughput: 0.5                                                    # model_importer.py instructions.xml ICL
-  uops: 1                                                            # model_importer.py instructions.xml ICL
-- name: JL                                                           # model_importer.py instructions.xml ICL
-  operands:                                                          # model_importer.py instructions.xml ICL
-  - class: identifier                                                # model_importer.py instructions.xml ICL
-  latency: ~                                                         # model_importer.py instructions.xml ICL
-  port_pressure: [[1, '06']]                                         # model_importer.py instructions.xml ICL
-  throughput: 0.5                                                    # model_importer.py instructions.xml ICL
-  uops: 1                                                            # model_importer.py instructions.xml ICL
-- name: JLE                                                          # model_importer.py instructions.xml ICL
-  operands:                                                          # model_importer.py instructions.xml ICL
-  - class: identifier                                                # model_importer.py instructions.xml ICL
-  latency: ~                                                         # model_importer.py instructions.xml ICL
-  port_pressure: [[1, '06']]                                         # model_importer.py instructions.xml ICL
-  throughput: 0.5                                                    # model_importer.py instructions.xml ICL
-  uops: 1                                                            # model_importer.py instructions.xml ICL
-- name: JO                                                           # model_importer.py instructions.xml ICL
-  operands:                                                          # model_importer.py instructions.xml ICL
-  - class: identifier                                                # model_importer.py instructions.xml ICL
-  latency: ~                                                         # model_importer.py instructions.xml ICL
-  port_pressure: [[1, '06']]                                         # model_importer.py instructions.xml ICL
-  throughput: 0.5                                                    # model_importer.py instructions.xml ICL
-  uops: 1                                                            # model_importer.py instructions.xml ICL
-- name: JS                                                           # model_importer.py instructions.xml ICL
-  operands:                                                          # model_importer.py instructions.xml ICL
-  - class: identifier                                                # model_importer.py instructions.xml ICL
-  latency: ~                                                         # model_importer.py instructions.xml ICL
-  port_pressure: [[1, '06']]                                         # model_importer.py instructions.xml ICL
-  throughput: 0.5                                                    # model_importer.py instructions.xml ICL
-  uops: 1                                                            # model_importer.py instructions.xml ICL
-- name: JZ                                                           # model_importer.py instructions.xml ICL
-  operands:                                                          # model_importer.py instructions.xml ICL
-  - class: identifier                                                # model_importer.py instructions.xml ICL
-  latency: ~                                                         # model_importer.py instructions.xml ICL
-  port_pressure: [[1, '06']]                                         # model_importer.py instructions.xml ICL
-  throughput: 0.5                                                    # model_importer.py instructions.xml ICL
-  uops: 1                                                            # model_importer.py instructions.xml ICL
 - name: LEA                                                          # model_importer.py instructions.xml ICL
   operands:                                                          # model_importer.py instructions.xml ICL
   - class: memory                                                    # model_importer.py instructions.xml ICL
@@ -31465,7 +31416,7 @@ instruction_forms:
     imd: int                                                         # model_importer.py instructions.xml ICL
   - class: register                                                  # model_importer.py instructions.xml ICL
     name: gpr                                                        # model_importer.py instructions.xml ICL
-  latency: ~                                                         # model_importer.py instructions.xml ICL
+  latency: 0                                                         # model_importer.py instructions.xml ICL
   port_pressure: [[1, '0156']]                                       # model_importer.py instructions.xml ICL
   throughput: 0.25                                                   # model_importer.py instructions.xml ICL
   uops: 1                                                            # model_importer.py instructions.xml ICL

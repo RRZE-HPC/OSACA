@@ -24,6 +24,7 @@ store_throughput:
 - {base: '*', offset: '*', index: ~,   scale: '*', port_pressure: [[1, '237'], [1, '4']]}
 - {base: '*', offset: '*', index: gpr, scale: '*', port_pressure: [[1, '23'], [1, '4']]}
 store_throughput_default: [[1, '23'], [1, '4']]
+store_to_load_forward_latency: 5.0  # JH: minimum according to Agner Fog
 ports: ['0', 0DV, '1', '2', '2D', '3', '3D', '4', '5', '6', '7']
 port_model_scheme: |
   +------------------------------------------------------------------------+
@@ -552,7 +553,7 @@ instruction_forms:
 - name: XOR
   operands:
   - class: register
-    imd: gpr
+    name: gpr
   - class: register
     name: gpr
   latency: 1
@@ -1859,7 +1860,7 @@ instruction_forms:
   port_pressure: [[1, '0156']]
   throughput: 0.25
   uops: 1
-- name: CWDE
+- name: [CWDE, CWTL]
   operands: []
   latency: 1
   port_pressure: [[1, '0156']]
@@ -4461,7 +4462,7 @@ instruction_forms:
   port_pressure: [[1, '0156'], [1, '23']]
   throughput: 0.5
   uops: 2
-- name: CDQE
+- name: [CDQE, CLTQ]
   operands: []
   latency: 1
   port_pressure: [[1, '0156']]

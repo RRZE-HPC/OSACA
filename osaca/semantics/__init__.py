@@ -11,13 +11,13 @@ from .marker_utils import reduce_to_section, find_basic_blocks, find_basic_loop_
 from .marker_utils import find_jump_labels
 
 __all__ = [
-    'MachineModel',
-    'KernelDG',
-    'reduce_to_section',
-    'ArchSemantics',
-    'ISASemantics',
-    'INSTR_FLAGS',
-    'find_basic_blocks',
-    'find_basic_loop_bodies',
-    'find_jump_labels',
+    "MachineModel",
+    "KernelDG",
+    "reduce_to_section",
+    "ArchSemantics",
+    "ISASemantics",
+    "INSTR_FLAGS",
+    "find_basic_blocks",
+    "find_basic_loop_bodies",
+    "find_jump_labels",
 ]
