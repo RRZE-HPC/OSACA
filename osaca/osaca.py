@@ -20,19 +20,19 @@ from osaca.semantics import (
 
 
 SUPPORTED_ARCHS = [
-    'SNB',
-    'IVB',
-    'HSW',
-    'BDW',
-    'SKX',
-    'CSX',
-    'ICL',
-    'ZEN1',
-    'ZEN2',
-    'TX2',
-    'N1',
-    'A64FX',
-    'A72',
+    "SNB",
+    "IVB",
+    "HSW",
+    "BDW",
+    "SKX",
+    "CSX",
+    "ICL",
+    "ZEN1",
+    "ZEN2",
+    "TX2",
+    "N1",
+    "A64FX",
+    "A72",
 ]
 DEFAULT_ARCHS = {
     "aarch64": "A64FX",
@@ -95,8 +95,8 @@ def create_parser(parser=None):
     parser.add_argument(
         "--arch",
         type=str,
-        help='Define architecture (SNB, IVB, HSW, BDW, SKX, CSX, ICL, ZEN1, ZEN2, TX2, N1, '
-        'A64FX, A72). If no architecture is given, OSACA assumes a default uarch for x86/AArch64.',
+        help="Define architecture (SNB, IVB, HSW, BDW, SKX, CSX, ICL, ZEN1, ZEN2, TX2, N1, "
+        "A64FX, A72). If no architecture is given, OSACA assumes a default uarch for x86/AArch64.",
     )
     parser.add_argument(
         "--fixed",
