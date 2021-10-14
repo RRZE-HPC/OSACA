@@ -1,74 +1,83 @@
 #!/usr/bin/env python3
-import os.path
 import argparse
-import math
-import sys
-import re
 import json
+import math
+import re
+import sys
 
-from osaca.parser import get_parser
+from asmbench import bench, op
 from osaca.semantics import MachineModel
-
-from asmbench import op, bench
 
 
 def build_bench_instruction(name, operands):
     # Converts an OSACA model instruction to an asmbench one.
     # Returns `None` in case something went wrong.
     asmbench_inst = name
-    direction = 'dst'
-    separator = ' '
-    shift = ''
+    direction = "dst"
+    separator = " "
+    shift = ""
     for operand in operands:
-        if operand['class'] == 'register' or operand['class'] == 'register_shift':
-            if operand['prefix'] == 'x':
-                shape = 'i64'
-                constraint = 'r'
-            elif operand['prefix'] == 's':
-                shape = 'float'
-                constraint = 'w'
-            elif operand['prefix'] == 'd':
-                shape = 'double'
-                constraint = 'w'
-            elif operand['prefix'] == 'v':
-                constraint = 'w'
-                if operand['shape'] == 'b':
-                    shape = '<16 x i8>'
-                elif operand['shape'] == 'h':
-                    shape = '<8 x i16>'
-                elif operand['shape'] == 's':
-                    shape = '<4 x float>'
-                elif operand['shape'] == 'd':
-                    shape = '<2 x double>'
+        if operand["class"] == "register" or operand["class"] == "register_shift":
+            if operand["prefix"] == "x":
+                shape = "i64"
+                constraint = "r"
+            elif operand["prefix"] == "s":
+                shape = "float"
+                constraint = "w"
+            elif operand["prefix"] == "d":
+                shape = "double"
+                constraint = "w"
+            elif operand["prefix"] == "v":
+                constraint = "w"
+                if operand["shape"] == "b":
+                    shape = "<16 x i8>"
+                elif operand["shape"] == "h":
+                    shape = "<8 x i16>"
+                elif operand["shape"] == "s":
+                    shape = "<4 x float>"
+                elif operand["shape"] == "d":
+                    shape = "<2 x double>"
                 else:
                     return None
             else:
                 return None
-            if operand['class'] == 'register_shift':
-                shift = ', {}'.format(operand['shift_op'])
-                if operand['shift'] != None:
-                    shift += ' {}'.format(operand['shift'])
-        elif operand['class'] == 'immediate' or operand['class'] == 'immediate_shift':
-            shape = 'i32'
+            if operand["class"] == "register_shift":
+                shift = ", {}".format(operand["shift_op"])
+                if operand["shift"] is not None:
+                    shift += " {}".format(operand["shift"])
+        elif operand["class"] == "immediate" or operand["class"] == "immediate_shift":
+            shape = "i32"
             # Different instructions have different ranges for literaly,
             # so need to pick something "reasonable" for each.
-            if name in ['cmeq', 'cmge', 'cmgt', 'cmle', 'cmlt', 'fcmeq', 'fcmge', 'fcmgt', 'fcmle', 'fcmlt', 'fcmp']:
-                constraint = '0'
-            elif name in ['and', 'ands', 'eor', 'eors', 'orr', 'orrs']:
-                constraint = '255'
-            elif name in ['bfi', 'extr', 'sbfiz', 'sbfx', 'shl', 'sshr', 'ubfiz', 'ubfx', 'ushr']:
-                constraint = '7'
+            if name in [
+                "cmeq",
+                "cmge",
+                "cmgt",
+                "cmle",
+                "cmlt",
+                "fcmeq",
+                "fcmge",
+                "fcmgt",
+                "fcmle",
+                "fcmlt",
+                "fcmp",
+            ]:
+                constraint = "0"
+            elif name in ["and", "ands", "eor", "eors", "orr", "orrs"]:
+                constraint = "255"
+            elif name in ["bfi", "extr", "sbfiz", "sbfx", "shl", "sshr", "ubfiz", "ubfx", "ushr"]:
+                constraint = "7"
             else:
-                constraint = '42'
-            if operand['class'] == 'immediate_shift':
-                shift = ', {}'.format(operand['shift_op'])
-                if operand['shift'] != None:
-                    shift += ' {}'.format(operand['shift'])
+                constraint = "42"
+            if operand["class"] == "immediate_shift":
+                shift = ", {}".format(operand["shift_op"])
+                if operand["shift"] is not None:
+                    shift += " {}".format(operand["shift"])
         else:
             return None
-        asmbench_inst += '{}{{{}:{}:{}}}{}'.format(separator, direction, shape, constraint, shift)
-        direction = 'src'
-        separator = ', '
+        asmbench_inst += "{}{{{}:{}:{}}}{}".format(separator, direction, shape, constraint, shift)
+        direction = "src"
+        separator = ", "
     return asmbench_inst
 
 
@@ -76,7 +85,7 @@ def bench_instruction(name, operands):
     # Converts an OSACA model instruction to an asmbench one and benchmarks it.
     # Returned tuple may contain a `None` in case something went wrong.
     asmbench_inst = build_bench_instruction(name, operands)
-    if asmbench_inst == None:
+    if asmbench_inst is None:
         return (None, None)
     return bench.bench_instructions([op.Instruction.from_string(asmbench_inst)])
 
@@ -98,75 +107,73 @@ def operand_parse(op, state):
     # Future invocations may also modify previously returned objects.
     parameter = {}
 
-    memory_base = None
-
-    if op.startswith('_((REG:'):
-        parts = op.split('.')
+    if op.startswith("_((REG:"):
+        parts = op.split(".")
         register = parts[0][7:-2]
-        read_write, register_type, bits = register.split(':')
+        read_write, register_type, bits = register.split(":")
 
-        parameter['class'] = 'register'
-        if register_type == 'G':
-            if bits == '32':
-                parameter['prefix'] = 'r'
-            elif bits == '64':
-                parameter['prefix'] = 'x'
+        parameter["class"] = "register"
+        if register_type == "G":
+            if bits == "32":
+                parameter["prefix"] = "r"
+            elif bits == "64":
+                parameter["prefix"] = "x"
             else:
                 raise ValueError("Invalid register bits for {} {}".format(register_type, bits))
-        elif register_type == 'F':
-            if bits == '32':
-                parameter['prefix'] = 's'
-                state['type'] = 'float'
-            elif bits == '64':
-                parameter['prefix'] = 'd'
-                state['type'] = 'double'
-            elif bits == '128':
-                parameter['prefix'] = 'q'
-            elif bits == 'VEC':
+        elif register_type == "F":
+            if bits == "32":
+                parameter["prefix"] = "s"
+                state["type"] = "float"
+            elif bits == "64":
+                parameter["prefix"] = "d"
+                state["type"] = "double"
+            elif bits == "128":
+                parameter["prefix"] = "q"
+            elif bits == "VEC":
                 vec_shape = parts[1]
-                parameter['prefix'] = 'v'
-                if vec_shape == '16b':
-                    parameter['shape'] = 'b'
-                elif vec_shape == '8h':
-                    parameter['shape'] = 'h'
-                elif vec_shape == '4s':
-                    parameter['shape'] = 's'
-                    state['type'] = 'float'
-                elif vec_shape == '2d':
-                    parameter['shape'] = 'd'
-                    state['type'] = 'double'
+                parameter["prefix"] = "v"
+                if vec_shape == "16b":
+                    parameter["shape"] = "b"
+                elif vec_shape == "8h":
+                    parameter["shape"] = "h"
+                elif vec_shape == "4s":
+                    parameter["shape"] = "s"
+                    state["type"] = "float"
+                elif vec_shape == "2d":
+                    parameter["shape"] = "d"
+                    state["type"] = "double"
                 else:
                     raise ValueError("Invalid vector shape {}".format(vec_shape))
             else:
                 raise ValueError("Invalid register bits for {} {}".format(register_type, bits))
         else:
             raise ValueError("Unknown register type {}".format(register_type))
-    elif op.startswith('_[((MEM:'):
-        bits = op[8:-2].split(':')[0]
-        if bits == '64':
-            state['memory_base'] = 'x'
+    elif op.startswith("_[((MEM:"):
+        bits = op[8:-2].split(":")[0]
+        if bits == "64":
+            state["memory_base"] = "x"
         else:
             raise ValueError("Invalid register bits for MEM {}".format(bits))
         return None
-    elif op.startswith('_((MIMM:'):
-        bits = op[8:-3].split(':')[0]
-        if bits == '16':
-            parameter['class'] = 'memory'
-            parameter['base'] = state['memory_base']
-            parameter['offset'] = 'imd'
-            parameter['index'] = '*'
-            parameter['scale'] = '*'
-            parameter['post-indexed'] = False
-            parameter['pre-indexed'] = False
+    elif op.startswith("_((MIMM:"):
+        bits = op[8:-3].split(":")[0]
+        if bits == "16":
+            parameter["class"] = "memory"
+            parameter["base"] = state["memory_base"]
+            parameter["offset"] = "imd"
+            parameter["index"] = "*"
+            parameter["scale"] = "*"
+            parameter["post-indexed"] = False
+            parameter["pre-indexed"] = False
         else:
             raise ValueError("Invalid register bits for MEM {}".format(bits))
-    elif re.fullmatch('_#?-?(0x)?[0-9a-f]+', op):
-        parameter['class'] = 'immediate'
-        parameter['imd'] = 'int'
-    elif re.fullmatch('_#?-?[0-9]*\\.[0-9]*', op):
-        parameter['class'] = 'immediate'
-        parameter['imd'] = state['type']
-    elif re.fullmatch('_((sxt|uxt)[bhw]|lsl|lsr|asr|rol|ror)(_[0-9]+)?', op):
+    elif re.fullmatch("_#?-?(0x)?[0-9a-f]+", op):
+        parameter["class"] = "immediate"
+        parameter["imd"] = "int"
+    elif re.fullmatch("_#?-?[0-9]*\\.[0-9]*", op):
+        parameter["class"] = "immediate"
+        parameter["imd"] = state["type"]
+    elif re.fullmatch("_((sxt|uxt)[bhw]|lsl|lsr|asr|rol|ror)(_[0-9]+)?", op):
         # split = op[1:].split('_')
         # shift_op = split[0]
         # shift = None
@@ -181,7 +188,7 @@ def operand_parse(op, state):
     else:
         raise ValueError("Unknown operand {}".format(op))
 
-    state['previous'] = parameter
+    state["previous"] = parameter
     return parameter
 
 
@@ -193,17 +200,17 @@ def port_convert(ports):
     cycles = 0
 
     for entry in ports:
-        possible_ports = ''.join(entry)
+        possible_ports = "".join(entry)
 
         if possible_ports != previous:
-            if previous != None:
+            if previous is not None:
                 pressures.append([cycles, previous])
             previous = possible_ports
             cycles = 0
 
         cycles += 1
 
-    if previous != None:
+    if previous is not None:
         pressures.append([cycles, previous])
 
     return pressures
@@ -225,31 +232,30 @@ def latency_guess(ports):
 def extract_model(mapping, arch, template_model, asmbench):
     try:
         isa = MachineModel.get_isa_for_arch(arch)
-    except:
+    except ValueError:
         print("Skipping...", file=sys.stderr)
         return None
-    if template_model == None:
+    if template_model is None:
         mm = MachineModel(isa=isa)
     else:
         mm = template_model
-    parser = get_parser(isa)
 
-    for port in mapping['arch']['ports']:
+    for port in mapping["arch"]["ports"]:
         mm.add_port(port)
 
-    for insn in mapping['arch']['insns']:
+    for insn in mapping["arch"]["insns"]:
         try:
-            ports = mapping['assignment'][insn]
+            ports = mapping["assignment"][insn]
 
             # Parse instruction
-            insn_split = insn.split('_')
+            insn_split = insn.split("_")
             name = insn_split[1]
-            insn_parts = list(('_' + '_'.join(insn_split[2:])).split(','))
+            insn_parts = list(("_" + "_".join(insn_split[2:])).split(","))
             operands = []
             state = {}
-            for op in insn_parts:
-                parsed = operand_parse(op, state)
-                if parsed != None:
+            for operand in insn_parts:
+                parsed = operand_parse(operand, state)
+                if parsed is not None:
                     operands.append(parsed)
 
             # Port pressures from mapping
@@ -263,11 +269,11 @@ def extract_model(mapping, arch, template_model, asmbench):
             # print(build_bench_instruction(name, operands))
             if asmbench:
                 bench_latency, bench_throughput = bench_instruction(name, operands)
-                if bench_throughput != None:
+                if bench_throughput is not None:
                     throughput = round_cycles(bench_throughput)
                 else:
                     print("Failed to measure throughput for instruction {}.".format(insn))
-                if bench_latency != None:
+                if bench_latency is not None:
                     latency = round_cycles(bench_latency)
                 else:
                     print("Failed to measure latency for instruction {}.".format(insn))
@@ -276,7 +282,7 @@ def extract_model(mapping, arch, template_model, asmbench):
             uops = None
 
             # Insert instruction if not already found (can happen with template)
-            if mm.get_instruction(name, operands) == None:
+            if mm.get_instruction(name, operands) is None:
                 mm.set_instruction(name, operands, latency, port_pressure, throughput, uops)
         except ValueError as e:
             print("Failed to parse instruction {}: {}.".format(insn, e))
@@ -286,20 +292,20 @@ def extract_model(mapping, arch, template_model, asmbench):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('json', help='path of mapping.json')
-    parser.add_argument('yaml', help='path of template.yml', nargs='?')
-    parser.add_argument('--asmbench', help='Benchmark latency and throughput using asmbench.',
-                        action='store_true')
+    parser.add_argument("json", help="path of mapping.json")
+    parser.add_argument("yaml", help="path of template.yml", nargs="?")
+    parser.add_argument(
+        "--asmbench", help="Benchmark latency and throughput using asmbench.", action="store_true"
+    )
     args = parser.parse_args()
-    basename = os.path.basename(__file__)
 
-    json_file = open(args.json, 'r')
+    json_file = open(args.json, "r")
     mapping = json.load(json_file)
-    arch = mapping['arch']['name'].lower()
+    arch = mapping["arch"]["name"].lower()
     json_file.close()
 
     template_model = None
-    if args.yaml != None:
+    if args.yaml is not None:
         template_model = MachineModel(path_to_yaml=args.yaml)
 
     if args.asmbench:
@@ -307,9 +313,9 @@ def main():
 
     model = extract_model(mapping, arch, template_model, args.asmbench)
 
-    with open('{}.yml'.format(arch.lower()), 'w') as f:
+    with open("{}.yml".format(arch.lower()), "w") as f:
         f.write(model.dump())
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
