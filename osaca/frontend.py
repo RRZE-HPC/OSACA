@@ -234,7 +234,7 @@ class Frontend(object):
         separator += "--" + len(str(kernel[-1]["line_number"])) * "-"
         col_sep = "|"
         # for LCD/CP column
-        separator += "-" * (2 * 6 + len(col_sep)) + "-" * len(col_sep)
+        separator += "-" * (2 * 6 + len(col_sep)) + "-" * len(col_sep) + '--'
         sep_list = self._get_separator_list(col_sep)
         headline = "Port pressure in cycles"
         headline_str = "{{:^{}}}".format(len(separator))
@@ -249,13 +249,15 @@ class Frontend(object):
                 instr["line_number"]: lat for instr, lat in dep_dict[longest_lcd]["dependencies"]
             }
 
+        port_line = (
+            lineno_filler
+            + self._get_port_number_line(port_len, separator=col_sep)
+            + "{}{:^6}{}{:^6}{}".format(col_sep, "CP", col_sep, "LCD", col_sep)
+        )
+        separator = '-' * len(port_line)
         s += headline_str.format(headline) + "\n"
         s += (
-            (
-                lineno_filler
-                + self._get_port_number_line(port_len, separator=col_sep)
-                + "{}{:^6}{}{:^6}{}".format(col_sep, "CP", col_sep, "LCD", col_sep)
-            )
+            port_line
             + "\n"
             + separator
             + "\n"
@@ -300,7 +302,7 @@ class Frontend(object):
             s += (
                 lineno_filler
                 + self._get_port_pressure(tp_sum, port_len, separator=" ")
-                + " {:^6} {:^6}\n".format(cp_sum, lcd_sum)
+                + " {:>5}  {:>5}  \n".format(cp_sum, lcd_sum)
             )
         return s
 
