@@ -1,0 +1,808 @@
+osaca_version: 0.3.11
+micro_architecture: Cortex A-72
+arch_code: a72
+isa: aarch64
+hidden_loads: false
+ports: ['0', '1', '2', '3', '4', '5', '6', '7']
+port_model_scheme: |
+  +-------------------------------------------------------------------------------------+
+  |                                      scheduler                                      |
+  +-------------------------------------------------------------------------------------+
+    0 |I      1 |L       2 |M     3 |S        4 |F1       5 |I       6 |F0      7 |B
+      \/        \/         \/       \/          \/          \/         \/         \/
+   +-------+ +-------+ +-------+ +-------+ +-----------+ +-------+ +---------+ +-------+
+   |INT ALU| |  LOAD | |  MUL  | | STORE | |   ASIMD   | |INT ALU| |  ASIMD  | | Branch|
+   +-------+ +-------+ +-------+ +-------+ +-----------+ +-------+ +---------+ +-------+
+   +-------+           +-------+           +-----------+ +-------+ +---------+
+   |  AGU  |           |  DIV  |           |   FP ALU  | |  AGU  | |ASIMD MUL|
+   +-------+           +-------+           +-----------+ +-------+ +---------+
+                       +-------+           +-----------+           +---------+
+                       | SHIFT |           |   FP MUL  |           |  FP ALU |
+                       +-------+           +-----------+           +---------+
+                       +-------+           +-----------+           +---------+
+                       |  CRC  |           |   FP DIV  |           |  FP MUL |
+                       +-------+           +-----------+           +---------+
+                       +-------+           +-----------+           +---------+
+                       |  USAD |           |  FP SQRT  |           |  FP DIV |
+                       +-------+           +-----------+           +---------+
+                                           +-----------+           +---------+
+                                           |ASIMD SHIFT|           | FP CONV |
+                                           +-----------+           +---------+
+                                                                   +---------+
+                                                                   |  CRYPTO |
+                                                                   +---------+
+# The port pressues do not always correctly match this schema, because most
+# instructions are imported from an experimentally determined mapping, which
+# is not always correct.
+load_latency: {x: 4.0, s: 5.0, d: 5.0, h: 6.0, q: 6.0}
+load_throughput: []
+load_throughput_default: [[1, '1']]
+store_throughput: []
+store_throughput_default: [[2, '3']]
+instruction_forms:
+
+# Branch
+- name: b
+  operands:
+  - class: identifier
+  latency: 1.0
+  port_pressure: [[1, '7']]
+  throughput: 1.0
+- name: bne
+  operands:
+  - class: identifier
+  latency: 1.0
+  port_pressure: [[1, '7']]
+  throughput: 1.0
+- name: b.ne
+  operands:
+  - class: identifier
+  latency: 1.0
+  port_pressure: [[1, '7']]
+  throughput: 1.0
+- name: br
+  operands:
+  - class: register
+    prefix: x
+  latency: 1.0
+  port_pressure: [[1, '7']]
+  throughput: 1.0
+- name: ret
+  operands:
+  - class: register
+    prefix: x
+  latency: 1.0
+  port_pressure: [[1, '7']]
+  throughput: 1.0
+- name: bl
+  operands:
+  - class: identifier
+  latency: 1.0
+  port_pressure: [[1, '05'], [1, '7']]
+  throughput: 1.0
+- name: blr
+  operands:
+  - class: register
+    prefix: x
+  latency: 1.0
+  port_pressure: [[1, '05'], [1, '7']]
+  throughput: 1.0
+
+# Load GPR
+- name: ldr
+  operands:
+  - class: register
+    prefix: x
+  - class: memory
+    base: x
+    offset: '*'
+    index: '*'
+    scale: '*'
+    post-indexed: false
+    pre-indexed: false
+  latency: 4.0
+  port_pressure: [[1, '1']]
+  throughput: 1.0
+- name: ldr
+  operands:
+  - class: register
+    prefix: x
+  - class: memory
+    base: x
+    offset: '*'
+    index: '*'
+    scale: '*'
+    post-indexed: true
+    pre-indexed: false
+  latency: 5.0
+  port_pressure: [[1, '1'], [1, '05']]
+  throughput: 1.0
+- name: ldr
+  operands:
+  - class: register
+    prefix: x
+  - class: memory
+    base: x
+    offset: '*'
+    index: '*'
+    scale: '*'
+    post-indexed: false
+    pre-indexed: true
+  latency: 5.0
+  port_pressure: [[1, '3'], [1, '05']]
+  throughput: 1.0
+
+# Load FP d
+- name: ldr
+  operands:
+  - class: register
+    prefix: d
+  - class: memory
+    base: x
+    offset: '*'
+    index: '*'
+    scale: '*'
+    post-indexed: false
+    pre-indexed: false
+  latency: 5.0
+  port_pressure: [[1, '1']]
+  throughput: 1.0
+- name: ldr
+  operands:
+  - class: register
+    prefix: d
+  - class: memory
+    base: x
+    offset: '*'
+    index: '*'
+    scale: '*'
+    post-indexed: true
+    pre-indexed: false
+  latency: 5.0
+  port_pressure: [[1, '1'], [2, '05']]
+  throughput: 1.0
+- name: ldr
+  operands:
+  - class: register
+    prefix: d
+  - class: memory
+    base: x
+    offset: '*'
+    index: '*'
+    scale: '*'
+    post-indexed: false
+    pre-indexed: true
+  latency: 5.0
+  port_pressure: [[1, '1'], [2, '05']]
+  throughput: 1.0
+
+# Load FP q
+- name: ldr
+  operands:
+  - class: register
+    prefix: q
+  - class: memory
+    base: x
+    offset: '*'
+    index: '*'
+    scale: 1
+    post-indexed: false
+    pre-indexed: false
+  latency: 5.0
+  port_pressure: [[1, '1']]
+  throughput: 1.0
+- name: ldr
+  operands:
+  - class: register
+    prefix: q
+  - class: memory
+    base: x
+    offset: '*'
+    index: '*'
+    scale: 1
+    post-indexed: true
+    pre-indexed: false
+  latency: 5.0
+  port_pressure: [[1, '1'], [1, '05']]
+  throughput: 1.0
+- name: ldr
+  operands:
+  - class: register
+    prefix: q
+  - class: memory
+    base: x
+    offset: '*'
+    index: '*'
+    scale: 1
+    post-indexed: false
+    pre-indexed: true
+  latency: 5.0
+  port_pressure: [[1, '1'], [1, '05']]
+  throughput: 1.0
+- name: ldr
+  operands:
+  - class: register
+    prefix: q
+  - class: memory
+    base: x
+    offset: '*'
+    index: '*'
+    scale: '*'
+    post-indexed: false
+    pre-indexed: false
+  latency: 6.0
+  port_pressure: [[1, '1'], [1, '05']]
+  throughput: 1.0
+- name: ldr
+  operands:
+  - class: register
+    prefix: q
+  - class: memory
+    base: x
+    offset: '*'
+    index: '*'
+    scale: '*'
+    post-indexed: true
+    pre-indexed: false
+  latency: 6.0
+  port_pressure: [[1, '1'], [2, '05']]
+  throughput: 1.0
+- name: ldr
+  operands:
+  - class: register
+    prefix: q
+  - class: memory
+    base: x
+    offset: '*'
+    index: '*'
+    scale: '*'
+    post-indexed: false
+    pre-indexed: true
+  latency: 6.0
+  port_pressure: [[1, '1'], [2, '05']]
+  throughput: 1.0
+
+# Store GPR
+- name: str
+  operands:
+  - class: register
+    prefix: x
+  - class: memory
+    base: x
+    offset: '*'
+    index: '*'
+    scale: '*'
+    post-indexed: false
+    pre-indexed: false
+  latency: 1.0
+  port_pressure: [[1, '3']]
+  throughput: 1.0
+- name: str
+  operands:
+  - class: register
+    prefix: x
+  - class: memory
+    base: x
+    offset: '*'
+    index: '*'
+    scale: '*'
+    post-indexed: true
+    pre-indexed: false
+  latency: 1.0
+  port_pressure: [[1, '3'], [1, '05']]
+  throughput: 1.0
+- name: str
+  operands:
+  - class: register
+    prefix: x
+  - class: memory
+    base: x
+    offset: '*'
+    index: '*'
+    scale: '*'
+    post-indexed: false
+    pre-indexed: true
+  latency: 1.0
+  port_pressure: [[1, '3'], [1, '05']]
+  throughput: 1.0
+
+# Store FP d
+- name: str
+  operands:
+  - class: register
+    prefix: d
+  - class: memory
+    base: x
+    offset: '*'
+    index: '*'
+    scale: '*'
+    post-indexed: false
+    pre-indexed: false
+  latency: 1.0
+  port_pressure: [[1, '3'], [1, '05']]
+  throughput: 1.0
+- name: str
+  operands:
+  - class: register
+    prefix: d
+  - class: memory
+    base: x
+    offset: '*'
+    index: '*'
+    scale: '*'
+    post-indexed: true
+    pre-indexed: false
+  latency: 1.0
+  port_pressure: [[1, '3'], [1, '05']]
+  throughput: 1.0
+- name: str
+  operands:
+  - class: register
+    prefix: d
+  - class: memory
+    base: x
+    offset: '*'
+    index: '*'
+    scale: '*'
+    post-indexed: false
+    pre-indexed: true
+  latency: 1.0
+  port_pressure: [[1, '3'], [1, '05']]
+  throughput: 1.0
+
+# Store FP q
+- name: str
+  operands:
+  - class: register
+    prefix: q
+  - class: memory
+    base: x
+    offset: '*'
+    index: '*'
+    scale: 1
+    post-indexed: false
+    pre-indexed: false
+  latency: 4.0
+  port_pressure: [[2, '3']]
+  throughput: 2.0
+- name: str
+  operands:
+  - class: register
+    prefix: q
+  - class: memory
+    base: x
+    offset: '*'
+    index: '*'
+    scale: 1
+    post-indexed: true
+    pre-indexed: false
+  latency: 4.0
+  port_pressure: [[2, '3'], [1, '05']]
+  throughput: 2.0
+- name: str
+  operands:
+  - class: register
+    prefix: q
+  - class: memory
+    base: x
+    offset: '*'
+    index: '*'
+    scale: 1
+    post-indexed: false
+    pre-indexed: true
+  latency: 2.0
+  port_pressure: [[2, '3'], [1, '05']]
+  throughput: 2.0
+- name: str
+  operands:
+  - class: register
+    prefix: q
+  - class: memory
+    base: x
+    offset: '*'
+    index: '*'
+    scale: '*'
+    post-indexed: false
+    pre-indexed: false
+  latency: 4.0
+  port_pressure: [[2, '3'], [1, '05']]
+  throughput: 2.0
+- name: str
+  operands:
+  - class: register
+    prefix: q
+  - class: memory
+    base: x
+    offset: '*'
+    index: '*'
+    scale: '*'
+    post-indexed: true
+    pre-indexed: false
+  latency: 4.0
+  port_pressure: [[2, '3'], [2, '05']]
+  throughput: 2.0
+- name: str
+  operands:
+  - class: register
+    prefix: q
+  - class: memory
+    base: x
+    offset: '*'
+    index: '*'
+    scale: '*'
+    post-indexed: false
+    pre-indexed: true
+  latency: 4.0
+  port_pressure: [[2, '3'], [2, '05']]
+  throughput: 2.0
+
+# Load unscaled GPR
+- name: ldur
+  operands:
+  - class: register
+    prefix: x
+  - class: memory
+    base: x
+    offset: '*'
+    index: '*'
+    scale: '*'
+    post-indexed: '*'
+    pre-indexed: '*'
+  latency: 4.0
+  port_pressure: [[1, '1']]
+  throughput: 1.0
+
+# Load unscaled FP q
+- name: ldur
+  operands:
+  - class: register
+    prefix: q
+  - class: memory
+    base: x
+    offset: '*'
+    index: '*'
+    scale: '*'
+    post-indexed: '*'
+    pre-indexed: '*'
+  latency: 5.0
+  port_pressure: [[1, '1']]
+  throughput: 1.0
+
+# Store unscaled GPR
+- name: stur
+  operands:
+  - class: register
+    prefix: x
+  - class: memory
+    base: x
+    offset: '*'
+    index: '*'
+    scale: '*'
+    post-indexed: '*'
+    pre-indexed: '*'
+  latency: 1.0
+  port_pressure: [[1, '3']]
+  throughput: 1.0
+
+# Store unscaled FP q
+- name: stur
+  operands:
+  - class: register
+    prefix: q
+  - class: memory
+    base: x
+    offset: '*'
+    index: '*'
+    scale: '*'
+    post-indexed: '*'
+    pre-indexed: '*'
+  latency: 2.0
+  port_pressure: [[2, '3']]
+  throughput: 2.0
+
+# Load pair GPR
+- name: ldp
+  operands:
+  - class: register
+    prefix: x
+  - class: register
+    prefix: x
+  - class: memory
+    base: x
+    offset: '*'
+    index: '*'
+    scale: '*'
+    post-indexed: false
+    pre-indexed: false
+  latency: 4.0
+  port_pressure: [[1, '1']]
+  throughput: 1.0
+- name: ldp
+  operands:
+  - class: register
+    prefix: x
+  - class: register
+    prefix: x
+  - class: memory
+    base: x
+    offset: '*'
+    index: '*'
+    scale: '*'
+    post-indexed: true
+    pre-indexed: false
+  latency: 4.0
+  port_pressure: [[1, '1'], [1, '05']]
+  throughput: 1.0
+- name: ldp
+  operands:
+  - class: register
+    prefix: x
+  - class: register
+    prefix: x
+  - class: memory
+    base: x
+    offset: '*'
+    index: '*'
+    scale: '*'
+    post-indexed: false
+    pre-indexed: true
+  latency: 4.0
+  port_pressure: [[1, '1'], [1, '05']]
+  throughput: 1.0
+
+# Load pair FP q
+- name: ldp
+  operands:
+  - class: register
+    prefix: q
+  - class: register
+    prefix: q
+  - class: memory
+    base: x
+    offset: '*'
+    index: '*'
+    scale: '*'
+    post-indexed: false
+    pre-indexed: false
+  latency: 6.0
+  port_pressure: [[2, '1']]
+  throughput: 2.0
+- name: ldp
+  operands:
+  - class: register
+    prefix: q
+  - class: register
+    prefix: q
+  - class: memory
+    base: x
+    offset: '*'
+    index: '*'
+    scale: '*'
+    post-indexed: true
+    pre-indexed: false
+  latency: 6.0
+  port_pressure: [[2, '1'], [1, '05']]
+  throughput: 2.0
+- name: ldp
+  operands:
+  - class: register
+    prefix: q
+  - class: register
+    prefix: q
+  - class: memory
+    base: x
+    offset: '*'
+    index: '*'
+    scale: '*'
+    post-indexed: false
+    pre-indexed: true
+  latency: 6.0
+  port_pressure: [[2, '1'], [1, '05']]
+  throughput: 2.0
+
+# Store pair GPR
+- name: stp
+  operands:
+  - class: register
+    prefix: x
+  - class: register
+    prefix: x
+  - class: memory
+    base: x
+    offset: '*'
+    index: '*'
+    scale: '*'
+    post-indexed: false
+    pre-indexed: false
+  latency: 2.0
+  port_pressure: [[2, '3']]
+  throughput: 2.0
+- name: stp
+  operands:
+  - class: register
+    prefix: x
+  - class: register
+    prefix: x
+  - class: memory
+    base: x
+    offset: '*'
+    index: '*'
+    scale: '*'
+    post-indexed: true
+    pre-indexed: false
+  latency: 2.0
+  port_pressure: [[2, '3'], [1, '05']]
+  throughput: 2.0
+- name: stp
+  operands:
+  - class: register
+    prefix: x
+  - class: register
+    prefix: x
+  - class: memory
+    base: x
+    offset: '*'
+    index: '*'
+    scale: '*'
+    post-indexed: false
+    pre-indexed: true
+  latency: 2.0
+  port_pressure: [[2, '3'], [1, '05']]
+  throughput: 2.0
+
+# Store pair FP q
+- name: stp
+  operands:
+  - class: register
+    prefix: q
+  - class: register
+    prefix: q
+  - class: memory
+    base: x
+    offset: '*'
+    index: '*'
+    scale: '*'
+    post-indexed: false
+    pre-indexed: false
+  latency: 4.0
+  port_pressure: [[4, '3'], [1, '05']]
+  throughput: 4.0
+- name: stp
+  operands:
+  - class: register
+    prefix: q
+  - class: register
+    prefix: q
+  - class: memory
+    base: x
+    offset: '*'
+    index: '*'
+    scale: '*'
+    post-indexed: true
+    pre-indexed: false
+  latency: 4.0
+  port_pressure: [[4, '3'], [1, '05']]
+  throughput: 4.0
+- name: stp
+  operands:
+  - class: register
+    prefix: q
+  - class: register
+    prefix: q
+  - class: memory
+    base: x
+    offset: '*'
+    index: '*'
+    scale: '*'
+    post-indexed: false
+    pre-indexed: true
+  latency: 4.0
+  port_pressure: [[4, '3'], [1, '05']]
+  throughput: 4.0
+
+# Fast-forward (measures 4 cycles, but can be 3)
+# Lower bound is used in order to ensure no over-estimates are possible.
+# Ports do not match documentation, but "fixing" requires also "fixing" almost
+# the entire rest of the model.
+- name: fadd
+  operands:
+  - class: register
+    prefix: s
+  - class: register
+    prefix: s
+  - class: register
+    prefix: s
+  latency: 3.0
+  port_pressure: [[1, '45']]
+  throughput: 0.5
+- name: fadd
+  operands:
+  - class: register
+    prefix: d
+  - class: register
+    prefix: d
+  - class: register
+    prefix: d
+  latency: 3.0
+  port_pressure: [[1, '45']]
+  throughput: 0.5
+- name: fadd
+  operands:
+  - class: register
+    prefix: v
+    shape: s
+  - class: register
+    prefix: v
+    shape: s
+  - class: register
+    prefix: v
+    shape: s
+  latency: 3.0
+  port_pressure: [[1, '5']]
+  throughput: 1.0
+- name: fadd
+  operands:
+  - class: register
+    prefix: v
+    shape: d
+  - class: register
+    prefix: v
+    shape: d
+  - class: register
+    prefix: v
+    shape: d
+  latency: 3.0
+  port_pressure: [[1, '5']]
+  throughput: 1.0
+- name: fsub
+  operands:
+  - class: register
+    prefix: s
+  - class: register
+    prefix: s
+  - class: register
+    prefix: s
+  latency: 3.0
+  port_pressure: [[1, '45']]
+  throughput: 0.5
+- name: fsub
+  operands:
+  - class: register
+    prefix: d
+  - class: register
+    prefix: d
+  - class: register
+    prefix: d
+  latency: 3.0
+  port_pressure: [[1, '45']]
+  throughput: 0.5
+- name: fsub
+  operands:
+  - class: register
+    prefix: v
+    shape: s
+  - class: register
+    prefix: v
+    shape: s
+  - class: register
+    prefix: v
+    shape: s
+  latency: 3.0
+  port_pressure: [[1, '5']]
+  throughput: 1.0
+- name: fsub
+  operands:
+  - class: register
+    prefix: v
+    shape: d
+  - class: register
+    prefix: v
+    shape: d
+  - class: register
+    prefix: v
+    shape: d
+  latency: 3.0
+  port_pressure: [[1, '5']]
+  throughput: 1.0
+
+# Automatically generated instructions
