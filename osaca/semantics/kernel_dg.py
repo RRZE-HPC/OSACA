@@ -215,6 +215,7 @@ class KernelDG(nx.DiGraph):
         max_latency_instr = max(self.kernel, key=lambda k: k["latency"])
         if nx.algorithms.dag.is_directed_acyclic_graph(self.dg):
             longest_path = nx.algorithms.dag.dag_longest_path(self.dg, weight="latency")
+            # TODO verify that we can remove the next two lince due to earlier initialization
             for line_number in longest_path:
                 self._get_node_by_lineno(int(line_number))["latency_cp"] = 0
             # set cp latency to instruction
@@ -223,6 +224,9 @@ class KernelDG(nx.DiGraph):
                 node = self._get_node_by_lineno(int(s))
                 node["latency_cp"] = self.dg.edges[(s, d)]["latency"]
                 path_latency += node["latency_cp"]
+            # add latency for last instruction
+            node = self._get_node_by_lineno(longest_path[-1])
+            node["latency_cp"] = node["latency"]
             if max_latency_instr["latency"] > path_latency:
                 max_latency_instr["latency_cp"] = float(max_latency_instr["latency"])
                 return [max_latency_instr]
