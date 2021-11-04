@@ -234,7 +234,7 @@ class Frontend(object):
         separator += "--" + len(str(kernel[-1]["line_number"])) * "-"
         col_sep = "|"
         # for LCD/CP column
-        separator += "-" * (2 * 6 + len(col_sep)) + "-" * len(col_sep) + '--'
+        separator += "-" * (2 * 6 + len(col_sep)) + "-" * len(col_sep) + "--"
         sep_list = self._get_separator_list(col_sep)
         headline = "Port pressure in cycles"
         headline_str = "{{:^{}}}".format(len(separator))
@@ -254,14 +254,9 @@ class Frontend(object):
             + self._get_port_number_line(port_len, separator=col_sep)
             + "{}{:^6}{}{:^6}{}".format(col_sep, "CP", col_sep, "LCD", col_sep)
         )
-        separator = '-' * len(port_line)
+        separator = "-" * len(port_line)
         s += headline_str.format(headline) + "\n"
-        s += (
-            port_line
-            + "\n"
-            + separator
-            + "\n"
-        )
+        s += port_line + "\n" + separator + "\n"
         for instruction_form in kernel:
             if show_cmnts is False and self._is_comment(instruction_form):
                 continue
