@@ -4,23 +4,9 @@ arch_code: tsv110
 isa: AArch64
 ROB_size: 128
 retired_uOps_per_cycle: 4
-scheduler_size: "*"
+scheduler_size: '*'
 hidden_loads: false
 load_latency: {w: 4.0, x: 4.0, b: 4.0, h: 4.0, s: 4.0, d: 4.0, q: 4.0, v: 4.0}
-load_throughput:
-- {base: x, index: ~, offset: ~, scale: 1, pre-indexed: false, post-indexed: false, port_pressure:   [[1, '34'], [1, '012']]}
-- {base: x, index: ~, offset: imd, scale: 1, pre-indexed: false, post-indexed: true, port_pressure:  [[1, '34'], [1, '012']]}
-- {base: x, index: ~, offset: imd, scale: 1, pre-indexed: false, post-indexed: false, port_pressure: [[1, '34'], [1, '012']]}
-- {base: x, index: ~, offset: imd, scale: 1, pre-indexed: true, post-indexed: true, port_pressure:   [[1, '34'], [1, '012']]}
-- {base: x, index: ~, offset: imd, scale: 1, pre-indexed: true, post-indexed: false, port_pressure:  [[1, '34'], [1, '012']]}
-- {base: x, index: x, offset: ~, scale: 1, pre-indexed: false, post-indexed: true, port_pressure:    [[1, '34'], [1, '012']]}
-- {base: x, index: x, offset: ~, scale: 1, pre-indexed: false, post-indexed: false, port_pressure:   [[1, '34'], [1, '012']]}
-- {base: x, index: x, offset: ~, scale: 1, pre-indexed: true, post-indexed: true, port_pressure:     [[1, '34'], [1, '012']]}
-- {base: x, index: x, offset: ~, scale: 1, pre-indexed: true, post-indexed: false, port_pressure:    [[1, '34'], [1, '012']]}
-- {base: x, index: x, offset: imd, scale: 1, pre-indexed: false, post-indexed: true, port_pressure:  [[1, '34'], [1, '012']]}
-- {base: x, index: x, offset: imd, scale: 1, pre-indexed: false, post-indexed: false, port_pressure: [[1, '34'], [1, '012']]}
-- {base: x, index: x, offset: imd, scale: 1, pre-indexed: true, post-indexed: true, port_pressure:   [[1, '34'], [1, '012']]}
-- {base: x, index: x, offset: imd, scale: 1, pre-indexed: true, post-indexed: false, port_pressure:  [[1, '34'], [1, '012']]}
 ports: ['0', '1', '2', '3', '4', '5', '6', '7']
 port_model_scheme: |
   +--------------------------------------------------------------------------------------------+
@@ -32,7 +18,21 @@ port_model_scheme: |
    | INT ALU | | INT ALU | | INT ALU | | Multi-Cycle |  |   FP  | |   FP  |  | LD/ST | | LD/ST |
    +---------+ |   BRU   | |   BRU   | +-------------+  | ASIMD | | ASIMD |  +-------+ +-------+ 
                +---------+ +---------+                  +-------+ +-------+ 
-instruction_forms:                   
+load_throughput:
+- {base: x, index: ~, offset: ~, scale: 1, pre-indexed: false, post-indexed: false, port_pressure: [[1, '34'], [1, '012']]}
+- {base: x, index: ~, offset: imd, scale: 1, pre-indexed: false, post-indexed: true, port_pressure: [[1, '34'], [1, '012']]}
+- {base: x, index: ~, offset: imd, scale: 1, pre-indexed: false, post-indexed: false, port_pressure: [[1, '34'], [1, '012']]}
+- {base: x, index: ~, offset: imd, scale: 1, pre-indexed: true, post-indexed: true, port_pressure: [[1, '34'], [1, '012']]}
+- {base: x, index: ~, offset: imd, scale: 1, pre-indexed: true, post-indexed: false, port_pressure: [[1, '34'], [1, '012']]}
+- {base: x, index: x, offset: ~, scale: 1, pre-indexed: false, post-indexed: true, port_pressure: [[1, '34'], [1, '012']]}
+- {base: x, index: x, offset: ~, scale: 1, pre-indexed: false, post-indexed: false, port_pressure: [[1, '34'], [1, '012']]}
+- {base: x, index: x, offset: ~, scale: 1, pre-indexed: true, post-indexed: true, port_pressure: [[1, '34'], [1, '012']]}
+- {base: x, index: x, offset: ~, scale: 1, pre-indexed: true, post-indexed: false, port_pressure: [[1, '34'], [1, '012']]}
+- {base: x, index: x, offset: imd, scale: 1, pre-indexed: false, post-indexed: true, port_pressure: [[1, '34'], [1, '012']]}
+- {base: x, index: x, offset: imd, scale: 1, pre-indexed: false, post-indexed: false, port_pressure: [[1, '34'], [1, '012']]}
+- {base: x, index: x, offset: imd, scale: 1, pre-indexed: true, post-indexed: true, port_pressure: [[1, '34'], [1, '012']]}
+- {base: x, index: x, offset: imd, scale: 1, pre-indexed: true, post-indexed: false, port_pressure: [[1, '34'], [1, '012']]}
+instruction_forms:
 - name: add
   operands:
   - class: register
@@ -42,7 +42,7 @@ instruction_forms:
   - class: register
     prefix: w
   throughput: 0.3333
-  latency: 1.0  # 	1*p012
+  latency: 1.0
   port_pressure: [[1, '012']]
 - name: ldur
   operands:
@@ -56,7 +56,7 @@ instruction_forms:
     post-indexed: false
     pre-indexed: false
   throughput: 0.5
-  latency: 4.0  # 	1*p67
+  latency: 4.0
   port_pressure: [[1, '67']]
 - name: ldr
   operands:
@@ -70,7 +70,7 @@ instruction_forms:
     post-indexed: false
     pre-indexed: false
   throughput: 0.5
-  latency: 4.0  # 	1*p67
+  latency: 4.0
   port_pressure: [[1, '67']]
 - name: str
   operands:
@@ -84,5 +84,714 @@ instruction_forms:
     post-indexed: false
     pre-indexed: false
   throughput: 0.5
-  latency: 1.0  # 	1*p67
+  latency: 1.0
   port_pressure: [[1, '67']]
+- name: str
+  operands:
+  - class: register
+    prefix: x
+  - class: memory
+    base: x
+    offset: ~
+    index: ~
+    scale: 1
+    pre-indexed: false
+    post-indexed: true
+  latency: ~
+  port_pressure: ~
+  throughput: ~
+  uops: ~
+- name: fmla
+  operands:
+  - class: register
+    prefix: v
+    shape: s
+  - class: register
+    prefix: v
+    shape: s
+  - class: register
+    prefix: v
+    shape: s
+  latency: ~
+  port_pressure: ~
+  throughput: 0.5
+  uops: ~
+- name: fdiv
+  operands:
+  - class: register
+    prefix: v
+    shape: s
+  - class: register
+    prefix: v
+    shape: s
+  - class: register
+    prefix: v
+    shape: s
+  latency: ~
+  port_pressure: ~
+  throughput: ~
+  uops: ~
+- name: ldr
+  operands:
+  - class: register
+    prefix: q
+  - class: memory
+    base: x
+    offset: ~
+    index: ~
+    scale: 1
+    pre-indexed: false
+    post-indexed: false
+  latency: ~
+  port_pressure: ~
+  throughput: ~
+  uops: ~
+- name: fsqrt
+  operands:
+  - class: register
+    prefix: v
+    shape: s
+  - class: register
+    prefix: v
+    shape: s
+  - class: register
+    prefix: v
+    shape: s
+  latency: ~
+  port_pressure: ~
+  throughput: ~
+  uops: ~
+- name: fadd
+  operands:
+  - class: register
+    prefix: v
+    shape: d
+  - class: register
+    prefix: v
+    shape: d
+  - class: register
+    prefix: v
+    shape: d
+  latency: ~
+  port_pressure: ~
+  throughput: 1.0
+  uops: ~
+- name: ldr
+  operands:
+  - class: register
+    prefix: x
+  - class: memory
+    base: x
+    offset: ~
+    index: ~
+    scale: 1
+    pre-indexed: false
+    post-indexed: false
+  latency: ~
+  port_pressure: ~
+  throughput: ~
+  uops: ~
+- name: str
+  operands:
+  - class: register
+    prefix: q
+  - class: memory
+    base: x
+    offset: ~
+    index: ~
+    scale: 1
+    pre-indexed: false
+    post-indexed: true
+  latency: ~
+  port_pressure: ~
+  throughput: 1.0
+  uops: ~
+- name: add
+  operands:
+  - class: register
+    prefix: x
+  - class: register
+    prefix: x
+  - class: immediate
+    imd: int
+  latency: ~
+  port_pressure: ~
+  throughput: 0.33333
+  uops: ~
+- name: str
+  operands:
+  - class: register
+    prefix: x
+  - class: memory
+    base: x
+    offset: ~
+    index: gpr
+    scale: 1
+    pre-indexed: false
+    post-indexed: false
+  latency: ~
+  port_pressure: ~
+  throughput: ~
+  uops: ~
+- name: str
+  operands:
+  - class: register
+    prefix: x
+  - class: memory
+    base: x
+    offset: ~
+    index: ~
+    scale: 1
+    pre-indexed: false
+    post-indexed: false
+  latency: ~
+  port_pressure: ~
+  throughput: ~
+  uops: ~
+- name: str
+  operands:
+  - class: register
+    prefix: q
+  - class: memory
+    base: x
+    offset: ~
+    index: ~
+    scale: 1
+    pre-indexed: false
+    post-indexed: false
+  latency: ~
+  port_pressure: ~
+  throughput: ~
+  uops: ~
+- name: stp
+  operands:
+  - class: register
+    prefix: q
+  - class: register
+    prefix: q
+  - class: memory
+    base: x
+    offset: ~
+    index: ~
+    scale: 1
+    pre-indexed: false
+    post-indexed: false
+  latency: ~
+  port_pressure: ~
+  throughput: ~
+  uops: ~
+- name: fsub
+  operands:
+  - class: register
+    prefix: v
+    shape: d
+  - class: register
+    prefix: v
+    shape: d
+  - class: register
+    prefix: v
+    shape: d
+  latency: ~
+  port_pressure: ~
+  throughput: 1.0
+  uops: ~
+- name: ldp
+  operands:
+  - class: register
+    prefix: q
+  - class: register
+    prefix: q
+  - class: memory
+    base: x
+    offset: ~
+    index: ~
+    scale: 1
+    pre-indexed: false
+    post-indexed: true
+  latency: ~
+  port_pressure: ~
+  throughput: ~
+  uops: ~
+- name: fmul
+  operands:
+  - class: register
+    prefix: d
+  - class: register
+    prefix: d
+  - class: register
+    prefix: d
+  latency: ~
+  port_pressure: ~
+  throughput: 0.5
+  uops: ~
+- name: ldp
+  operands:
+  - class: register
+    prefix: q
+  - class: register
+    prefix: q
+  - class: memory
+    base: x
+    offset: imd
+    index: ~
+    scale: 1
+    pre-indexed: false
+    post-indexed: false
+  latency: ~
+  port_pressure: ~
+  throughput: 1.0
+  uops: ~
+- name: fdiv
+  operands:
+  - class: register
+    prefix: v
+    shape: d
+  - class: register
+    prefix: v
+    shape: d
+  - class: register
+    prefix: v
+    shape: d
+  latency: ~
+  port_pressure: ~
+  throughput: ~
+  uops: ~
+- name: frecpe
+  operands:
+  - class: register
+    prefix: v
+    shape: d
+  - class: register
+    prefix: v
+    shape: d
+  latency: ~
+  port_pressure: ~
+  throughput: 1.0
+  uops: ~
+- name: subs
+  operands:
+  - class: register
+    prefix: x
+  - class: register
+    prefix: x
+  - class: immediate
+    imd: int
+  latency: ~
+  port_pressure: ~
+  throughput: 0.5
+  uops: ~
+- name: stur
+  operands:
+  - class: register
+    prefix: q
+  - class: memory
+    base: x
+    offset: ~
+    index: ~
+    scale: 1
+    pre-indexed: false
+    post-indexed: false
+  latency: ~
+  port_pressure: ~
+  throughput: ~
+  uops: ~
+- name: fmla
+  operands:
+  - class: register
+    prefix: v
+    shape: d
+  - class: register
+    prefix: v
+    shape: d
+  - class: register
+    prefix: v
+    shape: d
+  latency: ~
+  port_pressure: ~
+  throughput: 1.0
+  uops: ~
+- name: mov
+  operands:
+  - class: register
+    prefix: x
+  - class: register
+    prefix: x
+  latency: ~
+  port_pressure: ~
+  throughput: 0.33333
+  uops: ~
+- name: str
+  operands:
+  - class: register
+    prefix: q
+  - class: memory
+    base: x
+    offset: ~
+    index: gpr
+    scale: 1
+    pre-indexed: false
+    post-indexed: false
+  latency: ~
+  port_pressure: ~
+  throughput: 1.0
+  uops: ~
+- name: sub
+  operands:
+  - class: register
+    prefix: w
+  - class: register
+    prefix: w
+  - class: immediate
+    imd: int
+  latency: ~
+  port_pressure: ~
+  throughput: 0.33333
+  uops: ~
+- name: dup
+  operands:
+  - class: register
+    prefix: d
+  - class: register
+    prefix: v
+    shape: d
+  latency: ~
+  port_pressure: ~
+  throughput: ~
+  uops: ~
+- name: frecpe
+  operands:
+  - class: register
+    prefix: v
+    shape: s
+  - class: register
+    prefix: v
+    shape: s
+  latency: ~
+  port_pressure: ~
+  throughput: ~
+  uops: ~
+- name: fmul
+  operands:
+  - class: register
+    prefix: v
+    shape: s
+  - class: register
+    prefix: v
+    shape: s
+  - class: register
+    prefix: v
+    shape: s
+  latency: ~
+  port_pressure: ~
+  throughput: 0.5
+  uops: ~
+- name: str
+  operands:
+  - class: register
+    prefix: d
+  - class: memory
+    base: x
+    offset: ~
+    index: ~
+    scale: 1
+    pre-indexed: false
+    post-indexed: false
+  latency: ~
+  port_pressure: ~
+  throughput: 1.0
+  uops: ~
+- name: fadd
+  operands:
+  - class: register
+    prefix: d
+  - class: register
+    prefix: d
+  - class: register
+    prefix: d
+  latency: ~
+  port_pressure: ~
+  throughput: 0.5
+  uops: ~
+- name: stp
+  operands:
+  - class: register
+    prefix: q
+  - class: register
+    prefix: q
+  - class: memory
+    base: x
+    offset: imd
+    index: ~
+    scale: 1
+    pre-indexed: false
+    post-indexed: false
+  latency: ~
+  port_pressure: ~
+  throughput: ~
+  uops: ~
+- name: fsqrt
+  operands:
+  - class: register
+    prefix: v
+    shape: d
+  - class: register
+    prefix: v
+    shape: d
+  - class: register
+    prefix: v
+    shape: d
+  latency: ~
+  port_pressure: ~
+  throughput: ~
+  uops: ~
+- name: adds
+  operands:
+  - class: register
+    prefix: x
+  - class: register
+    prefix: x
+  - class: immediate
+    imd: int
+  latency: ~
+  port_pressure: ~
+  throughput: 0.5
+  uops: ~
+- name: stp
+  operands:
+  - class: register
+    prefix: d
+  - class: register
+    prefix: d
+  - class: memory
+    base: x
+    offset: imd
+    index: ~
+    scale: 1
+    pre-indexed: false
+    post-indexed: false
+  latency: ~
+  port_pressure: ~
+  throughput: ~
+  uops: ~
+- name: stur
+  operands:
+  - class: register
+    prefix: d
+  - class: memory
+    base: x
+    offset: ~
+    index: ~
+    scale: 1
+    pre-indexed: false
+    post-indexed: false
+  latency: ~
+  port_pressure: ~
+  throughput: 1.0
+  uops: ~
+- name: fsub
+  operands:
+  - class: register
+    prefix: v
+    shape: s
+  - class: register
+    prefix: v
+    shape: s
+  - class: register
+    prefix: v
+    shape: s
+  latency: ~
+  port_pressure: ~
+  throughput: 0.5
+  uops: ~
+- name: ldr
+  operands:
+  - class: register
+    prefix: q
+  - class: memory
+    base: x
+    offset: ~
+    index: ~
+    scale: 1
+    pre-indexed: false
+    post-indexed: true
+  latency: ~
+  port_pressure: ~
+  throughput: ~
+  uops: ~
+- name: fmul
+  operands:
+  - class: register
+    prefix: v
+    shape: d
+  - class: register
+    prefix: v
+    shape: d
+  - class: register
+    prefix: v
+    shape: d
+  latency: ~
+  port_pressure: ~
+  throughput: 1.0
+  uops: ~
+- name: mul
+  operands:
+  - class: register
+    prefix: x
+  - class: register
+    prefix: x
+  - class: register
+    prefix: x
+  latency: ~
+  port_pressure: ~
+  throughput: 1.0
+  uops: ~
+- name: stp
+  operands:
+  - class: register
+    prefix: x
+  - class: register
+    prefix: x
+  - class: memory
+    base: x
+    offset: imd
+    index: ~
+    scale: 1
+    pre-indexed: false
+    post-indexed: false
+  latency: ~
+  port_pressure: ~
+  throughput: 1.0
+  uops: ~
+- name: fadd
+  operands:
+  - class: register
+    prefix: v
+    shape: s
+  - class: register
+    prefix: v
+    shape: s
+  - class: register
+    prefix: v
+    shape: s
+  latency: ~
+  port_pressure: ~
+  throughput: ~
+  uops: ~
+- name: add
+  operands:
+  - class: register
+    prefix: x
+  - class: register
+    prefix: x
+  - class: register
+    prefix: x
+  latency: ~
+  port_pressure: ~
+  throughput: 0.33333
+  uops: ~
+- name: mov
+  operands:
+  - class: register
+    prefix: v
+    shape: b
+  - class: register
+    prefix: v
+    shape: b
+  latency: ~
+  port_pressure: ~
+  throughput: 0.5
+  uops: ~
+- name: ldp
+  operands:
+  - class: register
+    prefix: d
+  - class: register
+    prefix: d
+  - class: memory
+    base: x
+    offset: imd
+    index: ~
+    scale: 1
+    pre-indexed: false
+    post-indexed: false
+  latency: ~
+  port_pressure: ~
+  throughput: 1.0
+  uops: ~
+- name: ldp
+  operands:
+  - class: register
+    prefix: x
+  - class: register
+    prefix: x
+  - class: memory
+    base: x
+    offset: imd
+    index: ~
+    scale: 1
+    pre-indexed: false
+    post-indexed: false
+  latency: ~
+  port_pressure: ~
+  throughput: ~
+  uops: ~
+- name: str
+  operands:
+  - class: register
+    prefix: d
+  - class: memory
+    base: x
+    offset: ~
+    index: ~
+    scale: 1
+    pre-indexed: false
+    post-indexed: true
+  latency: ~
+  port_pressure: ~
+  throughput: 1.0
+  uops: ~
+- name: cmp
+  operands:
+  - class: register
+    prefix: x
+  - class: register
+    prefix: x
+  latency: ~
+  port_pressure: ~
+  throughput: 0.5
+  uops: ~
+- name: fmov
+  operands:
+  - class: register
+    prefix: s
+  - class: immediate
+    imd: int
+  latency: ~
+  port_pressure: ~
+  throughput: 0.5
+  uops: ~
+- name: cmp
+  operands:
+  - class: register
+    prefix: w
+  - class: register
+    prefix: w
+  latency: ~
+  port_pressure: ~
+  throughput: 0.5
+  uops: ~
+- name: ldr
+  operands:
+  - class: register
+    prefix: q
+  - class: memory
+    base: x
+    offset: ~
+    index: gpr
+    scale: 1
+    pre-indexed: false
+    post-indexed: false
+  latency: ~
+  port_pressure: ~
+  throughput: ~
+  uops: ~
