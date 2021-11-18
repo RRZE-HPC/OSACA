@@ -2,7 +2,7 @@
 from copy import deepcopy
 import pyparsing as pp
 
-from osaca.parser import AttrDict, BaseParser, DirectiveOperand, IdentifierOperand, ImmediateOperand, MemoryOperand, RegisterOperand, PrefetchOperand, InstructionForm
+from osaca.parser import BaseParser, DirectiveOperand, IdentifierOperand, ImmediateOperand, MemoryOperand, RegisterOperand, PrefetchOperand, InstructionForm
 
 
 class ParserAArch64(BaseParser):
@@ -261,13 +261,10 @@ class ParserAArch64(BaseParser):
                 result = self.process_operand(
                     self.directive.parseString(line, parseAll=True).asDict()
                 )
-                result = AttrDict.convert_dict(result)
-                instruction_form["DIRECTIVE"] = AttrDict(
-                    {
-                        "name": result["DIRECTIVE"].name,
-                        "parameters": result["DIRECTIVE"].parameters,
-                    }
-                )
+                instruction_form["DIRECTIVE"] = {
+                    "name": result["DIRECTIVE"].name,
+                    "parameters": result["DIRECTIVE"].parameters,
+                }
                 if "COMMENT" in result["DIRECTIVE"]:
                     instruction_form["COMMENT"] = " ".join(
                         result["DIRECTIVE"]["COMMENT"]
@@ -326,15 +323,13 @@ class ParserAArch64(BaseParser):
             operand.name = operand_strings[4]
             operands.extend(operand) if isinstance(operand, list) else operands.append(operand)
 
-        return_dict = AttrDict(
-            {
-                "MNEMONIC": result["mnemonic"],
-                "OPERANDS": operands,
-                "COMMENT": " ".join(result["COMMENT"])
-                if "COMMENT" in result
-                else None,
-            }
-        )
+        return_dict = {
+            "MNEMONIC": result["mnemonic"],
+            "OPERANDS": operands,
+            "COMMENT": " ".join(result["COMMENT"])
+            if "COMMENT" in result
+            else None,
+        }
         return return_dict
 
     def process_operand(self, operand):

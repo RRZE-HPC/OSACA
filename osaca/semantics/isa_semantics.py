@@ -2,7 +2,7 @@
 from itertools import chain
 
 from osaca import utils
-from osaca.parser import AttrDict, ParserAArch64, ParserX86ATT, ImmediateOperand, MemoryOperand, RegisterOperand
+from osaca.parser import ParserAArch64, ParserX86ATT, ImmediateOperand, MemoryOperand, RegisterOperand
 
 from .hw_model import MachineModel
 
@@ -115,7 +115,7 @@ class ISASemantics(object):
                     )
 
         # store operand list in dict and reassign operand key/value pair
-        instruction_form.semantic_operands = AttrDict.convert_dict(op_dict)
+        instruction_form.semantic_operands = op_dict
         # assign LD/ST flags
         if self._has_load(instruction_form):
             instruction_form.flags.append(INSTR_FLAGS.HAS_LD)
@@ -134,8 +134,8 @@ class ISASemantics(object):
         dest_reg_names = [
             op.prefix + op.regid if op.regid is not None else ""
             for op in chain(
-                instruction_form.semantic_operands.destination,
-                instruction_form.semantic_operands.src_dst,
+                instruction_form.semantic_operands["destination"],
+                instruction_form.semantic_operands["src_dst"],
             )
             if isinstance(op, RegisterOperand)
         ]
@@ -223,13 +223,11 @@ class ISASemantics(object):
             op_dict["destination"] += operands
             if "hidden_operands" in isa_data:
                 op_dict["destination"] += [
-                    AttrDict.convert_dict(
-                        {
-                            hop["class"]: {
-                                k: hop[k] for k in ["name", "class", "source", "destination"]
-                            }
+                    {
+                        hop["class"]: {
+                            k: hop[k] for k in ["name", "class", "source", "destination"]
                         }
-                    )
+                    }
                     for hop in isa_data["hidden_operands"]
                 ]
             return op_dict
@@ -259,7 +257,7 @@ class ISASemantics(object):
                 key_filter = ["class", "source", "destination"]
                 for key in [k for k in op.keys() if k not in key_filter]:
                     hidden_op[op["class"]][key] = op[key]
-                hidden_op = AttrDict.convert_dict(hidden_op)
+                hidden_op = hidden_op
                 op_dict[dict_key].append(hidden_op)
         return op_dict
 
