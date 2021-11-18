@@ -5,7 +5,15 @@ import re
 
 import pyparsing as pp
 
-from osaca.parser import AttrDict, BaseParser
+from osaca.parser import (
+    BaseParser,
+    DirectiveOperand,
+    IdentifierOperand,
+    ImmediateOperand,
+    MemoryOperand,
+    RegisterOperand,
+    InstructionForm,
+)
 
 
 class ParserX86ATT(BaseParser):
@@ -32,7 +40,7 @@ class ParserX86ATT(BaseParser):
         # Comment - either '#' or '//' (icc)
         self.comment = (pp.Literal("#") | pp.Literal("//")) + pp.Group(
             pp.ZeroOrMore(pp.Word(pp.printables))
-        ).setResultsName(self.COMMENT_ID)
+        ).setResultsName("COMMENT")
         # Define x86 assembly identifier
         relocation = pp.Combine(pp.Literal("@") + pp.Word(pp.alphas))
         id_offset = pp.Word(pp.nums) + pp.Suppress(pp.Literal("+"))
@@ -45,7 +53,7 @@ class ParserX86ATT(BaseParser):
                 joinString="::",
             ).setResultsName("name")
             + pp.Optional(relocation).setResultsName("relocation")
-        ).setResultsName("identifier")
+        ).setResultsName("IDENTIFIER")
         # Label
         label_rest = pp.Word(pp.alphanums + "$_.+-()")
         label_identifier = pp.Group(
@@ -55,16 +63,16 @@ class ParserX86ATT(BaseParser):
                 joinString="::",
             ).setResultsName("name")
             + pp.Optional(relocation).setResultsName("relocation")
-        ).setResultsName("identifier")
+        ).setResultsName("IDENTIFIER")
         numeric_identifier = pp.Group(
             pp.Word(pp.nums).setResultsName("name")
             + pp.Optional(pp.oneOf("b f", caseless=True).setResultsName("suffix"))
-        ).setResultsName("identifier")
+        ).setResultsName("IDENTIFIER")
         self.label = pp.Group(
             (label_identifier | numeric_identifier).setResultsName("name")
             + pp.Literal(":")
             + pp.Optional(self.comment)
-        ).setResultsName(self.LABEL_ID)
+        ).setResultsName("LABEL")
         # Register: pp.Regex('^%[0-9a-zA-Z]+{}{z},?')
         self.register = pp.Group(
             pp.Literal("%")
@@ -81,17 +89,15 @@ class ParserX86ATT(BaseParser):
                     + pp.Suppress(pp.Literal("}"))
                 )
             )
-        ).setResultsName(self.REGISTER_ID)
+        ).setResultsName("REGISTER")
         # Immediate: pp.Regex('^\$(-?[0-9]+)|(0x[0-9a-fA-F]+),?')
         symbol_immediate = "$"
         immediate = pp.Group(
             pp.Literal(symbol_immediate) + (hex_number | decimal_number | identifier)
-        ).setResultsName(self.IMMEDIATE_ID)
+        ).setResultsName("IMMEDIATE")
 
         # Memory preparations
-        offset = pp.Group(hex_number | decimal_number | identifier).setResultsName(
-            self.IMMEDIATE_ID
-        )
+        offset = pp.Group(hex_number | decimal_number | identifier).setResultsName("IMMEDIATE")
         scale = pp.Word("1248", exact=1)
         # Segment register extension
         segment_extension = (
@@ -112,7 +118,7 @@ class ParserX86ATT(BaseParser):
             pp.Optional(pp.Suppress(pp.Literal("*")))
             + self.register.setResultsName("base")
             + pp.Literal(":")
-            + segment_extension.setResultsName(self.SEGMENT_EXT_ID)
+            + segment_extension.setResultsName("SEGMENT_EXTENSION")
         )
         # Memory: offset | seg:seg_ext | offset(base, index, scale){mask}
         memory_abs = pp.Suppress(pp.Literal("*")) + (offset | self.register).setResultsName(
@@ -139,7 +145,7 @@ class ParserX86ATT(BaseParser):
             | memory_abs
             | memory_segmentation
             | (hex_number | pp.Word(pp.nums)).setResultsName("offset")
-        ).setResultsName(self.MEMORY_ID)
+        ).setResultsName("MEMORY")
 
         # Directive
         # parameter can be any quoted string or sequence of characters besides '#' (for comments)
@@ -157,7 +163,7 @@ class ParserX86ATT(BaseParser):
             + pp.Word(pp.alphanums + "_").setResultsName("name")
             + pp.ZeroOrMore(directive_parameter).setResultsName("parameters")
             + pp.Optional(self.comment)
-        ).setResultsName(self.DIRECTIVE_ID)
+        ).setResultsName("DIRECTIVE")
 
         # Instructions
         # Mnemonic
@@ -199,24 +205,13 @@ class ParserX86ATT(BaseParser):
         :type line_number: int, optional
         :return: ``dict`` -- parsed asm line (comment, label, directive or instruction form)
         """
-        instruction_form = AttrDict(
-            {
-                self.INSTRUCTION_ID: None,
-                self.OPERANDS_ID: [],
-                self.DIRECTIVE_ID: None,
-                self.COMMENT_ID: None,
-                self.LABEL_ID: None,
-                "line": line,
-                "line_number": line_number,
-            }
-        )
+        instruction_form = InstructionForm(line=line, line_number=line_number)
         result = None
 
         # 1. Parse comment
         try:
-            result = self.process_operand(self.comment.parseString(line, parseAll=True).asDict())
-            result = AttrDict.convert_dict(result)
-            instruction_form[self.COMMENT_ID] = " ".join(result[self.COMMENT_ID])
+            result = self.comment.parseString(line, parseAll=True).asDict()
+            instruction_form.comment = " ".join(result["COMMENT"])
         except pp.ParseException:
             pass
 
@@ -224,12 +219,9 @@ class ParserX86ATT(BaseParser):
         if result is None:
             try:
                 result = self.process_operand(self.label.parseString(line, parseAll=True).asDict())
-                result = AttrDict.convert_dict(result)
-                instruction_form[self.LABEL_ID] = result[self.LABEL_ID]["name"]
-                if self.COMMENT_ID in result[self.LABEL_ID]:
-                    instruction_form[self.COMMENT_ID] = " ".join(
-                        result[self.LABEL_ID][self.COMMENT_ID]
-                    )
+                instruction_form.label = result["LABEL"]["name"]
+                if "COMMENT" in result:
+                    instruction_form.comment = " ".join(result["COMMENT"])
             except pp.ParseException:
                 pass
 
@@ -239,17 +231,13 @@ class ParserX86ATT(BaseParser):
                 result = self.process_operand(
                     self.directive.parseString(line, parseAll=True).asDict()
                 )
-                result = AttrDict.convert_dict(result)
-                instruction_form[self.DIRECTIVE_ID] = AttrDict(
-                    {
-                        "name": result[self.DIRECTIVE_ID]["name"],
-                        "parameters": result[self.DIRECTIVE_ID]["parameters"],
-                    }
+                instruction_form.directive = DirectiveOperand(
+                    ".{} {}".format(result["name"], ",".join(result["parameters"])),
+                    result["name"],
+                    result["parameters"],
                 )
-                if self.COMMENT_ID in result[self.DIRECTIVE_ID]:
-                    instruction_form[self.COMMENT_ID] = " ".join(
-                        result[self.DIRECTIVE_ID][self.COMMENT_ID]
-                    )
+                if "COMMENT" in result:
+                    instruction_form.comment = " ".join(result["COMMENT"])
             except pp.ParseException:
                 pass
 
@@ -261,9 +249,9 @@ class ParserX86ATT(BaseParser):
                 raise ValueError(
                     "Could not parse instruction on line {}: {!r}".format(line_number, line)
                 )
-            instruction_form[self.INSTRUCTION_ID] = result[self.INSTRUCTION_ID]
-            instruction_form[self.OPERANDS_ID] = result[self.OPERANDS_ID]
-            instruction_form[self.COMMENT_ID] = result[self.COMMENT_ID]
+            instruction_form.mnemonic = result["MNEMONIC"]
+            instruction_form.operands += result["OPERANDS"]
+            instruction_form.comment = result["COMMENT"]
 
         return instruction_form
 
@@ -275,52 +263,65 @@ class ParserX86ATT(BaseParser):
         :returns: `dict` -- parsed instruction form
         """
         result = self.instruction_parser.parseString(instruction, parseAll=True).asDict()
-        result = AttrDict.convert_dict(result)
         operands = []
+        operand_strings = [op[:-1] if op[-1] == "," else op for op in instruction.split()[1:]]
         # Add operands to list
         # Check first operand
         if "operand1" in result:
-            operands.append(self.process_operand(result["operand1"]))
+            op = self.process_operand(result["operand1"])
+            op.name = operand_strings[0]
+            operands.append(op)
         # Check second operand
         if "operand2" in result:
-            operands.append(self.process_operand(result["operand2"]))
+            op = self.process_operand(result["operand2"])
+            op.name = operand_strings[1]
+            operands.append(op)
         # Check third operand
         if "operand3" in result:
-            operands.append(self.process_operand(result["operand3"]))
+            op = self.process_operand(result["operand3"])
+            op.name = operand_strings[2]
+            operands.append(op)
         # Check fourth operand
         if "operand4" in result:
-            operands.append(self.process_operand(result["operand4"]))
-        return_dict = AttrDict(
-            {
-                self.INSTRUCTION_ID: result["mnemonic"].split(",")[0],
-                self.OPERANDS_ID: operands,
-                self.COMMENT_ID: " ".join(result[self.COMMENT_ID])
-                if self.COMMENT_ID in result
-                else None,
-            }
-        )
+            op = self.process_operand(result["operand4"])
+            op.name = operand_strings[3]
+            operands.append(op)
+        return_dict = {
+            "MNEMONIC": result["mnemonic"].split(",")[0],
+            "OPERANDS": operands,
+            "COMMENT": " ".join(result["COMMENT"]) if "COMMENT" in result else None,
+        }
         return return_dict
 
     def process_operand(self, operand):
         """Post-process operand"""
-        # For the moment, only used to structure memory addresses
-        if self.MEMORY_ID in operand:
-            return self.process_memory_address(operand[self.MEMORY_ID])
-        if self.IMMEDIATE_ID in operand:
-            return self.process_immediate(operand[self.IMMEDIATE_ID])
-        if self.LABEL_ID in operand:
-            return self.process_label(operand[self.LABEL_ID])
-        if self.DIRECTIVE_ID in operand:
-            return self.process_directive(operand[self.DIRECTIVE_ID])
+        if "REGISTER" in operand:
+            return self.process_register(operand["REGISTER"])
+        if "MEMORY" in operand:
+            return self.process_memory_address(operand["MEMORY"])
+        if "IMMEDIATE" in operand:
+            return self.process_immediate(operand["IMMEDIATE"])
+        if "IDENTIFIER" in operand:
+            return self.process_identifier(operand["IDENTIFIER"])
+        if "LABEL" in operand:
+            return self.process_label(operand["LABEL"])
+        if "DIRECTIVE" in operand:
+            return self.process_directive(operand["DIRECTIVE"])
         return operand
+
+    def process_register(self, register):
+        return self.get_regop_info_by_reg(register)
+
+    def process_identifier(self, identifier):
+        return IdentifierOperand(identifier["name"], identifier.get("offset", None))
 
     def process_directive(self, directive):
         directive_new = {"name": directive["name"], "parameters": []}
         if "parameters" in directive:
             directive_new["parameters"] = directive["parameters"]
         if "comment" in directive:
-            directive_new["comment"] = directive["comment"]
-        return AttrDict({self.DIRECTIVE_ID: directive_new})
+            directive_new["COMMENT"] = directive["comment"]
+        return directive_new
 
     def process_memory_address(self, memory_address):
         """Post-process memory address operand"""
@@ -329,38 +330,105 @@ class ParserX86ATT(BaseParser):
         base = memory_address.get("base", None)
         index = memory_address.get("index", None)
         scale = 1 if "scale" not in memory_address else int(memory_address["scale"], 0)
+        # convert Offset to operand
         if isinstance(offset, str) and base is None and index is None:
-            try:
-                offset = {"value": int(offset, 0)}
-            except ValueError:
-                offset = {"value": offset}
+            offset = ImmediateOperand(offset)
         elif offset is not None and "value" in offset:
-            offset["value"] = int(offset["value"], 0)
-        new_dict = AttrDict({"offset": offset, "base": base, "index": index, "scale": scale})
+            offset = ImmediateOperand(offset["value"])
+        # convert Base to operand
+        if base is not None and "name" in base:
+            base = self.get_regop_info_by_reg(base)
+        # convert index to operand
+        if index is not None and "name" in index:
+            index = self.get_regop_info_by_reg(index)
+        new_op = MemoryOperand("", offset=offset, base=base, index=index, scale=scale)
         # Add segmentation extension if existing
-        if self.SEGMENT_EXT_ID in memory_address:
-            new_dict[self.SEGMENT_EXT_ID] = memory_address[self.SEGMENT_EXT_ID]
-        return AttrDict({self.MEMORY_ID: new_dict})
+        if "SEGMENT_EXTENSION" in memory_address:
+            new_op.segment_extension = memory_address["SEGMENT_EXTENSION"]
+        return new_op
 
     def process_label(self, label):
         """Post-process label asm line"""
         # remove duplicated 'name' level due to identifier
         label["name"] = label["name"][0]["name"]
-        return AttrDict({self.LABEL_ID: label})
+        return {"LABEL": label}
 
     def process_immediate(self, immediate):
         """Post-process immediate operand"""
-        if "identifier" in immediate:
+        if "IDENTIFIER" in immediate:
             # actually an identifier, change declaration
-            return immediate
-        # otherwise just make sure the immediate is a decimal
-        immediate["value"] = int(immediate["value"], 0)
-        return AttrDict({self.IMMEDIATE_ID: immediate})
+            return IdentifierOperand(immediate["IDENTIFIER"])
+        # otherwise convert value to operand
+        immediate = ImmediateOperand(immediate["value"])
+        return immediate
+
+    def get_regop_info_by_reg(self, reg):
+        if "name" not in reg:
+            return None
+        basename = reg["name"].lower()
+        # check for masking
+        mask = None
+        if "mask" in reg:
+            mask_str = reg["mask"].lower()
+            mask_prefix = mask_str.rstrip(string.digits)
+            mask_id = mask_str.lstrip(string.ascii_letters)
+            mask = RegisterOperand(
+                "{" + mask_str + "}", width=64, prefix=mask_prefix, regid=mask_id, regtype="mask"
+            )
+        # check for zeroing
+        zeroing = False
+        if reg.get("zeroing", None) == "z":
+            zeroing = True
+        reg_dict = {"name": basename}
+        regtype = self.get_reg_type(reg_dict)
+        prefix = basename.rstrip(string.digits)
+        regid = basename.lstrip(string.ascii_letters)
+        if regid == "":
+            regid = None
+        # determine width
+        if self.is_gpr(reg_dict):
+            if basename[0] == "r":
+                width = 64
+            elif len(basename) == 3:
+                width = 32
+            elif basename[-1] == "x" or basename in ["sp", "si", "di"]:
+                width = 16
+            else:
+                width = 8
+        elif self.is_vector_register(reg_dict):
+            if len(basename) == 2:
+                width = 64
+            elif basename[0] == "x":
+                width = 128
+            elif basename[0] == "y":
+                width = 256
+            else:
+                width = 512
+        elif regtype == "mask":
+            width = 64
+        else:
+            width = None
+        name_str = "%{}{}{}{}".format(
+            prefix,
+            regid if regid is not None else "",
+            mask.name if mask is not None else "",
+            "{z}" if zeroing else "",
+        )
+        reg = RegisterOperand(
+            name_str,
+            width=width,
+            prefix=prefix,
+            regid=regid,
+            regtype=regtype,
+            mask=mask,
+            zeroing=zeroing,
+        )
+        return reg
 
     def get_full_reg_name(self, register):
         """Return one register name string including all attributes"""
         # nothing to do
-        return register["name"]
+        return register.name
 
     def normalize_imd(self, imd):
         """Normalize immediate to decimal based representation"""
@@ -383,17 +451,13 @@ class ParserX86ATT(BaseParser):
 
     def is_reg_dependend_of(self, reg_a, reg_b):
         """Check if ``reg_a`` is dependent on ``reg_b``"""
-        # Normalize name
-        reg_a_name = reg_a["name"].upper()
-        reg_b_name = reg_b["name"].upper()
-
         # Check if they are the same registers
-        if reg_a_name == reg_b_name:
+        if reg_a.name == reg_b.name:
             return True
         # Check vector registers first
         if self.is_vector_register(reg_a):
             if self.is_vector_register(reg_b):
-                if reg_a_name[1:] == reg_b_name[1:]:
+                if reg_a.regid == reg_b.regid:
                     # Registers in the same vector space
                     return True
             return False
@@ -410,14 +474,14 @@ class ParserX86ATT(BaseParser):
         if self.is_basic_gpr(reg_a):
             if self.is_basic_gpr(reg_b):
                 for dep_group in gpr_groups.values():
-                    if reg_a_name in dep_group:
-                        if reg_b_name in dep_group:
+                    if reg_a.name in dep_group:
+                        if reg_b.name in dep_group:
                             return True
             return False
 
         # Check other GPRs
-        ma = re.match(r"R([0-9]+)[DWB]?", reg_a_name)
-        mb = re.match(r"R([0-9]+)[DWB]?", reg_b_name)
+        ma = re.match(r"R([0-9]+)[DWB]?", reg_a.name)
+        mb = re.match(r"R([0-9]+)[DWB]?", reg_b.name)
         if ma and mb and ma.group(1) == mb.group(1):
             return True
 
@@ -426,6 +490,10 @@ class ParserX86ATT(BaseParser):
 
     def is_basic_gpr(self, register):
         """Check if register is a basic general purpose register (ebi, rax, ...)"""
+        if isinstance(register, RegisterOperand):
+            if register.regtype != "gpr" or any(char.isdigit() for char in register.name):
+                return False
+            return True
         if any(char.isdigit() for char in register["name"]) or any(
             register["name"].lower().startswith(x) for x in ["mm", "xmm", "ymm", "zmm"]
         ):
@@ -436,6 +504,8 @@ class ParserX86ATT(BaseParser):
         """Check if register is a general purpose register"""
         if register is None:
             return False
+        if isinstance(register, RegisterOperand):
+            return "gpr" == register.regtype
         if self.is_basic_gpr(register):
             return True
         return re.match(r"R([0-9]+)[DWB]?", register["name"], re.IGNORECASE)
@@ -444,6 +514,8 @@ class ParserX86ATT(BaseParser):
         """Check if register is a vector register"""
         if register is None:
             return False
+        if isinstance(register, RegisterOperand):
+            return "vector" == register.regtype
         if register["name"].rstrip(string.digits).lower() in [
             "mm",
             "xmm",
@@ -455,10 +527,14 @@ class ParserX86ATT(BaseParser):
 
     def get_reg_type(self, register):
         """Get register type"""
+        if isinstance(register, RegisterOperand):
+            return register.regtype
         if register is None:
             return False
         if self.is_gpr(register):
             return "gpr"
         elif self.is_vector_register(register):
-            return register["name"].rstrip(string.digits).lower()
+            return "vector"
+        elif register["name"][0] == "k":
+            return "mask"
         raise ValueError

@@ -133,12 +133,12 @@ def find_marked_section(
     index_end = -1
     for i, line in enumerate(lines):
         try:
-            if line.instruction is None and comments is not None and line.comment is not None:
+            if line.mnemonic is None and comments is not None and line.comment is not None:
                 if comments["start"] == line.comment:
                     index_start = i + 1
                 elif comments["end"] == line.comment:
                     index_end = i
-            elif line.instruction in mov_instr and lines[i + 1].directive is not None:
+            elif line.mnemonic in mov_instr and lines[i + 1].directive is not None:
                 source = line.operands[0 if not reverse else 1]
                 destination = line.operands[1 if not reverse else 0]
                 # instruction pair matches, check for operands

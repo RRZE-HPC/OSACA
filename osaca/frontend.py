@@ -150,9 +150,9 @@ class Frontend(object):
                 separator,
                 dep_dict[dep]["latency"],
                 separator,
-                dep_dict[dep]["root"]["line"].strip(),
+                dep_dict[dep]["root"].line.strip(),
                 separator,
-                [node["line_number"] for node, lat in dep_dict[dep]["dependencies"]],
+                [node.line_number for node, lat in dep_dict[dep]["dependencies"]],
             )
         return s
 
@@ -231,7 +231,7 @@ class Frontend(object):
         # Separator for ports
         separator = "-" * sum([x + 3 for x in port_len]) + "-"
         # ... for line numbers
-        separator += "--" + len(str(kernel[-1]["line_number"])) * "-"
+        separator += "--" + len(str(kernel[-1].line_number)) * "-"
         col_sep = "|"
         # for LCD/CP column
         separator += "-" * (2 * 6 + len(col_sep)) + "-" * len(col_sep)
@@ -239,14 +239,14 @@ class Frontend(object):
         headline = "Port pressure in cycles"
         headline_str = "{{:^{}}}".format(len(separator))
         # Prepare CP/LCD variable
-        cp_lines = [x["line_number"] for x in cp_kernel]
+        cp_lines = [x.line_number for x in cp_kernel]
         lcd_sum = 0.0
         lcd_lines = {}
         if dep_dict:
             longest_lcd = max(dep_dict, key=lambda ln: dep_dict[ln]["latency"])
             lcd_sum = dep_dict[longest_lcd]["latency"]
             lcd_lines = {
-                instr["line_number"]: lat for instr, lat in dep_dict[longest_lcd]["dependencies"]
+                instr.line_number: lat for instr, lat in dep_dict[longest_lcd]["dependencies"]
             }
 
         s += headline_str.format(headline) + "\n"
@@ -263,31 +263,31 @@ class Frontend(object):
         for instruction_form in kernel:
             if show_cmnts is False and self._is_comment(instruction_form):
                 continue
-            line_number = instruction_form["line_number"]
-            used_ports = [list(uops[1]) for uops in instruction_form["port_uops"]]
+            line_number = instruction_form.line_number
+            used_ports = [list(uops[1]) for uops in instruction_form.port_uops]
             used_ports = list(set([p for uops_ports in used_ports for p in uops_ports]))
             s += "{:4d} {}{} {} {}\n".format(
                 line_number,
                 self._get_port_pressure(
-                    instruction_form["port_pressure"], port_len, used_ports, sep_list
+                    instruction_form.port_pressure, port_len, used_ports, sep_list
                 ),
                 self._get_lcd_cp_ports(
-                    instruction_form["line_number"],
+                    instruction_form.line_number,
                     cp_kernel if line_number in cp_lines else None,
                     lcd_lines.get(line_number),
                 ),
-                self._get_flag_symbols(instruction_form["flags"])
-                if instruction_form["instruction"] is not None
+                self._get_flag_symbols(instruction_form.flags)
+                if instruction_form.mnemonic is not None
                 else " ",
-                instruction_form["line"].strip().replace("\t", " "),
+                instruction_form.line.strip().replace("\t", " "),
             )
         s += "\n"
         # check for unknown instructions and throw warning if called without --ignore-unknown
         if not ignore_unknown and INSTR_FLAGS.TP_UNKWN in [
-            flag for instr in kernel for flag in instr["flags"]
+            flag for instr in kernel for flag in instr.flags
         ]:
             num_missing = len(
-                [instr["flags"] for instr in kernel if INSTR_FLAGS.TP_UNKWN in instr["flags"]]
+                [instr.flags for instr in kernel if INSTR_FLAGS.TP_UNKWN in instr.flags]
             )
             s += self._missing_instruction_error(num_missing)
         else:
@@ -295,8 +295,8 @@ class Frontend(object):
             tp_sum = ArchSemantics.get_throughput_sum(kernel)
             # if ALL instructions are unknown, take a line of 0s
             if not tp_sum:
-                tp_sum = kernel[0]["port_pressure"]
-            cp_sum = sum([x["latency_cp"] for x in cp_kernel])
+                tp_sum = kernel[0].port_pressure
+            cp_sum = sum([x.latency_cp for x in cp_kernel])
             s += (
                 lineno_filler
                 + self._get_port_pressure(tp_sum, port_len, separator=" ")
@@ -409,14 +409,14 @@ class Frontend(object):
 
     def _get_node_by_lineno(self, lineno, kernel):
         """Returns instruction form from kernel by its line number."""
-        nodes = [instr for instr in kernel if instr["line_number"] == lineno]
+        nodes = [instr for instr in kernel if instr.line_number == lineno]
         return nodes[0] if len(nodes) > 0 else None
 
     def _get_lcd_cp_ports(self, line_number, cp_dg, dep_lat, separator="|"):
         """Returns the CP and LCD line for one instruction."""
         lat_cp = lat_lcd = ""
         if cp_dg:
-            lat_cp = float(self._get_node_by_lineno(line_number, cp_dg)["latency_cp"])
+            lat_cp = float(self._get_node_by_lineno(line_number, cp_dg).latency_cp)
         if dep_lat is not None:
             lat_lcd = float(dep_lat)
         return "{} {:>4} {} {:>4} {}".format(separator, lat_cp, separator, lat_lcd, separator)
@@ -425,7 +425,7 @@ class Frontend(object):
         """Returns the maximal length needed to print all throughputs of the kernel."""
         port_len = [4 for x in self._machine_model.get_ports()]
         for instruction_form in kernel:
-            for i, port in enumerate(instruction_form["port_pressure"]):
+            for i, port in enumerate(instruction_form.port_pressure):
                 if len("{:.2f}".format(port)) > port_len[i]:
                     port_len[i] = len("{:.2f}".format(port))
         return port_len

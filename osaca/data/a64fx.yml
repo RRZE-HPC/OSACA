@@ -1581,8 +1581,8 @@ instruction_forms:
     prefix: q
   - class: memory
     base: x
-    offset: ~
-    index: ~
+    offset: '*'
+    index: '*'
     scale: 1
     pre-indexed: false
     post-indexed: true
