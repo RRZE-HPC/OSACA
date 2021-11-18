@@ -261,12 +261,13 @@ class ParserAArch64(BaseParser):
                 result = self.process_operand(
                     self.directive.parseString(line, parseAll=True).asDict()
                 )
-                instruction_form["DIRECTIVE"] = {
-                    "name": result["DIRECTIVE"].name,
-                    "parameters": result["DIRECTIVE"].parameters,
-                }
+                instruction_form.directive = DirectiveOperand(
+                    ".{} {}".format(result["DIRECTIVE"]["name"], ",".join(result["DIRECTIVE"]["parameters"],
+                    result["DIRECTIVE"]["name"],
+                    result["DIRECTIVE"]["parameters"],
+                )
                 if "COMMENT" in result["DIRECTIVE"]:
-                    instruction_form["COMMENT"] = " ".join(
+                    instruction_form.comment = " ".join(
                         result["DIRECTIVE"]["COMMENT"]
                     )
             except pp.ParseException:

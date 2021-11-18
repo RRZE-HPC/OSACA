@@ -10,7 +10,7 @@ from copy import deepcopy
 
 import networkx as nx
 from osaca.osaca import get_unmatched_instruction_ratio
-from osaca.parser import AttrDict, ParserAArch64, ParserX86ATT
+from osaca.parser import ParserAArch64, ParserX86ATT
 from osaca.semantics import (
     INSTR_FLAGS,
     ArchSemantics,
@@ -483,8 +483,8 @@ class TestSemanticTools(unittest.TestCase):
     def test_is_read_is_written_x86(self):
         # independent form HW model
         dag = KernelDG(self.kernel_x86, self.parser_x86, None, None)
-        reg_rcx = AttrDict({"name": "rcx"})
-        reg_ymm1 = AttrDict({"name": "ymm1"})
+        reg_rcx = {"name": "rcx"}
+        reg_ymm1 = {"name": "ymm1"}
 
         instr_form_r_c = self.parser_x86.parse_line("vmovsd  %xmm0, (%r15,%rcx,8)")
         self.semantics_csx.assign_src_dst(instr_form_r_c)
@@ -516,11 +516,11 @@ class TestSemanticTools(unittest.TestCase):
     def test_is_read_is_written_AArch64(self):
         # independent form HW model
         dag = KernelDG(self.kernel_AArch64, self.parser_AArch64, None, None)
-        reg_x1 = AttrDict({"prefix": "x", "name": "1"})
-        reg_w1 = AttrDict({"prefix": "w", "name": "1"})
-        reg_d1 = AttrDict({"prefix": "d", "name": "1"})
-        reg_q1 = AttrDict({"prefix": "q", "name": "1"})
-        reg_v1 = AttrDict({"prefix": "v", "name": "1", "lanes": "2", "shape": "d"})
+        reg_x1 = {"prefix": "x", "name": "1"}
+        reg_w1 = {"prefix": "w", "name": "1"}
+        reg_d1 = {"prefix": "d", "name": "1"}
+        reg_q1 = {"prefix": "q", "name": "1"}
+        reg_v1 = {"prefix": "v", "name": "1", "lanes": "2", "shape": "d"}
         regs = [reg_d1, reg_q1, reg_v1]
         regs_gp = [reg_w1, reg_x1]
 

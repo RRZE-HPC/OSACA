@@ -8,7 +8,7 @@ import unittest
 
 from pyparsing import ParseException
 
-from osaca.parser import AttrDict, ParserX86ATT
+from osaca.parser import ParserX86ATT
 
 
 class TestParserX86ATT(unittest.TestCase):
@@ -261,22 +261,22 @@ class TestParserX86ATT(unittest.TestCase):
         )
 
     def test_reg_dependency(self):
-        reg_a1 = AttrDict({"name": "rax"})
-        reg_a2 = AttrDict({"name": "eax"})
-        reg_a3 = AttrDict({"name": "ax"})
-        reg_a4 = AttrDict({"name": "al"})
-        reg_r11 = AttrDict({"name": "r11"})
-        reg_r11b = AttrDict({"name": "r11b"})
-        reg_r11d = AttrDict({"name": "r11d"})
-        reg_r11w = AttrDict({"name": "r11w"})
-        reg_xmm1 = AttrDict({"name": "xmm1"})
-        reg_ymm1 = AttrDict({"name": "ymm1"})
-        reg_zmm1 = AttrDict({"name": "zmm1"})
+        reg_a1 = {"name": "rax"}
+        reg_a2 = {"name": "eax"}
+        reg_a3 = {"name": "ax"}
+        reg_a4 = {"name": "al"}
+        reg_r11 = {"name": "r11"}
+        reg_r11b = {"name": "r11b"}
+        reg_r11d = {"name": "r11d"}
+        reg_r11w = {"name": "r11w"}
+        reg_xmm1 = {"name": "xmm1"}
+        reg_ymm1 = {"name": "ymm1"}
+        reg_zmm1 = {"name": "zmm1"}
 
-        reg_b1 = AttrDict({"name": "rbx"})
-        reg_r15 = AttrDict({"name": "r15"})
-        reg_xmm2 = AttrDict({"name": "xmm2"})
-        reg_ymm3 = AttrDict({"name": "ymm3"})
+        reg_b1 = {"name": "rbx"}
+        reg_r15 = {"name": "r15"}
+        reg_xmm2 = {"name": "xmm2"}
+        reg_ymm3 = {"name": "ymm3"}
 
         reg_a = [reg_a1, reg_a2, reg_a3, reg_a4]
         reg_r = [reg_r11, reg_r11b, reg_r11d, reg_r11w]
@@ -310,21 +310,13 @@ class TestParserX86ATT(unittest.TestCase):
     # Helper functions
     ##################
     def _get_comment(self, parser, comment):
-        return " ".join(
-            AttrDict.convert_dict(
-                parser.process_operand(parser.comment.parseString(comment, parseAll=True).asDict())
-            ).comment
-        )
+        return " ".join(parser.process_operand(parser.comment.parseString(comment, parseAll=True).asDict())["COMMENT"])
 
     def _get_label(self, parser, label):
-        return AttrDict.convert_dict(
-            parser.process_operand(parser.label.parseString(label, parseAll=True).asDict())
-        ).label
+        return parser.process_operand(parser.label.parseString(label, parseAll=True).asDict())["LABEL"]
 
     def _get_directive(self, parser, directive):
-        return AttrDict.convert_dict(
-            parser.process_operand(parser.directive.parseString(directive, parseAll=True).asDict())
-        ).directive
+        return parser.process_operand(parser.directive.parseString(directive, parseAll=True).asDict())["DIRECTIVE"]
 
     @staticmethod
     def _find_file(name):

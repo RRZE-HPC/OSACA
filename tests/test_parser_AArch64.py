@@ -8,7 +8,7 @@ import unittest
 
 from pyparsing import ParseException
 
-from osaca.parser import AttrDict, ParserAArch64
+from osaca.parser import ParserAArch64
 
 
 class TestParserAArch64(unittest.TestCase):
@@ -335,17 +335,17 @@ class TestParserAArch64(unittest.TestCase):
         instr_list_with_index = "ld4 {v0.S, v1.S, v2.S, v3.S}[2]"
         instr_range_single = "dummy  { z1.d }"
         reg_list = [
-            AttrDict({"register": {"prefix": "x", "name": "5"}}),
-            AttrDict({"register": {"prefix": "x", "name": "6"}}),
-            AttrDict({"register": {"prefix": "x", "name": "7"}}),
+            {"register": {"prefix": "x", "name": "5"}},
+            {"register": {"prefix": "x", "name": "6"}},
+            {"register": {"prefix": "x", "name": "7"}},
         ]
         reg_list_idx = [
-            AttrDict({"register": {"prefix": "v", "name": "0", "shape": "S", "index": 2}}),
-            AttrDict({"register": {"prefix": "v", "name": "1", "shape": "S", "index": 2}}),
-            AttrDict({"register": {"prefix": "v", "name": "2", "shape": "S", "index": 2}}),
-            AttrDict({"register": {"prefix": "v", "name": "3", "shape": "S", "index": 2}}),
+            {"register": {"prefix": "v", "name": "0", "shape": "S", "index": 2}},
+            {"register": {"prefix": "v", "name": "1", "shape": "S", "index": 2}},
+            {"register": {"prefix": "v", "name": "2", "shape": "S", "index": 2}},
+            {"register": {"prefix": "v", "name": "3", "shape": "S", "index": 2}},
         ]
-        reg_list_single = [AttrDict({"register": {"prefix": "z", "name": "1", "shape": "d"}})]
+        reg_list_single = [{"register": {"prefix": "z", "name": "1", "shape": "d"}}]
 
         prange = self.parser.parse_line(instr_range)
         plist = self.parser.parse_line(instr_list)
@@ -360,22 +360,22 @@ class TestParserAArch64(unittest.TestCase):
         self.assertEqual(p_single.operands, reg_list_single)
 
     def test_reg_dependency(self):
-        reg_1_1 = AttrDict({"prefix": "b", "name": "1"})
-        reg_1_2 = AttrDict({"prefix": "h", "name": "1"})
-        reg_1_3 = AttrDict({"prefix": "s", "name": "1"})
-        reg_1_4 = AttrDict({"prefix": "d", "name": "1"})
-        reg_1_4 = AttrDict({"prefix": "q", "name": "1"})
-        reg_2_1 = AttrDict({"prefix": "w", "name": "2"})
-        reg_2_2 = AttrDict({"prefix": "x", "name": "2"})
-        reg_v1_1 = AttrDict({"prefix": "v", "name": "11", "lanes": "16", "shape": "b"})
-        reg_v1_2 = AttrDict({"prefix": "v", "name": "11", "lanes": "8", "shape": "h"})
-        reg_v1_3 = AttrDict({"prefix": "v", "name": "11", "lanes": "4", "shape": "s"})
-        reg_v1_4 = AttrDict({"prefix": "v", "name": "11", "lanes": "2", "shape": "d"})
+        reg_1_1 = {"prefix": "b", "name": "1"}
+        reg_1_2 = {"prefix": "h", "name": "1"}
+        reg_1_3 = {"prefix": "s", "name": "1"}
+        reg_1_4 = {"prefix": "d", "name": "1"}
+        reg_1_4 = {"prefix": "q", "name": "1"}
+        reg_2_1 = {"prefix": "w", "name": "2"}
+        reg_2_2 = {"prefix": "x", "name": "2"}
+        reg_v1_1 = {"prefix": "v", "name": "11", "lanes": "16", "shape": "b"}
+        reg_v1_2 = {"prefix": "v", "name": "11", "lanes": "8", "shape": "h"}
+        reg_v1_3 = {"prefix": "v", "name": "11", "lanes": "4", "shape": "s"}
+        reg_v1_4 = {"prefix": "v", "name": "11", "lanes": "2", "shape": "d"}
 
-        reg_b5 = AttrDict({"prefix": "b", "name": "5"})
-        reg_q15 = AttrDict({"prefix": "q", "name": "15"})
-        reg_v10 = AttrDict({"prefix": "v", "name": "10", "lanes": "2", "shape": "s"})
-        reg_v20 = AttrDict({"prefix": "v", "name": "20", "lanes": "2", "shape": "d"})
+        reg_b5 = {"prefix": "b", "name": "5"}
+        reg_q15 = {"prefix": "q", "name": "15"}
+        reg_v10 = {"prefix": "v", "name": "10", "lanes": "2", "shape": "s"}
+        reg_v20 = {"prefix": "v", "name": "20", "lanes": "2", "shape": "d"}
 
         reg_1 = [reg_1_1, reg_1_2, reg_1_3, reg_1_4]
         reg_2 = [reg_2_1, reg_2_2]
@@ -409,21 +409,13 @@ class TestParserAArch64(unittest.TestCase):
     # Helper functions
     ##################
     def _get_comment(self, parser, comment):
-        return " ".join(
-            AttrDict.convert_dict(
-                parser.process_operand(parser.comment.parseString(comment, parseAll=True).asDict())
-            ).comment
-        )
+        return " ".join(parser.process_operand(parser.comment.parseString(comment, parseAll=True).asDict())["COMMENT"])
 
     def _get_label(self, parser, label):
-        return AttrDict.convert_dict(
-            parser.process_operand(parser.label.parseString(label, parseAll=True).asDict())
-        ).label
+        return parser.process_operand(parser.label.parseString(label, parseAll=True).asDict()["LABEL"]
 
     def _get_directive(self, parser, directive):
-        return AttrDict.convert_dict(
-            parser.process_operand(parser.directive.parseString(directive, parseAll=True).asDict())
-        ).directive
+        return parser.process_operand(parser.directive.parseString(directive, parseAll=True).asDict())["DIRECTIVE"]
 
     @staticmethod
     def _find_file(name):
