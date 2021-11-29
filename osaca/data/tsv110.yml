@@ -219,13 +219,43 @@ instruction_forms:
 - name: mov
   operands:
   - class: register
+    prefix: w
+  - class: register
+    prefix: w
+  latency: 0.0
+  port_pressure: []
+  throughput: 0.0
+  uops: 0
+- name: mov
+  operands:
+  - class: register
     prefix: x
   - class: register
     prefix: x
-  latency: ~
-  port_pressure: ~
-  throughput: 0.33333
-  uops: ~
+  latency: 0.0
+  port_pressure: []
+  throughput: 0.0
+  uops: 0
+- name: mov
+  operands:
+  - class: register
+    prefix: d
+  - class: register
+    prefix: d
+  latency: 0.0
+  port_pressure: []
+  throughput: 0.0
+  uops: 0
+- name: mov
+  operands:
+  - class: register
+    prefix: q
+  - class: register
+    prefix: q
+  latency: 0.0
+  port_pressure: []
+  throughput: 0.0
+  uops: 0
 - name: sub
   operands:
   - class: register
@@ -403,14 +433,14 @@ instruction_forms:
   operands:
   - class: register
     prefix: v
-    shape: b
+    shape: '*'
   - class: register
     prefix: v
-    shape: b
-  latency: ~
-  port_pressure: ~
-  throughput: 0.5
-  uops: ~
+    shape: '*'
+  latency: 0.0
+  port_pressure: []
+  throughput: 0.0
+  uops: 0
 - name: cmp
   operands:
   - class: register
