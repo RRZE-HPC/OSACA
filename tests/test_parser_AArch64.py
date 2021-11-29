@@ -8,7 +8,7 @@ import unittest
 
 from pyparsing import ParseException
 
-from osaca.parser import ParserAArch64
+from osaca.parser import ParserAArch64, IdentifierOperand, DirectiveOperand, ImmediateOperand, PrefetchOperand, RegisterOperand, MemoryOperand, InstructionForm
 
 
 class TestParserAArch64(unittest.TestCase):
@@ -33,24 +33,24 @@ class TestParserAArch64(unittest.TestCase):
         )
 
     def test_label_parser(self):
-        self.assertEqual(self._get_label(self.parser, "main:").name, "main")
-        self.assertEqual(self._get_label(self.parser, "..B1.10:").name, "..B1.10")
-        self.assertEqual(self._get_label(self.parser, ".2.3_2_pack.3:").name, ".2.3_2_pack.3")
-        self.assertEqual(self._get_label(self.parser, ".L1:\t\t\t//label1").name, ".L1")
+        self.assertEqual(self._get_label(self.parser, "main:")["name"], "main")
+        self.assertEqual(self._get_label(self.parser, "..B1.10:")["name"], "..B1.10")
+        self.assertEqual(self._get_label(self.parser, ".2.3_2_pack.3:")["name"], ".2.3_2_pack.3")
+        self.assertEqual(self._get_label(self.parser, ".L1:\t\t\t//label1")["name"], ".L1")
         self.assertEqual(
-            " ".join(self._get_label(self.parser, ".L1:\t\t\t//label1").comment),
+            " ".join(self._get_label(self.parser, ".L1:\t\t\t//label1")["COMMENT"]),
             "label1",
         )
         with self.assertRaises(ParseException):
             self._get_label(self.parser, "\t.cfi_startproc")
 
     def test_directive_parser(self):
-        self.assertEqual(self._get_directive(self.parser, "\t.text").name, "text")
-        self.assertEqual(len(self._get_directive(self.parser, "\t.text").parameters), 0)
-        self.assertEqual(self._get_directive(self.parser, "\t.align\t16,0x90").name, "align")
-        self.assertEqual(len(self._get_directive(self.parser, "\t.align\t16,0x90").parameters), 2)
+        self.assertEqual(self._get_directive(self.parser, "\t.text")["name"], "text")
+        self.assertEqual(len(self._get_directive(self.parser, "\t.text")["parameters"]), 0)
+        self.assertEqual(self._get_directive(self.parser, "\t.align\t16,0x90")["name"], "align")
+        self.assertEqual(len(self._get_directive(self.parser, "\t.align\t16,0x90")["parameters"]), 2)
         self.assertEqual(
-            self._get_directive(self.parser, "\t.align\t16,0x90").parameters[1], "0x90"
+            self._get_directive(self.parser, "\t.align\t16,0x90")["parameters"][1], "0x90"
         )
         self.assertEqual(
             self._get_directive(self.parser, "        .byte 100,103,144       //IACA START")[
@@ -67,7 +67,7 @@ class TestParserAArch64(unittest.TestCase):
         self.assertEqual(
             " ".join(
                 self._get_directive(self.parser, "        .byte 100,103,144       //IACA START")[
-                    "comment"
+                    "COMMENT"
                 ]
             ),
             "IACA START",
@@ -90,57 +90,58 @@ class TestParserAArch64(unittest.TestCase):
         parsed_6 = self.parser.parse_instruction(instr6)
         parsed_7 = self.parser.parse_instruction(instr7)
 
-        self.assertEqual(parsed_1.instruction, "vcvt.F32.S32")
-        self.assertEqual(parsed_1.operands[0].register.name, "1")
-        self.assertEqual(parsed_1.operands[0].register.prefix, "w")
-        self.assertEqual(parsed_1.operands[1].register.name, "2")
-        self.assertEqual(parsed_1.operands[1].register.prefix, "w")
-        self.assertEqual(parsed_1.comment, "12.27")
+        self.assertEqual(parsed_1["MNEMONIC"], "vcvt.F32.S32")
+        self.assertEqual(parsed_1["OPERANDS"][0].regid, "1")
+        self.assertEqual(parsed_1["OPERANDS"][0].prefix, "w")
+        self.assertEqual(parsed_1["OPERANDS"][1].regid, "2")
+        self.assertEqual(parsed_1["OPERANDS"][1].prefix, "w")
+        self.assertEqual(parsed_1["COMMENT"], "12.27")
 
-        self.assertEqual(parsed_2.instruction, "b.lo")
-        self.assertEqual(parsed_2.operands[0].identifier.name, "..B1.4")
-        self.assertEqual(len(parsed_2.operands), 1)
-        self.assertIsNone(parsed_2.comment)
+        self.assertEqual(parsed_2["MNEMONIC"], "b.lo")
+        self.assertEqual(parsed_2["OPERANDS"][0].name, "..B1.4")
+        self.assertEqual(len(parsed_2["OPERANDS"]), 1)
+        self.assertIsNone(parsed_2["COMMENT"])
 
-        self.assertEqual(parsed_3.instruction, "mov")
-        self.assertEqual(parsed_3.operands[0].register.name, "2")
-        self.assertEqual(parsed_3.operands[0].register.prefix, "x")
-        self.assertEqual(parsed_3.operands[1].immediate.value, int("0x222", 0))
-        self.assertEqual(parsed_3.comment, "NOT IACA END")
+        self.assertEqual(parsed_3["MNEMONIC"], "mov")
+        self.assertEqual(parsed_3["OPERANDS"][0].regid, "2")
+        self.assertEqual(parsed_3["OPERANDS"][0].prefix, "x")
+        self.assertEqual(parsed_3["OPERANDS"][1].value, int("0x222", 0))
+        self.assertEqual(parsed_3["COMMENT"], "NOT IACA END")
 
-        self.assertEqual(parsed_4.instruction, "str")
-        self.assertIsNone(parsed_4.operands[1].memory.offset)
-        self.assertEqual(parsed_4.operands[1].memory.base.name, "sp")
-        self.assertEqual(parsed_4.operands[1].memory.base.prefix, "x")
-        self.assertEqual(parsed_4.operands[1].memory.index.name, "1")
-        self.assertEqual(parsed_4.operands[1].memory.index.prefix, "x")
-        self.assertEqual(parsed_4.operands[1].memory.scale, 16)
-        self.assertEqual(parsed_4.operands[0].register.name, "28")
-        self.assertEqual(parsed_4.operands[0].register.prefix, "x")
-        self.assertEqual(parsed_4.comment, "12.9")
+        self.assertEqual(parsed_4["MNEMONIC"], "str")
+        self.assertIsNone(parsed_4["OPERANDS"][1].offset)
+        self.assertEqual(parsed_4["OPERANDS"][1].base.name, "sp")
+        self.assertEqual(parsed_4["OPERANDS"][1].base.regid, "31")
+        self.assertEqual(parsed_4["OPERANDS"][1].base.prefix, "x")
+        self.assertEqual(parsed_4["OPERANDS"][1].index.regid, "1")
+        self.assertEqual(parsed_4["OPERANDS"][1].index.prefix, "x")
+        self.assertEqual(parsed_4["OPERANDS"][1].scale, 16)
+        self.assertEqual(parsed_4["OPERANDS"][0].regid, "28")
+        self.assertEqual(parsed_4["OPERANDS"][0].prefix, "x")
+        self.assertEqual(parsed_4["COMMENT"], "12.9")
 
-        self.assertEqual(parsed_5.instruction, "ldr")
-        self.assertEqual(parsed_5.operands[0].register.name, "0")
-        self.assertEqual(parsed_5.operands[0].register.prefix, "x")
-        self.assertEqual(parsed_5.operands[1].memory.offset.identifier.name, "q2c")
-        self.assertEqual(parsed_5.operands[1].memory.offset.identifier.relocation, ":got_lo12:")
-        self.assertEqual(parsed_5.operands[1].memory.base.name, "0")
-        self.assertEqual(parsed_5.operands[1].memory.base.prefix, "x")
-        self.assertIsNone(parsed_5.operands[1].memory.index)
-        self.assertEqual(parsed_5.operands[1].memory.scale, 1)
+        self.assertEqual(parsed_5["MNEMONIC"], "ldr")
+        self.assertEqual(parsed_5["OPERANDS"][0].regid, "0")
+        self.assertEqual(parsed_5["OPERANDS"][0].prefix, "x")
+        self.assertEqual(parsed_5["OPERANDS"][1].offset.name, "q2c")
+        self.assertEqual(parsed_5["OPERANDS"][1].offset.relocation, ":got_lo12:")
+        self.assertEqual(parsed_5["OPERANDS"][1].base.regid, "0")
+        self.assertEqual(parsed_5["OPERANDS"][1].base.prefix, "x")
+        self.assertIsNone(parsed_5["OPERANDS"][1].index)
+        self.assertEqual(parsed_5["OPERANDS"][1].scale, 1)
 
-        self.assertEqual(parsed_6.instruction, "adrp")
-        self.assertEqual(parsed_6.operands[0].register.name, "0")
-        self.assertEqual(parsed_6.operands[0].register.prefix, "x")
-        self.assertEqual(parsed_6.operands[1].identifier.relocation, ":got:")
-        self.assertEqual(parsed_6.operands[1].identifier.name, "visited")
+        self.assertEqual(parsed_6["MNEMONIC"], "adrp")
+        self.assertEqual(parsed_6["OPERANDS"][0].regid, "0")
+        self.assertEqual(parsed_6["OPERANDS"][0].prefix, "x")
+        self.assertEqual(parsed_6["OPERANDS"][1].relocation, ":got:")
+        self.assertEqual(parsed_6["OPERANDS"][1].name, ":got:visited")
 
-        self.assertEqual(parsed_7.instruction, "fadd")
-        self.assertEqual(parsed_7.operands[0].register.name, "17")
-        self.assertEqual(parsed_7.operands[0].register.prefix, "v")
-        self.assertEqual(parsed_7.operands[0].register.lanes, "2")
-        self.assertEqual(parsed_7.operands[0].register.shape, "d")
-        self.assertEqual(self.parser.get_full_reg_name(parsed_7.operands[2].register), "v1.2d")
+        self.assertEqual(parsed_7["MNEMONIC"], "fadd")
+        self.assertEqual(parsed_7["OPERANDS"][0].regid, "17")
+        self.assertEqual(parsed_7["OPERANDS"][0].prefix, "v")
+        self.assertEqual(parsed_7["OPERANDS"][0].lanes, "2")
+        self.assertEqual(parsed_7["OPERANDS"][0].shape, "d")
+        self.assertEqual(self.parser.get_full_reg_name(parsed_7["OPERANDS"][2]), "v1.2d")
 
     def test_parse_line(self):
         line_comment = "// -- Begin  main"
@@ -152,135 +153,75 @@ class TestParserAArch64(unittest.TestCase):
         line_postindexed = "ldp q2, q3, [x11], #64"
         line_5_operands = "fcmla z26.d, p0/m, z29.d, z21.d, #90"
 
-        instruction_form_1 = {
-            "instruction": None,
-            "operands": [],
-            "directive": None,
-            "comment": "-- Begin main",
-            "label": None,
-            "line": "// -- Begin  main",
-            "line_number": 1,
-        }
-
-        instruction_form_2 = {
-            "instruction": None,
-            "operands": [],
-            "directive": None,
-            "comment": "=>This Inner Loop Header: Depth=1",
-            "label": ".LBB0_1",
-            "line": ".LBB0_1:              // =>This Inner Loop Header: Depth=1",
-            "line_number": 2,
-        }
-        instruction_form_3 = {
-            "instruction": None,
-            "operands": [],
-            "directive": {"name": "cfi_def_cfa", "parameters": ["w29", "-16"]},
-            "comment": None,
-            "label": None,
-            "line": ".cfi_def_cfa w29, -16",
-            "line_number": 3,
-        }
-        instruction_form_4 = {
-            "instruction": "ldr",
-            "operands": [
-                {"register": {"prefix": "s", "name": "0"}},
-                {
-                    "memory": {
-                        "offset": None,
-                        "base": {"prefix": "x", "name": "11"},
-                        "index": {
-                            "prefix": "w",
-                            "name": "10",
-                            "shift_op": "sxtw",
-                            "immediate": {"value": "2"},
-                            "shift": [{"value": "2"}],
-                        },
-                        "scale": 4,
-                    }
-                },
+        instruction_form_1 = InstructionForm("// -- Begin  main", comment="-- Begin main", line_number=1)
+        instruction_form_2 = InstructionForm(
+            ".LBB0_1:              // =>This Inner Loop Header: Depth=1",
+            comment="=>This Inner Loop Header: Depth=1",
+            label=IdentifierOperand(".LBB0_1"),
+            line_number=2
+        )
+        instruction_form_3 = InstructionForm(
+            ".cfi_def_cfa w29, -16",
+            directive=DirectiveOperand(".cfi_def_cfa w29, -16", directive="cfi_def_cfa", parameters=["w29", "-16"]),
+            line_number=3
+        )
+        instruction_form_4 = InstructionForm(
+            "ldr s0, [x11, w10, sxtw #2]    // = <<2",
+            mnemonic="ldr",
+            operands=[
+                RegisterOperand("s0", width=32, prefix="s", regid="0", regtype="vector"),
+                MemoryOperand(
+                    "[x11, w10, sxtw #2]",
+                    base=RegisterOperand("x11", width=64, prefix="x", regid="11", regtype="gpr"),
+                    index=RegisterOperand("w10", width=32, prefix="w", regid="10", regtype="gpr"),
+                    scale=4
+                ),
             ],
-            "directive": None,
-            "comment": "= <<2",
-            "label": None,
-            "line": "ldr s0, [x11, w10, sxtw #2]    // = <<2",
-            "line_number": 4,
-        }
-        instruction_form_5 = {
-            "instruction": "prfm",
-            "operands": [
-                {"prfop": {"type": ["PLD"], "target": ["L1"], "policy": ["KEEP"]}},
-                {
-                    "memory": {
-                        "offset": {"value": 2048},
-                        "base": {"prefix": "x", "name": "26"},
-                        "index": None,
-                        "scale": 1,
-                    }
-                },
+            comment="= <<2",
+            line_number=4
+        )
+        instruction_form_5 = InstructionForm(
+            "prfm    pldl1keep, [x26, #2048] //HPL",
+            mnemonic="prfm",
+            operands=[
+                PrefetchOperand("PLD", "L1", "KEEP"),
+                MemoryOperand("[x26, #2048]", base=RegisterOperand("x26", width=64, prefix="x", regid="26", regtype="gpr"), offset=ImmediateOperand(2048))
             ],
-            "directive": None,
-            "comment": "HPL",
-            "label": None,
-            "line": "prfm    pldl1keep, [x26, #2048] //HPL",
-            "line_number": 5,
-        }
-        instruction_form_6 = {
-            "instruction": "stp",
-            "operands": [
-                {"register": {"prefix": "x", "name": "29"}},
-                {"register": {"prefix": "x", "name": "30"}},
-                {
-                    "memory": {
-                        "offset": {"value": -16},
-                        "base": {"name": "sp", "prefix": "x"},
-                        "index": None,
-                        "scale": 1,
-                        "pre_indexed": True,
-                    }
-                },
+            comment="HPL",
+            line_number=5
+        )
+        instruction_form_6 = InstructionForm(
+            "stp x29, x30, [sp, #-16]!",
+            mnemonic="stp",
+            operands=[
+                RegisterOperand("x29", width=64, prefix="x", regid="29", regtype="gpr"),
+                RegisterOperand("x30", width=64, prefix="x", regid="30", regtype="gpr"),
+                MemoryOperand("[sp, #-16]!", base=RegisterOperand("sp", width=64, prefix="x", regid="31", regtype="gpr"), offset=ImmediateOperand(-16), pre_indexed=True)
             ],
-            "directive": None,
-            "comment": None,
-            "label": None,
-            "line": "stp x29, x30, [sp, #-16]!",
-            "line_number": 6,
-        }
-        instruction_form_7 = {
-            "instruction": "ldp",
-            "operands": [
-                {"register": {"prefix": "q", "name": "2"}},
-                {"register": {"prefix": "q", "name": "3"}},
-                {
-                    "memory": {
-                        "offset": None,
-                        "base": {"prefix": "x", "name": "11"},
-                        "index": None,
-                        "scale": 1,
-                        "post_indexed": {"value": 64},
-                    }
-                },
+            line_number=6
+        )
+        instruction_form_7 = InstructionForm(
+            "ldp q2, q3, [x11], #64",
+            mnemonic="ldp",
+            operands=[
+                RegisterOperand("q2", width=128, prefix="q", regid="2", regtype="vector"),
+                RegisterOperand("q3", width=128, prefix="q", regid="3", regtype="vector"),
+                MemoryOperand("[x11]", base=RegisterOperand("x11", width=64, prefix="x", regid="11", regtype="gpr"), post_indexed=True, indexed_val=ImmediateOperand(64))
             ],
-            "directive": None,
-            "comment": None,
-            "label": None,
-            "line": "ldp q2, q3, [x11], #64",
-            "line_number": 7,
-        }
-        instruction_form_8 = {
-            "instruction": "fcmla",
-            "operands": [
-                {"register": {"prefix": "z", "name": "26", "shape": "d"}},
-                {"register": {"prefix": "p", "name": "0", "predication": "m"}},
-                {"register": {"prefix": "z", "name": "29", "shape": "d"}},
-                {"register": {"prefix": "z", "name": "21", "shape": "d"}},
-                {"immediate": {"value": 90, "type": "int"}},
+            line_number=7
+        )
+        instruction_form_8 = InstructionForm(
+            "fcmla z26.d, p0/m, z29.d, z21.d, #90",
+            mnemonic="fcmla",
+            operands=[
+                RegisterOperand("z26", width=512, prefix="z", regid="26", regtype="vector", shape="d"),
+                RegisterOperand("p0/m", width=64, prefix="p", regid="0", regtype="predicate", zeroing=False),
+                RegisterOperand("z29", width=512, prefix="z", regid="29", regtype="vector", shape="d"),
+                RegisterOperand("z21", width=512, prefix="z", regid="21", regtype="vector", shape="d"),
+                ImmediateOperand(90)
             ],
-            "directive": None,
-            "comment": None,
-            "label": None,
-            "line": "fcmla z26.d, p0/m, z29.d, z21.d, #90",
-            "line_number": 8,
-        }
+            line_number=8
+        )
 
         parsed_1 = self.parser.parse_line(line_comment, 1)
         parsed_2 = self.parser.parse_line(line_label, 2)
@@ -335,17 +276,17 @@ class TestParserAArch64(unittest.TestCase):
         instr_list_with_index = "ld4 {v0.S, v1.S, v2.S, v3.S}[2]"
         instr_range_single = "dummy  { z1.d }"
         reg_list = [
-            {"register": {"prefix": "x", "name": "5"}},
-            {"register": {"prefix": "x", "name": "6"}},
-            {"register": {"prefix": "x", "name": "7"}},
+            RegisterOperand("x5", prefix="x", width=64, regid="5", regtype="gpr"),
+            RegisterOperand("x6", prefix="x", width=64, regid="6", regtype="gpr"),
+            RegisterOperand("x7", prefix="x", width=64, regid="7", regtype="gpr"),
         ]
         reg_list_idx = [
-            {"register": {"prefix": "v", "name": "0", "shape": "S", "index": 2}},
-            {"register": {"prefix": "v", "name": "1", "shape": "S", "index": 2}},
-            {"register": {"prefix": "v", "name": "2", "shape": "S", "index": 2}},
-            {"register": {"prefix": "v", "name": "3", "shape": "S", "index": 2}},
+            RegisterOperand("v0.S", prefix="v", width=128, regid="0", regtype="vector", shape="s", index="2"),
+            RegisterOperand("v1.S", prefix="v", width=128, regid="1", regtype="vector", shape="s", index="2"),
+            RegisterOperand("v2.S", prefix="v", width=128, regid="2", regtype="vector", shape="s", index="2"),
+            RegisterOperand("v3.S", prefix="v", width=128, regid="3", regtype="vector", shape="s", index="2"),
         ]
-        reg_list_single = [{"register": {"prefix": "z", "name": "1", "shape": "d"}}]
+        reg_list_single = [RegisterOperand("z1.d", prefix="z", width=512, regid="1", regtype="vector", shape="d")]
 
         prange = self.parser.parse_line(instr_range)
         plist = self.parser.parse_line(instr_list)
@@ -353,31 +294,35 @@ class TestParserAArch64(unittest.TestCase):
         p_idx_list = self.parser.parse_line(instr_list_with_index)
         p_single = self.parser.parse_line(instr_range_single)
 
-        self.assertEqual(prange.operands, reg_list)
-        self.assertEqual(plist.operands, reg_list)
-        self.assertEqual(p_idx_range.operands, reg_list_idx)
-        self.assertEqual(p_idx_list.operands, reg_list_idx)
+        for idx in range(len(prange.operands)):
+            self.assertEqual(prange.operands[idx], reg_list[idx])
+        for idx in range(len(plist.operands)):
+            self.assertEqual(plist.operands[idx], reg_list[idx])
+        for idx in range(len(p_idx_range.operands)):
+            self.assertEqual(p_idx_range.operands[idx], reg_list_idx[idx])
+        for idx in range(len(p_idx_list.operands)):
+            self.assertEqual(p_idx_list.operands[idx], reg_list_idx[idx])
         self.assertEqual(p_single.operands, reg_list_single)
 
     def test_reg_dependency(self):
-        reg_1_1 = {"prefix": "b", "name": "1"}
-        reg_1_2 = {"prefix": "h", "name": "1"}
-        reg_1_3 = {"prefix": "s", "name": "1"}
-        reg_1_4 = {"prefix": "d", "name": "1"}
-        reg_1_4 = {"prefix": "q", "name": "1"}
-        reg_2_1 = {"prefix": "w", "name": "2"}
-        reg_2_2 = {"prefix": "x", "name": "2"}
-        reg_v1_1 = {"prefix": "v", "name": "11", "lanes": "16", "shape": "b"}
-        reg_v1_2 = {"prefix": "v", "name": "11", "lanes": "8", "shape": "h"}
-        reg_v1_3 = {"prefix": "v", "name": "11", "lanes": "4", "shape": "s"}
-        reg_v1_4 = {"prefix": "v", "name": "11", "lanes": "2", "shape": "d"}
+        reg_1_1 = RegisterOperand("b1", width=8, prefix="b", regid="1", regtype="vector")
+        reg_1_2 = RegisterOperand("h1", width=16, prefix="h", regid="1", regtype="vector")
+        reg_1_3 = RegisterOperand("s1", width=32, prefix="s", regid="1", regtype="vector")
+        reg_1_4 = RegisterOperand("d1", width=64, prefix="d", regid="1", regtype="vector")
+        reg_1_5 = RegisterOperand("q1", width=128, prefix="q", regid="1", regtype="vector")
+        reg_2_1 = RegisterOperand("w2", width=32, prefix="w", regid="2", regtype="gpr")
+        reg_2_2 = RegisterOperand("x2", width=64, prefix="x", regid="2", regtype="gpr")
+        reg_v1_1 = RegisterOperand("v11", width=128, prefix="v", regid="11", regtype="vector", lanes=16, shape="b")
+        reg_v1_2 = RegisterOperand("v11", width=128, prefix="v", regid="11", regtype="vector", lanes=8, shape="h")
+        reg_v1_3 = RegisterOperand("v11", width=128, prefix="v", regid="11", regtype="vector", lanes=4, shape="s")
+        reg_v1_4 = RegisterOperand("v11", width=128, prefix="v", regid="11", regtype="vector", lanes=2, shape="d")
 
-        reg_b5 = {"prefix": "b", "name": "5"}
-        reg_q15 = {"prefix": "q", "name": "15"}
-        reg_v10 = {"prefix": "v", "name": "10", "lanes": "2", "shape": "s"}
-        reg_v20 = {"prefix": "v", "name": "20", "lanes": "2", "shape": "d"}
+        reg_b5 = RegisterOperand("b5", width=8, prefix="b", regid="5", regtype="vector")
+        reg_q15 = RegisterOperand("q15", width=128, prefix="q", regid="15", regtype="vector")
+        reg_v10 = RegisterOperand("v10", width=128, prefix="v", regid="10", regtype="vector", lanes=4, shape="s")
+        reg_v20 = RegisterOperand("v20", width=128, prefix="v", regid="20", regtype="vector", lanes=2, shape="d")
 
-        reg_1 = [reg_1_1, reg_1_2, reg_1_3, reg_1_4]
+        reg_1 = [reg_1_1, reg_1_2, reg_1_3, reg_1_4, reg_1_5]
         reg_2 = [reg_2_1, reg_2_2]
         reg_v = [reg_v1_1, reg_v1_2, reg_v1_3, reg_v1_4]
         reg_others = [reg_b5, reg_q15, reg_v10, reg_v20]
@@ -412,7 +357,7 @@ class TestParserAArch64(unittest.TestCase):
         return " ".join(parser.process_operand(parser.comment.parseString(comment, parseAll=True).asDict())["COMMENT"])
 
     def _get_label(self, parser, label):
-        return parser.process_operand(parser.label.parseString(label, parseAll=True).asDict()["LABEL"]
+        return parser.process_operand(parser.label.parseString(label, parseAll=True).asDict())["LABEL"]
 
     def _get_directive(self, parser, directive):
         return parser.process_operand(parser.directive.parseString(directive, parseAll=True).asDict())["DIRECTIVE"]

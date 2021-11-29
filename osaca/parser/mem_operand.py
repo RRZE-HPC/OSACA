@@ -30,6 +30,12 @@ class MemoryOperand(Operand):
         self.post_indexed = post_indexed
         self.indexed_val = indexed_val
 
+    def __eq__(self, other):
+        for key, val in self.__dict__.items():
+            if val != other.__dict__[key]:
+                return False
+        return True
+
     def __str__(self):
         return self.name
 
@@ -41,12 +47,11 @@ class MemoryOperand(Operand):
         mask_str = "" if not self.mask else "{{{}}}".format(repr(self.mask))
         indexed_str = "" if not self.post_indexed or self.pre_indexed else ", {}".format(repr(self.indexed_val))
         indexed_str += "!" if self.pre_indexed else ""
-        return "Mem({}({}{}{}){}{}{})".format(
+        return "Mem({}({}{}{}){}{})".format(
             offs_str,
             base_str,
             index_str,
             scale_str,
-            "!" if self.pre_indexed else "",
             mask_str,
             indexed_str,
         )

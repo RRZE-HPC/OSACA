@@ -32,6 +32,12 @@ class InstructionForm:
         self.port_uops = []
         self.flags = []
 
+    def __eq__(self, other):
+        for key, val in self.__dict__.items():
+            if val != other.__dict__[key]:
+                return False
+        return True
+
     def __str__(self):
         return self.line
 

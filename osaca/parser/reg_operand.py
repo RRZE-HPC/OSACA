@@ -48,6 +48,19 @@ class RegisterOperand(Operand):
             self.prefix, self.regid, self.width, self.regtype, add_str
         )
 
+    def __eq__(self, other):
+        if (
+            self.prefix.lower() == other.prefix.lower()
+            and self.regid.lower() == other.regid.lower()
+            and self.regtype == other.regtype
+            and self.shape == other.shape
+            and (any(te.lanes is None for te in [self, other]) or self.lanes == other.lanes)
+            and (any(te.index is None for te in [self, other]) or self.index == other.index)
+            and (any(te.mask is None for te in [self, other]) or self.mask == other.mask)
+        ):
+            return True
+        return False
+
     def is_dependent_of(self, operand):
         if not isinstance(operand, RegisterOperand) or not isinstance(operand, MemoryOperand):
             return False

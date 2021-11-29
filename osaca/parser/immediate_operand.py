@@ -10,6 +10,11 @@ class ImmediateOperand(Operand):
         self.value = self.conv2decimal(value)
         self.itype = "int" if int(self.value) == self.value else "float"
 
+    def __eq__(self, other):
+        if not isinstance(other, ImmediateOperand):
+            return False
+        return self.value == other.value
+
     def __str__(self):
         return str(self.value)
 
@@ -19,7 +24,7 @@ class ImmediateOperand(Operand):
     def conv2decimal(self, value):
         try:
             return int(value, 0)
-        except ValueError:
+        except (ValueError, TypeError):
             # check for float
             try:
                 tmp_val = float(value)

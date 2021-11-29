@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
-from copy import deepcopy
 import pyparsing as pp
+from copy import deepcopy
+import re
 
 from osaca.parser import BaseParser, DirectiveOperand, IdentifierOperand, ImmediateOperand, MemoryOperand, RegisterOperand, PrefetchOperand, InstructionForm
 
@@ -213,9 +214,9 @@ class ParserAArch64(BaseParser):
         )
 
         # for testing
-        self.predicate = predicate
-        self.vector = vector
-        self.register = register
+        # self.predicate = predicate
+        # self.vector = vector
+        # self.register = register
 
     def parse_line(self, line, line_number=None):
         """
@@ -247,7 +248,7 @@ class ParserAArch64(BaseParser):
         if result is None:
             try:
                 result = self.process_operand(self.label.parseString(line, parseAll=True).asDict())
-                instruction_form.label = result["LABEL"]["name"]
+                instruction_form.label = IdentifierOperand(result["LABEL"]["name"], offset=result["LABEL"].get("offset", None), relocation=result["LABEL"].get("relocation", None))
                 if "COMMENT" in result["LABEL"]:
                     instruction_form.comment = " ".join(
                         result["LABEL"]["COMMENT"]
@@ -262,7 +263,7 @@ class ParserAArch64(BaseParser):
                     self.directive.parseString(line, parseAll=True).asDict()
                 )
                 instruction_form.directive = DirectiveOperand(
-                    ".{} {}".format(result["DIRECTIVE"]["name"], ",".join(result["DIRECTIVE"]["parameters"],
+                    ".{} {}".format(result["DIRECTIVE"]["name"], ",".join(result["DIRECTIVE"]["parameters"])),
                     result["DIRECTIVE"]["name"],
                     result["DIRECTIVE"]["parameters"],
                 )
@@ -281,7 +282,7 @@ class ParserAArch64(BaseParser):
                 raise ValueError(
                     "Unable to parse {!r} on line {}".format(line, line_number)
                 ) from e
-            instruction_form.mnemonic = result["MNEMONIC"]
+            instruction_form.mnemonic = result["MNEMONIC"].upper()
             instruction_form.operands += result["OPERANDS"]
             instruction_form.comment = result["COMMENT"]
 
@@ -296,32 +297,63 @@ class ParserAArch64(BaseParser):
         """
         result = self.instruction_parser.parseString(instruction, parseAll=True).asDict()
         operands = []
-        operand_strings = [op[:-1] if op[-1] == "," else op for op in instruction.split()[1:]]
+        # operand_strings = [op[:-1] if op[-1] == "," else op for op in instruction.split()[1:]]
+        operand_strings = [x for x in re.split(r"\s+|,", instruction.strip()) if x != ""]
+        if re.search(r"\s", operand_strings[0]):
+            operand_strings[0] = "".join(operand_strings[0].split()[1:])
+        else:
+            del(operand_strings[0])
+        start_idx_par = [i for i, x in enumerate(operand_strings) if re.search(r"^\[.*", x)]
+        end_idx_par = [i for i, x in enumerate(operand_strings) if re.search(r".*\]!?$", x)]
+        if len(start_idx_par) > 0 and len(end_idx_par) > 0:
+            tmp_split = re.split(r"\[|\]", instruction)
+            mem_op = "[" + tmp_split[1] + "]" + ("!" if tmp_split[2].startswith("!") else "")
+            operand_strings[start_idx_par[0] : end_idx_par[0] + 1] = [mem_op]
         # Add operands to list
         # Check first operand
         if "operand1" in result:
             operand = self.process_operand(result["operand1"])
-            operand.name = operand_strings[0]
+            if not isinstance(operand, list):
+                operand.name = operand_strings[0]
+            elif "range" in result["operand1"]:
+                for i in range(len(operand)):
+                    operand[i].name = operand_strings[0]
             operands.extend(operand) if isinstance(operand, list) else operands.append(operand)
         # Check second operand
         if "operand2" in result:
             operand = self.process_operand(result["operand2"])
-            operand.name = operand_strings[1]
+            if not isinstance(operand, list):
+                operand.name = operand_strings[1]
+            else:
+                for i in range(len(operand)):
+                    operand[i].name = operand_strings[1]
             operands.extend(operand) if isinstance(operand, list) else operands.append(operand)
         # Check third operand
         if "operand3" in result:
             operand = self.process_operand(result["operand3"])
-            operand.name = operand_strings[2]
+            if not isinstance(operand, list):
+                operand.name = operand_strings[2]
+            else:
+                for i in range(len(operand)):
+                    operand[i].name = operand_strings[2]
             operands.extend(operand) if isinstance(operand, list) else operands.append(operand)
         # Check fourth operand
         if "operand4" in result:
             operand = self.process_operand(result["operand4"])
-            operand.name = operand_strings[3]
+            if not isinstance(operand, list):
+                operand.name = operand_strings[3]
+            else:
+                for i in range(len(operand)):
+                    operand[i].name = operand_strings[3]
             operands.extend(operand) if isinstance(operand, list) else operands.append(operand)
         # Check fifth operand
         if "operand5" in result:
             operand = self.process_operand(result["operand5"])
-            operand.name = operand_strings[4]
+            if not isinstance(operand, list):
+                operand.name = operand_strings[4]
+            else:
+                for i in range(len(operand)):
+                    operand[i].name = operand_strings[4]
             operands.extend(operand) if isinstance(operand, list) else operands.append(operand)
 
         return_dict = {
@@ -355,7 +387,7 @@ class ParserAArch64(BaseParser):
         # structure register lists
         if "list" in register or "range" in register:
             # resolve ranges and lists
-            return self.resolve_range_list(self.process_register_list(register))
+            return self.process_register_list(register)
         return self.get_regop_info_by_reg(register)
 
     def process_memory_address(self, memory_address):
@@ -370,6 +402,8 @@ class ParserAArch64(BaseParser):
             offset = offset[0]
         if offset is not None and "value" in offset:
             offset = ImmediateOperand(offset["value"])
+        elif offset is not None and "IDENTIFIER" in offset:
+            offset = IdentifierOperand(offset["IDENTIFIER"]["name"], offset["IDENTIFIER"].get("offset", None), offset["IDENTIFIER"].get("relocation", None))
         # convert base to operand
         if base is not None and "name" in base:
             base = self.get_regop_info_by_reg(base)
@@ -399,12 +433,15 @@ class ParserAArch64(BaseParser):
         if "name" not in reg:
             return None
         regid = reg["name"].lower()
+        # special treatment for stack pointer
         if regid == "sp":
-            # special treatment for stack pointer
+            name_str = "sp"
             reg["prefix"] = "x"
-        name_str = self.get_full_reg_name(reg)
-        regtype = self.get_reg_type(reg)
+            regid = "31"
+        else:
+            name_str = self.get_full_reg_name(reg)
         prefix = reg["prefix"]
+        regtype = self.get_reg_type(reg)
         shape = reg.get("shape", None)
         shape = shape.lower() if shape is not None else None
         index = reg.get("index", None)
@@ -414,6 +451,10 @@ class ParserAArch64(BaseParser):
                 width = 32
             else:
                 width = 64
+        elif regtype == "predicate":
+            # predicate registers are 1/8 of z reg length
+            # Since SVE allows variable reg widths, we cannot be sure here, but assume 512b
+            width = 64
         else:
             # vector
             if prefix == "b":
@@ -445,58 +486,39 @@ class ParserAArch64(BaseParser):
         )
         return reg
 
-    def resolve_range_list(self, operand):
-        """Resolve range or list register operand to list of registers."""
-        if "register" in operand:
-            if "list" in operand["REGISTER"]:
-                index = operand["REGISTER"].get("index")
-                range_list = []
-                for reg in operand["REGISTER"]["list"]:
-                    reg = deepcopy(reg)
-                    if index is not None:
-                        reg["index"] = int(index, 0)
-                    range_list.append({"REGISTER": reg})
-                return range_list
-            elif "range" in operand.register:
-                base_register = operand["REGISTER"]["range"][0]
-                index = operand["REGISTER"].get("index")
-                range_list = []
-                start_name = base_register["name"]
-                end_name = operand["REGISTER"]["range"][1]["name"]
-                for name in range(int(start_name), int(end_name) + 1):
-                    reg = deepcopy(base_register)
-                    if index is not None:
-                        reg["index"] = int(index, 0)
-                    reg["name"] = str(name)
-                    range_list.append({"REGISTER": reg})
-                return range_list
-        # neither register list nor range, return unmodified
-        return operand
-
     def process_register_list(self, register_list):
         """Post-process register lists (e.g., {r0,r3,r5}) and register ranges (e.g., {r0-r7})"""
         # Remove unnecessarily created dictionary entries during parsing
         rlist = []
-        dict_name = ""
-        if "list" in register_list:
-            dict_name = "list"
-        if "range" in register_list:
-            dict_name = "range"
-        for r in register_list[dict_name]:
-            rlist.append(
-                self.list_element.parseString(r, parseAll=True).asDict()
-            )
+        dict_name = "list" if "list" in register_list else "range"
         index = register_list.get("index", None)
-        new_dict = {dict_name: rlist, "index": index}
-        if len(new_dict[dict_name]) == 1:
-            return {"REGISTER": new_dict[dict_name][0]}
-        return {"REGISTER": new_dict}
+        if dict_name == "range":
+            asm_name = "{" + "-".join(r for r in register_list[dict_name]) + "}"
+        for r in register_list[dict_name]:
+            tmp_r = self.get_regop_info_by_reg(self.list_element.parseString(r, parseAll=True).asDict())
+            tmp_r.index = index
+            rlist.append(tmp_r)
+        if dict_name == "range":
+            new_rlist = [rlist[0]]
+            new_rlist[0].name = asm_name
+            # extend range
+            for rid in range(int(rlist[0].regid) + 1, int(rlist[-1].regid)):
+                tmp_r = deepcopy(rlist[0])
+                tmp_r.regid = str(rid)
+                tmp_r.name = asm_name
+                new_rlist.append(tmp_r)
+            new_rlist.append(rlist[-1])
+            new_rlist[-1].name = asm_name
+            rlist = new_rlist
+        if len(rlist) == 1:
+            return rlist[0]
+        return rlist
 
     def process_immediate(self, immediate):
         """Post-process immediate operand"""
         if "IDENTIFIER" in immediate:
             # actually an identifier, change declaration
-            return IdentifierOperand(immediate["IDENTIFIER"])
+            return IdentifierOperand(immediate["IDENTIFIER"], immediate["IDENTIFIER"].get("offset", None), immediate["IDENTIFIER"].get("relocation", None))
         if "value" in immediate:
             return ImmediateOperand(immediate["value"])
         if "base_immediate" in immediate:
@@ -509,7 +531,7 @@ class ParserAArch64(BaseParser):
             return ImmediateOperand(immediate["value"])
         else:
             # change 'mantissa' key to 'value'
-            return ImmediateOperand(immediate["mantissa"])
+            return ImmediateOperand(self.normalize_imd(immediate))
 
     def process_label(self, label):
         """Post-process label asm line"""
@@ -520,14 +542,19 @@ class ParserAArch64(BaseParser):
     def process_identifier(self, identifier):
         """Post-process identifier operand"""
         # remove value if it consists of symbol+offset
-        return IdentifierOperand(identifier["name"], identifier.get("offset", None))
+        return IdentifierOperand(identifier["name"], identifier.get("offset", None), identifier.get("relocation", None))
 
     def process_prfop(self, prfop):
         """Post-process prefetch operand"""
-        return PrefetchOperand(prfop["type"], prfop["target"], prfop["policy"])
+        ptype = prfop["type"][0]
+        target = prfop["target"][0]
+        policy = prfop["policy"][0]
+        return PrefetchOperand(ptype, target, policy)
 
     def get_full_reg_name(self, register):
         """Return one register name string including all attributes"""
+        if isinstance(register, RegisterOperand):
+            return register.name
         if "lanes" in register:
             return (
                 register["prefix"]
@@ -549,7 +576,9 @@ class ParserAArch64(BaseParser):
         elif "float" in imd:
             return self.ieee_to_float(imd["float"])
         elif "double" in imd:
-            return self.ieee_to_float(imd["double"])
+            if "exponent" in imd["double"]:
+                return self.ieee_to_float(imd["double"])
+            return float(imd["double"]["mantissa"])
         # identifier
         return imd
 
@@ -583,6 +612,16 @@ class ParserAArch64(BaseParser):
             return True
         return False
 
+    def is_predicate_register(self, register):
+        """Check if register is a predicate register"""
+        if register is None:
+            return False
+        if isinstance(register, RegisterOperand):
+            return "predicate" == register.regtype
+        if register["prefix"] in "p":
+            return True
+        return False
+
     def is_flag_dependend_of(self, flag_a, flag_b):
         """Check if ``flag_a`` is dependent on ``flag_b``"""
         # we assume flags are independent of each other, e.g., CF can be read while ZF gets written
@@ -608,4 +647,6 @@ class ParserAArch64(BaseParser):
             return "gpr"
         if self.is_vector_register(register):
             return "vector"
+        if self.is_predicate_register(register):
+            return "predicate"
         raise ValueError

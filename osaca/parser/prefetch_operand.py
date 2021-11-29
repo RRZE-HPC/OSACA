@@ -11,6 +11,9 @@ class PrefetchOperand(Operand):
         self.target = target
         self.policy = policy
 
+    def __eq__(self, other):
+        return self.ptype.lower() == other.ptype.lower() and self.target.lower() == other.target.lower() and self.policy.lower() == other.policy.lower()
+
     def __str__(self):
         return str(self.name)
 
