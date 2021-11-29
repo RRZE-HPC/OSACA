@@ -62,35 +62,6 @@ instruction_forms:
   throughput: 0.5
   latency: 4.0
   port_pressure: [[1, '67']]
-- name: str
-  operands:
-  - class: register
-    prefix: w
-  - class: memory
-    base: x
-    offset: imd
-    index: '*'
-    scale: '*'
-    post-indexed: false
-    pre-indexed: false
-  throughput: 0.5
-  latency: 1.0
-  port_pressure: [[1, '67']]
-- name: str
-  operands:
-  - class: register
-    prefix: x
-  - class: memory
-    base: x
-    offset: ~
-    index: ~
-    scale: 1
-    pre-indexed: false
-    post-indexed: true
-  latency: ~
-  port_pressure: ~
-  throughput: ~
-  uops: ~
 - name: fmla
   operands:
   - class: register
@@ -181,21 +152,6 @@ instruction_forms:
   port_pressure: ~
   throughput: ~
   uops: ~
-- name: str
-  operands:
-  - class: register
-    prefix: q
-  - class: memory
-    base: x
-    offset: ~
-    index: ~
-    scale: 1
-    pre-indexed: false
-    post-indexed: true
-  latency: ~
-  port_pressure: ~
-  throughput: 1.0
-  uops: ~
 - name: add
   operands:
   - class: register
@@ -207,51 +163,6 @@ instruction_forms:
   latency: ~
   port_pressure: ~
   throughput: 0.33333
-  uops: ~
-- name: str
-  operands:
-  - class: register
-    prefix: x
-  - class: memory
-    base: x
-    offset: ~
-    index: gpr
-    scale: 1
-    pre-indexed: false
-    post-indexed: false
-  latency: ~
-  port_pressure: ~
-  throughput: ~
-  uops: ~
-- name: str
-  operands:
-  - class: register
-    prefix: x
-  - class: memory
-    base: x
-    offset: ~
-    index: ~
-    scale: 1
-    pre-indexed: false
-    post-indexed: false
-  latency: ~
-  port_pressure: ~
-  throughput: ~
-  uops: ~
-- name: str
-  operands:
-  - class: register
-    prefix: q
-  - class: memory
-    base: x
-    offset: ~
-    index: ~
-    scale: 1
-    pre-indexed: false
-    post-indexed: false
-  latency: ~
-  port_pressure: ~
-  throughput: ~
   uops: ~
 - name: stp
   operands:
@@ -266,7 +177,7 @@ instruction_forms:
     scale: 1
     pre-indexed: false
     post-indexed: false
-  latency: ~
+  latency: 0.0
   port_pressure: ~
   throughput: ~
   uops: ~
@@ -381,7 +292,7 @@ instruction_forms:
     scale: 1
     pre-indexed: false
     post-indexed: false
-  latency: ~
+  latency: 0.0
   port_pressure: ~
   throughput: ~
   uops: ~
@@ -409,21 +320,6 @@ instruction_forms:
   latency: ~
   port_pressure: ~
   throughput: 0.33333
-  uops: ~
-- name: str
-  operands:
-  - class: register
-    prefix: q
-  - class: memory
-    base: x
-    offset: ~
-    index: gpr
-    scale: 1
-    pre-indexed: false
-    post-indexed: false
-  latency: ~
-  port_pressure: ~
-  throughput: 1.0
   uops: ~
 - name: sub
   operands:
@@ -475,21 +371,6 @@ instruction_forms:
   port_pressure: ~
   throughput: 0.5
   uops: ~
-- name: str
-  operands:
-  - class: register
-    prefix: d
-  - class: memory
-    base: x
-    offset: ~
-    index: ~
-    scale: 1
-    pre-indexed: false
-    post-indexed: false
-  latency: ~
-  port_pressure: ~
-  throughput: 1.0
-  uops: ~
 - name: fadd
   operands:
   - class: register
@@ -515,7 +396,7 @@ instruction_forms:
     scale: 1
     pre-indexed: false
     post-indexed: false
-  latency: ~
+  latency: 0.0
   port_pressure: ~
   throughput: ~
   uops: ~
@@ -559,7 +440,7 @@ instruction_forms:
     scale: 1
     pre-indexed: false
     post-indexed: false
-  latency: ~
+  latency: 0.0
   port_pressure: ~
   throughput: ~
   uops: ~
@@ -574,7 +455,7 @@ instruction_forms:
     scale: 1
     pre-indexed: false
     post-indexed: false
-  latency: ~
+  latency: 0.0
   port_pressure: ~
   throughput: 1.0
   uops: ~
@@ -648,7 +529,7 @@ instruction_forms:
     scale: 1
     pre-indexed: false
     post-indexed: false
-  latency: ~
+  latency: 0.0
   port_pressure: ~
   throughput: 1.0
   uops: ~
@@ -725,21 +606,6 @@ instruction_forms:
   port_pressure: ~
   throughput: ~
   uops: ~
-- name: str
-  operands:
-  - class: register
-    prefix: d
-  - class: memory
-    base: x
-    offset: ~
-    index: ~
-    scale: 1
-    pre-indexed: false
-    post-indexed: true
-  latency: ~
-  port_pressure: ~
-  throughput: 1.0
-  uops: ~
 - name: cmp
   operands:
   - class: register
@@ -785,3 +651,183 @@ instruction_forms:
   port_pressure: ~
   throughput: ~
   uops: ~
+- name: str
+  operands:
+  - class: register
+    prefix: w
+  - class: memory
+    base: x
+    offset: '*'
+    index: '*'
+    scale: '*'
+    pre-indexed: false
+    post-indexed: false
+  throughput: 0.5
+  latency: 0.0
+  port_pressure: [[1, '67']]
+  uops: 1
+- name: str
+  operands:
+  - class: register
+    prefix: w
+  - class: memory
+    base: x
+    offset: '*'
+    index: '*'
+    scale: '*'
+    pre-indexed: true
+    post-indexed: false
+  throughput: 0.5
+  latency: 0.0
+  port_pressure: [[1, '67'], [1, '012']]
+  uops: 2
+- name: str
+  operands:
+  - class: register
+    prefix: w
+  - class: memory
+    base: x
+    offset: '*'
+    index: '*'
+    scale: '*'
+    pre-indexed: false
+    post-indexed: true 
+  throughput: 0.5
+  latency: 0.0
+  port_pressure: [[1, '67'], [1, '012']]
+  uops: 2
+- name: str
+  operands:
+  - class: register
+    prefix: x
+  - class: memory
+    base: x
+    offset: '*'
+    index: '*'
+    scale: '*'
+    pre-indexed: true
+    post-indexed: false
+  throughput: 0.5
+  latency: 0.0
+  port_pressure: [[1, '67'], [1, '012']]
+  uops: 2
+- name: str
+  operands:
+  - class: register
+    prefix: x
+  - class: memory
+    base: x
+    offset: '*'
+    index: '*'
+    scale: '*'
+    pre-indexed: false
+    post-indexed: true 
+  throughput: 0.5
+  latency: 0.0
+  port_pressure: [[1, '67'], [1, '012']]
+  uops: 2
+- name: str
+  operands:
+  - class: register
+    prefix: x
+  - class: memory
+    base: x
+    offset: '*'
+    index: '*'
+    scale: '*'
+    pre-indexed: false
+    post-indexed: false
+  throughput: 0.5
+  latency: 0.0
+  port_pressure: [[1, '67']]
+  uops: 2
+- name: str
+  operands:
+  - class: register
+    prefix: d
+  - class: memory
+    base: x
+    offset: '*'
+    index: '*'
+    scale: '*'
+    pre-indexed: false
+    post-indexed: false
+  throughput: 0.5
+  latency: 0.0
+  port_pressure: [[1, '67']]
+  uops: 1
+- name: str
+  operands:
+  - class: register
+    prefix: d
+  - class: memory
+    base: x
+    offset: '*'
+    index: '*'
+    scale: '*'
+    pre-indexed: true 
+    post-indexed: false
+  throughput: 0.5
+  latency: 0.0
+  port_pressure: [[1, '67'], [1, '012']]
+  uops: 1
+- name: str
+  operands:
+  - class: register
+    prefix: d
+  - class: memory
+    base: x
+    offset: '*'
+    index: '*'
+    scale: '*'
+    pre-indexed: false
+    post-indexed: true
+  throughput: 0.5
+  latency: 0.0
+  port_pressure: [[1, '67'], [1, '012']]
+  uops: 1
+- name: str
+  operands:
+  - class: register
+    prefix: q
+  - class: memory
+    base: x
+    offset: '*'
+    index: '*'
+    scale: '*'
+    pre-indexed: false
+    post-indexed: false
+  throughput: 0.5
+  latency: 0.0
+  port_pressure: [[1, '67']]
+  uops: 1
+- name: str
+  operands:
+  - class: register
+    prefix: q
+  - class: memory
+    base: x
+    offset: '*'
+    index: '*'
+    scale: '*'
+    pre-indexed: true
+    post-indexed: false
+  throughput: 0.5
+  latency: 0.0
+  port_pressure: [[1, '67'], [1, '012']]
+  uops: 1
+- name: str
+  operands:
+  - class: register
+    prefix: q
+  - class: memory
+    base: x
+    offset: '*'
+    index: '*'
+    scale: '*'
+    pre-indexed: false
+    post-indexed: true
+  throughput: 0.5
+  latency: 0.0
+  port_pressure: [[1, '67'], [1, '012']]
+  uops: 1
