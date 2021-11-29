@@ -120,23 +120,6 @@ instruction_forms:
   port_pressure: ~
   throughput: 0.33333
   uops: ~
-- name: stp
-  operands:
-  - class: register
-    prefix: q
-  - class: register
-    prefix: q
-  - class: memory
-    base: x
-    offset: ~
-    index: ~
-    scale: 1
-    pre-indexed: false
-    post-indexed: false
-  latency: 0.0
-  port_pressure: ~
-  throughput: ~
-  uops: ~
 - name: fsub
   operands:
   - class: register
@@ -152,23 +135,6 @@ instruction_forms:
   port_pressure: ~
   throughput: 1.0
   uops: ~
-- name: ldp
-  operands:
-  - class: register
-    prefix: q
-  - class: register
-    prefix: q
-  - class: memory
-    base: x
-    offset: ~
-    index: ~
-    scale: 1
-    pre-indexed: false
-    post-indexed: true
-  latency: ~
-  port_pressure: ~
-  throughput: ~
-  uops: ~
 - name: fmul
   operands:
   - class: register
@@ -180,23 +146,6 @@ instruction_forms:
   latency: ~
   port_pressure: ~
   throughput: 0.5
-  uops: ~
-- name: ldp
-  operands:
-  - class: register
-    prefix: q
-  - class: register
-    prefix: q
-  - class: memory
-    base: x
-    offset: imd
-    index: ~
-    scale: 1
-    pre-indexed: false
-    post-indexed: false
-  latency: ~
-  port_pressure: ~
-  throughput: 1.0
   uops: ~
 - name: fdiv
   operands:
@@ -339,23 +288,6 @@ instruction_forms:
   port_pressure: ~
   throughput: 0.5
   uops: ~
-- name: stp
-  operands:
-  - class: register
-    prefix: q
-  - class: register
-    prefix: q
-  - class: memory
-    base: x
-    offset: imd
-    index: ~
-    scale: 1
-    pre-indexed: false
-    post-indexed: false
-  latency: 0.0
-  port_pressure: ~
-  throughput: ~
-  uops: ~
 - name: fsqrt
   operands:
   - class: register
@@ -382,23 +314,6 @@ instruction_forms:
   latency: ~
   port_pressure: ~
   throughput: 0.5
-  uops: ~
-- name: stp
-  operands:
-  - class: register
-    prefix: d
-  - class: register
-    prefix: d
-  - class: memory
-    base: x
-    offset: imd
-    index: ~
-    scale: 1
-    pre-indexed: false
-    post-indexed: false
-  latency: 0.0
-  port_pressure: ~
-  throughput: ~
   uops: ~
 - name: stur
   operands:
@@ -457,23 +372,6 @@ instruction_forms:
   port_pressure: ~
   throughput: 1.0
   uops: ~
-- name: stp
-  operands:
-  - class: register
-    prefix: x
-  - class: register
-    prefix: x
-  - class: memory
-    base: x
-    offset: imd
-    index: ~
-    scale: 1
-    pre-indexed: false
-    post-indexed: false
-  latency: 0.0
-  port_pressure: ~
-  throughput: 1.0
-  uops: ~
 - name: fadd
   operands:
   - class: register
@@ -513,40 +411,6 @@ instruction_forms:
   port_pressure: ~
   throughput: 0.5
   uops: ~
-- name: ldp
-  operands:
-  - class: register
-    prefix: d
-  - class: register
-    prefix: d
-  - class: memory
-    base: x
-    offset: imd
-    index: ~
-    scale: 1
-    pre-indexed: false
-    post-indexed: false
-  latency: ~
-  port_pressure: ~
-  throughput: 1.0
-  uops: ~
-- name: ldp
-  operands:
-  - class: register
-    prefix: x
-  - class: register
-    prefix: x
-  - class: memory
-    base: x
-    offset: imd
-    index: ~
-    scale: 1
-    pre-indexed: false
-    post-indexed: false
-  latency: ~
-  port_pressure: ~
-  throughput: ~
-  uops: ~
 - name: cmp
   operands:
   - class: register
@@ -577,6 +441,312 @@ instruction_forms:
   port_pressure: ~
   throughput: 0.5
   uops: ~
+- name: ldp
+  operands:
+  - class: register
+    prefix: x
+  - class: register
+    prefix: x
+  - class: memory
+    base: x
+    offset: '*'
+    index: '*'
+    scale: '*'
+    pre-indexed: false
+    post-indexed: false
+  throughput: 1.0
+  latency: ~
+  port_pressure: [[2, '67']
+  uops: 2
+- name: ldp
+  operands:
+  - class: register
+    prefix: x
+  - class: register
+    prefix: x
+  - class: memory
+    base: x
+    offset: '*'
+    index: '*'
+    scale: '*'
+    pre-indexed: true
+    post-indexed: false
+  throughput: 1.0
+  latency: ~
+  port_pressure: [[2, '67'], [2, '012']]
+  uops: 4
+- name: ldp
+  operands:
+  - class: register
+    prefix: x
+  - class: register
+    prefix: x
+  - class: memory
+    base: x
+    offset: '*'
+    index: '*'
+    scale: '*'
+    pre-indexed: false
+    post-indexed: true
+  throughput: 1.0
+  latency: ~
+  port_pressure: [[2, '67'], [2, '012']]
+  uops: 4
+- name: ldp
+  operands:
+  - class: register
+    prefix: d
+  - class: register
+    prefix: d
+  - class: memory
+    base: x
+    offset: '*'
+    index: '*'
+    scale: '*'
+    pre-indexed: false
+    post-indexed: false
+  throughput: 1.0
+  latency: ~
+  port_pressure: [[2, '67']]
+  uops: 2
+- name: ldp
+  operands:
+  - class: register
+    prefix: d
+  - class: register
+    prefix: d
+  - class: memory
+    base: x
+    offset: '*'
+    index: '*'
+    scale: '*'
+    pre-indexed: true
+    post-indexed: false
+  throughput: 1.0
+  latency: ~
+  port_pressure: [[2, '67'], [2, '012']]
+  uops: 4
+- name: ldp
+  operands:
+  - class: register
+    prefix: d
+  - class: register
+    prefix: d
+  - class: memory
+    base: x
+    offset: '*'
+    index: '*'
+    scale: '*'
+    pre-indexed: false
+    post-indexed: true
+  throughput: 1.0
+  latency: ~
+  port_pressure: [[2, '67'], [2, '012']]
+  uops: 4
+- name: ldp
+  operands:
+  - class: register
+    prefix: q
+  - class: register
+    prefix: q
+  - class: memory
+    base: x
+    offset: '*'
+    index: '*'
+    scale: '*'
+    pre-indexed: false
+    post-indexed: false
+  throughput: 1.0
+  latency: ~
+  port_pressure: [[2, '67']]
+  uops: 2
+- name: ldp
+  operands:
+  - class: register
+    prefix: q
+  - class: register
+    prefix: q
+  - class: memory
+    base: x
+    offset: '*'
+    index: '*'
+    scale: '*'
+    pre-indexed: true
+    post-indexed: false
+  throughput: 1.0
+  latency: ~
+  port_pressure: [[2, '67'], [2, '012']]
+  uops: 4
+- name: ldp
+  operands:
+  - class: register
+    prefix: q
+  - class: register
+    prefix: q
+  - class: memory
+    base: x
+    offset: '*'
+    index: '*'
+    scale: '*'
+    pre-indexed: false
+    post-indexed: true
+  throughput: 1.0
+  latency: ~
+  port_pressure: [[2, '67'], [2, '012']]
+  uops: 4
+- name: stp
+  operands:
+  - class: register
+    prefix: x
+  - class: register
+    prefix: x
+  - class: memory
+    base: x
+    offset: '*'
+    index: '*'
+    scale: '*'
+    pre-indexed: false
+    post-indexed: false
+  throughput: 1.0
+  latency: 0.0
+  port_pressure: [[2, '67']
+  uops: 2
+- name: stp
+  operands:
+  - class: register
+    prefix: x
+  - class: register
+    prefix: x
+  - class: memory
+    base: x
+    offset: '*'
+    index: '*'
+    scale: '*'
+    pre-indexed: true
+    post-indexed: false
+  throughput: 1.0
+  latency: 0.0
+  port_pressure: [[2, '67'], [2, '012']]
+  uops: 4
+- name: stp
+  operands:
+  - class: register
+    prefix: x
+  - class: register
+    prefix: x
+  - class: memory
+    base: x
+    offset: '*'
+    index: '*'
+    scale: '*'
+    pre-indexed: false
+    post-indexed: true
+  throughput: 1.0
+  latency: 0.0
+  port_pressure: [[2, '67'], [2, '012']]
+  uops: 4
+- name: stp
+  operands:
+  - class: register
+    prefix: d
+  - class: register
+    prefix: d
+  - class: memory
+    base: x
+    offset: '*'
+    index: '*'
+    scale: '*'
+    pre-indexed: false
+    post-indexed: false
+  throughput: 1.0
+  latency: 0.0
+  port_pressure: [[2, '67']]
+  uops: 2
+- name: stp
+  operands:
+  - class: register
+    prefix: d
+  - class: register
+    prefix: d
+  - class: memory
+    base: x
+    offset: '*'
+    index: '*'
+    scale: '*'
+    pre-indexed: true
+    post-indexed: false
+  throughput: 1.0
+  latency: 0.0
+  port_pressure: [[2, '67'], [2, '012']]
+  uops: 4
+- name: stp
+  operands:
+  - class: register
+    prefix: d
+  - class: register
+    prefix: d
+  - class: memory
+    base: x
+    offset: '*'
+    index: '*'
+    scale: '*'
+    pre-indexed: false
+    post-indexed: true
+  throughput: 1.0
+  latency: 0.0
+  port_pressure: [[2, '67'], [2, '012']]
+  uops: 4
+- name: stp
+  operands:
+  - class: register
+    prefix: q
+  - class: register
+    prefix: q
+  - class: memory
+    base: x
+    offset: '*'
+    index: '*'
+    scale: '*'
+    pre-indexed: false
+    post-indexed: false
+  throughput: 1.0
+  latency: 0.0
+  port_pressure: [[2, '67']]
+  uops: 2
+- name: stp
+  operands:
+  - class: register
+    prefix: q
+  - class: register
+    prefix: q
+  - class: memory
+    base: x
+    offset: '*'
+    index: '*'
+    scale: '*'
+    pre-indexed: true
+    post-indexed: false
+  throughput: 1.0
+  latency: 0.0
+  port_pressure: [[2, '67'], [2, '012']]
+  uops: 4
+- name: stp
+  operands:
+  - class: register
+    prefix: q
+  - class: register
+    prefix: q
+  - class: memory
+    base: x
+    offset: '*'
+    index: '*'
+    scale: '*'
+    pre-indexed: false
+    post-indexed: true
+  throughput: 1.0
+  latency: 0.0
+  port_pressure: [[2, '67'], [2, '012']]
+  uops: 4
 - name: ldr
   operands:
   - class: register
@@ -617,7 +787,7 @@ instruction_forms:
     index: '*'
     scale: '*'
     pre-indexed: false
-    post-indexed: true 
+    post-indexed: true
   throughput: 0.5
   latency: 4.0
   port_pressure: [[1, '67'], [1, '012']]
@@ -662,7 +832,7 @@ instruction_forms:
     index: '*'
     scale: '*'
     pre-indexed: false
-    post-indexed: true 
+    post-indexed: true
   throughput: 0.5
   latency: 4.0
   port_pressure: [[1, '67'], [1, '012']]
@@ -691,7 +861,7 @@ instruction_forms:
     offset: '*'
     index: '*'
     scale: '*'
-    pre-indexed: true 
+    pre-indexed: true
     post-indexed: false
   throughput: 0.5
   latency: 4.0
@@ -797,7 +967,7 @@ instruction_forms:
     index: '*'
     scale: '*'
     pre-indexed: false
-    post-indexed: true 
+    post-indexed: true
   throughput: 0.5
   latency: 0.0
   port_pressure: [[1, '67'], [1, '012']]
@@ -842,7 +1012,7 @@ instruction_forms:
     index: '*'
     scale: '*'
     pre-indexed: false
-    post-indexed: true 
+    post-indexed: true
   throughput: 0.5
   latency: 0.0
   port_pressure: [[1, '67'], [1, '012']]
@@ -871,7 +1041,7 @@ instruction_forms:
     offset: '*'
     index: '*'
     scale: '*'
-    pre-indexed: true 
+    pre-indexed: true
     post-indexed: false
   throughput: 0.5
   latency: 0.0
