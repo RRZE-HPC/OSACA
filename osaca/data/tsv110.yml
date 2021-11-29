@@ -23,6 +23,12 @@ port_model_scheme: |
    +---------+ |   BRU   | |   BRU   | +-------------+  | ASIMD | | ASIMD |  +-------+ +-------+ 
                +---------+ +---------+                  +-------+ +-------+ 
 instruction_forms:
+- name: [b, bl, bcc, bcs, bgt, bhi, b.lo, b.ne, b.any, b.none, b.lt, b.eq, b.hs, b.gt, b.hi, bne, beq]
+  operands:
+  - class: identifier
+  throughput: 0.5
+  latency: 0.0
+  port_pressure: [[1, '12']]
 - name: add
   operands:
   - class: register
@@ -116,10 +122,10 @@ instruction_forms:
     prefix: x
   - class: immediate
     imd: int
-  latency: ~
-  port_pressure: ~
+  latency: 1
+  port_pressure: [[1, '012']]
   throughput: 0.33333
-  uops: ~
+  uops: 1
 - name: fsub
   operands:
   - class: register
@@ -425,10 +431,10 @@ instruction_forms:
     prefix: x
   - class: register
     prefix: x
-  latency: ~
-  port_pressure: ~
+  latency: 1
+  port_pressure: [[1, '012']]
   throughput: 0.33333
-  uops: ~
+  uops: 1
 - name: mov
   operands:
   - class: register
