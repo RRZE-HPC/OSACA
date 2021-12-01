@@ -1,8 +1,8 @@
 osaca_version: 0.4.6
-micro_architecture: TaiShan v110
+micro_architecture: TaiShan v110 # https://en.wikichip.org/wiki/hisilicon/microarchitectures/taishan_v110
 arch_code: tsv110
 isa: AArch64
-ROB_size: 128
+ROB_size: 128 # https://github.com/llvm/llvm-project/blob/main/llvm/lib/Target/AArch64/AArch64SchedTSV110.td#L21
 retired_uOps_per_cycle: 4
 scheduler_size: ~   # unknown
 hidden_loads: false
@@ -29,6 +29,7 @@ instruction_forms:
   throughput: 0.5
   latency: 0.0
   port_pressure: [[1, '12']]
+# arithmetic instructions: add (from AArch64SchedTSV110.td and ibench)
 - name: add
   operands:
   - class: register
@@ -40,6 +41,7 @@ instruction_forms:
   throughput: 0.3333
   latency: 1.0
   port_pressure: [[1, '012']]
+# memory instructions: ldur (data from AArch64SchedTSV110.td)
 - name: ldur
   operands:
   - class: register
@@ -54,6 +56,7 @@ instruction_forms:
   throughput: 0.5
   latency: 4.0
   port_pressure: [[1, '67']]
+# arithmetic instructions: fmla (latency and throughput from ibench, port data missed)
 - name: fmla
   operands:
   - class: register
@@ -65,10 +68,11 @@ instruction_forms:
   - class: register
     prefix: v
     shape: s
-  latency: ~
+  latency: 4.0
   port_pressure: ~
   throughput: 0.5
   uops: ~
+# arithmetic instructions: fdiv (latency and throughput from ibench, port data from AArch64SchedTSV110.td) 
 - name: fdiv
   operands:
   - class: register
@@ -80,10 +84,11 @@ instruction_forms:
   - class: register
     prefix: v
     shape: s
-  latency: ~
-  port_pressure: ~
-  throughput: ~
-  uops: ~
+  latency: 26.0
+  port_pressure: [[1, '45']]
+  throughput: 22.0
+  uops: 1
+# arithmetic instructions: fsqrt (latency and throughput from ibench, port data from AArch64SchedTSV110.td) 
 - name: fsqrt
   operands:
   - class: register
@@ -95,10 +100,11 @@ instruction_forms:
   - class: register
     prefix: v
     shape: s
-  latency: ~
-  port_pressure: ~
-  throughput: ~
+  latency: 22.0
+  port_pressure: [[1, '45']]
+  throughput: 34.0
   uops: ~
+# arithmetic instructions: fadd (latency and throughput from ibench, port data from AArch64SchedTSV110.td) 
 - name: fadd
   operands:
   - class: register
@@ -110,10 +116,10 @@ instruction_forms:
   - class: register
     prefix: v
     shape: d
-  latency: ~
-  port_pressure: ~
+  latency: 4.0
+  port_pressure: [[1, '45']]
   throughput: 1.0
-  uops: ~
+  uops: 1
 - name: add
   operands:
   - class: register
@@ -137,10 +143,10 @@ instruction_forms:
   - class: register
     prefix: v
     shape: d
-  latency: ~
-  port_pressure: ~
+  latency: 4.0
+  port_pressure: [[1, '45']]
   throughput: 1.0
-  uops: ~
+  uops: 1
 - name: fmul
   operands:
   - class: register
@@ -149,10 +155,10 @@ instruction_forms:
     prefix: d
   - class: register
     prefix: d
-  latency: ~
-  port_pressure: ~
+  latency: 5.0
+  port_pressure: [[1, '45']]
   throughput: 0.5
-  uops: ~
+  uops: 1
 - name: fdiv
   operands:
   - class: register
@@ -164,10 +170,10 @@ instruction_forms:
   - class: register
     prefix: v
     shape: d
-  latency: ~
-  port_pressure: ~
-  throughput: ~
-  uops: ~
+  latency: 40.0
+  port_pressure: [[1, '45']]
+  throughput: 36.0
+  uops: 1
 - name: frecpe
   operands:
   - class: register
@@ -176,10 +182,11 @@ instruction_forms:
   - class: register
     prefix: v
     shape: d
-  latency: ~
-  port_pressure: ~
+  latency: 3.0
+  port_pressure: [[1, '45']]
   throughput: 1.0
-  uops: ~
+  uops: 1
+# arithmetic instructions: subs (latency and throughput from ibench, port data from AArch64SchedTSV110.td)
 - name: subs
   operands:
   - class: register
@@ -188,25 +195,27 @@ instruction_forms:
     prefix: x
   - class: immediate
     imd: int
-  latency: ~
-  port_pressure: ~
+  latency: 1.0
+  port_pressure: [[1, '12']]
   throughput: 0.5
-  uops: ~
+  uops: 1
+# memory instructions: stur (data from AArch64SchedTSV110.td)
 - name: stur
   operands:
   - class: register
     prefix: q
   - class: memory
     base: x
-    offset: ~
-    index: ~
-    scale: 1
+    offset: '*'
+    index: '*'
+    scale: '*'
     pre-indexed: false
     post-indexed: false
-  latency: 0.0
-  port_pressure: ~
-  throughput: ~
-  uops: ~
+  throughput: 0.5
+  latency: 1.0
+  port_pressure: [[1, '67']]
+  uops: 1
+# arithmetic instructions: fmla (latency and throughput from ibench, port data missed)
 - name: fmla
   operands:
   - class: register
@@ -218,9 +227,9 @@ instruction_forms:
   - class: register
     prefix: v
     shape: d
-  latency: ~
+  latency: 5.0
   port_pressure: ~
-  throughput: 1.0
+  throughput: 1.322
   uops: ~
 - name: mov
   operands:
@@ -270,10 +279,11 @@ instruction_forms:
     prefix: w
   - class: immediate
     imd: int
-  latency: ~
-  port_pressure: ~
+  latency: 1.0
+  port_pressure: [[1, '012']]
   throughput: 0.33333
-  uops: ~
+  uops: 1
+# miscellaneous instructions: dup (latency and throughput from ibench, port data from AArch64SchedTSV110.td)
 - name: dup
   operands:
   - class: register
@@ -281,10 +291,11 @@ instruction_forms:
   - class: register
     prefix: v
     shape: d
-  latency: ~
-  port_pressure: ~
-  throughput: ~
-  uops: ~
+  latency: 2.0
+  port_pressure: [2, '45']
+  throughput: 0.667
+  uops: 2
+# arithmetic instructions: frecpe (latency and throughput from ibench, port data from AArch64SchedTSV110.td) 
 - name: frecpe
   operands:
   - class: register
@@ -293,10 +304,10 @@ instruction_forms:
   - class: register
     prefix: v
     shape: s
-  latency: ~
-  port_pressure: ~
-  throughput: ~
-  uops: ~
+  latency: 3.0
+  port_pressure: [[1, '45']]
+  throughput: 1.0
+  uops: 1
 - name: fmul
   operands:
   - class: register
@@ -308,10 +319,10 @@ instruction_forms:
   - class: register
     prefix: v
     shape: s
-  latency: ~
-  port_pressure: ~
-  throughput: 0.5
-  uops: ~
+  latency: 5.0
+  port_pressure: [[1, '45']]
+  throughput: 1.0
+  uops: 1
 - name: fadd
   operands:
   - class: register
@@ -320,10 +331,10 @@ instruction_forms:
     prefix: d
   - class: register
     prefix: d
-  latency: ~
-  port_pressure: ~
+  latency: 4.0
+  port_pressure: [[1, '45']]
   throughput: 0.5
-  uops: ~
+  uops: 1
 - name: fsqrt
   operands:
   - class: register
@@ -335,10 +346,11 @@ instruction_forms:
   - class: register
     prefix: v
     shape: d
-  latency: ~
-  port_pressure: ~
-  throughput: ~
-  uops: ~
+  latency: 22.0
+  port_pressure: [[1, '45']]
+  throughput: 64.0
+  uops: 1
+# arithmetic instructions: adds (latency and throughput from ibench, port data from AArch64SchedTSV110.td)
 - name: adds
   operands:
   - class: register
@@ -347,25 +359,25 @@ instruction_forms:
     prefix: x
   - class: immediate
     imd: int
-  latency: ~
-  port_pressure: ~
+  latency: 1.0
+  port_pressure: [[1, '12']]
   throughput: 0.5
-  uops: ~
+  uops: 1
 - name: stur
   operands:
   - class: register
     prefix: d
   - class: memory
     base: x
-    offset: ~
-    index: ~
-    scale: 1
+    offset: '*'
+    index: '*'
+    scale: '*'
     pre-indexed: false
     post-indexed: false
-  latency: 0.0
-  port_pressure: ~
-  throughput: 1.0
-  uops: ~
+  throughput: 0.5
+  latency: 1.0
+  port_pressure: [[1, '67']]
+  uops: 1
 - name: fsub
   operands:
   - class: register
@@ -377,10 +389,10 @@ instruction_forms:
   - class: register
     prefix: v
     shape: s
-  latency: ~
-  port_pressure: ~
-  throughput: 0.5
-  uops: ~
+  latency: 5.0
+  port_pressure: [[1, '45']]
+  throughput: 1.321
+  uops: 1
 - name: fmul
   operands:
   - class: register
@@ -392,10 +404,11 @@ instruction_forms:
   - class: register
     prefix: v
     shape: d
-  latency: ~
-  port_pressure: ~
+  latency: 5.0
+  port_pressure: [[1, '45']]
   throughput: 1.0
-  uops: ~
+  uops: 1
+# arithmetic instructions: mul (latency and throughput from ibench, port data from AArch64SchedTSV110.td)
 - name: mul
   operands:
   - class: register
@@ -404,10 +417,10 @@ instruction_forms:
     prefix: x
   - class: register
     prefix: x
-  latency: ~
-  port_pressure: ~
+  latency: 4.0
+  port_pressure: [[1, '3']]
   throughput: 1.0
-  uops: ~
+  uops: 1
 - name: fadd
   operands:
   - class: register
@@ -419,10 +432,10 @@ instruction_forms:
   - class: register
     prefix: v
     shape: s
-  latency: ~
-  port_pressure: ~
-  throughput: ~
-  uops: ~
+  latency: 5.0
+  port_pressure: [[1, '45']]
+  throughput: 1.321
+  uops: 1
 - name: add
   operands:
   - class: register
@@ -447,36 +460,38 @@ instruction_forms:
   port_pressure: []
   throughput: 0.0
   uops: 0
+# miscellaneous instructions: cmp (throughput from ibench, latency and port data from AArch64SchedTSV110.td)
 - name: cmp
   operands:
   - class: register
     prefix: x
   - class: register
     prefix: x
-  latency: ~
-  port_pressure: ~
+  latency: 1.0
+  port_pressure: [1, '12']
   throughput: 0.5
-  uops: ~
+  uops: 1
+# miscellaneous instructions: mov (assumed free register renaming, register to register moves without conversion)
 - name: fmov
   operands:
   - class: register
     prefix: s
   - class: immediate
     imd: int
-  latency: ~
-  port_pressure: ~
-  throughput: 0.5
-  uops: ~
+  latency: 0.0
+  port_pressure: []
+  throughput: 0.0
+  uops: 0
 - name: cmp
   operands:
   - class: register
     prefix: w
   - class: register
     prefix: w
-  latency: ~
-  port_pressure: ~
+  latency: 1.0
+  port_pressure: [1, '12']
   throughput: 0.5
-  uops: ~
+  uops: 1
 - name: ldp
   operands:
   - class: register
@@ -494,6 +509,24 @@ instruction_forms:
   latency: ~
   port_pressure: [[2, '67']
   uops: 2
+# memory instructions: ldp (data from AArch64SchedTSV110.td)
+- name: ldp
+  operands:
+  - class: register
+    prefix: x
+  - class: register
+    prefix: x
+  - class: memory
+    base: x
+    offset: '*'
+    index: '*'
+    scale: '*'
+    pre-indexed: false
+    post-indexed: false
+  throughput: 1.0
+  latency: 8.0
+  port_pressure: [[1, '67'], [1, '012']]
+  uops: 2
 - name: ldp
   operands:
   - class: register
@@ -508,7 +541,7 @@ instruction_forms:
     pre-indexed: true
     post-indexed: false
   throughput: 1.0
-  latency: ~
+  latency: 9.0
   port_pressure: [[2, '67'], [2, '012']]
   uops: 4
 - name: ldp
@@ -525,7 +558,7 @@ instruction_forms:
     pre-indexed: false
     post-indexed: true
   throughput: 1.0
-  latency: ~
+  latency: 9.0
   port_pressure: [[2, '67'], [2, '012']]
   uops: 4
 - name: ldp
@@ -542,8 +575,8 @@ instruction_forms:
     pre-indexed: false
     post-indexed: false
   throughput: 1.0
-  latency: ~
-  port_pressure: [[2, '67']]
+  latency: 8.0
+  port_pressure: [[1, '67'], [1, '012']]
   uops: 2
 - name: ldp
   operands:
@@ -559,7 +592,7 @@ instruction_forms:
     pre-indexed: true
     post-indexed: false
   throughput: 1.0
-  latency: ~
+  latency: 9.0
   port_pressure: [[2, '67'], [2, '012']]
   uops: 4
 - name: ldp
@@ -576,7 +609,7 @@ instruction_forms:
     pre-indexed: false
     post-indexed: true
   throughput: 1.0
-  latency: ~
+  latency: 9.0
   port_pressure: [[2, '67'], [2, '012']]
   uops: 4
 - name: ldp
@@ -593,9 +626,9 @@ instruction_forms:
     pre-indexed: false
     post-indexed: false
   throughput: 1.0
-  latency: ~
-  port_pressure: [[2, '67']]
-  uops: 2
+  latency: 9.0
+  port_pressure: [[2, '67'], [2, '012']]
+  uops: 4
 - name: ldp
   operands:
   - class: register
@@ -610,7 +643,7 @@ instruction_forms:
     pre-indexed: true
     post-indexed: false
   throughput: 1.0
-  latency: ~
+  latency: 9.0
   port_pressure: [[2, '67'], [2, '012']]
   uops: 4
 - name: ldp
@@ -627,9 +660,10 @@ instruction_forms:
     pre-indexed: false
     post-indexed: true
   throughput: 1.0
-  latency: ~
+  latency: 9.0
   port_pressure: [[2, '67'], [2, '012']]
   uops: 4
+# memory instructions: stp (data from AArch64SchedTSV110.td)
 - name: stp
   operands:
   - class: register
@@ -644,7 +678,7 @@ instruction_forms:
     pre-indexed: false
     post-indexed: false
   throughput: 1.0
-  latency: 0.0
+  latency: 2.0
   port_pressure: [[2, '67']
   uops: 2
 - name: stp
@@ -661,9 +695,9 @@ instruction_forms:
     pre-indexed: true
     post-indexed: false
   throughput: 1.0
-  latency: 0.0
-  port_pressure: [[2, '67'], [2, '012']]
-  uops: 4
+  latency: 2.0
+  port_pressure: [[1, '67'], [1, '012']]
+  uops: 2
 - name: stp
   operands:
   - class: register
@@ -678,9 +712,9 @@ instruction_forms:
     pre-indexed: false
     post-indexed: true
   throughput: 1.0
-  latency: 0.0
-  port_pressure: [[2, '67'], [2, '012']]
-  uops: 4
+  latency: 2.0
+  port_pressure: [[1, '67'], [1, '012']]
+  uops: 2
 - name: stp
   operands:
   - class: register
@@ -695,8 +729,8 @@ instruction_forms:
     pre-indexed: false
     post-indexed: false
   throughput: 1.0
-  latency: 0.0
-  port_pressure: [[2, '67']]
+  latency: 2.0
+  port_pressure: [[2, '67']
   uops: 2
 - name: stp
   operands:
@@ -712,9 +746,9 @@ instruction_forms:
     pre-indexed: true
     post-indexed: false
   throughput: 1.0
-  latency: 0.0
-  port_pressure: [[2, '67'], [2, '012']]
-  uops: 4
+  latency: 2.0
+  port_pressure: [[2, '67'], [1, '012']]
+  uops: 3
 - name: stp
   operands:
   - class: register
@@ -729,9 +763,9 @@ instruction_forms:
     pre-indexed: false
     post-indexed: true
   throughput: 1.0
-  latency: 0.0
-  port_pressure: [[2, '67'], [2, '012']]
-  uops: 4
+  latency: 2.0
+  port_pressure: [[2, '67'], [1, '012']]
+  uops: 3
 - name: stp
   operands:
   - class: register
@@ -746,7 +780,7 @@ instruction_forms:
     pre-indexed: false
     post-indexed: false
   throughput: 1.0
-  latency: 0.0
+  latency: 2.0
   port_pressure: [[2, '67']]
   uops: 2
 - name: stp
@@ -763,9 +797,9 @@ instruction_forms:
     pre-indexed: true
     post-indexed: false
   throughput: 1.0
-  latency: 0.0
-  port_pressure: [[2, '67'], [2, '012']]
-  uops: 4
+  latency: 3.0
+  port_pressure: [[2, '67'], [1, '012']]
+  uops: 3
 - name: stp
   operands:
   - class: register
@@ -780,9 +814,9 @@ instruction_forms:
     pre-indexed: false
     post-indexed: true
   throughput: 1.0
-  latency: 0.0
-  port_pressure: [[2, '67'], [2, '012']]
-  uops: 4
+  latency: 2.0
+  port_pressure: [[2, '67'], [1, '012']]
+  uops: 3
 - name: ldr
   operands:
   - class: register
