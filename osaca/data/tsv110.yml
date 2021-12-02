@@ -507,7 +507,7 @@ instruction_forms:
     post-indexed: false
   throughput: 1.0
   latency: ~
-  port_pressure: [[2, '67']
+  port_pressure: [[2, '67']]
   uops: 2
 # memory instructions: ldp (data from AArch64SchedTSV110.td)
 - name: ldp
@@ -679,7 +679,7 @@ instruction_forms:
     post-indexed: false
   throughput: 1.0
   latency: 2.0
-  port_pressure: [[2, '67']
+  port_pressure: [[2, '67']]
   uops: 2
 - name: stp
   operands:
@@ -730,7 +730,7 @@ instruction_forms:
     post-indexed: false
   throughput: 1.0
   latency: 2.0
-  port_pressure: [[2, '67']
+  port_pressure: [[2, '67']]
   uops: 2
 - name: stp
   operands:
