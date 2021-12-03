@@ -29,7 +29,9 @@ class ParserAArch64(BaseParser):
         decimal_number = pp.Combine(
             pp.Optional(pp.Literal("-")) + pp.Word(pp.nums)
         ).setResultsName("value")
-        hex_number = pp.Combine(pp.Optional(pp.Literal("-")) + pp.Literal("0x") + pp.Word(pp.hexnums)).setResultsName("value")
+        hex_number = pp.Combine(
+            pp.Optional(pp.Literal("-")) + pp.Literal("0x") + pp.Word(pp.hexnums)
+        ).setResultsName("value")
         relocation = pp.Combine(pp.Literal(":") + pp.Word(pp.alphanums + "_") + pp.Literal(":"))
         first = pp.Word(pp.alphas + "_.", exact=1)
         rest = pp.Word(pp.alphanums + "_.")
