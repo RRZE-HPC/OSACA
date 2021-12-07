@@ -65,6 +65,18 @@ instruction_forms:
   port_pressure: [[1, '012']]
   throughput: 0.33333
   uops: 1
+- name: add
+  operands:
+  - class: register
+    prefix: w
+  - class: register
+    prefix: w
+  - class: immediate
+    imd: int
+  latency: 1
+  port_pressure: [[1, '012']]
+  throughput: 0.33333
+  uops: 1
 # arithmetic instructions: adds (from AArch64SchedTSV110.td and ibench)
 - name: adds
   operands:
@@ -79,6 +91,42 @@ instruction_forms:
   throughput: 0.5
   uops: 1
 # arithmetic instructions: sub (from AArch64SchedTSV110.td and ibench)
+- name: sub
+  operands:
+  - class: register
+    prefix: w
+  - class: register
+    prefix: w
+  - class: immediate
+    imd: int
+  latency: 1.0
+  port_pressure: [[1, '012']]
+  throughput: 0.33333
+  uops: 1
+- name: sub
+  operands:
+  - class: register
+    prefix: x
+  - class: register
+    prefix: x
+  - class: register
+    prefix: x
+  latency: 1.0
+  port_pressure: [[1, '012']]
+  throughput: 0.33333
+  uops: 1
+- name: sub
+  operands:
+  - class: register
+    prefix: x
+  - class: register
+    prefix: x
+  - class: immediate
+    imd: int
+  latency: 1.0
+  port_pressure: [[1, '012']]
+  throughput: 0.33333
+  uops: 1
 - name: sub
   operands:
   - class: register
@@ -160,7 +208,31 @@ instruction_forms:
   port_pressure: [[1, '45']]
   throughput: 1.321
   uops: 1
-# arithmetic instructions: fsub (latency and throughput from ibench, port data from AArch64SchedTSV110.td) 
+# arithmetic instructions: fsub (latency and throughput from ibench and asmbench, port data from AArch64SchedTSV110.td) 
+- name: fadd
+  operands:
+  - class: register
+    prefix: d
+  - class: register
+    prefix: d
+  - class: register
+    prefix: d
+  latency: 5.0
+  port_pressure: [[1, '45']]
+  throughput: 0.5
+  uops: 1
+- name: fadd
+  operands:
+  - class: register
+    prefix: s
+  - class: register
+    prefix: s
+  - class: register
+    prefix: s
+  latency: 4.0
+  port_pressure: [[1, '45']]
+  throughput: 0.5
+  uops: 1
 - name: fsub
   operands:
   - class: register
@@ -189,7 +261,7 @@ instruction_forms:
     shape: s
   latency: 5.0
   port_pressure: [[1, '45']]
-  throughput: 1.321
+  throughput: 0.5
   uops: 1
 # arithmetic instructions: fmul (latency and throughput from ibench, port data from AArch64SchedTSV110.td) 
 - name: fmul
@@ -232,9 +304,33 @@ instruction_forms:
     shape: s
   latency: 5.0
   port_pressure: [[1, '45']]
-  throughput: 1.0
+  throughput: 0.5
   uops: 1
-# arithmetic instructions: fdiv (latency and throughput from ibench, port data from AArch64SchedTSV110.td) 
+# arithmetic instructions: fdiv (latency and throughput from asmbench, port data from AArch64SchedTSV110.td) 
+- name: fdiv
+  operands:
+  - class: register
+    prefix: d
+  - class: register
+    prefix: d
+  - class: register
+    prefix: d
+  latency: 6.0
+  port_pressure: [[1, '4']]
+  throughput: 6.0
+  uops: 1
+- name: fdiv
+  operands:
+  - class: register
+    prefix: s
+  - class: register
+    prefix: s
+  - class: register
+    prefix: s
+  latency: 6.0
+  port_pressure: [[1, '4']]
+  throughput: 6.0
+  uops: 1
 - name: fdiv
   operands:
   - class: register
@@ -246,9 +342,9 @@ instruction_forms:
   - class: register
     prefix: v
     shape: d
-  latency: 40.0
-  port_pressure: [[1, '45']]
-  throughput: 36.0
+  latency: 16.0
+  port_pressure: [[1, '4']]
+  throughput: 12..0
   uops: 1
 - name: fdiv
   operands:
@@ -261,11 +357,11 @@ instruction_forms:
   - class: register
     prefix: v
     shape: s
-  latency: 26.0
-  port_pressure: [[1, '45']]
-  throughput: 22.0
+  latency: 16.0
+  port_pressure: [[1, '4']]
+  throughput: 12.0
   uops: 1
-# arithmetic instructions: fmla (latency and throughput from ibench, port data missed)
+# arithmetic instructions: fmla (latency and throughput from ibench, uops and port data missed)
 - name: fmla
   operands:
   - class: register
@@ -277,7 +373,7 @@ instruction_forms:
   - class: register
     prefix: v
     shape: s
-  latency: 4.0
+  latency: 5.0
   port_pressure: ~
   throughput: 0.5
   uops: ~
@@ -292,11 +388,35 @@ instruction_forms:
   - class: register
     prefix: v
     shape: d
-  latency: 5.0
+  latency: 7.0
   port_pressure: ~
-  throughput: 1.322
+  throughput: 1.0
   uops: ~
-# arithmetic instructions: fsqrt (latency and throughput from ibench, port data from AArch64SchedTSV110.td) 
+# arithmetic instructions: fsqrt (latency and throughput from asmbench, port data from AArch64SchedTSV110.td) 
+- name: fsqrt
+  operands:
+  - class: register
+    prefix: d
+  - class: register
+    prefix: d
+  - class: register
+    prefix: d
+  latency: 9.0
+  port_pressure: [[1, '5']]
+  throughput: 9.0
+  uops: 1
+- name: fsqrt
+  operands:
+  - class: register
+    prefix: s
+  - class: register
+    prefix: s
+  - class: register
+    prefix: s
+  latency: 9.0
+  port_pressure: [[1, '5']]
+  throughput: 9.0
+  uops: 1
 - name: fsqrt
   operands:
   - class: register
@@ -309,8 +429,8 @@ instruction_forms:
     prefix: v
     shape: d
   latency: 22.0
-  port_pressure: [[1, '45']]
-  throughput: 64.0
+  port_pressure: [[1, '5']]
+  throughput: 18.0
   uops: 1
 - name: fsqrt
   operands:
@@ -324,9 +444,9 @@ instruction_forms:
     prefix: v
     shape: s
   latency: 22.0
-  port_pressure: [[1, '45']]
-  throughput: 34.0
-  uops: ~
+  port_pressure: [[1, '5']]
+  throughput: 18.0
+  uops: 1
 # arithmetic instructions: frecpe (latency and throughput from ibench, port data from AArch64SchedTSV110.td) 
 - name: frecpe
   operands:
@@ -414,7 +534,7 @@ instruction_forms:
     prefix: v
     shape: d
   latency: 2.0
-  port_pressure: [2, '45']
+  port_pressure: [[1, '4'], [1, '5']]
   throughput: 0.667
   uops: 2
 # miscellaneous instructions: cmp (throughput from ibench, latency and port data from AArch64SchedTSV110.td)
