@@ -176,6 +176,46 @@ instruction_forms:
   latency: 1.0
   port_pressure: [[1, '012']]
   uops: 1
+# logical instructions: orn (latency and throughput from asmbench, port data from AArch64SchedTSV110.td)
+- name: orr
+  operands:
+  - class: register
+    prefix: x
+  - class: register
+    prefix: x
+  - class: register
+    prefix: x
+  throughput: 0.3333
+  latency: 1.0
+  port_pressure: [[1, '012']]
+  uops: 1
+- name: orr
+  operands:
+  - class: register
+    prefix: w
+  - class: register
+    prefix: w
+  - class: register
+    prefix: w
+  throughput: 0.3333
+  latency: 1.0
+  port_pressure: [[1, '012']]
+  uops: 1
+- name: orr
+  operands:
+  - class: register
+    prefix: v
+    shape: '*'
+  - class: register
+    prefix: v
+    shape: '*'
+  - class: register
+    prefix: v
+    shape: '*'
+  throughput: 1
+  latency: 2.0
+  port_pressure: [[1, '4'], [1, '5']]
+  uops: 2
 # logical instructions: eor (latency and throughput from asmbench, port data from AArch64SchedTSV110.td)
 - name: eor
   operands:
@@ -250,6 +290,50 @@ instruction_forms:
   throughput: 0.5
   latency: 1.0
   port_pressure: [[1, '12']]
+  uops: 1
+# logical instructions: rbit (latency and throughput, port data from AArch64SchedTSV110.td)
+- name: rbit
+  operands:
+  - class: register
+    prefix: x
+  - class: register
+    prefix: x
+  throughput: 0.333
+  latency: 1.0
+  port_pressure: [[1, '012']]
+  uops: 1
+- name: rbit
+  operands:
+  - class: register
+    prefix: w
+  - class: register
+    prefix: w
+  throughput: 0.333
+  latency: 1.0
+  port_pressure: [[1, '012']]
+  uops: 1
+# logical instructions: rev[16|32] (latency and throughput, port data from AArch64SchedTSV110.td)
+- name: [rev, rev16, rev32]
+  operands:
+  - class: register
+    prefix: '*'
+  - class: register
+    prefix: '*'
+  throughput: 0.333
+  latency: 1.0
+  port_pressure: [[1, '012']]
+  uops: 1
+- name: [rev, rev16, rev32]
+  operands:
+  - class: register
+    prefix: v
+    shape: '*'
+  - class: register
+    prefix: v
+    shape: '*'
+  throughput: 0.333
+  latency: 1.0
+  port_pressure: [[1, '012']]
   uops: 1
 # shift instructions: lsl (latency and throughput from asmbench, port data from AArch64SchedTSV110.td)
 - name: lsl
@@ -349,6 +433,91 @@ instruction_forms:
   throughput: 0.3333
   latency: 1.0
   port_pressure: [[1, '012']]
+  uops: 1
+# shift instructions: ror (latency and throughput from asmbench, port data from AArch64SchedTSV110.td)
+- name: ror
+  operands:
+  - class: register
+    prefix: x
+  - class: register
+    prefix: x
+  - class: immediate
+    imd: int
+  throughput: 0.3333
+  latency: 1.0
+  port_pressure: [[1, '012']]
+  uops: 1
+- name: ror
+  operands:
+  - class: register
+    prefix: w
+  - class: register
+    prefix: w
+  - class: immediate
+    imd: int
+  throughput: 0.3333
+  latency: 1.0
+  port_pressure: [[1, '012']]
+  uops: 1
+# shift instructions: [s|u]shll (latency and throughput from asmbench, port data from AArch64SchedTSV110.td)
+- name: [sshll, ushll]
+  operands:
+  - class: register
+    prefix: v
+    shape: '*'
+  - class: register
+    prefix: v
+    shape: '*'  
+  - class: register
+    prefix: v
+    shape: '*'
+  latency: 4.0
+  throughput: 1.0
+  port_pressure: [[1, '5']]
+  uops: 1
+- name: [sshll, ushll]
+  operands:
+  - class: register
+    prefix: v
+    shape: '*'
+  - class: register
+    prefix: v
+    shape: '*'  
+  - class: immediate
+    imd: int
+  latency: 4.0
+  throughput: 1.0
+  port_pressure: [[1, '5']]
+  uops: 1
+# shift instructions: sshll2 (latency and throughput from asmbench, port data from AArch64SchedTSV110.td)
+- name: sshll2
+  operands:
+  - class: register
+    prefix: v
+    shape: '*'
+  - class: register
+    prefix: v
+    shape: '*'  
+  - class: register
+    prefix: v
+    shape: '*'
+  latency: 4.0
+  throughput: 1.0
+  port_pressure: [[1, '5']]
+  uops: 1
+- name: sshll2
+  operands:
+  - class: register
+    prefix: v
+    shape: '*'
+  - class: register
+    prefix: v
+    shape: '*'  
+  - class: immediate
+    imd: int
+  latency: 4.0
+  throughput: 1.0
+  port_pressure: [[1, '5']]
   uops: 1
 # arithmetic instructions: add (from AArch64SchedTSV110.td and ibench)
 - name: add
@@ -604,6 +773,31 @@ instruction_forms:
   port_pressure: [[1, '12']]
   throughput: 0.5
   uops: 1
+# arithmetic instructions: sbc (latency and throughput, port data from AArch64SchedTSV110.td)
+- name: sbc
+  operands:
+  - class: register
+    prefix: x
+  - class: register
+    prefix: x
+  - class: register
+    prefix: x
+  latency: 1.0
+  port_pressure: [[1, '012']]
+  throughput: 0.5
+  uops: 1
+- name: sbc
+  operands:
+  - class: register
+    prefix: w
+  - class: register
+    prefix: w
+  - class: register
+    prefix: w
+  latency: 0.333
+  port_pressure: [[1, '012']]
+  throughput: 0.5
+  uops: 1
 # arithmetic instructions: mul (latency and throughput from ibench, port data from AArch64SchedTSV110.td)
 - name: mul
   operands:
@@ -632,7 +826,7 @@ instruction_forms:
   port_pressure: [[1, '4']]
   throughput: 2.5
   uops: 1
-- name: mla
+- name: mul
   operands:
   - class: register
     prefix: v
@@ -647,7 +841,7 @@ instruction_forms:
   port_pressure: [[1, '4']]
   throughput: 2.5
   uops: 1
-- name: mla
+- name: mul
   operands:
   - class: register
     prefix: v
@@ -661,6 +855,82 @@ instruction_forms:
   latency: 7.0
   port_pressure: [[1, '4']]
   throughput: 2.5
+  uops: 1
+# arithmetic instructions: [s|u]mulh (latency and throughput from asmbench, port data from AArch64SchedTSV110.td)
+- name: [smulh, umulh]
+  operands:
+  - class: register
+    prefix: x
+  - class: register
+    prefix: x
+  - class: register
+    prefix: x
+  latency: 4.0
+  port_pressure: [[1, '3']]
+  throughput: 1.0
+  uops: 1
+# arithmetic instructions: [s|u]mull (latency and throughput from asmbench, port data from AArch64SchedTSV110.td)
+- name: [smulh, umulh]
+  operands:
+  - class: register
+    prefix: x
+  - class: register
+    prefix: w
+  - class: register
+    prefix: w
+  latency: 3.0
+  port_pressure: [[1, '3']]
+  throughput: 1.0
+  uops: 1
+# arithmetic instructions: sdiv (latency and throughput from asmbench, port data from AArch64SchedTSV110.td)
+- name: sdiv
+  operands:
+  - class: register
+    prefix: x
+  - class: register
+    prefix: x
+  - class: register
+    prefix: x
+  latency: 6.0
+  port_pressure: [[1, '3']]
+  throughput: 5.0
+  uops: 1
+- name: sdiv
+  operands:
+  - class: register
+    prefix: w
+  - class: register
+    prefix: w
+  - class: register
+    prefix: w
+  latency: 4.0
+  port_pressure: [[1, '3']]
+  throughput: 1.0
+  uops: 1
+# arithmetic instructions: udiv (latency and throughput from asmbench, port data from AArch64SchedTSV110.td)
+- name: udiv
+  operands:
+  - class: register
+    prefix: x
+  - class: register
+    prefix: x
+  - class: register
+    prefix: x
+  latency: 6.0
+  port_pressure: [[1, '3']]
+  throughput: 5.0
+  uops: 1
+- name: udiv
+  operands:
+  - class: register
+    prefix: w
+  - class: register
+    prefix: w
+  - class: register
+    prefix: w
+  latency: 4.0
+  port_pressure: [[1, '3']]
+  throughput: 1.0
   uops: 1
 # arithmetic instructions: madd (latency and throughput, port data from AArch64SchedTSV110.td)
 - name: madd
@@ -690,6 +960,80 @@ instruction_forms:
   latency: ~
   port_pressure: [[1, '3'], [1, '012']]
   throughput: ~
+  uops: 2
+# arithmetic instructions: [smaddl|umaddl] (latency and throughput, port data from AArch64SchedTSV110.td)
+- name: [smaddl,umaddl]
+  operands:
+  - class: register
+    prefix: x
+  - class: register
+    prefix: w
+  - class: register
+    prefix: w
+  - class: register
+    prefix: x
+  latency: 3.0
+  port_pressure: [[1, '3'], [1, '012']]
+  throughput: 1.0
+  uops: 2
+# arithmetic instructions: [smsubl|umsubl] (latency and throughput, port data from AArch64SchedTSV110.td)
+- name: [smsubl, umsubl]
+  operands:
+  - class: register
+    prefix: x
+  - class: register
+    prefix: w
+  - class: register
+    prefix: w
+  - class: register
+    prefix: x
+  latency: 3.0
+  port_pressure: [[1, '3'], [1, '012']]
+  throughput: 1.0
+  uops: 2
+# arithmetic instructions: msub (latency and throughput, port data from AArch64SchedTSV110.td)
+- name: msub
+  operands:
+  - class: register
+    prefix: x
+  - class: register
+    prefix: x
+  - class: register
+    prefix: x
+  - class: register
+    prefix: x
+  latency: ~
+  port_pressure: [[1, '3'], [1, '012']]
+  throughput: ~
+  uops: 2
+- name: msub
+  operands:
+  - class: register
+    prefix: w
+  - class: register
+    prefix: w
+  - class: register
+    prefix: w
+  - class: register
+    prefix: w
+  latency: ~
+  port_pressure: [[1, '3'], [1, '012']]
+  throughput: ~
+  uops: 2
+# arithmetic instructions: smsubl (latency and throughput, port data from AArch64SchedTSV110.td)
+- name: smsubl
+  operands:
+  - class: register
+    prefix: x
+  - class: register
+    prefix: w
+  - class: register
+    prefix: w
+  - class: register
+    prefix: x
+  latency: 3.0
+  port_pressure: [[1, '3'], [1, '012']]
+  throughput: 1.0
   uops: 2
 # arithmetic instructions: mla (latency and throughput from asmbench, port data from AArch64SchedTSV110.td)
 - name: mla
@@ -737,17 +1081,73 @@ instruction_forms:
   port_pressure: [[1, '4']]
   throughput: 2.5
   uops: 1
-# arithmetic instructions: neg (latency and throughput from ibench, port data from AArch64SchedTSV110.td) 
+# arithmetic instructions: [s|u]max (latency and throughput from asmbench, port data from AArch64SchedTSV110.td) 
+- name: [smax, umax]
+  operands:
+  - class: register
+    prefix: v
+    shape: '*'
+  - class: register
+    prefix: v
+    shape: '*'
+  - class: register
+    prefix: v
+    shape: '*'
+  latency: 2.0
+  port_pressure: [[1, '4'], [1, '5']]
+  throughput: 0.5
+  uops: 1
+# arithmetic instructions: [s|u]min (latency and throughput from asmbench, port data from AArch64SchedTSV110.td) 
+- name: [smin, umin]
+  operands:
+  - class: register
+    prefix: v
+    shape: '*'
+  - class: register
+    prefix: v
+    shape: '*'
+  - class: register
+    prefix: v
+    shape: '*'
+  latency: 2.0
+  port_pressure: [[1, '4'], [1, '5']]
+  throughput: 0.5
+  uops: 1
+# arithmetic instructions: [s|u]maxv (latency and throughput from asmbench, port data from AArch64SchedTSV110.td) 
+- name: [smaxv, umaxv]
+  operands:
+  - class: register
+    prefix: '*'
+  - class: register
+    prefix: v
+    shape: '*'
+  latency: 2.0
+  port_pressure: [[1, '4'], [1, '5']]
+  throughput: 0.5
+  uops: 1
+# arithmetic instructions: [s|u]minv (latency and throughput from asmbench, port data from AArch64SchedTSV110.td) 
+- name: [sminv, uminv]
+  operands:
+  - class: register
+    prefix: '*'
+  - class: register
+    prefix: v
+    shape: '*'
+  latency: 2.0
+  port_pressure: [[1, '4'], [1, '5']]
+  throughput: 0.5
+  uops: 1
+# arithmetic instructions: neg (latency and throughput from asmbench, port data from AArch64SchedTSV110.td) 
 - name: neg
   operands:
   - class: register
     prefix: x
   - class: register
     prefix: x
-  latency: 2.0
-  port_pressure: [[1, '4'], [1, '5']]
+  latency: 1.0
+  port_pressure: [[1, '012']]
   throughput: 1.0
-  uops: 2
+  uops: 1
 - name: neg
   operands:
   - class: register
@@ -755,9 +1155,9 @@ instruction_forms:
   - class: register
     prefix: d
   latency: 2.0
-  port_pressure: [[1, '4'], [1, '5']]
+  port_pressure: [[1, '12']]
   throughput: 1.0
-  uops: 2
+  uops: 1
 - name: neg
   operands:
   - class: register
@@ -767,9 +1167,9 @@ instruction_forms:
     prefix: v
     shape: d
   latency: 2.0
-  port_pressure: [[1, '4'], [1, '5']]
+  port_pressure: [[1, '12']]
   throughput: 1.0
-  uops: 2
+  uops: 1
 - name: neg
   operands:
   - class: register
@@ -779,9 +1179,9 @@ instruction_forms:
     prefix: v
     shape: s
   latency: 2.0
-  port_pressure: [[1, '4'], [1, '5']]
+  port_pressure: [[1, '12']]
   throughput: 1.0
-  uops: 2
+  uops: 1
 - name: neg
   operands:
   - class: register
@@ -791,9 +1191,20 @@ instruction_forms:
     prefix: v
     shape: h
   latency: 2.0
-  port_pressure: [[1, '4'], [1, '5']]
+  port_pressure: [[1, '12']]
   throughput: 1.0
-  uops: 2
+  uops: 1
+# arithmetic instructions: negs (latency and throughput from ibench, port data from AArch64SchedTSV110.td) 
+- name: neg
+  operands:
+  - class: register
+    prefix: x
+  - class: register
+    prefix: x
+  latency: 2.0
+  port_pressure: [[1, '12']]
+  throughput: 0.5
+  uops: 1
 # arithmetic instructions: fadd (latency and throughput from ibench, port data from AArch64SchedTSV110.td) 
 - name: fadd
   operands:
@@ -1363,7 +1774,18 @@ instruction_forms:
   port_pressure: [[1, '4']]
   throughput: 1.0
   uops: 1
-# miscellaneous instructions: mov (assumed free register renaming, register to register moves without conversion)
+# mov instructions: adrp? (latency and throughput from asmbench, from AArch64SchedTSV110.td)
+- name: [adr, adrp]
+  operands:
+  - class: register
+    prefix: '*'
+  - class: immediate
+    imd: int
+  latency: 1.0
+  port_pressure: [[1, '012']]
+  throughput: 0.333
+  uops: 1
+# mov instructions: mov (assumed free register renaming, register to register moves without conversion)
 - name: mov
   operands:
   - class: register
@@ -1405,6 +1827,48 @@ instruction_forms:
   throughput: 0.0
   uops: 0
 - name: mov
+# mov instructions: mvn (assumed free register renaming, register to register moves without conversion)
+- name: mvn
+  operands:
+  - class: register
+    prefix: w
+  - class: register
+    prefix: w
+  latency: 0.0
+  port_pressure: []
+  throughput: 0.0
+  uops: 0
+- name: mvn
+  operands:
+  - class: register
+    prefix: x
+  - class: register
+    prefix: x
+  latency: 0.0
+  port_pressure: []
+  throughput: 0.0
+  uops: 0
+- name: mvn
+  operands:
+  - class: register
+    prefix: d
+  - class: register
+    prefix: d
+  latency: 0.0
+  port_pressure: []
+  throughput: 0.0
+  uops: 0
+- name: mvn
+  operands:
+  - class: register
+    prefix: q
+  - class: register
+    prefix: q
+  latency: 0.0
+  port_pressure: []
+  throughput: 0.0
+  uops: 0
+- name: mvn
   operands:
   - class: register
     prefix: v
@@ -1416,6 +1880,48 @@ instruction_forms:
   port_pressure: []
   throughput: 0.0
   uops: 0
+# mov instructions: mov[i|k|n|z] (assumed free register renaming, register to register moves without conversion)
+- name: [movi, movk, movn, movz]
+  operands:
+  - class: register
+    prefix: w
+  - class: immediate
+    imd: int
+  latency: 1.0
+  port_pressure: [[1, '012']]
+  throughput: 0.333
+  uops: 1
+- name: [movi, movk, movn, movz]
+  operands:
+  - class: register
+    prefix: d
+  - class: immediate
+    imd: int
+  latency: 1.0
+  port_pressure: [[1, '012']]
+  throughput: 0.333
+  uops: 1
+- name: [movi, movk, movn, movz]
+  operands:
+  - class: register
+    prefix: x
+  - class: immediate
+    imd: int
+  latency: 1.0
+  port_pressure: [[1, '012']]
+  throughput: 0.333
+  uops: 1
+- name: [movi, movk, movn, movz]
+  operands:
+  - class: register
+    prefix: v
+    shape: '*'
+  - class: immediate
+    imd: int
+  latency: 3.0
+  port_pressure: [[1, '4']]
+  throughput: 1
+  uops: 1
 # miscellaneous instructions: dup (latency and throughput from ibench, port data from AArch64SchedTSV110.td)
 - name: dup
   operands:
@@ -1553,6 +2059,36 @@ instruction_forms:
     prefix: x
   - class: register
     prefix: x
+  - class: immediate
+    imd: int
+  throughput: 0.333
+  latency: 1.0
+  port_pressure: [[1, '012']]
+  uops: 1
+# miscellaneous instructions: sbifz (throughput from asmbench, latency and port data from AArch64SchedTSV110.td)
+- name: sbifz
+  operands:
+  - class: register
+    prefix: x
+  - class: register
+    prefix: x
+  - class: immediate
+    imd: int
+  - class: immediate
+    imd: int
+  throughput: 0.333
+  latency: 1.0
+  port_pressure: [[1, '012']]
+  uops: 1
+# miscellaneous instructions: sbfz (throughput from asmbench, latency and port data from AArch64SchedTSV110.td)
+- name: sbfz
+  operands:
+  - class: register
+    prefix: x
+  - class: register
+    prefix: x
+  - class: immediate
+    imd: int
   - class: immediate
     imd: int
   throughput: 0.333
@@ -1743,8 +2279,8 @@ instruction_forms:
   port_pressure: [[1, '4'], [1, '5']]
   throughput: 0.5
   uops: 2
-# miscellaneous instructions: scvtf (throughput and latency from asmbench, port data from AArch64SchedTSV110.td, imformation missed with scala instructions)
-- name: scvtf
+# miscellaneous instructions: [scvtf|ucvtf] (throughput and latency from asmbench, port data from AArch64SchedTSV110.td, imformation missed with scala instructions)
+- name: [scvtf, ucvtf]
   operands:
   - class: register
     prefix: v
@@ -1756,7 +2292,7 @@ instruction_forms:
   port_pressure: [[1, '45']]
   throughput: 1.0
   uops: 1
-- name: scvtf
+- name: [scvtf, ucvtf]
   operands:
   - class: register
     prefix: v
@@ -1767,6 +2303,45 @@ instruction_forms:
   latency: 3.0
   port_pressure: [[2, '45']]
   throughput: 2.0
+  uops: 1
+# miscellaneous instructions: [s|u]xt[b|h|w] (throughput and latency from asmbench, port data from AArch64SchedTSV110.td)
+- name: [sxtb, sxth, sxtw, uxtb, uxth, uxtw]
+  operands:
+  - class: register
+    prefix: '*'
+  - class: register
+    prefix: '*'
+  latency: 1.0
+  port_pressure: [[1, '012']]
+  throughput: 1.0
+  uops: 1
+# miscellaneous instructions: xtn2? (throughput and latency from asmbench, port data from AArch64SchedTSV110.td)
+- name: [xtn, xtn2]
+  operands:
+  - class: register
+    prefix: v
+    shape: '*'
+  - class: register
+    prefix: v
+    shape: '*'
+  latency: 2.0
+  port_pressure: [[1, '4'], [1, '5']]
+  throughput: 1.0
+  uops: 1
+# miscellaneous instructions: [ubfiz|ubfx|ubfm] (throughput and latency from asmbench, port data from AArch64SchedTSV110.td)
+- name: [ubfiz, ubfx, ubfm]
+  operands:
+  - class: register
+    prefix: '*'
+  - class: register
+    prefix: '*'
+  - class: immediate
+    imd: int
+  - class: immediate
+    imd: int
+  latency: 1.0
+  port_pressure: [[1, '012']]
+  throughput: 1.0
   uops: 1
 # miscellaneous instructions: fmov (assumed free register renaming, register to register moves without conversion)
 - name: fmov
@@ -1849,7 +2424,102 @@ instruction_forms:
   port_pressure: []
   throughput: 0.0
   uops: 0
-# memory instructions: ldur (data from AArch64SchedTSV110.td)
+# test instructions: tst (throughput from asmbench, latency and port data from AArch64SchedTSV110.td)
+- name: tst
+  operands:
+  - class: register
+    prefix: w
+  - class: register
+    prefix: w
+  latency: 1.0
+  port_pressure: [[1, '12']]
+  throughput: 0.5
+  uops: 1
+- name: tst
+  operands:
+  - class: register
+    prefix: x
+  - class: register
+    prefix: x
+  latency: 1.0
+  port_pressure: [[1, '12']]
+  throughput: 0.5
+  uops: 1
+- name: tst
+  operands:
+  - class: register
+    prefix: w
+  - class: immediate
+    imd: int
+  latency: 1.0
+  port_pressure: [[1, '12']]
+  throughput: 0.5
+  uops: 1
+- name: tst
+  operands:
+  - class: register
+    prefix: x
+  - class: immediate
+    imd: int
+  latency: 1.0
+  port_pressure: [[1, '12']]
+  throughput: 0.5
+  uops: 1
+# cryptography instructions: sha1[c|m|p] (throughput from asmbench, latency and port data from AArch64SchedTSV110.td)
+- name: [sha1c, sha1m, sha1p]
+  operands:
+  - class: register
+    prefix: q
+  - class: register
+    prefix: s
+  - class: register
+    prefix: v
+    shape: '*'
+  latency: 5.0
+  port_pressure: [[1, '4']]
+  throughput: 1.0
+  uops: 1
+# cryptography instructions: sha1h (throughput from asmbench, latency and port data from AArch64SchedTSV110.td)
+- name: sha1h
+  operands:
+  - class: register
+    prefix: s
+  - class: register
+    prefix: s
+  latency: 2.0
+  port_pressure: [[1, '45']]
+  throughput: 1.0
+  uops: 1
+# cryptography instructions: sha1su0 (throughput from asmbench, latency and port data from AArch64SchedTSV110.td)
+- name: sha1su0
+  operands:
+  - class: register
+    prefix: v
+    shape: '*'
+  - class: register
+    prefix: v
+    shape: '*'
+  - class: register
+    prefix: v
+    shape: '*'
+  latency: 2.0
+  port_pressure: [[1, '45']]
+  throughput: 1.0
+  uops: 1
+# cryptography instructions: sha1su0 (throughput from asmbench, latency and port data from AArch64SchedTSV110.td)
+- name: sha1su0
+  operands:
+  - class: register
+    prefix: v
+    shape: '*'
+  - class: register
+    prefix: v
+    shape: '*'
+  latency: 2.0
+  port_pressure: [[1, '4']]
+  throughput: 1.0
+  uops: 1
+# memory instructions: ldr (data from AArch64SchedTSV110.td)
 - name: ldr
   operands:
   - class: register
@@ -2030,7 +2700,38 @@ instruction_forms:
   latency: 5.0
   port_pressure: [[1, '67'], [1, '012']]
   uops: 2
-# memory instructions: str (data from AArch64SchedTSV110.td)
+# memory instructions: ldar[b|xr]? (data from AArch64SchedTSV110.td)
+- name: [ldar, ldarb, ldaxr]
+  operands:
+  - class: register
+    prefix: x
+  - class: memory
+    base: x
+    offset: '*'
+    index: '*'
+    scale: '*'
+    pre-indexed: false
+    post-indexed: false
+  throughput: 0.5
+  latency: 4.0
+  port_pressure: [[1, '67']]
+  uops: 1
+- name: [ldar, ldarb, ldaxr]
+  operands:
+  - class: register
+    prefix: w
+  - class: memory
+    base: x
+    offset: '*'
+    index: '*'
+    scale: '*'
+    pre-indexed: false
+    post-indexed: false
+  throughput: 0.5
+  latency: 4.0
+  port_pressure: [[1, '67']]
+  uops: 1
+  # memory instructions: str (data from AArch64SchedTSV110.td)
 - name: str
   operands:
   - class: register
@@ -2211,6 +2912,38 @@ instruction_forms:
   latency: 2.0
   port_pressure: [[1, '67'], [1, '012']]
   uops: 2 
+# memory instructions: stlr (data from AArch64SchedTSV110.td)
+- name: stlr
+  operands:
+  - class: register
+    prefix: w
+  - class: memory
+    base: x
+    offset: '*'
+    index: '*'
+    scale: '*'
+    pre-indexed: false
+    post-indexed: false
+  throughput: 0.5
+  latency: 1.0
+  port_pressure: [[1, '67']]
+  uops: 1
+# memory instructions: stlrb (data from AArch64SchedTSV110.td)
+- name: stlrb
+  operands:
+  - class: register
+    prefix: w
+  - class: memory
+    base: x
+    offset: '*'
+    index: '*'
+    scale: '*'
+    pre-indexed: false
+    post-indexed: false
+  throughput: 0.5
+  latency: 1.0
+  port_pressure: [[1, '67']]
+  uops: 1
 # memory instructions: ldur (data from AArch64SchedTSV110.td)
 - name: ldur
   operands:
@@ -2246,6 +2979,22 @@ instruction_forms:
   operands:
   - class: register
     prefix: d
+  - class: memory
+    base: x
+    offset: '*'
+    index: '*'
+    scale: '*'
+    pre-indexed: false
+    post-indexed: false
+  throughput: 0.5
+  latency: 1.0
+  port_pressure: [[1, '67']]
+  uops: 1
+# memory instructions: stur[b|h] (data from AArch64SchedTSV110.td)
+- name: [sturb, sturh]
+  operands:
+  - class: register
+    prefix: w
   - class: memory
     base: x
     offset: '*'
