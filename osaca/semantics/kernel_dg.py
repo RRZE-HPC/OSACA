@@ -225,7 +225,7 @@ class KernelDG(nx.DiGraph):
                 node["latency_cp"] = self.dg.edges[(s, d)]["latency"]
                 path_latency += node["latency_cp"]
             # add latency for last instruction
-            node = self._get_node_by_lineno(longest_path[-1])
+            node = self._get_node_by_lineno(int(longest_path[-1]))
             node["latency_cp"] = node["latency"]
             if max_latency_instr["latency"] > path_latency:
                 max_latency_instr["latency_cp"] = float(max_latency_instr["latency"])
