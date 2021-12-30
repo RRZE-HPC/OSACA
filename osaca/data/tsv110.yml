@@ -742,8 +742,8 @@ instruction_forms:
     prefix: w
   - class: register
     prefix: w
-  - class: immediate
-    imd: int
+  - class: register
+    prefix: w
   latency: 1.0
   port_pressure: [[1, '012']]
   throughput: 0.33333
@@ -3010,9 +3010,9 @@ instruction_forms:
 - name: ldp
   operands:
   - class: register
-    prefix: x
+    prefix: w
   - class: register
-    prefix: x
+    prefix: w
   - class: memory
     base: x
     offset: '*'
@@ -3021,7 +3021,7 @@ instruction_forms:
     pre-indexed: false
     post-indexed: false
   throughput: 1.0
-  latency: 8.0
+  latency: 4.0
   port_pressure: [[1, '67'], [1, '012']]
   uops: 2
 - name: ldp
