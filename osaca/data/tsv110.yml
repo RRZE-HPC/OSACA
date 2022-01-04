@@ -409,6 +409,30 @@ instruction_forms:
   latency: 1.0
   port_pressure: [[1, '012']]
   uops: 1
+- name: lsr
+  operands:
+  - class: register
+    prefix: w
+  - class: register
+    prefix: w
+  - class: register
+    prefix: w
+  throughput: 0.3333
+  latency: 1.0
+  port_pressure: [[1, '012']]
+  uops: 1
+- name: lsr
+  operands:
+  - class: register
+    prefix: w
+  - class: register
+    prefix: w
+  - class: immediate
+    imd: int
+  throughput: 0.3333
+  latency: 1.0
+  port_pressure: [[1, '012']]
+  uops: 1
 # shift instructions: asr (latency and throughput from asmbench, port data from AArch64SchedTSV110.td)
 - name: asr
   operands:
@@ -2700,6 +2724,21 @@ instruction_forms:
   latency: 5.0
   port_pressure: [[1, '67'], [1, '012']]
   uops: 2
+# memory instructions: ldur (data from AArch64SchedTSV110.td)
+- name: ldur
+  operands:
+  - class: register
+    prefix: w
+  - class: memory
+    base: x
+    offset: imd
+    index: '*'
+    scale: '*'
+    post-indexed: false
+    pre-indexed: false
+  throughput: 0.5
+  latency: 4.0
+  port_pressure: [[1, '67']]
 # memory instructions: ldar[b|xr]? (data from AArch64SchedTSV110.td)
 - name: [ldar, ldarb, ldaxr]
   operands:
@@ -2912,6 +2951,22 @@ instruction_forms:
   latency: 2.0
   port_pressure: [[1, '67'], [1, '012']]
   uops: 2 
+# memory instructions: stlb (data from AArch64SchedTSV110.td)
+- name: strb
+  operands:
+  - class: register
+    prefix: w
+  - class: memory
+    base: x
+    offset: '*'
+    index: '*'
+    scale: '*'
+    pre-indexed: false
+    post-indexed: false
+  throughput: 0.5
+  latency: 1.0
+  port_pressure: [[1, '67']]
+  uops: 1
 # memory instructions: stlr (data from AArch64SchedTSV110.td)
 - name: stlr
   operands:
@@ -2944,21 +2999,6 @@ instruction_forms:
   latency: 1.0
   port_pressure: [[1, '67']]
   uops: 1
-# memory instructions: ldur (data from AArch64SchedTSV110.td)
-- name: ldur
-  operands:
-  - class: register
-    prefix: w
-  - class: memory
-    base: x
-    offset: imd
-    index: '*'
-    scale: '*'
-    post-indexed: false
-    pre-indexed: false
-  throughput: 0.5
-  latency: 4.0
-  port_pressure: [[1, '67']]
 # memory instructions: stur (data from AArch64SchedTSV110.td)
 - name: stur
   operands:
