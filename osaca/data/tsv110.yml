@@ -458,6 +458,30 @@ instruction_forms:
   latency: 1.0
   port_pressure: [[1, '012']]
   uops: 1
+- name: asr
+  operands:
+  - class: register
+    prefix: w
+  - class: register
+    prefix: w
+  - class: register
+    prefix: w
+  throughput: 0.3333
+  latency: 1.0
+  port_pressure: [[1, '012']]
+  uops: 1
+- name: asr
+  operands:
+  - class: register
+    prefix: w
+  - class: register
+    prefix: w
+  - class: immediate
+    imd: int
+  throughput: 0.3333
+  latency: 1.0
+  port_pressure: [[1, '012']]
+  uops: 1
 # shift instructions: ror (latency and throughput from asmbench, port data from AArch64SchedTSV110.td)
 - name: ror
   operands:
@@ -1182,7 +1206,17 @@ instruction_forms:
     prefix: x
   latency: 1.0
   port_pressure: [[1, '012']]
-  throughput: 1.0
+  throughput: 0.333
+  uops: 1
+- name: neg
+  operands:
+  - class: register
+    prefix: w
+  - class: register
+    prefix: w
+  latency: 1.0
+  port_pressure: [[1, '012']]
+  throughput: 0.333
   uops: 1
 - name: neg
   operands:
@@ -1192,7 +1226,7 @@ instruction_forms:
     prefix: d
   latency: 2.0
   port_pressure: [[1, '12']]
-  throughput: 1.0
+  throughput: 0.333
   uops: 1
 - name: neg
   operands:
@@ -1204,7 +1238,7 @@ instruction_forms:
     shape: d
   latency: 2.0
   port_pressure: [[1, '12']]
-  throughput: 1.0
+  throughput: 0.5
   uops: 1
 - name: neg
   operands:
@@ -1216,7 +1250,7 @@ instruction_forms:
     shape: s
   latency: 2.0
   port_pressure: [[1, '12']]
-  throughput: 1.0
+  throughput: 0.5
   uops: 1
 - name: neg
   operands:
@@ -1228,10 +1262,10 @@ instruction_forms:
     shape: h
   latency: 2.0
   port_pressure: [[1, '12']]
-  throughput: 1.0
+  throughput: 0.5
   uops: 1
 # arithmetic instructions: negs (latency and throughput from ibench, port data from AArch64SchedTSV110.td) 
-- name: neg
+- name: negs
   operands:
   - class: register
     prefix: x
@@ -2752,11 +2786,71 @@ instruction_forms:
   latency: 4.0
   port_pressure: [[1, '67']]
   uops: 1
+- name: ldrb
+  operands:
+  - class: register
+    prefix: w
+  - class: memory
+    base: x
+    offset: '*'
+    index: '*'
+    scale: '*'
+    pre-indexed: true
+    post-indexed: false
+  throughput: 0.5
+  latency: 5.0
+  port_pressure: [[1, '67'], [1, '012']]
+  uops: 2
+# memory instructions: ldrh (data from AArch64SchedTSV110.td)
+- name: ldrh
+  operands:
+  - class: register
+    prefix: w
+  - class: memory
+    base: x
+    offset: '*'
+    index: '*'
+    scale: '*'
+    pre-indexed: false
+    post-indexed: false
+  throughput: 0.5
+  latency: 4.0
+  port_pressure: [[1, '67']]
+  uops: 1
+- name: ldrh
+  operands:
+  - class: register
+    prefix: w
+  - class: memory
+    base: x
+    offset: '*'
+    index: '*'
+    scale: '*'
+    pre-indexed: true
+    post-indexed: false
+  throughput: 0.5
+  latency: 5.0
+  port_pressure: [[1, '67'], [1, '012']]
+  uops: 2
 # memory instructions: ldur (data from AArch64SchedTSV110.td)
 - name: ldur
   operands:
   - class: register
     prefix: w
+  - class: memory
+    base: x
+    offset: imd
+    index: '*'
+    scale: '*'
+    post-indexed: false
+    pre-indexed: false
+  throughput: 0.5
+  latency: 4.0
+  port_pressure: [[1, '67']]
+- name: ldur
+  operands:
+  - class: register
+    prefix: x
   - class: memory
     base: x
     offset: imd
@@ -3288,6 +3382,57 @@ instruction_forms:
     prefix: x
   - class: memory
     base: x
+    offset: '*'
+    index: '*'
+    scale: '*'
+    pre-indexed: false
+    post-indexed: true
+  throughput: 1.0
+  latency: 2.0
+  port_pressure: [[1, '67'], [1, '012']]
+  uops: 2
+- name: stp
+  operands:
+  - class: register
+    prefix: w
+  - class: register
+    prefix: w
+  - class: memory
+    base: x
+    offset: '*'
+    index: '*'
+    scale: '*'
+    pre-indexed: false
+    post-indexed: false
+  throughput: 1.0
+  latency: 2.0
+  port_pressure: [[2, '67']]
+  uops: 2
+- name: stp
+  operands:
+  - class: register
+    prefix: w
+  - class: register
+    prefix: w
+  - class: memory
+    base: x
+    offset: '*'
+    index: '*'
+    scale: '*'
+    pre-indexed: true
+    post-indexed: false
+  throughput: 1.0
+  latency: 2.0
+  port_pressure: [[1, '67'], [1, '012']]
+  uops: 2
+- name: stp
+  operands:
+  - class: register
+    prefix: w
+  - class: register
+    prefix: w
+  - class: memory
+    base: w
     offset: '*'
     index: '*'
     scale: '*'
