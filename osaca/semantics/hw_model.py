@@ -639,6 +639,12 @@ class MachineModel(object):
             ):
                 return True
             return False
+        if "lanes" in reg:
+            if "lanes" in i_reg and (
+                reg["lanes"] == i_reg["lanes"] or self.WILDCARD in (reg["lanes"] + i_reg["lanes"])
+            ):
+                return True
+            return False
         return True
 
     def _is_x86_reg_type(self, i_reg, reg, consider_masking=False):
