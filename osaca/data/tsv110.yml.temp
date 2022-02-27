@@ -1,0 +1,1214 @@
+osaca_version: 0.4.6
+micro_architecture: TaiShan v110 # https://en.wikichip.org/wiki/hisilicon/microarchitectures/taishan_v110
+arch_code: tsv110
+isa: AArch64
+ROB_size: 128 # https://github.com/llvm/llvm-project/blob/main/llvm/lib/Target/AArch64/AArch64SchedTSV110.td#L21
+retired_uOps_per_cycle: 4 
+scheduler_size: ~   # unknown
+hidden_loads: false
+load_latency: {w: 4.0, x: 4.0, b: 4.0, h: 4.0, s: 4.0, d: 4.0, q: 4.0, v: 4.0}
+load_throughput: []
+load_throughput_default: [[1, '67']]
+store_throughput: []
+store_throughput_default: [[1, '67']]
+ports: ['0', '1', '2', '3', '4', '5', '6', '7']
+port_model_scheme: |
+  +--------------------------------------------------------------------------------------------+
+  |                                - entries                                                   |
+  +--------------------------------------------------------------------------------------------+
+    0 |ALU      1 |AB       2 |AB       3 |MDU           4 |FSU1   5 |FSU2    6 |LdSt   7 |LdSt    
+      \/          \/          \/          \/               \/        \/         \/        \/
+   +---------+ +---------+ +---------+ +-------------+  +-------+ +------ +  +-------+ +-------+ 
+   | INT ALU | | INT ALU | | INT ALU | | Multi-Cycle |  |   FP  | |   FP  |  | LD/ST | | LD/ST |
+   +---------+ |   BRU   | |   BRU   | +-------------+  | ASIMD | | ASIMD |  +-------+ +-------+ 
+               +---------+ +---------+                  +-------+ +-------+ 
+instruction_forms:
+- name: [b, bl, bcc, bcs, bgt, bhi, b.lo, b.ne, b.any, b.none, b.lt, b.eq, b.hs, b.gt, b.hi, bne, beq] 
+  operands:
+  - class: identifier
+  throughput: 0.5
+  latency: 0.0
+  port_pressure: [[1, '12']]
+# arithmetic instructions: add (from AArch64SchedTSV110.td and ibench)
+- name: add 
+  operands:
+  - class: register
+    prefix: w
+  - class: register
+    prefix: w
+  - class: register
+    prefix: w
+  throughput: 0.3333
+  latency: 1.0
+  port_pressure: [[1, '012']] 
+  uops: 1
+- name: add
+  operands:
+  - class: register
+    prefix: x
+  - class: register
+    prefix: x
+  - class: register
+    prefix: x
+  latency: 1.0
+  port_pressure: [[1, '012']]
+  throughput: 0.33333
+  uops: 1
+- name: add
+  operands:
+  - class: register
+    prefix: x
+  - class: register
+    prefix: x
+  - class: immediate
+    imd: int
+  latency: 1.0
+  port_pressure: [[1, '012']]
+  throughput: 0.33333
+  uops: 1
+- name: add
+  operands:
+  - class: register
+    prefix: w
+  - class: register
+    prefix: w
+  - class: immediate
+    imd: int
+  latency: 1.0
+  port_pressure: [[1, '012']]
+  throughput: 0.33333
+  uops: 1
+# arithmetic instructions: adds (latency and throughput from ibench, port data from AArch64SchedTSV110.td)
+- name: adds
+  operands:
+  - class: register
+    prefix: x
+  - class: register
+    prefix: x
+  - class: immediate
+    imd: int
+  latency: 1.0
+  port_pressure: [[1, '12']]
+  throughput: 0.5
+  uops: ~  
+# arithmetic instructions: sub (from AArch64SchedTSV110.td)
+- name: sub
+  operands:
+  - class: register
+    prefix: w
+  - class: register
+    prefix: w
+  - class: register
+    prefix: w
+  throughput: 0.3333
+  latency: 1.0
+  port_pressure: [[1, '012']] 
+  uops: 1
+- name: sub
+  operands:
+  - class: register
+    prefix: x
+  - class: register
+    prefix: x
+  - class: register
+    prefix: x
+  latency: 1.0
+  port_pressure: [[1, '012']]
+  throughput: 0.33333
+  uops: 1
+- name: sub
+  operands:
+  - class: register
+    prefix: x
+  - class: register
+    prefix: x
+  - class: immediate
+    imd: int
+  latency: 1.0
+  port_pressure: [[1, '012']]
+  throughput: 0.33333
+  uops: 1
+- name: sub
+  operands:
+  - class: register
+    prefix: w
+  - class: register
+    prefix: w
+  - class: immediate
+    imd: int
+  latency: 1.0
+  port_pressure: [[1, '012']]
+  throughput: 0.33333
+  uops: 1
+# arithmetic instructions: subs (latency and throughput from ibench, port data from AArch64SchedTSV110.td)
+- name: subs
+  operands:
+  - class: register
+    prefix: x
+  - class: register
+    prefix: x
+  - class: immediate
+    imd: int
+  latency: 1.0
+  port_pressure: [[1, '12']]
+  throughput: 0.5
+  uops: ~
+# arithmetic instructions: mul (latency and throughput from ibench, port data from AArch64SchedTSV110.td)
+- name: mul
+  operands:
+  - class: register
+    prefix: x
+  - class: register
+    prefix: x
+  - class: register
+    prefix: x
+  latency: 4.0
+  port_pressure: [[1, '3']]
+  throughput: 1.0
+  uops: ~
+# arithmetic instructions: fadd (latency and throughput from ibench, port data from AArch64SchedTSV110.td) 
+- name: fadd
+  operands:
+  - class: register
+    prefix: d
+  - class: register
+    prefix: d
+  - class: register
+    prefix: d
+  latency: 4.0
+  port_pressure: [[1, '45']]
+  throughput: 0.5
+  uops: 1
+- name: fadd
+  operands:
+  - class: register
+    prefix: v
+    shape: s
+  - class: register
+    prefix: v
+    shape: s
+  - class: register
+    prefix: v
+    shape: s
+  latency: 5.0
+  port_pressure: [[1, '45']]
+  throughput: 1.321
+  uops: 1
+- name: fadd
+  operands:
+  - class: register
+    prefix: v
+    shape: d
+  - class: register
+    prefix: v
+    shape: d
+  - class: register
+    prefix: v
+    shape: d
+  latency: 4.0
+  port_pressure: [[1, '45']]
+  throughput: 1.0
+  uops: 1
+# arithmetic instructions: fsub (latency and throughput from ibench, port data from AArch64SchedTSV110.td) 
+- name: fsub
+  operands:
+  - class: register
+    prefix: v
+    shape: s
+  - class: register
+    prefix: v
+    shape: s
+  - class: register
+    prefix: v
+    shape: s
+  latency: 5.0
+  port_pressure: [[1, '45']]
+  throughput: 1.321
+  uops: 1
+- name: fsub
+  operands:
+  - class: register
+    prefix: v
+    shape: d
+  - class: register
+    prefix: v
+    shape: d
+  - class: register
+    prefix: v
+    shape: d
+  latency: 4.0
+  port_pressure: [[1, '45']]
+  throughput: 1.0
+  uops: 1
+# arithmetic instructions: fmla (latency and throughput from ibench, port data missed)
+- name: fmla
+  operands:
+  - class: register
+    prefix: v
+    shape: s
+  - class: register
+    prefix: v
+    shape: s
+  - class: register
+    prefix: v
+    shape: s
+  latency: 4.0
+  port_pressure: ~
+  throughput: 0.5
+  uops: ~
+- name: fmla
+  operands:
+  - class: register
+    prefix: v
+    shape: d
+  - class: register
+    prefix: v
+    shape: d
+  - class: register
+    prefix: v
+    shape: d
+  latency: 5.0
+  port_pressure: ~
+  throughput: 1.322
+  uops: ~
+# arithmetic instructions: fmul (latency and throughput from ibench, port data from AArch64SchedTSV110.td) 
+- name: fmul
+  operands:
+  - class: register
+    prefix: s
+  - class: register
+    prefix: s
+  - class: register
+    prefix: s
+  latency: 5.0
+  port_pressure: [[1, '45']]
+  throughput: 0.5
+  uops: 1
+- name: fmul
+  operands:
+  - class: register
+    prefix: d
+  - class: register
+    prefix: d
+  - class: register
+    prefix: d
+  latency: 5.0
+  port_pressure: [[1, '45']]
+  throughput: 0.5
+  uops: 1
+- name: fmul
+  operands:
+  - class: register
+    prefix: v
+    shape: d
+  - class: register
+    prefix: v
+    shape: d
+  - class: register
+    prefix: v
+    shape: d
+  latency: 5.0
+  port_pressure: [[1, '45']]
+  throughput: 1.0
+  uops: 1
+# arithmetic instructions: fdiv (latency and throughput from ibench, port data from AArch64SchedTSV110.td) 
+- name: fdiv
+  operands:
+  - class: register
+    prefix: v
+    shape: s
+  - class: register
+    prefix: v
+    shape: s
+  - class: register
+    prefix: v
+    shape: s
+  latency: 26.0
+  port_pressure: [[1, '45']]
+  throughput: 22.0
+  uops: 1
+- name: fdiv
+  operands:
+  - class: register
+    prefix: v
+    shape: d
+  - class: register
+    prefix: v
+    shape: d
+  - class: register
+    prefix: v
+    shape: d
+  latency: 40.0
+  port_pressure: [[1, '45']]
+  throughput: 36.0
+  uops: 1
+# arithmetic instructions: fsqrt (latency and throughput from ibench, port data from AArch64SchedTSV110.td) 
+- name: fsqrt
+  operands:
+  - class: register
+    prefix: v
+    shape: s
+  - class: register
+    prefix: v
+    shape: s
+  - class: register
+    prefix: v
+    shape: s
+  latency: 22.0
+  port_pressure: [[1, '45']]
+  throughput: 34.0
+  uops: ~
+- name: fsqrt
+  operands:
+  - class: register
+    prefix: v
+    shape: d
+  - class: register
+    prefix: v
+    shape: d
+  - class: register
+    prefix: v
+    shape: d
+  latency: 22.0
+  port_pressure: [[1, '45']]
+  throughput: 64.0
+  uops: ~
+# arithmetic instructions: frecpe (latency and throughput from ibench, port data from AArch64SchedTSV110.td) 
+- name: frecpe
+  operands:
+  - class: register
+    prefix: v
+    shape: s
+  - class: register
+    prefix: v
+    shape: s
+  latency: 3.0
+  port_pressure: [[1, '45']]
+  throughput: 1.0
+  uops: 1
+- name: frecpe
+  operands:
+  - class: register
+    prefix: v
+    shape: d
+  - class: register
+    prefix: v
+    shape: d
+  latency: 3.0
+  port_pressure: [[1, '45']]
+  throughput: 1.0
+  uops: 1
+# miscellaneous instructions: mov (assumed free register renaming, register to register moves without conversion)
+- name: mov
+  operands:
+  - class: register
+    prefix: w
+  - class: register
+    prefix: w
+  latency: 0.0
+  port_pressure: []
+  throughput: 0.0
+  uops: 0
+- name: mov
+  operands:
+  - class: register
+    prefix: x
+  - class: register
+    prefix: x
+  latency: 0.0
+  port_pressure: []
+  throughput: 0.0
+  uops: 0
+- name: mov
+  operands:
+  - class: register
+    prefix: d
+  - class: register
+    prefix: d
+  latency: 0.0
+  port_pressure: []
+  throughput: 0.0
+  uops: 0
+- name: mov
+  operands:
+  - class: register
+    prefix: q
+  - class: register
+    prefix: q
+  latency: 0.0
+  port_pressure: []
+  throughput: 0.0
+  uops: 0
+- name: mov
+  operands:
+  - class: register
+    prefix: v
+    shape: '*'
+  - class: register
+    prefix: v
+    shape: '*'
+  latency: 0.0
+  port_pressure: []
+  throughput: 0.0
+  uops: 0
+# miscellaneous instructions: cmp (throughput from ibench, latency and port data from AArch64SchedTSV110.td)
+- name: cmp
+  operands:
+  - class: register
+    prefix: x
+  - class: register
+    prefix: x
+  latency: 1.0
+  port_pressure: [1, '12']
+  throughput: 0.5
+  uops: 1
+- name: cmp
+  operands:
+  - class: register
+    prefix: w
+  - class: register
+    prefix: w
+  latency: 1.0
+  port_pressure: [1, '12']
+  throughput: 0.5
+  uops: 1
+# miscellaneous instructions: dup (latency and throughput from ibench, port data from AArch64SchedTSV110.td)
+- name: dup
+  operands:
+  - class: register
+    prefix: d
+  - class: register
+    prefix: v
+    shape: d
+  latency: 2.0
+  port_pressure: [2, '45']
+  throughput: 0.667
+  uops: 2
+# miscellaneous instructions: mov (assumed free register renaming, register to register moves without conversion)
+- name: fmov
+  operands:
+  - class: register
+    prefix: s
+  - class: immediate
+    imd: int
+  latency: 0.0
+  port_pressure: []
+  throughput: 0.0
+  uops: 0
+# memory instructions: ldr (data from AArch64SchedTSV110.td)
+- name: ldr
+  operands:
+  - class: register
+    prefix: w
+  - class: memory
+    base: x
+    offset: '*'
+    index: '*'
+    scale: '*'
+    pre-indexed: false
+    post-indexed: false
+  throughput: 0.5
+  latency: 4.0
+  port_pressure: [[1, '67']]
+  uops: 1
+- name: ldr
+  operands:
+  - class: register
+    prefix: w
+  - class: memory
+    base: x
+    offset: '*'
+    index: '*'
+    scale: '*'
+    pre-indexed: true
+    post-indexed: false
+  throughput: 0.5
+  latency: 5.0
+  port_pressure: [[1, '67'], [1, '012']]
+  uops: 2
+- name: ldr
+  operands:
+  - class: register
+    prefix: w
+  - class: memory
+    base: x
+    offset: '*'
+    index: '*'
+    scale: '*'
+    pre-indexed: false
+    post-indexed: true
+  throughput: 0.5
+  latency: 5.0
+  port_pressure: [[1, '67'], [1, '012']]
+  uops: 2
+- name: ldr
+  operands:
+  - class: register
+    prefix: x
+  - class: memory
+    base: x
+    offset: '*'
+    index: '*'
+    scale: '*'
+    pre-indexed: false
+    post-indexed: false
+  throughput: 0.5
+  latency: 4.0
+  port_pressure: [[1, '67']]
+  uops: 2
+- name: ldr
+  operands:
+  - class: register
+    prefix: x
+  - class: memory
+    base: x
+    offset: '*'
+    index: '*'
+    scale: '*'
+    pre-indexed: true
+    post-indexed: false
+  throughput: 0.5
+  latency: 5.0
+  port_pressure: [[1, '67'], [1, '012']]
+  uops: 2
+- name: ldr
+  operands:
+  - class: register
+    prefix: x
+  - class: memory
+    base: x
+    offset: '*'
+    index: '*'
+    scale: '*'
+    pre-indexed: false
+    post-indexed: true
+  throughput: 0.5
+  latency: 4.0
+  port_pressure: [[1, '67'], [1, '012']]
+  uops: 2
+- name: ldr
+  operands:
+  - class: register
+    prefix: d
+  - class: memory
+    base: x
+    offset: '*'
+    index: '*'
+    scale: '*'
+    pre-indexed: false
+    post-indexed: false
+  throughput: 0.5
+  latency: 4.0
+  port_pressure: [[1, '67']]
+  uops: 1
+- name: ldr
+  operands:
+  - class: register
+    prefix: d
+  - class: memory
+    base: x
+    offset: '*'
+    index: '*'
+    scale: '*'
+    pre-indexed: true
+    post-indexed: false
+  throughput: 0.5
+  latency: 5.0
+  port_pressure: [[1, '67'], [1, '012']]
+  uops: 2
+- name: ldr
+  operands:
+  - class: register
+    prefix: d
+  - class: memory
+    base: x
+    offset: '*'
+    index: '*'
+    scale: '*'
+    pre-indexed: false
+    post-indexed: true
+  throughput: 0.5
+  latency: 5.0
+  port_pressure: [[1, '67'], [1, '012']]
+  uops: 2
+- name: ldr
+  operands:
+  - class: register
+    prefix: q
+  - class: memory
+    base: x
+    offset: '*'
+    index: '*'
+    scale: '*'
+    pre-indexed: false
+    post-indexed: false
+  throughput: 0.5
+  latency: 5.0
+  port_pressure: [[1, '67']]
+  uops: 1
+- name: ldr
+  operands:
+  - class: register
+    prefix: q
+  - class: memory
+    base: x
+    offset: '*'
+    index: '*'
+    scale: '*'
+    pre-indexed: true
+    post-indexed: false
+  throughput: 0.5
+  latency: 5.0
+  port_pressure: [[1, '67'], [1, '012']]
+  uops: 2
+- name: ldr
+  operands:
+  - class: register
+    prefix: q
+  - class: memory
+    base: x
+    offset: '*'
+    index: '*'
+    scale: '*'
+    pre-indexed: false
+    post-indexed: true
+  throughput: 0.5
+  latency: 5.0
+  port_pressure: [[1, '67'], [1, '012']]
+  uops: 2
+# memory instructions: ldur (data from AArch64SchedTSV110.td)
+- name: ldur
+  operands:
+  - class: register
+    prefix: w
+  - class: memory
+    base: x
+    offset: imd
+    index: '*'
+    scale: '*'
+    post-indexed: false
+    pre-indexed: false
+  throughput: 0.5
+  latency: 4.0
+  port_pressure: [[1, '67']]
+# memory instructions: str (data from AArch64SchedTSV110.td)
+- name: str
+  operands:
+  - class: register
+    prefix: w
+  - class: memory
+    base: x
+    offset: '*'
+    index: '*'
+    scale: '*'
+    pre-indexed: false
+    post-indexed: false
+  throughput: 0.5
+  latency: 4.0
+  port_pressure: [[1, '67']]
+  uops: 1
+- name: str
+  operands:
+  - class: register
+    prefix: w
+  - class: memory
+    base: x
+    offset: '*'
+    index: '*'
+    scale: '*'
+    pre-indexed: true
+    post-indexed: false
+  throughput: 0.5
+  latency: 5.0
+  port_pressure: [[1, '67'], [1, '012']]
+  uops: 2
+- name: str
+  operands:
+  - class: register
+    prefix: w
+  - class: memory
+    base: x
+    offset: '*'
+    index: '*'
+    scale: '*'
+    pre-indexed: false
+    post-indexed: true
+  throughput: 0.5
+  latency: 5.0
+  port_pressure: [[1, '67'], [1, '012']]
+  uops: 2
+- name: str
+  operands:
+  - class: register
+    prefix: x
+  - class: memory
+    base: x
+    offset: '*'
+    index: '*'
+    scale: '*'
+    pre-indexed: false
+    post-indexed: false
+  throughput: 0.5
+  latency: 4.0
+  port_pressure: [[1, '67']]
+  uops: 1
+- name: str
+  operands:
+  - class: register
+    prefix: x
+  - class: memory
+    base: x
+    offset: '*'
+    index: '*'
+    scale: '*'
+    pre-indexed: true
+    post-indexed: false
+  throughput: 0.5
+  latency: 5.0
+  port_pressure: [[1, '67'], [1, '012']]
+  uops: 2
+- name: str
+  operands:
+  - class: register
+    prefix: x
+  - class: memory
+    base: x
+    offset: '*'
+    index: '*'
+    scale: '*'
+    pre-indexed: false
+    post-indexed: true
+  throughput: 0.5
+  latency: 5.0
+  port_pressure: [[1, '67'], [1, '012']]
+  uops: 2
+- name: str
+  operands:
+  - class: register
+    prefix: d
+  - class: memory
+    base: x
+    offset: '*'
+    index: '*'
+    scale: '*'
+    pre-indexed: false
+    post-indexed: false
+  throughput: 0.5
+  latency: 4.0
+  port_pressure: [[1, '67']]
+  uops: 1
+- name: str
+  operands:
+  - class: register
+    prefix: d
+  - class: memory
+    base: x
+    offset: '*'
+    index: '*'
+    scale: '*'
+    pre-indexed: true
+    post-indexed: false
+  throughput: 0.5
+  latency: 5.0
+  port_pressure: [[1, '67'], [1, '012']]
+  uops: 2
+- name: str
+  operands:
+  - class: register
+    prefix: d
+  - class: memory
+    base: x
+    offset: '*'
+    index: '*'
+    scale: '*'
+    pre-indexed: false
+    post-indexed: true
+  throughput: 0.5
+  latency: 5.0
+  port_pressure: [[1, '67'], [1, '012']]
+  uops: 2
+- name: str
+  operands:
+  - class: register
+    prefix: q
+  - class: memory
+    base: x
+    offset: '*'
+    index: '*'
+    scale: '*'
+    pre-indexed: false
+    post-indexed: false
+  throughput: 0.5
+  latency: 4.0
+  port_pressure: [[1, '67']]
+  uops: 1
+- name: str
+  operands:
+  - class: register
+    prefix: q
+  - class: memory
+    base: x
+    offset: '*'
+    index: '*'
+    scale: '*'
+    pre-indexed: true
+    post-indexed: false
+  throughput: 0.5
+  latency: 5.0
+  port_pressure: [[1, '67'], [1, '012']]
+  uops: 2
+- name: str
+  operands:
+  - class: register
+    prefix: q
+  - class: memory
+    base: x
+    offset: '*'
+    index: '*'
+    scale: '*'
+    pre-indexed: false
+    post-indexed: true
+  throughput: 0.5
+  latency: 5.0
+  port_pressure: [[1, '67'], [1, '012']]
+  uops: 2
+# memory instructions: stur (data from AArch64SchedTSV110.td)
+- name: stur
+  operands:
+  - class: register
+    prefix: q
+  - class: memory
+    base: x
+    offset: '*'
+    index: '*'
+    scale: '*'
+    pre-indexed: false
+    post-indexed: false
+  throughput: 0.5
+  latency: 1.0
+  port_pressure: [[1, '67']]
+  uops: 1
+- name: stur
+  operands:
+  - class: register
+    prefix: d
+  - class: memory
+    base: x
+    offset: '*'
+    index: '*'
+    scale: '*'
+    pre-indexed: false
+    post-indexed: false
+  throughput: 0.5
+  latency: 1.0
+  port_pressure: [[1, '67']]
+  uops: 1
+# memory instructions: ldp (data from AArch64SchedTSV110.td)
+- name: ldp
+  operands:
+  - class: register
+    prefix: x
+  - class: register
+    prefix: x
+  - class: memory
+    base: x
+    offset: '*'
+    index: '*'
+    scale: '*'
+    pre-indexed: false
+    post-indexed: false
+  throughput: 1.0
+  latency: 8.0
+  port_pressure: [[1, '67'], [1, '012']]
+  uops: 2
+- name: ldp
+  operands:
+  - class: register
+    prefix: x
+  - class: register
+    prefix: x
+  - class: memory
+    base: x
+    offset: '*'
+    index: '*'
+    scale: '*'
+    pre-indexed: true
+    post-indexed: false
+  throughput: 1.0
+  latency: 9.0
+  port_pressure: [[2, '67'], [2, '012']]
+  uops: 4
+- name: ldp
+  operands:
+  - class: register
+    prefix: x
+  - class: register
+    prefix: x
+  - class: memory
+    base: x
+    offset: '*'
+    index: '*'
+    scale: '*'
+    pre-indexed: false
+    post-indexed: true
+  throughput: 1.0
+  latency: 9.0
+  port_pressure: [[2, '67'], [2, '012']]
+  uops: 4
+- name: ldp
+  operands:
+  - class: register
+    prefix: d
+  - class: register
+    prefix: d
+  - class: memory
+    base: x
+    offset: '*'
+    index: '*'
+    scale: '*'
+    pre-indexed: false
+    post-indexed: false
+  throughput: 1.0
+  latency: 8.0
+  port_pressure: [[1, '67'], [1, '012']]
+  uops: 2
+- name: ldp
+  operands:
+  - class: register
+    prefix: d
+  - class: register
+    prefix: d
+  - class: memory
+    base: x
+    offset: '*'
+    index: '*'
+    scale: '*'
+    pre-indexed: true
+    post-indexed: false
+  throughput: 1.0
+  latency: 9.0
+  port_pressure: [[2, '67'], [2, '012']]
+  uops: 4
+- name: ldp
+  operands:
+  - class: register
+    prefix: d
+  - class: register
+    prefix: d
+  - class: memory
+    base: x
+    offset: '*'
+    index: '*'
+    scale: '*'
+    pre-indexed: false
+    post-indexed: true
+  throughput: 1.0
+  latency: 9.0
+  port_pressure: [[2, '67'], [2, '012']]
+  uops: 4
+- name: ldp
+  operands:
+  - class: register
+    prefix: q
+  - class: register
+    prefix: q
+  - class: memory
+    base: x
+    offset: '*'
+    index: '*'
+    scale: '*'
+    pre-indexed: false
+    post-indexed: false
+  throughput: 1.0
+  latency: 9.0
+  port_pressure: [[2, '67'], [2, '012']]
+  uops: 4
+- name: ldp
+  operands:
+  - class: register
+    prefix: q
+  - class: register
+    prefix: q
+  - class: memory
+    base: x
+    offset: '*'
+    index: '*'
+    scale: '*'
+    pre-indexed: true
+    post-indexed: false
+  throughput: 1.0
+  latency: 9.0
+  port_pressure: [[2, '67'], [2, '012']]
+  uops: 4
+- name: ldp
+  operands:
+  - class: register
+    prefix: q
+  - class: register
+    prefix: q
+  - class: memory
+    base: x
+    offset: '*'
+    index: '*'
+    scale: '*'
+    pre-indexed: false
+    post-indexed: true
+  throughput: 1.0
+  latency: 9.0
+  port_pressure: [[2, '67'], [2, '012']]
+  uops: 4
+# memory instructions: stp (data from AArch64SchedTSV110.td)
+- name: stp
+  operands:
+  - class: register
+    prefix: x
+  - class: register
+    prefix: x
+  - class: memory
+    base: x
+    offset: '*'
+    index: '*'
+    scale: '*'
+    pre-indexed: false
+    post-indexed: false
+  throughput: 1.0
+  latency: 2.0
+  port_pressure: [[2, '67']
+  uops: 2
+- name: stp
+  operands:
+  - class: register
+    prefix: x
+  - class: register
+    prefix: x
+  - class: memory
+    base: x
+    offset: '*'
+    index: '*'
+    scale: '*'
+    pre-indexed: true
+    post-indexed: false
+  throughput: 1.0
+  latency: 2.0
+  port_pressure: [[1, '67'], [1, '012']]
+  uops: 2
+- name: stp
+  operands:
+  - class: register
+    prefix: x
+  - class: register
+    prefix: x
+  - class: memory
+    base: x
+    offset: '*'
+    index: '*'
+    scale: '*'
+    pre-indexed: false
+    post-indexed: true
+  throughput: 1.0
+  latency: 2.0
+  port_pressure: [[1, '67'], [1, '012']]
+  uops: 2
+- name: stp
+  operands:
+  - class: register
+    prefix: d
+  - class: register
+    prefix: d
+  - class: memory
+    base: x
+    offset: '*'
+    index: '*'
+    scale: '*'
+    pre-indexed: false
+    post-indexed: false
+  throughput: 1.0
+  latency: 2.0
+  port_pressure: [[2, '67']
+  uops: 2
+- name: stp
+  operands:
+  - class: register
+    prefix: d
+  - class: register
+    prefix: d
+  - class: memory
+    base: x
+    offset: '*'
+    index: '*'
+    scale: '*'
+    pre-indexed: true
+    post-indexed: false
+  throughput: 1.0
+  latency: 2.0
+  port_pressure: [[2, '67'], [1, '012']]
+  uops: 3
+- name: stp
+  operands:
+  - class: register
+    prefix: d
+  - class: register
+    prefix: d
+  - class: memory
+    base: x
+    offset: '*'
+    index: '*'
+    scale: '*'
+    pre-indexed: false
+    post-indexed: true
+  throughput: 1.0
+  latency: 2.0
+  port_pressure: [[2, '67'], [1, '012']]
+  uops: 3
+- name: stp
+  operands:
+  - class: register
+    prefix: q
+  - class: register
+    prefix: q
+  - class: memory
+    base: x
+    offset: '*'
+    index: '*'
+    scale: '*'
+    pre-indexed: false
+    post-indexed: false
+  throughput: 1.0
+  latency: 2.0
+  port_pressure: [[2, '67']]
+  uops: 2
+- name: stp
+  operands:
+  - class: register
+    prefix: q
+  - class: register
+    prefix: q
+  - class: memory
+    base: x
+    offset: '*'
+    index: '*'
+    scale: '*'
+    pre-indexed: true
+    post-indexed: false
+  throughput: 1.0
+  latency: 3.0
+  port_pressure: [[2, '67'], [1, '012']]
+  uops: 3
+- name: stp
+  operands:
+  - class: register
+    prefix: q
+  - class: register
+    prefix: q
+  - class: memory
+    base: x
+    offset: '*'
+    index: '*'
+    scale: '*'
+    pre-indexed: false
+    post-indexed: true
+  throughput: 1.0
+  latency: 2.0
+  port_pressure: [[2, '67'], [1, '012']]
+  uops: 3
+
