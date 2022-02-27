@@ -516,21 +516,6 @@ instruction_forms:
   - class: register
     prefix: v
     shape: '*'  
-  - class: register
-    prefix: v
-    shape: '*'
-  latency: 4.0
-  throughput: 1.0
-  port_pressure: [[1, '5']]
-  uops: 1
-- name: [sshll, ushll]
-  operands:
-  - class: register
-    prefix: v
-    shape: '*'
-  - class: register
-    prefix: v
-    shape: '*'  
   - class: immediate
     imd: int
   latency: 4.0
@@ -538,21 +523,6 @@ instruction_forms:
   port_pressure: [[1, '5']]
   uops: 1
 # shift instructions: sshll2 (latency and throughput from asmbench, port data from AArch64SchedTSV110.td)
-- name: sshll2
-  operands:
-  - class: register
-    prefix: v
-    shape: '*'
-  - class: register
-    prefix: v
-    shape: '*'  
-  - class: register
-    prefix: v
-    shape: '*'
-  latency: 4.0
-  throughput: 1.0
-  port_pressure: [[1, '5']]
-  uops: 1
 - name: sshll2
   operands:
   - class: register
