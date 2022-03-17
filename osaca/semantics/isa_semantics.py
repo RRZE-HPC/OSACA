@@ -55,11 +55,7 @@ class ISASemantics(object):
         isa_data = self._isa_model.get_instruction(
             instruction_form["instruction"], instruction_form["operands"]
         )
-        if (
-            isa_data is None
-            and self._isa == "x86"
-            and instruction_form["instruction"][-1] in self.GAS_SUFFIXES
-        ):
+        if isa_data is None and instruction_form["instruction"][-1] in self.GAS_SUFFIXES:
             # Check for instruction without GAS suffix
             isa_data = self._isa_model.get_instruction(
                 instruction_form["instruction"][:-1], instruction_form["operands"]
@@ -81,7 +77,6 @@ class ISASemantics(object):
                 )
                 if (
                     isa_data_reg is None
-                    and self._isa == "x86"
                     and instruction_form["instruction"][-1] in self.GAS_SUFFIXES
                 ):
                     # Check for instruction without GAS suffix
@@ -164,11 +159,7 @@ class ISASemantics(object):
         isa_data = self._isa_model.get_instruction(
             instruction_form["instruction"], instruction_form["operands"]
         )
-        if (
-            isa_data is None
-            and self._isa == "x86"
-            and instruction_form["instruction"][-1] in self.GAS_SUFFIXES
-        ):
+        if isa_data is None and instruction_form["instruction"][-1] in self.GAS_SUFFIXES:
             # Check for instruction without GAS suffix
             isa_data = self._isa_model.get_instruction(
                 instruction_form["instruction"][:-1], instruction_form["operands"]
@@ -192,7 +183,7 @@ class ISASemantics(object):
         for o in instruction_form.operands:
             if "pre_indexed" in o.get("memory", {}):
                 # Assuming no isa_data.operation
-                if isa_data.get("operation", None) is not None:
+                if isa_data is not None and isa_data.get("operation", None) is not None:
                     raise ValueError(
                         "ISA information for pre-indexed instruction {!r} has operation set."
                         "This is currently not supprted.".format(instruction_form.line)
