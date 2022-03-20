@@ -177,7 +177,7 @@ instruction_forms:
   port_pressure: [[1, '012']]
   uops: 1
 # logical instructions: orn (latency and throughput from asmbench, port data from AArch64SchedTSV110.td)
-- name: orr
+- name: orn
   operands:
   - class: register
     prefix: x
@@ -189,7 +189,7 @@ instruction_forms:
   latency: 1.0
   port_pressure: [[1, '012']]
   uops: 1
-- name: orr
+- name: orn
   operands:
   - class: register
     prefix: w
@@ -201,21 +201,30 @@ instruction_forms:
   latency: 1.0
   port_pressure: [[1, '012']]
   uops: 1
-- name: orr
+- name: orn
   operands:
   - class: register
-    prefix: v
-    shape: '*'
+    prefix: x
   - class: register
-    prefix: v
-    shape: '*'
+    prefix: x
+  - class: immediate
+    imd: int
+  throughput: 0.3333
+  latency: 1.0
+  port_pressure: [[1, '012']]
+  uops: 1
+- name: orn
+  operands:
   - class: register
-    prefix: v
-    shape: '*'
-  throughput: 1
-  latency: 2.0
-  port_pressure: [[1, '4'], [1, '5']]
-  uops: 2
+    prefix: w
+  - class: register
+    prefix: w
+  - class: immediate
+    imd: int
+  throughput: 0.3333
+  latency: 1.0
+  port_pressure: [[1, '012']]
+  uops: 1
 # logical instructions: eor (latency and throughput from asmbench, port data from AArch64SchedTSV110.td)
 - name: eor
   operands:
