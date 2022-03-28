@@ -108,7 +108,7 @@ instruction_forms:
 ##########################################
 # assume all register mov's 0 for now
 # TODO add mov instructions
-- name: [vmovupd, vmovups, movupd, movups, movapd, vmovapd, movsd, vmovsd, movss, vmovss, movzb, movzx, movz]
+- name: [vmovupd, vmovups, movupd, movups, movapd, movaps, vmovapd, movsd, vmovsd, movss, vmovss, movzb, movzx, movz]
   operands:
   - class: register
     name: '*'
