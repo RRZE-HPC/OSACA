@@ -120,7 +120,7 @@ instruction_forms:
           post-indexed: "*"
           source: true
           destination: false
-    - name: [ldr, ldur]
+    - name: [ldr, ldur, ldrb, ldrh, ldrsb, ldrsh, ldrsw]
       operands:
         - class: register
           prefix: "*"
