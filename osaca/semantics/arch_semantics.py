@@ -165,11 +165,7 @@ class ArchSemantics(ISASemantics):
             instruction_data = self._machine_model.get_instruction(
                 instruction_form["instruction"], instruction_form["operands"]
             )
-            if (
-                not instruction_data
-                and self._isa == "x86"
-                and instruction_form["instruction"][-1] in self.GAS_SUFFIXES
-            ):
+            if not instruction_data and instruction_form["instruction"][-1] in self.GAS_SUFFIXES:
                 # check for instruction without GAS suffix
                 instruction_data = self._machine_model.get_instruction(
                     instruction_form["instruction"][:-1], instruction_form["operands"]
@@ -200,7 +196,6 @@ class ArchSemantics(ISASemantics):
                     )
                     if (
                         not instruction_data_reg
-                        and self._isa == "x86"
                         and instruction_form["instruction"][-1] in self.GAS_SUFFIXES
                     ):
                         # check for instruction without GAS suffix
