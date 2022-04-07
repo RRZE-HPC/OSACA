@@ -266,6 +266,7 @@ class MachineModel(object):
         """Return ISA for given micro-arch ``arch``."""
         arch_dict = {
             "a64fx": "aarch64",
+            "tsv110": "aarch64",
             "a72": "aarch64",
             "tx2": "aarch64",
             "n1": "aarch64",
@@ -635,6 +636,12 @@ class MachineModel(object):
         if "shape" in reg:
             if "shape" in i_reg and (
                 reg["shape"] == i_reg["shape"] or self.WILDCARD in (reg["shape"] + i_reg["shape"])
+            ):
+                return True
+            return False
+        if "lanes" in reg:
+            if "lanes" in i_reg and (
+                reg["lanes"] == i_reg["lanes"] or self.WILDCARD in (reg["lanes"] + i_reg["lanes"])
             ):
                 return True
             return False
