@@ -540,7 +540,7 @@ class ParserAArch64(BaseParser):
         exponent = int(ieee_val["exponent"], 10)
         if ieee_val["e_sign"] == "-":
             exponent *= -1
-        return float(ieee_val["mantissa"]) * (10 ** exponent)
+        return float(ieee_val["mantissa"]) * (10**exponent)
 
     def parse_register(self, register_string):
         raise NotImplementedError

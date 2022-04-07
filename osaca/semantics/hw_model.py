@@ -811,4 +811,4 @@ class MachineModel(object):
 
     def __represent_none(self, yaml_obj, data):
         """YAML representation for `None`"""
-        return yaml_obj.represent_scalar(u"tag:yaml.org,2002:null", u"~")
+        return yaml_obj.represent_scalar("tag:yaml.org,2002:null", "~")
