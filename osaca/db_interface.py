@@ -615,7 +615,7 @@ def _get_full_instruction_name(instruction_form):
 
 def __represent_none(self, data):
     """Get YAML None representation."""
-    return self.represent_scalar(u"tag:yaml.org,2002:null", u"~")
+    return self.represent_scalar("tag:yaml.org,2002:null", "~")
 
 
 def _create_yaml_object():
