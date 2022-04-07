@@ -104,6 +104,7 @@ class ParserAArch64(BaseParser):
             ^ pp.CaselessLiteral("ror")
             ^ pp.CaselessLiteral("sxtw")
             ^ pp.CaselessLiteral("uxtw")
+            ^ pp.CaselessLiteral("uxtb")
             ^ pp.CaselessLiteral("mul vl")
         )
         arith_immediate = pp.Group(
@@ -384,7 +385,7 @@ class ParserAArch64(BaseParser):
             base["prefix"] = "x"
         if index is not None and "name" in index and index["name"] == "sp":
             index["prefix"] = "x"
-        valid_shift_ops = ["lsl", "uxtw", "sxtw"]
+        valid_shift_ops = ["lsl", "uxtw", "uxtb", "sxtw"]
         if "index" in memory_address:
             if "shift" in memory_address["index"]:
                 if memory_address["index"]["shift_op"].lower() in valid_shift_ops:
