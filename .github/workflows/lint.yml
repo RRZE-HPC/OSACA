@@ -14,10 +14,15 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v1
         with:
-          python-version: 3.8
+          python-version: 3.9
 
       - name: Install Python dependencies
         run: python -m pip install black flake8
+
+      - name: Black solo
+        uses: psf/black@stable
+        with:
+          options: "--check --verbose --diff --color -l 99"
 
       - name: Run linters
         uses: wearerequired/lint-action@v1
