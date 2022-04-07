@@ -172,26 +172,36 @@ instruction_forms:
           name: "CF"
           source: false
           destination: true
+    - name: divsd
+      operands:
+        - class: "register"
+          name: "xmm"
+          source: true
+          destination: false
+        - class: "register"
+          name: "xmm"
+          source: true
+          destination: true
     - name: addsd
       operands:
         - class: "register"
           name: "xmm"
           source: true
-          destination: true
+          destination: false
         - class: "register"
           name: "xmm"
           source: true
-          destination: false
+          destination: true
     - name: [addss, addps, addpd]
       operands:
         - class: "register"
           name: "xmm"
           source: true
-          destination: true
+          destination: false
         - class: "register"
           name: "xmm"
           source: true
-          destination: false
+          destination: true
     - name: [addsubps, addsubpd]
       operands:
         - class: "register"

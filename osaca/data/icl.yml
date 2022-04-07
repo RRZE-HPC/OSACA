@@ -108,7 +108,7 @@ instruction_forms:
 ##########################################
 # assume all register mov's 0 for now
 # TODO add mov instructions
-- name: [vmovupd, vmovups, movupd, movups, movapd, vmovapd, movsd, vmovsd, movss, vmovss, movzb, movzx, movz]
+- name: [vmovupd, vmovups, movupd, movups, movapd, movaps, vmovapd, movsd, vmovsd, movss, vmovss, movzb, movzx, movz]
   operands:
   - class: register
     name: '*'
@@ -118,6 +118,16 @@ instruction_forms:
   port_pressure: []
   throughput: 0.0
   uops: 0
+- name: mov                                                 # ./generate_mov_entries.py csx
+  operands:                                                 # ./generate_mov_entries.py csx
+  - class: register                                         # ./generate_mov_entries.py csx
+    name: gpr                                               # ./generate_mov_entries.py csx
+  - class: register                                         # ./generate_mov_entries.py csx
+    name: gpr                                               # ./generate_mov_entries.py csx
+  latency: 1                                                # ./generate_mov_entries.py csx
+  port_pressure: [[1, '0156']]                              # ./generate_mov_entries.py csx
+  throughput: 0.25                                          # ./generate_mov_entries.py csx
+  uops: 1                                                   # ./generate_mov_entries.py csx
 ##########################################
 - name: ADCX                                                         # model_importer.py instructions.xml ICL
   operands:                                                          # model_importer.py instructions.xml ICL
