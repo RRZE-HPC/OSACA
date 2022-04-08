@@ -1,4 +1,4 @@
-osaca_version: 0.4.6
+osaca_version: 0.4.8
 micro_architecture: TaiShan v110 # https://en.wikichip.org/wiki/hisilicon/microarchitectures/taishan_v110
 arch_code: tsv110
 isa: AArch64
