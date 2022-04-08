@@ -129,6 +129,26 @@ instruction_forms:
   throughput: 0.25                                          # ./generate_mov_entries.py csx
   uops: 1                                                   # ./generate_mov_entries.py csx
 ##########################################
+- name: AND                                                          # model_importer.py instructions.xml ICL
+  operands:                                                          # model_importer.py instructions.xml ICL
+  - class: register                                                 # model_importer.py instructions.xml ICL
+    name: gpr                                                         # model_importer.py instructions.xml ICL
+  - class: register                                                  # model_importer.py instructions.xml ICL
+    name: gpr                                                        # model_importer.py instructions.xml ICL
+  latency: 1                                                         # model_importer.py instructions.xml ICL
+  port_pressure: [[1, '0156']]                                       # model_importer.py instructions.xml ICL
+  throughput: 0.25                                                   # model_importer.py instructions.xml ICL
+  uops: 1                                                            # model_importer.py instructions.xml ICL
+- name: OR                                                          # model_importer.py instructions.xml ICL
+  operands:                                                          # model_importer.py instructions.xml ICL
+  - class: register                                                 # model_importer.py instructions.xml ICL
+    name: gpr                                                         # model_importer.py instructions.xml ICL
+  - class: register                                                  # model_importer.py instructions.xml ICL
+    name: gpr                                                        # model_importer.py instructions.xml ICL
+  latency: 1                                                         # model_importer.py instructions.xml ICL
+  port_pressure: [[1, '0156']]                                       # model_importer.py instructions.xml ICL
+  throughput: 0.25                                                   # model_importer.py instructions.xml ICL
+  uops: 1                                                            # model_importer.py instructions.xml ICL
 - name: ADCX                                                         # model_importer.py instructions.xml ICL
   operands:                                                          # model_importer.py instructions.xml ICL
   - class: register                                                  # model_importer.py instructions.xml ICL
