@@ -565,6 +565,18 @@ instruction_forms:
   - class: register
     prefix: x
   - class: register
+    prefix: w
+  latency: 1
+  port_pressure: [[1, '012']]
+  throughput: 0.33333
+  uops: 1
+- name: add
+  operands:
+  - class: register
+    prefix: x
+  - class: register
+    prefix: x
+  - class: register
     prefix: x
   latency: 1
   port_pressure: [[1, '012']]
