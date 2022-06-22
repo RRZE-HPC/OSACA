@@ -53,6 +53,8 @@ class TestMarkerUtils(unittest.TestCase):
         bytes_3_lines_2 = ".byte     213\n" + ".byte     3,32\n" + ".byte     31\n"
         bytes_3_lines_3 = ".byte     213\n" + ".byte     3\n" + ".byte     32,31\n"
         bytes_4_lines = ".byte     213\n" + ".byte     3\n" + ".byte     32\n" + ".byte     31\n"
+        bytes_hex = ".byte 0xd5, 0x3, 0x20, 0x1f\n"
+        bytes_mixed = ".byte 0xd5\n.byte 3,0x20\n.byte 31\n"
         mov_start_1 = "mov      x1, #111\n"
         mov_start_2 = "mov      x1, 111  // should work as well\n"
         mov_end_1 = "mov      x1, #222 // preferred way\n"
@@ -80,6 +82,8 @@ class TestMarkerUtils(unittest.TestCase):
             bytes_3_lines_2,
             bytes_3_lines_3,
             bytes_4_lines,
+            bytes_hex,
+            bytes_mixed
         ]
         mov_start_variations = [mov_start_1, mov_start_2]
         mov_end_variations = [mov_end_1, mov_end_2]
@@ -129,6 +133,8 @@ class TestMarkerUtils(unittest.TestCase):
             + ".byte     103 # IACA MARKER UTILITY\n"
             + ".byte     144 # IACA MARKER UTILITY\n"
         )
+        bytes_hex_line = ".byte     0x64,0x67,0x90\n"
+        bytes_mixed = ".byte     0x64 # MARKER\n .byte 103,0x90 # ANOTHER MARKER\n"
         mov_start_1 = "movl      $111, %ebx # IACA START\n"
         mov_start_2 = "mov      $111, %ebx # IACA START\n"
         mov_end_1 = "movl      $222, %ebx # IACA END\n"
@@ -148,6 +154,8 @@ class TestMarkerUtils(unittest.TestCase):
             bytes_2_lines_1,
             bytes_2_lines_2,
             bytes_3_lines,
+            bytes_hex_line,
+            bytes_mixed
         ]
         mov_start_variations = [mov_start_1, mov_start_2]
         mov_end_variations = [mov_end_1, mov_end_2]
