@@ -83,7 +83,7 @@ class TestMarkerUtils(unittest.TestCase):
             bytes_3_lines_3,
             bytes_4_lines,
             bytes_hex,
-            bytes_mixed
+            bytes_mixed,
         ]
         mov_start_variations = [mov_start_1, mov_start_2]
         mov_end_variations = [mov_end_1, mov_end_2]
@@ -155,7 +155,7 @@ class TestMarkerUtils(unittest.TestCase):
             bytes_2_lines_2,
             bytes_3_lines,
             bytes_hex_line,
-            bytes_mixed
+            bytes_mixed,
         ]
         mov_start_variations = [mov_start_1, mov_start_2]
         mov_end_variations = [mov_end_1, mov_end_2]
