@@ -35,7 +35,7 @@ def find_marked_kernel_AArch64(lines):
     :param list lines: kernel
     :returns: `tuple of int` -- start and end line of marked section
     """
-    nop_bytes = ["213", "3", "32", "31"]
+    nop_bytes = [213, 3, 32, 31]
     return find_marked_section(
         lines,
         ParserAArch64(),
@@ -55,7 +55,7 @@ def find_marked_kernel_x86ATT(lines):
     :param list lines: kernel
     :returns: `tuple of int` -- start and end line of marked section
     """
-    nop_bytes = ["100", "103", "144"]
+    nop_bytes = [100, 103, 144]
     return find_marked_section(
         lines,
         ParserX86ATT(),
@@ -186,7 +186,7 @@ def match_bytes(lines, index, byte_list):
         and lines[index].directive.name == "byte"
     ):
         line_count += 1
-        extracted_bytes += lines[index].directive.parameters
+        extracted_bytes += [int(x, 0) for x in lines[index].directive.parameters]
         index += 1
     if extracted_bytes[0 : len(byte_list)] == byte_list:
         return True, line_count
