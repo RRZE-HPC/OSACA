@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-from collections import OrderedDict, defaultdict
+from collections import defaultdict
 from fractions import Fraction
 
 
@@ -42,7 +42,9 @@ class EntryBuilder:
                 description += '    scale: "*"\n'
             else:
                 if "{k}" in ot:
-                    description += "  - class: register\n    name: {}\n    mask: True\n".format(ot.replace("{k}", ""))
+                    description += "  - class: register\n    name: {}\n    mask: True\n".format(
+                        ot.replace("{k}", "")
+                    )
                 else:
                     description += "  - class: register\n    name: {}\n".format(ot)
 
@@ -107,15 +109,13 @@ class EntryBuilderIntelPort9(EntryBuilder):
             port_pressure = port_pressure + [[1, "79"], [1, "48"]]
             operands = ["mem" if o == "mem" else o for o in operand_types]
             latency += 0
-            return (
-                EntryBuilder.build_description(
-                    self,
-                    instruction_name,
-                    operands,
-                    port_pressure,
-                    latency,
-                    "with store",
-                )
+            return EntryBuilder.build_description(
+                self,
+                instruction_name,
+                operands,
+                port_pressure,
+                latency,
+                "with store",
             )
 
         # Register only:
@@ -132,9 +132,7 @@ def get_description(instruction_form, port_pressure, latency, rhs_comment=None):
 
         commented_entry = ""
         for line in entry.split("\n"):
-            commented_entry += ("{:<" + str(max_length) + "}  # {}\n").format(
-                line, rhs_comment
-            )
+            commented_entry += ("{:<" + str(max_length) + "}  # {}\n").format(line, rhs_comment)
         entry = commented_entry
 
     return entry
