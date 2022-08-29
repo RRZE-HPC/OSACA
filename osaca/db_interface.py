@@ -260,7 +260,7 @@ def _create_db_operand_aarch64(operand):
 
 def _create_db_operand_x86(operand):
     """Get DB operand for AArch64 by operand string."""
-    if operand == "r":
+    if operand.startswith("r"):
         return {"class": "register", "name": "gpr"}
     elif operand in "xyz":
         return {"class": "register", "name": operand + "mm"}
