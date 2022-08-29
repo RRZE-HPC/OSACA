@@ -126,15 +126,13 @@ class MOVEntryBuilderIntelPort9(MOVEntryBuilder):
             port_pressure = port_pressure + [[1, "79"], [1, "48"]]
             operands = ["mem" if o == "mem" else o for o in operand_types]
             latency += 0
-            return (
-                MOVEntryBuilder.build_description(
-                    self,
-                    instruction_name,
-                    operands,
-                    port_pressure,
-                    latency,
-                    "with store",
-                )
+            return MOVEntryBuilder.build_description(
+                self,
+                instruction_name,
+                operands,
+                port_pressure,
+                latency,
+                "with store",
             )
 
         # Register only:
@@ -243,7 +241,7 @@ icx_mov_instructions = [
     ("vmovdqa64 zmm zmm", ("1*p05", 1)),
     ("vmovdqa64 mem zmm", ("", 0)),
     ("vmovdqa64 zmm mem", ("", 0)),
-   # https://www.felixcloutier.com/x86/movdqu:vmovdqu8:vmovdqu16:vmovdqu32:vmovdqu64
+    # https://www.felixcloutier.com/x86/movdqu:vmovdqu8:vmovdqu16:vmovdqu32:vmovdqu64
     ("movdqu xmm xmm", ("1*p015", 1)),
     ("movdqu mem xmm", ("", 0)),
     ("movdqu xmm mem", ("", 0)),
@@ -330,9 +328,9 @@ icx_mov_instructions = [
     ("vmovntdq zmm mem", ("", 0)),  # TODO NT-store: what latency to use?
     # https://www.felixcloutier.com/x86/movntdqa
     ("movntdqa mem xmm", ("", 0)),  # TODO NT-store: what latency to use?
-    ("vmovntdqa mem xmm", ("", 0)), # TODO NT-store: what latency to use?
-    ("vmovntdqa mem ymm", ("", 0)), # TODO NT-store: what latency to use?
-    ("vmovntdqa mem zmm", ("", 0)), # TODO NT-store: what latency to use?
+    ("vmovntdqa mem xmm", ("", 0)),  # TODO NT-store: what latency to use?
+    ("vmovntdqa mem ymm", ("", 0)),  # TODO NT-store: what latency to use?
+    ("vmovntdqa mem zmm", ("", 0)),  # TODO NT-store: what latency to use?
     # https://www.felixcloutier.com/x86/movnti
     ("movnti gpr mem", ("", 0)),  # TODO NT-store: what latency to use?
     # https://www.felixcloutier.com/x86/movntpd
