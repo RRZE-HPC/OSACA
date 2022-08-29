@@ -3294,6 +3294,27 @@ instruction_forms:
           destination: true
     - name: push
       operands:
+        - class: "memory"
+          base: "*"
+          offset: "*"
+          index: "*"
+          scale: "*"
+          source: true
+          destination: false
+      hidden_operands:
+        - class: "memory"
+          base: {name: 'rsp'}
+          offset: ~
+          index: ~
+          scale: 1
+          source: false
+          destination: true
+        - class: "register"
+          name: "rsp"
+          source: true
+          destination: true
+    - name: push
+      operands:
         - class: "register"
           name: "gpr"
           source: true

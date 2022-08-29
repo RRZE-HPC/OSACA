@@ -273,7 +273,6 @@ class MachineModel(object):
             "zen1": "x86",
             "zen+": "x86",
             "zen2": "x86",
-            "icl": "x86",
             "con": "x86",  # Intel Conroe
             "wol": "x86",  # Intel Wolfdale
             "snb": "x86",
@@ -289,6 +288,7 @@ class MachineModel(object):
             "cnl": "x86",
             "cfl": "x86",
             "icl": "x86",
+            "icx": "x86",
         }
         arch = arch.lower()
         if arch in arch_dict:
