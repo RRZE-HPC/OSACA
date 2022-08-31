@@ -4796,7 +4796,7 @@ instruction_forms:
   - class: register                      # ibench
     name: xmm                            # ibench
   latency: 13                            # ibench
-  port_pressure: [[1, '0'], [4, '0DV']]  # ibench
+  port_pressure: [[1, '0'], [4, ['0DV']]]  # ibench
   throughput: 4.0                        # ibench
   uops: 5                                # ibench
 - name: vdivpd                           # asmbench 
@@ -4808,7 +4808,7 @@ instruction_forms:
   - class: register                      # asmbench
     name: ymm                            # asmbench
   latency: 13                            # asmbench
-  port_pressure: [[1, '0'], [8, '0DV']]  # asmbench
+  port_pressure: [[1, '0'], [8, ['0DV']]]  # asmbench
   throughput: 8.0                        # asmbench
   uops: 9                                # asmbench
 - name: vdivpd                              # ibench
