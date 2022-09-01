@@ -3424,6 +3424,12 @@ instruction_forms:
           name: "ID"
           source: true
           destination: false
+    - name: [sar, sal, shl, shr]
+      operands:
+        - class: "register"
+          name: "gpr"
+          source: true
+          destination: true 
     - name: sbb
       operands:
         - class: "register"
