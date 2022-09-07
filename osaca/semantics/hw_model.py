@@ -690,6 +690,8 @@ class MachineModel(object):
                             return False
                 return True
         else:
+            if reg["name"].rstrip(string.digits).lower() == i_reg_name:
+                return True
             if i_reg_name == "gpr":
                 return True
         return False
