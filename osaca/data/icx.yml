@@ -10170,7 +10170,7 @@ instruction_forms:
   - class: register                                                  # model_importer.py instructions.xml ICL
     name: xmm                                                        # model_importer.py instructions.xml ICL
   - class: register                                                  # model_importer.py instructions.xml ICL
-    name: k	                                                         # model_importer.py instructions.xml ICL
+    name: k                                                         # model_importer.py instructions.xml ICL
   latency: 3                                                         # model_importer.py instructions.xml ICL
   port_pressure: [[1, '5']]                                          # model_importer.py instructions.xml ICL
   throughput: 1.0                                                    # model_importer.py instructions.xml ICL
@@ -10182,7 +10182,7 @@ instruction_forms:
   - class: register                                                  # model_importer.py instructions.xml ICL
     name: ymm                                                        # model_importer.py instructions.xml ICL
   - class: register                                                  # model_importer.py instructions.xml ICL
-    name: k	                                                         # model_importer.py instructions.xml ICL
+    name: k                                                         # model_importer.py instructions.xml ICL
   latency: 3                                                         # model_importer.py instructions.xml ICL
   port_pressure: [[1, '5']]                                          # model_importer.py instructions.xml ICL
   throughput: 1.0                                                    # model_importer.py instructions.xml ICL
@@ -10194,7 +10194,7 @@ instruction_forms:
   - class: register                                                  # model_importer.py instructions.xml ICL
     name: zmm                                                        # model_importer.py instructions.xml ICL
   - class: register                                                  # model_importer.py instructions.xml ICL
-    name: k	                                                         # model_importer.py instructions.xml ICL
+    name: k                                                         # model_importer.py instructions.xml ICL
   latency: 3                                                         # model_importer.py instructions.xml ICL
   port_pressure: [[1, '5']]                                          # model_importer.py instructions.xml ICL
   throughput: 1.0                                                    # model_importer.py instructions.xml ICL
@@ -10206,9 +10206,9 @@ instruction_forms:
   - class: register                                                  # model_importer.py instructions.xml ICL
     name: xmm                                                        # model_importer.py instructions.xml ICL
   - class: register                                                  # model_importer.py instructions.xml ICL
-    name: k	                                                         # model_importer.py instructions.xml ICL
+    name: k                                                         # model_importer.py instructions.xml ICL
   - class: register                                                  # model_importer.py instructions.xml ICL
-    name: k	                                                         # model_importer.py instructions.xml ICL
+    name: k                                                         # model_importer.py instructions.xml ICL
   latency: 3                                                         # model_importer.py instructions.xml ICL
   port_pressure: [[1, '5']]                                          # model_importer.py instructions.xml ICL
   throughput: 1.0                                                    # model_importer.py instructions.xml ICL
@@ -10220,9 +10220,9 @@ instruction_forms:
   - class: register                                                  # model_importer.py instructions.xml ICL
     name: ymm                                                        # model_importer.py instructions.xml ICL
   - class: register                                                  # model_importer.py instructions.xml ICL
-    name: k	                                                         # model_importer.py instructions.xml ICL
+    name: k                                                         # model_importer.py instructions.xml ICL
   - class: register                                                  # model_importer.py instructions.xml ICL
-    name: k	                                                         # model_importer.py instructions.xml ICL
+    name: k                                                         # model_importer.py instructions.xml ICL
   latency: 3                                                         # model_importer.py instructions.xml ICL
   port_pressure: [[1, '5']]                                          # model_importer.py instructions.xml ICL
   throughput: 1.0                                                    # model_importer.py instructions.xml ICL
@@ -10234,9 +10234,9 @@ instruction_forms:
   - class: register                                                  # model_importer.py instructions.xml ICL
     name: zmm                                                        # model_importer.py instructions.xml ICL
   - class: register                                                  # model_importer.py instructions.xml ICL
-    name: k	                                                         # model_importer.py instructions.xml ICL
+    name: k                                                         # model_importer.py instructions.xml ICL
   - class: register                                                  # model_importer.py instructions.xml ICL
-    name: k	                                                         # model_importer.py instructions.xml ICL
+    name: k                                                         # model_importer.py instructions.xml ICL
   latency: 3                                                         # model_importer.py instructions.xml ICL
   port_pressure: [[1, '5']]                                          # model_importer.py instructions.xml ICL
   throughput: 1.0                                                    # model_importer.py instructions.xml ICL
