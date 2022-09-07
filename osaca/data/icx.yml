@@ -10241,3 +10241,23 @@ instruction_forms:
   port_pressure: [[1, '5']]                                          # model_importer.py instructions.xml ICL
   throughput: 1.0                                                    # model_importer.py instructions.xml ICL
   uops: 1                                                            # model_importer.py instructions.xml ICL
+- name: VCOMISD                                                      # model_importer.py instructions.xml ICL
+  operands:                                                          # model_importer.py instructions.xml ICL
+  - class: register                                                  # model_importer.py instructions.xml ICL
+    name: xmm                                                        # model_importer.py instructions.xml ICL
+  - class: register                                                  # model_importer.py instructions.xml ICL
+    name: xmm                                                        # model_importer.py instructions.xml ICL
+  latency: 3                                                         # model_importer.py instructions.xml ICL
+  port_pressure: [[1, '0']]                                          # model_importer.py instructions.xml ICL
+  throughput: 1.0                                                    # model_importer.py instructions.xml ICL
+  uops: 1                                                            # model_importer.py instructions.xml ICL
+- name: VCOMISS                                                      # model_importer.py instructions.xml ICL
+  operands:                                                          # model_importer.py instructions.xml ICL
+  - class: register                                                  # model_importer.py instructions.xml ICL
+    name: xmm                                                        # model_importer.py instructions.xml ICL
+  - class: register                                                  # model_importer.py instructions.xml ICL
+    name: xmm                                                        # model_importer.py instructions.xml ICL
+  latency: 3                                                         # model_importer.py instructions.xml ICL
+  port_pressure: [[1, '0']]                                          # model_importer.py instructions.xml ICL
+  throughput: 1.0                                                    # model_importer.py instructions.xml ICL
+  uops: 1                                                            # model_importer.py instructions.xml ICL
