@@ -82,7 +82,7 @@ instruction_forms:
   throughput: 0.0
   latency: 0.0
   port_pressure: []
-- name: jmp 
+- name: jmp
   operands:
   - class: identifier
   throughput: 0.0
@@ -5002,7 +5002,7 @@ instruction_forms:
   port_pressure: [[1, '0'], [4, ['0DV']]]  # ibench
   throughput: 4.0                          # ibench
   uops: 5                                  # ibench
-- name: [vfmadd213pd, vfmadd132pd, vfmadd231pd]  # ibench
+- name: [vfmadd213pd, vfmadd132pd, vfmadd231pd, vfnmadd213pd, vfnmadd132pd, vfnmadd231pd]  # ibench
   operands:                                      # ibench
   - class: register                              # ibench
     name: xmm                                    # ibench
@@ -5014,7 +5014,7 @@ instruction_forms:
   port_pressure: [[1, '01']]                     # ibench
   throughput: 0.5                                # ibench
   uops: 1                                        # ibench
-- name: [vfmadd213pd, vfmadd132pd, vfmadd231pd]  # ibench
+- name: [vfmadd213pd, vfmadd132pd, vfmadd231pd, vfnmadd213pd, vfnmadd132pd, vfnmadd231pd]  # ibench
   operands:                                      # ibench
   - class: register                              # ibench
     name: xmm                                    # ibench
@@ -5027,7 +5027,7 @@ instruction_forms:
   port_pressure: [[1, '01']]                     # ibench
   throughput: 0.5                                # ibench
   uops: 1                                        # ibench
-- name: [vfmadd213pd, vfmadd132pd, vfmadd231pd]  # ibench
+- name: [vfmadd213pd, vfmadd132pd, vfmadd231pd, vfnmadd213pd, vfnmadd132pd, vfnmadd231pd]  # ibench
   operands:                                      # ibench
   - class: register                              # ibench
     name: ymm                                    # ibench
@@ -5040,7 +5040,7 @@ instruction_forms:
   port_pressure: [[1, '01']]                     # ibench
   throughput: 0.5                                # ibench
   uops: 1                                        # ibench
-- name: [vfmadd213pd, vfmadd132pd, vfmadd231pd]  # ibench
+- name: [vfmadd213pd, vfmadd132pd, vfmadd231pd, vfnmadd213pd, vfnmadd132pd, vfnmadd231pd]  # ibench
   operands:                                      # ibench
   - class: register                              # ibench
     name: ymm                                    # ibench
@@ -5052,7 +5052,7 @@ instruction_forms:
   port_pressure: [[1, '01']]                     # ibench
   throughput: 0.5                                # ibench
   uops: 1                                        # ibench
-- name: [vfmadd213pd, vfmadd132pd, vfmadd231pd]  # ibench
+- name: [vfmadd213pd, vfmadd132pd, vfmadd231pd, vfnmadd213pd, vfnmadd132pd, vfnmadd231pd]  # ibench
   operands:                                      # ibench
   - class: register                              # ibench
     name: zmm                                    # ibench
@@ -5064,82 +5064,7 @@ instruction_forms:
   port_pressure: [[1, '05']]                     # ibench
   throughput: 0.5                                # ibench
   uops: 1                                        # ibench
-- name: [vfmadd213pd, vfmadd132pd, vfmadd231pd]  # ibench
-  operands:                                      # ibench
-  - class: register                              # ibench
-    name: zmm                                    # ibench
-  - class: register                              # ibench
-    name: zmm                                    # ibench
-  - class: register                              # ibench
-    name: zmm                                    # ibench
-    mask: True                                   # ibench
-  latency: 4                                     # ibench
-  port_pressure: [[1, '05']]                     # ibench
-  throughput: 0.5                                # ibench
-  uops: 1                                        # ibench
-- name: [vfmadd213ps, vfmadd132ps, vfmadd231ps]  # ibench
-  operands:                                      # ibench
-  - class: register                              # ibench
-    name: xmm                                    # ibench
-  - class: register                              # ibench
-    name: xmm                                    # ibench
-  - class: register                              # ibench
-    name: xmm                                    # ibench
-  latency: 4                                     # ibench
-  port_pressure: [[1, '01']]                     # ibench
-  throughput: 0.5                                # ibench
-  uops: 1                                        # ibench
-- name: [vfmadd213ps, vfmadd132ps, vfmadd231ps]  # ibench
-  operands:                                      # ibench
-  - class: register                              # ibench
-    name: xmm                                    # ibench
-  - class: register                              # ibench
-    name: xmm                                    # ibench
-  - class: register                              # ibench
-    name: xmm                                    # ibench
-    mask: True                                   # ibench
-  latency: 4                                     # ibench
-  port_pressure: [[1, '01']]                     # ibench
-  throughput: 0.5                                # ibench
-  uops: 1                                        # ibench
-- name: [vfmadd213ps, vfmadd132ps, vfmadd231ps]  # ibench
-  operands:                                      # ibench
-  - class: register                              # ibench
-    name: ymm                                    # ibench
-  - class: register                              # ibench
-    name: ymm                                    # ibench
-  - class: register                              # ibench
-    name: ymm                                    # ibench
-  latency: 4                                     # ibench
-  port_pressure: [[1, '01']]                     # ibench
-  throughput: 0.5                                # ibench
-  uops: 1                                        # ibench
-- name: [vfmadd213ps, vfmadd132ps, vfmadd231ps]  # ibench
-  operands:                                      # ibench
-  - class: register                              # ibench
-    name: ymm                                    # ibench
-  - class: register                              # ibench
-    name: ymm                                    # ibench
-  - class: register                              # ibench
-    name: ymm                                    # ibench
-    mask: True                                   # ibench
-  latency: 4                                     # ibench
-  port_pressure: [[1, '01']]                     # ibench
-  throughput: 0.5                                # ibench
-  uops: 1                                        # ibench
-- name: [vfmadd213ps, vfmadd132ps, vfmadd231ps]  # ibench
-  operands:                                      # ibench
-  - class: register                              # ibench
-    name: zmm                                    # ibench
-  - class: register                              # ibench
-    name: zmm                                    # ibench
-  - class: register                              # ibench
-    name: zmm                                    # ibench
-  latency: 4                                     # ibench
-  port_pressure: [[1, '05']]                     # ibench
-  throughput: 0.5                                # ibench
-  uops: 1                                        # ibench
-- name: [vfmadd213ps, vfmadd132ps, vfmadd231ps]  # ibench
+- name: [vfmadd213pd, vfmadd132pd, vfmadd231pd, vfnmadd213pd, vfnmadd132pd, vfnmadd231pd]  # ibench
   operands:                                      # ibench
   - class: register                              # ibench
     name: zmm                                    # ibench
@@ -5152,7 +5077,7 @@ instruction_forms:
   port_pressure: [[1, '05']]                     # ibench
   throughput: 0.5                                # ibench
   uops: 1                                        # ibench
-- name: [vfmadd213sd, vfmadd132sd, vfmadd231sd]  # ibench
+- name: [vfmadd213ps, vfmadd132ps, vfmadd231ps, vfnmadd213ps, vfnmadd132ps, vfnmadd231ps]  # ibench
   operands:                                      # ibench
   - class: register                              # ibench
     name: xmm                                    # ibench
@@ -5164,20 +5089,7 @@ instruction_forms:
   port_pressure: [[1, '01']]                     # ibench
   throughput: 0.5                                # ibench
   uops: 1                                        # ibench
-- name: [vfmadd213sd, vfmadd132sd, vfmadd231sd]  # ibench
-  operands:                                      # ibench
-  - class: register                              # ibench
-    name: xmm                                    # ibench
-  - class: register                              # ibench
-    name: xmm                                    # ibench
-  - class: register                              # ibench
-    name: xmm                                    # ibench
-    mask: True                                   # ibench
-  latency: 4                                     # ibench
-  port_pressure: [[1, '01']]                     # ibench
-  throughput: 0.5                                # ibench
-  uops: 1                                        # ibench
-- name: [vfmadd213ss, vfmadd132ss, vfmadd231ss]  # ibench
+- name: [vfmadd213ps, vfmadd132ps, vfmadd231ps, vfnmadd213ps, vfnmadd132ps, vfnmadd231ps]  # ibench
   operands:                                      # ibench
   - class: register                              # ibench
     name: xmm                                    # ibench
@@ -5190,44 +5102,19 @@ instruction_forms:
   port_pressure: [[1, '01']]                     # ibench
   throughput: 0.5                                # ibench
   uops: 1                                        # ibench
-- name: [vfmadd213ss, vfmadd132ss, vfmadd231ss]  # ibench
+- name: [vfmadd213ps, vfmadd132ps, vfmadd231ps, vfnmadd213ps, vfnmadd132ps, vfnmadd231ps]  # ibench
   operands:                                      # ibench
   - class: register                              # ibench
-    name: xmm                                    # ibench
+    name: ymm                                    # ibench
   - class: register                              # ibench
-    name: xmm                                    # ibench
+    name: ymm                                    # ibench
   - class: register                              # ibench
-    name: xmm                                    # ibench
+    name: ymm                                    # ibench
   latency: 4                                     # ibench
   port_pressure: [[1, '01']]                     # ibench
   throughput: 0.5                                # ibench
   uops: 1                                        # ibench
-- name: [vfmsub213pd, vfmsub132pd, vfmsub231pd]  # ibench
-  operands:                                      # ibench
-  - class: register                              # ibench
-    name: xmm                                    # ibench
-  - class: register                              # ibench
-    name: xmm                                    # ibench
-  - class: register                              # ibench
-    name: xmm                                    # ibench
-  latency: 4                                     # ibench
-  port_pressure: [[1, '01']]                     # ibench
-  throughput: 0.5                                # ibench
-  uops: 1                                        # ibench
-- name: [vfmsub213pd, vfmsub132pd, vfmsub231pd]  # ibench
-  operands:                                      # ibench
-  - class: register                              # ibench
-    name: xmm                                    # ibench
-  - class: register                              # ibench
-    name: xmm                                    # ibench
-  - class: register                              # ibench
-    name: xmm                                    # ibench
-    mask: True                                   # ibench
-  latency: 4                                     # ibench
-  port_pressure: [[1, '01']]                     # ibench
-  throughput: 0.5                                # ibench
-  uops: 1                                        # ibench
-- name: [vfmsub213pd, vfmsub132pd, vfmsub231pd]  # ibench
+- name: [vfmadd213ps, vfmadd132ps, vfmadd231ps, vfnmadd213ps, vfnmadd132ps, vfnmadd231ps]  # ibench
   operands:                                      # ibench
   - class: register                              # ibench
     name: ymm                                    # ibench
@@ -5240,19 +5127,7 @@ instruction_forms:
   port_pressure: [[1, '01']]                     # ibench
   throughput: 0.5                                # ibench
   uops: 1                                        # ibench
-- name: [vfmsub213pd, vfmsub132pd, vfmsub231pd]  # ibench
-  operands:                                      # ibench
-  - class: register                              # ibench
-    name: ymm                                    # ibench
-  - class: register                              # ibench
-    name: ymm                                    # ibench
-  - class: register                              # ibench
-    name: ymm                                    # ibench
-  latency: 4                                     # ibench
-  port_pressure: [[1, '01']]                     # ibench
-  throughput: 0.5                                # ibench
-  uops: 1                                        # ibench
-- name: [vfmsub213pd, vfmsub132pd, vfmsub231pd]  # ibench
+- name: [vfmadd213ps, vfmadd132ps, vfmadd231ps, vfnmadd213ps, vfnmadd132ps, vfnmadd231ps]  # ibench
   operands:                                      # ibench
   - class: register                              # ibench
     name: zmm                                    # ibench
@@ -5264,7 +5139,7 @@ instruction_forms:
   port_pressure: [[1, '05']]                     # ibench
   throughput: 0.5                                # ibench
   uops: 1                                        # ibench
-- name: [vfmsub213pd, vfmsub132pd, vfmsub231pd]  # ibench
+- name: [vfmadd213ps, vfmadd132ps, vfmadd231ps, vfnmadd213ps, vfnmadd132ps, vfnmadd231ps]  # ibench
   operands:                                      # ibench
   - class: register                              # ibench
     name: zmm                                    # ibench
@@ -5277,7 +5152,7 @@ instruction_forms:
   port_pressure: [[1, '05']]                     # ibench
   throughput: 0.5                                # ibench
   uops: 1                                        # ibench
-- name: [vfmsub213ps, vfmsub132ps, vfmsub231ps]  # ibench
+- name: [vfmadd213sd, vfmadd132sd, vfmadd231sd, vfnmadd213ps, vfnmadd132ps, vfnmadd231ps]  # ibench
   operands:                                      # ibench
   - class: register                              # ibench
     name: xmm                                    # ibench
@@ -5289,7 +5164,7 @@ instruction_forms:
   port_pressure: [[1, '01']]                     # ibench
   throughput: 0.5                                # ibench
   uops: 1                                        # ibench
-- name: [vfmsub213ps, vfmsub132ps, vfmsub231ps]  # ibench
+- name: [vfmadd213sd, vfmadd132sd, vfmadd231sd, vfnmadd213ps, vfnmadd132ps, vfnmadd231ps]  # ibench
   operands:                                      # ibench
   - class: register                              # ibench
     name: xmm                                    # ibench
@@ -5302,19 +5177,57 @@ instruction_forms:
   port_pressure: [[1, '01']]                     # ibench
   throughput: 0.5                                # ibench
   uops: 1                                        # ibench
-- name: [vfmsub213ps, vfmsub132ps, vfmsub231ps]  # ibench
+- name: [vfmadd213ss, vfmadd132ss, vfmadd231ss, vfnmadd213ss, vfnmadd132ss, vfnmadd231ss]  # ibench
   operands:                                      # ibench
   - class: register                              # ibench
-    name: ymm                                    # ibench
+    name: xmm                                    # ibench
   - class: register                              # ibench
-    name: ymm                                    # ibench
+    name: xmm                                    # ibench
   - class: register                              # ibench
-    name: ymm                                    # ibench
+    name: xmm                                    # ibench
+    mask: True                                   # ibench
   latency: 4                                     # ibench
   port_pressure: [[1, '01']]                     # ibench
   throughput: 0.5                                # ibench
   uops: 1                                        # ibench
-- name: [vfmsub213ps, vfmsub132ps, vfmsub231ps]  # ibench
+- name: [vfmadd213ss, vfmadd132ss, vfmadd231ss, vfnmadd213ss, vfnmadd132ss, vfnmadd231ss]  # ibench
+  operands:                                      # ibench
+  - class: register                              # ibench
+    name: xmm                                    # ibench
+  - class: register                              # ibench
+    name: xmm                                    # ibench
+  - class: register                              # ibench
+    name: xmm                                    # ibench
+  latency: 4                                     # ibench
+  port_pressure: [[1, '01']]                     # ibench
+  throughput: 0.5                                # ibench
+  uops: 1                                        # ibench
+- name: [vfmsub213pd, vfmsub132pd, vfmsub231pd, vfnmsub213pd, vfnmsub132pd, vfnmsub231pd]  # ibench
+  operands:                                      # ibench
+  - class: register                              # ibench
+    name: xmm                                    # ibench
+  - class: register                              # ibench
+    name: xmm                                    # ibench
+  - class: register                              # ibench
+    name: xmm                                    # ibench
+  latency: 4                                     # ibench
+  port_pressure: [[1, '01']]                     # ibench
+  throughput: 0.5                                # ibench
+  uops: 1                                        # ibench
+- name: [vfmsub213pd, vfmsub132pd, vfmsub231pd, vfnmsub213pd, vfnmsub132pd, vfnmsub231pd]  # ibench
+  operands:                                      # ibench
+  - class: register                              # ibench
+    name: xmm                                    # ibench
+  - class: register                              # ibench
+    name: xmm                                    # ibench
+  - class: register                              # ibench
+    name: xmm                                    # ibench
+    mask: True                                   # ibench
+  latency: 4                                     # ibench
+  port_pressure: [[1, '01']]                     # ibench
+  throughput: 0.5                                # ibench
+  uops: 1                                        # ibench
+- name: [vfmsub213pd, vfmsub132pd, vfmsub231pd, vfnmsub213pd, vfnmsub132pd, vfnmsub231pd]  # ibench
   operands:                                      # ibench
   - class: register                              # ibench
     name: ymm                                    # ibench
@@ -5327,7 +5240,19 @@ instruction_forms:
   port_pressure: [[1, '01']]                     # ibench
   throughput: 0.5                                # ibench
   uops: 1                                        # ibench
-- name: [vfmsub213ps, vfmsub132ps, vfmsub231ps]  # ibench
+- name: [vfmsub213pd, vfmsub132pd, vfmsub231pd, vfnmsub213pd, vfnmsub132pd, vfnmsub231pd]  # ibench
+  operands:                                      # ibench
+  - class: register                              # ibench
+    name: ymm                                    # ibench
+  - class: register                              # ibench
+    name: ymm                                    # ibench
+  - class: register                              # ibench
+    name: ymm                                    # ibench
+  latency: 4                                     # ibench
+  port_pressure: [[1, '01']]                     # ibench
+  throughput: 0.5                                # ibench
+  uops: 1                                        # ibench
+- name: [vfmsub213pd, vfmsub132pd, vfmsub231pd, vfnmsub213pd, vfnmsub132pd, vfnmsub231pd]  # ibench
   operands:                                      # ibench
   - class: register                              # ibench
     name: zmm                                    # ibench
@@ -5339,7 +5264,7 @@ instruction_forms:
   port_pressure: [[1, '05']]                     # ibench
   throughput: 0.5                                # ibench
   uops: 1                                        # ibench
-- name: [vfmsub213ps, vfmsub132ps, vfmsub231ps]  # ibench
+- name: [vfmsub213pd, vfmsub132pd, vfmsub231pd, vfnmsub213pd, vfnmsub132pd, vfnmsub231pd]  # ibench
   operands:                                      # ibench
   - class: register                              # ibench
     name: zmm                                    # ibench
@@ -5352,7 +5277,7 @@ instruction_forms:
   port_pressure: [[1, '05']]                     # ibench
   throughput: 0.5                                # ibench
   uops: 1                                        # ibench
-- name: [vfmsub213sd, vfmsub132sd, vfmsub231sd]  # ibench
+- name: [vfmsub213ps, vfmsub132ps, vfmsub231ps, vfnmsub213ps, vfnmsub132ps, vfnmsub231ps]  # ibench
   operands:                                      # ibench
   - class: register                              # ibench
     name: xmm                                    # ibench
@@ -5364,20 +5289,7 @@ instruction_forms:
   port_pressure: [[1, '01']]                     # ibench
   throughput: 0.5                                # ibench
   uops: 1                                        # ibench
-- name: [vfmsub213sd, vfmsub132sd, vfmsub231sd]  # ibench
-  operands:                                      # ibench
-  - class: register                              # ibench
-    name: xmm                                    # ibench
-  - class: register                              # ibench
-    name: xmm                                    # ibench
-  - class: register                              # ibench
-    name: xmm                                    # ibench
-    mask: True                                   # ibench
-  latency: 4                                     # ibench
-  port_pressure: [[1, '01']]                     # ibench
-  throughput: 0.5                                # ibench
-  uops: 1                                        # ibench
-- name: [vfmsub213ss, vfmsub132ss, vfmsub231ss]  # ibench
+- name: [vfmsub213ps, vfmsub132ps, vfmsub231ps, vfnmsub213ps, vfnmsub132ps, vfnmsub231ps]  # ibench
   operands:                                      # ibench
   - class: register                              # ibench
     name: xmm                                    # ibench
@@ -5390,7 +5302,95 @@ instruction_forms:
   port_pressure: [[1, '01']]                     # ibench
   throughput: 0.5                                # ibench
   uops: 1                                        # ibench
-- name: [vfmsub213ss, vfmsub132ss, vfmsub231ss]  # ibench
+- name: [vfmsub213ps, vfmsub132ps, vfmsub231ps, vfnmsub213ps, vfnmsub132ps, vfnmsub231ps]  # ibench
+  operands:                                      # ibench
+  - class: register                              # ibench
+    name: ymm                                    # ibench
+  - class: register                              # ibench
+    name: ymm                                    # ibench
+  - class: register                              # ibench
+    name: ymm                                    # ibench
+  latency: 4                                     # ibench
+  port_pressure: [[1, '01']]                     # ibench
+  throughput: 0.5                                # ibench
+  uops: 1                                        # ibench
+- name: [vfmsub213ps, vfmsub132ps, vfmsub231ps, vfnmsub213ps, vfnmsub132ps, vfnmsub231ps]  # ibench
+  operands:                                      # ibench
+  - class: register                              # ibench
+    name: ymm                                    # ibench
+  - class: register                              # ibench
+    name: ymm                                    # ibench
+  - class: register                              # ibench
+    name: ymm                                    # ibench
+    mask: True                                   # ibench
+  latency: 4                                     # ibench
+  port_pressure: [[1, '01']]                     # ibench
+  throughput: 0.5                                # ibench
+  uops: 1                                        # ibench
+- name: [vfmsub213ps, vfmsub132ps, vfmsub231ps, vfnmsub213ps, vfnmsub132ps, vfnmsub231ps]  # ibench
+  operands:                                      # ibench
+  - class: register                              # ibench
+    name: zmm                                    # ibench
+  - class: register                              # ibench
+    name: zmm                                    # ibench
+  - class: register                              # ibench
+    name: zmm                                    # ibench
+  latency: 4                                     # ibench
+  port_pressure: [[1, '05']]                     # ibench
+  throughput: 0.5                                # ibench
+  uops: 1                                        # ibench
+- name: [vfmsub213ps, vfmsub132ps, vfmsub231ps, vfnmsub213ps, vfnmsub132ps, vfnmsub231ps]  # ibench
+  operands:                                      # ibench
+  - class: register                              # ibench
+    name: zmm                                    # ibench
+  - class: register                              # ibench
+    name: zmm                                    # ibench
+  - class: register                              # ibench
+    name: zmm                                    # ibench
+    mask: True                                   # ibench
+  latency: 4                                     # ibench
+  port_pressure: [[1, '05']]                     # ibench
+  throughput: 0.5                                # ibench
+  uops: 1                                        # ibench
+- name: [vfmsub213sd, vfmsub132sd, vfmsub231sd, vfnmsub213sd, vfnmsub132sd, vfnmsub231sd]  # ibench
+  operands:                                      # ibench
+  - class: register                              # ibench
+    name: xmm                                    # ibench
+  - class: register                              # ibench
+    name: xmm                                    # ibench
+  - class: register                              # ibench
+    name: xmm                                    # ibench
+  latency: 4                                     # ibench
+  port_pressure: [[1, '01']]                     # ibench
+  throughput: 0.5                                # ibench
+  uops: 1                                        # ibench
+- name: [vfmsub213sd, vfmsub132sd, vfmsub231sd, vfnmsub213sd, vfnmsub132sd, vfnmsub231sd]  # ibench
+  operands:                                      # ibench
+  - class: register                              # ibench
+    name: xmm                                    # ibench
+  - class: register                              # ibench
+    name: xmm                                    # ibench
+  - class: register                              # ibench
+    name: xmm                                    # ibench
+    mask: True                                   # ibench
+  latency: 4                                     # ibench
+  port_pressure: [[1, '01']]                     # ibench
+  throughput: 0.5                                # ibench
+  uops: 1                                        # ibench
+- name: [vfmsub213ss, vfmsub132ss, vfmsub231ss, vfnmsub213ss, vfnmsub132ss, vfnmsub231ss]  # ibench
+  operands:                                      # ibench
+  - class: register                              # ibench
+    name: xmm                                    # ibench
+  - class: register                              # ibench
+    name: xmm                                    # ibench
+  - class: register                              # ibench
+    name: xmm                                    # ibench
+    mask: True                                   # ibench
+  latency: 4                                     # ibench
+  port_pressure: [[1, '01']]                     # ibench
+  throughput: 0.5                                # ibench
+  uops: 1                                        # ibench
+- name: [vfmsub213ss, vfmsub132ss, vfmsub231ss, vfnmsub213ss, vfnmsub132ss, vfnmsub231ss]  # ibench
   operands:                                      # ibench
   - class: register                              # ibench
     name: xmm                                    # ibench
@@ -6937,6 +6937,108 @@ instruction_forms:
   port_pressure: [[1, '5']]                           # asmbench
   throughput: 1.0                                     # asmbench
   uops: 1                                             # asmbench
+- name: [vpcmpgtb, vpcmpgtw, vpcmpgtd, vpcmpgtq]
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: k
+  latency: 3
+  port_pressure: [[1, '5']]
+  throughput: 1.0
+  uops: 1
+- name: [vpcmpgtb, vpcmpgtw, vpcmpgtd, vpcmpgtq]
+  operands:
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  - class: register
+    name: k
+  latency: 3
+  port_pressure: [[1, '5']]
+  throughput: 1.0
+  uops: 1
+- name: [vpcmpgtb, vpcmpgtw, vpcmpgtd, vpcmpgtq, vpcmpeqb, vpcmpeqw, vpcmpeqd, vpcmpeqq]
+  operands:
+  - class: register
+    name: zmm
+  - class: register
+    name: zmm
+  - class: register
+    name: k
+  latency: 3
+  port_pressure: [[1, '5']]
+  throughput: 1.0
+  uops: 1
+- name: vpcmpd
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: k
+  latency: 3
+  port_pressure: [[1, '5']]
+  throughput: 1.0
+  uops: 1
+- name: vpcmpd
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  - class: register
+    name: k
+  latency: 3
+  port_pressure: [[1, '5']]
+  throughput: 1.0
+  uops: 1
+- name: vpcmpd
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: zmm
+  - class: register
+    name: zmm
+  - class: register
+    name: k
+  latency: 3
+  port_pressure: [[1, '5']]
+  throughput: 1.0
+  uops: 1
+- name: [vpcmpeqb, vpcmpeqw, vpcmpeqd, vpcmpeqq]
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '01']]
+  throughput: 0.5
+  uops: 1
+- name: [vpcmpeqb, vpcmpeqw, vpcmpeqd, vpcmpeqq]
+  operands:
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  latency: 1
+  port_pressure: [[1, '01']]
+  throughput: 0.5
+  uops: 1
 #################################################
 - name: AND                                                          # model_importer.py instructions.xml ICL
   operands:                                                          # model_importer.py instructions.xml ICL
@@ -10061,3 +10163,81 @@ instruction_forms:
   port_pressure: [[1, '01'], [2, '5']]                               # model_importer.py instructions.xml ICL
   throughput: 2.0                                                    # model_importer.py instructions.xml ICL
   uops: 3                                                            # model_importer.py instructions.xml ICL
+- name: [VFPCLASSPH, VFPCLASSPS, VFPCLASSPD]                         # model_importer.py instructions.xml ICL
+  operands:                                                          # model_importer.py instructions.xml ICL
+  - class: immediate                                                 # model_importer.py instructions.xml ICL
+    imd: int                                                         # model_importer.py instructions.xml ICL
+  - class: register                                                  # model_importer.py instructions.xml ICL
+    name: xmm                                                        # model_importer.py instructions.xml ICL
+  - class: register                                                  # model_importer.py instructions.xml ICL
+    name: k	                                                         # model_importer.py instructions.xml ICL
+  latency: 3                                                         # model_importer.py instructions.xml ICL
+  port_pressure: [[1, '5']]                                          # model_importer.py instructions.xml ICL
+  throughput: 1.0                                                    # model_importer.py instructions.xml ICL
+  uops: 1                                                            # model_importer.py instructions.xml ICL
+- name: [VFPCLASSPH, VFPCLASSPS, VFPCLASSPD]                         # model_importer.py instructions.xml ICL
+  operands:                                                          # model_importer.py instructions.xml ICL
+  - class: immediate                                                 # model_importer.py instructions.xml ICL
+    imd: int                                                         # model_importer.py instructions.xml ICL
+  - class: register                                                  # model_importer.py instructions.xml ICL
+    name: ymm                                                        # model_importer.py instructions.xml ICL
+  - class: register                                                  # model_importer.py instructions.xml ICL
+    name: k	                                                         # model_importer.py instructions.xml ICL
+  latency: 3                                                         # model_importer.py instructions.xml ICL
+  port_pressure: [[1, '5']]                                          # model_importer.py instructions.xml ICL
+  throughput: 1.0                                                    # model_importer.py instructions.xml ICL
+  uops: 1                                                            # model_importer.py instructions.xml ICL
+- name: [VFPCLASSPH, VFPCLASSPS, VFPCLASSPD]                         # model_importer.py instructions.xml ICL
+  operands:                                                          # model_importer.py instructions.xml ICL
+  - class: immediate                                                 # model_importer.py instructions.xml ICL
+    imd: int                                                         # model_importer.py instructions.xml ICL
+  - class: register                                                  # model_importer.py instructions.xml ICL
+    name: zmm                                                        # model_importer.py instructions.xml ICL
+  - class: register                                                  # model_importer.py instructions.xml ICL
+    name: k	                                                         # model_importer.py instructions.xml ICL
+  latency: 3                                                         # model_importer.py instructions.xml ICL
+  port_pressure: [[1, '5']]                                          # model_importer.py instructions.xml ICL
+  throughput: 1.0                                                    # model_importer.py instructions.xml ICL
+  uops: 1                                                            # model_importer.py instructions.xml ICL
+- name: [VFPCLASSPH, VFPCLASSPS, VFPCLASSPD]                         # model_importer.py instructions.xml ICL
+  operands:                                                          # model_importer.py instructions.xml ICL
+  - class: immediate                                                 # model_importer.py instructions.xml ICL
+    imd: int                                                         # model_importer.py instructions.xml ICL
+  - class: register                                                  # model_importer.py instructions.xml ICL
+    name: xmm                                                        # model_importer.py instructions.xml ICL
+  - class: register                                                  # model_importer.py instructions.xml ICL
+    name: k	                                                         # model_importer.py instructions.xml ICL
+  - class: register                                                  # model_importer.py instructions.xml ICL
+    name: k	                                                         # model_importer.py instructions.xml ICL
+  latency: 3                                                         # model_importer.py instructions.xml ICL
+  port_pressure: [[1, '5']]                                          # model_importer.py instructions.xml ICL
+  throughput: 1.0                                                    # model_importer.py instructions.xml ICL
+  uops: 1                                                            # model_importer.py instructions.xml ICL
+- name: [VFPCLASSPH, VFPCLASSPS, VFPCLASSPD]                         # model_importer.py instructions.xml ICL
+  operands:                                                          # model_importer.py instructions.xml ICL
+  - class: immediate                                                 # model_importer.py instructions.xml ICL
+    imd: int                                                         # model_importer.py instructions.xml ICL
+  - class: register                                                  # model_importer.py instructions.xml ICL
+    name: ymm                                                        # model_importer.py instructions.xml ICL
+  - class: register                                                  # model_importer.py instructions.xml ICL
+    name: k	                                                         # model_importer.py instructions.xml ICL
+  - class: register                                                  # model_importer.py instructions.xml ICL
+    name: k	                                                         # model_importer.py instructions.xml ICL
+  latency: 3                                                         # model_importer.py instructions.xml ICL
+  port_pressure: [[1, '5']]                                          # model_importer.py instructions.xml ICL
+  throughput: 1.0                                                    # model_importer.py instructions.xml ICL
+  uops: 1                                                            # model_importer.py instructions.xml ICL
+- name: [VFPCLASSPH, VFPCLASSPS, VFPCLASSPD]                         # model_importer.py instructions.xml ICL
+  operands:                                                          # model_importer.py instructions.xml ICL
+  - class: immediate                                                 # model_importer.py instructions.xml ICL
+    imd: int                                                         # model_importer.py instructions.xml ICL
+  - class: register                                                  # model_importer.py instructions.xml ICL
+    name: zmm                                                        # model_importer.py instructions.xml ICL
+  - class: register                                                  # model_importer.py instructions.xml ICL
+    name: k	                                                         # model_importer.py instructions.xml ICL
+  - class: register                                                  # model_importer.py instructions.xml ICL
+    name: k	                                                         # model_importer.py instructions.xml ICL
+  latency: 3                                                         # model_importer.py instructions.xml ICL
+  port_pressure: [[1, '5']]                                          # model_importer.py instructions.xml ICL
+  throughput: 1.0                                                    # model_importer.py instructions.xml ICL
+  uops: 1                                                            # model_importer.py instructions.xml ICL
