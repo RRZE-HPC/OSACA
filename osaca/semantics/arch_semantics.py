@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
 """Semantics opbject responsible for architecture specific semantic operations"""
 
+import sys
 import warnings
 from itertools import chain
 from operator import itemgetter
+from copy import deepcopy
 
 from .hw_model import MachineModel
 from .isa_semantics import INSTR_FLAGS, ISASemantics
@@ -31,7 +33,7 @@ class ArchSemantics(ISASemantics):
         if self._machine_model.has_hidden_loads():
             self.set_hidden_loads(kernel)
 
-    def assign_optimal_throughput(self, kernel):
+    def assign_optimal_throughput(self, kernel, start=0):
         """
         Assign optimal throughput port pressure to a kernel. This is done in steps of ``0.01cy``.
 
@@ -40,7 +42,26 @@ class ArchSemantics(ISASemantics):
         INC = 0.01
         kernel.reverse()
         port_list = self._machine_model.get_ports()
-        for instruction_form in kernel:
+        for idx, instruction_form in enumerate(kernel[start:], start):
+            multiple_assignments = False
+            # if iform has multiple possible port assignments, check all in a DFS manner and take the best
+            if isinstance(instruction_form["port_uops"], dict):
+                best_kernel = None
+                best_kernel_tp = sys.maxsize
+                for port_util_alt in list(instruction_form["port_uops"].values())[1:]:
+                    k_tmp = deepcopy(kernel)
+                    k_tmp[idx]["port_uops"] = deepcopy(port_util_alt)
+                    k_tmp[idx]["port_pressure"] = self._machine_model.average_port_pressure(
+                        k_tmp[idx]["port_uops"]
+                    )
+                    k_tmp.reverse()
+                    self.assign_optimal_throughput(k_tmp, idx)
+                    if max(self.get_throughput_sum(k_tmp)) < best_kernel_tp:
+                        best_kernel = k_tmp
+                        best_kernel_tp = max(self.get_throughput_sum(best_kernel))
+                # check the first option in the main branch and compare against the best option later
+                multiple_assignments = True
+                kernel[idx]["port_uops"] = list(instruction_form["port_uops"].values())[0]
             for uop in instruction_form["port_uops"]:
                 cycles = uop[0]
                 ports = list(uop[1])
@@ -84,6 +105,7 @@ class ArchSemantics(ISASemantics):
                                     p
                                     for p in indices
                                     if round(instruction_form["port_pressure"][p], 2) == 0
+                                    or instruction_form["port_pressure"][p] < 0.00
                                 ][0]
                                 instruction_form["port_pressure"][zero_index] = 0.0
                             # Remove from further balancing
@@ -108,6 +130,11 @@ class ArchSemantics(ISASemantics):
                             itemgetter(*indices)(self.get_throughput_sum(kernel))
                         )
         kernel.reverse()
+        if multiple_assignments:
+            if max(self.get_throughput_sum(kernel)) > best_kernel_tp:
+                for i, instr in enumerate(best_kernel):
+                    kernel[i]["port_uops"] = best_kernel[i]["port_uops"]
+                    kernel[i]["port_pressure"] = best_kernel[i]["port_pressure"]
 
     def set_hidden_loads(self, kernel):
         """Hide loads behind stores if architecture supports hidden loads (depricated)"""
@@ -209,11 +236,12 @@ class ArchSemantics(ISASemantics):
                                 operands.index(self._create_reg_wildcard())
                             ]
                         )
+                        dummy_reg = {"class": "register", "name": reg_type}
                         data_port_pressure = [0.0 for _ in range(port_number)]
                         data_port_uops = []
                         if INSTR_FLAGS.HAS_LD in instruction_form["flags"]:
                             # LOAD performance data
-                            data_port_uops = self._machine_model.get_load_throughput(
+                            load_perf_data = self._machine_model.get_load_throughput(
                                 [
                                     x["memory"]
                                     for x in instruction_form["semantic_operands"]["source"]
@@ -221,6 +249,19 @@ class ArchSemantics(ISASemantics):
                                     if "memory" in x
                                 ][0]
                             )
+                            # if multiple options, choose based on reg type
+                            data_port_uops = [
+                                ldp["port_pressure"]
+                                for ldp in load_perf_data
+                                if "dst" in ldp
+                                and self._machine_model._check_operands(
+                                    dummy_reg, {"register": {"name": ldp["dst"]}}
+                                )
+                            ]
+                            if len(data_port_uops) < 1:
+                                data_port_uops = load_perf_data[0]["port_pressure"]
+                            else:
+                                data_port_uops = data_port_uops[0]
                             data_port_pressure = self._machine_model.average_port_pressure(
                                 data_port_uops
                             )
@@ -235,9 +276,22 @@ class ArchSemantics(ISASemantics):
                                 instruction_form["semantic_operands"]["destination"]
                                 + instruction_form["semantic_operands"]["src_dst"]
                             )
-                            st_data_port_uops = self._machine_model.get_store_throughput(
+                            store_perf_data = self._machine_model.get_store_throughput(
                                 [x["memory"] for x in destinations if "memory" in x][0]
                             )
+                            # if multiple options, choose based on reg type
+                            st_data_port_uops = [
+                                stp["port_pressure"]
+                                for stp in store_perf_data
+                                if "src" in stp
+                                and self._machine_model._check_operands(
+                                    dummy_reg, {"register": {"name": stp["src"]}}
+                                )
+                            ]
+                            if len(data_port_uops) < 1:
+                                st_data_port_uops = store_perf_data[0]["port_pressure"]
+                            else:
+                                st_data_port_uops = st_data_port_uops[0]
                             # zero data port pressure and remove HAS_ST flag if
                             #   - no mem operand in dst &&
                             #   - all mem operands in src_dst are pre-/post-indexed

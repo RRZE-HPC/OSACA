@@ -143,11 +143,16 @@ class MachineModel(object):
             print("\nname: {}\noperands: {}".format(name, operands))
             raise TypeError from e
 
-    def average_port_pressure(self, port_pressure):
+    def average_port_pressure(self, port_pressure, option=0):
         """Construct average port pressure list from instruction data."""
         port_list = self._data["ports"]
         average_pressure = [0.0] * len(port_list)
-        for cycles, ports in port_pressure:
+        # if there are multiple port utilization options and none is selected, choose first one
+        if isinstance(port_pressure, dict):
+            used_pp = port_pressure[option]
+        else:
+            used_pp = port_pressure
+        for cycles, ports in used_pp:
             for p in ports:
                 try:
                     average_pressure[port_list.index(p)] += cycles / len(ports)
@@ -221,8 +226,8 @@ class MachineModel(object):
         """Return load thorughput for given register type."""
         ld_tp = [m for m in self._data["load_throughput"] if self._match_mem_entries(memory, m)]
         if len(ld_tp) > 0:
-            return ld_tp[0]["port_pressure"].copy()
-        return self._data["load_throughput_default"].copy()
+            return ld_tp.copy()
+        return [{"port_pressure": self._data["load_throughput_default"].copy()}]
 
     def get_store_latency(self, reg_type):
         """Return store latency for given register type."""
@@ -233,8 +238,8 @@ class MachineModel(object):
         """Return store throughput for given register type."""
         st_tp = [m for m in self._data["store_throughput"] if self._match_mem_entries(memory, m)]
         if len(st_tp) > 0:
-            return st_tp[0]["port_pressure"].copy()
-        return self._data["store_throughput_default"].copy()
+            return st_tp.copy()
+        return [{"port_pressure": self._data["store_throughput_default"].copy()}]
 
     def _match_mem_entries(self, mem, i_mem):
         """Check if memory addressing ``mem`` and ``i_mem`` are of the same type."""
@@ -273,6 +278,7 @@ class MachineModel(object):
             "zen1": "x86",
             "zen+": "x86",
             "zen2": "x86",
+            "zen3": "x86",
             "con": "x86",  # Intel Conroe
             "wol": "x86",  # Intel Wolfdale
             "snb": "x86",
