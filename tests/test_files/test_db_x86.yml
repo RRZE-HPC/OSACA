@@ -61,6 +61,24 @@ port_model_scheme: |
    +-------+ |  VNNI |                         
              +-------+                         
 instruction_forms:
+- name: fantasyinstr1
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  port_pressure: {0: [[1, '015']], 1: [[1, '56']]}
+  throughput: 0.333333
+  latency: 1.0
+- name: fantasyinstr2
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  port_pressure: [[1, '0'], [1, '1'], [1, '5']]
+  throughput: 0.5
+  latency: 1.0
 - name: LEA
   operands:
   - class: memory

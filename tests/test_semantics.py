@@ -175,7 +175,7 @@ class TestSemanticTools(unittest.TestCase):
         self.assertEqual(
             test_mm_x86.get_store_throughput(
                 {"base": {"name": "x"}, "offset": None, "index": None, "scale": 1}
-            ),
+            )[0]["port_pressure"],
             [[2, "237"], [2, "4"]],
         )
         self.assertEqual(
@@ -186,13 +186,13 @@ class TestSemanticTools(unittest.TestCase):
                     "index": "NOT_NONE",
                     "scale": 1,
                 }
-            ),
+            )[0]["port_pressure"],
             [[1, "23"], [1, "4"]],
         )
         self.assertEqual(
             test_mm_arm.get_store_throughput(
                 {"base": {"prefix": "x"}, "offset": None, "index": None, "scale": 1}
-            ),
+            )[0]["port_pressure"],
             [[2, "34"], [2, "5"]],
         )
         self.assertEqual(
@@ -203,7 +203,7 @@ class TestSemanticTools(unittest.TestCase):
                     "index": None,
                     "scale": 1,
                 }
-            ),
+            )[0]["port_pressure"],
             [[1, "34"], [1, "5"]],
         )
 
@@ -228,7 +228,7 @@ class TestSemanticTools(unittest.TestCase):
         self.assertEqual(
             test_mm_x86.get_load_throughput(
                 {"base": {"name": "x"}, "offset": None, "index": None, "scale": 1}
-            ),
+            )[0]["port_pressure"],
             [[1, "23"], [1, ["2D", "3D"]]],
         )
 
@@ -288,6 +288,21 @@ class TestSemanticTools(unittest.TestCase):
         tp_optimal = self.semantics_csx.get_throughput_sum(kernel_optimal)
         self.assertNotEqual(tp_fixed, tp_optimal)
         self.assertTrue(max(tp_optimal) <= max(tp_fixed))
+        # test multiple port assignment options
+        test_mm_x86 = MachineModel(path_to_yaml=self._find_file("test_db_x86.yml"))
+        tmp_semantics = ArchSemantics(test_mm_x86)
+        tmp_code_1 = "fantasyinstr1 %rax, %rax\n"
+        tmp_code_2 = "fantasyinstr1 %rax, %rax\nfantasyinstr2 %rbx, %rbx\n"
+        tmp_kernel_1 = self.parser_x86.parse_file(tmp_code_1)
+        tmp_kernel_2 = self.parser_x86.parse_file(tmp_code_2)
+        tmp_semantics.add_semantics(tmp_kernel_1)
+        tmp_semantics.add_semantics(tmp_kernel_2)
+        tmp_semantics.assign_optimal_throughput(tmp_kernel_1)
+        tmp_semantics.assign_optimal_throughput(tmp_kernel_2)
+        k1i1_pp = [round(x, 2) for x in tmp_kernel_1[0]["port_pressure"]]
+        k2i1_pp = [round(x, 2) for x in tmp_kernel_2[0]["port_pressure"]]
+        self.assertEqual(k1i1_pp, [0.33, 0.0, 0.33, 0.0, 0.0, 0.0, 0.0, 0.0, 0.33, 0.0, 0.0])
+        self.assertEqual(k2i1_pp, [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0])
 
         # arm
         kernel_fixed = deepcopy(self.kernel_AArch64)
