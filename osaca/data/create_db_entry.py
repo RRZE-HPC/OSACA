@@ -16,8 +16,11 @@ class EntryBuilder:
     def classify(operands_types):
         load = "mem" in operands_types[:-1]
         store = "mem" in operands_types[-1:]
+        vec = False
+        if any([vecr in operands_types for vecr in ["mm", "xmm", "ymm", "zmm"]]):
+            vec = True
         assert not (load and store), "Can not process a combined load-store instruction."
-        return load, store
+        return load, store, vec
 
     def build_description(
         self, instruction_name, operand_types, port_pressure=[], latency=0, comment=None
@@ -26,7 +29,7 @@ class EntryBuilder:
             comment = "  # " + comment
         else:
             comment = ""
-        description = "- name: {}{}\n  operands:\n".format(instruction_name, comment)
+        description = "- name: {}{}\n  operands: {}\n".format(instruction_name, comment, "[]" if len(operand_types) == 0 else "")
 
         for ot in operand_types:
             if ot == "imd":
@@ -64,14 +67,18 @@ class EntryBuilder:
     def parse_port_pressure(self, port_pressure_str):
         """
         Example:
-        1*p45+2*p0 -> [[1, '45'], [2, '0']]
+        1*p45+2*p0+2*p10,11 -> [[1, '45'], [2, '0'], [2, ['10', '11']]]
         """
         port_pressure = []
         if port_pressure_str:
             for p in port_pressure_str.split("+"):
                 cycles, ports = p.split("*p")
-                if ports.startswith("(") and ports.endswith(")"):
-                    ports = ports[1:-1].split(",")
+                ports = ports.split(",")
+                if len(ports) == 1:
+                    ports = ports[0]
+                else:
+                    ports = list(filter(lambda p: len(p) > 0, ports))
+                
                 port_pressure.append([int(cycles), ports])
         return port_pressure
 
@@ -92,23 +99,42 @@ class EntryBuilder:
         return self.build_description(instruction_name, operand_types, port_pressure, latency)
 
 
-class EntryBuilderIntelPort9(EntryBuilder):
-    # for ICX
-
+class ArchEntryBuilder(EntryBuilder):
     def build_description(self, instruction_name, operand_types, port_pressure=[], latency=0):
-        load, store = self.classify(operand_types)
+        # Intel ICX
+        # LD_pressure = [[1, "23"], [1, ["2D", "3D"]]]
+        # LD_pressure_vec = LD_pressure
+        # ST_pressure = [[1, "79"], [1, "48"]]
+        # ST_pressure_vec = ST_pressure 
+        # LD_lat = 5
+        # ST_lat = 0
+        # Zen3
+        LD_pressure = [[1, ["11", "12", "13"]]]
+        LD_pressure_vec = [[1, ["11", "12"]]]
+        ST_pressure = [[1, ["12", "13"]]]
+        ST_pressure_vec = [[1, ["4"]], [1, ["13"]]]
+        LD_lat = 4
+        ST_lat = 0
+
+        load, store, vec = self.classify(operand_types)
 
         if load:
-            port_pressure += [[1, "23"], [1, ["2D", "3D"]]]
-            latency += 5
+            if vec:
+                port_pressure += LD_pressure_vec 
+            else:
+                port_pressure += LD_pressure
+            latency += LD_lat
             comment = "with load"
             return EntryBuilder.build_description(
                 self, instruction_name, operand_types, port_pressure, latency, comment
             )
         if store:
-            port_pressure = port_pressure + [[1, "79"], [1, "48"]]
+            if vec:
+                port_pressure = port_pressure + ST_pressure_vec
+            else:
+                port_pressure = port_pressure + ST_pressure
             operands = ["mem" if o == "mem" else o for o in operand_types]
-            latency += 0
+            latency += ST_lat
             return EntryBuilder.build_description(
                 self,
                 instruction_name,
@@ -125,7 +151,7 @@ class EntryBuilderIntelPort9(EntryBuilder):
 
 
 def get_description(instruction_form, port_pressure, latency, rhs_comment=None):
-    entry = EntryBuilderIntelPort9().process_item(instruction_form, (port_pressure, latency))
+    entry = ArchEntryBuilder().process_item(instruction_form, (port_pressure, latency))
 
     if rhs_comment is not None:
         max_length = max([len(line) for line in entry.split("\n")])
