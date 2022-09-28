@@ -288,7 +288,7 @@ class ArchSemantics(ISASemantics):
                                     dummy_reg, {"register": {"name": stp["src"]}}
                                 )
                             ]
-                            if len(data_port_uops) < 1:
+                            if len(st_data_port_uops) < 1:
                                 st_data_port_uops = store_perf_data[0]["port_pressure"]
                             else:
                                 st_data_port_uops = st_data_port_uops[0]
