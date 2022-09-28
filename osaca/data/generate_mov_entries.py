@@ -71,7 +71,6 @@ class MOVEntryBuilder:
                 ports = ports.split(",")
                 if len(ports) == 1:
                     ports = ports[0]
-                
                 port_pressure.append([int(cycles), ports])
         return port_pressure
 
@@ -519,7 +518,6 @@ zen3_mov_instructions = [
     # https://www.felixcloutier.com/x86/movq2dq
     ("movq2dq mm xmm", ("2*p0123", 1)),
 ]
-
 
 
 p9 = MOVEntryBuilderIntelPort9()
