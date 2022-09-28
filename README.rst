@@ -94,8 +94,8 @@ The usage of OSACA can be listed as:
   shows the program’s version number.
 --arch ARCH
   needs to be replaced with the target architecture abbreviation.
-  Possible options are ``SNB``, ``IVB``, ``HSW``, ``BDW``, ``SKX``, ``CSX`` and ``ICL`` for the latest Intel micro architectures starting from Intel Sandy Bridge and ``ZEN1``, ``ZEN2`` for AMD Zen architectures.
-  Furthermore, ``TX2`` for Marvell`s ARM-based ThunderX2 , ``N1`` for ARM's Neoverse, ``A72`` for ARM Cortex-A72  and ``A64FX`` for Fujitsu's HPC ARM architecture are available.
+  Possible options are ``SNB``, ``IVB``, ``HSW``, ``BDW``, ``SKX``, ``CSX``, ``ICL`` (Client), ``ICX`` (Server) for the latest Intel micro architectures starting from Intel Sandy Bridge and ``ZEN1``, ``ZEN2``, and ``ZEN3`` for AMD Zen architectures.
+  Furthermore, ``TX2`` for Marvell`s ARM-based ThunderX2 , ``N1`` for ARM's Neoverse, ``A72`` for ARM Cortex-A72, ``TSV110`` for the HiSilicon TaiShan v110,  and ``A64FX`` for Fujitsu's HPC ARM architecture are available.
   If no micro-architecture is given, OSACA assumes a default architecture for x86/AArch64.
 --fixed
   Run the throughput analysis with fixed port utilization for all suitable ports per instruction.
