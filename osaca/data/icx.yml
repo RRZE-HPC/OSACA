@@ -22,8 +22,7 @@ load_throughput:
 - {base: ~,   index: ~,   offset: imd, scale: 1, port_pressure: [[1, '23'], [1, ['2D', '3D']]]}
 - {base: ~,   index: ~,   offset: imd, scale: 8, port_pressure: [[1, '23'], [1, ['2D', '3D']]]}
 load_throughput_default: [[1, '23'], [1, ['2D', '3D']]]
-store_throughput: 
-- {src: ymm, base: "*", index: "*", offset: "*",   scale: "*", port_pressure: [[1, '23'], [1, ['7', '9', '8']]]}
+store_throughput: []
 store_throughput_default: [[1, '79'], [1, '48']]
 ports: ['0', 0DV, '1', 1DV, '2', 2D, '3', 3D, '4', '5', '6', '7', '8', '9']
 port_model_scheme: |
