@@ -78,7 +78,7 @@ class EntryBuilder:
                     ports = ports[0]
                 else:
                     ports = list(filter(lambda p: len(p) > 0, ports))
-                
+
                 port_pressure.append([int(cycles), ports])
         return port_pressure
 
@@ -105,7 +105,7 @@ class ArchEntryBuilder(EntryBuilder):
         # LD_pressure = [[1, "23"], [1, ["2D", "3D"]]]
         # LD_pressure_vec = LD_pressure
         # ST_pressure = [[1, "79"], [1, "48"]]
-        # ST_pressure_vec = ST_pressure 
+        # ST_pressure_vec = ST_pressure
         # LD_lat = 5
         # ST_lat = 0
         # Zen3
@@ -120,7 +120,7 @@ class ArchEntryBuilder(EntryBuilder):
 
         if load:
             if vec:
-                port_pressure += LD_pressure_vec 
+                port_pressure += LD_pressure_vec
             else:
                 port_pressure += LD_pressure
             latency += LD_lat
