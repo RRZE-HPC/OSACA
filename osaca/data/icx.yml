@@ -5155,7 +5155,7 @@ instruction_forms:
   port_pressure: [[1, '05']]                     # ibench
   throughput: 0.5                                # ibench
   uops: 1                                        # ibench
-- name: [vfmadd213sd, vfmadd132sd, vfmadd231sd, vfnmadd213ps, vfnmadd132ps, vfnmadd231ps]  # ibench
+- name: [vfmadd213sd, vfmadd132sd, vfmadd231sd, vfnmadd213sd, vfnmadd132sd, vfnmadd231sd]  # ibench
   operands:                                      # ibench
   - class: register                              # ibench
     name: xmm                                    # ibench
@@ -5167,7 +5167,7 @@ instruction_forms:
   port_pressure: [[1, '01']]                     # ibench
   throughput: 0.5                                # ibench
   uops: 1                                        # ibench
-- name: [vfmadd213sd, vfmadd132sd, vfmadd231sd, vfnmadd213ps, vfnmadd132ps, vfnmadd231ps]  # ibench
+- name: [vfmadd213sd, vfmadd132sd, vfmadd231sd, vfnmadd213sd, vfnmadd132sd, vfnmadd231sd]  # ibench
   operands:                                      # ibench
   - class: register                              # ibench
     name: xmm                                    # ibench
