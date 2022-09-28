@@ -86,6 +86,7 @@ instruction_forms:
   - class: immediate
     imd: int
   - class: register
+    name: gpr
   latency: 1.0
   port_pressure: [[1, '6789']]
   throughput: 0.25
@@ -1459,32 +1460,6 @@ instruction_forms:
   port_pressure: []                                    # ./generate_mov_entries.py zen3
   throughput: 0.0                                      # ./generate_mov_entries.py zen3
   uops: 0                                              # ./generate_mov_entries.py zen3
-- name: movq  # with load                              # ./generate_mov_entries.py zen3
-  operands:                                            # ./generate_mov_entries.py zen3
-  - class: memory                                      # ./generate_mov_entries.py zen3
-    base: "*"                                          # ./generate_mov_entries.py zen3
-    offset: "*"                                        # ./generate_mov_entries.py zen3
-    index: "*"                                         # ./generate_mov_entries.py zen3
-    scale: "*"                                         # ./generate_mov_entries.py zen3
-  - class: register                                    # ./generate_mov_entries.py zen3
-    name: mm                                           # ./generate_mov_entries.py zen3
-  latency: 4                                           # ./generate_mov_entries.py zen3
-  port_pressure: [[1, ['11', '12']]]                   # ./generate_mov_entries.py zen3
-  throughput: 0.5                                      # ./generate_mov_entries.py zen3
-  uops: 1                                              # ./generate_mov_entries.py zen3
-- name: movq  # with store                             # ./generate_mov_entries.py zen3
-  operands:                                            # ./generate_mov_entries.py zen3
-  - class: register                                    # ./generate_mov_entries.py zen3
-    name: mm                                           # ./generate_mov_entries.py zen3
-  - class: memory                                      # ./generate_mov_entries.py zen3
-    base: "*"                                          # ./generate_mov_entries.py zen3
-    offset: "*"                                        # ./generate_mov_entries.py zen3
-    index: "*"                                         # ./generate_mov_entries.py zen3
-    scale: "*"                                         # ./generate_mov_entries.py zen3
-  latency: 0                                           # ./generate_mov_entries.py zen3
-  port_pressure: [[1, ['4']], [1, ['13']]]             # ./generate_mov_entries.py zen3
-  throughput: 1.0                                      # ./generate_mov_entries.py zen3
-  uops: 2                                              # ./generate_mov_entries.py zen3
 - name: movq                                           # ./generate_mov_entries.py zen3
   operands:                                            # ./generate_mov_entries.py zen3
   - class: register                                    # ./generate_mov_entries.py zen3
@@ -1495,32 +1470,6 @@ instruction_forms:
   port_pressure: [[1, '0123']]                         # ./generate_mov_entries.py zen3
   throughput: 0.25                                     # ./generate_mov_entries.py zen3
   uops: 1                                              # ./generate_mov_entries.py zen3
-- name: movq  # with load                              # ./generate_mov_entries.py zen3
-  operands:                                            # ./generate_mov_entries.py zen3
-  - class: memory                                      # ./generate_mov_entries.py zen3
-    base: "*"                                          # ./generate_mov_entries.py zen3
-    offset: "*"                                        # ./generate_mov_entries.py zen3
-    index: "*"                                         # ./generate_mov_entries.py zen3
-    scale: "*"                                         # ./generate_mov_entries.py zen3
-  - class: register                                    # ./generate_mov_entries.py zen3
-    name: xmm                                          # ./generate_mov_entries.py zen3
-  latency: 4                                           # ./generate_mov_entries.py zen3
-  port_pressure: [[1, ['11', '12']]]                   # ./generate_mov_entries.py zen3
-  throughput: 0.5                                      # ./generate_mov_entries.py zen3
-  uops: 1                                              # ./generate_mov_entries.py zen3
-- name: movq  # with store                             # ./generate_mov_entries.py zen3
-  operands:                                            # ./generate_mov_entries.py zen3
-  - class: register                                    # ./generate_mov_entries.py zen3
-    name: xmm                                          # ./generate_mov_entries.py zen3
-  - class: memory                                      # ./generate_mov_entries.py zen3
-    base: "*"                                          # ./generate_mov_entries.py zen3
-    offset: "*"                                        # ./generate_mov_entries.py zen3
-    index: "*"                                         # ./generate_mov_entries.py zen3
-    scale: "*"                                         # ./generate_mov_entries.py zen3
-  latency: 0                                           # ./generate_mov_entries.py zen3
-  port_pressure: [[1, ['4']], [1, ['13']]]             # ./generate_mov_entries.py zen3
-  throughput: 1.0                                      # ./generate_mov_entries.py zen3
-  uops: 2                                              # ./generate_mov_entries.py zen3
 - name: vmovq                                          # ./generate_mov_entries.py zen3
   operands:                                            # ./generate_mov_entries.py zen3
   - class: register                                    # ./generate_mov_entries.py zen3
@@ -1531,32 +1480,6 @@ instruction_forms:
   port_pressure: [[1, '0123']]                         # ./generate_mov_entries.py zen3
   throughput: 0.25                                     # ./generate_mov_entries.py zen3
   uops: 1                                              # ./generate_mov_entries.py zen3
-- name: vmovq  # with load                             # ./generate_mov_entries.py zen3
-  operands:                                            # ./generate_mov_entries.py zen3
-  - class: memory                                      # ./generate_mov_entries.py zen3
-    base: "*"                                          # ./generate_mov_entries.py zen3
-    offset: "*"                                        # ./generate_mov_entries.py zen3
-    index: "*"                                         # ./generate_mov_entries.py zen3
-    scale: "*"                                         # ./generate_mov_entries.py zen3
-  - class: register                                    # ./generate_mov_entries.py zen3
-    name: xmm                                          # ./generate_mov_entries.py zen3
-  latency: 4                                           # ./generate_mov_entries.py zen3
-  port_pressure: [[1, ['11', '12']]]                   # ./generate_mov_entries.py zen3
-  throughput: 0.5                                      # ./generate_mov_entries.py zen3
-  uops: 1                                              # ./generate_mov_entries.py zen3
-- name: vmovq  # with store                            # ./generate_mov_entries.py zen3
-  operands:                                            # ./generate_mov_entries.py zen3
-  - class: register                                    # ./generate_mov_entries.py zen3
-    name: xmm                                          # ./generate_mov_entries.py zen3
-  - class: memory                                      # ./generate_mov_entries.py zen3
-    base: "*"                                          # ./generate_mov_entries.py zen3
-    offset: "*"                                        # ./generate_mov_entries.py zen3
-    index: "*"                                         # ./generate_mov_entries.py zen3
-    scale: "*"                                         # ./generate_mov_entries.py zen3
-  latency: 0                                           # ./generate_mov_entries.py zen3
-  port_pressure: [[1, ['4']], [1, ['13']]]             # ./generate_mov_entries.py zen3
-  throughput: 1.0                                      # ./generate_mov_entries.py zen3
-  uops: 2                                              # ./generate_mov_entries.py zen3
 - name: movsd                                          # ./generate_mov_entries.py zen3
   operands:                                            # ./generate_mov_entries.py zen3
   - class: register                                    # ./generate_mov_entries.py zen3
@@ -1840,19 +1763,6 @@ instruction_forms:
   port_pressure: [[1, ['4']], [1, ['13']]]             # ./generate_mov_entries.py zen3
   throughput: 1.0                                      # ./generate_mov_entries.py zen3
   uops: 2                                              # ./generate_mov_entries.py zen3
-- name: movss  # with load                             # ./generate_mov_entries.py zen3
-  operands:                                            # ./generate_mov_entries.py zen3
-  - class: memory                                      # ./generate_mov_entries.py zen3
-    base: "*"                                          # ./generate_mov_entries.py zen3
-    offset: "*"                                        # ./generate_mov_entries.py zen3
-    index: "*"                                         # ./generate_mov_entries.py zen3
-    scale: "*"                                         # ./generate_mov_entries.py zen3
-  - class: register                                    # ./generate_mov_entries.py zen3
-    name: xmm                                          # ./generate_mov_entries.py zen3
-  latency: 4                                           # ./generate_mov_entries.py zen3
-  port_pressure: [[1, ['11', '12']]]                   # ./generate_mov_entries.py zen3
-  throughput: 0.5                                      # ./generate_mov_entries.py zen3
-  uops: 1                                              # ./generate_mov_entries.py zen3
 - name: movsx                                          # ./generate_mov_entries.py zen3
   operands:                                            # ./generate_mov_entries.py zen3
   - class: register                                    # ./generate_mov_entries.py zen3
@@ -3397,6 +3307,16 @@ instruction_forms:
   port_pressure: [[1, '69']]
   throughput: 0.5
   uops: 1
+- name: adc
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: gpr
+  latency: 1
+  port_pressure: [[1, '69']]
+  throughput: 0.5
+  uops: 1
 - name: add
   operands:
   - class: register
@@ -3418,6 +3338,16 @@ instruction_forms:
   throughput: 0.25
   uops: 1
 - name: addpd
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 3
+  port_pressure: [[1, '23']]
+  throughput: 0.5
+  uops: 1
+- name: addps
   operands:
   - class: register
     name: xmm
@@ -3582,7 +3512,7 @@ instruction_forms:
     name: gpr                     # ibench
   latency: 1                      # ibench
   port_pressure: [[1, '6789']]  # ibench
-  throughput: 1.0                 # ibench
+  throughput: 0.25                 # ibench
   uops: 1                         # ibench
 - name: sub                       # ibench
   operands:                       # ibench
@@ -3592,7 +3522,7 @@ instruction_forms:
     name: gpr                     # ibench
   latency: 1                      # ibench
   port_pressure: [[1, '6789']]  # ibench
-  throughput: 1.0                 # ibench
+  throughput: 0.25                 # ibench
   uops: 1                         # ibench
 - name: vaddps                  # ibench
   operands:                     # ibench
@@ -3604,7 +3534,7 @@ instruction_forms:
     name: xmm                   # ibench
   latency: 3                    # ibench
   port_pressure: [[1, '23']]  # ibench
-  throughput: 1.0               # ibench
+  throughput: 0.5               # ibench
   uops: 1                       # ibench
 - name: vaddps                  # ibench
   operands:                     # ibench
@@ -3616,7 +3546,7 @@ instruction_forms:
     name: ymm                   # ibench
   latency: 3                    # ibench
   port_pressure: [[1, '23']]  # ibench
-  throughput: 1.0               # ibench
+  throughput: 0.5               # ibench
   uops: 1                       # ibench
 - name: vaddsd                  # ibench
   operands:                     # ibench
@@ -3628,7 +3558,7 @@ instruction_forms:
     name: xmm                   # ibench
   latency: 3                    # ibench
   port_pressure: [[1, '23']]  # ibench
-  throughput: 1.0               # ibench
+  throughput: 0.5               # ibench
   uops: 1                       # ibench
 - name: vaddss                  # ibench
   operands:                     # ibench
@@ -3640,20 +3570,8 @@ instruction_forms:
     name: xmm                   # ibench
   latency: 3                    # ibench
   port_pressure: [[1, '23']]  # ibench
-  throughput: 1.0               # ibench
+  throughput: 0.5               # ibench
   uops: 1                       # ibench
-- name: vcvtsi2ss            # ibench
-  operands:                  # ibench
-  - class: register          # ibench
-    name: gpr                # ibench
-  - class: register          # ibench
-    name: xmm                # ibench
-  - class: register          # ibench
-    name: xmm                # ibench
-  latency: 3                 # ibench
-  port_pressure: [[1, '5']]  # ibench
-  throughput: 1.0            # ibench
-  uops: 1                    # ibench
 - name: vdivpd                          # ibench
   operands:                             # ibench
   - class: register                     # ibench
@@ -3736,7 +3654,7 @@ instruction_forms:
     name: xmm                   # ibench
   latency: 4                    # ibench
   port_pressure: [[1, '01']]  # ibench
-  throughput: 1.0               # ibench
+  throughput: 0.5               # ibench
   uops: 1                       # ibench
 - name: [vfmadd213pd, vfmadd132pd, vfmadd231pd, vfnmadd213pd, vfnmadd132pd, vfnmadd231pd, vfmadd213ps, vfmadd132ps, vfmadd231ps, vfnmadd213ps, vfnmadd132ps, vfnmadd231ps]                  # ibench
   operands:                     # ibench
@@ -3748,9 +3666,9 @@ instruction_forms:
     name: ymm                   # ibench
   latency: 4                    # ibench
   port_pressure: [[1, '01']]  # ibench
-  throughput: 1.0               # ibench
+  throughput: 0.5               # ibench
   uops: 1                       # ibench
-- name: [vfmadd213sd, vfmadd132sd, vfmadd231sd, vfnmadd213ps, vfnmadd132ps, vfnmadd231ps, vfmadd213ss, vfmadd132ss, vfmadd231ss, vfnmadd213ss, vfnmadd132ss, vfnmadd231ss]                  # ibench
+- name: [vfmadd213sd, vfmadd132sd, vfmadd231sd, vfnmadd213sd, vfnmadd132sd, vfnmadd231sd, vfmadd213ss, vfmadd132ss, vfmadd231ss, vfnmadd213ss, vfnmadd132ss, vfnmadd231ss]                  # ibench
   operands:                     # ibench
   - class: register             # ibench
     name: xmm                   # ibench
@@ -3760,23 +3678,23 @@ instruction_forms:
     name: xmm                   # ibench
   latency: 4                    # ibench
   port_pressure: [[1, '01']]  # ibench
-  throughput: 1.0               # ibench
-  uops: 1                       # ibench
-- name: [vfmsub213pd, vfmsub132pd, vfmsub231pd, vfnmsub213pd, vfnmsub132pd, vfnmsub231pd, vfmsub213ps, vfmsub132ps, vfmsub231ps, vfnmsub213ps, vfnmsub132ps, vfnmsub231ps]                  # ibench
-  operands:                     # ibench
-  - class: register             # ibench
-    name: xmm                   # ibench
-  - class: register             # ibench
-    name: xmm                   # ibench
-  - class: register             # ibench
-    name: xmm                   # ibench
-  latency: 4                    # ibench
-  port_pressure: [[1, '01']]  # ibench
-  throughput: 1.0               # ibench
+  throughput: 0.5               # ibench
   uops: 1                       # ibench
 - name: [vfmsub213pd, vfmsub132pd, vfmsub231pd, vfnmsub213pd, vfnmsub132pd, vfnmsub231pd, vfmsub213ps, vfmsub132ps, vfmsub231ps, vfnmsub213ps, vfnmsub132ps, vfnmsub231ps]                  # ibench
   operands:                     # ibench
   - class: register             # ibench
+    name: xmm                   # ibench
+  - class: register             # ibench
+    name: xmm                   # ibench
+  - class: register             # ibench
+    name: xmm                   # ibench
+  latency: 4                    # ibench
+  port_pressure: [[1, '01']]  # ibench
+  throughput: 0.5               # ibench
+  uops: 1                       # ibench
+- name: [vfmsub213pd, vfmsub132pd, vfmsub231pd, vfnmsub213pd, vfnmsub132pd, vfnmsub231pd, vfmsub213ps, vfmsub132ps, vfmsub231ps, vfnmsub213ps, vfnmsub132ps, vfnmsub231ps]                  # ibench
+  operands:                     # ibench
+  - class: register             # ibench
     name: ymm                   # ibench
   - class: register             # ibench
     name: ymm                   # ibench
@@ -3784,9 +3702,9 @@ instruction_forms:
     name: ymm                   # ibench
   latency: 4                    # ibench
   port_pressure: [[1, '01']]  # ibench
-  throughput: 1.0               # ibench
+  throughput: 0.5               # ibench
   uops: 1                       # ibench
-- name: [vfmsub213sd, vfmsub132sd, vfmsub231sd, vfnmsub213ps, vfnmsub132ps, vfnmsub231ps, vfmsub213ss, vfmsub132ss, vfmsub231ss, vfnmsub213ss, vfnmsub132ss, vfnmsub231ss]                  # ibench
+- name: [vfmsub213sd, vfmsub132sd, vfmsub231sd, vfnmsub213sd, vfnmsub132sd, vfnmsub231sd, vfmsub213ss, vfmsub132ss, vfmsub231ss, vfnmsub213ss, vfnmsub132ss, vfnmsub231ss]                  # ibench
   operands:                     # ibench
   - class: register             # ibench
     name: xmm                   # ibench
@@ -3796,7 +3714,43 @@ instruction_forms:
     name: xmm                   # ibench
   latency: 4                    # ibench
   port_pressure: [[1, '01']]  # ibench
-  throughput: 1.0               # ibench
+  throughput: 0.5               # ibench
+  uops: 1                       # ibench
+- name: [vfmsubadd213pd, vfmsubadd132pd, vfmsubadd231pd, vfnmsubadd213pd, vfnmsubadd132pd, vfnmsubadd231pd, vfmsubadd213ps, vfmsubadd132ps, vfmsubadd231ps, vfnmsubadd213ps, vfnmsubadd132ps, vfnmsubadd231ps]                  # ibench
+  operands:                     # ibench
+  - class: register             # ibench
+    name: xmm                   # ibench
+  - class: register             # ibench
+    name: xmm                   # ibench
+  - class: register             # ibench
+    name: xmm                   # ibench
+  latency: 4                    # ibench
+  port_pressure: [[1, '01']]  # ibench
+  throughput: 0.5               # ibench
+  uops: 1                       # ibench
+- name: [vfmsubadd213pd, vfmsubadd132pd, vfmsubadd231pd, vfnmsubadd213pd, vfnmsubadd132pd, vfnmsubadd231pd, vfmsubadd213ps, vfmsubadd132ps, vfmsubadd231ps, vfnmsubadd213ps, vfnmsubadd132ps, vfnmsubadd231ps]                  # ibench
+  operands:                     # ibench
+  - class: register             # ibench
+    name: ymm                   # ibench
+  - class: register             # ibench
+    name: ymm                   # ibench
+  - class: register             # ibench
+    name: ymm                   # ibench
+  latency: 4                    # ibench
+  port_pressure: [[1, '01']]  # ibench
+  throughput: 0.5               # ibench
+  uops: 1                       # ibench
+- name: [vfmsubadd213sd, vfmsubadd132sd, vfmsubadd231sd, vfnmsubadd213sd, vfnmsubadd132sd, vfnmsubadd231sd, vfmsubadd213ss, vfmsubadd132ss, vfmsubadd231ss, vfnmsubadd213ss, vfnmsubadd132ss, vfnmsubadd231ss]                  # ibench
+  operands:                     # ibench
+  - class: register             # ibench
+    name: xmm                   # ibench
+  - class: register             # ibench
+    name: xmm                   # ibench
+  - class: register             # ibench
+    name: xmm                   # ibench
+  latency: 4                    # ibench
+  port_pressure: [[1, '01']]  # ibench
+  throughput: 0.5               # ibench
   uops: 1                       # ibench
 - name: [vgatherdpd, vgatherqpd]  # with load                                                   # uops.info
   operands:                                                                       # uops.info
@@ -3911,7 +3865,7 @@ instruction_forms:
     name: xmm                   # ibench
   latency: 3                    # ibench
   port_pressure: [[1, '01']]  # ibench
-  throughput: 1.0               # ibench
+  throughput: 0.5               # ibench
   uops: 1                       # ibench
 - name: vmulpd                  # ibench
   operands:                     # ibench
@@ -3923,7 +3877,7 @@ instruction_forms:
     name: xmm                   # ibench
   latency: 3                    # ibench
   port_pressure: [[1, '01']]  # ibench
-  throughput: 1.0               # ibench
+  throughput: 0.5               # ibench
   uops: 1                       # ibench
 - name: vmulpd                  # ibench
   operands:                     # ibench
@@ -3935,7 +3889,7 @@ instruction_forms:
     name: ymm                   # ibench
   latency: 3                    # ibench
   port_pressure: [[1, '01']]  # ibench
-  throughput: 1.0               # ibench
+  throughput: 0.5               # ibench
   uops: 1                       # ibench
 - name: mulps                   # ibench
   operands:                     # ibench
@@ -3945,7 +3899,7 @@ instruction_forms:
     name: xmm                   # ibench
   latency: 3                    # ibench
   port_pressure: [[1, '01']]  # ibench
-  throughput: 1.0               # ibench
+  throughput: 0.5               # ibench
   uops: 1                       # ibench
 - name: vmulps                  # ibench
   operands:                     # ibench
@@ -3957,7 +3911,7 @@ instruction_forms:
     name: xmm                   # ibench
   latency: 3                    # ibench
   port_pressure: [[1, '01']]  # ibench
-  throughput: 1.0               # ibench
+  throughput: 0.5               # ibench
   uops: 1                       # ibench
 - name: vmulps                  # ibench
   operands:                     # ibench
@@ -3969,17 +3923,7 @@ instruction_forms:
     name: ymm                   # ibench
   latency: 3                    # ibench
   port_pressure: [[1, '01']]  # ibench
-  throughput: 1.0               # ibench
-  uops: 1                       # ibench
-- name: mulsd                   # ibench
-  operands:                     # ibench
-  - class: register             # ibench
-    name: xmm                   # ibench
-  - class: register             # ibench
-    name: xmm                   # ibench
-  latency: 3                    # ibench
-  port_pressure: [[1, '01']]  # ibench
-  throughput: 1.0               # ibench
+  throughput: 0.5               # ibench
   uops: 1                       # ibench
 - name: vmulsd                  # ibench
   operands:                     # ibench
@@ -3991,7 +3935,7 @@ instruction_forms:
     name: xmm                   # ibench
   latency: 3                    # ibench
   port_pressure: [[1, '01']]  # ibench
-  throughput: 1.0               # ibench
+  throughput: 0.5               # ibench
   uops: 1                       # ibench
 - name: vmulsd                  # ibench
   operands:                     # ibench
@@ -4003,17 +3947,7 @@ instruction_forms:
     name: ymm                   # ibench
   latency: 3                    # ibench
   port_pressure: [[1, '01']]  # ibench
-  throughput: 1.0               # ibench
-  uops: 1                       # ibench
-- name: mulss                   # ibench
-  operands:                     # ibench
-  - class: register             # ibench
-    name: xmm                   # ibench
-  - class: register             # ibench
-    name: xmm                   # ibench
-  latency: 3                    # ibench
-  port_pressure: [[1, '01']]  # ibench
-  throughput: 1.0               # ibench
+  throughput: 0.5               # ibench
   uops: 1                       # ibench
 - name: vmulss                  # ibench
   operands:                     # ibench
@@ -4025,7 +3959,7 @@ instruction_forms:
     name: xmm                   # ibench
   latency: 3                    # ibench
   port_pressure: [[1, '01']]  # ibench
-  throughput: 1.0               # ibench
+  throughput: 0.5               # ibench
   uops: 1                       # ibench
 - name: sqrtsd                           # ibench
   operands:                              # ibench
@@ -4075,7 +4009,7 @@ instruction_forms:
     name: xmm                   # ibench
   latency: 3                    # ibench
   port_pressure: [[1, '01']]  # ibench
-  throughput: 1.0               # ibench
+  throughput: 0.5               # ibench
   uops: 1                       # ibench
 - name: rsqrtss                 # ibench
   operands:                     # ibench
@@ -4085,7 +4019,7 @@ instruction_forms:
     name: xmm                   # ibench
   latency: 3                    # ibench
   port_pressure: [[1, '01']]  # ibench
-  throughput: 1.0               # ibench
+  throughput: 0.5               # ibench
   uops: 1                       # ibench
 - name: vsqrtpd                          # ibench
   operands:                              # ibench
@@ -4420,6 +4354,16 @@ instruction_forms:
   port_pressure: [[1, '12']]  # asmbench
   throughput: 0.5             # asmbench
   uops: 1                     # asmbench
+- name: [unpckhpd, unpckhps, unpcklpd, unpcklps]  # asmbench
+  operands:                                        # asmbench
+  - class: register                                # asmbench
+    name: xmm                                      # asmbench
+  - class: register                                # asmbench
+    name: xmm                                      # asmbench
+  latency: 1                                       # asmbench
+  port_pressure: [[1, '12']]                       # asmbench
+  throughput: 0.5                                  # asmbench
+  uops: 1                                          # asmbench
 - name: [vunpckhpd, vunpckhps, vunpcklpd, vunpcklps]  # asmbench
   operands:                                        # asmbench
   - class: register                                # asmbench
@@ -4516,7 +4460,17 @@ instruction_forms:
   port_pressure: [[1, '01']]  # asmbench
   throughput: 0.5             # asmbench
   uops: 1                     # asmbench
-- name: and                     # asmbench
+- name: [and, andn]                     # asmbench
+  operands:                     # asmbench
+  - class: register             # asmbench
+    name: gpr                   # asmbench
+  - class: register             # asmbench
+    name: gpr                   # asmbench
+  latency: 1                    # asmbench
+  port_pressure: [[1, '6789']]  # asmbench
+  throughput: 0.25              # asmbench
+  uops: 1                       # asmbench
+- name: [and, andn]                   # asmbench
   operands:                     # asmbench
   - class: immediate            # asmbench
     imd: int                    # asmbench
@@ -4526,10 +4480,19 @@ instruction_forms:
   port_pressure: [[1, '6789']]  # asmbench
   throughput: 0.25              # asmbench
   uops: 1                       # asmbench
-- name: [vpand, vpandn, vandps, vandpd, vandnps, vandnpd]  # asmbench
-  operands:                                           # asmbench
+- name: [andnpd, andnps, andpd, andps]                     # asmbench
+  operands:                     # asmbench
   - class: register                                   # asmbench
     name: xmm                                         # asmbench
+  - class: register                                   # asmbench
+    name: xmm                                         # asmbench
+  latency: 1                    # asmbench
+  port_pressure: [[1, '6789']]  # asmbench
+  throughput: 0.25              # asmbench
+  uops: 1                       # asmbench
+
+- name: [vpand, vpandn, vandps, vandpd, vandnps, vandnpd]  # asmbench
+  operands:                                           # asmbench
   - class: register                                   # asmbench
     name: xmm                                         # asmbench
   - class: register                                   # asmbench
@@ -4746,6 +4709,12 @@ instruction_forms:
   latency: 1                    # uops.info
   port_pressure: [[1, '0123']]  # uops.info
   throughput: 0.25              # uops.info
+  uops: 1                       # uops.info
+- name: vzeroall              # uops.info
+  operands: []                  # uops.info
+  latency: 1                    # uops.info
+  port_pressure: [[24, '0123']]  # uops.info
+  throughput: 6.00              # uops.info
   uops: 1                       # uops.info
 - name: [cdq, cdqe]              # docs
   operands: []                  # docs
@@ -5121,46 +5090,6 @@ instruction_forms:
   port_pressure: [[1, '23'], [1, '4']]  # uops.info
   throughput: 1.0                       # uops.info
   uops: 2                               # uops.info
-- name: vcvtdq2pd             # uops.info
-  operands:                   # uops.info
-  - class: register           # uops.info
-    name: xmm                 # uops.info
-  - class: register           # uops.info
-    name: xmm                 # uops.info
-  latency: 3                  # uops.info
-  port_pressure: [[1, '23']]  # uops.info
-  throughput: 0.5             # uops.info
-  uops: 1                     # uops.info
-- name: vcvtdq2pd                       # uops.info
-  operands:                             # uops.info
-  - class: register                     # uops.info
-    name: xmm                           # uops.info
-  - class: register                     # uops.info
-    name: ymm                           # uops.info
-  latency: 4                            # uops.info
-  port_pressure: [[1, '23'], [1, '1']]  # uops.info
-  throughput: 1.0                       # uops.info
-  uops: 2                               # uops.info
-- name: vcvtdq2ps             # uops.info
-  operands:                   # uops.info
-  - class: register           # uops.info
-    name: xmm                 # uops.info
-  - class: register           # uops.info
-    name: xmm                 # uops.info
-  latency: 3                  # uops.info
-  port_pressure: [[1, '23']]  # uops.info
-  throughput: 0.5             # uops.info
-  uops: 1                     # uops.info
-- name: vcvtdq2ps             # uops.info
-  operands:                   # uops.info
-  - class: register           # uops.info
-    name: ymm                 # uops.info
-  - class: register           # uops.info
-    name: ymm                 # uops.info
-  latency: 3                  # uops.info
-  port_pressure: [[1, '23']]  # uops.info
-  throughput: 0.5             # uops.info
-  uops: 1                     # uops.info
 - name: vcvtph2ps             # uops.info
   operands:                   # uops.info
   - class: register           # uops.info
