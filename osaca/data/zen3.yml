@@ -4716,7 +4716,7 @@ instruction_forms:
   port_pressure: [[24, '0123']]  # uops.info
   throughput: 6.00              # uops.info
   uops: 1                       # uops.info
-- name: [cdq, cdqe]              # docs
+- name: [cdq, cdqe, cltq]       # docs
   operands: []                  # docs
   latency: 1                    # docs
   port_pressure: [[1, '6789']]  # docs
@@ -5144,3 +5144,51 @@ instruction_forms:
   port_pressure: [[1, '23'], [1, '4']]  # uops.info
   throughput: 1.0                       # uops.info
   uops: 2                               # uops.info
+- name: [vpaddb, vpaddw, vpaddd, vpaddq]  # uops.info
+  operands:                     # uops.info
+  - class: register             # uops.info
+    name: xmm                   # uops.info
+  - class: register             # uops.info
+    name: xmm                   # uops.info
+  - class: register             # uops.info
+    name: xmm                   # uops.info
+  latency: 1                    # uops.info
+  port_pressure: [[1, '0123']]  # uops.info
+  throughput: 0.25              # uops.info
+  uops: 1                       # uops.info
+- name: [vpaddsb, vpaddsw, vpaddusb, vpaddusw]  # uops.info
+  operands:                                  # uops.info
+  - class: register                          # uops.info
+    name: xmm                                # uops.info
+  - class: register                          # uops.info
+    name: xmm                                # uops.info
+  - class: register                          # uops.info
+    name: xmm                                # uops.info
+  latency: 1                                 # uops.info
+  port_pressure: [[1, '01']]                 # uops.info
+  throughput: 0.5                            # uops.info
+  uops: 1                                    # uops.info
+- name: [vpaddb, vpaddw, vpaddd, vpaddq]  # uops.info
+  operands:                            # uops.info
+  - class: register                    # uops.info
+    name: ymm                          # uops.info
+  - class: register                    # uops.info
+    name: ymm                          # uops.info
+  - class: register                    # uops.info
+    name: ymm                          # uops.info
+  latency: 1                           # uops.info
+  port_pressure: [[1, '0123']]         # uops.info
+  throughput: 0.25                     # uops.info
+  uops: 1                              # uops.info
+- name: [vpaddsb, vpaddsw, vpaddusb, vpaddusw]  # uops.info
+  operands:                                  # uops.info
+  - class: register                          # uops.info
+    name: ymm                                # uops.info
+  - class: register                          # uops.info
+    name: ymm                                # uops.info
+  - class: register                          # uops.info
+    name: ymm                                # uops.info
+  latency: 1                                 # uops.info
+  port_pressure: [[1, '01']]                 # uops.info
+  throughput: 0.5                            # uops.info
+  uops: 1                                    # uops.info
