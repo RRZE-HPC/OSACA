@@ -6137,7 +6137,7 @@ instruction_forms:
   port_pressure: [[1, '0'], [12, ['0DV']]]  # asmbench
   throughput: 12.0                          # asmbench
   uops: 13                                  # asmbench
-- name: inc
+- name: [inc, dec]
   operands:
   - class: register
     name: gpr
