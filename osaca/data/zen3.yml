@@ -4086,7 +4086,7 @@ instruction_forms:
   throughput: 5.0                        # ibench
   uops: 10                               # ibench
 ##########################################
-- name: inc                     # asmbench
+- name: [inc, dec]              # asmbench
   operands:                     # asmbench
   - class: register             # asmbench
     name: gpr                   # asmbench
