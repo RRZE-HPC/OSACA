@@ -91,6 +91,58 @@ instruction_forms:
   port_pressure: [[1, '6789']]
   throughput: 0.25
   uops: 1
+- name: [vcmppd, vcmpps, vcmpsd, vcmpss]
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1.0
+  port_pressure: [[1, '23']]
+  throughput: 0.5
+  uops: 1
+- name: [vcmppd, vcmpps]
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  latency: 1.0
+  port_pressure: [[1, '23']]
+  throughput: 0.5
+  uops: 1
+- name: [vcmpltpd, vcmplepd, vcmpltps, vcmpleps]
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1.0
+  port_pressure: [[1, '23']]
+  throughput: 0.5
+  uops: 1
+- name: [vcmpltpd, vcmplepd, vcmpltps, vcmpleps]
+  operands:
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  latency: 1.0
+  port_pressure: [[1, '23']]
+  throughput: 0.5
+  uops: 1
 ##########################################
 - name: mov                                            # ./generate_mov_entries.py zen3
   operands:                                            # ./generate_mov_entries.py zen3
@@ -2998,98 +3050,52 @@ instruction_forms:
   port_pressure: [[1, '12'], [1, ['11', '12']]]        # ./generate_mov_entries.py zen3
   throughput: 0.5                                      # ./generate_mov_entries.py zen3
   uops: 2                                              # ./generate_mov_entries.py zen3
-- name: vpmovsxbw                                      # ./generate_mov_entries.py zen3
-  operands:                                            # ./generate_mov_entries.py zen3
-  - class: register                                    # ./generate_mov_entries.py zen3
-    name: xmm                                          # ./generate_mov_entries.py zen3
-  - class: register                                    # ./generate_mov_entries.py zen3
-    name: xmm                                          # ./generate_mov_entries.py zen3
-  latency: 1                                           # ./generate_mov_entries.py zen3
-  port_pressure: [[1, '12']]                           # ./generate_mov_entries.py zen3
-  throughput: 0.5                                      # ./generate_mov_entries.py zen3
-  uops: 1                                              # ./generate_mov_entries.py zen3
-- name: vpmovsxbw  # with load                         # ./generate_mov_entries.py zen3
-  operands:                                            # ./generate_mov_entries.py zen3
-  - class: memory                                      # ./generate_mov_entries.py zen3
-    base: "*"                                          # ./generate_mov_entries.py zen3
-    offset: "*"                                        # ./generate_mov_entries.py zen3
-    index: "*"                                         # ./generate_mov_entries.py zen3
-    scale: "*"                                         # ./generate_mov_entries.py zen3
-  - class: register                                    # ./generate_mov_entries.py zen3
-    name: xmm                                          # ./generate_mov_entries.py zen3
-  latency: 5                                           # ./generate_mov_entries.py zen3
-  port_pressure: [[1, '12'], [1, ['11', '12']]]        # ./generate_mov_entries.py zen3
-  throughput: 0.5                                      # ./generate_mov_entries.py zen3
-  uops: 2                                              # ./generate_mov_entries.py zen3
-- name: vpmovsxbd                                      # ./generate_mov_entries.py zen3
-  operands:                                            # ./generate_mov_entries.py zen3
-  - class: register                                    # ./generate_mov_entries.py zen3
-    name: xmm                                          # ./generate_mov_entries.py zen3
-  - class: register                                    # ./generate_mov_entries.py zen3
-    name: xmm                                          # ./generate_mov_entries.py zen3
-  latency: 1                                           # ./generate_mov_entries.py zen3
-  port_pressure: [[1, '12']]                           # ./generate_mov_entries.py zen3
-  throughput: 0.5                                      # ./generate_mov_entries.py zen3
-  uops: 1                                              # ./generate_mov_entries.py zen3
-- name: vpmovsxbd  # with load                         # ./generate_mov_entries.py zen3
-  operands:                                            # ./generate_mov_entries.py zen3
-  - class: memory                                      # ./generate_mov_entries.py zen3
-    base: "*"                                          # ./generate_mov_entries.py zen3
-    offset: "*"                                        # ./generate_mov_entries.py zen3
-    index: "*"                                         # ./generate_mov_entries.py zen3
-    scale: "*"                                         # ./generate_mov_entries.py zen3
-  - class: register                                    # ./generate_mov_entries.py zen3
-    name: xmm                                          # ./generate_mov_entries.py zen3
-  latency: 5                                           # ./generate_mov_entries.py zen3
-  port_pressure: [[1, '12'], [1, ['11', '12']]]        # ./generate_mov_entries.py zen3
-  throughput: 0.5                                      # ./generate_mov_entries.py zen3
-  uops: 2                                              # ./generate_mov_entries.py zen3
-- name: vpmovsxbq                                      # ./generate_mov_entries.py zen3
-  operands:                                            # ./generate_mov_entries.py zen3
-  - class: register                                    # ./generate_mov_entries.py zen3
-    name: xmm                                          # ./generate_mov_entries.py zen3
-  - class: register                                    # ./generate_mov_entries.py zen3
-    name: xmm                                          # ./generate_mov_entries.py zen3
-  latency: 1                                           # ./generate_mov_entries.py zen3
-  port_pressure: [[1, '12']]                           # ./generate_mov_entries.py zen3
-  throughput: 0.5                                      # ./generate_mov_entries.py zen3
-  uops: 1                                              # ./generate_mov_entries.py zen3
-- name: vpmovsxbq  # with load                         # ./generate_mov_entries.py zen3
-  operands:                                            # ./generate_mov_entries.py zen3
-  - class: memory                                      # ./generate_mov_entries.py zen3
-    base: "*"                                          # ./generate_mov_entries.py zen3
-    offset: "*"                                        # ./generate_mov_entries.py zen3
-    index: "*"                                         # ./generate_mov_entries.py zen3
-    scale: "*"                                         # ./generate_mov_entries.py zen3
-  - class: register                                    # ./generate_mov_entries.py zen3
-    name: xmm                                          # ./generate_mov_entries.py zen3
-  latency: 5                                           # ./generate_mov_entries.py zen3
-  port_pressure: [[1, '12'], [1, ['11', '12']]]        # ./generate_mov_entries.py zen3
-  throughput: 0.5                                      # ./generate_mov_entries.py zen3
-  uops: 2                                              # ./generate_mov_entries.py zen3
-- name: vpmovsxbw                                      # ./generate_mov_entries.py zen3
-  operands:                                            # ./generate_mov_entries.py zen3
-  - class: register                                    # ./generate_mov_entries.py zen3
-    name: xmm                                          # ./generate_mov_entries.py zen3
-  - class: register                                    # ./generate_mov_entries.py zen3
-    name: ymm                                          # ./generate_mov_entries.py zen3
-  latency: 1                                           # ./generate_mov_entries.py zen3
-  port_pressure: [[1, '0123']]                         # ./generate_mov_entries.py zen3
-  throughput: 0.25                                     # ./generate_mov_entries.py zen3
-  uops: 1                                              # ./generate_mov_entries.py zen3
-- name: vpmovsxbw  # with load                         # ./generate_mov_entries.py zen3
-  operands:                                            # ./generate_mov_entries.py zen3
-  - class: memory                                      # ./generate_mov_entries.py zen3
-    base: "*"                                          # ./generate_mov_entries.py zen3
-    offset: "*"                                        # ./generate_mov_entries.py zen3
-    index: "*"                                         # ./generate_mov_entries.py zen3
-    scale: "*"                                         # ./generate_mov_entries.py zen3
-  - class: register                                    # ./generate_mov_entries.py zen3
-    name: ymm                                          # ./generate_mov_entries.py zen3
-  latency: 5                                           # ./generate_mov_entries.py zen3
-  port_pressure: [[1, '12'], [1, ['11', '12']]]        # ./generate_mov_entries.py zen3
-  throughput: 0.5                                      # ./generate_mov_entries.py zen3
-  uops: 2                                              # ./generate_mov_entries.py zen3
+- name: [vpmovsxbw, vpmovsxbd, vpmovsxbq, vpmovsxwd, vpmovsxwq, vpmovsxdq] 
+  operands:                                            
+  - class: register                                    
+    name: xmm                                          
+  - class: register                                    
+    name: xmm                                          
+  latency: 1                                           
+  port_pressure: [[1, '12']]                           
+  throughput: 0.5                                      
+  uops: 1                                              
+- name: [vpmovsxbw, vpmovsxbd, vpmovsxbq, vpmovsxwd, vpmovsxwq, vpmovsxdq]  # with load                         
+  operands:                                            
+  - class: memory                                      
+    base: "*"                                          
+    offset: "*"                                        
+    index: "*"                                         
+    scale: "*"                                         
+  - class: register                                    
+    name: xmm                                          
+  latency: 5                                           
+  port_pressure: [[1, '12'], [1, ['11', '12']]]        
+  throughput: 0.5                                      
+  uops: 2                                              
+- name: [vpmovsxbw, vpmovsxbd, vpmovsxbq, vpmovsxwd, vpmovsxwq, vpmovsxdq]
+  operands:                                            
+  - class: register                                    
+    name: xmm                                          
+  - class: register                                    
+    name: ymm                                          
+  latency: 4                                           
+  port_pressure: [[1, '0123'], [1, '1']]                         
+  throughput: 1.25                                     
+  uops: 1                                              
+- name: [vpmovsxbw, vpmovsxbd, vpmovsxbq, vpmovsxwd, vpmovsxwq, vpmovsxdq]   # with load                         
+  operands:                                            
+  - class: memory                                      
+    base: "*"                                          
+    offset: "*"                                        
+    index: "*"                                         
+    scale: "*"                                         
+  - class: register                                    
+    name: ymm                                          
+  latency: 8                                           
+  port_pressure: [[1, '0123'], [1, '1'], [1, ['11', '12']]]        
+  throughput: 0.5                                      
+  uops: 2                                              
 - name: vpmovsxbd                                      # ./generate_mov_entries.py zen3
   operands:                                            # ./generate_mov_entries.py zen3
   - class: register                                    # ./generate_mov_entries.py zen3
@@ -3891,6 +3897,30 @@ instruction_forms:
   port_pressure: [[1, '01']]  # ibench
   throughput: 0.5               # ibench
   uops: 1                       # ibench
+- name: [vpmulld, vpmullw, vpmuldq, vpmulhw, vpmulhuw, vpmulhrsw]                  # ibench
+  operands:                     # ibench
+  - class: register             # ibench
+    name: xmm                   # ibench
+  - class: register             # ibench
+    name: xmm                   # ibench
+  - class: register             # ibench
+    name: xmm                   # ibench
+  latency: 3                    # ibench
+  port_pressure: [[1, '03']]  # ibench
+  throughput: 0.5               # ibench
+  uops: 1                       # ibench
+- name: [vpmulld, vpmullw, vpmuldq, vpmulhw, vpmulhuw, vpmulhrsw]                  # ibench
+  operands:                     # ibench
+  - class: register             # ibench
+    name: ymm                   # ibench
+  - class: register             # ibench
+    name: ymm                   # ibench
+  - class: register             # ibench
+    name: ymm                   # ibench
+  latency: 3                    # ibench
+  port_pressure: [[1, '03']]  # ibench
+  throughput: 0.5               # ibench
+  uops: 1                       # ibench
 - name: mulps                   # ibench
   operands:                     # ibench
   - class: register             # ibench
@@ -4640,6 +4670,25 @@ instruction_forms:
   port_pressure: [[1, '12']]  # uops.info
   throughput: 0.5             # uops.info
   uops: 1                     # uops.info
+- name: [vpbroadcastb, vpbroadcastd, vpbroadcastq, vpbroadcastw] # uops.info
+  operands:                   # uops.info
+  - class: register           # uops.info
+    name: xmm                 # uops.info
+  - class: register           # uops.info
+    name: xmm                 # uops.info
+  latency: 1                  # uops.info
+  port_pressure: [[1, '12']]  # uops.info
+  throughput: 0.5             # uops.info
+- name: [vpbroadcastb, vpbroadcastd, vpbroadcastq, vpbroadcastw] # uops.info
+  operands:                  # uops.info
+  - class: register          # uops.info
+    name: xmm                # uops.info
+  - class: register          # uops.info
+    name: ymm                # uops.info
+  latency: 1                 # uops.info
+  port_pressure: [[1, '0']]  # uops.info
+  throughput: 1.0            # uops.info
+  uops: 1                    # uops.info
 - name: vpxor                   # uops.info
   operands:                     # uops.info
   - class: register             # uops.info
@@ -5192,3 +5241,255 @@ instruction_forms:
   port_pressure: [[1, '01']]                 # uops.info
   throughput: 0.5                            # uops.info
   uops: 1                                    # uops.info
+- name: [vpsubb, vpsubw, vpsubd, vpsubq]  # uops.info
+  operands:                     # uops.info
+  - class: register             # uops.info
+    name: xmm                   # uops.info
+  - class: register             # uops.info
+    name: xmm                   # uops.info
+  - class: register             # uops.info
+    name: xmm                   # uops.info
+  latency: 1                    # uops.info
+  port_pressure: [[1, '0123']]  # uops.info
+  throughput: 0.25              # uops.info
+  uops: 1                       # uops.info
+- name: [vpsubsb, vpsubsw, vpsubusb, vpsubusw]  # uops.info
+  operands:                                  # uops.info
+  - class: register                          # uops.info
+    name: xmm                                # uops.info
+  - class: register                          # uops.info
+    name: xmm                                # uops.info
+  - class: register                          # uops.info
+    name: xmm                                # uops.info
+  latency: 1                                 # uops.info
+  port_pressure: [[1, '01']]                 # uops.info
+  throughput: 0.5                            # uops.info
+  uops: 1                                    # uops.info
+- name: [vpsubb, vpsubw, vpsubd, vpsubq]  # uops.info
+  operands:                            # uops.info
+  - class: register                    # uops.info
+    name: ymm                          # uops.info
+  - class: register                    # uops.info
+    name: ymm                          # uops.info
+  - class: register                    # uops.info
+    name: ymm                          # uops.info
+  latency: 1                           # uops.info
+  port_pressure: [[1, '0123']]         # uops.info
+  throughput: 0.25                     # uops.info
+  uops: 1                              # uops.info
+- name: [vpsubsb, vpsubsw, vpsubusb, vpsubusw]  # uops.info
+  operands:                                  # uops.info
+  - class: register                          # uops.info
+    name: ymm                                # uops.info
+  - class: register                          # uops.info
+    name: ymm                                # uops.info
+  - class: register                          # uops.info
+    name: ymm                                # uops.info
+  latency: 1                                 # uops.info
+  port_pressure: [[1, '01']]                 # uops.info
+  throughput: 0.5                            # uops.info
+  uops: 1                                    # uops.info
+- name: [vpaddb, vpaddw, vpaddd, vpaddq]  # uops.info
+  operands:                     # uops.info
+  - class: identifier
+  - class: register             # uops.info
+    name: xmm                   # uops.info
+  - class: register             # uops.info
+    name: xmm                   # uops.info
+  latency: 1                    # uops.info
+  port_pressure: [[1, '0123']]  # uops.info
+  throughput: 0.25              # uops.info
+  uops: 1                       # uops.info
+- name: [vpaddsb, vpaddsw, vpaddusb, vpaddusw]  # uops.info
+  operands:                                  # uops.info
+  - class: identifier
+  - class: register                          # uops.info
+    name: xmm                                # uops.info
+  - class: register                          # uops.info
+    name: xmm                                # uops.info
+  latency: 1                                 # uops.info
+  port_pressure: [[1, '01']]                 # uops.info
+  throughput: 0.5                            # uops.info
+  uops: 1                                    # uops.info
+- name: [vpaddb, vpaddw, vpaddd, vpaddq]  # uops.info
+  operands:                            # uops.info
+  - class: identifier
+  - class: register                    # uops.info
+    name: ymm                          # uops.info
+  - class: register                    # uops.info
+    name: ymm                          # uops.info
+  latency: 1                           # uops.info
+  port_pressure: [[1, '0123']]         # uops.info
+  throughput: 0.25                     # uops.info
+  uops: 1                              # uops.info
+- name: [vpaddsb, vpaddsw, vpaddusb, vpaddusw]  # uops.info
+  operands:                                  # uops.info
+  - class: identifier
+  - class: register                          # uops.info
+    name: ymm                                # uops.info
+  - class: register                          # uops.info
+    name: ymm                                # uops.info
+  latency: 1                                 # uops.info
+  port_pressure: [[1, '01']]                 # uops.info
+  throughput: 0.5                            # uops.info
+  uops: 1                                    # uops.info
+- name: [vpsubb, vpsubw, vpsubd, vpsubq]  # uops.info
+  operands:                     # uops.info
+  - class: identifier
+  - class: register             # uops.info
+    name: xmm                   # uops.info
+  - class: register             # uops.info
+    name: xmm                   # uops.info
+  latency: 1                    # uops.info
+  port_pressure: [[1, '0123']]  # uops.info
+  throughput: 0.25              # uops.info
+  uops: 1                       # uops.info
+- name: [vpsubsb, vpsubsw, vpsubusb, vpsubusw]  # uops.info
+  operands:                                  # uops.info
+  - class: identifier
+  - class: register                          # uops.info
+    name: xmm                                # uops.info
+  - class: register                          # uops.info
+    name: xmm                                # uops.info
+  latency: 1                                 # uops.info
+  port_pressure: [[1, '01']]                 # uops.info
+  throughput: 0.5                            # uops.info
+  uops: 1                                    # uops.info
+- name: [vpsubb, vpsubw, vpsubd, vpsubq]  # uops.info
+  operands:                            # uops.info
+  - class: identifier
+  - class: register                    # uops.info
+    name: ymm                          # uops.info
+  - class: register                    # uops.info
+    name: ymm                          # uops.info
+  latency: 1                           # uops.info
+  port_pressure: [[1, '0123']]         # uops.info
+  throughput: 0.25                     # uops.info
+  uops: 1                              # uops.info
+- name: [vpsubsb, vpsubsw, vpsubusb, vpsubusw]  # uops.info
+  operands:                                  # uops.info
+  - class: identifier
+  - class: register                          # uops.info
+    name: ymm                                # uops.info
+  - class: register                          # uops.info
+    name: ymm                                # uops.info
+  latency: 1                                 # uops.info
+  port_pressure: [[1, '01']]                 # uops.info
+  throughput: 0.5                            # uops.info
+  uops: 1                                    # uops.info
+- name: [vpsllw, vpslld, vpsllq]
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '12']]
+  throughput: 0.5
+  uops: 1
+- name: [vpsllw, vpslld, vpsllq]
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '12']]
+  throughput: 0.5
+  uops: 1
+- name: [vpsllw, vpslld, vpsllq]
+  operands:
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  latency: 1
+  port_pressure: [[1, '12']]
+  throughput: 0.5
+  uops: 1
+- name: [vpsllw, vpslld, vpsllq]
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  latency: 1
+  port_pressure: [[1, '12']]
+  throughput: 0.5
+  uops: 1
+- name: [vpextrb, vpextrw, vpextrd, vpextrq]
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: xmm
+  - class: register
+    name: gpr 
+  latency: 6
+  port_pressure: [[1, '1']]
+  throughput: 1.0
+  uops: 1
+- name: [vblendvpd, vblendvps, vpblendvb]   #asmbench
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '01']]
+  throughput: 0.5
+  uops: 1
+- name: [vblendpd, vblendps, vpblendd, vpblendw] # asmbench
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '0123']]
+  throughput: 0.25
+  uops: 1
+- name: [vblendpd, vblendps, vpblendd, vpblendw] # asmbench
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  latency: 1
+  port_pressure: [[1, '0123']]
+  throughput: 0.25
+  uops: 1
+- name: [vblendvpd, vblendvps, vpblendvb]   #asmbench
+  operands:
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  latency: 1
+  port_pressure: [[1, '01']]
+  throughput: 0.5
+  uops: 1
