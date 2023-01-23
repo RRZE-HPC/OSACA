@@ -11,8 +11,6 @@ load_throughput:
 - {base: gpr, index: gpr, offset: imd, scale: 1, port_pressure: [[1, '23'], [1, ['2D', '3D']]]}
 - {base: gpr, index: gpr, offset: imd, scale: 8, port_pressure: [[1, '23'], [1, ['2D', '3D']]]}
 - {base: gpr, index: gpr, offset: ~,   scale: 1, port_pressure: [[1, '23'], [1, ['2D', '3D']]]}
-- {dst: gpr, base: gpr, index: gpr, offset: ~,   scale: 1, port_pressure: [[1, '23'], [1, ['4', '5']]]}
-- {dst: ymm, base: "*", index: "*", offset: "*",   scale: "*", port_pressure: [[1, '23'], [1, ['9', '8']]]}
 - {base: gpr, index: ~,   offset: imd, scale: 1, port_pressure: [[1, '23'], [1, ['2D', '3D']]]}
 - {base: gpr, index: ~,   offset: imd, scale: 8, port_pressure: [[1, '23'], [1, ['2D', '3D']]]}
 - {base: gpr, index: ~,   offset: ~,   scale: 1, port_pressure: [[1, '23'], [1, ['2D', '3D']]]}
@@ -4398,6 +4396,14 @@ instruction_forms:
   port_pressure: [[1, '0156']]  # ibench
   throughput: 0.25              # ibench
   uops: 1                       # ibench
+- name: [setne, sete]
+  operands:                     # uops.info
+  - class: register             # uops.info
+    name: gpr                   # uops.info
+  latency: 1                    # uops.info
+  port_pressure: [[1, '06']]  # uops.info
+  throughput: 0.5              # uops.info
+  uops: 1                       # uops.info
 - name: add                     # ibench
   operands:                     # ibench
   - class: immediate            # ibench
@@ -6471,7 +6477,7 @@ instruction_forms:
   port_pressure: [[1, '0156']]                                # uops.info
   throughput: 0.5                                             # uops.info
   uops: 3                                                     # uops.info
-- name: [shl, shr]            # uops.info
+- name: [shl, shr, sal, sar]  # uops.info
   operands:                   # uops.info
   - class: immediate          # uops.info
     imd: int                  # uops.info
@@ -8181,6 +8187,16 @@ instruction_forms:
   uops: 1                                                            # model_importer.py instructions.xml ICL
 - name: NOT                                                          # model_importer.py instructions.xml ICL
   operands:                                                          # model_importer.py instructions.xml ICL
+  - class: register                                                  # model_importer.py instructions.xml ICL
+    name: gpr                                                        # model_importer.py instructions.xml ICL
+  latency: 1                                                         # model_importer.py instructions.xml ICL
+  port_pressure: [[1, '0156']]                                       # model_importer.py instructions.xml ICL
+  throughput: 0.25                                                   # model_importer.py instructions.xml ICL
+  uops: 1                                                            # model_importer.py instructions.xml ICL
+- name: OR                                                           # model_importer.py instructions.xml ICL
+  operands:                                                          # model_importer.py instructions.xml ICL
+  - class: register                                                  # model_importer.py instructions.xml ICL
+    name: gpr                                                        # model_importer.py instructions.xml ICL
   - class: register                                                  # model_importer.py instructions.xml ICL
     name: gpr                                                        # model_importer.py instructions.xml ICL
   latency: 1                                                         # model_importer.py instructions.xml ICL
@@ -10283,3 +10299,16 @@ instruction_forms:
   port_pressure: [[1, '0']]                                          # model_importer.py instructions.xml ICL
   throughput: 1.0                                                    # model_importer.py instructions.xml ICL
   uops: 1                                                            # model_importer.py instructions.xml ICL
+- name: vcmpltpd                # uops.info
+  operands:                   # uops.info
+  - class: register           # uops.info
+    name: zmm                 # uops.info
+  - class: register           # uops.info
+    name: zmm                 # uops.info
+  - class: register           # uops.info
+    name: k                 # uops.info
+    mask: True                # uops.info
+  latency: 4                  # uops.info
+  port_pressure: [[1, '05']]  # uops.info
+  throughput: 0.5             # uops.info
+  uops: 1                     # uops.info
