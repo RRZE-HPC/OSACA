@@ -29,7 +29,9 @@ class EntryBuilder:
             comment = "  # " + comment
         else:
             comment = ""
-        description = "- name: {}{}\n  operands: {}\n".format(instruction_name, comment, "[]" if len(operand_types) == 0 else "")
+        description = "- name: {}{}\n  operands: {}\n".format(
+            instruction_name, comment, "[]" if len(operand_types) == 0 else ""
+        )
 
         for ot in operand_types:
             if ot == "imd":
