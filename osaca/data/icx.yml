@@ -5495,7 +5495,7 @@ instruction_forms:
     mask: True                # ibench
   latency: 24                                                                     # ibench
   port_pressure: [[1, '015'], [1, '15'], [1, '0'], [14, ['2D', '3D']], [14, '23']]  # ibench
-  throughput: 7.0                                                                 # ibench
+  throughput: 6.0                                                                 # ibench
   uops: 31                                                                       # ibench
 - name: vgatherdps  # with load                                                   # ibench
   operands:                                                                       # ibench
@@ -7218,6 +7218,19 @@ instruction_forms:
   latency: 3                                                         # model_importer.py instructions.xml ICL
   port_pressure: [[1, '5']]                                          # model_importer.py instructions.xml ICL
   throughput: 1.0                                                    # model_importer.py instructions.xml ICL
+  uops: 1                                                            # model_importer.py instructions.xml ICL
+- name: VBROADCASTF64X4                                              # model_importer.py instructions.xml ICL
+  operands:                                                          # model_importer.py instructions.xml ICL
+  - class: memory
+    base: "*"
+    offset: "*"
+    index: "*"
+    scale: "*"
+  - class: register                                                  # model_importer.py instructions.xml ICL
+    name: zmm                                                        # model_importer.py instructions.xml ICL
+  latency: 5                                                         # model_importer.py instructions.xml ICL
+  port_pressure: [[1, '23'], [1, ['2D', '3D']]]                      # model_importer.py instructions.xml ICL
+  throughput: 0.5                                                    # model_importer.py instructions.xml ICL
   uops: 1                                                            # model_importer.py instructions.xml ICL
 - name: VPXOR                                                        # model_importer.py instructions.xml ICL
   operands:                                                          # model_importer.py instructions.xml ICL
@@ -10299,7 +10312,7 @@ instruction_forms:
   port_pressure: [[1, '0']]                                          # model_importer.py instructions.xml ICL
   throughput: 1.0                                                    # model_importer.py instructions.xml ICL
   uops: 1                                                            # model_importer.py instructions.xml ICL
-- name: vcmpltpd                # uops.info
+- name: [vcmpltpd, vcmpltps]                # uops.info
   operands:                   # uops.info
   - class: register           # uops.info
     name: zmm                 # uops.info
@@ -10312,3 +10325,275 @@ instruction_forms:
   port_pressure: [[1, '05']]  # uops.info
   throughput: 0.5             # uops.info
   uops: 1                     # uops.info
+- name: [vcmpltpd, vcmpltps]                # uops.info
+  operands:                   # uops.info
+  - class: register           # uops.info
+    name: ymm                 # uops.info
+  - class: register           # uops.info
+    name: ymm                 # uops.info
+  - class: register           # uops.info
+    name: ymm                 # uops.info
+  latency: 4                  # uops.info
+  port_pressure: [[1, '05']]  # uops.info
+  throughput: 0.5             # uops.info
+  uops: 1                     # uops.info
+- name: VCMPPS                                                                                                                 # model_importer.py ICX
+  operands:                                                                                                                    # model_importer.py ICX
+  - class: immediate                                                                                                           # model_importer.py ICX
+    imd: int                                                                                                                   # model_importer.py ICX
+  - class: register                                                                                                            # model_importer.py ICX
+    name: xmm                                                                                                                  # model_importer.py ICX
+  - class: register                                                                                                            # model_importer.py ICX
+    name: xmm                                                                                                                  # model_importer.py ICX
+  - class: register                                                                                                            # model_importer.py ICX
+    name: xmm                                                                                                                  # model_importer.py ICX
+  latency: 4                                                                                                                   # model_importer.py ICX
+  port_pressure: [[1, '01']]                                                                                                   # model_importer.py ICX
+  throughput: 0.5                                                                                                              # model_importer.py ICX
+  uops: 1                                                                                                                      # model_importer.py ICX
+- name: VCMPPS                                                                                                                 # model_importer.py ICX
+  operands:                                                                                                                    # model_importer.py ICX
+  - class: immediate                                                                                                           # model_importer.py ICX
+    imd: int                                                                                                                   # model_importer.py ICX
+  - class: register                                                                                                            # model_importer.py ICX
+    name: ymm                                                                                                                  # model_importer.py ICX
+  - class: register                                                                                                            # model_importer.py ICX
+    name: ymm                                                                                                                  # model_importer.py ICX
+  - class: register                                                                                                            # model_importer.py ICX
+    name: ymm                                                                                                                  # model_importer.py ICX
+  latency: 4                                                                                                                   # model_importer.py ICX
+  port_pressure: [[1, '01']]                                                                                                   # model_importer.py ICX
+  throughput: 0.5                                                                                                              # model_importer.py ICX
+  uops: 1                                                                                                                      # model_importer.py ICX
+- name: VCMPPD                                                                                                                 # model_importer.py ICX
+  operands:                                                                                                                    # model_importer.py ICX
+  - class: immediate                                                                                                           # model_importer.py ICX
+    imd: int                                                                                                                   # model_importer.py ICX
+  - class: register                                                                                                            # model_importer.py ICX
+    name: xmm                                                                                                                  # model_importer.py ICX
+  - class: register                                                                                                            # model_importer.py ICX
+    name: xmm                                                                                                                  # model_importer.py ICX
+  - class: register                                                                                                            # model_importer.py ICX
+    name: xmm                                                                                                                  # model_importer.py ICX
+  latency: 4                                                                                                                   # model_importer.py ICX
+  port_pressure: [[1, '01']]                                                                                                   # model_importer.py ICX
+  throughput: 0.5                                                                                                              # model_importer.py ICX
+  uops: 1                                                                                                                      # model_importer.py ICX
+- name: VCMPPD                                                                                                                 # model_importer.py ICX
+  operands:                                                                                                                    # model_importer.py ICX
+  - class: immediate                                                                                                           # model_importer.py ICX
+    imd: int                                                                                                                   # model_importer.py ICX
+  - class: register                                                                                                            # model_importer.py ICX
+    name: ymm                                                                                                                  # model_importer.py ICX
+  - class: register                                                                                                            # model_importer.py ICX
+    name: ymm                                                                                                                  # model_importer.py ICX
+  - class: register                                                                                                            # model_importer.py ICX
+    name: ymm                                                                                                                  # model_importer.py ICX
+  latency: 4                                                                                                                   # model_importer.py ICX
+  port_pressure: [[1, '01']]                                                                                                   # model_importer.py ICX
+  throughput: 0.5                                                                                                              # model_importer.py ICX
+  uops: 1                                                                                                                      # model_importer.py ICX
+- name: VCMPPS                                                                                                                 # model_importer.py ICX
+  operands:                                                                                                                    # model_importer.py ICX
+  - class: immediate                                                                                                           # model_importer.py ICX
+    imd: int                                                                                                                   # model_importer.py ICX
+  - class: register                                                                                                            # model_importer.py ICX
+    name: zmm                                                                                                                  # model_importer.py ICX
+  - class: register                                                                                                            # model_importer.py ICX
+    name: zmm                                                                                                                  # model_importer.py ICX
+  - class: register                                                                                                            # model_importer.py ICX
+    name: k                                                                                                                  # model_importer.py ICX
+  latency: 3                                                                                                                   # model_importer.py ICX
+  port_pressure: [[1, '5']]                                                                                                    # model_importer.py ICX
+  throughput: 1.0                                                                                                              # model_importer.py ICX
+  uops: 1                                                                                                                      # model_importer.py ICX
+- name: VCMPPS                                                                                                                 # model_importer.py ICX
+  operands:                                                                                                                    # model_importer.py ICX
+  - class: immediate                                                                                                           # model_importer.py ICX
+    imd: int                                                                                                                   # model_importer.py ICX
+  - class: register                                                                                                            # model_importer.py ICX
+    name: zmm                                                                                                                  # model_importer.py ICX
+  - class: register                                                                                                            # model_importer.py ICX
+    name: zmm                                                                                                                  # model_importer.py ICX
+  - class: register                                                                                                            # model_importer.py ICX
+    name: k                                                                                                                  # model_importer.py ICX
+    mask: True
+  latency: 3                                                                                                                   # model_importer.py ICX
+  port_pressure: [[1, '5']]                                                                                                    # model_importer.py ICX
+  throughput: 1.0                                                                                                              # model_importer.py ICX
+  uops: 1                                                                                                                      # model_importer.py ICX
+- name: VCMPPS                                                                                                                 # model_importer.py ICX
+  operands:                                                                                                                    # model_importer.py ICX
+  - class: immediate                                                                                                           # model_importer.py ICX
+    imd: int                                                                                                                   # model_importer.py ICX
+  - class: register                                                                                                            # model_importer.py ICX
+    name: xmm                                                                                                                  # model_importer.py ICX
+  - class: register                                                                                                            # model_importer.py ICX
+    name: xmm                                                                                                                  # model_importer.py ICX
+  - class: register                                                                                                            # model_importer.py ICX
+    name: k                                                                                                                  # model_importer.py ICX
+    mask: True
+  latency: 3                                                                                                                   # model_importer.py ICX
+  port_pressure: [[1, '5']]                                                                                                    # model_importer.py ICX
+  throughput: 1.0                                                                                                              # model_importer.py ICX
+  uops: 1                                                                                                                      # model_importer.py ICX
+- name: VCMPPS                                                                                                                 # model_importer.py ICX
+  operands:                                                                                                                    # model_importer.py ICX
+  - class: immediate                                                                                                           # model_importer.py ICX
+    imd: int                                                                                                                   # model_importer.py ICX
+  - class: register                                                                                                            # model_importer.py ICX
+    name: ymm                                                                                                                  # model_importer.py ICX
+  - class: register                                                                                                            # model_importer.py ICX
+    name: ymm                                                                                                                  # model_importer.py ICX
+  - class: register                                                                                                            # model_importer.py ICX
+    name: k
+    mask: True  
+  latency: 3                                                                                                                   # model_importer.py ICX
+  port_pressure: [[1, '5']]                                                                                                    # model_importer.py ICX
+  throughput: 1.0                                                                                                              # model_importer.py ICX
+  uops: 1                                                                                                                      # model_importer.py ICX
+- name: VCMPPD                                                                                                                 # model_importer.py ICX
+  operands:                                                                                                                    # model_importer.py ICX
+  - class: immediate                                                                                                           # model_importer.py ICX
+    imd: int                                                                                                                   # model_importer.py ICX
+  - class: register                                                                                                            # model_importer.py ICX
+    name: zmm                                                                                                                  # model_importer.py ICX
+  - class: register                                                                                                            # model_importer.py ICX
+    name: zmm                                                                                                                  # model_importer.py ICX
+  - class: register                                                                                                            # model_importer.py ICX
+    name: k                                                                                                                  # model_importer.py ICX
+  latency: 3                                                                                                                   # model_importer.py ICX
+  port_pressure: [[1, '5']]                                                                                                    # model_importer.py ICX
+  throughput: 1.0                                                                                                              # model_importer.py ICX
+  uops: 1                                                                                                                      # model_importer.py ICX
+- name: VCMPPD                                                                                                                 # model_importer.py ICX
+  operands:                                                                                                                    # model_importer.py ICX
+  - class: immediate                                                                                                           # model_importer.py ICX
+    imd: int                                                                                                                   # model_importer.py ICX
+  - class: register                                                                                                            # model_importer.py ICX
+    name: zmm                                                                                                                  # model_importer.py ICX
+  - class: register                                                                                                            # model_importer.py ICX
+    name: zmm                                                                                                                  # model_importer.py ICX
+  - class: register                                                                                                            # model_importer.py ICX
+    name: k                                                                                                                 # model_importer.py ICX
+    mask: True
+  latency: 3                                                                                                                   # model_importer.py ICX
+  port_pressure: [[1, '5']]                                                                                                    # model_importer.py ICX
+  throughput: 1.0                                                                                                              # model_importer.py ICX
+  uops: 1                                                                                                                      # model_importer.py ICX
+- name: VCMPPD                                                                                                                 # model_importer.py ICX
+  operands:                                                                                                                    # model_importer.py ICX
+  - class: immediate                                                                                                           # model_importer.py ICX
+    imd: int                                                                                                                   # model_importer.py ICX
+  - class: register                                                                                                            # model_importer.py ICX
+    name: xmm                                                                                                                  # model_importer.py ICX
+  - class: register                                                                                                            # model_importer.py ICX
+    name: xmm                                                                                                                  # model_importer.py ICX
+  - class: register                                                                                                            # model_importer.py ICX
+    name: k                                                                                                                  # model_importer.py ICX
+    mask: True
+  latency: 3                                                                                                                   # model_importer.py ICX
+  port_pressure: [[1, '5']]                                                                                                    # model_importer.py ICX
+  throughput: 1.0                                                                                                              # model_importer.py ICX
+  uops: 1                                                                                                                      # model_importer.py ICX
+- name: VCMPPD                                                                                                                 # model_importer.py ICX
+  operands:                                                                                                                    # model_importer.py ICX
+  - class: immediate                                                                                                           # model_importer.py ICX
+    imd: int                                                                                                                   # model_importer.py ICX
+  - class: register                                                                                                            # model_importer.py ICX
+    name: ymm                                                                                                                  # model_importer.py ICX
+  - class: register                                                                                                            # model_importer.py ICX
+    name: ymm                                                                                                                  # model_importer.py ICX
+  - class: register                                                                                                            # model_importer.py ICX
+    name: k                                                                                                                  # model_importer.py ICX
+    mask: True
+  latency: 3                                                                                                                   # model_importer.py ICX
+  port_pressure: [[1, '5']]                                                                                                    # model_importer.py ICX
+  throughput: 1.0                                                                                                              # model_importer.py ICX
+  uops: 1                                                                                                                      # model_importer.py ICX
+- name: vpunpckhqdq
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '15']]
+  throughput: 0.5
+  uops: 1
+- name: vpunpckhqdq
+  operands:
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  latency: 1
+  port_pressure: [[1, '15']]
+  throughput: 0.5
+  uops: 1
+- name: vpunpckhqdq
+  operands:
+  - class: register
+    name: zmm
+  - class: register
+    name: zmm
+  - class: register
+    name: zmm
+  latency: 1
+  port_pressure: [[1, '5']]
+  throughput: 1.0
+  uops: 1
+- name: vandpd
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '015']]
+  throughput: 0.33333
+  uops: 1
+- name: vandpd
+  operands:
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  latency: 1
+  port_pressure: [[1, '015']]
+  throughput: 0.33333
+  uops: 1
+- name: vandpd
+  operands:
+  - class: register
+    name: zmm
+  - class: register
+    name: zmm
+  - class: register
+    name: zmm
+  latency: 1
+  port_pressure: [[1, '05']]
+  throughput: 0.5
+  uops: 1
+- name: vshuff64x2  #asmbench 
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: zmm
+  - class: register
+    name: zmm
+  - class: register
+    name: zmm
+  latency: 3
+  port_pressure: [[1, '5']]
+  throughput: 1.0
+  uops: 1
