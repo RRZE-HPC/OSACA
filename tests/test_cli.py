@@ -29,7 +29,9 @@ class TestCLI(unittest.TestCase):
 
     def test_check_arguments(self):
         parser = osaca.create_parser(parser=ErrorRaisingArgumentParser())
-        args = parser.parse_args(["--arch", "WRONG_ARCH", self._find_file("gs", "csx", "gcc")])
+        args = parser.parse_args(
+            ["--arch", "WRONG_ARCH", self._find_file("gs", "csx", "gcc")]
+        )
         with self.assertRaises(ValueError):
             osaca.check_arguments(args, parser)
         args = parser.parse_args(
@@ -234,7 +236,9 @@ class TestCLI(unittest.TestCase):
         # Run tests with --lines option
         parser = osaca.create_parser()
         kernel_x86 = "triad_x86_iaca.s"
-        args_base = parser.parse_args(["--arch", "csx", self._find_test_file(kernel_x86)])
+        args_base = parser.parse_args(
+            ["--arch", "csx", self._find_test_file(kernel_x86)]
+        )
         output_base = StringIO()
         osaca.run(args_base, output_file=output_base)
         output_base = output_base.getvalue().split("\n")[8:]
