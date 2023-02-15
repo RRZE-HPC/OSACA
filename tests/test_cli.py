@@ -22,7 +22,6 @@ class ErrorRaisingArgumentParser(argparse.ArgumentParser):
 
 
 class TestCLI(unittest.TestCase):
-
     ###########
     # Tests
     ###########
