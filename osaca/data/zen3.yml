@@ -5434,7 +5434,7 @@ instruction_forms:
   - class: register
     name: gpr 
   latency: 6
-  port_pressure: [[1, '1']]
+  port_pressure: [[1, '01'], [1, '1']]
   throughput: 1.0
   uops: 1
 - name: [vblendvpd, vblendvps, vpblendvb]   #asmbench
