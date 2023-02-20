@@ -581,6 +581,8 @@ class MachineModel(object):
         # prefetch option
         if "prfop" in operand:
             return i_operand["class"] == "prfop"
+        if "condition" in operand:
+            return i_operand["class"] == "condition"
         # no match
         return False
 
