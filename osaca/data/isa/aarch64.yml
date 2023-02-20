@@ -5,7 +5,7 @@ isa: "AArch64"
 #   mnemonic op1 ... opN
 # means that op1 is the only destination operand and op2 to op(N) are source operands.
 instruction_forms:
-    - name: [add, adds]
+    - name: add
       operands:
       - class: register
         prefix: x
@@ -20,7 +20,135 @@ instruction_forms:
         source: true
         destination: false
       operation: "op1['value'] = op2['value'] + op3['value']; op1['name'] = op2['name']"
-    - name: [sub, subs]
+    - name: adds
+      operands:
+      - class: register
+        prefix: x
+        source: false
+        destination: true
+      - class: register
+        prefix: x
+        source: true
+        destination: false
+      - class: register
+        prefix: x
+        source: true
+        destination: false
+      hidden_operands:
+      - class: flag
+        name: "N"
+        source: false
+        destination: true
+      - class: flag
+        name: "Z"
+        source: false
+        destination: true
+      - class: flag
+        name: "C"
+        source: false
+        destination: true
+      - class: flag
+        name: "V"
+        source: false
+        destination: true
+      operation: "op1['value'] = op2['value'] + op3['value']; op1['name'] = op2['name']"
+    - name: adds
+      operands:
+      - class: register
+        prefix: x
+        source: false
+        destination: true
+      - class: register
+        prefix: x
+        source: true
+        destination: false
+      - class: immediate
+        imd: 'int'
+        source: true
+        destination: false
+      hidden_operands:
+      - class: flag
+        name: "N"
+        source: false
+        destination: true
+      - class: flag
+        name: "Z"
+        source: false
+        destination: true
+      - class: flag
+        name: "C"
+        source: false
+        destination: true
+      - class: flag
+        name: "V"
+        source: false
+        destination: true
+      operation: "op1['value'] = op2['value'] + op3['value']; op1['name'] = op2['name']"
+    - name: adds
+      operands:
+      - class: register
+        prefix: w
+        source: false
+        destination: true
+      - class: register
+        prefix: w
+        source: true
+        destination: false
+      - class: register
+        prefix: w
+        source: true
+        destination: false
+      hidden_operands:
+      - class: flag
+        name: "N"
+        source: false
+        destination: true
+      - class: flag
+        name: "Z"
+        source: false
+        destination: true
+      - class: flag
+        name: "C"
+        source: false
+        destination: true
+      - class: flag
+        name: "V"
+        source: false
+        destination: true
+      operation: "op1['value'] = op2['value'] + op3['value']; op1['name'] = op2['name']"
+    - name: adds
+      operands:
+      - class: register
+        prefix: w
+        source: false
+        destination: true
+      - class: register
+        prefix: w
+        source: true
+        destination: false
+      - class: immediate
+        imd: 'int'
+        source: true
+        destination: false
+      hidden_operands:
+      - class: flag
+        name: "N"
+        source: false
+        destination: true
+      - class: flag
+        name: "Z"
+        source: false
+        destination: true
+      - class: flag
+        name: "C"
+        source: false
+        destination: true
+      - class: flag
+        name: "V"
+        source: false
+        destination: true
+      operation: "op1['value'] = op2['value'] + op3['value']; op1['name'] = op2['name']"
+    - name: sub
       operands:
       - class: register
         prefix: x
@@ -35,10 +163,631 @@ instruction_forms:
         source: true
         destination: false
       operation: "op1['value'] = op2['value'] - op3['value']; op1['name'] = op2['name']"
-    - name: [b, bcc, bcs, b.ne, b.any, b.none, b.lt, b.eq, b.hs, b.gt, bne, beq]
+    - name: subs
+      operands:
+      - class: register
+        prefix: x
+        source: false
+        destination: true
+      - class: register
+        prefix: x
+        source: true
+        destination: false
+      - class: register
+        prefix: x
+        source: true
+        destination: false
+      hidden_operands:
+      - class: flag
+        name: "N"
+        source: false
+        destination: true
+      - class: flag
+        name: "Z"
+        source: false
+        destination: true
+      - class: flag
+        name: "C"
+        source: false
+        destination: true
+      - class: flag
+        name: "V"
+        source: false
+        destination: true
+      operation: "op1['value'] = op2['value'] - op3['value']; op1['name'] = op2['name']"
+    - name: subs
+      operands:
+      - class: register
+        prefix: x
+        source: false
+        destination: true
+      - class: register
+        prefix: x
+        source: true
+        destination: false
+      - class: immediate
+        imd: 'int'
+        source: true
+        destination: false
+      hidden_operands:
+      - class: flag
+        name: "N"
+        source: false
+        destination: true
+      - class: flag
+        name: "Z"
+        source: false
+        destination: true
+      - class: flag
+        name: "C"
+        source: false
+        destination: true
+      - class: flag
+        name: "V"
+        source: false
+        destination: true
+      operation: "op1['value'] = op2['value'] - op3['value']; op1['name'] = op2['name']"
+    - name: subs
+      operands:
+      - class: register
+        prefix: w
+        source: false
+        destination: true
+      - class: register
+        prefix: w
+        source: true
+        destination: false
+      - class: register
+        prefix: w
+        source: true
+        destination: false
+      hidden_operands:
+      - class: flag
+        name: "N"
+        source: false
+        destination: true
+      - class: flag
+        name: "Z"
+        source: false
+        destination: true
+      - class: flag
+        name: "C"
+        source: false
+        destination: true
+      - class: flag
+        name: "V"
+        source: false
+        destination: true
+      operation: "op1['value'] = op2['value'] - op3['value']; op1['name'] = op2['name']"
+    - name: subs
+      operands:
+      - class: register
+        prefix: w
+        source: false
+        destination: true
+      - class: register
+        prefix: w
+        source: true
+        destination: false
+      - class: immediate
+        imd: 'int'
+        source: true
+        destination: false
+      hidden_operands:
+      - class: flag
+        name: "N"
+        source: false
+        destination: true
+      - class: flag
+        name: "Z"
+        source: false
+        destination: true
+      - class: flag
+        name: "C"
+        source: false
+        destination: true
+      - class: flag
+        name: "V"
+        source: false
+        destination: true
+      operation: "op1['value'] = op2['value'] - op3['value']; op1['name'] = op2['name']"
+    - name: [adcs, sbcs]
+      operands:
+      - class: register
+        prefix: x
+        source: false
+        destination: true
+      - class: register
+        prefix: x
+        source: true
+        destination: false
+      - class: register
+        prefix: x
+        source: true
+        destination: false
+      hidden_operands:
+      - class: flag
+        name: "N"
+        source: false
+        destination: true
+      - class: flag
+        name: "Z"
+        source: false
+        destination: true
+      - class: flag
+        name: "C"
+        source: true
+        destination: true
+      - class: flag
+        name: "V"
+        source: false
+        destination: true
+    - name: [adcs, sbcs]
+      operands:
+      - class: register
+        prefix: w
+        source: false
+        destination: true
+      - class: register
+        prefix: w
+        source: true
+        destination: false
+      - class: register
+        prefix: w
+        source: true
+        destination: false
+      hidden_operands:
+      - class: flag
+        name: "N"
+        source: false
+        destination: true
+      - class: flag
+        name: "Z"
+        source: false
+        destination: true
+      - class: flag
+        name: "C"
+        source: true
+        destination: true
+      - class: flag
+        name: "V"
+        source: false
+        destination: true
+    - name: negs
+      operands:
+      - class: register
+        prefix: x
+        source: false
+        destination: true
+      - class: register
+        prefix: x
+        source: true
+        destination: false
+      hidden_operands:
+      - class: flag
+        name: "N"
+        source: false
+        destination: true
+      - class: flag
+        name: "Z"
+        source: false
+        destination: true
+      - class: flag
+        name: "C"
+        source: false
+        destination: true
+      - class: flag
+        name: "V"
+        source: false
+        destination: true
+    - name: negs
+      operands:
+      - class: register
+        prefix: w
+        source: false
+        destination: true
+      - class: register
+        prefix: w
+        source: true
+        destination: false
+      hidden_operands:
+      - class: flag
+        name: "N"
+        source: false
+        destination: true
+      - class: flag
+        name: "Z"
+        source: false
+        destination: true
+      - class: flag
+        name: "C"
+        source: false
+        destination: true
+      - class: flag
+        name: "V"
+        source: false
+        destination: true
+    - name: ngcs
+      operands:
+      - class: register
+        prefix: x
+        source: false
+        destination: true
+      - class: register
+        prefix: x
+        source: true
+        destination: false
+      hidden_operands:
+      - class: flag
+        name: "N"
+        source: false
+        destination: true
+      - class: flag
+        name: "Z"
+        source: false
+        destination: true
+      - class: flag
+        name: "C"
+        source: true
+        destination: true
+      - class: flag
+        name: "V"
+        source: false
+        destination: true
+    - name: ngcs
+      operands:
+      - class: register
+        prefix: w
+        source: false
+        destination: true
+      - class: register
+        prefix: w
+        source: true
+        destination: false
+      hidden_operands:
+      - class: flag
+        name: "N"
+        source: false
+        destination: true
+      - class: flag
+        name: "Z"
+        source: false
+        destination: true
+      - class: flag
+        name: "C"
+        source: true
+        destination: true
+      - class: flag
+        name: "V"
+        source: false
+        destination: true
+    - name: [ands, bics]
+      operands:
+      - class: register
+        prefix: x
+        source: false
+        destination: true
+      - class: register
+        prefix: x
+        source: true
+        destination: false
+      - class: register
+        prefix: x
+        source: true
+        destination: false
+      hidden_operands:
+      - class: flag
+        name: "N"
+        source: false
+        destination: true
+      - class: flag
+        name: "Z"
+        source: false
+        destination: true
+      - class: flag
+        name: "C"
+        source: false
+        destination: true
+      - class: flag
+        name: "V"
+        source: false
+        destination: true
+    - name: [ands, bics]
+      operands:
+      - class: register
+        prefix: x
+        source: false
+        destination: true
+      - class: register
+        prefix: x
+        source: true
+        destination: false
+      - class: immediate
+        imd: 'int'
+        source: true
+        destination: false
+      hidden_operands:
+      - class: flag
+        name: "N"
+        source: false
+        destination: true
+      - class: flag
+        name: "Z"
+        source: false
+        destination: true
+      - class: flag
+        name: "C"
+        source: false
+        destination: true
+      - class: flag
+        name: "V"
+        source: false
+        destination: true
+    - name: [ands, bics]
+      operands:
+      - class: register
+        prefix: w
+        source: false
+        destination: true
+      - class: register
+        prefix: w
+        source: true
+        destination: false
+      - class: register
+        prefix: w
+        source: true
+        destination: false
+      hidden_operands:
+      - class: flag
+        name: "N"
+        source: false
+        destination: true
+      - class: flag
+        name: "Z"
+        source: false
+        destination: true
+      - class: flag
+        name: "C"
+        source: false
+        destination: true
+      - class: flag
+        name: "V"
+        source: false
+        destination: true
+    - name: [ands, bics]
+      operands:
+      - class: register
+        prefix: w
+        source: false
+        destination: true
+      - class: register
+        prefix: w
+        source: true
+        destination: false
+      - class: immediate
+        imd: 'int'
+        source: true
+        destination: false
+      hidden_operands:
+      - class: flag
+        name: "N"
+        source: false
+        destination: true
+      - class: flag
+        name: "Z"
+        source: false
+        destination: true
+      - class: flag
+        name: "C"
+        source: false
+        destination: true
+      - class: flag
+        name: "V"
+        source: false
+        destination: true
+    - name: tst
+      operands:
+      - class: register
+        prefix: x
+        source: false
+        destination: true
+      - class: register
+        prefix: x
+        source: true
+        destination: false
+      hidden_operands:
+      - class: flag
+        name: "N"
+        source: false
+        destination: true
+      - class: flag
+        name: "Z"
+        source: false
+        destination: true
+      - class: flag
+        name: "C"
+        source: false
+        destination: true
+      - class: flag
+        name: "V"
+        source: false
+        destination: true
+    - name: tst
+      operands:
+      - class: register
+        prefix: x
+        source: false
+        destination: true
+      - class: immediate
+        imd: 'int'
+        source: true
+        destination: false
+      hidden_operands:
+      - class: flag
+        name: "N"
+        source: false
+        destination: true
+      - class: flag
+        name: "Z"
+        source: false
+        destination: true
+      - class: flag
+        name: "C"
+        source: false
+        destination: true
+      - class: flag
+        name: "V"
+        source: false
+        destination: true
+    - name: tst
+      operands:
+      - class: register
+        prefix: w
+        source: false
+        destination: true
+      - class: register
+        prefix: w
+        source: true
+        destination: false
+      hidden_operands:
+      - class: flag
+        name: "N"
+        source: false
+        destination: true
+      - class: flag
+        name: "Z"
+        source: false
+        destination: true
+      - class: flag
+        name: "C"
+        source: true
+        destination: true
+      - class: flag
+        name: "V"
+        source: false
+        destination: true
+    - name: tst
+      operands:
+      - class: register
+        prefix: w
+        source: false
+        destination: true
+      - class: immediate
+        imd: 'int'
+        source: true
+        destination: false
+      hidden_operands:
+      - class: flag
+        name: "N"
+        source: false
+        destination: true
+      - class: flag
+        name: "Z"
+        source: false
+        destination: true
+      - class: flag
+        name: "C"
+        source: false
+        destination: true
+      - class: flag
+        name: "V"
+        source: false
+        destination: true
+    - name: [b, b.any, b.none]
       operands:
       - class: identifier
         source: false
+        destination: false
+    # - name: [bcc, bcs, b.ne, b.any, b.none, b.lt, b.eq, b.hs, b.gt, bne, beq]
+    #   operands:
+    #   - class: identifier
+    #     source: false
+    #     destination: false
+    - name: [beq, b.eq, bne, b.ne]
+      operands:
+      - class: identifier
+        source: false
+        destination: false
+      hidden_operands:
+      - class: flag
+        name: "Z"
+        source: true
+        destination: false
+    - name: [bcs, b.cs, bhs, b.hs, bcc, b.cc, blo, b.lo]
+      operands:
+      - class: identifier
+        source: false
+        destination: false
+      hidden_operands:
+      - class: flag
+        name: "C"
+        source: true
+        destination: false
+    - name: [bhi, b.hi, bls, b.ls]
+      operands:
+      - class: identifier
+        source: false
+        destination: false
+      hidden_operands:
+      - class: flag
+        name: "Z"
+        source: true
+        destination: false
+      - class: flag
+        name: "C"
+        source: true
+        destination: false
+    - name: [bge, b.ge, blt, b.lt]
+      operands:
+      - class: identifier
+        source: false
+        destination: false
+      hidden_operands:
+      - class: flag
+        name: "N"
+        source: true
+        destination: false
+      - class: flag
+        name: "V"
+        source: true
+        destination: false
+    - name: [bgt, b.gt, ble, b.le]
+      operands:
+      - class: identifier
+        source: false
+        destination: false
+      hidden_operands:
+      - class: flag
+        name: "N"
+        source: true
+        destination: false
+      - class: flag
+        name: "Z"
+        source: true
+        destination: false
+      - class: flag
+        name: "V"
+        source: true
+        destination: false
+    - name: [bmi, b.mi, bpl, b.pl]
+      operands:
+      - class: identifier
+        source: false
+        destination: false
+      hidden_operands:
+      - class: flag
+        name: "N"
+        source: true
+        destination: false
+    - name: [bvs, b.vs, bvc, b.vc]
+      operands:
+      - class: identifier
+        source: false
+        destination: false
+      hidden_operands:
+      - class: flag
+        name: "V"
+        source: true
         destination: false
     - name: [incb, incd]
       operands:
@@ -190,6 +939,23 @@ instruction_forms:
           prefix: "*"
           source: true
           destination: false
+      hidden_operands:
+        - class: flag
+          name: "N"
+          source: false
+          destination: true
+        - class: flag
+          name: "Z"
+          source: false
+          destination: true
+        - class: flag
+          name: "C"
+          source: false
+          destination: true
+        - class: flag
+          name: "V"
+          source: false
+          destination: true
     - name: cmp
       operands:
         - class: register
@@ -200,6 +966,23 @@ instruction_forms:
           imd: "int"
           source: true
           destination: false
+      hidden_operands:
+        - class: flag
+          name: "N"
+          source: false
+          destination: true
+        - class: flag
+          name: "Z"
+          source: false
+          destination: true
+        - class: flag
+          name: "C"
+          source: false
+          destination: true
+        - class: flag
+          name: "V"
+          source: false
+          destination: true
     - name: cmn
       operands:
         - class: register
@@ -210,6 +993,23 @@ instruction_forms:
           prefix: "*"
           source: true
           destination: false
+      hidden_operands:
+        - class: flag
+          name: "N"
+          source: false
+          destination: true
+        - class: flag
+          name: "Z"
+          source: false
+          destination: true
+        - class: flag
+          name: "C"
+          source: false
+          destination: true
+        - class: flag
+          name: "V"
+          source: false
+          destination: true
     - name: cmn
       operands:
         - class: register
@@ -220,6 +1020,23 @@ instruction_forms:
           imd: "int"
           source: true
           destination: false
+      hidden_operands:
+        - class: flag
+          name: "N"
+          source: false
+          destination: true
+        - class: flag
+          name: "Z"
+          source: false
+          destination: true
+        - class: flag
+          name: "C"
+          source: false
+          destination: true
+        - class: flag
+          name: "V"
+          source: false
+          destination: true
     - name: fcmp
       operands:
         - class: register
@@ -248,5 +1065,1015 @@ instruction_forms:
           destination: false
         - class: immediate
           imd: float
+          source: true
+          destination: false
+    - name: [cinc, cinv, cneg]
+      operands:
+        - class: register
+          prefix: "*"
+          source: false
+          destination: true
+        - class: register
+          prefix: "*"
+          source: true
+          destination: false
+        - class: condition
+          code: "eq"
+          source: true
+          destination: false
+      hidden_operands:
+        - class: flag
+          name: "Z"
+          source: true
+          destination: false
+    - name: [cinc, cinv, cneg]
+      operands:
+        - class: register
+          prefix: "*"
+          source: false
+          destination: true
+        - class: register
+          prefix: "*"
+          source: true
+          destination: false
+        - class: condition
+          code: "ne"
+          source: true
+          destination: false
+      hidden_operands:
+        - class: flag
+          name: "Z"
+          source: true
+          destination: false
+    - name: [cinc, cinv, cneg]
+      operands:
+        - class: register
+          prefix: "*"
+          source: false
+          destination: true
+        - class: register
+          prefix: "*"
+          source: true
+          destination: false
+        - class: condition
+          code: "cs"
+          source: true
+          destination: false
+      hidden_operands:
+        - class: flag
+          name: "C"
+          source: true
+          destination: false
+    - name: [cinc, cinv, cneg]
+      operands:
+        - class: register
+          prefix: "*"
+          source: false
+          destination: true
+        - class: register
+          prefix: "*"
+          source: true
+          destination: false
+        - class: condition
+          code: "hs"
+          source: true
+          destination: false
+      hidden_operands:
+        - class: flag
+          name: "C"
+          source: true
+          destination: false
+    - name: [cinc, cinv, cneg]
+      operands:
+        - class: register
+          prefix: "*"
+          source: false
+          destination: true
+        - class: register
+          prefix: "*"
+          source: true
+          destination: false
+        - class: condition
+          code: "cc"
+          source: true
+          destination: false
+      hidden_operands:
+        - class: flag
+          name: "C"
+          source: true
+          destination: false
+    - name: [cinc, cinv, cneg]
+      operands:
+        - class: register
+          prefix: "*"
+          source: false
+          destination: true
+        - class: register
+          prefix: "*"
+          source: true
+          destination: false
+        - class: condition
+          code: "lo"
+          source: true
+          destination: false
+      hidden_operands:
+        - class: flag
+          name: "C"
+          source: true
+          destination: false
+    - name: [cinc, cinv, cneg]
+      operands:
+        - class: register
+          prefix: "*"
+          source: false
+          destination: true
+        - class: register
+          prefix: "*"
+          source: true
+          destination: false
+        - class: condition
+          code: "hi"
+          source: true
+          destination: false
+      hidden_operands:
+        - class: flag
+          name: "Z"
+          source: true
+          destination: false
+        - class: flag
+          name: "C"
+          source: true
+          destination: false
+    - name: [cinc, cinv, cneg]
+      operands:
+        - class: register
+          prefix: "*"
+          source: false
+          destination: true
+        - class: register
+          prefix: "*"
+          source: true
+          destination: false
+        - class: condition
+          code: "ls"
+          source: true
+          destination: false
+      hidden_operands:
+        - class: flag
+          name: "Z"
+          source: true
+          destination: false
+        - class: flag
+          name: "C"
+          source: true
+          destination: false
+    - name: [cinc, cinv, cneg]
+      operands:
+        - class: register
+          prefix: "*"
+          source: false
+          destination: true
+        - class: register
+          prefix: "*"
+          source: true
+          destination: false
+        - class: condition
+          code: "ge"
+          source: true
+          destination: false
+      hidden_operands:
+        - class: flag
+          name: "N"
+          source: true
+          destination: false
+        - class: flag
+          name: "V"
+          source: true
+          destination: false
+    - name: [cinc, cinv, cneg]
+      operands:
+        - class: register
+          prefix: "*"
+          source: false
+          destination: true
+        - class: register
+          prefix: "*"
+          source: true
+          destination: false
+        - class: condition
+          code: "lt"
+          source: true
+          destination: false
+      hidden_operands:
+        - class: flag
+          name: "N"
+          source: true
+          destination: false
+        - class: flag
+          name: "V"
+          source: true
+          destination: false
+    - name: [cinc, cinv, cneg]
+      operands:
+        - class: register
+          prefix: "*"
+          source: false
+          destination: true
+        - class: register
+          prefix: "*"
+          source: true
+          destination: false
+        - class: condition
+          code: "gt"
+          source: true
+          destination: false
+      hidden_operands:
+        - class: flag
+          name: "N"
+          source: true
+          destination: false
+        - class: flag
+          name: "Z"
+          source: true
+          destination: false
+        - class: flag
+          name: "V"
+          source: true
+          destination: false
+    - name: [cinc, cinv, cneg]
+      operands:
+        - class: register
+          prefix: "*"
+          source: false
+          destination: true
+        - class: register
+          prefix: "*"
+          source: true
+          destination: false
+        - class: condition
+          code: "le"
+          source: true
+          destination: false
+      hidden_operands:
+        - class: flag
+          name: "N"
+          source: true
+          destination: false
+        - class: flag
+          name: "Z"
+          source: true
+          destination: false
+        - class: flag
+          name: "V"
+          source: true
+          destination: false
+    - name: [cinc, cinv, cneg]
+      operands:
+        - class: register
+          prefix: "*"
+          source: false
+          destination: true
+        - class: register
+          prefix: "*"
+          source: true
+          destination: false
+        - class: condition
+          code: "mi"
+          source: true
+          destination: false
+      hidden_operands:
+        - class: flag
+          name: "N"
+          source: true
+          destination: false
+    - name: [cinc, cinv, cneg]
+      operands:
+        - class: register
+          prefix: "*"
+          source: false
+          destination: true
+        - class: register
+          prefix: "*"
+          source: true
+          destination: false
+        - class: condition
+          code: "pl"
+          source: true
+          destination: false
+      hidden_operands:
+        - class: flag
+          name: "N"
+          source: true
+          destination: false
+    - name: [cinc, cinv, cneg]
+      operands:
+        - class: register
+          prefix: "*"
+          source: false
+          destination: true
+        - class: register
+          prefix: "*"
+          source: true
+          destination: false
+        - class: condition
+          code: "vs"
+          source: true
+          destination: false
+      hidden_operands:
+        - class: flag
+          name: "V"
+          source: true
+          destination: false
+    - name: [cinc, cinv, cneg]
+      operands:
+        - class: register
+          prefix: "*"
+          source: false
+          destination: true
+        - class: register
+          prefix: "*"
+          source: true
+          destination: false
+        - class: condition
+          code: "vc"
+          source: true
+          destination: false
+      hidden_operands:
+        - class: flag
+          name: "V"
+          source: true
+          destination: false
+    - name: [cset, csetm]
+      operands:
+        - class: register
+          prefix: "*"
+          source: false
+          destination: true
+        - class: condition
+          code: "eq"
+          source: true
+          destination: false
+      hidden_operands:
+        - class: flag
+          name: "Z"
+          source: true
+          destination: false
+    - name: [cset, csetm]
+      operands:
+        - class: register
+          prefix: "*"
+          source: false
+          destination: true
+        - class: condition
+          code: "ne"
+          source: true
+          destination: false
+      hidden_operands:
+        - class: flag
+          name: "Z"
+          source: true
+          destination: false
+    - name: [cset, csetm]
+      operands:
+        - class: register
+          prefix: "*"
+          source: false
+          destination: true
+        - class: condition
+          code: "cs"
+          source: true
+          destination: false
+      hidden_operands:
+        - class: flag
+          name: "C"
+          source: true
+          destination: false
+    - name: [cset, csetm]
+      operands:
+        - class: register
+          prefix: "*"
+          source: false
+          destination: true
+        - class: condition
+          code: "hs"
+          source: true
+          destination: false
+      hidden_operands:
+        - class: flag
+          name: "C"
+          source: true
+          destination: false
+    - name: [cset, csetm]
+      operands:
+        - class: register
+          prefix: "*"
+          source: false
+          destination: true
+        - class: condition
+          code: "cc"
+          source: true
+          destination: false
+      hidden_operands:
+        - class: flag
+          name: "C"
+          source: true
+          destination: false
+    - name: [cset, csetm]
+      operands:
+        - class: register
+          prefix: "*"
+          source: false
+          destination: true
+        - class: condition
+          code: "lo"
+          source: true
+          destination: false
+      hidden_operands:
+        - class: flag
+          name: "C"
+          source: true
+          destination: false
+    - name: [cset, csetm]
+      operands:
+        - class: register
+          prefix: "*"
+          source: false
+          destination: true
+        - class: condition
+          code: "hi"
+          source: true
+          destination: false
+      hidden_operands:
+        - class: flag
+          name: "Z"
+          source: true
+          destination: false
+        - class: flag
+          name: "C"
+          source: true
+          destination: false
+    - name: [cset, csetm]
+      operands:
+        - class: register
+          prefix: "*"
+          source: false
+          destination: true
+        - class: condition
+          code: "ls"
+          source: true
+          destination: false
+      hidden_operands:
+        - class: flag
+          name: "Z"
+          source: true
+          destination: false
+        - class: flag
+          name: "C"
+          source: true
+          destination: false
+    - name: [cset, csetm]
+      operands:
+        - class: register
+          prefix: "*"
+          source: false
+          destination: true
+        - class: condition
+          code: "ge"
+          source: true
+          destination: false
+      hidden_operands:
+        - class: flag
+          name: "N"
+          source: true
+          destination: false
+        - class: flag
+          name: "V"
+          source: true
+          destination: false
+    - name: [cset, csetm]
+      operands:
+        - class: register
+          prefix: "*"
+          source: false
+          destination: true
+        - class: condition
+          code: "lt"
+          source: true
+          destination: false
+      hidden_operands:
+        - class: flag
+          name: "N"
+          source: true
+          destination: false
+        - class: flag
+          name: "V"
+          source: true
+          destination: false
+    - name: [cset, csetm]
+      operands:
+        - class: register
+          prefix: "*"
+          source: false
+          destination: true
+        - class: condition
+          code: "gt"
+          source: true
+          destination: false
+      hidden_operands:
+        - class: flag
+          name: "N"
+          source: true
+          destination: false
+        - class: flag
+          name: "Z"
+          source: true
+          destination: false
+        - class: flag
+          name: "V"
+          source: true
+          destination: false
+    - name: [cset, csetm]
+      operands:
+        - class: register
+          prefix: "*"
+          source: false
+          destination: true
+        - class: condition
+          code: "le"
+          source: true
+          destination: false
+      hidden_operands:
+        - class: flag
+          name: "N"
+          source: true
+          destination: false
+        - class: flag
+          name: "Z"
+          source: true
+          destination: false
+        - class: flag
+          name: "V"
+          source: true
+          destination: false
+    - name: [cset, csetm]
+      operands:
+        - class: register
+          prefix: "*"
+          source: false
+          destination: true
+        - class: condition
+          code: "mi"
+          source: true
+          destination: false
+      hidden_operands:
+        - class: flag
+          name: "N"
+          source: true
+          destination: false
+    - name: [cset, csetm]
+      operands:
+        - class: register
+          prefix: "*"
+          source: false
+          destination: true
+        - class: condition
+          code: "pl"
+          source: true
+          destination: false
+      hidden_operands:
+        - class: flag
+          name: "N"
+          source: true
+          destination: false
+    - name: [cset, csetm]
+      operands:
+        - class: register
+          prefix: "*"
+          source: false
+          destination: true
+        - class: condition
+          code: "vs"
+          source: true
+          destination: false
+      hidden_operands:
+        - class: flag
+          name: "V"
+          source: true
+          destination: false
+    - name: [cset, csetm]
+      operands:
+        - class: register
+          prefix: "*"
+          source: false
+          destination: true
+        - class: condition
+          code: "vc"
+          source: true
+          destination: false
+      hidden_operands:
+        - class: flag
+          name: "V"
+          source: true
+          destination: false
+
+
+    - name: [csel, csinc, csinv, csneg]
+      operands:
+        - class: register
+          prefix: "*"
+          source: false
+          destination: true
+        - class: register
+          prefix: "*"
+          source: false
+          destination: true
+        - class: register
+          prefix: "*"
+          source: false
+          destination: true
+        - class: condition
+          code: "eq"
+          source: true
+          destination: false
+      hidden_operands:
+        - class: flag
+          name: "Z"
+          source: true
+          destination: false
+    - name: [csel, csinc, csinv, csneg]
+      operands:
+        - class: register
+          prefix: "*"
+          source: false
+          destination: true
+        - class: register
+          prefix: "*"
+          source: false
+          destination: true
+        - class: register
+          prefix: "*"
+          source: false
+          destination: true
+        - class: condition
+          code: "ne"
+          source: true
+          destination: false
+      hidden_operands:
+        - class: flag
+          name: "Z"
+          source: true
+          destination: false
+    - name: [csel, csinc, csinv, csneg]
+      operands:
+        - class: register
+          prefix: "*"
+          source: false
+          destination: true
+        - class: register
+          prefix: "*"
+          source: false
+          destination: true
+        - class: register
+          prefix: "*"
+          source: false
+          destination: true
+        - class: condition
+          code: "cs"
+          source: true
+          destination: false
+      hidden_operands:
+        - class: flag
+          name: "C"
+          source: true
+          destination: false
+    - name: [csel, csinc, csinv, csneg]
+      operands:
+        - class: register
+          prefix: "*"
+          source: false
+          destination: true
+        - class: register
+          prefix: "*"
+          source: false
+          destination: true
+        - class: register
+          prefix: "*"
+          source: false
+          destination: true
+        - class: condition
+          code: "hs"
+          source: true
+          destination: false
+      hidden_operands:
+        - class: flag
+          name: "C"
+          source: true
+          destination: false
+    - name: [csel, csinc, csinv, csneg]
+      operands:
+        - class: register
+          prefix: "*"
+          source: false
+          destination: true
+        - class: register
+          prefix: "*"
+          source: false
+          destination: true
+        - class: register
+          prefix: "*"
+          source: false
+          destination: true
+        - class: condition
+          code: "cc"
+          source: true
+          destination: false
+      hidden_operands:
+        - class: flag
+          name: "C"
+          source: true
+          destination: false
+    - name: [csel, csinc, csinv, csneg]
+      operands:
+        - class: register
+          prefix: "*"
+          source: false
+          destination: true
+        - class: register
+          prefix: "*"
+          source: false
+          destination: true
+        - class: register
+          prefix: "*"
+          source: false
+          destination: true
+        - class: condition
+          code: "lo"
+          source: true
+          destination: false
+      hidden_operands:
+        - class: flag
+          name: "C"
+          source: true
+          destination: false
+    - name: [csel, csinc, csinv, csneg]
+      operands:
+        - class: register
+          prefix: "*"
+          source: false
+          destination: true
+        - class: register
+          prefix: "*"
+          source: false
+          destination: true
+        - class: register
+          prefix: "*"
+          source: false
+          destination: true
+        - class: condition
+          code: "hi"
+          source: true
+          destination: false
+      hidden_operands:
+        - class: flag
+          name: "Z"
+          source: true
+          destination: false
+        - class: flag
+          name: "C"
+          source: true
+          destination: false
+    - name: [csel, csinc, csinv, csneg]
+      operands:
+        - class: register
+          prefix: "*"
+          source: false
+          destination: true
+        - class: register
+          prefix: "*"
+          source: false
+          destination: true
+        - class: register
+          prefix: "*"
+          source: false
+          destination: true
+        - class: condition
+          code: "ls"
+          source: true
+          destination: false
+      hidden_operands:
+        - class: flag
+          name: "Z"
+          source: true
+          destination: false
+        - class: flag
+          name: "C"
+          source: true
+          destination: false
+    - name: [csel, csinc, csinv, csneg]
+      operands:
+        - class: register
+          prefix: "*"
+          source: false
+          destination: true
+        - class: register
+          prefix: "*"
+          source: false
+          destination: true
+        - class: register
+          prefix: "*"
+          source: false
+          destination: true
+        - class: condition
+          code: "ge"
+          source: true
+          destination: false
+      hidden_operands:
+        - class: flag
+          name: "N"
+          source: true
+          destination: false
+        - class: flag
+          name: "V"
+          source: true
+          destination: false
+    - name: [csel, csinc, csinv, csneg]
+      operands:
+        - class: register
+          prefix: "*"
+          source: false
+          destination: true
+        - class: register
+          prefix: "*"
+          source: false
+          destination: true
+        - class: register
+          prefix: "*"
+          source: false
+          destination: true
+        - class: condition
+          code: "lt"
+          source: true
+          destination: false
+      hidden_operands:
+        - class: flag
+          name: "N"
+          source: true
+          destination: false
+        - class: flag
+          name: "V"
+          source: true
+          destination: false
+    - name: [csel, csinc, csinv, csneg]
+      operands:
+        - class: register
+          prefix: "*"
+          source: false
+          destination: true
+        - class: register
+          prefix: "*"
+          source: false
+          destination: true
+        - class: register
+          prefix: "*"
+          source: false
+          destination: true
+        - class: condition
+          code: "gt"
+          source: true
+          destination: false
+      hidden_operands:
+        - class: flag
+          name: "N"
+          source: true
+          destination: false
+        - class: flag
+          name: "Z"
+          source: true
+          destination: false
+        - class: flag
+          name: "V"
+          source: true
+          destination: false
+    - name: [csel, csinc, csinv, csneg]
+      operands:
+        - class: register
+          prefix: "*"
+          source: false
+          destination: true
+        - class: register
+          prefix: "*"
+          source: false
+          destination: true
+        - class: register
+          prefix: "*"
+          source: false
+          destination: true
+        - class: condition
+          code: "le"
+          source: true
+          destination: false
+      hidden_operands:
+        - class: flag
+          name: "N"
+          source: true
+          destination: false
+        - class: flag
+          name: "Z"
+          source: true
+          destination: false
+        - class: flag
+          name: "V"
+          source: true
+          destination: false
+    - name: [csel, csinc, csinv, csneg]
+      operands:
+        - class: register
+          prefix: "*"
+          source: false
+          destination: true
+        - class: register
+          prefix: "*"
+          source: false
+          destination: true
+        - class: register
+          prefix: "*"
+          source: false
+          destination: true
+        - class: condition
+          code: "mi"
+          source: true
+          destination: false
+      hidden_operands:
+        - class: flag
+          name: "N"
+          source: true
+          destination: false
+    - name: [csel, csinc, csinv, csneg]
+      operands:
+        - class: register
+          prefix: "*"
+          source: false
+          destination: true
+        - class: register
+          prefix: "*"
+          source: false
+          destination: true
+        - class: register
+          prefix: "*"
+          source: false
+          destination: true
+        - class: condition
+          code: "pl"
+          source: true
+          destination: false
+      hidden_operands:
+        - class: flag
+          name: "N"
+          source: true
+          destination: false
+    - name: [csel, csinc, csinv, csneg]
+      operands:
+        - class: register
+          prefix: "*"
+          source: false
+          destination: true
+        - class: register
+          prefix: "*"
+          source: false
+          destination: true
+        - class: register
+          prefix: "*"
+          source: false
+          destination: true
+        - class: condition
+          code: "vs"
+          source: true
+          destination: false
+      hidden_operands:
+        - class: flag
+          name: "V"
+          source: true
+          destination: false
+    - name: [csel, csinc, csinv, csneg]
+      operands:
+        - class: register
+          prefix: "*"
+          source: false
+          destination: true
+        - class: register
+          prefix: "*"
+          source: false
+          destination: true
+        - class: register
+          prefix: "*"
+          source: false
+          destination: true
+        - class: condition
+          code: "vc"
+          source: true
+          destination: false
+      hidden_operands:
+        - class: flag
+          name: "V"
           source: true
           destination: false

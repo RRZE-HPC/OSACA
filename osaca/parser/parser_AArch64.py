@@ -196,11 +196,34 @@ class ParserAArch64(BaseParser):
                 "policy"
             )
         ).setResultsName("prfop")
+        # Condition codes
+        condition = pp.Group(
+            (
+                pp.CaselessLiteral("EQ")
+                ^ pp.CaselessLiteral("NE")
+                ^ pp.CaselessLiteral("CS")
+                ^ pp.CaselessLiteral("HS")
+                ^ pp.CaselessLiteral("CC")
+                ^ pp.CaselessLiteral("LO")
+                ^ pp.CaselessLiteral("HI")
+                ^ pp.CaselessLiteral("LS")
+                ^ pp.CaselessLiteral("GE")
+                ^ pp.CaselessLiteral("LT")
+                ^ pp.CaselessLiteral("GT")
+                ^ pp.CaselessLiteral("LE")
+                ^ pp.CaselessLiteral("MI")
+                ^ pp.CaselessLiteral("PL")
+                ^ pp.CaselessLiteral("VS")
+                ^ pp.CaselessLiteral("VC")
+            ).setResultsName("code")
+        ).setResultsName("condition")
         # Combine to instruction form
         operand_first = pp.Group(
             register ^ (prefetch_op | immediate) ^ memory ^ arith_immediate ^ identifier
         )
-        operand_rest = pp.Group((register ^ immediate ^ memory ^ arith_immediate) | identifier)
+        operand_rest = pp.Group(
+            (register ^ condition ^ immediate ^ memory ^ arith_immediate) | identifier
+        )
         self.instruction_parser = (
             mnemonic
             + pp.Optional(operand_first.setResultsName("operand1"))
@@ -561,7 +584,7 @@ class ParserAArch64(BaseParser):
         """Check if ``flag_a`` is dependent on ``flag_b``"""
         # we assume flags are independent of each other, e.g., CF can be read while ZF gets written
         # TODO validate this assumption
-        if flag_a.name == flag_b.name:
+        if flag_a["name"] == flag_b["name"]:
             return True
         return False
 
