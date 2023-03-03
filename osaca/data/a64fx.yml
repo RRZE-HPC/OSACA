@@ -1915,15 +1915,26 @@ instruction_forms:
   operands:
   - class: register
     prefix: v
-    shape: b
+    shape: '*'
     width: '*'
   - class: register
     prefix: v
-    shape: b
+    shape: '*'
     width: '*'
   throughput: 0.5
   latency: 4.0  # 	1*p02
   port_pressure: [[1, '02']]
+- name: mov
+  operands:
+  - class: register
+    prefix: '*'
+  - class: register
+    prefix: v
+    shape: '*'
+    width: '*'
+  throughput: 3.0
+  latency: 15.0  # 	3*p0+3*p3
+  port_pressure: [[3, '0'], [3, '3']]
 - name: movprfx
   operands:
   - class: register
