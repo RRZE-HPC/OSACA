@@ -55,10 +55,24 @@ class ISASemantics(object):
         isa_data = self._isa_model.get_instruction(
             instruction_form["instruction"], instruction_form["operands"]
         )
-        if isa_data is None and instruction_form["instruction"][-1] in self.GAS_SUFFIXES:
+        if (
+            isa_data is None
+            and self._isa == "x86"
+            and instruction_form["instruction"][-1] in self.GAS_SUFFIXES
+        ):
             # Check for instruction without GAS suffix
             isa_data = self._isa_model.get_instruction(
                 instruction_form["instruction"][:-1], instruction_form["operands"]
+            )
+        if (
+            isa_data is None
+            and self._isa == "aarch64"
+            and "." in instruction_form["instruction"]
+        ):
+            # Check for instruction without shape/cc suffix
+            suffix_start = instruction_form["instruction"].index(".")
+            isa_data = self._isa_model.get_instruction(
+                instruction_form["instruction"][:suffix_start], instruction_form["operands"]
             )
         operands = instruction_form["operands"]
         op_dict = {}
@@ -77,11 +91,22 @@ class ISASemantics(object):
                 )
                 if (
                     isa_data_reg is None
+                    and self._isa == "x86"
                     and instruction_form["instruction"][-1] in self.GAS_SUFFIXES
                 ):
                     # Check for instruction without GAS suffix
                     isa_data_reg = self._isa_model.get_instruction(
                         instruction_form["instruction"][:-1], operands_reg
+                    )
+                if (
+                    isa_data_reg is None
+                    and self._isa == "aarch64"
+                    and "." in instruction_form["instruction"]
+                ):
+                    # Check for instruction without shape/cc suffix
+                    suffix_start = instruction_form["instruction"].index(".")
+                    isa_data_reg = self._isa_model.get_instruction(
+                        instruction_form["instruction"][:suffix_start], operands_reg
                     )
                 if isa_data_reg:
                     assign_default = False
@@ -159,10 +184,24 @@ class ISASemantics(object):
         isa_data = self._isa_model.get_instruction(
             instruction_form["instruction"], instruction_form["operands"]
         )
-        if isa_data is None and instruction_form["instruction"][-1] in self.GAS_SUFFIXES:
+        if (
+            isa_data is None
+            and self._isa == "x86"
+            and instruction_form["instruction"][-1] in self.GAS_SUFFIXES
+        ):
             # Check for instruction without GAS suffix
             isa_data = self._isa_model.get_instruction(
                 instruction_form["instruction"][:-1], instruction_form["operands"]
+            )
+        if (
+            isa_data is None
+            and self._isa == "aarch64"
+            and "." in instruction_form["instruction"]
+        ):
+            # Check for instruction without shape/cc suffix
+            suffix_start = instruction_form["instruction"].index(".")
+            isa_data = self._isa_model.get_instruction(
+                instruction_form["instruction"][:suffix_start], instruction_form["operands"]
             )
 
         if only_postindexed:
