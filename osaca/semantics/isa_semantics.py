@@ -64,11 +64,7 @@ class ISASemantics(object):
             isa_data = self._isa_model.get_instruction(
                 instruction_form["instruction"][:-1], instruction_form["operands"]
             )
-        if (
-            isa_data is None
-            and self._isa == "aarch64"
-            and "." in instruction_form["instruction"]
-        ):
+        if isa_data is None and self._isa == "aarch64" and "." in instruction_form["instruction"]:
             # Check for instruction without shape/cc suffix
             suffix_start = instruction_form["instruction"].index(".")
             isa_data = self._isa_model.get_instruction(
@@ -193,11 +189,7 @@ class ISASemantics(object):
             isa_data = self._isa_model.get_instruction(
                 instruction_form["instruction"][:-1], instruction_form["operands"]
             )
-        if (
-            isa_data is None
-            and self._isa == "aarch64"
-            and "." in instruction_form["instruction"]
-        ):
+        if isa_data is None and self._isa == "aarch64" and "." in instruction_form["instruction"]:
             # Check for instruction without shape/cc suffix
             suffix_start = instruction_form["instruction"].index(".")
             isa_data = self._isa_model.get_instruction(
