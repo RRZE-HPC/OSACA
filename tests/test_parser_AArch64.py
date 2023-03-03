@@ -81,6 +81,7 @@ class TestParserAArch64(unittest.TestCase):
         instr5 = "ldr x0, [x0, #:got_lo12:q2c]"
         instr6 = "adrp    x0, :got:visited"
         instr7 = "fadd    v17.2d, v16.2d, v1.2d"
+        instr8 = "mov.d   x0, v16.d[1]"
 
         parsed_1 = self.parser.parse_instruction(instr1)
         parsed_2 = self.parser.parse_instruction(instr2)
@@ -89,6 +90,7 @@ class TestParserAArch64(unittest.TestCase):
         parsed_5 = self.parser.parse_instruction(instr5)
         parsed_6 = self.parser.parse_instruction(instr6)
         parsed_7 = self.parser.parse_instruction(instr7)
+        parsed_8 = self.parser.parse_instruction(instr8)
 
         self.assertEqual(parsed_1.instruction, "vcvt.F32.S32")
         self.assertEqual(parsed_1.operands[0].register.name, "1")
@@ -141,6 +143,14 @@ class TestParserAArch64(unittest.TestCase):
         self.assertEqual(parsed_7.operands[0].register.lanes, "2")
         self.assertEqual(parsed_7.operands[0].register.shape, "d")
         self.assertEqual(self.parser.get_full_reg_name(parsed_7.operands[2].register), "v1.2d")
+
+        self.assertEqual(parsed_8.instruction, "mov.d")
+        self.assertEqual(parsed_8.operands[0].register.name, "0")
+        self.assertEqual(parsed_8.operands[0].register.prefix, "x")
+        self.assertEqual(parsed_8.operands[1].register.name, "16")
+        self.assertEqual(parsed_8.operands[1].register.prefix, "v")
+        self.assertEqual(parsed_8.operands[1].register.index, "1")
+        self.assertEqual(self.parser.get_full_reg_name(parsed_8.operands[1].register), "v16.d[1]")
 
     def test_parse_line(self):
         line_comment = "// -- Begin  main"
