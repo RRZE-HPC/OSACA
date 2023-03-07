@@ -272,9 +272,7 @@ class KernelDG(nx.DiGraph):
                 # print("  TO", instr_form.line, register_changes)
                 if "register" in dst:
                     # read of register
-                    if self.is_read(dst.register, instr_form) and not (
-                        dst.get("pre_indexed", False) or dst.get("post_indexed", False)
-                    ):
+                    if self.is_read(dst.register, instr_form):
                         yield instr_form, []
                     # write to register -> abort
                     if self.is_written(dst.register, instr_form):

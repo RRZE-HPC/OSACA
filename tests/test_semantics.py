@@ -369,7 +369,7 @@ class TestSemanticTools(unittest.TestCase):
         self.assertTrue(nx.algorithms.dag.is_directed_acyclic_graph(dg.dg))
         self.assertEqual(set(dg.get_dependent_instruction_forms(line_number=3)), {7, 8})
         self.assertEqual(set(dg.get_dependent_instruction_forms(line_number=4)), {9, 10})
-        self.assertEqual(set(dg.get_dependent_instruction_forms(line_number=5)), {7, 8})
+        self.assertEqual(set(dg.get_dependent_instruction_forms(line_number=5)), {6, 7, 8})
         self.assertEqual(set(dg.get_dependent_instruction_forms(line_number=6)), {9, 10})
         self.assertEqual(next(dg.get_dependent_instruction_forms(line_number=7)), 13)
         self.assertEqual(next(dg.get_dependent_instruction_forms(line_number=8)), 14)
@@ -438,7 +438,7 @@ class TestSemanticTools(unittest.TestCase):
             self.semantics_tx2,
         )
         lc_deps = dg.get_loopcarried_dependencies()
-        self.assertEqual(len(lc_deps), 2)
+        self.assertEqual(len(lc_deps), 4)
         # based on line 6
         self.assertEqual(lc_deps[6]["latency"], 28.0)
         self.assertEqual(
