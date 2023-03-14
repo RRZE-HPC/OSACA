@@ -451,10 +451,7 @@ class TestSemanticTools(unittest.TestCase):
         dep_path = "6-10-11-12-13-14"
         self.assertEqual(lc_deps[dep_path]["latency"], 29.0)
         self.assertEqual(
-            [
-                (iform.line_number, lat)
-                for iform, lat in lc_deps[dep_path]["dependencies"]
-            ],
+            [(iform.line_number, lat) for iform, lat in lc_deps[dep_path]["dependencies"]],
             [(6, 4.0), (10, 6.0), (11, 6.0), (12, 6.0), (13, 6.0), (14, 1.0)],
         )
         dg = KernelDG(

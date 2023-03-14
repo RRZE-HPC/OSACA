@@ -198,7 +198,7 @@ class ParserAArch64(BaseParser):
         ).setResultsName("prfop")
         # Condition codes, based on http://tiny.cc/armcc
         condition = (
-            pp.CaselessLiteral("EQ")    # z set
+            pp.CaselessLiteral("EQ")  # z set
             ^ pp.CaselessLiteral("NE")  # z clear
             ^ pp.CaselessLiteral("CS")  # c set
             ^ pp.CaselessLiteral("HS")  # c set
