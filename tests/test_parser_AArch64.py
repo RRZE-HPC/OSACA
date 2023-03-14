@@ -73,6 +73,14 @@ class TestParserAArch64(unittest.TestCase):
             "IACA START",
         )
 
+    def test_condition_parser(self):
+        self.assertEqual(self._get_condition(self.parser, "EQ"), "EQ")
+        self.assertEqual(self._get_condition(self.parser, "ne"), "NE")
+        self.assertEqual(self._get_condition(self.parser, "Lt"), "LT")
+        self.assertEqual(self._get_condition(self.parser, "Gt"), "GT")
+        with self.assertRaises(ParseException):
+            self._get_condition(self.parser, "LOcondition")
+
     def test_parse_instruction(self):
         instr1 = "\t\tvcvt.F32.S32 w1, w2\t\t\t//12.27"
         instr2 = "b.lo        ..B1.4 \t"
@@ -81,6 +89,7 @@ class TestParserAArch64(unittest.TestCase):
         instr5 = "ldr x0, [x0, #:got_lo12:q2c]"
         instr6 = "adrp    x0, :got:visited"
         instr7 = "fadd    v17.2d, v16.2d, v1.2d"
+        instr8 = "ccmp    x0, x1, #4, cc"
 
         parsed_1 = self.parser.parse_instruction(instr1)
         parsed_2 = self.parser.parse_instruction(instr2)
@@ -89,6 +98,7 @@ class TestParserAArch64(unittest.TestCase):
         parsed_5 = self.parser.parse_instruction(instr5)
         parsed_6 = self.parser.parse_instruction(instr6)
         parsed_7 = self.parser.parse_instruction(instr7)
+        parsed_8 = self.parser.parse_instruction(instr8)
 
         self.assertEqual(parsed_1.instruction, "vcvt.F32.S32")
         self.assertEqual(parsed_1.operands[0].register.name, "1")
@@ -142,6 +152,11 @@ class TestParserAArch64(unittest.TestCase):
         self.assertEqual(parsed_7.operands[0].register.shape, "d")
         self.assertEqual(self.parser.get_full_reg_name(parsed_7.operands[2].register), "v1.2d")
 
+        self.assertEqual(parsed_8.instruction, "ccmp")
+        self.assertEqual(parsed_8.operands[0].register.name, "0")
+        self.assertEqual(parsed_8.operands[0].register.prefix, "x")
+        self.assertEqual(parsed_8.operands[3].condition, "CC")
+
     def test_parse_line(self):
         line_comment = "// -- Begin  main"
         line_label = ".LBB0_1:              // =>This Inner Loop Header: Depth=1"
@@ -151,6 +166,7 @@ class TestParserAArch64(unittest.TestCase):
         line_preindexed = "stp x29, x30, [sp, #-16]!"
         line_postindexed = "ldp q2, q3, [x11], #64"
         line_5_operands = "fcmla z26.d, p0/m, z29.d, z21.d, #90"
+        line_conditions = "ccmn  x11, #1, #3, eq"
 
         instruction_form_1 = {
             "instruction": None,
@@ -281,6 +297,20 @@ class TestParserAArch64(unittest.TestCase):
             "line": "fcmla z26.d, p0/m, z29.d, z21.d, #90",
             "line_number": 8,
         }
+        instruction_form_9 = {
+            "instruction": "ccmn",
+            "operands": [
+                {"register": {"prefix": "x", "name": "11"}},
+                {"immediate": {"value": 1, "type": "int"}},
+                {"immediate": {"value": 3, "type": "int"}},
+                {"condition": "EQ"}
+            ],
+            "directive": None,
+            "comment": None,
+            "label": None,
+            "line": "ccmn  x11, #1, #3, eq",
+            "line_number": 9,
+        }
 
         parsed_1 = self.parser.parse_line(line_comment, 1)
         parsed_2 = self.parser.parse_line(line_label, 2)
@@ -290,6 +320,7 @@ class TestParserAArch64(unittest.TestCase):
         parsed_6 = self.parser.parse_line(line_preindexed, 6)
         parsed_7 = self.parser.parse_line(line_postindexed, 7)
         parsed_8 = self.parser.parse_line(line_5_operands, 8)
+        parsed_9 = self.parser.parse_line(line_conditions, 9)
 
         self.assertEqual(parsed_1, instruction_form_1)
         self.assertEqual(parsed_2, instruction_form_2)
@@ -299,6 +330,7 @@ class TestParserAArch64(unittest.TestCase):
         self.assertEqual(parsed_6, instruction_form_6)
         self.assertEqual(parsed_7, instruction_form_7)
         self.assertEqual(parsed_8, instruction_form_8)
+        self.assertEqual(parsed_9, instruction_form_9)
 
     def test_parse_file(self):
         parsed = self.parser.parse_file(self.triad_code)
@@ -424,6 +456,11 @@ class TestParserAArch64(unittest.TestCase):
         return AttrDict.convert_dict(
             parser.process_operand(parser.directive.parseString(directive, parseAll=True).asDict())
         ).directive
+
+    def _get_condition(self, parser, condition):
+        return AttrDict.convert_dict(
+            parser.process_operand(parser.condition.parseString(condition, parseAll=True).asDict())
+        ).condition
 
     @staticmethod
     def _find_file(name):

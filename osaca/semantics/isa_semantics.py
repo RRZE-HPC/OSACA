@@ -127,7 +127,6 @@ class ISASemantics(object):
                             }
                         )
                     )
-
         # store operand list in dict and reassign operand key/value pair
         instruction_form["semantic_operands"] = AttrDict.convert_dict(op_dict)
         # assign LD/ST flags

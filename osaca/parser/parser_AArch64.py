@@ -196,27 +196,27 @@ class ParserAArch64(BaseParser):
                 "policy"
             )
         ).setResultsName("prfop")
-        # Condition codes
-        condition = pp.Group(
-            (
-                pp.CaselessLiteral("EQ")
-                ^ pp.CaselessLiteral("NE")
-                ^ pp.CaselessLiteral("CS")
-                ^ pp.CaselessLiteral("HS")
-                ^ pp.CaselessLiteral("CC")
-                ^ pp.CaselessLiteral("LO")
-                ^ pp.CaselessLiteral("HI")
-                ^ pp.CaselessLiteral("LS")
-                ^ pp.CaselessLiteral("GE")
-                ^ pp.CaselessLiteral("LT")
-                ^ pp.CaselessLiteral("GT")
-                ^ pp.CaselessLiteral("LE")
-                ^ pp.CaselessLiteral("MI")
-                ^ pp.CaselessLiteral("PL")
-                ^ pp.CaselessLiteral("VS")
-                ^ pp.CaselessLiteral("VC")
-            ).setResultsName("code")
+        # Condition codes, based on http://tiny.cc/armcc
+        condition = (
+            pp.CaselessLiteral("EQ")    # z set
+            ^ pp.CaselessLiteral("NE")  # z clear
+            ^ pp.CaselessLiteral("CS")  # c set
+            ^ pp.CaselessLiteral("HS")  # c set
+            ^ pp.CaselessLiteral("CC")  # c clear
+            ^ pp.CaselessLiteral("LO")  # c clear
+            ^ pp.CaselessLiteral("MI")  # n set
+            ^ pp.CaselessLiteral("PL")  # n clear
+            ^ pp.CaselessLiteral("VS")  # v set
+            ^ pp.CaselessLiteral("VC")  # v clear
+            ^ pp.CaselessLiteral("HI")  # c set and z clear
+            ^ pp.CaselessLiteral("LS")  # c clear or z set
+            ^ pp.CaselessLiteral("GE")  # n and v the same
+            ^ pp.CaselessLiteral("LT")  # n and v different
+            ^ pp.CaselessLiteral("GT")  # z clear, and n and v the same
+            ^ pp.CaselessLiteral("LE")  # z set, or n and v different
+            ^ pp.CaselessLiteral("AL")  # any
         ).setResultsName("condition")
+        self.condition = condition
         # Combine to instruction form
         operand_first = pp.Group(
             register ^ (prefetch_op | immediate) ^ memory ^ arith_immediate ^ identifier
