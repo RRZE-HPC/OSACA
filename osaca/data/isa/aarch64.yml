@@ -1,4 +1,4 @@
-osaca_version: 0.3.7
+osaca_version: 0.5.0
 isa: "AArch64"
 # Contains all operand-irregular instruction forms OSACA supports for AArch64.
 # Operand-regular for a AArch64 instruction form with N operands in the shape of
@@ -802,14 +802,14 @@ instruction_forms:
         source: true
         destination: true
       - class: identifier
-        source: false 
+        source: false
         destination: false
       - class: identifier
-        source: false 
+        source: false
         destination: false
       - class: immediate
         imd: int
-        source: false 
+        source: false
         destination: false
     - name: fmla
       operands:
@@ -1078,7 +1078,7 @@ instruction_forms:
           source: true
           destination: false
         - class: condition
-          code: "eq"
+          ccode: "eq"
           source: true
           destination: false
       hidden_operands:
@@ -1097,7 +1097,7 @@ instruction_forms:
           source: true
           destination: false
         - class: condition
-          code: "ne"
+          ccode: "ne"
           source: true
           destination: false
       hidden_operands:
@@ -1116,7 +1116,7 @@ instruction_forms:
           source: true
           destination: false
         - class: condition
-          code: "cs"
+          ccode: "cs"
           source: true
           destination: false
       hidden_operands:
@@ -1135,7 +1135,7 @@ instruction_forms:
           source: true
           destination: false
         - class: condition
-          code: "hs"
+          ccode: "hs"
           source: true
           destination: false
       hidden_operands:
@@ -1154,7 +1154,7 @@ instruction_forms:
           source: true
           destination: false
         - class: condition
-          code: "cc"
+          ccode: "cc"
           source: true
           destination: false
       hidden_operands:
@@ -1173,7 +1173,7 @@ instruction_forms:
           source: true
           destination: false
         - class: condition
-          code: "lo"
+          ccode: "lo"
           source: true
           destination: false
       hidden_operands:
@@ -1192,30 +1192,7 @@ instruction_forms:
           source: true
           destination: false
         - class: condition
-          code: "hi"
-          source: true
-          destination: false
-      hidden_operands:
-        - class: flag
-          name: "Z"
-          source: true
-          destination: false
-        - class: flag
-          name: "C"
-          source: true
-          destination: false
-    - name: [cinc, cinv, cneg]
-      operands:
-        - class: register
-          prefix: "*"
-          source: false
-          destination: true
-        - class: register
-          prefix: "*"
-          source: true
-          destination: false
-        - class: condition
-          code: "ls"
+          ccode: "hi"
           source: true
           destination: false
       hidden_operands:
@@ -1238,7 +1215,30 @@ instruction_forms:
           source: true
           destination: false
         - class: condition
-          code: "ge"
+          ccode: "ls"
+          source: true
+          destination: false
+      hidden_operands:
+        - class: flag
+          name: "Z"
+          source: true
+          destination: false
+        - class: flag
+          name: "C"
+          source: true
+          destination: false
+    - name: [cinc, cinv, cneg]
+      operands:
+        - class: register
+          prefix: "*"
+          source: false
+          destination: true
+        - class: register
+          prefix: "*"
+          source: true
+          destination: false
+        - class: condition
+          ccode: "ge"
           source: true
           destination: false
       hidden_operands:
@@ -1261,7 +1261,7 @@ instruction_forms:
           source: true
           destination: false
         - class: condition
-          code: "lt"
+          ccode: "lt"
           source: true
           destination: false
       hidden_operands:
@@ -1284,34 +1284,7 @@ instruction_forms:
           source: true
           destination: false
         - class: condition
-          code: "gt"
-          source: true
-          destination: false
-      hidden_operands:
-        - class: flag
-          name: "N"
-          source: true
-          destination: false
-        - class: flag
-          name: "Z"
-          source: true
-          destination: false
-        - class: flag
-          name: "V"
-          source: true
-          destination: false
-    - name: [cinc, cinv, cneg]
-      operands:
-        - class: register
-          prefix: "*"
-          source: false
-          destination: true
-        - class: register
-          prefix: "*"
-          source: true
-          destination: false
-        - class: condition
-          code: "le"
+          ccode: "gt"
           source: true
           destination: false
       hidden_operands:
@@ -1338,7 +1311,34 @@ instruction_forms:
           source: true
           destination: false
         - class: condition
-          code: "mi"
+          ccode: "le"
+          source: true
+          destination: false
+      hidden_operands:
+        - class: flag
+          name: "N"
+          source: true
+          destination: false
+        - class: flag
+          name: "Z"
+          source: true
+          destination: false
+        - class: flag
+          name: "V"
+          source: true
+          destination: false
+    - name: [cinc, cinv, cneg]
+      operands:
+        - class: register
+          prefix: "*"
+          source: false
+          destination: true
+        - class: register
+          prefix: "*"
+          source: true
+          destination: false
+        - class: condition
+          ccode: "mi"
           source: true
           destination: false
       hidden_operands:
@@ -1357,7 +1357,7 @@ instruction_forms:
           source: true
           destination: false
         - class: condition
-          code: "pl"
+          ccode: "pl"
           source: true
           destination: false
       hidden_operands:
@@ -1376,7 +1376,7 @@ instruction_forms:
           source: true
           destination: false
         - class: condition
-          code: "vs"
+          ccode: "vs"
           source: true
           destination: false
       hidden_operands:
@@ -1395,10 +1395,41 @@ instruction_forms:
           source: true
           destination: false
         - class: condition
-          code: "vc"
+          ccode: "vc"
           source: true
           destination: false
       hidden_operands:
+        - class: flag
+          name: "V"
+          source: true
+          destination: false
+    - name: [cinc, cinv, cneg]
+      operands:
+        - class: register
+          prefix: "*"
+          source: false
+          destination: true
+        - class: register
+          prefix: "*"
+          source: true
+          destination: false
+        - class: condition
+          ccode: "AL"
+          source: true
+          destination: false
+      hidden_operands:
+        - class: flag
+          name: "Z"
+          source: true
+          destination: false
+        - class: flag
+          name: "C"
+          source: true
+          destination: false
+        - class: flag
+          name: "N"
+          source: true
+          destination: false
         - class: flag
           name: "V"
           source: true
@@ -1410,7 +1441,7 @@ instruction_forms:
           source: false
           destination: true
         - class: condition
-          code: "eq"
+          ccode: "eq"
           source: true
           destination: false
       hidden_operands:
@@ -1425,7 +1456,7 @@ instruction_forms:
           source: false
           destination: true
         - class: condition
-          code: "ne"
+          ccode: "ne"
           source: true
           destination: false
       hidden_operands:
@@ -1440,7 +1471,7 @@ instruction_forms:
           source: false
           destination: true
         - class: condition
-          code: "cs"
+          ccode: "cs"
           source: true
           destination: false
       hidden_operands:
@@ -1455,7 +1486,7 @@ instruction_forms:
           source: false
           destination: true
         - class: condition
-          code: "hs"
+          ccode: "hs"
           source: true
           destination: false
       hidden_operands:
@@ -1470,7 +1501,7 @@ instruction_forms:
           source: false
           destination: true
         - class: condition
-          code: "cc"
+          ccode: "cc"
           source: true
           destination: false
       hidden_operands:
@@ -1485,7 +1516,7 @@ instruction_forms:
           source: false
           destination: true
         - class: condition
-          code: "lo"
+          ccode: "lo"
           source: true
           destination: false
       hidden_operands:
@@ -1500,26 +1531,7 @@ instruction_forms:
           source: false
           destination: true
         - class: condition
-          code: "hi"
-          source: true
-          destination: false
-      hidden_operands:
-        - class: flag
-          name: "Z"
-          source: true
-          destination: false
-        - class: flag
-          name: "C"
-          source: true
-          destination: false
-    - name: [cset, csetm]
-      operands:
-        - class: register
-          prefix: "*"
-          source: false
-          destination: true
-        - class: condition
-          code: "ls"
+          ccode: "hi"
           source: true
           destination: false
       hidden_operands:
@@ -1538,7 +1550,26 @@ instruction_forms:
           source: false
           destination: true
         - class: condition
-          code: "ge"
+          ccode: "ls"
+          source: true
+          destination: false
+      hidden_operands:
+        - class: flag
+          name: "Z"
+          source: true
+          destination: false
+        - class: flag
+          name: "C"
+          source: true
+          destination: false
+    - name: [cset, csetm]
+      operands:
+        - class: register
+          prefix: "*"
+          source: false
+          destination: true
+        - class: condition
+          ccode: "ge"
           source: true
           destination: false
       hidden_operands:
@@ -1557,7 +1588,7 @@ instruction_forms:
           source: false
           destination: true
         - class: condition
-          code: "lt"
+          ccode: "lt"
           source: true
           destination: false
       hidden_operands:
@@ -1576,30 +1607,7 @@ instruction_forms:
           source: false
           destination: true
         - class: condition
-          code: "gt"
-          source: true
-          destination: false
-      hidden_operands:
-        - class: flag
-          name: "N"
-          source: true
-          destination: false
-        - class: flag
-          name: "Z"
-          source: true
-          destination: false
-        - class: flag
-          name: "V"
-          source: true
-          destination: false
-    - name: [cset, csetm]
-      operands:
-        - class: register
-          prefix: "*"
-          source: false
-          destination: true
-        - class: condition
-          code: "le"
+          ccode: "gt"
           source: true
           destination: false
       hidden_operands:
@@ -1622,7 +1630,30 @@ instruction_forms:
           source: false
           destination: true
         - class: condition
-          code: "mi"
+          ccode: "le"
+          source: true
+          destination: false
+      hidden_operands:
+        - class: flag
+          name: "N"
+          source: true
+          destination: false
+        - class: flag
+          name: "Z"
+          source: true
+          destination: false
+        - class: flag
+          name: "V"
+          source: true
+          destination: false
+    - name: [cset, csetm]
+      operands:
+        - class: register
+          prefix: "*"
+          source: false
+          destination: true
+        - class: condition
+          ccode: "mi"
           source: true
           destination: false
       hidden_operands:
@@ -1637,7 +1668,7 @@ instruction_forms:
           source: false
           destination: true
         - class: condition
-          code: "pl"
+          ccode: "pl"
           source: true
           destination: false
       hidden_operands:
@@ -1652,7 +1683,7 @@ instruction_forms:
           source: false
           destination: true
         - class: condition
-          code: "vs"
+          ccode: "vs"
           source: true
           destination: false
       hidden_operands:
@@ -1667,7 +1698,7 @@ instruction_forms:
           source: false
           destination: true
         - class: condition
-          code: "vc"
+          ccode: "vc"
           source: true
           destination: false
       hidden_operands:
@@ -1675,8 +1706,33 @@ instruction_forms:
           name: "V"
           source: true
           destination: false
-
-
+    - name: [cset, csetm]
+      operands:
+        - class: register
+          prefix: "*"
+          source: false
+          destination: true
+        - class: condition
+          ccode: "AL"
+          source: true
+          destination: false
+      hidden_operands:
+        - class: flag
+          name: "Z"
+          source: true
+          destination: false
+        - class: flag
+          name: "C"
+          source: true
+          destination: false
+        - class: flag
+          name: "N"
+          source: true
+          destination: false
+        - class: flag
+          name: "V"
+          source: true
+          destination: false
     - name: [csel, csinc, csinv, csneg]
       operands:
         - class: register
@@ -1685,14 +1741,14 @@ instruction_forms:
           destination: true
         - class: register
           prefix: "*"
-          source: false
-          destination: true
+          source: true
+          destination: false
         - class: register
           prefix: "*"
-          source: false
-          destination: true
+          source: true
+          destination: false
         - class: condition
-          code: "eq"
+          ccode: "eq"
           source: true
           destination: false
       hidden_operands:
@@ -1708,14 +1764,14 @@ instruction_forms:
           destination: true
         - class: register
           prefix: "*"
-          source: false
-          destination: true
+          source: true
+          destination: false
         - class: register
           prefix: "*"
-          source: false
-          destination: true
+          source: true
+          destination: false
         - class: condition
-          code: "ne"
+          ccode: "ne"
           source: true
           destination: false
       hidden_operands:
@@ -1731,14 +1787,14 @@ instruction_forms:
           destination: true
         - class: register
           prefix: "*"
-          source: false
-          destination: true
+          source: true
+          destination: false
         - class: register
           prefix: "*"
-          source: false
-          destination: true
+          source: true
+          destination: false
         - class: condition
-          code: "cs"
+          ccode: "cs"
           source: true
           destination: false
       hidden_operands:
@@ -1754,14 +1810,14 @@ instruction_forms:
           destination: true
         - class: register
           prefix: "*"
-          source: false
-          destination: true
+          source: true
+          destination: false
         - class: register
           prefix: "*"
-          source: false
-          destination: true
+          source: true
+          destination: false
         - class: condition
-          code: "hs"
+          ccode: "hs"
           source: true
           destination: false
       hidden_operands:
@@ -1777,14 +1833,14 @@ instruction_forms:
           destination: true
         - class: register
           prefix: "*"
-          source: false
-          destination: true
+          source: true
+          destination: false
         - class: register
           prefix: "*"
-          source: false
-          destination: true
+          source: true
+          destination: false
         - class: condition
-          code: "cc"
+          ccode: "cc"
           source: true
           destination: false
       hidden_operands:
@@ -1800,14 +1856,14 @@ instruction_forms:
           destination: true
         - class: register
           prefix: "*"
-          source: false
-          destination: true
+          source: true
+          destination: false
         - class: register
           prefix: "*"
-          source: false
-          destination: true
+          source: true
+          destination: false
         - class: condition
-          code: "lo"
+          ccode: "lo"
           source: true
           destination: false
       hidden_operands:
@@ -1823,41 +1879,14 @@ instruction_forms:
           destination: true
         - class: register
           prefix: "*"
-          source: false
-          destination: true
+          source: true
+          destination: false
         - class: register
           prefix: "*"
-          source: false
-          destination: true
+          source: true
+          destination: false
         - class: condition
-          code: "hi"
-          source: true
-          destination: false
-      hidden_operands:
-        - class: flag
-          name: "Z"
-          source: true
-          destination: false
-        - class: flag
-          name: "C"
-          source: true
-          destination: false
-    - name: [csel, csinc, csinv, csneg]
-      operands:
-        - class: register
-          prefix: "*"
-          source: false
-          destination: true
-        - class: register
-          prefix: "*"
-          source: false
-          destination: true
-        - class: register
-          prefix: "*"
-          source: false
-          destination: true
-        - class: condition
-          code: "ls"
+          ccode: "hi"
           source: true
           destination: false
       hidden_operands:
@@ -1877,14 +1906,41 @@ instruction_forms:
           destination: true
         - class: register
           prefix: "*"
-          source: false
-          destination: true
+          source: true
+          destination: false
+        - class: register
+          prefix: "*"
+          source: true
+          destination: false
+        - class: condition
+          ccode: "ls"
+          source: true
+          destination: false
+      hidden_operands:
+        - class: flag
+          name: "Z"
+          source: true
+          destination: false
+        - class: flag
+          name: "C"
+          source: true
+          destination: false
+    - name: [csel, csinc, csinv, csneg]
+      operands:
         - class: register
           prefix: "*"
           source: false
           destination: true
+        - class: register
+          prefix: "*"
+          source: true
+          destination: false
+        - class: register
+          prefix: "*"
+          source: true
+          destination: false
         - class: condition
-          code: "ge"
+          ccode: "ge"
           source: true
           destination: false
       hidden_operands:
@@ -1904,14 +1960,14 @@ instruction_forms:
           destination: true
         - class: register
           prefix: "*"
-          source: false
-          destination: true
+          source: true
+          destination: false
         - class: register
           prefix: "*"
-          source: false
-          destination: true
+          source: true
+          destination: false
         - class: condition
-          code: "lt"
+          ccode: "lt"
           source: true
           destination: false
       hidden_operands:
@@ -1931,45 +1987,14 @@ instruction_forms:
           destination: true
         - class: register
           prefix: "*"
-          source: false
-          destination: true
+          source: true
+          destination: false
         - class: register
           prefix: "*"
-          source: false
-          destination: true
+          source: true
+          destination: false
         - class: condition
-          code: "gt"
-          source: true
-          destination: false
-      hidden_operands:
-        - class: flag
-          name: "N"
-          source: true
-          destination: false
-        - class: flag
-          name: "Z"
-          source: true
-          destination: false
-        - class: flag
-          name: "V"
-          source: true
-          destination: false
-    - name: [csel, csinc, csinv, csneg]
-      operands:
-        - class: register
-          prefix: "*"
-          source: false
-          destination: true
-        - class: register
-          prefix: "*"
-          source: false
-          destination: true
-        - class: register
-          prefix: "*"
-          source: false
-          destination: true
-        - class: condition
-          code: "le"
+          ccode: "gt"
           source: true
           destination: false
       hidden_operands:
@@ -1993,14 +2018,45 @@ instruction_forms:
           destination: true
         - class: register
           prefix: "*"
-          source: false
-          destination: true
+          source: true
+          destination: false
+        - class: register
+          prefix: "*"
+          source: true
+          destination: false
+        - class: condition
+          ccode: "le"
+          source: true
+          destination: false
+      hidden_operands:
+        - class: flag
+          name: "N"
+          source: true
+          destination: false
+        - class: flag
+          name: "Z"
+          source: true
+          destination: false
+        - class: flag
+          name: "V"
+          source: true
+          destination: false
+    - name: [csel, csinc, csinv, csneg]
+      operands:
         - class: register
           prefix: "*"
           source: false
           destination: true
+        - class: register
+          prefix: "*"
+          source: true
+          destination: false
+        - class: register
+          prefix: "*"
+          source: true
+          destination: false
         - class: condition
-          code: "mi"
+          ccode: "mi"
           source: true
           destination: false
       hidden_operands:
@@ -2016,14 +2072,14 @@ instruction_forms:
           destination: true
         - class: register
           prefix: "*"
-          source: false
-          destination: true
+          source: true
+          destination: false
         - class: register
           prefix: "*"
-          source: false
-          destination: true
+          source: true
+          destination: false
         - class: condition
-          code: "pl"
+          ccode: "pl"
           source: true
           destination: false
       hidden_operands:
@@ -2039,14 +2095,14 @@ instruction_forms:
           destination: true
         - class: register
           prefix: "*"
-          source: false
-          destination: true
+          source: true
+          destination: false
         - class: register
           prefix: "*"
-          source: false
-          destination: true
+          source: true
+          destination: false
         - class: condition
-          code: "vs"
+          ccode: "vs"
           source: true
           destination: false
       hidden_operands:
@@ -2062,14 +2118,14 @@ instruction_forms:
           destination: true
         - class: register
           prefix: "*"
-          source: false
-          destination: true
+          source: true
+          destination: false
         - class: register
           prefix: "*"
-          source: false
-          destination: true
+          source: true
+          destination: false
         - class: condition
-          code: "vc"
+          ccode: "vc"
           source: true
           destination: false
       hidden_operands:
@@ -2077,3 +2133,1228 @@ instruction_forms:
           name: "V"
           source: true
           destination: false
+    - name: [csel, csinc, csinv, csneg]
+      operands:
+        - class: register
+          prefix: "*"
+          source: false
+          destination: true
+        - class: register
+          prefix: "*"
+          source: true
+          destination: false
+        - class: register
+          prefix: "*"
+          source: true
+          destination: false
+        - class: condition
+          ccode: "AL"
+          source: true
+          destination: false
+      hidden_operands:
+        - class: flag
+          name: "Z"
+          source: true
+          destination: false
+        - class: flag
+          name: "C"
+          source: true
+          destination: false
+        - class: flag
+          name: "N"
+          source: true
+          destination: false
+        - class: flag
+          name: "V"
+          source: true
+          destination: false
+    - name: [ccmn, ccmp]
+      operands:
+        - class: register
+          prefix: "*"
+          source: true
+          destination: false
+        - class: register
+          prefix: "*"
+          source: true
+          destination: false
+        - class: immediate
+          imd: "int"
+          source: true
+          destination: false
+        - class: condition
+          ccode: "EQ"
+          source: true
+          destination: false
+      hidden_operands:
+        - class: flag
+          name: "Z"
+          source: true
+          destination: true
+        - class: flag
+          name: "C"
+          source: false
+          destination: true
+        - class: flag
+          name: "N"
+          source: false
+          destination: true
+        - class: flag
+          name: "V"
+          source: false
+          destination: true
+    - name: [ccmn, ccmp]
+      operands:
+        - class: register
+          prefix: "*"
+          source: true
+          destination: false
+        - class: register
+          prefix: "*"
+          source: true
+          destination: false
+        - class: immediate
+          imd: "int"
+          source: true
+          destination: false
+        - class: condition
+          ccode: "NE"
+          source: true
+          destination: false
+      hidden_operands:
+        - class: flag
+          name: "Z"
+          source: true
+          destination: true
+        - class: flag
+          name: "C"
+          source: false
+          destination: true
+        - class: flag
+          name: "N"
+          source: false
+          destination: true
+        - class: flag
+          name: "V"
+          source: false
+          destination: true
+    - name: [ccmn, ccmp]
+      operands:
+        - class: register
+          prefix: "*"
+          source: true
+          destination: false
+        - class: register
+          prefix: "*"
+          source: true
+          destination: false
+        - class: immediate
+          imd: "int"
+          source: true
+          destination: false
+        - class: condition
+          ccode: "CS"
+          source: true
+          destination: false
+      hidden_operands:
+        - class: flag
+          name: "Z"
+          source: false
+          destination: true
+        - class: flag
+          name: "C"
+          source: true
+          destination: true
+        - class: flag
+          name: "N"
+          source: false
+          destination: true
+        - class: flag
+          name: "V"
+          source: false
+          destination: true
+    - name: [ccmn, ccmp]
+      operands:
+        - class: register
+          prefix: "*"
+          source: true
+          destination: false
+        - class: register
+          prefix: "*"
+          source: true
+          destination: false
+        - class: immediate
+          imd: "int"
+          source: true
+          destination: false
+        - class: condition
+          ccode: "HS"
+          source: true
+          destination: false
+      hidden_operands:
+        - class: flag
+          name: "Z"
+          source: false
+          destination: true
+        - class: flag
+          name: "C"
+          source: true
+          destination: true
+        - class: flag
+          name: "N"
+          source: false
+          destination: true
+        - class: flag
+          name: "V"
+          source: false
+          destination: true
+    - name: [ccmn, ccmp]
+      operands:
+        - class: register
+          prefix: "*"
+          source: true
+          destination: false
+        - class: register
+          prefix: "*"
+          source: true
+          destination: false
+        - class: immediate
+          imd: "int"
+          source: true
+          destination: false
+        - class: condition
+          ccode: "CC"
+          source: true
+          destination: false
+      hidden_operands:
+        - class: flag
+          name: "Z"
+          source: false
+          destination: true
+        - class: flag
+          name: "C"
+          source: true
+          destination: true
+        - class: flag
+          name: "N"
+          source: false
+          destination: true
+        - class: flag
+          name: "V"
+          source: false
+          destination: true
+    - name: [ccmn, ccmp]
+      operands:
+        - class: register
+          prefix: "*"
+          source: true
+          destination: false
+        - class: register
+          prefix: "*"
+          source: true
+          destination: false
+        - class: immediate
+          imd: "int"
+          source: true
+          destination: false
+        - class: condition
+          ccode: "LO"
+          source: true
+          destination: false
+      hidden_operands:
+        - class: flag
+          name: "Z"
+          source: false
+          destination: true
+        - class: flag
+          name: "C"
+          source: true
+          destination: true
+        - class: flag
+          name: "N"
+          source: false
+          destination: true
+        - class: flag
+          name: "V"
+          source: false
+          destination: true
+    - name: [ccmn, ccmp]
+      operands:
+        - class: register
+          prefix: "*"
+          source: true
+          destination: false
+        - class: register
+          prefix: "*"
+          source: true
+          destination: false
+        - class: immediate
+          imd: "int"
+          source: true
+          destination: false
+        - class: condition
+          ccode: "MI"
+          source: true
+          destination: false
+      hidden_operands:
+        - class: flag
+          name: "Z"
+          source: false
+          destination: true
+        - class: flag
+          name: "C"
+          source: false
+          destination: true
+        - class: flag
+          name: "N"
+          source: true
+          destination: true
+        - class: flag
+          name: "V"
+          source: false
+          destination: true
+    - name: [ccmn, ccmp]
+      operands:
+        - class: register
+          prefix: "*"
+          source: true
+          destination: false
+        - class: register
+          prefix: "*"
+          source: true
+          destination: false
+        - class: immediate
+          imd: "int"
+          source: true
+          destination: false
+        - class: condition
+          ccode: "PL"
+          source: true
+          destination: false
+      hidden_operands:
+        - class: flag
+          name: "Z"
+          source: false
+          destination: true
+        - class: flag
+          name: "C"
+          source: false
+          destination: true
+        - class: flag
+          name: "N"
+          source: true
+          destination: true
+        - class: flag
+          name: "V"
+          source: false
+          destination: true
+    - name: [ccmn, ccmp]
+      operands:
+        - class: register
+          prefix: "*"
+          source: true
+          destination: false
+        - class: register
+          prefix: "*"
+          source: true
+          destination: false
+        - class: immediate
+          imd: "int"
+          source: true
+          destination: false
+        - class: condition
+          ccode: "VS"
+          source: true
+          destination: false
+      hidden_operands:
+        - class: flag
+          name: "Z"
+          source: false
+          destination: true
+        - class: flag
+          name: "C"
+          source: false
+          destination: true
+        - class: flag
+          name: "N"
+          source: false
+          destination: true
+        - class: flag
+          name: "V"
+          source: true
+          destination: true
+    - name: [ccmn, ccmp]
+      operands:
+        - class: register
+          prefix: "*"
+          source: true
+          destination: false
+        - class: register
+          prefix: "*"
+          source: true
+          destination: false
+        - class: immediate
+          imd: "int"
+          source: true
+          destination: false
+        - class: condition
+          ccode: "VC"
+          source: true
+          destination: false
+      hidden_operands:
+        - class: flag
+          name: "Z"
+          source: false
+          destination: true
+        - class: flag
+          name: "C"
+          source: false
+          destination: true
+        - class: flag
+          name: "N"
+          source: false
+          destination: true
+        - class: flag
+          name: "V"
+          source: true
+          destination: true
+    - name: [ccmn, ccmp]
+      operands:
+        - class: register
+          prefix: "*"
+          source: true
+          destination: false
+        - class: register
+          prefix: "*"
+          source: true
+          destination: false
+        - class: immediate
+          imd: "int"
+          source: true
+          destination: false
+        - class: condition
+          ccode: "HI"
+          source: true
+          destination: false
+      hidden_operands:
+        - class: flag
+          name: "Z"
+          source: true
+          destination: true
+        - class: flag
+          name: "C"
+          source: true
+          destination: true
+        - class: flag
+          name: "N"
+          source: false
+          destination: true
+        - class: flag
+          name: "V"
+          source: false
+          destination: true
+    - name: [ccmn, ccmp]
+      operands:
+        - class: register
+          prefix: "*"
+          source: true
+          destination: false
+        - class: register
+          prefix: "*"
+          source: true
+          destination: false
+        - class: immediate
+          imd: "int"
+          source: true
+          destination: false
+        - class: condition
+          ccode: "LS"
+          source: true
+          destination: false
+      hidden_operands:
+        - class: flag
+          name: "Z"
+          source: true
+          destination: true
+        - class: flag
+          name: "C"
+          source: true
+          destination: true
+        - class: flag
+          name: "N"
+          source: false
+          destination: true
+        - class: flag
+          name: "V"
+          source: false
+          destination: true
+    - name: [ccmn, ccmp]
+      operands:
+        - class: register
+          prefix: "*"
+          source: true
+          destination: false
+        - class: register
+          prefix: "*"
+          source: true
+          destination: false
+        - class: immediate
+          imd: "int"
+          source: true
+          destination: false
+        - class: condition
+          ccode: "GE"
+          source: true
+          destination: false
+      hidden_operands:
+        - class: flag
+          name: "Z"
+          source: false
+          destination: true
+        - class: flag
+          name: "C"
+          source: false
+          destination: true
+        - class: flag
+          name: "N"
+          source: true
+          destination: true
+        - class: flag
+          name: "V"
+          source: true
+          destination: true
+    - name: [ccmn, ccmp]
+      operands:
+        - class: register
+          prefix: "*"
+          source: true
+          destination: false
+        - class: register
+          prefix: "*"
+          source: true
+          destination: false
+        - class: immediate
+          imd: "int"
+          source: true
+          destination: false
+        - class: condition
+          ccode: "LT"
+          source: true
+          destination: false
+      hidden_operands:
+        - class: flag
+          name: "Z"
+          source: false
+          destination: true
+        - class: flag
+          name: "C"
+          source: false
+          destination: true
+        - class: flag
+          name: "N"
+          source: true
+          destination: true
+        - class: flag
+          name: "V"
+          source: true
+          destination: true
+    - name: [ccmn, ccmp]
+      operands:
+        - class: register
+          prefix: "*"
+          source: true
+          destination: false
+        - class: register
+          prefix: "*"
+          source: true
+          destination: false
+        - class: immediate
+          imd: "int"
+          source: true
+          destination: false
+        - class: condition
+          ccode: "GT"
+          source: true
+          destination: false
+      hidden_operands:
+        - class: flag
+          name: "Z"
+          source: true
+          destination: true
+        - class: flag
+          name: "C"
+          source: false
+          destination: true
+        - class: flag
+          name: "N"
+          source: true
+          destination: true
+        - class: flag
+          name: "V"
+          source: true
+          destination: true
+    - name: [ccmn, ccmp]
+      operands:
+        - class: register
+          prefix: "*"
+          source: true
+          destination: false
+        - class: register
+          prefix: "*"
+          source: true
+          destination: false
+        - class: immediate
+          imd: "int"
+          source: true
+          destination: false
+        - class: condition
+          ccode: "LE"
+          source: true
+          destination: false
+      hidden_operands:
+        - class: flag
+          name: "Z"
+          source: true
+          destination: true
+        - class: flag
+          name: "C"
+          source: false
+          destination: true
+        - class: flag
+          name: "N"
+          source: true
+          destination: true
+        - class: flag
+          name: "V"
+          source: true
+          destination: true
+    - name: [ccmn, ccmp]
+      operands:
+        - class: register
+          prefix: "*"
+          source: true
+          destination: false
+        - class: register
+          prefix: "*"
+          source: true
+          destination: false
+        - class: immediate
+          imd: "int"
+          source: true
+          destination: false
+        - class: condition
+          ccode: "AL"
+          source: true
+          destination: false
+      hidden_operands:
+        - class: flag
+          name: "Z"
+          source: true
+          destination: true
+        - class: flag
+          name: "C"
+          source: true
+          destination: true
+        - class: flag
+          name: "N"
+          source: true
+          destination: true
+        - class: flag
+          name: "V"
+          source: true
+          destination: true
+    - name: [ccmn, ccmp]
+      operands:
+        - class: register
+          prefix: "*"
+          source: true
+          destination: false
+        - class: immediate
+          imd: "int"
+          source: true
+          destination: false
+        - class: immediate
+          imd: "int"
+          source: true
+          destination: false
+        - class: condition
+          ccode: "EQ"
+          source: true
+          destination: false
+      hidden_operands:
+        - class: flag
+          name: "Z"
+          source: true
+          destination: true
+        - class: flag
+          name: "C"
+          source: false
+          destination: true
+        - class: flag
+          name: "N"
+          source: false
+          destination: true
+        - class: flag
+          name: "V"
+          source: false
+          destination: true
+    - name: [ccmn, ccmp]
+      operands:
+        - class: register
+          prefix: "*"
+          source: true
+          destination: false
+        - class: immediate
+          imd: "int"
+          source: true
+          destination: false
+        - class: immediate
+          imd: "int"
+          source: true
+          destination: false
+        - class: condition
+          ccode: "NE"
+          source: true
+          destination: false
+      hidden_operands:
+        - class: flag
+          name: "Z"
+          source: true
+          destination: true
+        - class: flag
+          name: "C"
+          source: false
+          destination: true
+        - class: flag
+          name: "N"
+          source: false
+          destination: true
+        - class: flag
+          name: "V"
+          source: false
+          destination: true
+    - name: [ccmn, ccmp]
+      operands:
+        - class: register
+          prefix: "*"
+          source: true
+          destination: false
+        - class: immediate
+          imd: "int"
+          source: true
+          destination: false
+        - class: immediate
+          imd: "int"
+          source: true
+          destination: false
+        - class: condition
+          ccode: "CS"
+          source: true
+          destination: false
+      hidden_operands:
+        - class: flag
+          name: "Z"
+          source: false
+          destination: true
+        - class: flag
+          name: "C"
+          source: true
+          destination: true
+        - class: flag
+          name: "N"
+          source: false
+          destination: true
+        - class: flag
+          name: "V"
+          source: false
+          destination: true
+    - name: [ccmn, ccmp]
+      operands:
+        - class: register
+          prefix: "*"
+          source: true
+          destination: false
+        - class: immediate
+          imd: "int"
+          source: true
+          destination: false
+        - class: immediate
+          imd: "int"
+          source: true
+          destination: false
+        - class: condition
+          ccode: "HS"
+          source: true
+          destination: false
+      hidden_operands:
+        - class: flag
+          name: "Z"
+          source: false
+          destination: true
+        - class: flag
+          name: "C"
+          source: true
+          destination: true
+        - class: flag
+          name: "N"
+          source: false
+          destination: true
+        - class: flag
+          name: "V"
+          source: false
+          destination: true
+    - name: [ccmn, ccmp]
+      operands:
+        - class: register
+          prefix: "*"
+          source: true
+          destination: false
+        - class: immediate
+          imd: "int"
+          source: true
+          destination: false
+        - class: immediate
+          imd: "int"
+          source: true
+          destination: false
+        - class: condition
+          ccode: "CC"
+          source: true
+          destination: false
+      hidden_operands:
+        - class: flag
+          name: "Z"
+          source: false
+          destination: true
+        - class: flag
+          name: "C"
+          source: true
+          destination: true
+        - class: flag
+          name: "N"
+          source: false
+          destination: true
+        - class: flag
+          name: "V"
+          source: false
+          destination: true
+    - name: [ccmn, ccmp]
+      operands:
+        - class: register
+          prefix: "*"
+          source: true
+          destination: false
+        - class: immediate
+          imd: "int"
+          source: true
+          destination: false
+        - class: immediate
+          imd: "int"
+          source: true
+          destination: false
+        - class: condition
+          ccode: "LO"
+          source: true
+          destination: false
+      hidden_operands:
+        - class: flag
+          name: "Z"
+          source: false
+          destination: true
+        - class: flag
+          name: "C"
+          source: true
+          destination: true
+        - class: flag
+          name: "N"
+          source: false
+          destination: true
+        - class: flag
+          name: "V"
+          source: false
+          destination: true
+    - name: [ccmn, ccmp]
+      operands:
+        - class: register
+          prefix: "*"
+          source: true
+          destination: false
+        - class: immediate
+          imd: "int"
+          source: true
+          destination: false
+        - class: immediate
+          imd: "int"
+          source: true
+          destination: false
+        - class: condition
+          ccode: "MI"
+          source: true
+          destination: false
+      hidden_operands:
+        - class: flag
+          name: "Z"
+          source: false
+          destination: true
+        - class: flag
+          name: "C"
+          source: false
+          destination: true
+        - class: flag
+          name: "N"
+          source: true
+          destination: true
+        - class: flag
+          name: "V"
+          source: false
+          destination: true
+    - name: [ccmn, ccmp]
+      operands:
+        - class: register
+          prefix: "*"
+          source: true
+          destination: false
+        - class: immediate
+          imd: "int"
+          source: true
+          destination: false
+        - class: immediate
+          imd: "int"
+          source: true
+          destination: false
+        - class: condition
+          ccode: "PL"
+          source: true
+          destination: false
+      hidden_operands:
+        - class: flag
+          name: "Z"
+          source: false
+          destination: true
+        - class: flag
+          name: "C"
+          source: false
+          destination: true
+        - class: flag
+          name: "N"
+          source: true
+          destination: true
+        - class: flag
+          name: "V"
+          source: false
+          destination: true
+    - name: [ccmn, ccmp]
+      operands:
+        - class: register
+          prefix: "*"
+          source: true
+          destination: false
+        - class: immediate
+          imd: "int"
+          source: true
+          destination: false
+        - class: immediate
+          imd: "int"
+          source: true
+          destination: false
+        - class: condition
+          ccode: "VS"
+          source: true
+          destination: false
+      hidden_operands:
+        - class: flag
+          name: "Z"
+          source: false
+          destination: true
+        - class: flag
+          name: "C"
+          source: false
+          destination: true
+        - class: flag
+          name: "N"
+          source: false
+          destination: true
+        - class: flag
+          name: "V"
+          source: true
+          destination: true
+    - name: [ccmn, ccmp]
+      operands:
+        - class: register
+          prefix: "*"
+          source: true
+          destination: false
+        - class: immediate
+          imd: "int"
+          source: true
+          destination: false
+        - class: immediate
+          imd: "int"
+          source: true
+          destination: false
+        - class: condition
+          ccode: "VC"
+          source: true
+          destination: false
+      hidden_operands:
+        - class: flag
+          name: "Z"
+          source: false
+          destination: true
+        - class: flag
+          name: "C"
+          source: false
+          destination: true
+        - class: flag
+          name: "N"
+          source: false
+          destination: true
+        - class: flag
+          name: "V"
+          source: true
+          destination: true
+    - name: [ccmn, ccmp]
+      operands:
+        - class: register
+          prefix: "*"
+          source: true
+          destination: false
+        - class: immediate
+          imd: "int"
+          source: true
+          destination: false
+        - class: immediate
+          imd: "int"
+          source: true
+          destination: false
+        - class: condition
+          ccode: "HI"
+          source: true
+          destination: false
+      hidden_operands:
+        - class: flag
+          name: "Z"
+          source: true
+          destination: true
+        - class: flag
+          name: "C"
+          source: true
+          destination: true
+        - class: flag
+          name: "N"
+          source: false
+          destination: true
+        - class: flag
+          name: "V"
+          source: false
+          destination: true
+    - name: [ccmn, ccmp]
+      operands:
+        - class: register
+          prefix: "*"
+          source: true
+          destination: false
+        - class: immediate
+          imd: "int"
+          source: true
+          destination: false
+        - class: immediate
+          imd: "int"
+          source: true
+          destination: false
+        - class: condition
+          ccode: "LS"
+          source: true
+          destination: false
+      hidden_operands:
+        - class: flag
+          name: "Z"
+          source: true
+          destination: true
+        - class: flag
+          name: "C"
+          source: true
+          destination: true
+        - class: flag
+          name: "N"
+          source: false
+          destination: true
+        - class: flag
+          name: "V"
+          source: false
+          destination: true
+    - name: [ccmn, ccmp]
+      operands:
+        - class: register
+          prefix: "*"
+          source: true
+          destination: false
+        - class: immediate
+          imd: "int"
+          source: true
+          destination: false
+        - class: immediate
+          imd: "int"
+          source: true
+          destination: false
+        - class: condition
+          ccode: "GE"
+          source: true
+          destination: false
+      hidden_operands:
+        - class: flag
+          name: "Z"
+          source: false
+          destination: true
+        - class: flag
+          name: "C"
+          source: false
+          destination: true
+        - class: flag
+          name: "N"
+          source: true
+          destination: true
+        - class: flag
+          name: "V"
+          source: true
+          destination: true
+    - name: [ccmn, ccmp]
+      operands:
+        - class: register
+          prefix: "*"
+          source: true
+          destination: false
+        - class: immediate
+          imd: "int"
+          source: true
+          destination: false
+        - class: immediate
+          imd: "int"
+          source: true
+          destination: false
+        - class: condition
+          ccode: "LT"
+          source: true
+          destination: false
+      hidden_operands:
+        - class: flag
+          name: "Z"
+          source: false
+          destination: true
+        - class: flag
+          name: "C"
+          source: false
+          destination: true
+        - class: flag
+          name: "N"
+          source: true
+          destination: true
+        - class: flag
+          name: "V"
+          source: true
+          destination: true
+    - name: [ccmn, ccmp]
+      operands:
+        - class: register
+          prefix: "*"
+          source: true
+          destination: false
+        - class: immediate
+          imd: "int"
+          source: true
+          destination: false
+        - class: immediate
+          imd: "int"
+          source: true
+          destination: false
+        - class: condition
+          ccode: "GT"
+          source: true
+          destination: false
+      hidden_operands:
+        - class: flag
+          name: "Z"
+          source: true
+          destination: true
+        - class: flag
+          name: "C"
+          source: false
+          destination: true
+        - class: flag
+          name: "N"
+          source: true
+          destination: true
+        - class: flag
+          name: "V"
+          source: true
+          destination: true
+    - name: [ccmn, ccmp]
+      operands:
+        - class: register
+          prefix: "*"
+          source: true
+          destination: false
+        - class: immediate
+          imd: "int"
+          source: true
+          destination: false
+        - class: immediate
+          imd: "int"
+          source: true
+          destination: false
+        - class: condition
+          ccode: "LE"
+          source: true
+          destination: false
+      hidden_operands:
+        - class: flag
+          name: "Z"
+          source: true
+          destination: true
+        - class: flag
+          name: "C"
+          source: false
+          destination: true
+        - class: flag
+          name: "N"
+          source: true
+          destination: true
+        - class: flag
+          name: "V"
+          source: true
+          destination: true
+    - name: [ccmn, ccmp]
+      operands:
+        - class: register
+          prefix: "*"
+          source: true
+          destination: false
+        - class: immediate
+          imd: "int"
+          source: true
+          destination: false
+        - class: immediate
+          imd: "int"
+          source: true
+          destination: false
+        - class: condition
+          ccode: "AL"
+          source: true
+          destination: false
+      hidden_operands:
+        - class: flag
+          name: "Z"
+          source: true
+          destination: true
+        - class: flag
+          name: "C"
+          source: true
+          destination: true
+        - class: flag
+          name: "N"
+          source: true
+          destination: true
+        - class: flag
+          name: "V"
+          source: true
+          destination: true
