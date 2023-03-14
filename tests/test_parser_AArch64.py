@@ -313,7 +313,7 @@ class TestParserAArch64(unittest.TestCase):
                 {"register": {"prefix": "x", "name": "11"}},
                 {"immediate": {"value": 1, "type": "int"}},
                 {"immediate": {"value": 3, "type": "int"}},
-                {"condition": "EQ"}
+                {"condition": "EQ"},
             ],
             "directive": None,
             "comment": None,
