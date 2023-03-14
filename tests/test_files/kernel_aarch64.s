@@ -23,3 +23,4 @@
 // OSACA-END
     fmov    s1, #2.0e+2f
     prfm    pldl1keep, [x26, #2112]
+    add x11, x11, x11
