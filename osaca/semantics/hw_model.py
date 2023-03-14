@@ -581,8 +581,15 @@ class MachineModel(object):
         # prefetch option
         if "prfop" in operand:
             return i_operand["class"] == "prfop"
+        # condition
         if "condition" in operand:
-            return i_operand["class"] == "condition"
+            if i_operand["ccode"] == self.WILDCARD:
+                return True
+            return i_operand["class"] == "condition" and (
+                operand.get("condition", None) == i_operand.get("ccode", None).upper()
+                if isinstance(i_operand.get("ccode", None), str)
+                else i_operand.get("ccode", None)
+            )
         # no match
         return False
 

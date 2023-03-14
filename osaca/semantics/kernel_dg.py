@@ -22,14 +22,17 @@ class KernelDG(nx.DiGraph):
         hw_model: MachineModel,
         semantics: ArchSemantics,
         timeout=10,
+        flag_dependencies=False,
     ):
         self.timed_out = False
         self.kernel = parsed_kernel
         self.parser = parser
         self.model = hw_model
         self.arch_sem = semantics
-        self.dg = self.create_DG(self.kernel)
-        self.loopcarried_deps = self.check_for_loopcarried_dep(self.kernel, timeout)
+        self.dg = self.create_DG(self.kernel, flag_dependencies)
+        self.loopcarried_deps = self.check_for_loopcarried_dep(
+            self.kernel, timeout, flag_dependencies
+        )
 
     def _extend_path(self, dst_list, kernel, dg, offset):
         for instr in kernel:
@@ -40,12 +43,15 @@ class KernelDG(nx.DiGraph):
             dst_list.extend(tmp_list)
         # print('Thread [{}-{}] done'.format(kernel[0]['line_number'], kernel[-1]['line_number']))
 
-    def create_DG(self, kernel):
+    def create_DG(self, kernel, flag_dependencies=False):
         """
         Create directed graph from given kernel
 
         :param kernel: Parsed asm kernel with assigned semantic information
         :type kerne: list
+        :param flag_dependencies: indicating if dependencies of flags should be considered,
+                                  defaults to `False`
+        :type flag_dependencies: boolean, optional
         :returns: :class:`~nx.DiGraph` -- directed graph object
         """
         # 1. go through kernel instruction forms and add them as node attribute
@@ -71,23 +77,28 @@ class KernelDG(nx.DiGraph):
                     instruction_form["line_number"],
                     latency=instruction_form["latency"] - instruction_form["latency_wo_load"],
                 )
-            for dep, dep_flags in self.find_depending(instruction_form, kernel[i + 1 :]):
+            for dep, dep_flags in self.find_depending(
+                instruction_form, kernel[i + 1 :], flag_dependencies
+            ):
                 edge_weight = (
                     instruction_form["latency"]
                     if "mem_dep" in dep_flags or "latency_wo_load" not in instruction_form
                     else instruction_form["latency_wo_load"]
                 )
-                if "storeload_dep" in dep_flags:
+                if "storeload_dep" in dep_flags and self.model is not None:
                     edge_weight += self.model.get("store_to_load_forward_latency", 0)
+                if "p_indexed" in dep_flags and self.model is not None:
+                    edge_weight = self.model.get("p_index_latency", 1)
                 dg.add_edge(
                     instruction_form["line_number"],
                     dep["line_number"],
                     latency=edge_weight,
                 )
+
                 dg.nodes[dep["line_number"]]["instruction_form"] = dep
         return dg
 
-    def check_for_loopcarried_dep(self, kernel, timeout=10):
+    def check_for_loopcarried_dep(self, kernel, timeout=10, flag_dependencies=False):
         """
         Try to find loop-carried dependencies in given kernel.
 
@@ -106,7 +117,7 @@ class KernelDG(nx.DiGraph):
             temp_iform["line_number"] += offset
             tmp_kernel.append(temp_iform)
         # get dependency graph
-        dg = self.create_DG(tmp_kernel)
+        dg = self.create_DG(tmp_kernel, flag_dependencies)
 
         # build cyclic loop-carried dependencies
         loopcarried_deps = []
@@ -191,7 +202,8 @@ class KernelDG(nx.DiGraph):
         # map lcd back to nodes
         loopcarried_deps_dict = {}
         for lat_sum, involved_lines in loopcarried_deps:
-            loopcarried_deps_dict[involved_lines[0][0]] = {
+            dict_key = "-".join([str(il[0]) for il in involved_lines])
+            loopcarried_deps_dict[dict_key] = {
                 "root": self._get_node_by_lineno(involved_lines[0][0]),
                 "dependencies": [
                     (self._get_node_by_lineno(ln), lat) for ln, lat in involved_lines
@@ -272,10 +284,11 @@ class KernelDG(nx.DiGraph):
                 # print("  TO", instr_form.line, register_changes)
                 if "register" in dst:
                     # read of register
-                    if self.is_read(dst.register, instr_form) and not (
-                        dst.get("pre_indexed", False) or dst.get("post_indexed", False)
-                    ):
-                        yield instr_form, []
+                    if self.is_read(dst.register, instr_form):
+                        if dst.get("pre_indexed", False) or dst.get("post_indexed", False):
+                            yield instr_form, ["p_indexed"]
+                        else:
+                            yield instr_form, []
                     # write to register -> abort
                     if self.is_written(dst.register, instr_form):
                         break

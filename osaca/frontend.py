@@ -144,9 +144,9 @@ class Frontend(object):
             + "-----------------------------------------\n"
         )
         # TODO find a way to overcome padding for different tab-lengths
-        for dep in dep_dict:
+        for dep in sorted(dep_dict.keys()):
             s += "{:4d} {} {:4.1f} {} {:36}{} {}\n".format(
-                dep,
+                int(dep.split("-")[0]),
                 separator,
                 dep_dict[dep]["latency"],
                 separator,
