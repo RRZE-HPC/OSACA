@@ -187,11 +187,22 @@ instruction_forms:
 - name: adds
   operands:
   - class: register
-    prefix: x 
+    prefix: "*"
   - class: register
-    prefix: x
+    prefix: "*"
   - class: immediate
     imd: int
+  throughput: 0.5
+  latency: 1.0  # 	1*p34
+  port_pressure: [[1, '34']]
+- name: adds
+  operands:
+  - class: register
+    prefix: "*"
+  - class: register
+    prefix: "*"
+  - class: register
+    prefix: "*"
   throughput: 0.5
   latency: 1.0  # 	1*p34
   port_pressure: [[1, '34']]
