@@ -171,6 +171,14 @@ def create_parser(parser=None):
         " Set to -1 for no timeout.",
     )
     parser.add_argument(
+        "--consider-flag-deps",
+        "-f",
+        dest="consider_flag_deps",
+        action="store_true",
+        default=False,
+        help="Consider flag dependencies (carry, zero, ...)",
+    )
+    parser.add_argument(
         "--verbose", "-v", action="count", default=0, help="Increases verbosity level."
     )
     parser.add_argument(
@@ -333,7 +341,9 @@ def inspect(args, output_file=sys.stdout):
         semantics.assign_optimal_throughput(kernel)
 
     # Create DiGrahps
-    kernel_graph = KernelDG(kernel, parser, machine_model, semantics, args.lcd_timeout)
+    kernel_graph = KernelDG(
+        kernel, parser, machine_model, semantics, args.lcd_timeout, args.consider_flag_deps
+    )
     if args.dotpath is not None:
         kernel_graph.export_graph(args.dotpath if args.dotpath != "." else None)
     # Print analysis
