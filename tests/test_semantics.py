@@ -167,6 +167,10 @@ class TestSemanticTools(unittest.TestCase):
             test_mm_arm.get_instruction("b.ne", [{"class": "identifier"}]),
             test_mm_arm.get_instruction("b.ne", [{"class": "identifier"}]),
         )
+        self.assertEqual(
+            test_mm_arm.get_instruction("b.someNameThatDoesNotExist", [{"class": "identifier"}]),
+            test_mm_arm.get_instruction("b.someOtherName", [{"class": "identifier"}]),
+        )
 
         # test full instruction name
         self.assertEqual(

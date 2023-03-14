@@ -132,8 +132,8 @@ class ParserAArch64(BaseParser):
                 pp.Literal(".")
                 + pp.Optional(pp.Word("12468")).setResultsName("lanes")
                 + pp.Word(pp.alphas, exact=1).setResultsName("shape")
-                + pp.Optional(index)
             )
+            + pp.Optional(index)
         )
         predicate = (
             pp.CaselessLiteral("p").setResultsName("prefix")
@@ -533,15 +533,12 @@ class ParserAArch64(BaseParser):
 
     def get_full_reg_name(self, register):
         """Return one register name string including all attributes"""
-        if "lanes" in register:
-            return (
-                register["prefix"]
-                + str(register["name"])
-                + "."
-                + str(register["lanes"])
-                + register["shape"]
-            )
-        return register["prefix"] + str(register["name"])
+        name = register["prefix"] + str(register["name"])
+        if "shape" in register:
+            name += "." + str(register.get("lanes", "")) + register["shape"]
+        if "index" in register:
+            name += "[" + register["index"] + "]"
+        return name
 
     def normalize_imd(self, imd):
         """Normalize immediate to decimal based representation"""

@@ -811,7 +811,7 @@ instruction_forms:
         imd: int
         source: false
         destination: false
-    - name: fmla
+    - name: [fmla, fmad, mla, fmls, fmsb, mls]
       operands:
       - class: register
         prefix: "*"
@@ -833,7 +833,7 @@ instruction_forms:
         shape: "*"
         source: true
         destination: false
-    - name: fmla
+    - name: [fmla, mla, fmls, mls, smlal, smlal2, smlalb, smlalt, smlsl, smlsl2, smlslb, smlslt, umlal, umlal2, umlalb, umlalt, umlsl, umlsl2, umlslb, umlslt]
       operands:
         - class: register
           prefix: "*"
@@ -3358,3 +3358,48 @@ instruction_forms:
           name: "V"
           source: true
           destination: true
+    - name: [sadalp, uadalp]
+      operands:
+        - class: register
+          prefix: "*"
+          shape: "*"
+          source: true
+          destination: true
+        - class: register
+          prefix: "*"
+          shape: "*"
+          source: true
+          destination: false
+    - name: [sadalp, uadalp, sabal, sabal2, sabalb, sabalt]
+      operands:
+        - class: register
+          prefix: "*"
+          shape: "*"
+          source: true
+          destination: true
+        - class: register
+          prefix: "*"
+          shape: "*"
+          source: true
+          destination: false
+        - class: register
+          prefix: "*"
+          shape: "*"
+          source: true
+          destination: false
+    - name: [ssra, srsra, usra, ursra]
+      operands:
+        - class: register
+          prefix: "*"
+          shape: "*"
+          source: true
+          destination: true
+        - class: register
+          prefix: "*"
+          shape: "*"
+          source: true
+          destination: false
+        - class: immediate
+          imd: "int"
+          source: true
+          destination: false
