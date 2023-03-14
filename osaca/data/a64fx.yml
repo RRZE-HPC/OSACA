@@ -1,4 +1,4 @@
-osaca_version: 0.3.3
+osaca_version: 0.5.0
 micro_architecture: Fujitsu A64FX
 arch_code: a64fx
 isa: AArch64
@@ -25,6 +25,7 @@ load_throughput:
 load_throughput_default: [[1, '56'], [1, ['5D', '6D']]]
 store_throughput: []
 store_throughput_default: [[1, '5'], [1, '6']]
+p_index_latency: 1
 #store_throughput_multiplier: {w: 1.0, x: 1.0, b: 1.0, h: 1.0, s: 1.0, d: 1.0, q: 1.0, v: 2.0, z: 2.0}
 ports: ['0', 0DV, '1', '2', '3', '4', '5', 5D, '6', 6D, '7']
 port_model_scheme: |
@@ -356,27 +357,62 @@ instruction_forms:
   throughput: 0.5
   latency: 1.0  # 	1*p34
   port_pressure: [[1, '34']]
-- name: csel
+- name: [ccmp, ccmn]
   operands:
   - class: register
-    prefix: x
+    prefix: "*"
+  - class: immediate
+    imd: int
+  - class: immediate
+    imd: int
+  - class: condition
+    ccode: "*"
+  throughput: 1.0
+  latency: 2.0  # 	2*p3 | 2*p4
+  port_pressure: [[2, '34']]
+- name: [ccmp, ccmn]
+  operands:
   - class: register
-    prefix: x
+    prefix: "*"
   - class: register
-    prefix: x
-  - class: identifier
+    prefix: "*"
+  - class: immediate
+    imd: int
+  - class: condition
+    ccode: "*"
+  throughput: 1.0
+  latency: 2.0  # 	2*p3 | 2*p4
+  port_pressure: [[2, '34']]
+- name: [csel, csinc, csinv, csneg]
+  operands:
+  - class: register
+    prefix: "*"
+  - class: register
+    prefix: "*"
+  - class: register
+    prefix: "*"
+  - class: condition
+    ccode: "*"
   throughput: 0.5
   latency: 1.0  # 	1*p34
   port_pressure: [[1, '34']]
-- name: csel
+- name: [cinc, cinv, cneg]
   operands:
   - class: register
-    prefix: w
+    prefix: "*"
   - class: register
-    prefix: w
+    prefix: "*"
+  - class: condition
+    ccode: "*"
+  throughput: 0.5
+  latency: 1.0  # 	1*p34
+  port_pressure: [[1, '34']]
+- name: [cset, csetm]
+  operands:
   - class: register
-    prefix: w
-  - class: identifier
+    prefix: "*"
+  - class: condition
+    ccode: "*"
   throughput: 0.5
   latency: 1.0  # 	1*p34
   port_pressure: [[1, '34']]
@@ -2152,6 +2188,22 @@ instruction_forms:
   throughput: 2.0
   latency: 0  # 	2*p56+2*p0
   port_pressure: [[2, '5'], [2,'6'], [2, '0']]
+- name: stp
+  operands:
+  - class: register
+    prefix: q
+  - class: register
+    prefix: q
+  - class: memory
+    base: x
+    offset: '*'
+    index: '*'
+    scale: '*'
+    pre-indexed: true
+    post-indexed: false
+  throughput: 2.0
+  latency: 0  # 	2*p56+2*p0+1*0234
+  port_pressure: [[2, '5'], [2,'6'], [2, '0'], [1, '0234']]
 - name: stp
   operands:
   - class: register
