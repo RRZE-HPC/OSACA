@@ -43,6 +43,8 @@ class TestSemanticTools(unittest.TestCase):
             cls.code_AArch64 = f.read()
         with open(cls._find_file("kernel_aarch64_sve.s")) as f:
             cls.code_AArch64_SVE = f.read()
+        with open(cls._find_file("kernel_aarch64_deps.s")) as f:
+            cls.code_AArch64_deps = f.read()
         cls.kernel_x86 = reduce_to_section(cls.parser_x86.parse_file(cls.code_x86), "x86")
         cls.kernel_x86_memdep = reduce_to_section(
             cls.parser_x86.parse_file(cls.code_x86_memdep), "x86"
@@ -58,6 +60,9 @@ class TestSemanticTools(unittest.TestCase):
         )
         cls.kernel_aarch64_SVE = reduce_to_section(
             cls.parser_AArch64.parse_file(cls.code_AArch64_SVE), "aarch64"
+        )
+        cls.kernel_aarch64_deps = reduce_to_section(
+            cls.parser_AArch64.parse_file(cls.code_AArch64_deps), "aarch64"
         )
 
         # set up machine models
@@ -104,6 +109,9 @@ class TestSemanticTools(unittest.TestCase):
         for i in range(len(cls.kernel_aarch64_SVE)):
             cls.semantics_a64fx.assign_src_dst(cls.kernel_aarch64_SVE[i])
             cls.semantics_a64fx.assign_tp_lt(cls.kernel_aarch64_SVE[i])
+        for i in range(len(cls.kernel_aarch64_deps)):
+            cls.semantics_a64fx.assign_src_dst(cls.kernel_aarch64_deps[i])
+            cls.semantics_a64fx.assign_tp_lt(cls.kernel_aarch64_deps[i])
 
     ###########
     # Tests
@@ -440,38 +448,71 @@ class TestSemanticTools(unittest.TestCase):
         lc_deps = dg.get_loopcarried_dependencies()
         self.assertEqual(len(lc_deps), 4)
         # based on line 6
-        self.assertEqual(lc_deps[6]["latency"], 28.0)
+        dep_path = "6-10-11-12-13-14"
+        self.assertEqual(lc_deps[dep_path]["latency"], 29.0)
         self.assertEqual(
-            [(iform.line_number, lat) for iform, lat in lc_deps[6]["dependencies"]],
-            [(6, 4.0), (10, 6.0), (11, 6.0), (12, 6.0), (13, 6.0), (14, 0)],
+            [(iform.line_number, lat) for iform, lat in lc_deps[dep_path]["dependencies"]],
+            [(6, 4.0), (10, 6.0), (11, 6.0), (12, 6.0), (13, 6.0), (14, 1.0)],
+        )
+        dg = KernelDG(
+            self.kernel_aarch64_deps,
+            self.parser_AArch64,
+            self.machine_model_a64fx,
+            self.semantics_a64fx,
+            flag_dependencies=True,
+        )
+        lc_deps = dg.get_loopcarried_dependencies()
+        self.assertEqual(len(lc_deps), 2)
+        # based on line 4
+        dep_path = "4-5-6-9-10-11-12"
+        self.assertEqual(lc_deps[dep_path]["latency"], 7.0)
+        self.assertEqual(
+            [(iform.line_number, lat) for iform, lat in lc_deps[dep_path]["dependencies"]],
+            [(4, 1.0), (5, 1.0), (6, 1.0), (9, 1.0), (10, 1.0), (11, 1.0), (12, 1.0)],
+        )
+        dg = KernelDG(
+            self.kernel_aarch64_deps,
+            self.parser_AArch64,
+            self.machine_model_a64fx,
+            self.semantics_a64fx,
+            flag_dependencies=False,
+        )
+        lc_deps = dg.get_loopcarried_dependencies()
+        self.assertEqual(len(lc_deps), 1)
+        # based on line 4
+        dep_path = "4-5-10-11-12"
+        self.assertEqual(lc_deps[dep_path]["latency"], 5.0)
+        self.assertEqual(
+            [(iform.line_number, lat) for iform, lat in lc_deps[dep_path]["dependencies"]],
+            [(4, 1.0), (5, 1.0), (10, 1.0), (11, 1.0), (12, 1.0)],
         )
 
     def test_loop_carried_dependency_x86(self):
-        lcd_id = 8
-        lcd_id2 = 5
+        lcd_id = "8"
+        lcd_id2 = "5"
         dg = KernelDG(self.kernel_x86, self.parser_x86, self.machine_model_csx, self.semantics_csx)
         lc_deps = dg.get_loopcarried_dependencies()
         self.assertEqual(len(lc_deps), 2)
         # ID 8
         self.assertEqual(
-            lc_deps[lcd_id]["root"], dg.dg.nodes(data=True)[lcd_id]["instruction_form"]
+            lc_deps[lcd_id]["root"], dg.dg.nodes(data=True)[int(lcd_id)]["instruction_form"]
         )
         self.assertEqual(len(lc_deps[lcd_id]["dependencies"]), 1)
         self.assertEqual(
             lc_deps[lcd_id]["dependencies"][0][0],
-            dg.dg.nodes(data=True)[lcd_id]["instruction_form"],
+            dg.dg.nodes(data=True)[int(lcd_id)]["instruction_form"],
         )
         # w/  flag dependencies: ID 9 w/ len=2
         # w/o flag dependencies: ID 5 w/ len=1
         # TODO discuss
         self.assertEqual(
             lc_deps[lcd_id2]["root"],
-            dg.dg.nodes(data=True)[lcd_id2]["instruction_form"],
+            dg.dg.nodes(data=True)[int(lcd_id2)]["instruction_form"],
         )
         self.assertEqual(len(lc_deps[lcd_id2]["dependencies"]), 1)
         self.assertEqual(
             lc_deps[lcd_id2]["dependencies"][0][0],
-            dg.dg.nodes(data=True)[lcd_id2]["instruction_form"],
+            dg.dg.nodes(data=True)[int(lcd_id2)]["instruction_form"],
         )
 
     def test_timeout_during_loop_carried_dependency(self):
