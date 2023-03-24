@@ -1,4 +1,4 @@
-osaca_version: 0.4.8
+osaca_version: 0.5.0
 micro_architecture: TaiShan v110 # https://en.wikichip.org/wiki/hisilicon/microarchitectures/taishan_v110
 arch_code: tsv110
 isa: AArch64
@@ -7,6 +7,7 @@ retired_uOps_per_cycle: 4
 scheduler_size: ~   # unknown
 hidden_loads: false
 load_latency: {w: 4.0, x: 4.0, b: 4.0, h: 4.0, s: 4.0, d: 4.0, q: 4.0, v: 4.0}
+p_index_latency: 1
 load_throughput: []
 load_throughput_default: [[1, '67']]
 store_throughput: []

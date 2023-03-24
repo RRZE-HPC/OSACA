@@ -1,4 +1,4 @@
-osaca_version: 0.3.11
+osaca_version: 0.5.0
 micro_architecture: Cortex A-72
 arch_code: a72
 isa: aarch64
@@ -9,6 +9,7 @@ load_throughput_default: [[1, '1']]
 store_throughput: []
 store_throughput_default: [[2, '3']]
 ports: ['0', '1', '2', '3', '4', '5', '6', '7']
+p_index_latency: 3
 port_model_scheme: |
   +-------------------------------------------------------------------------------------+
   |                                      scheduler                                      |
