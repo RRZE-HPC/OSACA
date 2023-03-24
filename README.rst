@@ -85,8 +85,9 @@ The usage of OSACA can be listed as:
     osaca [-h] [-V] [--arch ARCH] [--fixed] [--lines LINES]
     	  [--ignore-unknown] [--lcd-timeout SECONDS]
     	  [--db-check] [--import MICROBENCH] [--insert-marker]
-	  [--export-graph GRAPHNAME] [--out OUT] [--verbose]
-	  FILEPATH
+          [--export-graph GRAPHNAME] [--consider-flag-deps]
+          [--out OUT] [--verbose]
+          FILEPATH
 
 -h, --help
   prints out the help message.
@@ -121,6 +122,8 @@ The usage of OSACA can be listed as:
 --lcd-timeout SECONDS
   Set timeout in seconds for LCD analysis. After timeout, OSACA will continue its analysis with the dependency paths found up to this point.
   Defaults to `10`.
+-f, --consider-flag-deps
+  Consider flag dependencies for the critical path and loop-carried dependency analysis. By default, those dependencies are ignored.
 -v, --verbose
   Increases verbosity level
 -o OUT, --out OUT
