@@ -1,4 +1,4 @@
-osaca_version: 0.3.4
+osaca_version: 0.5.0
 micro_architecture: Arm Neoverse N1 
 arch_code: n1
 isa: AArch64
@@ -7,6 +7,7 @@ retired_uOps_per_cycle: 8       # wikichip
 scheduler_size: 120             # wikichip
 hidden_loads: false
 load_latency: {w: 4.0, x: 4.0, b: 4.0, h: 4.0, s: 4.0, d: 5.0, q: 6.0, v: 5.0, z: 4.0}
+p_index_latency: 1
 load_throughput:
 - {base: x, index: ~, offset: ~, scale: 1, pre-indexed: false, post-indexed: false, port_pressure:   [[1, '67']]}
 - {base: x, index: ~, offset: imd, scale: 1, pre-indexed: false, post-indexed: true, port_pressure:  [[1, '67'], [1, '123']]}

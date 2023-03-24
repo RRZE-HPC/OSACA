@@ -1,4 +1,4 @@
-osaca_version: 0.3.4
+osaca_version: 0.5.0
 micro_architecture: Thunder X2
 arch_code: tx2
 isa: AArch64
@@ -7,6 +7,7 @@ retired_uOps_per_cycle: 4
 scheduler_size: 60
 hidden_loads: false
 load_latency: {w: 4.0, x: 4.0, b: 4.0, h: 4.0, s: 4.0, d: 4.0, q: 4.0, v: 4.0}
+p_index_latency: 1
 load_throughput:
 - {base: x, index: ~, offset: ~, scale: 1, pre-indexed: false, post-indexed: false, port_pressure:   [[1, '34'], [1, '012']]}
 - {base: x, index: ~, offset: imd, scale: 1, pre-indexed: false, post-indexed: true, port_pressure:  [[1, '34'], [1, '012']]}
