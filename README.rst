@@ -56,10 +56,15 @@ After installation, OSACA can be started with the command ``osaca`` in the CLI.
 
 Dependencies:
 -------------
-Additional requirements are:
+Necessary equirements are:
 
--  `Python3 <https://www.python.org/>`__
--  `Graphviz <https://www.graphviz.org/>`__ for dependency graph creation (minimal dependency is `libgraphviz-dev` on Ubuntu)
+-  `Python3 <https://www.python.org/>`_
+-  `Graphviz <https://www.graphviz.org/>`_ for dependency graph creation (minimal dependency is ``libgraphviz-dev`` on Ubuntu)
+-  Python packages:
+
+  - `networkx <https://networkx.org/>`_
+  - `pyparsing <https://github.com/pyparsing/pyparsing>`_
+  - `ruamel.yaml <https://pypi.org/project/ruamel.yaml/>`_
 
 Optional requirements are:
 
