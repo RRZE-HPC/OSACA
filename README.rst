@@ -62,9 +62,9 @@ Necessary equirements are:
 -  `Graphviz <https://www.graphviz.org/>`_ for dependency graph creation (minimal dependency is ``libgraphviz-dev`` on Ubuntu)
 -  Python packages:
 
-  - `networkx <https://networkx.org/>`_
-  - `pyparsing <https://github.com/pyparsing/pyparsing>`_
-  - `ruamel.yaml <https://pypi.org/project/ruamel.yaml/>`_
+   -  `networkx <https://networkx.org/>`_
+   -  `pyparsing <https://github.com/pyparsing/pyparsing>`_
+   -  `ruamel.yaml <https://pypi.org/project/ruamel.yaml/>`_
 
 Optional requirements are:
 
