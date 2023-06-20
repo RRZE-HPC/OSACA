@@ -9,9 +9,9 @@ load_throughput:
 - {dst: ymm, base: gpr, index: "*", offset: "*", scale: "*", port_pressure:  [[1, ['11', '12']]]}
 load_throughput_default: [[1, ['11', '12']]]
 store_throughput:
-- {dst: gpr, base: gpr, index: "*", offset: "*", scale: "*", port_pressure:  [[1, ['12', '13']]]}
-- {dst: xmm, base: gpr, index: "*", offset: "*", scale: "*", port_pressure:  [[1, ['4']], [1, ['13']]]}
-- {dst: ymm, base: gpr, index: "*", offset: "*", scale: "*", port_pressure:  [[1, ['4']], [1, ['13']]]}
+- {src: gpr, base: gpr, index: "*", offset: "*", scale: "*", port_pressure:  [[1, ['12', '13']]]}
+- {src: xmm, base: gpr, index: "*", offset: "*", scale: "*", port_pressure:  [[1, ['4']], [1, ['13']]]}
+- {src: ymm, base: gpr, index: "*", offset: "*", scale: "*", port_pressure:  [[1, ['4']], [1, ['13']]]}
 store_throughput_default: [1 ,['13']]
 store_to_load_forward_latency: 0.0  # JH: according to Agner Fog "little or no penalty"
 hidden_loads: false
