@@ -234,9 +234,15 @@ class MachineModel(object):
         # assume 0 for now, since load-store-dependencies currently not detectable
         return 0
 
-    def get_store_throughput(self, memory):
-        """Return store throughput for given register type."""
+    def get_store_throughput(self, memory, src_reg=None):
+        """Return store throughput for a given destination and register type."""
         st_tp = [m for m in self._data["store_throughput"] if self._match_mem_entries(memory, m)]
+        if src_reg is not None:
+            st_tp = [
+                tp
+                for tp in st_tp
+                if "src" in tp and self._check_operands(src_reg, {"register": {"name": tp["src"]}})
+            ]
         if len(st_tp) > 0:
             return st_tp.copy()
         return [{"port_pressure": self._data["store_throughput_default"].copy()}]

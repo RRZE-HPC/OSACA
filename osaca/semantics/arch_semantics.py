@@ -302,21 +302,10 @@ class ArchSemantics(ISASemantics):
                                 + instruction_form["semantic_operands"]["src_dst"]
                             )
                             store_perf_data = self._machine_model.get_store_throughput(
-                                [x["memory"] for x in destinations if "memory" in x][0]
+                                [x["memory"] for x in destinations if "memory" in x][0], dummy_reg
                             )
-                            # if multiple options, choose based on reg type
-                            st_data_port_uops = [
-                                stp["port_pressure"]
-                                for stp in store_perf_data
-                                if "src" in stp
-                                and self._machine_model._check_operands(
-                                    dummy_reg, {"register": {"name": stp["src"]}}
-                                )
-                            ]
-                            if len(st_data_port_uops) < 1:
-                                st_data_port_uops = store_perf_data[0]["port_pressure"]
-                            else:
-                                st_data_port_uops = st_data_port_uops[0]
+                            st_data_port_uops = store_perf_data[0]["port_pressure"]
+
                             # zero data port pressure and remove HAS_ST flag if
                             #   - no mem operand in dst &&
                             #   - all mem operands in src_dst are pre-/post-indexed
