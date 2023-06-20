@@ -339,13 +339,13 @@ def _scrape_from_felixcloutier(mnemonic):
 def _get_src_dst_from_table(table, num_operands=2):
     """Prettify bs4 table object to string for user"""
     # Parse table
-    header = ["".join(x.string.lower().split()) for x in table.find("tr").findAll("td")]
+    header = ["".join(x.string.lower().split()) for x in table.find("tr").findAll("th")]
     data = table.findAll("tr")[1:]
     data_dict = OrderedDict()
     for i, row in enumerate(data):
         data_dict[i] = {}
         for j, col in enumerate(row.findAll("td")):
-            if col.string != "NA":
+            if col.string != "N/A":
                 data_dict[i][header[j]] = col.string
     # Get only the instruction forms with 2 operands
     num_ops = [_get_number_of_operands(row) for _, row in data_dict.items()]
