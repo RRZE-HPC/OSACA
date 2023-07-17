@@ -42,6 +42,7 @@ class ArchSemantics(ISASemantics):
         INC = 0.01
         kernel.reverse()
         port_list = self._machine_model.get_ports()
+        multiple_assignments = False
         for idx, instruction_form in enumerate(kernel[start:], start):
             multiple_assignments = False
             # if iform has multiple possible port assignments, check all in a DFS manner and take the best
