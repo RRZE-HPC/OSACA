@@ -8191,6 +8191,16 @@ instruction_forms:
   port_pressure: [[1, '1'], [1, '5']]                                # model_importer.py instructions.xml ICL
   throughput: 1.0                                                    # model_importer.py instructions.xml ICL
   uops: 2                                                            # model_importer.py instructions.xml ICL
+- name: IMUL                                                          # model_importer.py instructions.xml ICL
+  operands:                                                          # model_importer.py instructions.xml ICL
+  - class: register                                                  # model_importer.py instructions.xml ICL
+    name: gpr                                                        # model_importer.py instructions.xml ICL
+  - class: register                                                  # model_importer.py instructions.xml ICL
+    name: gpr                                                        # model_importer.py instructions.xml ICL
+  latency: 3                                                         # model_importer.py instructions.xml ICL
+  port_pressure: [[1, '1']]                                          # model_importer.py instructions.xml ICL
+  throughput: 1.0                                                    # model_importer.py instructions.xml ICL
+  uops: 1                                                            # model_importer.py instructions.xml ICL
 - name: NEG                                                          # model_importer.py instructions.xml ICL
   operands:                                                          # model_importer.py instructions.xml ICL
   - class: register                                                  # model_importer.py instructions.xml ICL
