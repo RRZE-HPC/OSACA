@@ -4554,7 +4554,7 @@ instruction_forms:
   - class: register                      # ibench
     name: xmm                            # ibench
   latency: 22                            # ibench
-  port_pressure: [[6, '0DV'], [1, '0']]  # ibench
+  port_pressure: [[6, ['0DV']], [1, '0']]  # ibench
   throughput: 6.0                        # ibench
   uops: 7                                # ibench
 - name: sqrtss                           # ibench
@@ -4564,7 +4564,7 @@ instruction_forms:
   - class: register                      # ibench
     name: xmm                            # ibench
   latency: 16                            # ibench
-  port_pressure: [[3, '0DV'], [1, '0']]  # ibench
+  port_pressure: [[3, ['0DV']], [1, '0']]  # ibench
   throughput: 3.0                        # ibench
   uops: 4                                # ibench
 - name: vsqrtsd                          # ibench
@@ -4576,7 +4576,7 @@ instruction_forms:
   - class: register                      # ibench
     name: xmm                            # ibench
   latency: 22                            # ibench
-  port_pressure: [[6, '0DV'], [1, '0']]  # ibench
+  port_pressure: [[6, ['0DV']], [1, '0']]  # ibench
   throughput: 6.0                        # ibench
   uops: 7                                # ibench
 - name: vsqrtss                          # ibench
@@ -4588,7 +4588,7 @@ instruction_forms:
   - class: register                      # ibench
     name: xmm                            # ibench
   latency: 16                            # ibench
-  port_pressure: [[3, '0DV'], [1, '0']]  # ibench
+  port_pressure: [[3, ['0DV']], [1, '0']]  # ibench
   throughput: 3.0                        # ibench
   uops: 4                                # ibench
 - name: sub                     # ibench
