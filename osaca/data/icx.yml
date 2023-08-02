@@ -119,9 +119,9 @@ instruction_forms:
     name: gpr                                               # ./generate_mov_entries.py icx
   - class: register                                         # ./generate_mov_entries.py icx
     name: gpr                                               # ./generate_mov_entries.py icx
-  latency: 1                                                # ./generate_mov_entries.py icx
-  port_pressure: [[1, '0156']]                              # ./generate_mov_entries.py icx
-  throughput: 0.25                                          # ./generate_mov_entries.py icx
+  latency: 0                                                # ./generate_mov_entries.py icx
+  port_pressure: []                                         # ./generate_mov_entries.py icx
+  throughput: 0.0                                           # ./generate_mov_entries.py icx
   uops: 1                                                   # ./generate_mov_entries.py icx
 - name: mov
   operands:
@@ -197,9 +197,9 @@ instruction_forms:
     name: xmm                                               # ./generate_mov_entries.py icx
   - class: register                                         # ./generate_mov_entries.py icx
     name: xmm                                               # ./generate_mov_entries.py icx
-  latency: 1                                                # ./generate_mov_entries.py icx
-  port_pressure: [[1, '015']]                               # ./generate_mov_entries.py icx
-  throughput: 0.3333333333333333                            # ./generate_mov_entries.py icx
+  latency: 0                                                # ./generate_mov_entries.py icx
+  port_pressure: []                                         # ./generate_mov_entries.py icx
+  throughput: 0.0                                           # ./generate_mov_entries.py icx
   uops: 1                                                   # ./generate_mov_entries.py icx
 - name: movapd  # with store                                # ./generate_mov_entries.py icx
   operands:                                                 # ./generate_mov_entries.py icx
@@ -233,9 +233,9 @@ instruction_forms:
     name: xmm                                               # ./generate_mov_entries.py icx
   - class: register                                         # ./generate_mov_entries.py icx
     name: xmm                                               # ./generate_mov_entries.py icx
-  latency: 1                                                # ./generate_mov_entries.py icx
-  port_pressure: [[1, '015']]                               # ./generate_mov_entries.py icx
-  throughput: 0.3333333333333333                            # ./generate_mov_entries.py icx
+  latency: 0                                                # ./generate_mov_entries.py icx
+  port_pressure: []                                         # ./generate_mov_entries.py icx
+  throughput: 0.0                                           # ./generate_mov_entries.py icx
   uops: 1                                                   # ./generate_mov_entries.py icx
 - name: vmovapd  # with store                               # ./generate_mov_entries.py icx
   operands:                                                 # ./generate_mov_entries.py icx
@@ -269,9 +269,9 @@ instruction_forms:
     name: ymm                                               # ./generate_mov_entries.py icx
   - class: register                                         # ./generate_mov_entries.py icx
     name: ymm                                               # ./generate_mov_entries.py icx
-  latency: 1                                                # ./generate_mov_entries.py icx
-  port_pressure: [[1, '015']]                               # ./generate_mov_entries.py icx
-  throughput: 0.3333333333333333                            # ./generate_mov_entries.py icx
+  latency: 0                                                # ./generate_mov_entries.py icx
+  port_pressure: []                                         # ./generate_mov_entries.py icx
+  throughput: 0.0                                           # ./generate_mov_entries.py icx
   uops: 1                                                   # ./generate_mov_entries.py icx
 - name: vmovapd  # with store                               # ./generate_mov_entries.py icx
   operands:                                                 # ./generate_mov_entries.py icx
@@ -305,9 +305,9 @@ instruction_forms:
     name: zmm                                               # ./generate_mov_entries.py icx
   - class: register                                         # ./generate_mov_entries.py icx
     name: zmm                                               # ./generate_mov_entries.py icx
-  latency: 1                                                # ./generate_mov_entries.py icx
-  port_pressure: [[1, '05']]                                # ./generate_mov_entries.py icx
-  throughput: 0.5                                           # ./generate_mov_entries.py icx
+  latency: 0                                                # ./generate_mov_entries.py icx
+  port_pressure: []                                         # ./generate_mov_entries.py icx
+  throughput: 0.0                                           # ./generate_mov_entries.py icx
   uops: 1                                                   # ./generate_mov_entries.py icx
 - name: vmovapd  # with store                               # ./generate_mov_entries.py icx
   operands:                                                 # ./generate_mov_entries.py icx
@@ -2869,9 +2869,9 @@ instruction_forms:
     name: xmm                                               # ./generate_mov_entries.py icx
   - class: register                                         # ./generate_mov_entries.py icx
     name: xmm                                               # ./generate_mov_entries.py icx
-  latency: 1                                                # ./generate_mov_entries.py icx
-  port_pressure: [[1, '015']]                               # ./generate_mov_entries.py icx
-  throughput: 0.3333333333333333                            # ./generate_mov_entries.py icx
+  latency: 0                                                # ./generate_mov_entries.py icx
+  port_pressure: []                                         # ./generate_mov_entries.py icx
+  throughput: 0.0                                           # ./generate_mov_entries.py icx
   uops: 1                                                   # ./generate_mov_entries.py icx
 - name: movupd  # with load                                 # ./generate_mov_entries.py icx
   operands:                                                 # ./generate_mov_entries.py icx
@@ -2905,9 +2905,9 @@ instruction_forms:
     name: xmm                                               # ./generate_mov_entries.py icx
   - class: register                                         # ./generate_mov_entries.py icx
     name: xmm                                               # ./generate_mov_entries.py icx
-  latency: 1                                                # ./generate_mov_entries.py icx
-  port_pressure: [[1, '015']]                               # ./generate_mov_entries.py icx
-  throughput: 0.3333333333333333                            # ./generate_mov_entries.py icx
+  latency: 0                                                # ./generate_mov_entries.py icx
+  port_pressure: []                                         # ./generate_mov_entries.py icx
+  throughput: 0.0                                           # ./generate_mov_entries.py icx
   uops: 1                                                   # ./generate_mov_entries.py icx
 - name: vmovupd  # with load                                # ./generate_mov_entries.py icx
   operands:                                                 # ./generate_mov_entries.py icx
@@ -2941,9 +2941,9 @@ instruction_forms:
     name: ymm                                               # ./generate_mov_entries.py icx
   - class: register                                         # ./generate_mov_entries.py icx
     name: ymm                                               # ./generate_mov_entries.py icx
-  latency: 1                                                # ./generate_mov_entries.py icx
-  port_pressure: [[1, '015']]                               # ./generate_mov_entries.py icx
-  throughput: 0.3333333333333333                            # ./generate_mov_entries.py icx
+  latency: 0                                                # ./generate_mov_entries.py icx
+  port_pressure: []                                         # ./generate_mov_entries.py icx
+  throughput: 0.0                                           # ./generate_mov_entries.py icx
   uops: 1                                                   # ./generate_mov_entries.py icx
 - name: vmovupd  # with load                                # ./generate_mov_entries.py icx
   operands:                                                 # ./generate_mov_entries.py icx
@@ -2977,9 +2977,9 @@ instruction_forms:
     name: zmm                                               # ./generate_mov_entries.py icx
   - class: register                                         # ./generate_mov_entries.py icx
     name: zmm                                               # ./generate_mov_entries.py icx
-  latency: 1                                                # ./generate_mov_entries.py icx
-  port_pressure: [[1, '05']]                                # ./generate_mov_entries.py icx
-  throughput: 0.5                                           # ./generate_mov_entries.py icx
+  latency: 0                                                # ./generate_mov_entries.py icx
+  port_pressure: []                                         # ./generate_mov_entries.py icx
+  throughput: 0.0                                           # ./generate_mov_entries.py icx
   uops: 1                                                   # ./generate_mov_entries.py icx
 - name: vmovupd  # with load                                # ./generate_mov_entries.py icx
   operands:                                                 # ./generate_mov_entries.py icx
@@ -3013,9 +3013,9 @@ instruction_forms:
     name: xmm                                               # ./generate_mov_entries.py icx
   - class: register                                         # ./generate_mov_entries.py icx
     name: xmm                                               # ./generate_mov_entries.py icx
-  latency: 1                                                # ./generate_mov_entries.py icx
-  port_pressure: [[1, '015']]                               # ./generate_mov_entries.py icx
-  throughput: 0.3333333333333333                            # ./generate_mov_entries.py icx
+  latency: 0                                                # ./generate_mov_entries.py icx
+  port_pressure: []                                         # ./generate_mov_entries.py icx
+  throughput: 0.0                                           # ./generate_mov_entries.py icx
   uops: 1                                                   # ./generate_mov_entries.py icx
 - name: movups  # with load                                 # ./generate_mov_entries.py icx
   operands:                                                 # ./generate_mov_entries.py icx
@@ -3049,9 +3049,9 @@ instruction_forms:
     name: xmm                                               # ./generate_mov_entries.py icx
   - class: register                                         # ./generate_mov_entries.py icx
     name: xmm                                               # ./generate_mov_entries.py icx
-  latency: 1                                                # ./generate_mov_entries.py icx
-  port_pressure: [[1, '015']]                               # ./generate_mov_entries.py icx
-  throughput: 0.3333333333333333                            # ./generate_mov_entries.py icx
+  latency: 0                                                # ./generate_mov_entries.py icx
+  port_pressure: []                                         # ./generate_mov_entries.py icx
+  throughput: 0.0                                           # ./generate_mov_entries.py icx
   uops: 1                                                   # ./generate_mov_entries.py icx
 - name: vmovups  # with load                                # ./generate_mov_entries.py icx
   operands:                                                 # ./generate_mov_entries.py icx
@@ -3085,9 +3085,9 @@ instruction_forms:
     name: ymm                                               # ./generate_mov_entries.py icx
   - class: register                                         # ./generate_mov_entries.py icx
     name: ymm                                               # ./generate_mov_entries.py icx
-  latency: 1                                                # ./generate_mov_entries.py icx
-  port_pressure: [[1, '015']]                               # ./generate_mov_entries.py icx
-  throughput: 0.3333333333333333                            # ./generate_mov_entries.py icx
+  latency: 0                                                # ./generate_mov_entries.py icx
+  port_pressure: []                                         # ./generate_mov_entries.py icx
+  throughput: 0.0                                           # ./generate_mov_entries.py icx
   uops: 1                                                   # ./generate_mov_entries.py icx
 - name: vmovups  # with load                                # ./generate_mov_entries.py icx
   operands:                                                 # ./generate_mov_entries.py icx
@@ -3121,9 +3121,9 @@ instruction_forms:
     name: zmm                                               # ./generate_mov_entries.py icx
   - class: register                                         # ./generate_mov_entries.py icx
     name: zmm                                               # ./generate_mov_entries.py icx
-  latency: 1                                                # ./generate_mov_entries.py icx
-  port_pressure: [[1, '05']]                                # ./generate_mov_entries.py icx
-  throughput: 0.5                                           # ./generate_mov_entries.py icx
+  latency: 0                                                # ./generate_mov_entries.py icx
+  port_pressure: []                                         # ./generate_mov_entries.py icx
+  throughput: 0.0                                           # ./generate_mov_entries.py icx
   uops: 1                                                   # ./generate_mov_entries.py icx
 - name: vmovups  # with load                                # ./generate_mov_entries.py icx
   operands:                                                 # ./generate_mov_entries.py icx
