@@ -4815,6 +4815,17 @@ instruction_forms:
   port_pressure: [[1, '6789']]  # asmbench
   throughput: 0.25              # asmbench
   uops: 1                       # asmbench
+- name: or                      # asmbench
+  operands:                     # asmbench
+  - class: register             # asmbench
+    name: gpr                   # asmbench
+  - class: register             # asmbench
+    name: gpr                   # asmbench
+  latency: 1                    # asmbench
+  port_pressure: [[1, '6789']]  # asmbench
+  throughput: 0.25              # asmbench
+  uops: 1                       # asmbench
+
 - name: rcl                   # asmbench
   operands:                   # asmbench
   - class: immediate          # asmbench
@@ -5493,3 +5504,14 @@ instruction_forms:
   port_pressure: [[1, '01']]
   throughput: 0.5
   uops: 1
+- name: pdep
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: 3
+  port_pressure: [[1, '7']]
+  throughput: 1.0
