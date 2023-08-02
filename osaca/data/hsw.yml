@@ -215,25 +215,25 @@ instruction_forms:
   port_pressure: [[11, '0'], [57, '06'], [14, '1'], [13, '15'], [1, '4'], [12, '5']]
   throughput: 39.5
   uops: 108
-- name: REPE SCASW
+- name: SCASW
   operands: []
   latency: ~
   port_pressure: [[11, '0156'], [5, '06'], [1, '15'], [1, '23']]
   throughput: 5.25
   uops: 12
-- name: REPE SCASD
+- name: SCASD
   operands: []
   latency: ~
   port_pressure: [[11, '0156'], [5, '06'], [1, '15'], [1, '23']]
   throughput: 5.25
   uops: 12
-- name: REPE SCASB
+- name: SCASB
   operands: []
   latency: ~
   port_pressure: [[11, '0156'], [5, '06'], [1, '15'], [1, '23']]
   throughput: 5.25
   uops: 12
-- name: REX64 REPE SCASB
+- name: SCASB
   operands: []
   latency: ~
   port_pressure: [[11, '0156'], [5, '06'], [1, '15'], [1, '23']]
@@ -321,7 +321,7 @@ instruction_forms:
   port_pressure: [[1, '0156']]
   throughput: 0.25
   uops: 1
-- name: REX CMP
+- name: CMP
   operands:
   - class: immediate
     imd: int
@@ -351,7 +351,7 @@ instruction_forms:
   port_pressure: [[1, '0156']]
   throughput: 0.25
   uops: 1
-- name: REX NOT
+- name: NOT
   operands:
   - class: register
     name: gpr
@@ -373,7 +373,7 @@ instruction_forms:
   port_pressure: [[1, '0156']]
   throughput: 0.25
   uops: 1
-- name: REX INC
+- name: INC
   operands:
   - class: register
     name: gpr
@@ -407,7 +407,7 @@ instruction_forms:
   port_pressure: [[1, '06']]
   throughput: 0.5
   uops: 1
-- name: REX SETB
+- name: SETB
   operands:
   - class: register
     name: gpr
@@ -423,7 +423,7 @@ instruction_forms:
   port_pressure: [[1, '06']]
   throughput: 0.5
   uops: 1
-- name: REX SETL
+- name: SETL
   operands:
   - class: register
     name: gpr
@@ -439,7 +439,7 @@ instruction_forms:
   port_pressure: [[1, '06']]
   throughput: 0.5
   uops: 1
-- name: REX SETO
+- name: SETO
   operands:
   - class: register
     name: gpr
@@ -465,7 +465,7 @@ instruction_forms:
   port_pressure: [[1, '06']]
   throughput: 0.5
   uops: 1
-- name: REX SETP
+- name: SETP
   operands:
   - class: register
     name: gpr
@@ -560,7 +560,7 @@ instruction_forms:
   port_pressure: [[1, '0156']]
   throughput: 0.25
   uops: 1
-- name: REX XOR
+- name: XOR
   operands:
   - class: immediate
     imd: int
@@ -580,7 +580,7 @@ instruction_forms:
   port_pressure: [[1, '06']]
   throughput: 0.5
   uops: 1
-- name: REX SAR
+- name: SAR
   operands:
   - class: immediate
     imd: int
@@ -616,13 +616,13 @@ instruction_forms:
   port_pressure: [[1, '0156'], [1, '237'], [1, '4']]
   throughput: 1.0
   uops: 3
-- name: REPE LODSW
+- name: LODSW
   operands: []
   latency: ~
   port_pressure: [[2, '0156'], [1, '23']]
   throughput: 0.5
   uops: 10
-- name: REPNE LODSW
+- name: LODSW
   operands: []
   latency: ~
   port_pressure: [[2, '0156'], [1, '23']]
@@ -634,37 +634,37 @@ instruction_forms:
   port_pressure: [[1, '0'], [7, '01'], [6, '015'], [37, '06'], [5, '1'], [6, '15'], [3, '5']]
   throughput: 25.0
   uops: 65
-- name: REPE LODSB
+- name: LODSB
   operands: []
   latency: ~
   port_pressure: [[2, '0156'], [1, '23']]
   throughput: 0.5
   uops: 10
-- name: REX64 REPE LODSB
+- name: LODSB
   operands: []
   latency: ~
   port_pressure: [[2, '0156'], [1, '23']]
   throughput: 0.5
   uops: 10
-- name: REPNE LODSB
+- name: LODSB
   operands: []
   latency: ~
   port_pressure: [[2, '0156'], [1, '23']]
   throughput: 0.5
   uops: 10
-- name: REX64 REPNE LODSB
+- name: LODSB
   operands: []
   latency: ~
   port_pressure: [[2, '0156'], [1, '23']]
   throughput: 0.5
   uops: 10
-- name: REPE LODSD
+- name: LODSD
   operands: []
   latency: ~
   port_pressure: [[1, '0156'], [1, '23']]
   throughput: 0.5
   uops: 10
-- name: REPNE LODSD
+- name: LODSD
   operands: []
   latency: ~
   port_pressure: [[1, '0156'], [1, '23']]
@@ -678,7 +678,7 @@ instruction_forms:
   port_pressure: [[2, '0'], [3, '0156'], [2, '1'], [2, '5']]
   throughput: 2.75
   uops: 9
-- name: REX IDIV
+- name: IDIV
   operands:
   - class: register
     name: gpr
@@ -686,19 +686,19 @@ instruction_forms:
   port_pressure: [[2, '0'], [3, '0156'], [2, '1'], [2, '5']]
   throughput: 2.75
   uops: 9
-- name: REPNE CMPSB
+- name: CMPSB
   operands: []
   latency: ~
   port_pressure: [[3, '0156'], [2, '23']]
   throughput: 1.0
   uops: 12
-- name: REX64 REPNE CMPSB
+- name: CMPSB
   operands: []
   latency: ~
   port_pressure: [[3, '0156'], [2, '23']]
   throughput: 1.0
   uops: 12
-- name: REPNE CMPSD
+- name: CMPSD
   operands: []
   latency: ~
   port_pressure: [[3, '0156'], [2, '23']]
@@ -712,7 +712,7 @@ instruction_forms:
   port_pressure: [[1, '06']]
   throughput: 0.5
   uops: 1
-- name: REX SETS
+- name: SETS
   operands:
   - class: register
     name: gpr
@@ -730,7 +730,7 @@ instruction_forms:
   port_pressure: [[1, '06']]
   throughput: 0.5
   uops: 1
-- name: REX SHR
+- name: SHR
   operands:
   - class: immediate
     imd: int
@@ -750,7 +750,7 @@ instruction_forms:
   port_pressure: [[1, '06']]
   throughput: 0.5
   uops: 1
-- name: REX SHL
+- name: SHL
   operands:
   - class: immediate
     imd: int
@@ -854,7 +854,7 @@ instruction_forms:
   port_pressure: [[1, '1']]
   throughput: 1.0
   uops: 1
-- name: REX MUL
+- name: MUL
   operands:
   - class: register
     name: gpr
@@ -892,7 +892,7 @@ instruction_forms:
   port_pressure: [[1, '06']]
   throughput: 0.5
   uops: 1
-- name: REX SETNO
+- name: SETNO
   operands:
   - class: register
     name: gpr
@@ -908,7 +908,7 @@ instruction_forms:
   port_pressure: [[1, '06']]
   throughput: 0.5
   uops: 1
-- name: REX SETNL
+- name: SETNL
   operands:
   - class: register
     name: gpr
@@ -936,7 +936,7 @@ instruction_forms:
   port_pressure: [[1, '06']]
   throughput: 0.5
   uops: 1
-- name: REX SETNB
+- name: SETNB
   operands:
   - class: register
     name: gpr
@@ -958,7 +958,7 @@ instruction_forms:
   port_pressure: [[1, '06']]
   throughput: 0.5
   uops: 1
-- name: REX SETNZ
+- name: SETNZ
   operands:
   - class: register
     name: gpr
@@ -974,7 +974,7 @@ instruction_forms:
   port_pressure: [[1, '06']]
   throughput: 0.5
   uops: 1
-- name: REX SETNS
+- name: SETNS
   operands:
   - class: register
     name: gpr
@@ -990,7 +990,7 @@ instruction_forms:
   port_pressure: [[1, '06']]
   throughput: 0.5
   uops: 1
-- name: REX SETNP
+- name: SETNP
   operands:
   - class: register
     name: gpr
@@ -1028,7 +1028,7 @@ instruction_forms:
   port_pressure: [[1, '0156'], [1, '06']]
   throughput: 0.75
   uops: 2
-- name: REX SETNBE
+- name: SETNBE
   operands:
   - class: register
     name: gpr
@@ -1036,73 +1036,73 @@ instruction_forms:
   port_pressure: [[1, '0156'], [1, '06']]
   throughput: 0.75
   uops: 2
-- name: REPE INSW
+- name: INSW
   operands: []
   latency: ~
   port_pressure: [[4, '0'], [3, '015'], [3, '0156'], [18, '06'], [10, '1'], [1, '15'], [5, '5']]
   throughput: 14.75
   uops: 44
-- name: REPNE INSW
+- name: INSW
   operands: []
   latency: ~
   port_pressure: [[4, '0'], [3, '015'], [3, '0156'], [18, '06'], [10, '1'], [1, '15'], [5, '5']]
   throughput: 14.75
   uops: 44
-- name: REPE INSB
+- name: INSB
   operands: []
   latency: ~
   port_pressure: [[5, '0'], [2, '015'], [4, '0156'], [17, '06'], [10, '1'], [1, '15'], [5, '5']]
   throughput: 15.166666666666668
   uops: 44
-- name: REX64 REPE INSB
+- name: INSB
   operands: []
   latency: ~
   port_pressure: [[5, '0'], [2, '015'], [4, '0156'], [17, '06'], [10, '1'], [1, '15'], [5, '5']]
   throughput: 15.166666666666668
   uops: 44
-- name: REPNE INSB
+- name: INSB
   operands: []
   latency: ~
   port_pressure: [[5, '0'], [2, '015'], [4, '0156'], [17, '06'], [10, '1'], [1, '15'], [5, '5']]
   throughput: 15.166666666666668
   uops: 44
-- name: REX64 REPNE INSB
+- name: INSB
   operands: []
   latency: ~
   port_pressure: [[5, '0'], [2, '015'], [4, '0156'], [17, '06'], [10, '1'], [1, '15'], [5, '5']]
   throughput: 15.166666666666668
   uops: 44
-- name: REPE INSD
+- name: INSD
   operands: []
   latency: ~
   port_pressure: [[4, '0'], [3, '015'], [4, '0156'], [17, '06'], [10, '1'], [1, '15'], [5, '5']]
   throughput: 14.5
   uops: 44
-- name: REX64 REPE INSD
+- name: INSD
   operands: []
   latency: ~
   port_pressure: [[4, '0'], [3, '015'], [4, '0156'], [17, '06'], [10, '1'], [1, '15'], [5, '5']]
   throughput: 14.5
   uops: 44
-- name: REPNE INSD
+- name: INSD
   operands: []
   latency: ~
   port_pressure: [[4, '0'], [3, '015'], [4, '0156'], [17, '06'], [10, '1'], [1, '15'], [5, '5']]
   throughput: 14.5
   uops: 44
-- name: REX64 REPNE INSD
+- name: INSD
   operands: []
   latency: ~
   port_pressure: [[4, '0'], [3, '015'], [4, '0156'], [17, '06'], [10, '1'], [1, '15'], [5, '5']]
   throughput: 14.5
   uops: 44
-- name: REPE STOSD
+- name: STOSD
   operands: []
   latency: ~
   port_pressure: [[1, '0156'], [1, '237'], [1, '4']]
   throughput: 1.0
   uops: 65
-- name: REPNE STOSD
+- name: STOSD
   operands: []
   latency: ~
   port_pressure: [[1, '0156'], [1, '237'], [1, '4']]
@@ -1116,37 +1116,37 @@ instruction_forms:
   port_pressure: [[2, '0'], [3, '06'], [5, '1'], [3, '5']]
   throughput: 5.0
   uops: 13
-- name: REPE STOSB
+- name: STOSB
   operands: []
   latency: ~
   port_pressure: [[1, '0156'], [1, '237'], [1, '4']]
   throughput: 1.0
   uops: 76
-- name: REX64 REPE STOSB
+- name: STOSB
   operands: []
   latency: ~
   port_pressure: [[1, '0156'], [1, '237'], [1, '4']]
   throughput: 1.0
   uops: 76
-- name: REPNE STOSB
+- name: STOSB
   operands: []
   latency: ~
   port_pressure: [[1, '0156'], [1, '237'], [1, '4']]
   throughput: 1.0
   uops: 76
-- name: REX64 REPNE STOSB
+- name: STOSB
   operands: []
   latency: ~
   port_pressure: [[1, '0156'], [1, '237'], [1, '4']]
   throughput: 1.0
   uops: 76
-- name: REPE STOSW
+- name: STOSW
   operands: []
   latency: ~
   port_pressure: [[1, '0156'], [1, '237'], [1, '4']]
   throughput: 1.0
   uops: 65
-- name: REPNE STOSW
+- name: STOSW
   operands: []
   latency: ~
   port_pressure: [[1, '0156'], [1, '237'], [1, '4']]
@@ -1168,7 +1168,7 @@ instruction_forms:
   port_pressure: [[1, '0156']]
   throughput: 0.25
   uops: 1
-- name: REX TEST
+- name: TEST
   operands:
   - class: immediate
     imd: int
@@ -1188,7 +1188,7 @@ instruction_forms:
   port_pressure: [[1, '0156']]
   throughput: 0.25
   uops: 1
-- name: REX TEST
+- name: TEST
   operands:
   - class: register
     name: gpr
@@ -1319,25 +1319,25 @@ instruction_forms:
   port_pressure: [[3, '0156'], [1, '06'], [1, '1'], [1, '237'], [1, '4']]
   throughput: 1.75
   uops: 12
-- name: REPNE SCASB
+- name: SCASB
   operands: []
   latency: ~
   port_pressure: [[19, '0156'], [9, '06'], [1, '15'], [3, '23']]
   throughput: 9.25
   uops: 12
-- name: REX64 REPNE SCASB
+- name: SCASB
   operands: []
   latency: ~
   port_pressure: [[19, '0156'], [9, '06'], [1, '15'], [3, '23']]
   throughput: 9.25
   uops: 12
-- name: REPNE SCASD
+- name: SCASD
   operands: []
   latency: ~
   port_pressure: [[2, '0156'], [1, '23']]
   throughput: 0.5
   uops: 12
-- name: REPNE SCASW
+- name: SCASW
   operands: []
   latency: ~
   port_pressure: [[2, '0156'], [1, '23']]
@@ -1355,61 +1355,61 @@ instruction_forms:
   port_pressure: [[1, '0156'], [1, '23']]
   throughput: 0.5
   uops: 3
-- name: REPE OUTSW
+- name: OUTSW
   operands: []
   latency: ~
   port_pressure: [[4, '0'], [2, '015'], [5, '0156'], [16, '06'], [10, '1'], [6, '5']]
   throughput: 13.916666666666668
   uops: 43
-- name: REPNE OUTSW
+- name: OUTSW
   operands: []
   latency: ~
   port_pressure: [[4, '0'], [2, '015'], [5, '0156'], [16, '06'], [10, '1'], [6, '5']]
   throughput: 13.916666666666668
   uops: 43
-- name: REPE OUTSB
+- name: OUTSB
   operands: []
   latency: ~
   port_pressure: [[4, '0'], [2, '015'], [5, '0156'], [16, '06'], [10, '1'], [1, '15'], [5, '5']]
   throughput: 13.916666666666668
   uops: 43
-- name: REX64 REPE OUTSB
+- name: OUTSB
   operands: []
   latency: ~
   port_pressure: [[4, '0'], [2, '015'], [5, '0156'], [16, '06'], [10, '1'], [1, '15'], [5, '5']]
   throughput: 13.916666666666668
   uops: 43
-- name: REPNE OUTSB
+- name: OUTSB
   operands: []
   latency: ~
   port_pressure: [[4, '0'], [2, '015'], [5, '0156'], [16, '06'], [10, '1'], [1, '15'], [5, '5']]
   throughput: 13.916666666666668
   uops: 43
-- name: REX64 REPNE OUTSB
+- name: OUTSB
   operands: []
   latency: ~
   port_pressure: [[4, '0'], [2, '015'], [5, '0156'], [16, '06'], [10, '1'], [1, '15'], [5, '5']]
   throughput: 13.916666666666668
   uops: 43
-- name: REPE OUTSD
+- name: OUTSD
   operands: []
   latency: ~
   port_pressure: [[4, '0'], [2, '015'], [4, '0156'], [17, '06'], [10, '1'], [1, '15'], [5, '5']]
   throughput: 14.166666666666668
   uops: 43
-- name: REX64 REPE OUTSD
+- name: OUTSD
   operands: []
   latency: ~
   port_pressure: [[4, '0'], [2, '015'], [4, '0156'], [17, '06'], [10, '1'], [1, '15'], [5, '5']]
   throughput: 14.166666666666668
   uops: 43
-- name: REPNE OUTSD
+- name: OUTSD
   operands: []
   latency: ~
   port_pressure: [[4, '0'], [2, '015'], [4, '0156'], [17, '06'], [10, '1'], [1, '15'], [5, '5']]
   throughput: 14.166666666666668
   uops: 43
-- name: REX64 REPNE OUTSD
+- name: OUTSD
   operands: []
   latency: ~
   port_pressure: [[4, '0'], [2, '015'], [4, '0156'], [17, '06'], [10, '1'], [1, '15'], [5, '5']]
@@ -1449,7 +1449,7 @@ instruction_forms:
   port_pressure: [[1, '0156']]
   throughput: 0.25
   uops: 1
-- name: REX AND
+- name: AND
   operands:
   - class: immediate
     imd: int
@@ -1504,7 +1504,7 @@ instruction_forms:
   port_pressure: [[1, '1']]
   throughput: 1.0
   uops: 1
-- name: REX IMUL
+- name: IMUL
   operands:
   - class: register
     name: gpr
@@ -1532,7 +1532,7 @@ instruction_forms:
   port_pressure: [[2, '0156'], [1, '06']]
   throughput: 1.0
   uops: 3
-- name: REX RCR
+- name: RCR
   operands:
   - class: immediate
     imd: int
@@ -1552,7 +1552,7 @@ instruction_forms:
   port_pressure: [[2, '0156'], [1, '06']]
   throughput: 1.0
   uops: 3
-- name: REX RCL
+- name: RCL
   operands:
   - class: immediate
     imd: int
@@ -1643,12 +1643,22 @@ instruction_forms:
   port_pressure: [[3, '015'], [14, '06'], [1, '1'], [1, '23'], [2, '4'], [4, '5']]
   throughput: 8.0
   uops: 25
-- name: REPE CMPSD
+- name: CMPSD
   operands: []
   latency: ~
   port_pressure: [[3, '0156'], [2, '23']]
   throughput: 1.0
   uops: 12
+- name: OR
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: 1
+  port_pressure: [[1, '0156']]
+  throughput: 0.25
+  uops: 1
 - name: OR
   operands:
   - class: immediate
@@ -1659,29 +1669,19 @@ instruction_forms:
   port_pressure: [[1, '0156']]
   throughput: 0.25
   uops: 1
-- name: REX OR
-  operands:
-  - class: immediate
-    imd: int
-  - class: register
-    name: gpr
-  latency: 1
-  port_pressure: [[1, '0156']]
-  throughput: 0.25
-  uops: 1
-- name: REPE CMPSB
+- name: CMPSB
   operands: []
   latency: ~
   port_pressure: [[3, '0156'], [2, '23']]
   throughput: 1.0
   uops: 12
-- name: REX64 REPE CMPSB
+- name: CMPSB
   operands: []
   latency: ~
   port_pressure: [[3, '0156'], [2, '23']]
   throughput: 1.0
   uops: 12
-- name: REPE CMPSW
+- name: CMPSW
   operands: []
   latency: ~
   port_pressure: [[3, '0156'], [2, '23']]
@@ -1693,7 +1693,7 @@ instruction_forms:
   port_pressure: [[4, '06'], [2, '5']]
   throughput: 2.0
   uops: 7
-- name: REPNE CMPSW
+- name: CMPSW
   operands: []
   latency: ~
   port_pressure: [[3, '0156'], [2, '23']]
@@ -1709,7 +1709,7 @@ instruction_forms:
   port_pressure: [[2, '06']]
   throughput: 1.0
   uops: 2
-- name: REX ROL
+- name: ROL
   operands:
   - class: immediate
     imd: int
@@ -1752,7 +1752,7 @@ instruction_forms:
   port_pressure: [[2, '06']]
   throughput: 1.0
   uops: 2
-- name: REX ROR
+- name: ROR
   operands:
   - class: immediate
     imd: int
@@ -1770,7 +1770,7 @@ instruction_forms:
   port_pressure: [[1, '06']]
   throughput: 0.5
   uops: 1
-- name: REX SETLE
+- name: SETLE
   operands:
   - class: register
     name: gpr
@@ -1788,7 +1788,7 @@ instruction_forms:
   port_pressure: [[1, '0156']]
   throughput: 0.25
   uops: 1
-- name: REX SUB
+- name: SUB
   operands:
   - class: immediate
     imd: int
@@ -1806,7 +1806,7 @@ instruction_forms:
   port_pressure: [[1, '0156']]
   throughput: 0.25
   uops: 1
-- name: REX NEG
+- name: NEG
   operands:
   - class: register
     name: gpr
@@ -1822,7 +1822,7 @@ instruction_forms:
   port_pressure: [[1, '06']]
   throughput: 0.5
   uops: 1
-- name: REX SETNLE
+- name: SETNLE
   operands:
   - class: register
     name: gpr
@@ -1850,7 +1850,7 @@ instruction_forms:
   port_pressure: [[1, '0156']]
   throughput: 0.25
   uops: 1
-- name: REX ADD
+- name: ADD
   operands:
   - class: immediate
     imd: int
@@ -1884,7 +1884,7 @@ instruction_forms:
   port_pressure: [[1, '06']]
   throughput: 0.5
   uops: 1
-- name: REX SETZ
+- name: SETZ
   operands:
   - class: register
     name: gpr
@@ -1900,7 +1900,7 @@ instruction_forms:
   port_pressure: [[1, '0156']]
   throughput: 0.25
   uops: 1
-- name: REX DEC
+- name: DEC
   operands:
   - class: register
     name: gpr
@@ -1916,7 +1916,7 @@ instruction_forms:
   port_pressure: [[1, '0156'], [1, '06']]
   throughput: 0.75
   uops: 2
-- name: REX SETBE
+- name: SETBE
   operands:
   - class: register
     name: gpr
@@ -4444,7 +4444,7 @@ instruction_forms:
   port_pressure: [[1, '5']]
   throughput: 1.0
   uops: 1
-- name: REPE SCASQ
+- name: SCASQ
   operands: []
   latency: ~
   port_pressure: [[11, '0156'], [5, '06'], [1, '15'], [1, '23']]
@@ -4468,13 +4468,13 @@ instruction_forms:
   port_pressure: [[1, '0156']]
   throughput: 0.25
   uops: 1
-- name: REPE LODSQ
+- name: LODSQ
   operands: []
   latency: ~
   port_pressure: [[1, '0156'], [1, '23']]
   throughput: 0.5
   uops: 10
-- name: REPNE LODSQ
+- name: LODSQ
   operands: []
   latency: ~
   port_pressure: [[1, '0156'], [1, '23']]
@@ -4486,19 +4486,19 @@ instruction_forms:
   port_pressure: [[1, '0156']]
   throughput: 0.25
   uops: ~
-- name: REPNE CMPSQ
+- name: CMPSQ
   operands: []
   latency: ~
   port_pressure: [[3, '0156'], [2, '23']]
   throughput: 1.0
   uops: 12
-- name: REPE STOSQ
+- name: STOSQ
   operands: []
   latency: ~
   port_pressure: [[1, '0156'], [1, '237'], [1, '4']]
   throughput: 1.0
   uops: 65
-- name: REPNE STOSQ
+- name: STOSQ
   operands: []
   latency: ~
   port_pressure: [[1, '0156'], [1, '237'], [1, '4']]
@@ -4510,7 +4510,7 @@ instruction_forms:
   port_pressure: [[2, '0156'], [1, '23']]
   throughput: 0.5
   uops: 3
-- name: REPNE SCASQ
+- name: SCASQ
   operands: []
   latency: ~
   port_pressure: [[2, '0156'], [1, '23']]
@@ -4534,7 +4534,7 @@ instruction_forms:
   port_pressure: [[1, '06']]
   throughput: 0.5
   uops: 1
-- name: REPE CMPSQ
+- name: CMPSQ
   operands: []
   latency: ~
   port_pressure: [[3, '0156'], [2, '23']]
@@ -4754,7 +4754,7 @@ instruction_forms:
   port_pressure: [[1, '1']]
   throughput: 1.0
   uops: 1
-- name: REX CRC32
+- name: CRC32
   operands:
   - class: register
     name: gpr
@@ -4800,7 +4800,7 @@ instruction_forms:
   port_pressure: [[3, '0']]
   throughput: 3.0
   uops: 3
-- name: REX64 PCMPISTRI
+- name: PCMPISTRI
   operands:
   - class: immediate
     imd: int
