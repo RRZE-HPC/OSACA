@@ -6474,10 +6474,10 @@ instruction_forms:
     scale: "*"                                                # uops.info
   - class: register                                           # uops.info
     name: gpr                                                 # uops.info
-  latency: 6                                                  # uops.info
+  latency: 1                                                  # uops.info
   port_pressure: [[1, '0156']]                                # uops.info
   throughput: 0.5                                             # uops.info
-  uops: 3                                                     # uops.info
+  uops: 1                                                     # uops.info
 - name: [shl, shr, sal, sar]  # uops.info
   operands:                   # uops.info
   - class: immediate          # uops.info
