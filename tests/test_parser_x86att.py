@@ -82,22 +82,16 @@ class TestParserX86ATT(unittest.TestCase):
             self._get_directive(self.parser, "\t.align\t16,0x90").parameters[1], "0x90"
         )
         self.assertEqual(
-            self._get_directive(self.parser, "        .byte 100,103,144       #IACA START")[
-                "name"
-            ],
+            self._get_directive(self.parser, "        .byte 100,103,144       #IACA START").name,
             "byte",
         )
         self.assertEqual(
-            self._get_directive(self.parser, "        .byte 100,103,144       #IACA START")[
-                "parameters"
-            ][2],
+            self._get_directive(self.parser, "        .byte 100,103,144       #IACA START").parameters[2],
             "144",
         )
         self.assertEqual(
             " ".join(
-                self._get_directive(self.parser, "        .byte 100,103,144       #IACA START")[
-                    "comment"
-                ]
+                self._get_directive(self.parser, "        .byte 100,103,144       #IACA START").comment
             ),
             "IACA START",
         )
