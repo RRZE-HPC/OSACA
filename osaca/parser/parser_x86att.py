@@ -86,6 +86,43 @@ class InstructionForm:
     def comment(self, comment):
         self._COMMENT_ID =comment
 
+class DirectiveForm:
+    def __init__(self, NAME_ID = None, PARAMETER_ID = None, COMMENT_ID = None):
+        self._NAME_ID = NAME_ID
+        self._PARAMETER_ID = PARAMETER_ID
+        self._COMMENT_ID = COMMENT_ID
+    
+    @property
+    def name(self):
+        return self._NAME_ID
+    
+    @property
+    def parameters(self):
+        return self._PARAMETER_ID
+    
+    @property
+    def comment(self):
+        return self._COMMENT_ID
+
+    def __iter__(self):
+        return self
+    
+    def __next__(self):
+        if not self._COMMENT_ID:
+            raise StopIteration
+        return self._COMMENT_ID.pop(0)
+
+    @name.setter
+    def name(self, name):
+        self._NAME_ID = name
+    
+    @parameters.setter
+    def parameters(self, parameters):
+        self._PARAMETER_ID = parameters
+    
+    @comment.setter
+    def comment(self, comment):
+        self._COMMENT_ID = comment
 
 class ParserX86ATT(BaseParser):
     _instance = None
@@ -307,13 +344,13 @@ class ParserX86ATT(BaseParser):
                     self.directive.parseString(line, parseAll=True).asDict()
                 )
                 instruction_form.directive = {
-                        "name": result[self.DIRECTIVE_ID]["name"],
-                        "parameters": result[self.DIRECTIVE_ID]["parameters"],
+                        "name": result.directive.name,
+                        "parameters": result.directive.parameters,
                     }
                 
-                if self.COMMENT_ID in result[self.DIRECTIVE_ID]:
+                if self.COMMENT_ID in result.directive:
                     instruction_form.comment = " ".join(
-                        result[self.DIRECTIVE_ID][self.COMMENT_ID]
+                        result.directive.comment
                     )
             except pp.ParseException:
                 pass
@@ -379,12 +416,12 @@ class ParserX86ATT(BaseParser):
         return operand
 
     def process_directive(self, directive):
-        directive_new = {"name": directive["name"], "parameters": []}
+        directive_new = DirectiveForm(NAME_ID =  directive["name"], PARAMETER_ID = [])
         if "parameters" in directive:
-            directive_new["parameters"] = directive["parameters"]
+            directive_new.parameters = directive["parameters"]
         if "comment" in directive:
-            directive_new["comment"] = directive["comment"]
-        return AttrDict({self.DIRECTIVE_ID: directive_new})
+            directive_new.comment = directive["comment"]
+        return InstructionForm(DIRECTIVE_ID = directive_new)
 
     def process_memory_address(self, memory_address):
         """Post-process memory address operand"""
