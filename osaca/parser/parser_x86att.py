@@ -7,6 +7,85 @@ import pyparsing as pp
 
 from osaca.parser import AttrDict, BaseParser
 
+class InstructionForm:
+    # Identifiers for operand types
+    COMMENT_ID = "comment"
+    DIRECTIVE_ID = "directive"
+    IMMEDIATE_ID = "immediate"
+    LABEL_ID = "label"
+    IDENTIFIER_ID = "identifier"
+    MEMORY_ID = "memory"
+    REGISTER_ID = "register"
+    SEGMENT_EXT_ID = "segment_extension"
+    INSTRUCTION_ID = "instruction"
+    OPERANDS_ID = "operands"
+
+    def __init__(self, INSTRUCTION_ID = None, OPERANDS_ID = [], DIRECTIVE_ID = None
+    , COMMENT_ID = None, LABEL_ID = None, LINE = None, LINE_NUMBER = None):
+        self._INSTRUCTION_ID = INSTRUCTION_ID
+        self._OPERANDS_ID = OPERANDS_ID
+        self._DIRECTIVE_ID = DIRECTIVE_ID
+        self._COMMENT_ID = COMMENT_ID
+        self._LABEL_ID = LABEL_ID
+        self._LINE = LINE
+        self._LINE_NUMBER = LINE_NUMBER
+
+    @property
+    def instruction(self):
+        return self._INSTRUCTION_ID
+    
+    @property
+    def label(self):
+        return self._LABEL_ID
+
+    @property
+    def comment(self):
+        return self._COMMENT_ID
+
+    @property
+    def directive(self):
+        return self._DIRECTIVE_ID
+
+    @property
+    def line_number(self):
+        return self._LINE_NUMBER
+    
+    @property
+    def line(self):
+        return self._LINE
+    
+    @property
+    def operands(self):
+        return self._OPERANDS_ID
+
+    @directive.setter
+    def directive(self, directive):
+        self._DIRECTIVE_ID = directive
+
+    @line_number.setter
+    def line_number(self, line_number):
+        self._LINE_NUMBER = line_number
+    
+    @line.setter
+    def line(self, line):
+        self._LINE = line
+    
+    @operands.setter
+    def operands(self, operands):
+        self._OPERANDS_ID = operands
+
+    @instruction.setter
+    def instruction(self, instruction):
+        self._INSTRUCTION_ID = instruction
+    
+    @label.setter
+    def label(self, label):
+        self._LABEL_ID = label
+
+    @comment.setter
+    def comment(self, comment):
+        self._COMMENT_ID =comment
+
 
 class ParserX86ATT(BaseParser):
     _instance = None
@@ -199,24 +278,13 @@ class ParserX86ATT(BaseParser):
         :type line_number: int, optional
         :return: ``dict`` -- parsed asm line (comment, label, directive or instruction form)
         """
-        instruction_form = AttrDict(
-            {
-                self.INSTRUCTION_ID: None,
-                self.OPERANDS_ID: [],
-                self.DIRECTIVE_ID: None,
-                self.COMMENT_ID: None,
-                self.LABEL_ID: None,
-                "line": line,
-                "line_number": line_number,
-            }
-        )
+        instruction_form = InstructionForm(LINE = line, LINE_NUMBER = line_number)
         result = None
 
         # 1. Parse comment
         try:
             result = self.process_operand(self.comment.parseString(line, parseAll=True).asDict())
-            result = AttrDict.convert_dict(result)
-            instruction_form[self.COMMENT_ID] = " ".join(result[self.COMMENT_ID])
+            instruction_form.comment = " ".join(result[self.COMMENT_ID])
         except pp.ParseException:
             pass
 
@@ -224,10 +292,9 @@ class ParserX86ATT(BaseParser):
         if result is None:
             try:
                 result = self.process_operand(self.label.parseString(line, parseAll=True).asDict())
-                result = AttrDict.convert_dict(result)
-                instruction_form[self.LABEL_ID] = result[self.LABEL_ID]["name"]
+                instruction_form.label = result[self.LABEL_ID]["name"]
                 if self.COMMENT_ID in result[self.LABEL_ID]:
-                    instruction_form[self.COMMENT_ID] = " ".join(
+                    instruction_form.comment = " ".join(
                         result[self.LABEL_ID][self.COMMENT_ID]
                     )
             except pp.ParseException:
@@ -239,15 +306,13 @@ class ParserX86ATT(BaseParser):
                 result = self.process_operand(
                     self.directive.parseString(line, parseAll=True).asDict()
                 )
-                result = AttrDict.convert_dict(result)
-                instruction_form[self.DIRECTIVE_ID] = AttrDict(
-                    {
+                instruction_form.directive = {
                         "name": result[self.DIRECTIVE_ID]["name"],
                         "parameters": result[self.DIRECTIVE_ID]["parameters"],
                     }
-                )
+                
                 if self.COMMENT_ID in result[self.DIRECTIVE_ID]:
-                    instruction_form[self.COMMENT_ID] = " ".join(
+                    instruction_form.comment = " ".join(
                         result[self.DIRECTIVE_ID][self.COMMENT_ID]
                     )
             except pp.ParseException:
@@ -261,9 +326,9 @@ class ParserX86ATT(BaseParser):
                 raise ValueError(
                     "Could not parse instruction on line {}: {!r}".format(line_number, line)
                 )
-            instruction_form[self.INSTRUCTION_ID] = result[self.INSTRUCTION_ID]
-            instruction_form[self.OPERANDS_ID] = result[self.OPERANDS_ID]
-            instruction_form[self.COMMENT_ID] = result[self.COMMENT_ID]
+            instruction_form.instruction = result.instruction
+            instruction_form.operands = result.operands
+            instruction_form.comment = result.comment
 
         return instruction_form
 
@@ -290,15 +355,14 @@ class ParserX86ATT(BaseParser):
         # Check fourth operand
         if "operand4" in result:
             operands.append(self.process_operand(result["operand4"]))
-        return_dict = AttrDict(
-            {
-                self.INSTRUCTION_ID: result["mnemonic"].split(",")[0],
-                self.OPERANDS_ID: operands,
-                self.COMMENT_ID: " ".join(result[self.COMMENT_ID])
+        return_dict = InstructionForm(
+                INSTRUCTION_ID = result["mnemonic"].split(",")[0],
+                OPERANDS_ID = operands,
+                COMMENT_ID = " ".join(result[self.COMMENT_ID])
                 if self.COMMENT_ID in result
                 else None,
-            }
         )
+        
         return return_dict
 
     def process_operand(self, operand):
