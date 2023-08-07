@@ -21,7 +21,8 @@ class InstructionForm:
     OPERANDS_ID = "operands"
 
     def __init__(self, INSTRUCTION_ID = None, OPERANDS_ID = [], DIRECTIVE_ID = None
-    , COMMENT_ID = None, LABEL_ID = None, LINE = None, LINE_NUMBER = None):
+    , COMMENT_ID = None, LABEL_ID = None, LINE = None, LINE_NUMBER = None
+    , SEMANTIC_OPERANDS = None):
         self._INSTRUCTION_ID = INSTRUCTION_ID
         self._OPERANDS_ID = OPERANDS_ID
         self._DIRECTIVE_ID = DIRECTIVE_ID
@@ -29,6 +30,11 @@ class InstructionForm:
         self._LABEL_ID = LABEL_ID
         self._LINE = LINE
         self._LINE_NUMBER = LINE_NUMBER
+        self._SEMANTIC_OPERANDS = SEMANTIC_OPERANDS
+
+    @property
+    def semantic_operands(self):
+        return self._SEMANTIC_OPERANDS
 
     @property
     def instruction(self):
@@ -58,6 +64,10 @@ class InstructionForm:
     def operands(self):
         return self._OPERANDS_ID
 
+    @semantic_operands.setter
+    def semantic_operands(self, semantic_operands):
+        self._SEMANTIC_OPERANDS = semantic_operands
+
     @directive.setter
     def directive(self, directive):
         self._DIRECTIVE_ID = directive
@@ -85,6 +95,55 @@ class InstructionForm:
     @comment.setter
     def comment(self, comment):
         self._COMMENT_ID =comment
+
+class OperandForm:
+    def __init__(self, MEMORY_ID = None, IMMEDIATE_ID = None, DIRECTIVE_ID = None, LABEL_ID = None
+    , COMMENT_ID = None):
+        self._MEMORY_ID = MEMORY_ID
+        self._IMMEDIATE_ID = IMMEDIATE_ID
+        self._DIRECTIVE_ID = DIRECTIVE_ID
+        self._LABEL_ID = LABEL_ID
+        self._COMMENT_ID = COMMENT_ID
+
+    @property
+    def memory(self):
+        return self._MEMORY_ID
+    
+    @property
+    def immediate(self):
+        return self._IMMEDIATE_ID
+    
+    @property
+    def directive(self):
+        return self._DIRECTIVE_ID    
+
+    @property
+    def label(self):
+        return self._LABEL_ID
+    
+    @property
+    def comment(self):
+        return self._COMMENT_ID
+
+    @memory.setter
+    def memory(self, memory):
+        self._MEMORY_ID = memory
+    
+    @immediate.setter
+    def immediate(self, immediate):
+        self._IMMEDIATE_ID = immediate
+    
+    @directive.setter
+    def directive(self, directive):
+        self._DIRECTIVE_ID = directive    
+
+    @label.setter
+    def label(self, label):
+        self._LABEL_ID = label
+
+    @comment.setter
+    def comment(self, comment):
+        self._COMMENT_ID = comment
 
 class DirectiveForm:
     def __init__(self, NAME_ID = None, PARAMETER_ID = None, COMMENT_ID = None):
@@ -124,6 +183,85 @@ class DirectiveForm:
     def comment(self, comment):
         self._COMMENT_ID = comment
 
+class MemoryForm:
+    def __init__(self, OFFSET_ID = None, BASE_ID = None, INDEX_ID = None
+    , SCALE_ID = None, SEGMENT_EXT_ID = None):
+        self._OFFSET_ID = OFFSET_ID
+        self._BASE_ID = BASE_ID
+        self._INDEX_ID = INDEX_ID
+        self._SCALE_ID = SCALE_ID
+        self._SEGMENT_EXT_ID = SEGMENT_EXT_ID
+    
+    @property
+    def offset(self):
+        return self._OFFSET_ID
+    
+    @property
+    def base(self):
+        return self._BASE_ID
+    
+    @property
+    def index(self):
+        return self._INDEX_ID
+
+    @property
+    def scale(self):
+        return self._SCALE_ID
+    
+    @property
+    def segment_ext_id(self):
+        return self._SEGMENT_EXT_ID
+    
+    @segment_ext_id.setter
+    def segment_ext_id(self, segment):
+        self._SEGMENT_EXT_ID= segment  
+
+    @offset.setter
+    def offset(self, offset):
+        self._OFFSET_ID = offset
+
+    @base.setter
+    def base(self, base):
+        self._BASE_ID = base
+    
+    @index.setter
+    def index(self, index):
+        self._INDEX_ID = index
+
+    @scale.setter
+    def scale(self, scale):
+        self._SCALE_ID = scale
+
+class LabelForm:
+    def __init__(self, NAME_ID = None, COMMENT_ID = None):
+        self._NAME_ID = NAME_ID
+        self._COMMENT_ID = COMMENT_ID
+    
+    @property
+    def name(self):
+        return self._NAME_ID
+    
+    @name.setter
+    def name(self, name):
+        self._NAME_ID = name
+
+    @property
+    def comment(self):
+        return self._COMMENT_ID
+    
+    @comment.setter
+    def comment(self, comment):
+        self._COMMENT_ID = comment
+    
+    def __iter__(self):
+        return self
+    
+    def __next__(self):
+        if not self._COMMENT_ID:
+            raise StopIteration
+        return self._COMMENT_ID.pop(0)
+    
+ 
 class ParserX86ATT(BaseParser):
     _instance = None
 
@@ -329,10 +467,10 @@ class ParserX86ATT(BaseParser):
         if result is None:
             try:
                 result = self.process_operand(self.label.parseString(line, parseAll=True).asDict())
-                instruction_form.label = result[self.LABEL_ID]["name"]
-                if self.COMMENT_ID in result[self.LABEL_ID]:
+                instruction_form.label = result.label.name
+                if self.COMMENT_ID in result.label:
                     instruction_form.comment = " ".join(
-                        result[self.LABEL_ID][self.COMMENT_ID]
+                        result.label.comment
                     )
             except pp.ParseException:
                 pass
@@ -343,10 +481,10 @@ class ParserX86ATT(BaseParser):
                 result = self.process_operand(
                     self.directive.parseString(line, parseAll=True).asDict()
                 )
-                instruction_form.directive = {
-                        "name": result.directive.name,
-                        "parameters": result.directive.parameters,
-                    }
+                instruction_form.directive = DirectiveForm(
+                        NAME_ID = result.directive.name,
+                        PARAMETER_ID = result.directive.parameters,
+                    )
                 
                 if self.COMMENT_ID in result.directive:
                     instruction_form.comment = " ".join(
@@ -421,7 +559,7 @@ class ParserX86ATT(BaseParser):
             directive_new.parameters = directive["parameters"]
         if "comment" in directive:
             directive_new.comment = directive["comment"]
-        return InstructionForm(DIRECTIVE_ID = directive_new)
+        return OperandForm(DIRECTIVE_ID = directive_new)
 
     def process_memory_address(self, memory_address):
         """Post-process memory address operand"""
@@ -437,17 +575,18 @@ class ParserX86ATT(BaseParser):
                 offset = {"value": offset}
         elif offset is not None and "value" in offset:
             offset["value"] = int(offset["value"], 0)
-        new_dict = AttrDict({"offset": offset, "base": base, "index": index, "scale": scale})
+        new_dict = MemoryForm(OFFSET_ID = offset, BASE_ID = base, INDEX_ID = index, SCALE_ID = scale)
         # Add segmentation extension if existing
         if self.SEGMENT_EXT_ID in memory_address:
-            new_dict[self.SEGMENT_EXT_ID] = memory_address[self.SEGMENT_EXT_ID]
-        return AttrDict({self.MEMORY_ID: new_dict})
+            new_dict.segment_ext_id = memory_address[self.SEGMENT_EXT_ID]
+        return OperandForm(MEMORY_ID = new_dict)
 
     def process_label(self, label):
         """Post-process label asm line"""
         # remove duplicated 'name' level due to identifier
         label["name"] = label["name"][0]["name"]
-        return AttrDict({self.LABEL_ID: label})
+        new_label = LabelForm(NAME_ID = label["name"], COMMENT_ID = label["comment"] if "comment" in label else None)
+        return OperandForm(LABEL_ID = new_label)
 
     def process_immediate(self, immediate):
         """Post-process immediate operand"""
@@ -456,7 +595,7 @@ class ParserX86ATT(BaseParser):
             return immediate
         # otherwise just make sure the immediate is a decimal
         immediate["value"] = int(immediate["value"], 0)
-        return AttrDict({self.IMMEDIATE_ID: immediate})
+        return OperandForm(IMMEDIATE_ID = immediate)
 
     def get_full_reg_name(self, register):
         """Return one register name string including all attributes"""

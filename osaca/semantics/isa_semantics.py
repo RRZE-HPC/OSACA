@@ -6,6 +6,36 @@ from osaca.parser import AttrDict, ParserAArch64, ParserX86ATT
 
 from .hw_model import MachineModel
 
+class SemanticForm:
+    def __init__(self, SOURCE_ID = [], DESTINATION_ID = [], SRC_DST = []):
+        self._SOURCE_ID = SOURCE_ID
+        self._DESTINATION_ID = DESTINATION_ID
+        self._SRC_DST = SRC_DST
+
+    @property
+    def source(self):
+        return self._SOURCE_ID
+    
+    @source.setter
+    def source(self, source):
+        self._SOURCE_ID = source
+    
+    @property
+    def destination(self):
+        return self._DESTINATION_ID
+    
+    @destination.setter
+    def destination(self, destination):
+        self._DESTINATION_ID = destination
+    
+    @property
+    def src_dst(self):
+        return self._SRC_DST
+    
+    @src_dst.setter
+    def src_dst(self, src_dst):
+        self._SRC_DST = src_dst
+    
 
 class INSTR_FLAGS:
     """
@@ -45,32 +75,32 @@ class ISASemantics(object):
     def assign_src_dst(self, instruction_form):
         """Update instruction form dictionary with source, destination and flag information."""
         # if the instruction form doesn't have operands or is None, there's nothing to do
-        if instruction_form["operands"] is None or instruction_form["instruction"] is None:
-            instruction_form["semantic_operands"] = AttrDict(
-                {"source": [], "destination": [], "src_dst": []}
+        if instruction_form.operands is None or instruction_form.instruction is None:
+            instruction_form.semantic_operands = SemanticForm(
+                SOURCE_ID = [], DESTINATION_ID = [], SRC_DST = []
             )
             return
         # check if instruction form is in ISA yaml, otherwise apply standard operand assignment
         # (one dest, others source)
         isa_data = self._isa_model.get_instruction(
-            instruction_form["instruction"], instruction_form["operands"]
+            instruction_form.instruction, instruction_form.operands
         )
         if (
             isa_data is None
             and self._isa == "x86"
-            and instruction_form["instruction"][-1] in self.GAS_SUFFIXES
+            and instruction_form.instruction[-1] in self.GAS_SUFFIXES
         ):
             # Check for instruction without GAS suffix
             isa_data = self._isa_model.get_instruction(
-                instruction_form["instruction"][:-1], instruction_form["operands"]
+                instruction_form.instruction[:-1], instruction_form.operands
             )
-        if isa_data is None and self._isa == "aarch64" and "." in instruction_form["instruction"]:
+        if isa_data is None and self._isa == "aarch64" and "." in instruction_form.instruction:
             # Check for instruction without shape/cc suffix
-            suffix_start = instruction_form["instruction"].index(".")
+            suffix_start = instruction_form.instruction.index(".")
             isa_data = self._isa_model.get_instruction(
-                instruction_form["instruction"][:suffix_start], instruction_form["operands"]
+                instruction_form.instruction[:suffix_start], instruction_form.operands
             )
-        operands = instruction_form["operands"]
+        operands = instruction_form.operands
         op_dict = {}
         assign_default = False
         if isa_data:
@@ -81,28 +111,28 @@ class ISASemantics(object):
             assign_default = True
             # check for equivalent register-operands DB entry if LD/ST
             if any(["memory" in op for op in operands]):
-                operands_reg = self.substitute_mem_address(instruction_form["operands"])
+                operands_reg = self.substitute_mem_address(instruction_form.operands)
                 isa_data_reg = self._isa_model.get_instruction(
-                    instruction_form["instruction"], operands_reg
+                    instruction_form.instruction, operands_reg
                 )
                 if (
                     isa_data_reg is None
                     and self._isa == "x86"
-                    and instruction_form["instruction"][-1] in self.GAS_SUFFIXES
+                    and instruction_form.instruction[-1] in self.GAS_SUFFIXES
                 ):
                     # Check for instruction without GAS suffix
                     isa_data_reg = self._isa_model.get_instruction(
-                        instruction_form["instruction"][:-1], operands_reg
+                        instruction_form.instruction[:-1], operands_reg
                     )
                 if (
                     isa_data_reg is None
                     and self._isa == "aarch64"
-                    and "." in instruction_form["instruction"]
+                    and "." in instruction_form.instruction
                 ):
                     # Check for instruction without shape/cc suffix
-                    suffix_start = instruction_form["instruction"].index(".")
+                    suffix_start = instruction_form.instruction.index(".")
                     isa_data_reg = self._isa_model.get_instruction(
-                        instruction_form["instruction"][:suffix_start], operands_reg
+                        instruction_form.instruction[:suffix_start], operands_reg
                     )
                 if isa_data_reg:
                     assign_default = False
@@ -149,7 +179,7 @@ class ISASemantics(object):
                         )
                     )
         # store operand list in dict and reassign operand key/value pair
-        instruction_form["semantic_operands"] = AttrDict.convert_dict(op_dict)
+        instruction_form.semantic_operands = AttrDict.convert_dict(op_dict)
         # assign LD/ST flags
         instruction_form["flags"] = (
             instruction_form["flags"] if "flags" in instruction_form else []
@@ -177,22 +207,22 @@ class ISASemantics(object):
             if "register" in op
         ]
         isa_data = self._isa_model.get_instruction(
-            instruction_form["instruction"], instruction_form["operands"]
+            instruction_form.instruction, instruction_form.operands
         )
         if (
             isa_data is None
             and self._isa == "x86"
-            and instruction_form["instruction"][-1] in self.GAS_SUFFIXES
+            and instruction_form.instruction[-1] in self.GAS_SUFFIXES
         ):
             # Check for instruction without GAS suffix
             isa_data = self._isa_model.get_instruction(
-                instruction_form["instruction"][:-1], instruction_form["operands"]
+                instruction_form.instruction[:-1], instruction_form.operands
             )
-        if isa_data is None and self._isa == "aarch64" and "." in instruction_form["instruction"]:
+        if isa_data is None and self._isa == "aarch64" and "." in instruction_form.instruction:
             # Check for instruction without shape/cc suffix
-            suffix_start = instruction_form["instruction"].index(".")
+            suffix_start = instruction_form.instruction.index(".")
             isa_data = self._isa_model.get_instruction(
-                instruction_form["instruction"][:suffix_start], instruction_form["operands"]
+                instruction_form.instruction[:suffix_start], instruction_form.operands
             )
 
         if only_postindexed:
@@ -308,8 +338,8 @@ class ISASemantics(object):
     def _has_load(self, instruction_form):
         """Check if instruction form performs a LOAD"""
         for operand in chain(
-            instruction_form["semantic_operands"]["source"],
-            instruction_form["semantic_operands"]["src_dst"],
+            instruction_form.semantic_operands.source,
+            instruction_form.semantic_operands.src_dst,
         ):
             if "memory" in operand:
                 return True
@@ -318,8 +348,8 @@ class ISASemantics(object):
     def _has_store(self, instruction_form):
         """Check if instruction form perfroms a STORE"""
         for operand in chain(
-            instruction_form["semantic_operands"]["destination"],
-            instruction_form["semantic_operands"]["src_dst"],
+            instruction_form.semantic_operands.destination,
+            instruction_form.semantic_operands.src_dst,
         ):
             if "memory" in operand:
                 return True
@@ -328,27 +358,27 @@ class ISASemantics(object):
     def _get_regular_source_operands(self, instruction_form):
         """Get source operand of given instruction form assuming regular src/dst behavior."""
         # if there is only one operand, assume it is a source operand
-        if len(instruction_form["operands"]) == 1:
-            return [instruction_form["operands"][0]]
+        if len(instruction_form.operands) == 1:
+            return [instruction_form.operands[0]]
         if self._isa == "x86":
             # return all but last operand
-            return [op for op in instruction_form["operands"][0:-1]]
+            return [op for op in instruction_form.operands[0:-1]]
         elif self._isa == "aarch64":
-            return [op for op in instruction_form["operands"][1:]]
+            return [op for op in instruction_form.operands[1:]]
         else:
             raise ValueError("Unsupported ISA {}.".format(self._isa))
 
     def _get_regular_destination_operands(self, instruction_form):
         """Get destination operand of given instruction form assuming regular src/dst behavior."""
         # if there is only one operand, assume no destination
-        if len(instruction_form["operands"]) == 1:
+        if len(instruction_form.operands) == 1:
             return []
         if self._isa == "x86":
             # return last operand
-            return instruction_form["operands"][-1:]
+            return instruction_form.operands[-1:]
         if self._isa == "aarch64":
             # return first operand
-            return instruction_form["operands"][:1]
+            return instruction_form.operands[:1]
         else:
             raise ValueError("Unsupported ISA {}.".format(self._isa))
 

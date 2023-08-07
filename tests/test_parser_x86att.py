@@ -311,14 +311,10 @@ class TestParserX86ATT(unittest.TestCase):
         )
 
     def _get_label(self, parser, label):
-        return AttrDict.convert_dict(
-            parser.process_operand(parser.label.parseString(label, parseAll=True).asDict())
-        ).label
+        return parser.process_operand(parser.label.parseString(label, parseAll=True).asDict()).label
 
     def _get_directive(self, parser, directive):
-        return AttrDict.convert_dict(
-            parser.process_operand(parser.directive.parseString(directive, parseAll=True).asDict())
-        ).directive
+        return parser.process_operand(parser.directive.parseString(directive, parseAll=True).asDict()).directive
 
     @staticmethod
     def _find_file(name):
