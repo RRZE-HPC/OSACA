@@ -7,6 +7,8 @@ import re
 import sys
 from functools import lru_cache
 
+import ruamel.yaml
+
 from osaca.db_interface import import_benchmark_output, sanity_check
 from osaca.frontend import Frontend
 from osaca.parser import BaseParser, ParserAArch64, ParserX86ATT
@@ -189,6 +191,13 @@ def create_parser(parser=None):
         help="Write analysis to this file (default to stdout).",
     )
     parser.add_argument(
+        "--yaml-out",
+        default=None,
+        dest="yaml_out",
+        type=argparse.FileType("w"),
+        help="Write YAML analysis to this file",
+    )
+    parser.add_argument(
         "file",
         type=argparse.FileType("r"),
         help="Path to object (ASM or instruction file).",
@@ -360,6 +369,17 @@ def inspect(args, output_file=sys.stdout):
         ),
         file=output_file,
     )
+    if args.yaml_out is not None:
+        ruamel.yaml.dump(
+            frontend.full_analysis_dict(
+                kernel,
+                kernel_graph,
+                arch_warning=print_arch_warning,
+                length_warning=print_length_warning,
+                lcd_warning=kernel_graph.timed_out,
+            ),
+            args.yaml_out,
+        )
 
 
 def run(args, output_file=sys.stdout):
