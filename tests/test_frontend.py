@@ -8,7 +8,7 @@ import unittest
 
 from osaca.frontend import Frontend
 from osaca.parser import ParserAArch64, ParserX86ATT
-from osaca.semantics import ArchSemantics, KernelDG, MachineModel
+from osaca.semantics import ArchSemantics, KernelDG, MachineModel, reduce_to_section
 
 
 class TestFrontend(unittest.TestCase):
@@ -80,6 +80,74 @@ class TestFrontend(unittest.TestCase):
         fe = Frontend(path_to_yaml=os.path.join(self.MODULE_DATA_DIR, "tx2.yml"))
         fe.full_analysis(self.kernel_AArch64, dg, verbose=True)
         # TODO compare output with checked string
+
+    def test_dict_output_x86(self):
+        dg = KernelDG(self.kernel_x86, self.parser_x86, self.machine_model_csx, self.semantics_csx)
+        fe = Frontend(path_to_yaml=os.path.join(self.MODULE_DATA_DIR, "csx.yml"))
+        analysis_dict = fe.full_analysis_dict(self.kernel_x86, dg)
+        self.assertEqual(len(self.kernel_x86), len(analysis_dict["Kernel"]))
+        self.assertEqual("csx", analysis_dict["Header"]["Architecture"])
+        self.assertEqual(len(analysis_dict["Warnings"]), 0)
+        for i, line in enumerate(self.kernel_x86):
+            self.assertEqual(line["throughput"], analysis_dict["Kernel"][i]["Throughput"])
+            self.assertEqual(line["latency"], analysis_dict["Kernel"][i]["Latency"])
+            self.assertEqual(
+                line["latency_wo_load"], analysis_dict["Kernel"][i]["LatencyWithoutLoad"]
+            )
+            self.assertEqual(line["latency_cp"], analysis_dict["Kernel"][i]["LatencyCP"])
+            self.assertEqual(line["instruction"], analysis_dict["Kernel"][i]["Instruction"])
+            self.assertEqual(len(line["operands"]), len(analysis_dict["Kernel"][i]["Operands"]))
+            self.assertEqual(
+                len(line["semantic_operands"]["source"]),
+                len(analysis_dict["Kernel"][i]["SemanticOperands"]["source"]),
+            )
+            self.assertEqual(
+                len(line["semantic_operands"]["destination"]),
+                len(analysis_dict["Kernel"][i]["SemanticOperands"]["destination"]),
+            )
+            self.assertEqual(
+                len(line["semantic_operands"]["src_dst"]),
+                len(analysis_dict["Kernel"][i]["SemanticOperands"]["src_dst"]),
+            )
+            self.assertEqual(line["flags"], analysis_dict["Kernel"][i]["Flags"])
+            self.assertEqual(line["line_number"], analysis_dict["Kernel"][i]["LineNumber"])
+
+    def test_dict_output_AArch64(self):
+        reduced_kernel = reduce_to_section(self.kernel_AArch64, self.semantics_tx2._isa)
+        dg = KernelDG(
+            reduced_kernel,
+            self.parser_AArch64,
+            self.machine_model_tx2,
+            self.semantics_tx2,
+        )
+        fe = Frontend(path_to_yaml=os.path.join(self.MODULE_DATA_DIR, "tx2.yml"))
+        analysis_dict = fe.full_analysis_dict(reduced_kernel, dg)
+        self.assertEqual(len(reduced_kernel), len(analysis_dict["Kernel"]))
+        self.assertEqual("tx2", analysis_dict["Header"]["Architecture"])
+        self.assertEqual(len(analysis_dict["Warnings"]), 0)
+        for i, line in enumerate(reduced_kernel):
+            self.assertEqual(line["throughput"], analysis_dict["Kernel"][i]["Throughput"])
+            self.assertEqual(line["latency"], analysis_dict["Kernel"][i]["Latency"])
+            self.assertEqual(
+                line["latency_wo_load"], analysis_dict["Kernel"][i]["LatencyWithoutLoad"]
+            )
+            self.assertEqual(line["latency_cp"], analysis_dict["Kernel"][i]["LatencyCP"])
+            self.assertEqual(line["instruction"], analysis_dict["Kernel"][i]["Instruction"])
+            self.assertEqual(len(line["operands"]), len(analysis_dict["Kernel"][i]["Operands"]))
+            self.assertEqual(
+                len(line["semantic_operands"]["source"]),
+                len(analysis_dict["Kernel"][i]["SemanticOperands"]["source"]),
+            )
+            self.assertEqual(
+                len(line["semantic_operands"]["destination"]),
+                len(analysis_dict["Kernel"][i]["SemanticOperands"]["destination"]),
+            )
+            self.assertEqual(
+                len(line["semantic_operands"]["src_dst"]),
+                len(analysis_dict["Kernel"][i]["SemanticOperands"]["src_dst"]),
+            )
+            self.assertEqual(line["flags"], analysis_dict["Kernel"][i]["Flags"])
+            self.assertEqual(line["line_number"], analysis_dict["Kernel"][i]["LineNumber"])
 
     ##################
     # Helper functions
