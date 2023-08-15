@@ -195,7 +195,7 @@ def create_parser(parser=None):
         default=None,
         dest="yaml_out",
         type=argparse.FileType("w"),
-        help="Write YAML analysis to this file",
+        help="Write analysis as YAML representation to this file",
     )
     parser.add_argument(
         "file",
