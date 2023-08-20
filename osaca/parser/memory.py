@@ -3,10 +3,10 @@
 from osaca.parser.operand import Operand
 
 class MemoryOperand(Operand):
-    def __init__(self, OFFSET_ID = None, BASE_ID = None, INDEX_ID = None
-    , SCALE_ID = None, SEGMENT_EXT_ID = None, MASK = None, PRE_INDEXED = False
-    , POST_INDEXED = False, IMMEDIATE_ID = None):
-        super().__init__()
+    def __init__(self, NAME_ID, OFFSET_ID = None, BASE_ID = None, INDEX_ID = None
+    , SCALE_ID = 1, SEGMENT_EXT_ID = None, MASK = None, PRE_INDEXED = False
+    , POST_INDEXED = False, INDEXED_VAL = None):
+        super().__init__(NAME_ID)
         self._OFFSET_ID = OFFSET_ID
         self._BASE_ID = BASE_ID
         self._INDEX_ID = INDEX_ID
@@ -15,7 +15,7 @@ class MemoryOperand(Operand):
         self._MASK = MASK 
         self._PRE_INDEXED = PRE_INDEXED
         self._POST_INDEXED = POST_INDEXED
-        self._IMMEDIATE_ID = IMMEDIATE_ID  
+        self._INDEXED_VAL = INDEXED_VAL
 
     @property
     def offset(self):
@@ -53,6 +53,10 @@ class MemoryOperand(Operand):
     def post_indexed(self):
         return self._POST_INDEXED
     
+    @property
+    def indexed_val(self):
+        return self._INDEXED_VAL
+    
     @segment_ext_id.setter
     def segment_ext_id(self, segment):
         self._SEGMENT_EXT_ID= segment  
@@ -84,3 +88,25 @@ class MemoryOperand(Operand):
     @post_indexed.setter
     def post_indexed(self, post_indexed):
         self._POST_INDEXED = post_indexed
+
+    @indexed_val.setter
+    def indexed_val(self, value):
+        self._INDEXED_VAL = value
+
+    def __str__(self):
+        return (
+            f"MemoryOperand(NAME_ID={self._NAME_ID}, OFFSET_ID={self._OFFSET_ID}, "
+            f"BASE_ID={self._BASE_ID}, INDEX_ID={self._INDEX_ID}, SCALE_ID={self._SCALE_ID}, "
+            f"SEGMENT_EXT_ID={self._SEGMENT_EXT_ID}, MASK={self._MASK}, "
+            f"PRE_INDEXED={self._PRE_INDEXED}, POST_INDEXED={self._POST_INDEXED}, "
+            f"INDEXED_VAL={self._INDEXED_VAL})"
+        )
+
+    def __repr__(self):
+        return (
+            f"MemoryOperand(NAME_ID={self._NAME_ID}, OFFSET_ID={self._OFFSET_ID}, "
+            f"BASE_ID={self._BASE_ID}, INDEX_ID={self._INDEX_ID}, SCALE_ID={self._SCALE_ID}, "
+            f"SEGMENT_EXT_ID={self._SEGMENT_EXT_ID}, MASK={self._MASK}, "
+            f"PRE_INDEXED={self._PRE_INDEXED}, POST_INDEXED={self._POST_INDEXED}, "
+            f"INDEXED_VAL={self._INDEXED_VAL})"
+        )

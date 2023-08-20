@@ -458,10 +458,10 @@ class TestParserAArch64(unittest.TestCase):
         )
 
     def _get_label(self, parser, label):
-        return parser.process_operand(parser.label.parseString(label, parseAll=True).asDict()).label
+        return parser.process_operand(parser.label.parseString(label, parseAll=True).asDict())
 
     def _get_directive(self, parser, directive):
-        return parser.process_operand(parser.directive.parseString(directive, parseAll=True).asDict()).directive
+        return parser.process_operand(parser.directive.parseString(directive, parseAll=True).asDict())
 
     def _get_condition(self, parser, condition):
         return parser.process_operand(parser.condition.parseString(condition, parseAll=True).asDict()).condition

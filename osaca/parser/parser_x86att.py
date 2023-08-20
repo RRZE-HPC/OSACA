@@ -217,10 +217,10 @@ class ParserX86ATT(BaseParser):
         if result is None:
             try:
                 result = self.process_operand(self.label.parseString(line, parseAll=True).asDict())
-                instruction_form.label = result.label.name
-                if self.COMMENT_ID in result.label:
+                instruction_form.label = result.name
+                if self.COMMENT_ID in result:
                     instruction_form.comment = " ".join(
-                        result.label.comment
+                        result.comment
                     )
             except pp.ParseException:
                 pass
@@ -232,13 +232,13 @@ class ParserX86ATT(BaseParser):
                     self.directive.parseString(line, parseAll=True).asDict()
                 )
                 instruction_form.directive = DirectiveOperand(
-                        NAME_ID = result.directive.name,
-                        PARAMETER_ID = result.directive.parameters,
+                        NAME_ID = result.name,
+                        PARAMETER_ID = result.parameters,
                     )
                 
-                if self.COMMENT_ID in result.directive:
+                if self.COMMENT_ID in result:
                     instruction_form.comment = " ".join(
-                        result.directive.comment
+                        result.comment
                     )
             except pp.ParseException:
                 pass
@@ -309,7 +309,7 @@ class ParserX86ATT(BaseParser):
             directive_new.parameters = directive["parameters"]
         if "comment" in directive:
             directive_new.comment = directive["comment"]
-        return Operand(DIRECTIVE_ID = directive_new)
+        return directive_new
 
     def process_memory_address(self, memory_address):
         """Post-process memory address operand"""
@@ -325,18 +325,18 @@ class ParserX86ATT(BaseParser):
                 offset = {"value": offset}
         elif offset is not None and "value" in offset:
             offset["value"] = int(offset["value"], 0)
-        new_dict = MemoryOperand(OFFSET_ID = offset, BASE_ID = base, INDEX_ID = index, SCALE_ID = scale)
+        new_dict = MemoryOperand(memory_address.get("name", None),OFFSET_ID = offset, BASE_ID = base, INDEX_ID = index, SCALE_ID = scale)
         # Add segmentation extension if existing
         if self.SEGMENT_EXT_ID in memory_address:
             new_dict.segment_ext_id = memory_address[self.SEGMENT_EXT_ID]
-        return Operand(MEMORY_ID = new_dict)
+        return new_dict
 
     def process_label(self, label):
         """Post-process label asm line"""
         # remove duplicated 'name' level due to identifier
         label["name"] = label["name"][0]["name"]
         new_label = LabelOperand(NAME_ID = label["name"], COMMENT_ID = label["comment"] if "comment" in label else None)
-        return Operand(LABEL_ID = new_label)
+        return new_label
 
     def process_immediate(self, immediate):
         """Post-process immediate operand"""
@@ -345,7 +345,7 @@ class ParserX86ATT(BaseParser):
             return immediate
         # otherwise just make sure the immediate is a decimal
         immediate["value"] = int(immediate["value"], 0)
-        return Operand(IMMEDIATE_ID = immediate)
+        return immediate
 
     def get_full_reg_name(self, register):
         """Return one register name string including all attributes"""

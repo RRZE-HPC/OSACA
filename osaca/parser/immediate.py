@@ -5,7 +5,7 @@ from osaca.parser.operand import Operand
 class ImmediateOperand(Operand):
     def __init__(self, IDENTIFIER_ID = None, TYPE_ID = None, VALUE_ID = None, SHIFT_ID = None
     , ):
-        super().__init__()
+        super().__init__(str(VALUE_ID))
         self._IDENTIFIER_ID = IDENTIFIER_ID
         self._TYPE_ID = TYPE_ID
         self._VALUE_ID = VALUE_ID
@@ -43,3 +43,14 @@ class ImmediateOperand(Operand):
     def index(self, shift):
         self._SHIFT_ID = shift
 
+    def __str__(self):
+        return (
+            f"ImmediateOperand(IDENTIFIER_ID={self._IDENTIFIER_ID}, TYPE_ID={self._TYPE_ID}, "
+            f"VALUE_ID={self._VALUE_ID}, SHIFT_ID={self._SHIFT_ID})"
+        )
+
+    def __repr__(self):
+        return (
+            f"ImmediateOperand(IDENTIFIER_ID={self._IDENTIFIER_ID}, TYPE_ID={self._TYPE_ID}, "
+            f"VALUE_ID={self._VALUE_ID}, SHIFT_ID={self._SHIFT_ID})"
+        )

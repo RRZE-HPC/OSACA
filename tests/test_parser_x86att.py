@@ -123,33 +123,33 @@ class TestParserX86ATT(unittest.TestCase):
         self.assertIsNone(parsed_2.comment)
 
         self.assertEqual(parsed_3.instruction, "movl")
-        self.assertEqual(parsed_3.operands[0].immediate.value, 222)
+        self.assertEqual(parsed_3.operands[0].value, 222)
         self.assertEqual(parsed_3.operands[1].register.name, "ebx")
         self.assertEqual(parsed_3.comment, "IACA END")
 
         self.assertEqual(parsed_4.instruction, "vmovss")
-        self.assertEqual(parsed_4.operands[1].memory.offset.value, -4)
-        self.assertEqual(parsed_4.operands[1].memory.base.name, "rsp")
-        self.assertEqual(parsed_4.operands[1].memory.index.name, "rax")
-        self.assertEqual(parsed_4.operands[1].memory.scale, 8)
+        self.assertEqual(parsed_4.operands[1].offset.value, -4)
+        self.assertEqual(parsed_4.operands[1].base.name, "rsp")
+        self.assertEqual(parsed_4.operands[1].index.name, "rax")
+        self.assertEqual(parsed_4.operands[1].scale, 8)
         self.assertEqual(parsed_4.operands[0].register.name, "xmm4")
         self.assertEqual(parsed_4.comment, "12.9")
 
         self.assertEqual(parsed_5.instruction, "mov")
-        self.assertEqual(parsed_5.operands[1].memory.offset.identifier.name, "var")
-        self.assertIsNone(parsed_5.operands[1].memory.base)
-        self.assertIsNone(parsed_5.operands[1].memory.index)
-        self.assertEqual(parsed_5.operands[1].memory.scale, 1)
+        self.assertEqual(parsed_5.operands[1].offset.identifier.name, "var")
+        self.assertIsNone(parsed_5.operands[1].base)
+        self.assertIsNone(parsed_5.operands[1].index)
+        self.assertEqual(parsed_5.operands[1].scale, 1)
         self.assertEqual(parsed_5.operands[0].register.name, "ebx")
 
         self.assertEqual(parsed_6.instruction, "lea")
-        self.assertIsNone(parsed_6.operands[0].memory.offset)
-        self.assertIsNone(parsed_6.operands[0].memory.base)
-        self.assertEqual(parsed_6.operands[0].memory.index.name, "rax")
-        self.assertEqual(parsed_6.operands[0].memory.scale, 8)
+        self.assertIsNone(parsed_6.operands[0].offset)
+        self.assertIsNone(parsed_6.operands[0].base)
+        self.assertEqual(parsed_6.operands[0].index.name, "rax")
+        self.assertEqual(parsed_6.operands[0].scale, 8)
         self.assertEqual(parsed_6.operands[1].register.name, "rbx")
 
-        self.assertEqual(parsed_7.operands[0].immediate.value, 0x1)
+        self.assertEqual(parsed_7.operands[0].value, 0x1)
         self.assertEqual(parsed_7.operands[1].register.name, "xmm0")
         self.assertEqual(parsed_7.operands[2].register.name, "ymm1")
         self.assertEqual(parsed_7.operands[3].register.name, "ymm1")
@@ -310,10 +310,10 @@ class TestParserX86ATT(unittest.TestCase):
         )
 
     def _get_label(self, parser, label):
-        return parser.process_operand(parser.label.parseString(label, parseAll=True).asDict()).label
+        return parser.process_operand(parser.label.parseString(label, parseAll=True).asDict())
 
     def _get_directive(self, parser, directive):
-        return parser.process_operand(parser.directive.parseString(directive, parseAll=True).asDict()).directive
+        return parser.process_operand(parser.directive.parseString(directive, parseAll=True).asDict())
 
     @staticmethod
     def _find_file(name):
