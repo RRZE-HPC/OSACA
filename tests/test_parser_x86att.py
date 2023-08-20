@@ -8,8 +8,7 @@ import unittest
 
 from pyparsing import ParseException
 
-from osaca.parser import AttrDict, ParserX86ATT
-from osaca.parser.parser_x86att import InstructionForm
+from osaca.parser import AttrDict, ParserX86ATT, InstructionForm
 
 class TestParserX86ATT(unittest.TestCase):
     @classmethod
