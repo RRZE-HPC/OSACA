@@ -8,7 +8,7 @@ import unittest
 
 from pyparsing import ParseException
 
-from osaca.parser import AttrDict, ParserX86ATT, InstructionForm
+from osaca.parser import ParserX86ATT, InstructionForm
 
 class TestParserX86ATT(unittest.TestCase):
     @classmethod
@@ -304,10 +304,8 @@ class TestParserX86ATT(unittest.TestCase):
     ##################
     def _get_comment(self, parser, comment):
         return " ".join(
-            AttrDict.convert_dict(
-                parser.process_operand(parser.comment.parseString(comment, parseAll=True).asDict())
-            ).comment
-        )
+            parser.process_operand(parser.comment.parseString(comment, parseAll=True).asDict())['comment']
+            )
 
     def _get_label(self, parser, label):
         return parser.process_operand(parser.label.parseString(label, parseAll=True).asDict())

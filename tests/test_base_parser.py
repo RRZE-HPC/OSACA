@@ -44,8 +44,8 @@ class TestBaseParser(unittest.TestCase):
             self.parser.parse_instruction(instr1)
 
     def test_register_funcs(self):
-        reg_a1 = AttrDict({"name": "rax"})
-        reg_a2 = AttrDict({"name": "eax"})
+        reg_a1 = {"name": "rax"}
+        reg_a2 = {"name": "eax"}
         register_string = "v1.2d"
         with self.assertRaises(NotImplementedError):
             self.parser.is_reg_dependend_of(reg_a1, reg_a2)

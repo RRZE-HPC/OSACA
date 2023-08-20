@@ -8,6 +8,8 @@ from osaca.parser.operand import Operand
 from osaca.parser.directive import DirectiveOperand
 from osaca.parser.memory import MemoryOperand
 from osaca.parser.label import LabelOperand
+from osaca.parser.register import RegisterOperand
+from osaca.parser.identifier import IdentifierOperand
 from osaca.parser.immediate import ImmediateOperand
 
 class ParserAArch64(BaseParser):
@@ -288,11 +290,10 @@ class ParserAArch64(BaseParser):
         if result is None:
             try:
                 result = self.process_operand(self.label.parseString(line, parseAll=True).asDict())
-                result = AttrDict.convert_dict(result)
-                instruction_form.label = result[self.LABEL_ID].name
-                if self.COMMENT_ID in result[self.LABEL_ID]:
+                instruction_form.label = result.name
+                if result.comment != None:
                     instruction_form.comment= " ".join(
-                        result[self.LABEL_ID][self.COMMENT_ID]
+                        result.comment
                     )
             except pp.ParseException:
                 pass
@@ -325,9 +326,9 @@ class ParserAArch64(BaseParser):
                 raise ValueError(
                     "Unable to parse {!r} on line {}".format(line, line_number)
                 ) from e
-            instruction_form.instruction = result[self.INSTRUCTION_ID]
-            instruction_form.operands = result[self.OPERANDS_ID]
-            instruction_form.comment = result[self.COMMENT_ID]
+            instruction_form.instruction = result.instruction
+            instruction_form.operands = result.operands
+            instruction_form.comment = result.comment
 
         return instruction_form
 
@@ -339,7 +340,6 @@ class ParserAArch64(BaseParser):
         :returns: `dict` -- parsed instruction form
         """
         result = self.instruction_parser.parseString(instruction, parseAll=True).asDict()
-        result = AttrDict.convert_dict(result)
         operands = []
         # Add operands to list
         # Check first operand
@@ -362,15 +362,12 @@ class ParserAArch64(BaseParser):
         if "operand5" in result:
             operand = self.process_operand(result["operand5"])
             operands.extend(operand) if isinstance(operand, list) else operands.append(operand)
-
-        return_dict = AttrDict(
-            {
-                self.INSTRUCTION_ID: result.mnemonic,
-                self.OPERANDS_ID: operands,
-                self.COMMENT_ID: " ".join(result[self.COMMENT_ID])
+        return_dict = InstructionForm(
+                INSTRUCTION_ID = result['mnemonic'],
+                OPERANDS_ID = operands,
+                COMMENT_ID = " ".join(result[self.COMMENT_ID])
                 if self.COMMENT_ID in result
                 else None,
-            }
         )
         return return_dict
 
@@ -416,30 +413,31 @@ class ParserAArch64(BaseParser):
             if "shift" in memory_address["index"]:
                 if memory_address["index"]["shift_op"].lower() in valid_shift_ops:
                     scale = 2 ** int(memory_address["index"]["shift"][0]["value"])
-        new_dict = AttrDict({"offset": offset, "base": base, "index": index, "scale": scale})
+        new_dict = MemoryOperand(OFFSET_ID = offset, BASE_ID = base, INDEX_ID = index, SCALE_ID = scale)
         if "pre_indexed" in memory_address:
-            new_dict["pre_indexed"] = True
+            new_dict.pre_indexed = True
         if "post_indexed" in memory_address:
             if "value" in memory_address["post_indexed"]:
-                new_dict["post_indexed"] = {
+                new_dict.post_indexed = {
                     "value": int(memory_address["post_indexed"]["value"], 0)
                 }
             else:
-                new_dict["post_indexed"] = memory_address["post_indexed"]
-        return AttrDict({self.MEMORY_ID: new_dict})
+                new_dict.post_indexed = memory_address["post_indexed"]
+        return new_dict
 
     def process_sp_register(self, register):
         """Post-process stack pointer register"""
         reg = register
-        reg["prefix"] = "x"
-        return AttrDict({self.REGISTER_ID: reg})
+        new_reg = RegisterOperand(PREFIX_ID = "x")
+        #reg["prefix"] = "x"
+        return new_reg
 
     def resolve_range_list(self, operand):
         """
         Resolve range or list register operand to list of registers.
         Returns None if neither list nor range
         """
-        if "register" in operand:
+        if "register" in operand.name:
             if "list" in operand.register:
                 index = operand.register.get("index")
                 range_list = []
@@ -447,7 +445,7 @@ class ParserAArch64(BaseParser):
                     reg = deepcopy(reg)
                     if index is not None:
                         reg["index"] = int(index, 0)
-                    range_list.append(AttrDict({self.REGISTER_ID: reg}))
+                    range_list.append(reg)
                 return range_list
             elif "range" in operand.register:
                 base_register = operand.register.range[0]
@@ -460,7 +458,7 @@ class ParserAArch64(BaseParser):
                     if index is not None:
                         reg["index"] = int(index, 0)
                     reg["name"] = str(name)
-                    range_list.append(AttrDict({self.REGISTER_ID: reg}))
+                    range_list.append(reg)
                 return range_list
         # neither register list nor range, return unmodified
         return operand
@@ -513,19 +511,14 @@ class ParserAArch64(BaseParser):
             return AttrDict({self.IMMEDIATE_ID: immediate})
         else:
             # change 'mantissa' key to 'value'
-            return AttrDict(
-                {
-                    self.IMMEDIATE_ID: AttrDict(
-                        {"value": immediate[dict_name]["mantissa"], "type": dict_name}
-                    )
-                }
-            )
+            return ImmediateOperand(VALUE_ID = immediate[dict_name]["mantissa"], TYPE_ID = dict_name)
 
     def process_label(self, label):
         """Post-process label asm line"""
         # remove duplicated 'name' level due to identifier
-        label["name"] = label["name"]["name"]
-        return AttrDict({self.LABEL_ID: label})
+        #label["name"] = label["name"]["name"]
+        new_label = LabelOperand(NAME_ID = label["name"]["name"])
+        return new_label
 
     def process_identifier(self, identifier):
         """Post-process identifier operand"""

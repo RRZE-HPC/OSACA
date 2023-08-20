@@ -3,6 +3,7 @@ from itertools import chain
 
 from osaca import utils
 from osaca.parser import AttrDict, ParserAArch64, ParserX86ATT
+from osaca.parser.memory import MemoryOperand
 
 from .hw_model import MachineModel
 
@@ -110,7 +111,8 @@ class ISASemantics(object):
             # Couldn't found instruction form in ISA DB
             assign_default = True
             # check for equivalent register-operands DB entry if LD/ST
-            if any(["memory" in op for op in operands]):
+            
+            if isinstance(operands, MemoryOperand) and operands.name == "memory":
                 operands_reg = self.substitute_mem_address(instruction_form.operands)
                 isa_data_reg = self._isa_model.get_instruction(
                     instruction_form.instruction, operands_reg
@@ -181,13 +183,13 @@ class ISASemantics(object):
         # store operand list in dict and reassign operand key/value pair
         instruction_form.semantic_operands = AttrDict.convert_dict(op_dict)
         # assign LD/ST flags
-        instruction_form["flags"] = (
-            instruction_form["flags"] if "flags" in instruction_form else []
+        instruction_form.flags = (
+            instruction_form.flags if instruction_form.flags != [] else []
         )
         if self._has_load(instruction_form):
-            instruction_form["flags"] += [INSTR_FLAGS.HAS_LD]
+            instruction_form.flags += [INSTR_FLAGS.HAS_LD]
         if self._has_store(instruction_form):
-            instruction_form["flags"] += [INSTR_FLAGS.HAS_ST]
+            instruction_form.flags += [INSTR_FLAGS.HAS_ST]
 
     def get_reg_changes(self, instruction_form, only_postindexed=False):
         """
@@ -341,7 +343,7 @@ class ISASemantics(object):
             instruction_form.semantic_operands.source,
             instruction_form.semantic_operands.src_dst,
         ):
-            if "memory" in operand:
+            if operand.name == "memory":
                 return True
         return False
 
