@@ -218,7 +218,8 @@ class ParserX86ATT(BaseParser):
             try:
                 result = self.process_operand(self.label.parseString(line, parseAll=True).asDict())
                 instruction_form.label = result.name
-                if self.COMMENT_ID in result:
+                if result.comment != None:
+                    #print(result)
                     instruction_form.comment = " ".join(
                         result.comment
                     )
@@ -236,7 +237,7 @@ class ParserX86ATT(BaseParser):
                         PARAMETER_ID = result.parameters,
                     )
                 
-                if self.COMMENT_ID in result:
+                if result.comment != None:
                     instruction_form.comment = " ".join(
                         result.comment
                     )
@@ -325,7 +326,7 @@ class ParserX86ATT(BaseParser):
                 offset = {"value": offset}
         elif offset is not None and "value" in offset:
             offset["value"] = int(offset["value"], 0)
-        new_dict = MemoryOperand(memory_address.get("name", None),OFFSET_ID = offset, BASE_ID = base, INDEX_ID = index, SCALE_ID = scale)
+        new_dict = MemoryOperand(OFFSET_ID = offset, BASE_ID = base, INDEX_ID = index, SCALE_ID = scale)
         # Add segmentation extension if existing
         if self.SEGMENT_EXT_ID in memory_address:
             new_dict.segment_ext_id = memory_address[self.SEGMENT_EXT_ID]

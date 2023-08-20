@@ -3,7 +3,12 @@ from copy import deepcopy
 import pyparsing as pp
 
 from osaca.parser import AttrDict, BaseParser
-
+from osaca.parser.instruction_form import InstructionForm
+from osaca.parser.operand import Operand
+from osaca.parser.directive import DirectiveOperand
+from osaca.parser.memory import MemoryOperand
+from osaca.parser.label import LabelOperand
+from osaca.parser.immediate import ImmediateOperand
 
 class ParserAArch64(BaseParser):
     _instance = None
@@ -252,16 +257,14 @@ class ParserAArch64(BaseParser):
         :type line_number: int, optional
         :return: `dict` -- parsed asm line (comment, label, directive or instruction form)
         """
-        instruction_form = AttrDict(
-            {
-                self.INSTRUCTION_ID: None,
-                self.OPERANDS_ID: [],
-                self.DIRECTIVE_ID: None,
-                self.COMMENT_ID: None,
-                self.LABEL_ID: None,
-                "line": line,
-                "line_number": line_number,
-            }
+        instruction_form = InstructionForm(
+                INSTRUCTION_ID = None,
+                OPERANDS_ID = [],
+                DIRECTIVE_ID = None,
+                COMMENT_ID = None,
+                LABEL_ID = None,
+                LINE = line,
+                LINE_NUMBER = line_number,
         )
         result = None
 
@@ -269,7 +272,7 @@ class ParserAArch64(BaseParser):
         try:
             result = self.process_operand(self.comment.parseString(line, parseAll=True).asDict())
             result = AttrDict.convert_dict(result)
-            instruction_form[self.COMMENT_ID] = " ".join(result[self.COMMENT_ID])
+            instruction_form.comment = " ".join(result[self.COMMENT_ID])
         except pp.ParseException:
             pass
         # 1.2 check for llvm-mca marker
@@ -278,7 +281,7 @@ class ParserAArch64(BaseParser):
                 self.llvm_markers.parseString(line, parseAll=True).asDict()
             )
             result = AttrDict.convert_dict(result)
-            instruction_form[self.COMMENT_ID] = " ".join(result[self.COMMENT_ID])
+            instruction_form.comment = " ".join(result[self.COMMENT_ID])
         except pp.ParseException:
             pass
         # 2. Parse label
@@ -286,9 +289,9 @@ class ParserAArch64(BaseParser):
             try:
                 result = self.process_operand(self.label.parseString(line, parseAll=True).asDict())
                 result = AttrDict.convert_dict(result)
-                instruction_form[self.LABEL_ID] = result[self.LABEL_ID].name
+                instruction_form.label = result[self.LABEL_ID].name
                 if self.COMMENT_ID in result[self.LABEL_ID]:
-                    instruction_form[self.COMMENT_ID] = " ".join(
+                    instruction_form.comment= " ".join(
                         result[self.LABEL_ID][self.COMMENT_ID]
                     )
             except pp.ParseException:
@@ -301,14 +304,14 @@ class ParserAArch64(BaseParser):
                     self.directive.parseString(line, parseAll=True).asDict()
                 )
                 result = AttrDict.convert_dict(result)
-                instruction_form[self.DIRECTIVE_ID] = AttrDict(
+                instruction_form.directive = AttrDict(
                     {
                         "name": result[self.DIRECTIVE_ID].name,
                         "parameters": result[self.DIRECTIVE_ID].parameters,
                     }
                 )
                 if self.COMMENT_ID in result[self.DIRECTIVE_ID]:
-                    instruction_form[self.COMMENT_ID] = " ".join(
+                    instruction_form.comment = " ".join(
                         result[self.DIRECTIVE_ID][self.COMMENT_ID]
                     )
             except pp.ParseException:
@@ -322,9 +325,9 @@ class ParserAArch64(BaseParser):
                 raise ValueError(
                     "Unable to parse {!r} on line {}".format(line, line_number)
                 ) from e
-            instruction_form[self.INSTRUCTION_ID] = result[self.INSTRUCTION_ID]
-            instruction_form[self.OPERANDS_ID] = result[self.OPERANDS_ID]
-            instruction_form[self.COMMENT_ID] = result[self.COMMENT_ID]
+            instruction_form.instruction = result[self.INSTRUCTION_ID]
+            instruction_form.operands = result[self.OPERANDS_ID]
+            instruction_form.comment = result[self.COMMENT_ID]
 
         return instruction_form
 

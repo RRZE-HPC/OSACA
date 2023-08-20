@@ -31,6 +31,15 @@ class DirectiveOperand(Operand):
     @comment.setter
     def comment(self, comment):
         self._COMMENT_ID = comment
+        
+    def __eq__(self, other):
+        if isinstance(other, DirectiveOperand):
+            return (
+                self._NAME_ID == other._NAME_ID and
+                self._PARAMETER_ID == other._PARAMETER_ID and
+                self._COMMENT_ID == other._COMMENT_ID
+            )
+        return False
 
     def __str__(self):
         return f"Directive(NAME_ID={self._NAME_ID}, PARAMETERS={self._PARAMETER_ID}, COMMENT={self._COMMENT_ID})"

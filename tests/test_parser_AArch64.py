@@ -178,37 +178,37 @@ class TestParserAArch64(unittest.TestCase):
         line_5_operands = "fcmla z26.d, p0/m, z29.d, z21.d, #90"
         line_conditions = "ccmn  x11, #1, #3, eq"
 
-        instruction_form_1 = {
-            "instruction": None,
-            "operands": [],
-            "directive": None,
-            "comment": "-- Begin main",
-            "label": None,
-            "line": "// -- Begin  main",
-            "line_number": 1,
-        }
+        instruction_form_1 = InstructionForm(
+            INSTRUCTION_ID = None,
+            OPERANDS_ID = [],
+            DIRECTIVE_ID = None,
+            COMMENT_ID = "-- Begin main",
+            LABEL_ID = None,
+            LINE = "// -- Begin  main",
+            LINE_NUMBER = 1,
+        )
 
-        instruction_form_2 = {
-            "instruction": None,
-            "operands": [],
-            "directive": None,
-            "comment": "=>This Inner Loop Header: Depth=1",
-            "label": ".LBB0_1",
-            "line": ".LBB0_1:              // =>This Inner Loop Header: Depth=1",
-            "line_number": 2,
-        }
-        instruction_form_3 = {
-            "instruction": None,
-            "operands": [],
-            "directive": {"name": "cfi_def_cfa", "parameters": ["w29", "-16"]},
-            "comment": None,
-            "label": None,
-            "line": ".cfi_def_cfa w29, -16",
-            "line_number": 3,
-        }
-        instruction_form_4 = {
-            "instruction": "ldr",
-            "operands": [
+        instruction_form_2 = InstructionForm(
+            INSTRUCTION_ID = None,
+            OPERANDS_ID = [],
+            DIRECTIVE_ID = None,
+            COMMENT_ID = "=>This Inner Loop Header: Depth=1",
+            LABEL_ID = ".LBB0_1",
+            LINE = ".LBB0_1:              // =>This Inner Loop Header: Depth=1",
+            LINE_NUMBER = 2,
+        )
+        instruction_form_3 = InstructionForm(
+            INSTRUCTION_ID = None,
+            OPERANDS_ID = [],
+            DIRECTIVE_ID = {"name": "cfi_def_cfa", "parameters": ["w29", "-16"]},
+            COMMENT_ID = None,
+            LABEL_ID = None,
+            LINE = ".cfi_def_cfa w29, -16",
+            LINE_NUMBER = 3,
+        )
+        instruction_form_4 = InstructionForm(
+            INSTRUCTION_ID = "ldr",
+            OPERANDS_ID = [
                 {"register": {"prefix": "s", "name": "0"}},
                 {
                     "memory": {
@@ -225,15 +225,15 @@ class TestParserAArch64(unittest.TestCase):
                     }
                 },
             ],
-            "directive": None,
-            "comment": "= <<2",
-            "label": None,
-            "line": "ldr s0, [x11, w10, sxtw #2]    // = <<2",
-            "line_number": 4,
-        }
-        instruction_form_5 = {
-            "instruction": "prfm",
-            "operands": [
+            DIRECTIVE_ID = None,
+            COMMENT_ID = "= <<2",
+            LABEL_ID = None,
+            LINE = "ldr s0, [x11, w10, sxtw #2]    // = <<2",
+            LINE_NUMBER = 4,
+        )
+        instruction_form_5 = InstructionForm(
+            INSTRUCTION_ID = "prfm",
+            OPERANDS_ID = [
                 {"prfop": {"type": ["PLD"], "target": ["L1"], "policy": ["KEEP"]}},
                 {
                     "memory": {
@@ -244,15 +244,15 @@ class TestParserAArch64(unittest.TestCase):
                     }
                 },
             ],
-            "directive": None,
-            "comment": "HPL",
-            "label": None,
-            "line": "prfm    pldl1keep, [x26, #2048] //HPL",
-            "line_number": 5,
-        }
-        instruction_form_6 = {
-            "instruction": "stp",
-            "operands": [
+            DIRECTIVE_ID = None,
+            COMMENT_ID = "HPL",
+            LABEL_ID = None,
+            LINE = "prfm    pldl1keep, [x26, #2048] //HPL",
+            LINE_NUMBER = 5,
+        )
+        instruction_form_6 = InstructionForm(
+            INSTRUCTION_ID = "stp",
+            OPERANDS_ID = [
                 {"register": {"prefix": "x", "name": "29"}},
                 {"register": {"prefix": "x", "name": "30"}},
                 {
@@ -265,15 +265,15 @@ class TestParserAArch64(unittest.TestCase):
                     }
                 },
             ],
-            "directive": None,
-            "comment": None,
-            "label": None,
-            "line": "stp x29, x30, [sp, #-16]!",
-            "line_number": 6,
-        }
-        instruction_form_7 = {
-            "instruction": "ldp",
-            "operands": [
+            DIRECTIVE_ID = None,
+            COMMENT_ID = None,
+            LABEL_ID = None,
+            LINE = "stp x29, x30, [sp, #-16]!",
+            LINE_NUMBER = 6,
+        )
+        instruction_form_7 = InstructionForm(
+            INSTRUCTION_ID = "ldp",
+            OPERANDS_ID = [
                 {"register": {"prefix": "q", "name": "2"}},
                 {"register": {"prefix": "q", "name": "3"}},
                 {
@@ -286,41 +286,41 @@ class TestParserAArch64(unittest.TestCase):
                     }
                 },
             ],
-            "directive": None,
-            "comment": None,
-            "label": None,
-            "line": "ldp q2, q3, [x11], #64",
-            "line_number": 7,
-        }
-        instruction_form_8 = {
-            "instruction": "fcmla",
-            "operands": [
+            DIRECTIVE_ID = None,
+            COMMENT_ID = None,
+            LABEL_ID = None,
+            LINE = "ldp q2, q3, [x11], #64",
+            LINE_NUMBER = 7,
+        )
+        instruction_form_8 = InstructionForm(
+            INSTRUCTION_ID = "fcmla",
+            OPERANDS_ID = [
                 {"register": {"prefix": "z", "name": "26", "shape": "d"}},
                 {"register": {"prefix": "p", "name": "0", "predication": "m"}},
                 {"register": {"prefix": "z", "name": "29", "shape": "d"}},
                 {"register": {"prefix": "z", "name": "21", "shape": "d"}},
                 {"immediate": {"value": 90, "type": "int"}},
             ],
-            "directive": None,
-            "comment": None,
-            "label": None,
-            "line": "fcmla z26.d, p0/m, z29.d, z21.d, #90",
-            "line_number": 8,
-        }
-        instruction_form_9 = {
-            "instruction": "ccmn",
-            "operands": [
+            DIRECTIVE_ID = None,
+            COMMENT_ID = None,
+            LABEL_ID = None,
+            LINE = "fcmla z26.d, p0/m, z29.d, z21.d, #90",
+            LINE_NUMBER = 8,
+        )
+        instruction_form_9 = InstructionForm(
+            INSTRUCTION_ID = "ccmn",
+            OPERANDS_ID = [
                 {"register": {"prefix": "x", "name": "11"}},
                 {"immediate": {"value": 1, "type": "int"}},
                 {"immediate": {"value": 3, "type": "int"}},
                 {"condition": "EQ"},
             ],
-            "directive": None,
-            "comment": None,
-            "label": None,
-            "line": "ccmn  x11, #1, #3, eq",
-            "line_number": 9,
-        }
+            DIRECTIVE_ID = None,
+            COMMENT_ID = None,
+            LABEL_ID = None,
+            LINE = "ccmn  x11, #1, #3, eq",
+            LINE_NUMBER = 9,
+        )
 
         parsed_1 = self.parser.parse_line(line_comment, 1)
         parsed_2 = self.parser.parse_line(line_label, 2)
@@ -458,13 +458,19 @@ class TestParserAArch64(unittest.TestCase):
         )
 
     def _get_label(self, parser, label):
-        return parser.process_operand(parser.label.parseString(label, parseAll=True).asDict())
+        return AttrDict.convert_dict(
+            parser.process_operand(parser.label.parseString(label, parseAll=True).asDict())
+        ).label
 
     def _get_directive(self, parser, directive):
-        return parser.process_operand(parser.directive.parseString(directive, parseAll=True).asDict())
+        return AttrDict.convert_dict(
+            parser.process_operand(parser.directive.parseString(directive, parseAll=True).asDict())
+        ).directive
 
     def _get_condition(self, parser, condition):
-        return parser.process_operand(parser.condition.parseString(condition, parseAll=True).asDict()).condition
+        return AttrDict.convert_dict(
+            parser.process_operand(parser.condition.parseString(condition, parseAll=True).asDict())
+        ).condition
 
     @staticmethod
     def _find_file(name):
