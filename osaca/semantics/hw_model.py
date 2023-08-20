@@ -526,7 +526,7 @@ class MachineModel(object):
     def _check_operands(self, i_operand, operand):
         """Check if the types of operand ``i_operand`` and ``operand`` match."""
         # check for wildcard
-        if self.WILDCARD in operand:
+        if self.WILDCARD in operand.name:
             if (
                 "class" in i_operand
                 and i_operand["class"] == "register"
@@ -601,24 +601,24 @@ class MachineModel(object):
 
     def _check_x86_operands(self, i_operand, operand):
         """Check if the types of operand ``i_operand`` and ``operand`` match."""
-        if "class" in operand:
+        if "class" in operand.name:
             # compare two DB entries
             return self._compare_db_entries(i_operand, operand)
         # register
-        if "register" in operand:
+        if "register" in operand.name:
             if i_operand["class"] != "register":
                 return False
-            return self._is_x86_reg_type(i_operand, operand["register"], consider_masking=False)
+            return self._is_x86_reg_type(i_operand, operand, consider_masking=False)
         # memory
-        if "memory" in operand:
+        if "memory" in operand.name:
             if i_operand["class"] != "memory":
                 return False
-            return self._is_x86_mem_type(i_operand, operand["memory"])
+            return self._is_x86_mem_type(i_operand, operand)
         # immediate
-        if "immediate" in operand or "value" in operand:
+        if "immediate" in operand.name or operand.value != None:
             return i_operand["class"] == "immediate" and i_operand["imd"] == "int"
         # identifier (e.g., labels)
-        if "identifier" in operand:
+        if "identifier" in operand.name:
             return i_operand["class"] == "identifier"
 
     def _compare_db_entries(self, operand_1, operand_2):

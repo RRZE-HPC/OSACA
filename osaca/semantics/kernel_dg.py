@@ -59,38 +59,37 @@ class KernelDG(nx.DiGraph):
         # 3. get LT value and set as edge weight
         dg = nx.DiGraph()
         for i, instruction_form in enumerate(kernel):
-            dg.add_node(instruction_form["line_number"])
-            dg.nodes[instruction_form["line_number"]]["instruction_form"] = instruction_form
+            dg.add_node(instruction_form.line_number)
+            print(dg.nodes[instruction_form.line_number])
+            dg.nodes[instruction_form.line_number].instruction_form = instruction_form
             # add load as separate node if existent
             if (
-                INSTR_FLAGS.HAS_LD in instruction_form["flags"]
-                and INSTR_FLAGS.LD not in instruction_form["flags"]
+                INSTR_FLAGS.HAS_LD in instruction_form.flags
+                and INSTR_FLAGS.LD not in instruction_form.flags
             ):
                 # add new node
-                dg.add_node(instruction_form["line_number"] + 0.1)
-                dg.nodes[instruction_form["line_number"] + 0.1][
-                    "instruction_form"
-                ] = instruction_form
+                dg.add_node(instruction_form.line_number + 0.1)
+                dg.nodes[instruction_form.line_number + 0.1].instruction_form = instruction_form
                 # and set LD latency as edge weight
                 dg.add_edge(
-                    instruction_form["line_number"] + 0.1,
-                    instruction_form["line_number"],
-                    latency=instruction_form["latency"] - instruction_form["latency_wo_load"],
+                    instruction_form.line_number + 0.1,
+                    instruction_form.line_number,
+                    latency=instruction_form.latency - instruction_form.latency_wo_load,
                 )
             for dep, dep_flags in self.find_depending(
                 instruction_form, kernel[i + 1 :], flag_dependencies
             ):
                 edge_weight = (
-                    instruction_form["latency"]
-                    if "mem_dep" in dep_flags or "latency_wo_load" not in instruction_form
-                    else instruction_form["latency_wo_load"]
+                    instruction_form.latency
+                    if "mem_dep" in dep_flags or instruction_form.latency_wo_load == None
+                    else instruction_form.latency_wo_load
                 )
                 if "storeload_dep" in dep_flags and self.model is not None:
                     edge_weight += self.model.get("store_to_load_forward_latency", 0)
                 if "p_indexed" in dep_flags and self.model is not None:
                     edge_weight = self.model.get("p_index_latency", 1)
                 dg.add_edge(
-                    instruction_form["line_number"],
+                    instruction_form.line_number,
                     dep["line_number"],
                     latency=edge_weight,
                 )

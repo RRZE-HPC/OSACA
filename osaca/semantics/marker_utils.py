@@ -146,11 +146,12 @@ def find_marked_section(
                 source = line.operands[0 if not reverse else 1]
                 destination = line.operands[1 if not reverse else 0]
                 # instruction pair matches, check for operands
+                print(source)
                 if (
                     "immediate" in source
                     and parser.normalize_imd(source.immediate) == mov_vals[0]
                     and "register" in destination
-                    and parser.get_full_reg_name(destination.register) == mov_reg
+                    and parser.get_full_reg_name(destination['register']) == mov_reg
                 ):
                     # operands of first instruction match start, check for second one
                     match, line_count = match_bytes(lines, i + 1, nop_bytes)
@@ -161,7 +162,7 @@ def find_marked_section(
                     "immediate" in source
                     and parser.normalize_imd(source.immediate) == mov_vals[1]
                     and "register" in destination
-                    and parser.get_full_reg_name(destination.register) == mov_reg
+                    and parser.get_full_reg_name(destination['register']) == mov_reg
                 ):
                     # operand of first instruction match end, check for second one
                     match, line_count = match_bytes(lines, i + 1, nop_bytes)
@@ -203,14 +204,14 @@ def find_jump_labels(lines):
     labels = OrderedDict()
     current_label = None
     for i, line in enumerate(lines):
-        if line["label"] is not None:
+        if line.label is not None:
             # When a new label is found, add to blocks dict
-            labels[line["label"]] = (i,)
+            labels[line.label] = (i,)
             # End previous block at previous line
             if current_label is not None:
                 labels[current_label] = (labels[current_label][0], i)
             # Update current block name
-            current_label = line["label"]
+            current_label = line.label
         elif current_label is None:
             # If no block has been started, skip end detection
             continue
@@ -222,9 +223,9 @@ def find_jump_labels(lines):
     for label in list(labels):
         if all(
             [
-                line["instruction"].startswith(".")
+                line.instruction.startswith(".")
                 for line in lines[labels[label][0] : labels[label][1]]
-                if line["instruction"] is not None
+                if line.instruction is not None
             ]
         ):
             del labels[label]
@@ -251,11 +252,11 @@ def find_basic_blocks(lines):
             terminate = False
             blocks[label].append(line)
             # Find end of block by searching for references to valid jump labels
-            if line["instruction"] and line["operands"]:
-                for operand in [o for o in line["operands"] if "identifier" in o]:
+            if line.instruction and line.operands:
+                for operand in [o for o in line.operands if "identifier" in o]:
                     if operand["identifier"]["name"] in valid_jump_labels:
                         terminate = True
-            elif line["label"] is not None:
+            elif line.label is not None:
                 terminate = True
             if terminate:
                 break
@@ -280,13 +281,13 @@ def find_basic_loop_bodies(lines):
             terminate = False
             current_block.append(line)
             # Find end of block by searching for references to valid jump labels
-            if line["instruction"] and line["operands"]:
+            if line.instruction and line.operands:
                 # Ignore `b.none` instructions (relevant von ARM SVE code)
                 # This branch instruction is often present _within_ inner loop blocks, but usually
                 # do not terminate
-                if line["instruction"] == "b.none":
+                if line.instruction == "b.none":
                     continue
-                for operand in [o for o in line["operands"] if "identifier" in o]:
+                for operand in [o for o in line.operands if "identifier" in o]:
                     if operand["identifier"]["name"] in valid_jump_labels:
                         if operand["identifier"]["name"] == label:
                             loop_bodies[label] = current_block

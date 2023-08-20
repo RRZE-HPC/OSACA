@@ -11,6 +11,9 @@ from osaca.parser.operand import Operand
 from osaca.parser.directive import DirectiveOperand
 from osaca.parser.memory import MemoryOperand
 from osaca.parser.label import LabelOperand
+from osaca.parser.register import RegisterOperand
+from osaca.parser.identifier import IdentifierOperand
+from osaca.parser.immediate import ImmediateOperand
  
 class ParserX86ATT(BaseParser):
     _instance = None

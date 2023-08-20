@@ -28,7 +28,18 @@ class InstructionForm:
         self._LABEL_ID = LABEL_ID
         self._LINE = LINE
         self._LINE_NUMBER = LINE_NUMBER
+
         self._SEMANTIC_OPERANDS = SEMANTIC_OPERANDS
+        self._UOPS = None
+        #self.semantic_operands = {"source": [], "destination": [], "src_dst": []}
+        self._LATENCY = None
+        self._THROUGHPUT = None
+        self._LATENCY_CP = []
+        self._LATENCY_LCD = []
+        self._LATENCY_WO_LOAD = None
+        self._PORT_PRESSURE = []
+        self._PORT_UOPS = []
+        self._FLAGS = []
 
     @property
     def semantic_operands(self):
@@ -62,6 +73,18 @@ class InstructionForm:
     def operands(self):
         return self._OPERANDS_ID
 
+    @property
+    def port_pressure(self):
+        return self._PORT_PRESSURE
+    
+    @property
+    def port_uops(self):
+        return self._PORT_UOPS
+    
+    @property
+    def flags(self):
+        return self._FLAGS
+
     @semantic_operands.setter
     def semantic_operands(self, semantic_operands):
         self._SEMANTIC_OPERANDS = semantic_operands
@@ -93,7 +116,19 @@ class InstructionForm:
     @comment.setter
     def comment(self, comment):
         self._COMMENT_ID =comment
+
+    @port_pressure.setter
+    def port_pressure(self, port_pressure):
+        self._PORT_PRESSURE = port_pressure
     
+    @port_uops.setter
+    def port_uops(self, port_uops):
+        self._PORT_UOPS = port_uops
+
+    @flags.setter
+    def flags(self, flags):
+        self._FLAGS = flags
+
     def __repr__(self):
         return f"InstructionForm(INSTRUCTION_ID={self._INSTRUCTION_ID}, OPERANDS_ID={self._OPERANDS_ID}, DIRECTIVE_ID={self._DIRECTIVE_ID}, COMMENT_ID={self._COMMENT_ID}, LABEL_ID={self._LABEL_ID}, LINE={self._LINE}, LINE_NUMBER={self._LINE_NUMBER}, SEMANTIC_OPERANDS={self._SEMANTIC_OPERANDS})"
 
