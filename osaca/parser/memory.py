@@ -3,10 +3,10 @@
 from osaca.parser.operand import Operand
 
 class MemoryOperand(Operand):
-    def __init__(self, NAME_ID, OFFSET_ID = None, BASE_ID = None, INDEX_ID = None
+    def __init__(self, OFFSET_ID = None, BASE_ID = None, INDEX_ID = None
     , SCALE_ID = 1, SEGMENT_EXT_ID = None, MASK = None, PRE_INDEXED = False
     , POST_INDEXED = False, INDEXED_VAL = None):
-        super().__init__(NAME_ID)
+        super().__init__('memory')
         self._OFFSET_ID = OFFSET_ID
         self._BASE_ID = BASE_ID
         self._INDEX_ID = INDEX_ID
