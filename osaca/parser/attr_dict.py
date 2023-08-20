@@ -27,3 +27,27 @@ class AttrDict(dict):
                     dictionary[key] = [AttrDict.convert_dict(x) for x in entry]
             return AttrDict(dictionary)
         return dictionary
+
+    @staticmethod
+    def get_dict(attrdict):
+        """
+        Convert given `AttrDict` to a standard dictionary.
+
+        :param attrdict: `AttrDict` to be converted
+        :type attrdict: `AttrDict`
+        :returns: `dict` representation of ``AttrDict``
+        """
+        if isinstance(attrdict, type(list())):
+            return [AttrDict.get_dict(x) for x in attrdict]
+        if isinstance(attrdict, type(AttrDict())):
+            newdict = {}
+            for key in list(attrdict.keys()):
+                entry = attrdict[key]
+                if isinstance(entry, type(dict())) or isinstance(entry, type(AttrDict())):
+                    newdict[key] = AttrDict.get_dict(attrdict[key])
+                elif isinstance(entry, type(list())):
+                    newdict[key] = [AttrDict.get_dict(x) for x in entry]
+                else:
+                    newdict[key] = entry
+            return newdict
+        return attrdict
