@@ -9,6 +9,7 @@ import unittest
 from pyparsing import ParseException
 
 from osaca.parser import ParserX86ATT, InstructionForm
+from osaca.parser.register import RegisterOperand
 
 class TestParserX86ATT(unittest.TestCase):
     @classmethod
@@ -113,46 +114,45 @@ class TestParserX86ATT(unittest.TestCase):
         parsed_7 = self.parser.parse_instruction(instr7)
 
         self.assertEqual(parsed_1.instruction, "vcvtsi2ss")
-        self.assertEqual(parsed_1.operands[0].register.name, "edx")
-        self.assertEqual(parsed_1.operands[1].register.name, "xmm2")
+        self.assertEqual(parsed_1.operands[0].name, "edx")
+        self.assertEqual(parsed_1.operands[1].name, "xmm2")
         self.assertEqual(parsed_1.comment, "12.27")
 
         self.assertEqual(parsed_2.instruction, "jb")
-        self.assertEqual(parsed_2.operands[0].identifier.name, "..B1.4")
+        self.assertEqual(parsed_2.operands[0]['identifier']['name'], "..B1.4")
         self.assertEqual(len(parsed_2.operands), 1)
         self.assertIsNone(parsed_2.comment)
-
         self.assertEqual(parsed_3.instruction, "movl")
-        self.assertEqual(parsed_3.operands[0].value, 222)
-        self.assertEqual(parsed_3.operands[1].register.name, "ebx")
+        self.assertEqual(parsed_3.operands[0]['value'], 222)
+        self.assertEqual(parsed_3.operands[1].name, "ebx")
         self.assertEqual(parsed_3.comment, "IACA END")
 
         self.assertEqual(parsed_4.instruction, "vmovss")
-        self.assertEqual(parsed_4.operands[1].offset.value, -4)
-        self.assertEqual(parsed_4.operands[1].base.name, "rsp")
-        self.assertEqual(parsed_4.operands[1].index.name, "rax")
+        self.assertEqual(parsed_4.operands[1].offset['value'], -4)
+        self.assertEqual(parsed_4.operands[1].base['name'], "rsp")
+        self.assertEqual(parsed_4.operands[1].index['name'], "rax")
         self.assertEqual(parsed_4.operands[1].scale, 8)
-        self.assertEqual(parsed_4.operands[0].register.name, "xmm4")
+        self.assertEqual(parsed_4.operands[0].name, "xmm4")
         self.assertEqual(parsed_4.comment, "12.9")
 
         self.assertEqual(parsed_5.instruction, "mov")
-        self.assertEqual(parsed_5.operands[1].offset.identifier.name, "var")
+        self.assertEqual(parsed_5.operands[1].offset['identifier']['name'], "var")
         self.assertIsNone(parsed_5.operands[1].base)
         self.assertIsNone(parsed_5.operands[1].index)
         self.assertEqual(parsed_5.operands[1].scale, 1)
-        self.assertEqual(parsed_5.operands[0].register.name, "ebx")
+        self.assertEqual(parsed_5.operands[0].name, "ebx")
 
         self.assertEqual(parsed_6.instruction, "lea")
         self.assertIsNone(parsed_6.operands[0].offset)
         self.assertIsNone(parsed_6.operands[0].base)
-        self.assertEqual(parsed_6.operands[0].index.name, "rax")
+        self.assertEqual(parsed_6.operands[0].index['name'], "rax")
         self.assertEqual(parsed_6.operands[0].scale, 8)
-        self.assertEqual(parsed_6.operands[1].register.name, "rbx")
+        self.assertEqual(parsed_6.operands[1].name, "rbx")
 
-        self.assertEqual(parsed_7.operands[0].value, 0x1)
-        self.assertEqual(parsed_7.operands[1].register.name, "xmm0")
-        self.assertEqual(parsed_7.operands[2].register.name, "ymm1")
-        self.assertEqual(parsed_7.operands[3].register.name, "ymm1")
+        self.assertEqual(parsed_7.operands[0]['value'], 0x1)
+        self.assertEqual(parsed_7.operands[1].name, "xmm0")
+        self.assertEqual(parsed_7.operands[2].name, "ymm1")
+        self.assertEqual(parsed_7.operands[3].name, "ymm1")
 
     def test_parse_line(self):
         line_comment = "# -- Begin  main"
@@ -228,10 +228,10 @@ class TestParserX86ATT(unittest.TestCase):
         register_str_3 = "%xmm1"
         register_str_4 = "%rip"
 
-        parsed_reg_1 = {"register": {"name": "rax"}}
-        parsed_reg_2 = {"register": {"name": "r9"}}
-        parsed_reg_3 = {"register": {"name": "xmm1"}}
-        parsed_reg_4 = {"register": {"name": "rip"}}
+        parsed_reg_1 = RegisterOperand(NAME_ID = "rax")
+        parsed_reg_2 = RegisterOperand(NAME_ID = "r9")
+        parsed_reg_3 = RegisterOperand(NAME_ID = "xmm1")
+        parsed_reg_4 = RegisterOperand(NAME_ID = "rip")
 
         self.assertEqual(self.parser.parse_register(register_str_1), parsed_reg_1)
         self.assertEqual(self.parser.parse_register(register_str_2), parsed_reg_2)

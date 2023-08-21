@@ -5,7 +5,7 @@ import re
 
 import pyparsing as pp
 
-from osaca.parser import AttrDict, BaseParser
+from osaca.parser import BaseParser
 from osaca.parser.instruction_form import InstructionForm
 from osaca.parser.operand import Operand
 from osaca.parser.directive import DirectiveOperand
@@ -268,7 +268,6 @@ class ParserX86ATT(BaseParser):
         :returns: `dict` -- parsed instruction form
         """
         result = self.instruction_parser.parseString(instruction, parseAll=True).asDict()
-        result = AttrDict.convert_dict(result)
         operands = []
         # Add operands to list
         # Check first operand
@@ -304,6 +303,13 @@ class ParserX86ATT(BaseParser):
             return self.process_label(operand[self.LABEL_ID])
         if self.DIRECTIVE_ID in operand:
             return self.process_directive(operand[self.DIRECTIVE_ID])
+        if self.REGISTER_ID in operand:
+            return RegisterOperand(PREFIX_ID = operand['register']['prefix'] if 'prefix' in operand['register'] else None, 
+            NAME_ID = operand['register']['name'],
+            SHAPE = operand['register']['shape'] if 'shape' in operand['register'] else None,
+            LANES = operand['register']['lanes'] if 'lanes' in operand['register'] else None,
+            INDEX = operand['register']['index'] if 'index' in operand['register'] else None,
+            PREDICATION = operand['register']['predication'] if 'predication' in operand['register'] else None)
         return operand
 
     def process_directive(self, directive):

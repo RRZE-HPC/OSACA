@@ -2,7 +2,7 @@
 from copy import deepcopy
 import pyparsing as pp
 
-from osaca.parser import AttrDict, BaseParser
+from osaca.parser import BaseParser
 from osaca.parser.instruction_form import InstructionForm
 from osaca.parser.operand import Operand
 from osaca.parser.directive import DirectiveOperand
@@ -273,7 +273,6 @@ class ParserAArch64(BaseParser):
         # 1. Parse comment
         try:
             result = self.process_operand(self.comment.parseString(line, parseAll=True).asDict())
-            result = AttrDict.convert_dict(result)
             instruction_form.comment = " ".join(result[self.COMMENT_ID])
         except pp.ParseException:
             pass
@@ -282,7 +281,6 @@ class ParserAArch64(BaseParser):
             result = self.process_operand(
                 self.llvm_markers.parseString(line, parseAll=True).asDict()
             )
-            result = AttrDict.convert_dict(result)
             instruction_form.comment = " ".join(result[self.COMMENT_ID])
         except pp.ParseException:
             pass
@@ -304,16 +302,13 @@ class ParserAArch64(BaseParser):
                 result = self.process_operand(
                     self.directive.parseString(line, parseAll=True).asDict()
                 )
-                result = AttrDict.convert_dict(result)
-                instruction_form.directive = AttrDict(
-                    {
-                        "name": result[self.DIRECTIVE_ID].name,
-                        "parameters": result[self.DIRECTIVE_ID].parameters,
-                    }
+                instruction_form.directive = DirectiveOperand(
+                    NAME_ID = result.name,
+                    PARAMETER_ID = result.parameters                  
                 )
-                if self.COMMENT_ID in result[self.DIRECTIVE_ID]:
+                if result.comment is not None:
                     instruction_form.comment = " ".join(
-                        result[self.DIRECTIVE_ID][self.COMMENT_ID]
+                        result.comment
                     )
             except pp.ParseException:
                 pass
@@ -391,6 +386,15 @@ class ParserAArch64(BaseParser):
             return self.process_label(operand[self.LABEL_ID])
         if self.IDENTIFIER_ID in operand:
             return self.process_identifier(operand[self.IDENTIFIER_ID])
+        if self.REGISTER_ID in operand:
+            return RegisterOperand(PREFIX_ID = operand['register']['prefix'], NAME_ID = operand['register']['name'],
+            SHAPE = operand['register']['shape'] if 'shape' in operand['register'] else None,
+            LANES = operand['register']['lanes'] if 'lanes' in operand['register'] else None,
+            INDEX = operand['register']['index'] if 'index' in operand['register'] else None,
+            PREDICATION = operand['register']['predication'] if 'predication' in operand['register'] else None)
+        if self.DIRECTIVE_ID in operand:
+            return DirectiveOperand(NAME_ID =  operand['directive']["name"], PARAMETER_ID = operand['directive']["parameters"], 
+                                    COMMENT_ID = operand['directive']["comment"] if "comment" in operand['directive'] else None)
         return operand
 
     def process_memory_address(self, memory_address):
@@ -437,7 +441,8 @@ class ParserAArch64(BaseParser):
         Resolve range or list register operand to list of registers.
         Returns None if neither list nor range
         """
-        if isinstance(Operand, RegisterOperand):
+        if isinstance(operand, RegisterOperand):
+
             if "list" in operand.register:
                 index = operand.register.get("index")
                 range_list = []
@@ -476,7 +481,7 @@ class ParserAArch64(BaseParser):
             dict_name = "range"
         for r in register_list[dict_name]:
             rlist.append(
-                AttrDict.convert_dict(self.list_element.parseString(r, parseAll=True).asDict())
+                self.list_element.parseString(r, parseAll=True).asDict()
             )
         index = register_list.get("index", None)
         reg_list = []
@@ -533,11 +538,11 @@ class ParserAArch64(BaseParser):
 
     def get_full_reg_name(self, register):
         """Return one register name string including all attributes"""
-        name = register["prefix"] + str(register["name"])
-        if "shape" in register:
-            name += "." + str(register.get("lanes", "")) + register["shape"]
-        if "index" in register:
-            name += "[" + register["index"] + "]"
+        name = register.prefix + str(register.name)
+        if register.shape is not None:
+            name += "." + str(register.lanes if register.lanes is not None else "") + register.shape
+        if register.index is not None:
+            name += "[" + str(register.index) + "]"
         return name
 
     def normalize_imd(self, imd):
