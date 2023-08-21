@@ -222,7 +222,6 @@ class ParserX86ATT(BaseParser):
                 result = self.process_operand(self.label.parseString(line, parseAll=True).asDict())
                 instruction_form.label = result.name
                 if result.comment != None:
-                    #print(result)
                     instruction_form.comment = " ".join(
                         result.comment
                     )

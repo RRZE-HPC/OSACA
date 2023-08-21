@@ -146,7 +146,6 @@ def find_marked_section(
                 source = line.operands[0 if not reverse else 1]
                 destination = line.operands[1 if not reverse else 0]
                 # instruction pair matches, check for operands
-                print(source)
                 if (
                     "immediate" in source
                     and parser.normalize_imd(source.immediate) == mov_vals[0]

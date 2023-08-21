@@ -20,10 +20,7 @@ class InstructionForm:
     , SEMANTIC_OPERANDS = None):
         self._INSTRUCTION_ID = INSTRUCTION_ID
         self._OPERANDS_ID = OPERANDS_ID
-        if DIRECTIVE_ID != None:
-            self._DIRECTIVE_ID = DirectiveOperand(NAME_ID = DIRECTIVE_ID['name'], PARAMETER_ID = DIRECTIVE_ID['parameters'])
-        else:
-            self._DIRECTIVE_ID = DIRECTIVE_ID
+        self._DIRECTIVE_ID = DIRECTIVE_ID
         self._COMMENT_ID = COMMENT_ID
         self._LABEL_ID = LABEL_ID
         self._LINE = LINE

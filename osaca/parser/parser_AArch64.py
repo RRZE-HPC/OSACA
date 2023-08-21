@@ -437,7 +437,7 @@ class ParserAArch64(BaseParser):
         Resolve range or list register operand to list of registers.
         Returns None if neither list nor range
         """
-        if "register" in operand.name:
+        if isinstance(Operand, RegisterOperand):
             if "list" in operand.register:
                 index = operand.register.get("index")
                 range_list = []
@@ -447,6 +447,7 @@ class ParserAArch64(BaseParser):
                         reg["index"] = int(index, 0)
                     range_list.append(reg)
                 return range_list
+                #return range_list
             elif "range" in operand.register:
                 base_register = operand.register.range[0]
                 index = operand.register.get("index")
@@ -460,6 +461,7 @@ class ParserAArch64(BaseParser):
                     reg["name"] = str(name)
                     range_list.append(reg)
                 return range_list
+                #return range_list
         # neither register list nor range, return unmodified
         return operand
 
@@ -477,10 +479,12 @@ class ParserAArch64(BaseParser):
                 AttrDict.convert_dict(self.list_element.parseString(r, parseAll=True).asDict())
             )
         index = register_list.get("index", None)
-        new_dict = AttrDict({dict_name: rlist, "index": index})
-        if len(new_dict[dict_name]) == 1:
-            return AttrDict({self.REGISTER_ID: new_dict[dict_name][0]})
-        return AttrDict({self.REGISTER_ID: new_dict})
+        reg_list = []
+        for reg in rlist:
+            reg_list.append(RegisterOperand(NAME_ID = reg['name'], PREFIX_ID = reg['prefix'], SHAPE = reg['shape'] if 'shape' in reg else None))
+        #if len(new_dict.name) == 1:
+        #    return new_dict.name[0]
+        return reg_list
 
     def process_immediate(self, immediate):
         """Post-process immediate operand"""
@@ -493,7 +497,7 @@ class ParserAArch64(BaseParser):
             immediate["type"] = "int"
             # convert hex/bin immediates to dec
             immediate["value"] = self.normalize_imd(immediate)
-            return AttrDict({self.IMMEDIATE_ID: immediate})
+            return ImmediateOperand(TYPE_ID = immediate["type"], VALUE_ID = immediate["value"])
         if "base_immediate" in immediate:
             # arithmetic immediate, add calculated value as value
             immediate["shift"] = immediate["shift"][0]
@@ -501,14 +505,14 @@ class ParserAArch64(BaseParser):
                 immediate["shift"]["value"]
             )
             immediate["type"] = "int"
-            return AttrDict({self.IMMEDIATE_ID: immediate})
+            return ImmediateOperand(TYPE_ID = immediate["type"], VALUE_ID = immediate["value"], SHIFT_ID = immediate["shift"])
         if "float" in immediate:
             dict_name = "float"
         if "double" in immediate:
             dict_name = "double"
         if "exponent" in immediate[dict_name]:
             immediate["type"] = dict_name
-            return AttrDict({self.IMMEDIATE_ID: immediate})
+            return ImmediateOperand(TYPE_ID = immediate["type"])
         else:
             # change 'mantissa' key to 'value'
             return ImmediateOperand(VALUE_ID = immediate[dict_name]["mantissa"], TYPE_ID = dict_name)
@@ -517,7 +521,7 @@ class ParserAArch64(BaseParser):
         """Post-process label asm line"""
         # remove duplicated 'name' level due to identifier
         #label["name"] = label["name"]["name"]
-        new_label = LabelOperand(NAME_ID = label["name"]["name"])
+        new_label = LabelOperand(NAME_ID = label["name"]["name"], COMMENT_ID = label['comment'] if self.COMMENT_ID in label else None)
         return new_label
 
     def process_identifier(self, identifier):
@@ -525,7 +529,7 @@ class ParserAArch64(BaseParser):
         # remove value if it consists of symbol+offset
         if "value" in identifier:
             del identifier["value"]
-        return AttrDict({self.IDENTIFIER_ID: identifier})
+        return IdentifierOperand(OFFSET = identifier['offset'], RELOCATION = identifier['relocation'])
 
     def get_full_reg_name(self, register):
         """Return one register name string including all attributes"""

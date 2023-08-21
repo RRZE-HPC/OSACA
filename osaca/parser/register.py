@@ -10,6 +10,7 @@ class RegisterOperand(Operand):
         self._WIDTH_ID = WIDTH_ID
         self._PREFIX_ID = PREFIX_ID
         self._REG_ID = REG_ID
+        self._REGTYPE_ID = REGTYPE_ID
         self._LANES = LANES
         self._SHAPE = SHAPE
         self._INDEX = INDEX
@@ -23,6 +24,14 @@ class RegisterOperand(Operand):
     @width.setter
     def width(self, width):
         self._WIDTH_ID = width
+
+    @property
+    def regtype(self):
+        return self._REGTYPE_ID
+    
+    @regtype.setter
+    def regtype(self, regtype):
+        self._REGTYPE_ID = regtype
     
     @property
     def prefix(self):
@@ -81,7 +90,33 @@ class RegisterOperand(Operand):
         self._ZEROING = zeroing
 
     def __str__(self):
-        return f"MemoryOperand({self.width_id}, {self.prefix_id}, {self.reg_id}, {self.lanes}, {self.shape}, {self.index}, {self.mask}, {self.zeroing})"
-    
+        return (
+            f"RegisterOperand(NAME_ID={self._NAME_ID}, WIDTH_ID={self._WIDTH_ID}, "
+            f"PREFIX_ID={self._PREFIX_ID}, REG_ID={self._REG_ID}, REGTYPE_ID={self._REGTYPE_ID}, "
+            f"LANES={self._LANES}, SHAPE={self._SHAPE}, INDEX={self._INDEX}, "
+            f"MASK={self._MASK}, ZEROING={self._ZEROING})"
+        )
+
     def __repr__(self):
-        return f"MemoryOperand(width_id={self.width_id}, prefix_id={self.prefix_id}, reg_id={self.reg_id}, lanes={self.lanes}, shape={self.shape}, index={self.index}, mask={self.mask}, zeroing={self.zeroing})"
+        return (
+            f"RegisterOperand(NAME_ID={self._NAME_ID}, WIDTH_ID={self._WIDTH_ID}, "
+            f"PREFIX_ID={self._PREFIX_ID}, REG_ID={self._REG_ID}, REGTYPE_ID={self._REGTYPE_ID}, "
+            f"LANES={self._LANES}, SHAPE={self._SHAPE}, INDEX={self._INDEX}, "
+            f"MASK={self._MASK}, ZEROING={self._ZEROING})"
+        )
+        
+    def __eq__(self, other):
+        if isinstance(other, RegisterOperand):
+            return (
+                self._NAME_ID == other._NAME_ID and
+                self._WIDTH_ID == other._WIDTH_ID and
+                self._PREFIX_ID == other._PREFIX_ID and
+                self._REG_ID == other._REG_ID and
+                self._REGTYPE_ID == other._REGTYPE_ID and
+                self._LANES == other._LANES and
+                self._SHAPE == other._SHAPE and
+                self._INDEX == other._INDEX and
+                self._MASK == other._MASK and
+                self._ZEROING == other._ZEROING
+            )
+        return False

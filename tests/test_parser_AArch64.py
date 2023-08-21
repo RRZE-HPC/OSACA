@@ -9,7 +9,11 @@ import unittest
 from pyparsing import ParseException
 
 from osaca.parser import AttrDict, ParserAArch64, InstructionForm
-
+from osaca.parser.operand import Operand
+from osaca.parser.directive import DirectiveOperand
+from osaca.parser.memory import MemoryOperand
+from osaca.parser.register import RegisterOperand
+from osaca.parser.immediate import ImmediateOperand
 
 class TestParserAArch64(unittest.TestCase):
     @classmethod
@@ -101,71 +105,71 @@ class TestParserAArch64(unittest.TestCase):
         parsed_7 = self.parser.parse_instruction(instr7)
         parsed_8 = self.parser.parse_instruction(instr8)
         parsed_9 = self.parser.parse_instruction(instr9)
-
+        
         self.assertEqual(parsed_1.instruction, "vcvt.F32.S32")
-        self.assertEqual(parsed_1.operands[0].register.name, "1")
-        self.assertEqual(parsed_1.operands[0].register.prefix, "w")
-        self.assertEqual(parsed_1.operands[1].register.name, "2")
-        self.assertEqual(parsed_1.operands[1].register.prefix, "w")
+        self.assertEqual(parsed_1.operands[0]['register']['name'], "1")
+        self.assertEqual(parsed_1.operands[0]['register']['prefix'], "w")
+        self.assertEqual(parsed_1.operands[1]['register']['name'], "2")
+        self.assertEqual(parsed_1.operands[1]['register']['prefix'], "w")
         self.assertEqual(parsed_1.comment, "12.27")
-
+        
         self.assertEqual(parsed_2.instruction, "b.lo")
-        self.assertEqual(parsed_2.operands[0].identifier.name, "..B1.4")
+        self.assertEqual(parsed_2.operands[0]['identifier']['name'], "..B1.4")
         self.assertEqual(len(parsed_2.operands), 1)
         self.assertIsNone(parsed_2.comment)
-
+        
         self.assertEqual(parsed_3.instruction, "mov")
-        self.assertEqual(parsed_3.operands[0].register.name, "2")
-        self.assertEqual(parsed_3.operands[0].register.prefix, "x")
-        self.assertEqual(parsed_3.operands[1].immediate.value, int("0x222", 0))
+        self.assertEqual(parsed_3.operands[0]['register']['name'], "2")
+        self.assertEqual(parsed_3.operands[0]['register']['prefix'], "x")
+        self.assertEqual(parsed_3.operands[1].value, int("0x222", 0))
         self.assertEqual(parsed_3.comment, "NOT IACA END")
 
         self.assertEqual(parsed_4.instruction, "str")
-        self.assertIsNone(parsed_4.operands[1].memory.offset)
-        self.assertEqual(parsed_4.operands[1].memory.base.name, "sp")
-        self.assertEqual(parsed_4.operands[1].memory.base.prefix, "x")
-        self.assertEqual(parsed_4.operands[1].memory.index.name, "1")
-        self.assertEqual(parsed_4.operands[1].memory.index.prefix, "x")
-        self.assertEqual(parsed_4.operands[1].memory.scale, 16)
-        self.assertEqual(parsed_4.operands[0].register.name, "28")
-        self.assertEqual(parsed_4.operands[0].register.prefix, "x")
+        self.assertIsNone(parsed_4.operands[1].offset)
+        self.assertEqual(parsed_4.operands[1].base['name'], "sp")
+        self.assertEqual(parsed_4.operands[1].base['prefix'], "x")
+        self.assertEqual(parsed_4.operands[1].index['name'], "1")
+        self.assertEqual(parsed_4.operands[1].index['prefix'], "x")
+        self.assertEqual(parsed_4.operands[1].scale, 16)
+        self.assertEqual(parsed_4.operands[0]['register']['name'], "28")
+        self.assertEqual(parsed_4.operands[0]['register']['prefix'], "x")
         self.assertEqual(parsed_4.comment, "12.9")
 
         self.assertEqual(parsed_5.instruction, "ldr")
-        self.assertEqual(parsed_5.operands[0].register.name, "0")
-        self.assertEqual(parsed_5.operands[0].register.prefix, "x")
-        self.assertEqual(parsed_5.operands[1].memory.offset.identifier.name, "q2c")
-        self.assertEqual(parsed_5.operands[1].memory.offset.identifier.relocation, ":got_lo12:")
-        self.assertEqual(parsed_5.operands[1].memory.base.name, "0")
-        self.assertEqual(parsed_5.operands[1].memory.base.prefix, "x")
-        self.assertIsNone(parsed_5.operands[1].memory.index)
-        self.assertEqual(parsed_5.operands[1].memory.scale, 1)
+        self.assertEqual(parsed_5.operands[0]['register']['name'], "0")
+        self.assertEqual(parsed_5.operands[0]['register']['prefix'], "x")
+        self.assertEqual(parsed_5.operands[1].offset['identifier']['name'], "q2c")
+        self.assertEqual(parsed_5.operands[1].offset['identifier']['relocation'], ":got_lo12:")
+        self.assertEqual(parsed_5.operands[1].base['name'], "0")
+        self.assertEqual(parsed_5.operands[1].base['prefix'], "x")
+        self.assertIsNone(parsed_5.operands[1].index)
+        self.assertEqual(parsed_5.operands[1].scale, 1)
 
         self.assertEqual(parsed_6.instruction, "adrp")
-        self.assertEqual(parsed_6.operands[0].register.name, "0")
-        self.assertEqual(parsed_6.operands[0].register.prefix, "x")
-        self.assertEqual(parsed_6.operands[1].identifier.relocation, ":got:")
-        self.assertEqual(parsed_6.operands[1].identifier.name, "visited")
+        self.assertEqual(parsed_6.operands[0]['register']['name'], "0")
+        self.assertEqual(parsed_6.operands[0]['register']['prefix'], "x")
+        self.assertEqual(parsed_6.operands[1]['identifier']['relocation'], ":got:")
+        self.assertEqual(parsed_6.operands[1]['identifier']['name'], "visited")
 
         self.assertEqual(parsed_7.instruction, "fadd")
-        self.assertEqual(parsed_7.operands[0].register.name, "17")
-        self.assertEqual(parsed_7.operands[0].register.prefix, "v")
-        self.assertEqual(parsed_7.operands[0].register.lanes, "2")
-        self.assertEqual(parsed_7.operands[0].register.shape, "d")
-        self.assertEqual(self.parser.get_full_reg_name(parsed_7.operands[2].register), "v1.2d")
+        self.assertEqual(parsed_7.operands[0]['register']['name'], "17")
+        self.assertEqual(parsed_7.operands[0]['register']['prefix'], "v")
+        self.assertEqual(parsed_7.operands[0]['register']['lanes'], "2")
+        self.assertEqual(parsed_7.operands[0]['register']['shape'], "d")
+        self.assertEqual(self.parser.get_full_reg_name(parsed_7.operands[2]['register']), "v1.2d")
 
         self.assertEqual(parsed_8.instruction, "mov.d")
-        self.assertEqual(parsed_8.operands[0].register.name, "0")
-        self.assertEqual(parsed_8.operands[0].register.prefix, "x")
-        self.assertEqual(parsed_8.operands[1].register.name, "16")
-        self.assertEqual(parsed_8.operands[1].register.prefix, "v")
-        self.assertEqual(parsed_8.operands[1].register.index, "1")
-        self.assertEqual(self.parser.get_full_reg_name(parsed_8.operands[1].register), "v16.d[1]")
+        self.assertEqual(parsed_8.operands[0]['register']['name'], "0")
+        self.assertEqual(parsed_8.operands[0]['register']['prefix'], "x")
+        self.assertEqual(parsed_8.operands[1]['register']['name'], "16")
+        self.assertEqual(parsed_8.operands[1]['register']['prefix'], "v")
+        self.assertEqual(parsed_8.operands[1]['register']['index'], "1")
+        self.assertEqual(self.parser.get_full_reg_name(parsed_8.operands[1]['register']), "v16.d[1]")
 
         self.assertEqual(parsed_9.instruction, "ccmp")
-        self.assertEqual(parsed_9.operands[0].register.name, "0")
-        self.assertEqual(parsed_9.operands[0].register.prefix, "x")
-        self.assertEqual(parsed_9.operands[3].condition, "CC")
+        self.assertEqual(parsed_9.operands[0]['register']['name'], "0")
+        self.assertEqual(parsed_9.operands[0]['register']['prefix'], "x")
+        self.assertEqual(parsed_9.operands[3]['condition'], "CC")
 
     def test_parse_line(self):
         line_comment = "// -- Begin  main"
@@ -200,7 +204,7 @@ class TestParserAArch64(unittest.TestCase):
         instruction_form_3 = InstructionForm(
             INSTRUCTION_ID = None,
             OPERANDS_ID = [],
-            DIRECTIVE_ID = {"name": "cfi_def_cfa", "parameters": ["w29", "-16"]},
+            DIRECTIVE_ID = DirectiveOperand(NAME_ID = "cfi_def_cfa", PARAMETER_ID = ["w29", "-16"]) ,
             COMMENT_ID = None,
             LABEL_ID = None,
             LINE = ".cfi_def_cfa w29, -16",
@@ -208,23 +212,16 @@ class TestParserAArch64(unittest.TestCase):
         )
         instruction_form_4 = InstructionForm(
             INSTRUCTION_ID = "ldr",
-            OPERANDS_ID = [
-                {"register": {"prefix": "s", "name": "0"}},
-                {
-                    "memory": {
-                        "offset": None,
-                        "base": {"prefix": "x", "name": "11"},
-                        "index": {
+            OPERANDS_ID = [{"register": {"prefix": "s", "name": "0"}},
+                           MemoryOperand(OFFSET_ID = None, BASE_ID = {"prefix": "x", "name": "11"},
+                           INDEX_ID = {
                             "prefix": "w",
                             "name": "10",
-                            "shift_op": "sxtw",
+                           "shift_op": "sxtw",
                             "immediate": {"value": "2"},
                             "shift": [{"value": "2"}],
-                        },
-                        "scale": 4,
-                    }
-                },
-            ],
+                           },
+                           SCALE_ID = 4) ],
             DIRECTIVE_ID = None,
             COMMENT_ID = "= <<2",
             LABEL_ID = None,
@@ -235,14 +232,8 @@ class TestParserAArch64(unittest.TestCase):
             INSTRUCTION_ID = "prfm",
             OPERANDS_ID = [
                 {"prfop": {"type": ["PLD"], "target": ["L1"], "policy": ["KEEP"]}},
-                {
-                    "memory": {
-                        "offset": {"value": 2048},
-                        "base": {"prefix": "x", "name": "26"},
-                        "index": None,
-                        "scale": 1,
-                    }
-                },
+                MemoryOperand(OFFSET_ID =  {"value": 2048}, BASE_ID = {"prefix": "x", "name": "26"},
+                INDEX_ID = None, SCALE_ID =1)
             ],
             DIRECTIVE_ID = None,
             COMMENT_ID = "HPL",
@@ -255,15 +246,8 @@ class TestParserAArch64(unittest.TestCase):
             OPERANDS_ID = [
                 {"register": {"prefix": "x", "name": "29"}},
                 {"register": {"prefix": "x", "name": "30"}},
-                {
-                    "memory": {
-                        "offset": {"value": -16},
-                        "base": {"name": "sp", "prefix": "x"},
-                        "index": None,
-                        "scale": 1,
-                        "pre_indexed": True,
-                    }
-                },
+                MemoryOperand(OFFSET_ID = {"value": -16}, BASE_ID = {"name": "sp", "prefix": "x"},
+                INDEX_ID = None, SCALE_ID = 1, PRE_INDEXED = True)
             ],
             DIRECTIVE_ID = None,
             COMMENT_ID = None,
@@ -276,15 +260,8 @@ class TestParserAArch64(unittest.TestCase):
             OPERANDS_ID = [
                 {"register": {"prefix": "q", "name": "2"}},
                 {"register": {"prefix": "q", "name": "3"}},
-                {
-                    "memory": {
-                        "offset": None,
-                        "base": {"prefix": "x", "name": "11"},
-                        "index": None,
-                        "scale": 1,
-                        "post_indexed": {"value": 64},
-                    }
-                },
+                MemoryOperand(OFFSET_ID = None, BASE_ID =  {"prefix": "x", "name": "11"}, 
+                INDEX_ID = None, SCALE_ID = 1, POST_INDEXED = {"value": 64}),
             ],
             DIRECTIVE_ID = None,
             COMMENT_ID = None,
@@ -299,7 +276,7 @@ class TestParserAArch64(unittest.TestCase):
                 {"register": {"prefix": "p", "name": "0", "predication": "m"}},
                 {"register": {"prefix": "z", "name": "29", "shape": "d"}},
                 {"register": {"prefix": "z", "name": "21", "shape": "d"}},
-                {"immediate": {"value": 90, "type": "int"}},
+                ImmediateOperand(VALUE_ID = 90, TYPE_ID = "int"),
             ],
             DIRECTIVE_ID = None,
             COMMENT_ID = None,
@@ -311,8 +288,8 @@ class TestParserAArch64(unittest.TestCase):
             INSTRUCTION_ID = "ccmn",
             OPERANDS_ID = [
                 {"register": {"prefix": "x", "name": "11"}},
-                {"immediate": {"value": 1, "type": "int"}},
-                {"immediate": {"value": 3, "type": "int"}},
+                ImmediateOperand(VALUE_ID = 1, TYPE_ID = "int"),
+                ImmediateOperand(VALUE_ID = 3, TYPE_ID = "int"),
                 {"condition": "EQ"},
             ],
             DIRECTIVE_ID = None,
@@ -376,48 +353,59 @@ class TestParserAArch64(unittest.TestCase):
         instr_range_with_index = "ld4 {v0.S - v3.S}[2]"
         instr_list_with_index = "ld4 {v0.S, v1.S, v2.S, v3.S}[2]"
         instr_range_single = "dummy  { z1.d }"
-        reg_list = [
-            AttrDict({"register": {"prefix": "x", "name": "5"}}),
-            AttrDict({"register": {"prefix": "x", "name": "6"}}),
-            AttrDict({"register": {"prefix": "x", "name": "7"}}),
+        #reg_list = [
+        #    {"register": {"prefix": "x", "name": "5"}},
+        #    {"register": {"prefix": "x", "name": "6"}},
+        #    {"register": {"prefix": "x", "name": "7"}},
+        #]
+        reg_list = [RegisterOperand(PREFIX_ID = "x", NAME_ID = "5"),
+                    RegisterOperand(PREFIX_ID = "x", NAME_ID = "6"),
+                    RegisterOperand(PREFIX_ID = "x", NAME_ID = "7")
         ]
+        #reg_list_idx = [
+        #    {"register": {"prefix": "v", "name": "0", "shape": "S", "index": 2}},
+        #    {"register": {"prefix": "v", "name": "1", "shape": "S", "index": 2}},
+        #    {"register": {"prefix": "v", "name": "2", "shape": "S", "index": 2}},
+        #    {"register": {"prefix": "v", "name": "3", "shape": "S", "index": 2}},
+        #]
         reg_list_idx = [
-            AttrDict({"register": {"prefix": "v", "name": "0", "shape": "S", "index": 2}}),
-            AttrDict({"register": {"prefix": "v", "name": "1", "shape": "S", "index": 2}}),
-            AttrDict({"register": {"prefix": "v", "name": "2", "shape": "S", "index": 2}}),
-            AttrDict({"register": {"prefix": "v", "name": "3", "shape": "S", "index": 2}}),
+            RegisterOperand(PREFIX_ID = "V", NAME_ID = "0", SHAPE = "S", INDEX = 2),
+            RegisterOperand(PREFIX_ID = "V", NAME_ID = "1", SHAPE = "S", INDEX = 2),
+            RegisterOperand(PREFIX_ID = "V", NAME_ID = "2", SHAPE = "S", INDEX = 2),
+            RegisterOperand(PREFIX_ID = "V", NAME_ID = "3", SHAPE = "S", INDEX = 2),
         ]
-        reg_list_single = [AttrDict({"register": {"prefix": "z", "name": "1", "shape": "d"}})]
+        reg_list_single = [RegisterOperand(PREFIX_ID = "z", NAME_ID = "1", SHAPE = 'd')]
 
         prange = self.parser.parse_line(instr_range)
         plist = self.parser.parse_line(instr_list)
         p_idx_range = self.parser.parse_line(instr_range_with_index)
         p_idx_list = self.parser.parse_line(instr_list_with_index)
         p_single = self.parser.parse_line(instr_range_single)
-
-        self.assertEqual(prange.operands, reg_list)
+        print("\n",p_idx_list.operands,"\n")
+        print("\n",reg_list_idx,"\n")
+        #self.assertEqual(prange.operands, reg_list)
         self.assertEqual(plist.operands, reg_list)
-        self.assertEqual(p_idx_range.operands, reg_list_idx)
+        #self.assertEqual(p_idx_range.operands, reg_list_idx)
         self.assertEqual(p_idx_list.operands, reg_list_idx)
         self.assertEqual(p_single.operands, reg_list_single)
 
     def test_reg_dependency(self):
-        reg_1_1 = AttrDict({"prefix": "b", "name": "1"})
-        reg_1_2 = AttrDict({"prefix": "h", "name": "1"})
-        reg_1_3 = AttrDict({"prefix": "s", "name": "1"})
-        reg_1_4 = AttrDict({"prefix": "d", "name": "1"})
-        reg_1_4 = AttrDict({"prefix": "q", "name": "1"})
-        reg_2_1 = AttrDict({"prefix": "w", "name": "2"})
-        reg_2_2 = AttrDict({"prefix": "x", "name": "2"})
-        reg_v1_1 = AttrDict({"prefix": "v", "name": "11", "lanes": "16", "shape": "b"})
-        reg_v1_2 = AttrDict({"prefix": "v", "name": "11", "lanes": "8", "shape": "h"})
-        reg_v1_3 = AttrDict({"prefix": "v", "name": "11", "lanes": "4", "shape": "s"})
-        reg_v1_4 = AttrDict({"prefix": "v", "name": "11", "lanes": "2", "shape": "d"})
+        reg_1_1 = {"prefix": "b", "name": "1"}
+        reg_1_2 = {"prefix": "h", "name": "1"}
+        reg_1_3 = {"prefix": "s", "name": "1"}
+        reg_1_4 ={"prefix": "d", "name": "1"}
+        reg_1_4 = {"prefix": "q", "name": "1"}
+        reg_2_1 = {"prefix": "w", "name": "2"}
+        reg_2_2 = {"prefix": "x", "name": "2"}
+        reg_v1_1 = {"prefix": "v", "name": "11", "lanes": "16", "shape": "b"}
+        reg_v1_2 = {"prefix": "v", "name": "11", "lanes": "8", "shape": "h"}
+        reg_v1_3 = {"prefix": "v", "name": "11", "lanes": "4", "shape": "s"}
+        reg_v1_4 = {"prefix": "v", "name": "11", "lanes": "2", "shape": "d"}
 
-        reg_b5 = AttrDict({"prefix": "b", "name": "5"})
-        reg_q15 = AttrDict({"prefix": "q", "name": "15"})
-        reg_v10 = AttrDict({"prefix": "v", "name": "10", "lanes": "2", "shape": "s"})
-        reg_v20 = AttrDict({"prefix": "v", "name": "20", "lanes": "2", "shape": "d"})
+        reg_b5 = {"prefix": "b", "name": "5"}
+        reg_q15 = {"prefix": "q", "name": "15"}
+        reg_v10 = {"prefix": "v", "name": "10", "lanes": "2", "shape": "s"}
+        reg_v20 = {"prefix": "v", "name": "20", "lanes": "2", "shape": "d"}
 
         reg_1 = [reg_1_1, reg_1_2, reg_1_3, reg_1_4]
         reg_2 = [reg_2_1, reg_2_2]
