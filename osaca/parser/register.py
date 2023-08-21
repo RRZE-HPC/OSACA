@@ -4,8 +4,8 @@ from osaca.parser.operand import Operand
 
 class RegisterOperand(Operand):
     def __init__(self, NAME_ID = None, WIDTH_ID = None, PREFIX_ID = None, REG_ID = None
-    , REGTYPE_ID = None, LANES = None, SHAPE = None, INDEX = False
-    , MASK = False, ZEROING = False):
+    , REGTYPE_ID = None, LANES = None, SHAPE = None, INDEX = None
+    , MASK = False, ZEROING = False, PREDICATION = None):
         super().__init__(NAME_ID)
         self._WIDTH_ID = WIDTH_ID
         self._PREFIX_ID = PREFIX_ID
@@ -16,6 +16,7 @@ class RegisterOperand(Operand):
         self._INDEX = INDEX
         self._MASK = MASK
         self._ZEROING = ZEROING
+        self._PREDICATION = PREDICATION
 
     @property
     def width(self):
@@ -24,6 +25,14 @@ class RegisterOperand(Operand):
     @width.setter
     def width(self, width):
         self._WIDTH_ID = width
+
+    @property
+    def predication(self):
+        return self._PREDICATION
+    
+    @predication.setter
+    def predication(self, predication):
+        self._PREDICATION = predication
 
     @property
     def regtype(self):
