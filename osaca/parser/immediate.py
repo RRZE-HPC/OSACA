@@ -54,3 +54,13 @@ class ImmediateOperand(Operand):
             f"ImmediateOperand(IDENTIFIER_ID={self._IDENTIFIER_ID}, TYPE_ID={self._TYPE_ID}, "
             f"VALUE_ID={self._VALUE_ID}, SHIFT_ID={self._SHIFT_ID})"
         )
+
+    def __eq__(self, other):
+        if isinstance(other, ImmediateOperand):
+            return (
+                self._IDENTIFIER_ID == other._IDENTIFIER_ID and
+                self._TYPE_ID == other._TYPE_ID and
+                self._VALUE_ID == other._VALUE_ID and
+                self._SHIFT_ID == other._SHIFT_ID
+            )
+        return False

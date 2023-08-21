@@ -39,6 +39,11 @@ class DirectiveOperand(Operand):
                 self._PARAMETER_ID == other._PARAMETER_ID and
                 self._COMMENT_ID == other._COMMENT_ID
             )
+        elif isinstance(other, dict):
+            return (
+                self._NAME_ID == other['name'] and
+                self._PARAMETER_ID == other['parameters']
+            )
         return False
 
     def __str__(self):

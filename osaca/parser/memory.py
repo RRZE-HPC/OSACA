@@ -110,3 +110,18 @@ class MemoryOperand(Operand):
             f"PRE_INDEXED={self._PRE_INDEXED}, POST_INDEXED={self._POST_INDEXED}, "
             f"INDEXED_VAL={self._INDEXED_VAL})"
         )
+
+    def __eq__(self, other):
+        if isinstance(other, MemoryOperand):
+            return (
+                self._OFFSET_ID == other._OFFSET_ID and
+                self._BASE_ID == other._BASE_ID and
+                self._INDEX_ID == other._INDEX_ID and
+                self._SCALE_ID == other._SCALE_ID and
+                self._SEGMENT_EXT_ID == other._SEGMENT_EXT_ID and
+                self._MASK == other._MASK and
+                self._PRE_INDEXED == other._PRE_INDEXED and
+                self._POST_INDEXED == other._POST_INDEXED and
+                self._INDEXED_VAL == other._INDEXED_VAL
+            )
+        return False
