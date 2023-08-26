@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+
 class Operand:
     def __init__(self, NAME_ID):
         self._NAME_ID = NAME_ID
@@ -11,7 +12,7 @@ class Operand:
     @name.setter
     def name(self, name):
         self._NAME_ID = name
-    
+
     def __repr__(self):
         return f"Operand(NAME_ID={self._NAME_ID}"
 

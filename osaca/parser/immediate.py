@@ -2,9 +2,15 @@
 
 from osaca.parser.operand import Operand
 
+
 class ImmediateOperand(Operand):
-    def __init__(self, IDENTIFIER_ID = None, TYPE_ID = None, VALUE_ID = None, SHIFT_ID = None
-    , ):
+    def __init__(
+        self,
+        IDENTIFIER_ID=None,
+        TYPE_ID=None,
+        VALUE_ID=None,
+        SHIFT_ID=None,
+    ):
         super().__init__(str(VALUE_ID))
         self._IDENTIFIER_ID = IDENTIFIER_ID
         self._TYPE_ID = TYPE_ID
@@ -14,11 +20,11 @@ class ImmediateOperand(Operand):
     @property
     def identifier(self):
         return self._IDENTIFIER_ID
-    
+
     @property
     def type(self):
         return self._TYPE_ID
-    
+
     @property
     def value(self):
         return self._VALUE_ID
@@ -26,10 +32,10 @@ class ImmediateOperand(Operand):
     @property
     def shift(self):
         return self._TYPE_ID
-    
+
     @identifier.setter
     def identifier(self, identifier):
-        self._IDENTIFIER_ID = identifier  
+        self._IDENTIFIER_ID = identifier
 
     @type.setter
     def type(self, type):
@@ -38,7 +44,7 @@ class ImmediateOperand(Operand):
     @value.setter
     def value(self, value):
         self._VALUE_ID = value
-    
+
     @shift.setter
     def index(self, shift):
         self._SHIFT_ID = shift
@@ -58,9 +64,9 @@ class ImmediateOperand(Operand):
     def __eq__(self, other):
         if isinstance(other, ImmediateOperand):
             return (
-                self._IDENTIFIER_ID == other._IDENTIFIER_ID and
-                self._TYPE_ID == other._TYPE_ID and
-                self._VALUE_ID == other._VALUE_ID and
-                self._SHIFT_ID == other._SHIFT_ID
+                self._IDENTIFIER_ID == other._IDENTIFIER_ID
+                and self._TYPE_ID == other._TYPE_ID
+                and self._VALUE_ID == other._VALUE_ID
+                and self._SHIFT_ID == other._SHIFT_ID
             )
         return False

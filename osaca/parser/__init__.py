@@ -10,7 +10,15 @@ from .parser_AArch64 import ParserAArch64
 from .instruction_form import InstructionForm
 from .operand import Operand
 
-__all__ = ["Operand", "InstructionForm", "AttrDict", "BaseParser", "ParserX86ATT", "ParserAArch64", "get_parser"]
+__all__ = [
+    "Operand",
+    "InstructionForm",
+    "AttrDict",
+    "BaseParser",
+    "ParserX86ATT",
+    "ParserAArch64",
+    "get_parser",
+]
 
 
 def get_parser(isa):

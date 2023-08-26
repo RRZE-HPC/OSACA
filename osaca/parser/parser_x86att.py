@@ -14,7 +14,8 @@ from osaca.parser.label import LabelOperand
 from osaca.parser.register import RegisterOperand
 from osaca.parser.identifier import IdentifierOperand
 from osaca.parser.immediate import ImmediateOperand
- 
+
+
 class ParserX86ATT(BaseParser):
     _instance = None
 
@@ -206,7 +207,7 @@ class ParserX86ATT(BaseParser):
         :type line_number: int, optional
         :return: ``dict`` -- parsed asm line (comment, label, directive or instruction form)
         """
-        instruction_form = InstructionForm(LINE = line, LINE_NUMBER = line_number)
+        instruction_form = InstructionForm(LINE=line, LINE_NUMBER=line_number)
         result = None
 
         # 1. Parse comment
@@ -222,9 +223,7 @@ class ParserX86ATT(BaseParser):
                 result = self.process_operand(self.label.parseString(line, parseAll=True).asDict())
                 instruction_form.label = result.name
                 if result.comment != None:
-                    instruction_form.comment = " ".join(
-                        result.comment
-                    )
+                    instruction_form.comment = " ".join(result.comment)
             except pp.ParseException:
                 pass
 
@@ -235,14 +234,12 @@ class ParserX86ATT(BaseParser):
                     self.directive.parseString(line, parseAll=True).asDict()
                 )
                 instruction_form.directive = DirectiveOperand(
-                        NAME_ID = result.name,
-                        PARAMETER_ID = result.parameters,
-                    )
-                
+                    NAME_ID=result.name,
+                    PARAMETER_ID=result.parameters,
+                )
+
                 if result.comment != None:
-                    instruction_form.comment = " ".join(
-                        result.comment
-                    )
+                    instruction_form.comment = " ".join(result.comment)
             except pp.ParseException:
                 pass
 
@@ -283,13 +280,11 @@ class ParserX86ATT(BaseParser):
         if "operand4" in result:
             operands.append(self.process_operand(result["operand4"]))
         return_dict = InstructionForm(
-                INSTRUCTION_ID = result["mnemonic"].split(",")[0],
-                OPERANDS_ID = operands,
-                COMMENT_ID = " ".join(result[self.COMMENT_ID])
-                if self.COMMENT_ID in result
-                else None,
+            INSTRUCTION_ID=result["mnemonic"].split(",")[0],
+            OPERANDS_ID=operands,
+            COMMENT_ID=" ".join(result[self.COMMENT_ID]) if self.COMMENT_ID in result else None,
         )
-        
+
         return return_dict
 
     def process_operand(self, operand):
@@ -304,16 +299,22 @@ class ParserX86ATT(BaseParser):
         if self.DIRECTIVE_ID in operand:
             return self.process_directive(operand[self.DIRECTIVE_ID])
         if self.REGISTER_ID in operand:
-            return RegisterOperand(PREFIX_ID = operand['register']['prefix'] if 'prefix' in operand['register'] else None, 
-            NAME_ID = operand['register']['name'],
-            SHAPE = operand['register']['shape'] if 'shape' in operand['register'] else None,
-            LANES = operand['register']['lanes'] if 'lanes' in operand['register'] else None,
-            INDEX = operand['register']['index'] if 'index' in operand['register'] else None,
-            PREDICATION = operand['register']['predication'] if 'predication' in operand['register'] else None)
+            return RegisterOperand(
+                PREFIX_ID=operand["register"]["prefix"]
+                if "prefix" in operand["register"]
+                else None,
+                NAME_ID=operand["register"]["name"],
+                SHAPE=operand["register"]["shape"] if "shape" in operand["register"] else None,
+                LANES=operand["register"]["lanes"] if "lanes" in operand["register"] else None,
+                INDEX=operand["register"]["index"] if "index" in operand["register"] else None,
+                PREDICATION=operand["register"]["predication"]
+                if "predication" in operand["register"]
+                else None,
+            )
         return operand
 
     def process_directive(self, directive):
-        directive_new = DirectiveOperand(NAME_ID =  directive["name"], PARAMETER_ID = [])
+        directive_new = DirectiveOperand(NAME_ID=directive["name"], PARAMETER_ID=[])
         if "parameters" in directive:
             directive_new.parameters = directive["parameters"]
         if "comment" in directive:
@@ -334,7 +335,7 @@ class ParserX86ATT(BaseParser):
                 offset = {"value": offset}
         elif offset is not None and "value" in offset:
             offset["value"] = int(offset["value"], 0)
-        new_dict = MemoryOperand(OFFSET_ID = offset, BASE_ID = base, INDEX_ID = index, SCALE_ID = scale)
+        new_dict = MemoryOperand(OFFSET_ID=offset, BASE_ID=base, INDEX_ID=index, SCALE_ID=scale)
         # Add segmentation extension if existing
         if self.SEGMENT_EXT_ID in memory_address:
             new_dict.segment_ext_id = memory_address[self.SEGMENT_EXT_ID]
@@ -344,7 +345,9 @@ class ParserX86ATT(BaseParser):
         """Post-process label asm line"""
         # remove duplicated 'name' level due to identifier
         label["name"] = label["name"][0]["name"]
-        new_label = LabelOperand(NAME_ID = label["name"], COMMENT_ID = label["comment"] if "comment" in label else None)
+        new_label = LabelOperand(
+            NAME_ID=label["name"], COMMENT_ID=label["comment"] if "comment" in label else None
+        )
         return new_label
 
     def process_immediate(self, immediate):
