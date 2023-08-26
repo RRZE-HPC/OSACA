@@ -11,6 +11,7 @@ from pyparsing import ParseException
 from osaca.parser import ParserX86ATT, InstructionForm
 from osaca.parser.register import RegisterOperand
 
+
 class TestParserX86ATT(unittest.TestCase):
     @classmethod
     def setUpClass(self):
@@ -86,12 +87,16 @@ class TestParserX86ATT(unittest.TestCase):
             "byte",
         )
         self.assertEqual(
-            self._get_directive(self.parser, "        .byte 100,103,144       #IACA START").parameters[2],
+            self._get_directive(
+                self.parser, "        .byte 100,103,144       #IACA START"
+            ).parameters[2],
             "144",
         )
         self.assertEqual(
             " ".join(
-                self._get_directive(self.parser, "        .byte 100,103,144       #IACA START").comment
+                self._get_directive(
+                    self.parser, "        .byte 100,103,144       #IACA START"
+                ).comment
             ),
             "IACA START",
         )
@@ -119,24 +124,24 @@ class TestParserX86ATT(unittest.TestCase):
         self.assertEqual(parsed_1.comment, "12.27")
 
         self.assertEqual(parsed_2.instruction, "jb")
-        self.assertEqual(parsed_2.operands[0]['identifier']['name'], "..B1.4")
+        self.assertEqual(parsed_2.operands[0]["identifier"]["name"], "..B1.4")
         self.assertEqual(len(parsed_2.operands), 1)
         self.assertIsNone(parsed_2.comment)
         self.assertEqual(parsed_3.instruction, "movl")
-        self.assertEqual(parsed_3.operands[0]['value'], 222)
+        self.assertEqual(parsed_3.operands[0]["value"], 222)
         self.assertEqual(parsed_3.operands[1].name, "ebx")
         self.assertEqual(parsed_3.comment, "IACA END")
 
         self.assertEqual(parsed_4.instruction, "vmovss")
-        self.assertEqual(parsed_4.operands[1].offset['value'], -4)
-        self.assertEqual(parsed_4.operands[1].base['name'], "rsp")
-        self.assertEqual(parsed_4.operands[1].index['name'], "rax")
+        self.assertEqual(parsed_4.operands[1].offset["value"], -4)
+        self.assertEqual(parsed_4.operands[1].base["name"], "rsp")
+        self.assertEqual(parsed_4.operands[1].index["name"], "rax")
         self.assertEqual(parsed_4.operands[1].scale, 8)
         self.assertEqual(parsed_4.operands[0].name, "xmm4")
         self.assertEqual(parsed_4.comment, "12.9")
 
         self.assertEqual(parsed_5.instruction, "mov")
-        self.assertEqual(parsed_5.operands[1].offset['identifier']['name'], "var")
+        self.assertEqual(parsed_5.operands[1].offset["identifier"]["name"], "var")
         self.assertIsNone(parsed_5.operands[1].base)
         self.assertIsNone(parsed_5.operands[1].index)
         self.assertEqual(parsed_5.operands[1].scale, 1)
@@ -145,11 +150,11 @@ class TestParserX86ATT(unittest.TestCase):
         self.assertEqual(parsed_6.instruction, "lea")
         self.assertIsNone(parsed_6.operands[0].offset)
         self.assertIsNone(parsed_6.operands[0].base)
-        self.assertEqual(parsed_6.operands[0].index['name'], "rax")
+        self.assertEqual(parsed_6.operands[0].index["name"], "rax")
         self.assertEqual(parsed_6.operands[0].scale, 8)
         self.assertEqual(parsed_6.operands[1].name, "rbx")
 
-        self.assertEqual(parsed_7.operands[0]['value'], 0x1)
+        self.assertEqual(parsed_7.operands[0]["value"], 0x1)
         self.assertEqual(parsed_7.operands[1].name, "xmm0")
         self.assertEqual(parsed_7.operands[2].name, "ymm1")
         self.assertEqual(parsed_7.operands[3].name, "ymm1")
@@ -161,35 +166,35 @@ class TestParserX86ATT(unittest.TestCase):
         line_instruction = "lea       2(%rax,%rax), %ecx #12.9"
 
         instruction_form_1 = InstructionForm(
-            INSTRUCTION_ID =  None,
-            OPERANDS_ID = [],
-            DIRECTIVE_ID = None,
-            COMMENT_ID = "-- Begin main",
-            LABEL_ID = None,
-            LINE = "# -- Begin  main",
-            LINE_NUMBER = 1,
+            INSTRUCTION_ID=None,
+            OPERANDS_ID=[],
+            DIRECTIVE_ID=None,
+            COMMENT_ID="-- Begin main",
+            LABEL_ID=None,
+            LINE="# -- Begin  main",
+            LINE_NUMBER=1,
         )
-        instruction_form_2 =  InstructionForm(
-            INSTRUCTION_ID = None,
-            OPERANDS_ID = [],
-            DIRECTIVE_ID = None,
-            COMMENT_ID = "Preds ..B1.6",
-            LABEL_ID = "..B1.7",
-            LINE = "..B1.7:                         # Preds ..B1.6",
-            LINE_NUMBER = 2,
+        instruction_form_2 = InstructionForm(
+            INSTRUCTION_ID=None,
+            OPERANDS_ID=[],
+            DIRECTIVE_ID=None,
+            COMMENT_ID="Preds ..B1.6",
+            LABEL_ID="..B1.7",
+            LINE="..B1.7:                         # Preds ..B1.6",
+            LINE_NUMBER=2,
         )
-        instruction_form_3 =  InstructionForm(
-            INSTRUCTION_ID = None,
-            OPERANDS_ID = [],
-            DIRECTIVE_ID = {"name": "quad", "parameters": [".2.3_2__kmpc_loc_pack.2"]},
-            COMMENT_ID = "qed",
-            LABEL_ID = None,
-            LINE = ".quad   .2.3_2__kmpc_loc_pack.2 #qed",
-            LINE_NUMBER = 3,
+        instruction_form_3 = InstructionForm(
+            INSTRUCTION_ID=None,
+            OPERANDS_ID=[],
+            DIRECTIVE_ID={"name": "quad", "parameters": [".2.3_2__kmpc_loc_pack.2"]},
+            COMMENT_ID="qed",
+            LABEL_ID=None,
+            LINE=".quad   .2.3_2__kmpc_loc_pack.2 #qed",
+            LINE_NUMBER=3,
         )
-        instruction_form_4 =  InstructionForm(
-            INSTRUCTION_ID = "lea",
-            OPERANDS_ID = [
+        instruction_form_4 = InstructionForm(
+            INSTRUCTION_ID="lea",
+            OPERANDS_ID=[
                 {
                     "memory": {
                         "offset": {"value": 2},
@@ -200,11 +205,11 @@ class TestParserX86ATT(unittest.TestCase):
                 },
                 {"register": {"name": "ecx"}},
             ],
-            DIRECTIVE_ID = None,
-            COMMENT_ID = "12.9",
-            LABEL_ID = None,
-            LINE = "lea       2(%rax,%rax), %ecx #12.9",
-            LINE_NUMBER = 4,
+            DIRECTIVE_ID=None,
+            COMMENT_ID="12.9",
+            LABEL_ID=None,
+            LINE="lea       2(%rax,%rax), %ecx #12.9",
+            LINE_NUMBER=4,
         )
 
         parsed_1 = self.parser.parse_line(line_comment, 1)
@@ -215,7 +220,7 @@ class TestParserX86ATT(unittest.TestCase):
         self.assertEqual(parsed_1, instruction_form_1)
         self.assertEqual(parsed_2, instruction_form_2)
         self.assertEqual(parsed_3, instruction_form_3)
-        #self.assertEqual(parsed_4, instruction_form_4)
+        # self.assertEqual(parsed_4, instruction_form_4)
 
     def test_parse_file(self):
         parsed = self.parser.parse_file(self.triad_code)
@@ -228,10 +233,10 @@ class TestParserX86ATT(unittest.TestCase):
         register_str_3 = "%xmm1"
         register_str_4 = "%rip"
 
-        parsed_reg_1 = RegisterOperand(NAME_ID = "rax")
-        parsed_reg_2 = RegisterOperand(NAME_ID = "r9")
-        parsed_reg_3 = RegisterOperand(NAME_ID = "xmm1")
-        parsed_reg_4 = RegisterOperand(NAME_ID = "rip")
+        parsed_reg_1 = RegisterOperand(NAME_ID="rax")
+        parsed_reg_2 = RegisterOperand(NAME_ID="r9")
+        parsed_reg_3 = RegisterOperand(NAME_ID="xmm1")
+        parsed_reg_4 = RegisterOperand(NAME_ID="rip")
 
         self.assertEqual(self.parser.parse_register(register_str_1), parsed_reg_1)
         self.assertEqual(self.parser.parse_register(register_str_2), parsed_reg_2)
@@ -304,14 +309,18 @@ class TestParserX86ATT(unittest.TestCase):
     ##################
     def _get_comment(self, parser, comment):
         return " ".join(
-            parser.process_operand(parser.comment.parseString(comment, parseAll=True).asDict())['comment']
-            )
+            parser.process_operand(parser.comment.parseString(comment, parseAll=True).asDict())[
+                "comment"
+            ]
+        )
 
     def _get_label(self, parser, label):
         return parser.process_operand(parser.label.parseString(label, parseAll=True).asDict())
 
     def _get_directive(self, parser, directive):
-        return parser.process_operand(parser.directive.parseString(directive, parseAll=True).asDict())
+        return parser.process_operand(
+            parser.directive.parseString(directive, parseAll=True).asDict()
+        )
 
     @staticmethod
     def _find_file(name):
