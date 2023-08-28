@@ -4,18 +4,6 @@ from osaca.parser.directive import DirectiveOperand
 
 
 class InstructionForm:
-    # Identifiers for operand types
-    COMMENT_ID = "comment"
-    DIRECTIVE_ID = "directive"
-    IMMEDIATE_ID = "immediate"
-    LABEL_ID = "label"
-    IDENTIFIER_ID = "identifier"
-    MEMORY_ID = "memory"
-    REGISTER_ID = "register"
-    SEGMENT_EXT_ID = "segment_extension"
-    INSTRUCTION_ID = "instruction"
-    OPERANDS_ID = "operands"
-
     def __init__(
         self,
         INSTRUCTION_ID=None,
@@ -91,6 +79,18 @@ class InstructionForm:
     def flags(self):
         return self._FLAGS
 
+    @property
+    def throughput(self):
+        return self._THROUGHPUT
+
+    @property
+    def latency(self):
+        return self._LATENCY
+
+    @property
+    def latency_wo_load(self):
+        return self._LATENCY_WO_LOAD
+
     @semantic_operands.setter
     def semantic_operands(self, semantic_operands):
         self._SEMANTIC_OPERANDS = semantic_operands
@@ -134,6 +134,18 @@ class InstructionForm:
     @flags.setter
     def flags(self, flags):
         self._FLAGS = flags
+
+    @throughput.setter
+    def throughput(self, throughput):
+        self._THROUGHPUT = throughput
+
+    @latency.setter
+    def latency(self, latency):
+        self._LATENCY = latency
+
+    @latency_wo_load.setter
+    def latency_wo_load(self, latency_wo_load):
+        self._LATENCY_WO_LOAD = latency_wo_load
 
     def __repr__(self):
         return f"InstructionForm(INSTRUCTION_ID={self._INSTRUCTION_ID}, OPERANDS_ID={self._OPERANDS_ID}, DIRECTIVE_ID={self._DIRECTIVE_ID}, COMMENT_ID={self._COMMENT_ID}, LABEL_ID={self._LABEL_ID}, LINE={self._LINE}, LINE_NUMBER={self._LINE_NUMBER}, SEMANTIC_OPERANDS={self._SEMANTIC_OPERANDS})"

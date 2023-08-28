@@ -9,6 +9,8 @@ from multiprocessing import Manager, Process, cpu_count
 
 import networkx as nx
 from osaca.semantics import INSTR_FLAGS, ArchSemantics, MachineModel
+from osaca.parser.memory import MemoryOperand
+from osaca.parser.register import RegisterOperand
 
 
 class KernelDG(nx.DiGraph):
@@ -60,8 +62,7 @@ class KernelDG(nx.DiGraph):
         dg = nx.DiGraph()
         for i, instruction_form in enumerate(kernel):
             dg.add_node(instruction_form.line_number)
-            print(dg.nodes[instruction_form.line_number])
-            dg.nodes[instruction_form.line_number].instruction_form = instruction_form
+            dg.nodes[instruction_form.line_number]["instruction_form"] = instruction_form
             # add load as separate node if existent
             if (
                 INSTR_FLAGS.HAS_LD in instruction_form.flags
@@ -271,8 +272,8 @@ class KernelDG(nx.DiGraph):
         if instruction_form.semantic_operands is None:
             return
         for dst in chain(
-            instruction_form.semantic_operands.destination,
-            instruction_form.semantic_operands.src_dst,
+            instruction_form.semantic_operands["destination"],
+            instruction_form.semantic_operands["src_dst"],
         ):
             # TODO instructions before must be considered as well, if they update registers
             # not used by insruction_form. E.g., validation/build/A64FX/gcc/O1/gs-2d-5pt.marked.s
@@ -281,27 +282,32 @@ class KernelDG(nx.DiGraph):
             for i, instr_form in enumerate(instructions):
                 self._update_reg_changes(instr_form, register_changes)
                 # print("  TO", instr_form.line, register_changes)
-                if "register" in dst:
+                if isinstance(dst, RegisterOperand):
                     # read of register
-                    if self.is_read(dst.register, instr_form):
+                    if self.is_read(dst, instr_form):
                         if dst.get("pre_indexed", False) or dst.get("post_indexed", False):
                             yield instr_form, ["p_indexed"]
                         else:
                             yield instr_form, []
                     # write to register -> abort
-                    if self.is_written(dst.register, instr_form):
+                    if self.is_written(dst, instr_form):
                         break
-                if "flag" in dst and flag_dependencies:
+                if (
+                    not isinstance(dst, RegisterOperand)
+                    and not isinstance(dst, MemoryOperandOperand)
+                    and "flag" in dst
+                    and flag_dependencies
+                ):
                     # read of flag
                     if self.is_read(dst.flag, instr_form):
                         yield instr_form, []
                     # write to flag -> abort
                     if self.is_written(dst.flag, instr_form):
                         break
-                if "memory" in dst:
+                if isinstance(dst, MemoryOperand):
                     # base register is altered during memory access
-                    if "pre_indexed" in dst.memory:
-                        if self.is_written(dst.memory.base, instr_form):
+                    if dist.pre_indexed != None:
+                        if self.is_written(dst.base, instr_form):
                             break
                     # if dst.memory.base:
                     #    if self.is_read(dst.memory.base, instr_form):
@@ -309,18 +315,18 @@ class KernelDG(nx.DiGraph):
                     # if dst.memory.index:
                     #    if self.is_read(dst.memory.index, instr_form):
                     #        yield instr_form, []
-                    if "post_indexed" in dst.memory:
+                    if dst.post_indexed:
                         # Check for read of base register until overwrite
-                        if self.is_written(dst.memory.base, instr_form):
+                        if self.is_written(dst.base, instr_form):
                             break
                     # TODO record register changes
                     #      (e.g., mov, leaadd, sub, inc, dec) in instructions[:i]
                     #      and pass to is_memload and is_memstore to consider relevance.
                     # load from same location (presumed)
-                    if self.is_memload(dst.memory, instr_form, register_changes):
+                    if self.is_memload(dst, instr_form, register_changes):
                         yield instr_form, ["storeload_dep"]
                     # store to same location (presumed)
-                    if self.is_memstore(dst.memory, instr_form, register_changes):
+                    if self.is_memstore(dst, instr_form, register_changes):
                         break
                 self._update_reg_changes(instr_form, register_changes, only_postindexed=True)
 
@@ -364,32 +370,32 @@ class KernelDG(nx.DiGraph):
         if instruction_form.semantic_operands is None:
             return is_read
         for src in chain(
-            instruction_form.semantic_operands.source,
-            instruction_form.semantic_operands.src_dst,
+            instruction_form.semantic_operands["source"],
+            instruction_form.semantic_operands["src_dst"],
         ):
-            if "register" in src:
-                is_read = self.parser.is_reg_dependend_of(register, src.register) or is_read
-            if "flag" in src:
+            if isinstance(src, RegisterOperand):
+                is_read = self.parser.is_reg_dependend_of(register, src) or is_read
+            if (
+                not isinstance(src, RegisterOperand)
+                and not isinstance(src, MemoryOperand)
+                and "flag" in src
+            ):
                 is_read = self.parser.is_flag_dependend_of(register, src.flag) or is_read
-            if "memory" in src:
-                if src.memory.base is not None:
-                    is_read = self.parser.is_reg_dependend_of(register, src.memory.base) or is_read
-                if src.memory.index is not None:
-                    is_read = (
-                        self.parser.is_reg_dependend_of(register, src.memory.index) or is_read
-                    )
+            if isinstance(src, MemoryOperand):
+                if src.base is not None:
+                    is_read = self.parser.is_reg_dependend_of(register, src.base) or is_read
+                if src.index is not None:
+                    is_read = self.parser.is_reg_dependend_of(register, src.index) or is_read
         # Check also if read in destination memory address
         for dst in chain(
-            instruction_form.semantic_operands.destination,
-            instruction_form.semantic_operands.src_dst,
+            instruction_form.semantic_operands["destination"],
+            instruction_form.semantic_operands["src_dst"],
         ):
-            if "memory" in dst:
-                if dst.memory.base is not None:
-                    is_read = self.parser.is_reg_dependend_of(register, dst.memory.base) or is_read
-                if dst.memory.index is not None:
-                    is_read = (
-                        self.parser.is_reg_dependend_of(register, dst.memory.index) or is_read
-                    )
+            if isinstance(dst, MemoryOperand):
+                if dst.base is not None:
+                    is_read = self.parser.is_reg_dependend_of(register, dst.base) or is_read
+                if dst.index is not None:
+                    is_read = self.parser.is_reg_dependend_of(register, dst.index) or is_read
         return is_read
 
     def is_memload(self, mem, instruction_form, register_changes={}):
@@ -455,28 +461,28 @@ class KernelDG(nx.DiGraph):
         if instruction_form.semantic_operands is None:
             return is_written
         for dst in chain(
-            instruction_form.semantic_operands.destination,
-            instruction_form.semantic_operands.src_dst,
+            instruction_form.semantic_operands["destination"],
+            instruction_form.semantic_operands["src_dst"],
         ):
-            if "register" in dst:
-                is_written = self.parser.is_reg_dependend_of(register, dst.register) or is_written
-            if "flag" in dst:
+            if isinstance(dst, RegisterOperand):
+                is_written = self.parser.is_reg_dependend_of(register, dst) or is_written
+            if (
+                not isinstance(dst, RegisterOperand)
+                and not isinstance(dst, MemoryOperand)
+                and "flag" in dst
+            ):
                 is_written = self.parser.is_flag_dependend_of(register, dst.flag) or is_written
-            if "memory" in dst:
-                if "pre_indexed" in dst.memory or "post_indexed" in dst.memory:
-                    is_written = (
-                        self.parser.is_reg_dependend_of(register, dst.memory.base) or is_written
-                    )
+            if isinstance(dst, MemoryOperand):
+                if dst.pre_indexed or dst.post_indexed:
+                    is_written = self.parser.is_reg_dependend_of(register, dst.base) or is_written
         # Check also for possible pre- or post-indexing in memory addresses
         for src in chain(
-            instruction_form.semantic_operands.source,
-            instruction_form.semantic_operands.src_dst,
+            instruction_form.semantic_operands["source"],
+            instruction_form.semantic_operands["src_dst"],
         ):
-            if "memory" in src:
-                if "pre_indexed" in src.memory or "post_indexed" in src.memory:
-                    is_written = (
-                        self.parser.is_reg_dependend_of(register, src.memory.base) or is_written
-                    )
+            if isinstance(src, MemoryOperand):
+                if src.pre_indexed or src.post_indexed:
+                    is_written = self.parser.is_reg_dependend_of(register, src.base) or is_written
         return is_written
 
     def is_memstore(self, mem, instruction_form, register_changes={}):
@@ -485,10 +491,10 @@ class KernelDG(nx.DiGraph):
         if instruction_form.semantic_operands is None:
             return is_store
         for dst in chain(
-            instruction_form.semantic_operands.destination,
-            instruction_form.semantic_operands.src_dst,
+            instruction_form.semantic_operands["destination"],
+            instruction_form.semantic_operands["src_dst"],
         ):
-            if "memory" in dst:
+            if isinstance(dst, MemoryOperand):
                 is_store = mem == dst["memory"] or is_store
         return is_store
 

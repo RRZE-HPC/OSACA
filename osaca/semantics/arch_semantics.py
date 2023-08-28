@@ -69,9 +69,7 @@ class ArchSemantics(ISASemantics):
                 indices = [port_list.index(p) for p in ports]
                 # check if port sum of used ports for uop are unbalanced
                 port_sums = self._to_list(itemgetter(*indices)(self.get_throughput_sum(kernel)))
-                instr_ports = self._to_list(
-                    itemgetter(*indices)(instruction_form.port_pressure)
-                )
+                instr_ports = self._to_list(itemgetter(*indices)(instruction_form.port_pressure))
                 if len(set(port_sums)) > 1:
                     # balance ports
                     # init list for keeping track of the current change
@@ -110,9 +108,7 @@ class ArchSemantics(ISASemantics):
                                 ][0]
                                 instruction_form.port_pressure[zero_index] = 0.0
                             # Remove from further balancing
-                            indices = [
-                                p for p in indices if instruction_form.port_pressure[p] > 0
-                            ]
+                            indices = [p for p in indices if instruction_form.port_pressure[p] > 0]
                             instr_ports = self._to_list(
                                 itemgetter(*indices)(instruction_form.port_pressure)
                             )
@@ -193,6 +189,7 @@ class ArchSemantics(ISASemantics):
             instruction_data = self._machine_model.get_instruction(
                 instruction_form.instruction, instruction_form.operands
             )
+
             if (
                 not instruction_data
                 and self._isa == "x86"

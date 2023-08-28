@@ -14,6 +14,11 @@ import ruamel.yaml
 from osaca import __version__, utils
 from osaca.parser import ParserX86ATT
 from ruamel.yaml.compat import StringIO
+from osaca.parser.operand import Operand
+from osaca.parser.memory import MemoryOperand
+from osaca.parser.register import RegisterOperand
+from osaca.parser.immediate import ImmediateOperand
+from osaca.parser.identifier import IdentifierOperand
 
 
 class MachineModel(object):
@@ -21,7 +26,7 @@ class MachineModel(object):
     INTERNAL_VERSION = 1  # increase whenever self._data format changes to invalidate cache!
     _runtime_cache = {}
 
-    def __init__(self, arch=None, path_to_yaml=None, isa=None, lazy=False):
+    def __init__(self, arch=None, path_to_yaml=None, isa=None, lazy=True):
         if not arch and not path_to_yaml:
             if not isa:
                 raise ValueError("One of arch, path_to_yaml and isa must be specified")
@@ -97,6 +102,7 @@ class MachineModel(object):
                 # Normalize instruction_form names (to UPPERCASE) and build dict for faster access:
                 self._data["instruction_forms_dict"] = defaultdict(list)
                 for iform in self._data["instruction_forms"]:
+                    print(iform)
                     iform["name"] = iform["name"].upper()
                     self._data["instruction_forms_dict"][iform["name"]].append(iform)
                 self._data["internal_version"] = self.INTERNAL_VERSION
@@ -128,6 +134,7 @@ class MachineModel(object):
         if name is None:
             return None
         name_matched_iforms = self._data["instruction_forms_dict"].get(name.upper(), [])
+        # print(name_matched_iforms)
         try:
             return next(
                 instruction_form
@@ -264,7 +271,7 @@ class MachineModel(object):
     def get_full_instruction_name(instruction_form):
         """Get one instruction name string including the mnemonic and all operands."""
         operands = []
-        for op in instruction_form["operands"]:
+        for op in instruction_form.operands:
             op_attrs = [
                 y + ":" + str(op[y])
                 for y in list(filter(lambda x: True if x != "class" else False, op))
@@ -526,7 +533,9 @@ class MachineModel(object):
     def _check_operands(self, i_operand, operand):
         """Check if the types of operand ``i_operand`` and ``operand`` match."""
         # check for wildcard
-        if self.WILDCARD in operand.name:
+        if (isinstance(operand, Operand) and operand.name == self.WILDCARD) or (
+            not isinstance(operand, Operand) and self.WILDCARD in operand
+        ):
             if (
                 "class" in i_operand
                 and i_operand["class"] == "register"
@@ -601,25 +610,27 @@ class MachineModel(object):
 
     def _check_x86_operands(self, i_operand, operand):
         """Check if the types of operand ``i_operand`` and ``operand`` match."""
-        if "class" in operand.name:
-            # compare two DB entries
-            return self._compare_db_entries(i_operand, operand)
+        # if "class" in operand.name:
+        # compare two DB entries
+        #    return self._compare_db_entries(i_operand, operand)
         # register
-        if "register" in operand.name:
+        if isinstance(operand, RegisterOperand):
             if i_operand["class"] != "register":
                 return False
             return self._is_x86_reg_type(i_operand, operand, consider_masking=False)
         # memory
-        if "memory" in operand.name:
+        if isinstance(operand, MemoryOperand):
             if i_operand["class"] != "memory":
                 return False
             return self._is_x86_mem_type(i_operand, operand)
         # immediate
-        if "immediate" in operand.name or operand.value != None:
+        if isinstance(operand, ImmediateOperand):
+            # if "immediate" in operand.name or operand.value != None:
             return i_operand["class"] == "immediate" and i_operand["imd"] == "int"
         # identifier (e.g., labels)
-        if "identifier" in operand.name:
+        if isinstance(operand, IdentifierOperand):
             return i_operand["class"] == "identifier"
+        return self._compare_db_entries(i_operand, operand)
 
     def _compare_db_entries(self, operand_1, operand_2):
         """Check if operand types in DB format (i.e., not parsed) match."""
@@ -676,29 +687,29 @@ class MachineModel(object):
                 return True
             return False
         # check for wildcards
-        if i_reg_name == self.WILDCARD or reg["name"] == self.WILDCARD:
+        if i_reg_name == self.WILDCARD or reg.name == self.WILDCARD:
             return True
         # differentiate between vector registers (mm, xmm, ymm, zmm) and others (gpr)
         parser_x86 = ParserX86ATT()
         if parser_x86.is_vector_register(reg):
-            if reg["name"].rstrip(string.digits).lower() == i_reg_name:
+            if reg.name.rstrip(string.digits).lower() == i_reg_name:
                 # Consider masking and zeroing for AVX512
                 if consider_masking:
                     mask_ok = zero_ok = True
-                    if "mask" in reg or "mask" in i_reg:
+                    if reg.mask != None or "mask" in i_reg:
                         # one instruction is missing the masking while the other has it
                         mask_ok = False
                         # check for wildcard
                         if (
                             (
-                                "mask" in reg
-                                and reg["mask"].rstrip(string.digits).lower() == i_reg.get("mask")
+                                reg.mask != None
+                                and reg.mask.rstrip(string.digits).lower() == i_reg.get("mask")
                             )
-                            or reg.get("mask") == self.WILDCARD
+                            or reg.mask == self.WILDCARD
                             or i_reg.get("mask") == self.WILDCARD
                         ):
                             mask_ok = True
-                        if bool("zeroing" in reg) ^ bool("zeroing" in i_reg):
+                        if bool(reg.zeroing) ^ bool("zeroing" in i_reg):
                             # one instruction is missing zeroing while the other has it
                             zero_ok = False
                             # check for wildcard
@@ -776,48 +787,48 @@ class MachineModel(object):
         if (
             # check base
             (
-                (mem["base"] is None and i_mem["base"] is None)
+                (mem.base is None and i_mem["base"] is None)
                 or i_mem["base"] == self.WILDCARD
-                or self._is_x86_reg_type(i_mem["base"], mem["base"])
+                or self._is_x86_reg_type(i_mem["base"], mem.base)
             )
             # check offset
             and (
-                mem["offset"] == i_mem["offset"]
+                mem.offset == i_mem["offset"]
                 or i_mem["offset"] == self.WILDCARD
                 or (
-                    mem["offset"] is not None
-                    and "identifier" in mem["offset"]
+                    mem.offset is not None
+                    and "identifier" in mem.offset
                     and i_mem["offset"] == "identifier"
                 )
                 or (
-                    mem["offset"] is not None
-                    and "value" in mem["offset"]
+                    mem.offset is not None
+                    and "value" in mem.offset
                     and (
-                        i_mem["offset"] == "imd"
-                        or (i_mem["offset"] is None and mem["offset"]["value"] == "0")
+                        i_mem.offset == "imd"
+                        or (i_mem["offset"] is None and mem.offset["value"] == "0")
                     )
                 )
                 or (
-                    mem["offset"] is not None
-                    and "identifier" in mem["offset"]
+                    mem.offset is not None
+                    and "identifier" in mem.offset
                     and i_mem["offset"] == "id"
                 )
             )
             # check index
             and (
-                mem["index"] == i_mem["index"]
+                mem.index == i_mem["index"]
                 or i_mem["index"] == self.WILDCARD
                 or (
-                    mem["index"] is not None
-                    and "name" in mem["index"]
-                    and self._is_x86_reg_type(i_mem["index"], mem["index"])
+                    mem.index is not None
+                    and "name" in mem.index
+                    and self._is_x86_reg_type(i_mem["index"], mem.index)
                 )
             )
             # check scale
             and (
-                mem["scale"] == i_mem["scale"]
+                mem.scale == i_mem["scale"]
                 or i_mem["scale"] == self.WILDCARD
-                or (mem["scale"] != 1 and i_mem["scale"] != 1)
+                or (mem.scale != 1 and i_mem["scale"] != 1)
             )
         ):
             return True
