@@ -256,38 +256,38 @@ class TestSemanticTools(unittest.TestCase):
     def test_src_dst_assignment_x86(self):
         for instruction_form in self.kernel_x86:
             with self.subTest(instruction_form=instruction_form):
-                if instruction_form["semantic_operands"] is not None:
-                    self.assertTrue("source" in instruction_form["semantic_operands"])
-                    self.assertTrue("destination" in instruction_form["semantic_operands"])
-                    self.assertTrue("src_dst" in instruction_form["semantic_operands"])
+                if instruction_form.semantic_operands is not None:
+                    self.assertTrue("source" in instruction_form.semantic_operands)
+                    self.assertTrue("destination" in instruction_form.semantic_operands)
+                    self.assertTrue("src_dst" in instruction_form.semantic_operands)
 
     def test_src_dst_assignment_AArch64(self):
         for instruction_form in self.kernel_AArch64:
             with self.subTest(instruction_form=instruction_form):
-                if instruction_form["semantic_operands"] is not None:
-                    self.assertTrue("source" in instruction_form["semantic_operands"])
-                    self.assertTrue("destination" in instruction_form["semantic_operands"])
-                    self.assertTrue("src_dst" in instruction_form["semantic_operands"])
+                if instruction_form.semantic_operands is not None:
+                    self.assertTrue("source" in instruction_form.semantic_operands)
+                    self.assertTrue("destination" in instruction_form.semantic_operands)
+                    self.assertTrue("src_dst" in instruction_form.semantic_operands)
 
     def test_tp_lt_assignment_x86(self):
         self.assertTrue("ports" in self.machine_model_csx)
         port_num = len(self.machine_model_csx["ports"])
         for instruction_form in self.kernel_x86:
             with self.subTest(instruction_form=instruction_form):
-                self.assertTrue("throughput" in instruction_form)
-                self.assertTrue("latency" in instruction_form)
-                self.assertIsInstance(instruction_form["port_pressure"], list)
-                self.assertEqual(len(instruction_form["port_pressure"]), port_num)
+                self.assertTrue(instruction_form.throughput != None)
+                self.assertTrue(instruction_form.latency != None)
+                self.assertIsInstance(instruction_form.port_pressure, list)
+                self.assertEqual(len(instruction_form.port_pressure), port_num)
 
     def test_tp_lt_assignment_AArch64(self):
         self.assertTrue("ports" in self.machine_model_tx2)
         port_num = len(self.machine_model_tx2["ports"])
         for instruction_form in self.kernel_AArch64:
             with self.subTest(instruction_form=instruction_form):
-                self.assertTrue("throughput" in instruction_form)
-                self.assertTrue("latency" in instruction_form)
-                self.assertIsInstance(instruction_form["port_pressure"], list)
-                self.assertEqual(len(instruction_form["port_pressure"]), port_num)
+                self.assertTrue(instruction_form.throughput != None)
+                self.assertTrue(instruction_form.latency != None)
+                self.assertIsInstance(instruction_form.port_pressure, list)
+                self.assertEqual(len(instruction_form.port_pressure), port_num)
 
     def test_optimal_throughput_assignment(self):
         # x86

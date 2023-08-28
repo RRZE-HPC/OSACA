@@ -430,10 +430,7 @@ def get_unmatched_instruction_ratio(kernel):
     """Return ratio of unmatched from total instructions in kernel."""
     unmatched_counter = 0
     for instruction in kernel:
-        if (
-            INSTR_FLAGS.TP_UNKWN in instruction["flags"]
-            and INSTR_FLAGS.LT_UNKWN in instruction["flags"]
-        ):
+        if INSTR_FLAGS.TP_UNKWN in instruction.flags and INSTR_FLAGS.LT_UNKWN in instruction.flags:
             unmatched_counter += 1
     return unmatched_counter / len(kernel)
 

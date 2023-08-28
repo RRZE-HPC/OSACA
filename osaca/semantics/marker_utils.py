@@ -150,7 +150,7 @@ def find_marked_section(
                     "immediate" in source
                     and parser.normalize_imd(source.immediate) == mov_vals[0]
                     and "register" in destination
-                    and parser.get_full_reg_name(destination['register']) == mov_reg
+                    and parser.get_full_reg_name(destination["register"]) == mov_reg
                 ):
                     # operands of first instruction match start, check for second one
                     match, line_count = match_bytes(lines, i + 1, nop_bytes)
@@ -161,7 +161,7 @@ def find_marked_section(
                     "immediate" in source
                     and parser.normalize_imd(source.immediate) == mov_vals[1]
                     and "register" in destination
-                    and parser.get_full_reg_name(destination['register']) == mov_reg
+                    and parser.get_full_reg_name(destination["register"]) == mov_reg
                 ):
                     # operand of first instruction match end, check for second one
                     match, line_count = match_bytes(lines, i + 1, nop_bytes)
@@ -169,7 +169,8 @@ def find_marked_section(
                         # return line of the marker
                         index_end = i
         except TypeError:
-            print(i, line)
+            pass
+        #    print("TESTER",i, line)
         if index_start != -1 and index_end != -1:
             break
     return index_start, index_end

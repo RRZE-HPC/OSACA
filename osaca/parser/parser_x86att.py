@@ -386,8 +386,8 @@ class ParserX86ATT(BaseParser):
     def is_reg_dependend_of(self, reg_a, reg_b):
         """Check if ``reg_a`` is dependent on ``reg_b``"""
         # Normalize name
-        reg_a_name = reg_a["name"].upper()
-        reg_b_name = reg_b["name"].upper()
+        reg_a_name = reg_a.name.upper()
+        reg_b_name = reg_b.name.upper()
 
         # Check if they are the same registers
         if reg_a_name == reg_b_name:
@@ -428,8 +428,8 @@ class ParserX86ATT(BaseParser):
 
     def is_basic_gpr(self, register):
         """Check if register is a basic general purpose register (ebi, rax, ...)"""
-        if any(char.isdigit() for char in register["name"]) or any(
-            register["name"].lower().startswith(x) for x in ["mm", "xmm", "ymm", "zmm"]
+        if any(char.isdigit() for char in register.name) or any(
+            register.name.lower().startswith(x) for x in ["mm", "xmm", "ymm", "zmm"]
         ):
             return False
         return True
@@ -446,7 +446,7 @@ class ParserX86ATT(BaseParser):
         """Check if register is a vector register"""
         if register is None:
             return False
-        if register["name"].rstrip(string.digits).lower() in [
+        if register.name.rstrip(string.digits).lower() in [
             "mm",
             "xmm",
             "ymm",
