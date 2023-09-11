@@ -259,22 +259,22 @@ class TestParserX86ATT(unittest.TestCase):
         )
 
     def test_reg_dependency(self):
-        reg_a1 = {"name": "rax"}
-        reg_a2 = {"name": "eax"}
-        reg_a3 = {"name": "ax"}
-        reg_a4 = {"name": "al"}
-        reg_r11 = {"name": "r11"}
-        reg_r11b = {"name": "r11b"}
-        reg_r11d = {"name": "r11d"}
-        reg_r11w = {"name": "r11w"}
-        reg_xmm1 = {"name": "xmm1"}
-        reg_ymm1 = {"name": "ymm1"}
-        reg_zmm1 = {"name": "zmm1"}
+        reg_a1 = RegisterOperand(NAME_ID = "rax")
+        reg_a2 = RegisterOperand(NAME_ID = "eax")
+        reg_a3 = RegisterOperand(NAME_ID = "ax")
+        reg_a4 = RegisterOperand(NAME_ID = "al")
+        reg_r11 = RegisterOperand(NAME_ID = "r11")
+        reg_r11b = RegisterOperand(NAME_ID = "r11b")
+        reg_r11d = RegisterOperand(NAME_ID = "r11d")
+        reg_r11w = RegisterOperand(NAME_ID = "r11w")
+        reg_xmm1 = RegisterOperand(NAME_ID = "xmm1")
+        reg_ymm1 = RegisterOperand(NAME_ID = "ymm1")
+        reg_zmm1 = RegisterOperand(NAME_ID = "zmm1")
 
-        reg_b1 = {"name": "rbx"}
-        reg_r15 = {"name": "r15"}
-        reg_xmm2 = {"name": "xmm2"}
-        reg_ymm3 = {"name": "ymm3"}
+        reg_b1 = RegisterOperand(NAME_ID = "rbx")
+        reg_r15 = RegisterOperand(NAME_ID = "r15")
+        reg_xmm2 = RegisterOperand(NAME_ID = "xmm2")
+        reg_ymm3 = RegisterOperand(NAME_ID = "ymm3")
 
         reg_a = [reg_a1, reg_a2, reg_a3, reg_a4]
         reg_r = [reg_r11, reg_r11b, reg_r11d, reg_r11w]
