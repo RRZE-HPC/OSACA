@@ -134,8 +134,8 @@ class TestParserX86ATT(unittest.TestCase):
 
         self.assertEqual(parsed_4.instruction, "vmovss")
         self.assertEqual(parsed_4.operands[1].offset["value"], -4)
-        self.assertEqual(parsed_4.operands[1].base["name"], "rsp")
-        self.assertEqual(parsed_4.operands[1].index["name"], "rax")
+        self.assertEqual(parsed_4.operands[1].base.name, "rsp")
+        self.assertEqual(parsed_4.operands[1].index.name, "rax")
         self.assertEqual(parsed_4.operands[1].scale, 8)
         self.assertEqual(parsed_4.operands[0].name, "xmm4")
         self.assertEqual(parsed_4.comment, "12.9")
@@ -150,7 +150,7 @@ class TestParserX86ATT(unittest.TestCase):
         self.assertEqual(parsed_6.instruction, "lea")
         self.assertIsNone(parsed_6.operands[0].offset)
         self.assertIsNone(parsed_6.operands[0].base)
-        self.assertEqual(parsed_6.operands[0].index["name"], "rax")
+        self.assertEqual(parsed_6.operands[0].index.name, "rax")
         self.assertEqual(parsed_6.operands[0].scale, 8)
         self.assertEqual(parsed_6.operands[1].name, "rbx")
 

@@ -368,7 +368,7 @@ class ParserX86ATT(BaseParser):
     def get_full_reg_name(self, register):
         """Return one register name string including all attributes"""
         # nothing to do
-        return register["name"]
+        return register.name
 
     def normalize_imd(self, imd):
         """Normalize immediate to decimal based representation"""
@@ -445,7 +445,7 @@ class ParserX86ATT(BaseParser):
             return False
         if self.is_basic_gpr(register):
             return True
-        return re.match(r"R([0-9]+)[DWB]?", register["name"], re.IGNORECASE)
+        return re.match(r"R([0-9]+)[DWB]?", register.name, re.IGNORECASE)
 
     def is_vector_register(self, register):
         """Check if register is a vector register"""
@@ -467,5 +467,5 @@ class ParserX86ATT(BaseParser):
         if self.is_gpr(register):
             return "gpr"
         elif self.is_vector_register(register):
-            return register["name"].rstrip(string.digits).lower()
+            return register.name.rstrip(string.digits).lower()
         raise ValueError

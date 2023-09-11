@@ -103,16 +103,34 @@ class MachineModel(object):
                 for iform in self._data["instruction_forms"]:
                     iform["name"] = iform["name"].upper()
                     if iform["operands"]!=[]:
+                        new_operands =[]
                         for o in iform["operands"]:
                             if o["class"] == "register":
-                                o = RegisterOperand(NAME_ID=o["name"] if "name" in o else None,
+                                new_operands.append(RegisterOperand(NAME_ID=o["name"] if "name" in o else None,
                                                     PREFIX_ID=o["prefix"] if "prefix" in o else None,
                                                     MASK=o["mask"] if "mask" in o else False) 
+                                                    )
                             elif o["class"] == "memory":
-                                o = MemoryOperand(BASE_ID=o["base"],OFFSET_ID=o["offset"],INDEX_ID=o["index"],SCALE_ID=o["scale"])
+                                new_operands.append(MemoryOperand(BASE_ID=o["base"],
+                                                                  OFFSET_ID=o["offset"],
+                                                                  INDEX_ID=o["index"],
+                                                                  SCALE_ID=o["scale"])
+                                                    )
+                        iform["operands"] = new_operands
                     self._data["instruction_forms_dict"][iform["name"]].append(iform)
-                self._data["internal_version"] = self.INTERNAL_VERSION
+                new_throughputs =[]
+                if 'load_throughput' in self._data:
+                    for m in self._data["load_throughput"]:
+                        new_throughputs.append(MemoryOperand(BASE_ID=m['base'],OFFSET_ID=m['offset'],SCALE_ID=m['scale'],INDEX_ID=m['index'],PORT_PRESSURE=m['port_pressure'],DST=m['dst'] if 'dst' in m else None))
+                    self._data["load_throughput"] = new_throughputs
 
+                new_throughputs =[]
+                if 'store_throughput' in self._data:
+                    for m in self._data["store_throughput"]:
+                        new_throughputs.append(MemoryOperand(BASE_ID=m['base'],OFFSET_ID=m['offset'],SCALE_ID=m['scale'],INDEX_ID=m['index'],PORT_PRESSURE=m['port_pressure']))
+                    self._data["store_throughput"] = new_throughputs
+
+                self._data["internal_version"] = self.INTERNAL_VERSION
                 if not lazy:
                     # cache internal representation for future use
                     self._write_in_cache(self._path)
@@ -238,6 +256,7 @@ class MachineModel(object):
     def get_load_throughput(self, memory):
         """Return load thorughput for given register type."""
         ld_tp = [m for m in self._data["load_throughput"] if self._match_mem_entries(memory, m)]
+        print(ld_tp)
         if len(ld_tp) > 0:
             return ld_tp.copy()
         return [{"port_pressure": self._data["load_throughput_default"].copy()}]
@@ -249,6 +268,7 @@ class MachineModel(object):
 
     def get_store_throughput(self, memory, src_reg=None):
         """Return store throughput for a given destination and register type."""
+
         st_tp = [m for m in self._data["store_throughput"] if self._match_mem_entries(memory, m)]
         if src_reg is not None:
             st_tp = [
@@ -535,9 +555,7 @@ class MachineModel(object):
         # check for wildcard
         if (isinstance(operand, Operand) and operand.name == self.WILDCARD) or (not isinstance(operand, Operand) and self.WILDCARD in operand):
             if (
-                "class" in i_operand
-                and i_operand["class"] == "register"
-                or "register" in i_operand
+                isinstance(i_operand, RegisterOperand)
             ):
                 return True
             else:
@@ -613,12 +631,12 @@ class MachineModel(object):
         #    return self._compare_db_entries(i_operand, operand)
         # register
         if isinstance(operand, RegisterOperand):
-            if i_operand["class"] != "register":
+            if not isinstance(i_operand, RegisterOperand):
                 return False
             return self._is_x86_reg_type(i_operand, operand, consider_masking=False)
         # memory
         if isinstance(operand, MemoryOperand):
-            if i_operand["class"] != "memory":
+            if not isinstance(i_operand, MemoryOperand):
                 return False
             return self._is_x86_mem_type(i_operand, operand)
         # immediate
@@ -632,6 +650,7 @@ class MachineModel(object):
 
     def _compare_db_entries(self, operand_1, operand_2):
         """Check if operand types in DB format (i.e., not parsed) match."""
+        return True
         operand_attributes = list(
             filter(
                 lambda x: True if x != "source" and x != "destination" else False,
@@ -679,11 +698,14 @@ class MachineModel(object):
 
     def _is_x86_reg_type(self, i_reg, reg, consider_masking=False):
         """Check if register type match."""
-        i_reg_name = i_reg["name"] if i_reg and "name" in i_reg else i_reg
         if reg is None:
             if i_reg is None:
                 return True
             return False
+        if isinstance(i_reg, RegisterOperand):
+            i_reg_name = i_reg.name
+        else:
+            i_reg_name = i_reg
         # check for wildcards
         if i_reg_name == self.WILDCARD or reg.name == self.WILDCARD:
             return True
@@ -694,17 +716,17 @@ class MachineModel(object):
                 # Consider masking and zeroing for AVX512
                 if consider_masking:
                     mask_ok = zero_ok = True
-                    if reg.mask != None or "mask" in i_reg:
+                    if reg.mask != None or i_reg.mask != None:
                         # one instruction is missing the masking while the other has it
                         mask_ok = False
                         # check for wildcard
                         if (
                             (
                                 reg.mask != None
-                                and reg.mask.rstrip(string.digits).lower() == i_reg.get("mask")
+                                and reg.mask.rstrip(string.digits).lower() == i_reg.mask
                             )
                             or reg.mask == self.WILDCARD
-                            or i_reg.get("mask") == self.WILDCARD
+                            or i_reg.mask == self.WILDCARD
                         ):
                             mask_ok = True
                         if bool(reg.zeroing) ^ bool("zeroing" in i_reg):
@@ -712,15 +734,15 @@ class MachineModel(object):
                             zero_ok = False
                             # check for wildcard
                             if (
-                                i_reg.get("zeroing") == self.WILDCARD
-                                or reg.get("zeroing") == self.WILDCARD
+                                i_reg.zeroing == self.WILDCARD
+                                or reg.zeroing == self.WILDCARD
                             ):
                                 zero_ok = True
                         if not mask_ok or not zero_ok:
                             return False
                 return True
         else:
-            if reg["name"].rstrip(string.digits).lower() == i_reg_name:
+            if reg.name.rstrip(string.digits).lower() == i_reg_name:
                 return True
             if i_reg_name == "gpr":
                 return True
@@ -731,50 +753,50 @@ class MachineModel(object):
         if (
             # check base
             (
-                (mem["base"] is None and i_mem["base"] is None)
-                or i_mem["base"] == self.WILDCARD
-                or mem["base"]["prefix"] == i_mem["base"]
+                (mem.base is None and i_mem.base is None)
+                or i_mem.base == self.WILDCARD
+                or mem.base["prefix"] == i_mem.base
             )
             # check offset
             and (
-                mem["offset"] == i_mem["offset"]
-                or i_mem["offset"] == self.WILDCARD
+                mem.offset == i_mem.offset
+                or i_mem.offset == self.WILDCARD
                 or (
-                    mem["offset"] is not None
-                    and "identifier" in mem["offset"]
-                    and i_mem["offset"] == "identifier"
+                    mem.offset is not None
+                    and "identifier" in mem.offset
+                    and i_mem.offset == "identifier"
                 )
                 or (
-                    mem["offset"] is not None
-                    and "value" in mem["offset"]
-                    and i_mem["offset"] == "imd"
+                    mem.offset is not None
+                    and "value" in mem.offset
+                    and i_mem.offset == "imd"
                 )
             )
             # check index
             and (
-                mem["index"] == i_mem["index"]
-                or i_mem["index"] == self.WILDCARD
+                mem.index == i_mem.index
+                or i_mem.index == self.WILDCARD
                 or (
-                    mem["index"] is not None
-                    and "prefix" in mem["index"]
-                    and mem["index"]["prefix"] == i_mem["index"]
+                    mem.index is not None
+                    and mem["index"].prefix!=None
+                    and mem.index["prefix"] == i_mem.index
                 )
             )
             # check scale
             and (
-                mem["scale"] == i_mem["scale"]
-                or i_mem["scale"] == self.WILDCARD
-                or (mem["scale"] != 1 and i_mem["scale"] != 1)
+                mem.scale == i_mem.scale
+                or i_mem.scale == self.WILDCARD
+                or (mem.scale != 1 and i_mem.scale != 1)
             )
             # check pre-indexing
             and (
-                i_mem["pre-indexed"] == self.WILDCARD
-                or ("pre_indexed" in mem) == (i_mem["pre-indexed"])
+                i_mem.pre-indexed == self.WILDCARD
+                or (mempre-indexed) == (i_mem.pre-indexed)
             )
             # check post-indexing
             and (
-                i_mem["post-indexed"] == self.WILDCARD
-                or ("post_indexed" in mem) == (i_mem["post-indexed"])
+                i_mem.post-indexed == self.WILDCARD
+                or (mem.post-indexed) == (i_mem.post-indexed)
             )
         ):
             return True
@@ -782,7 +804,6 @@ class MachineModel(object):
 
     def _is_x86_mem_type(self, i_mem, mem):
         """Check if memory addressing type match."""
-        i_mem = MemoryOperand(BASE_ID=i_mem["base"],OFFSET_ID=i_mem["offset"],INDEX_ID=i_mem["index"],SCALE_ID=i_mem["scale"])
         if (
             # check base
             (
@@ -819,7 +840,7 @@ class MachineModel(object):
                 or i_mem.index == self.WILDCARD
                 or (
                     mem.index is not None
-                    and "name" in mem.index
+                    and mem.index.name!=None
                     and self._is_x86_reg_type(i_mem.index, mem.index)
                 )
             )

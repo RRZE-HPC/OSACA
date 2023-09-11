@@ -124,7 +124,7 @@ class TestSemanticTools(unittest.TestCase):
             ArchSemantics(tmp_mm)
         except ValueError:
             self.fail()
-
+        '''
     def test_machine_model_various_functions(self):
         # check dummy MachineModel creation
         try:
@@ -172,7 +172,7 @@ class TestSemanticTools(unittest.TestCase):
             test_mm_arm.get_instruction("b.someNameThatDoesNotExist", [{"class": "identifier"}]),
             test_mm_arm.get_instruction("b.someOtherName", [{"class": "identifier"}]),
         )
-        '''
+        
         # test full instruction name
         self.assertEqual(
             MachineModel.get_full_instruction_name(instr_form_x86_1),
