@@ -326,6 +326,8 @@ class ParserX86ATT(BaseParser):
         # Remove unecessarily created dictionary entries during memory address parsing
         offset = memory_address.get("offset", None)
         base = memory_address.get("base", None)
+        baseOp = None
+        indexOp = None
         index = memory_address.get("index", None)
         scale = 1 if "scale" not in memory_address else int(memory_address["scale"], 0)
         if isinstance(offset, str) and base is None and index is None:
@@ -335,7 +337,11 @@ class ParserX86ATT(BaseParser):
                 offset = {"value": offset}
         elif offset is not None and "value" in offset:
             offset["value"] = int(offset["value"], 0)
-        new_dict = MemoryOperand(OFFSET_ID=offset, BASE_ID=base, INDEX_ID=index, SCALE_ID=scale)
+        if base != None:
+            baseOp = RegisterOperand(NAME_ID=base['name'],PREFIX_ID=base['prefix'] if 'prefix' in base else None)
+        if index != None:
+            indexOp = RegisterOperand(NAME_ID=index['name'],PREFIX_ID=index['prefix'] if 'prefix' in index else None)
+        new_dict = MemoryOperand(OFFSET_ID=offset, BASE_ID=baseOp, INDEX_ID=indexOp, SCALE_ID=scale)
         # Add segmentation extension if existing
         if self.SEGMENT_EXT_ID in memory_address:
             new_dict.segment_ext_id = memory_address[self.SEGMENT_EXT_ID]
@@ -385,7 +391,6 @@ class ParserX86ATT(BaseParser):
 
     def is_reg_dependend_of(self, reg_a, reg_b):
         """Check if ``reg_a`` is dependent on ``reg_b``"""
-        # Normalize name
         reg_a_name = reg_a.name.upper()
         reg_b_name = reg_b.name.upper()
 

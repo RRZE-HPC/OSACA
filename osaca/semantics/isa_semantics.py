@@ -182,19 +182,19 @@ class ISASemantics(object):
             isa_data = self._isa_model.get_instruction(
                 instruction_form.instruction[:suffix_start], instruction_form.operands
             )
-
+        '''
         if only_postindexed:
             for o in instruction_form.operands:
-                if "post_indexed" in o.get("memory", {}):
-                    base_name = o.memory.base.get("prefix", "") + o.memory.base.name
+                if isinstance(o, MemoryOperand) and o.base!=None:
+                    base_name = o.base.prefix if o.base.prefix!=None else "" + o.base.name
                     return {
                         base_name: {
-                            "name": o.memory.base.get("prefix", "") + o.memory.base.name,
-                            "value": o.memory.post_indexed.value,
+                            "name": o.base.prefix if o.base.prefix!=None else "" + o.base.name,
+                            "value": o.post_indexed["value"],
                         }
                     }
             return {}
-
+        '''
         reg_operand_names = {}  # e.g., {'rax': 'op1'}
         operand_state = {}  # e.g., {'op1': {'name': 'rax', 'value': 0}}  0 means unchanged
 
@@ -206,15 +206,15 @@ class ISASemantics(object):
                         "ISA information for pre-indexed instruction {!r} has operation set."
                         "This is currently not supprted.".format(instruction_form.line)
                     )
-                base_name = o.memory.base.get("prefix", "") + o.memory.base.name
+                base_name = o.base.prefix if o.base.prefix!=None else "" + o.base.name
                 reg_operand_names = {base_name: "op1"}
-                operand_state = {"op1": {"name": base_name, "value": o.memory.offset.value}}
+                operand_state = {"op1": {"name": base_name, "value": o.offset["value"]}}
 
         if isa_data is not None and "operation" in isa_data:
             for i, o in enumerate(instruction_form.operands):
                 operand_name = "op{}".format(i + 1)
-                if "register" in o:
-                    o_reg_name = o["register"].get("prefix", "") + o["register"]["name"]
+                if isinstance(o, RegisterOperand):
+                    o_reg_name = o.prefix if o.prefix!=None else "" + o.name
                     reg_operand_names[o_reg_name] = operand_name
                     operand_state[operand_name] = {"name": o_reg_name, "value": 0}
                 elif "immediate" in o:

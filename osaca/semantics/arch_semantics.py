@@ -9,6 +9,10 @@ from copy import deepcopy
 
 from .hw_model import MachineModel
 from .isa_semantics import INSTR_FLAGS, ISASemantics
+from osaca.parser.memory import MemoryOperand
+from osaca.parser.register import RegisterOperand
+from osaca.parser.immediate import ImmediateOperand
+from osaca.parser.identifier import IdentifierOperand
 
 
 class ArchSemantics(ISASemantics):
@@ -150,27 +154,27 @@ class ArchSemantics(ISASemantics):
         if len(loads) <= len(stores):
             # Hide all loads
             for load in loads:
-                load["flags"] += [INSTR_FLAGS.HIDDEN_LD]
-                load["port_pressure"] = self._nullify_data_ports(load["port_pressure"])
+                load.flags += [INSTR_FLAGS.HIDDEN_LD]
+                load.port_pressure = self._nullify_data_ports(load.port_pressure)
         else:
             for store in stores:
                 # Get 'closest' load instruction
                 min_distance_load = min(
                     [
                         (
-                            abs(load_instr["line_number"] - store["line_number"]),
-                            load_instr["line_number"],
+                            abs(load_instr.line_number - store.line_number),
+                            load_instr.line_number,
                         )
                         for load_instr in loads
-                        if INSTR_FLAGS.HIDDEN_LD not in load_instr["flags"]
+                        if INSTR_FLAGS.HIDDEN_LD not in load_instr.flags
                     ]
                 )
-                load = [instr for instr in kernel if instr["line_number"] == min_distance_load[1]][
+                load = [instr for instr in kernel if instr.line_number == min_distance_load[1]][
                     0
                 ]
                 # Hide load
-                load["flags"] += [INSTR_FLAGS.HIDDEN_LD]
-                load["port_pressure"] = self._nullify_data_ports(load["port_pressure"])
+                load.flags += [INSTR_FLAGS.HIDDEN_LD]
+                load.port_pressure = self._nullify_data_ports(load.port_pressure)
 
     # get parser result and assign throughput and latency value to instruction form
     # mark instruction form with semantic flags
@@ -253,13 +257,20 @@ class ArchSemantics(ISASemantics):
                             instruction_form.instruction[:suffix_start], operands
                         )
                     if instruction_data_reg:
+                        print(instruction_data_reg["operands"])
+                        for o in instruction_data_reg["operands"]:
+                                o = RegisterOperand(NAME_ID=o["name"] if "name" in o else None,
+                                                    PREFIX_ID=o["prefix"] if "prefix" in o else None,
+                                                    MASK=o["mask"] if "mask" in o else False) 
+                        print(instruction_data_reg["operands"])
                         assign_unknown = False
                         reg_type = self._parser.get_reg_type(
                             instruction_data_reg["operands"][
                                 operands.index(self._create_reg_wildcard())
                             ]
                         )
-                        dummy_reg = {"class": "register", "name": reg_type}
+                        #dummy_reg = {"class": "register", "name": reg_type}
+                        dummy_reg = RegisterOperand(NAME_ID=reg_type)
                         data_port_pressure = [0.0 for _ in range(port_number)]
                         data_port_uops = []
                         if INSTR_FLAGS.HAS_LD in instruction_form.flags:
@@ -445,11 +456,11 @@ class ArchSemantics(ISASemantics):
         """Create register operand for a memory addressing operand"""
         if self._isa == "x86":
             if reg_type == "gpr":
-                register = {"register": {"name": "r" + str(int(reg_id) + 9)}}
+                register = RegisterOperand(NAME_ID="r" + str(int(reg_id) + 9))
             else:
-                register = {"register": {"name": reg_type + reg_id}}
+                register = RegisterOperand(NAME_ID=reg_type + reg_id)
         elif self._isa == "aarch64":
-            register = {"register": {"prefix": reg_type, "name": reg_id}}
+            register = RegisterOperand(NAME_ID=reg_id,PREFIX_ID=reg_type)
         return register
 
     def _nullify_data_ports(self, port_pressure):

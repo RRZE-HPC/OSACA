@@ -11,7 +11,7 @@ import networkx as nx
 from osaca.semantics import INSTR_FLAGS, ArchSemantics, MachineModel
 from osaca.parser.memory import MemoryOperand
 from osaca.parser.register import RegisterOperand
-
+from osaca.parser.immediate import ImmediateOperand
 
 class KernelDG(nx.DiGraph):
     # threshold for checking dependency graph sequential or in parallel
@@ -70,7 +70,7 @@ class KernelDG(nx.DiGraph):
             ):
                 # add new node
                 dg.add_node(instruction_form.line_number + 0.1)
-                dg.nodes[instruction_form.line_number + 0.1].instruction_form = instruction_form
+                dg.nodes[instruction_form.line_number + 0.1]["instruction_form"] = instruction_form
                 # and set LD latency as edge weight
                 dg.add_edge(
                     instruction_form.line_number + 0.1,
@@ -91,11 +91,11 @@ class KernelDG(nx.DiGraph):
                     edge_weight = self.model.get("p_index_latency", 1)
                 dg.add_edge(
                     instruction_form.line_number,
-                    dep["line_number"],
+                    dep.line_number,
                     latency=edge_weight,
                 )
 
-                dg.nodes[dep["line_number"]]["instruction_form"] = dep
+                dg.nodes[dep.line_number]["instruction_form"] = dep
         return dg
 
     def check_for_loopcarried_dep(self, kernel, timeout=10, flag_dependencies=False):
@@ -114,7 +114,7 @@ class KernelDG(nx.DiGraph):
         tmp_kernel = [] + kernel
         for orig_iform in kernel:
             temp_iform = copy.copy(orig_iform)
-            temp_iform["line_number"] += offset
+            temp_iform.line_number += offset
             tmp_kernel.append(temp_iform)
         # get dependency graph
         dg = self.create_DG(tmp_kernel, flag_dependencies)
@@ -224,7 +224,7 @@ class KernelDG(nx.DiGraph):
 
     def get_critical_path(self):
         """Find and return critical path after the creation of a directed graph."""
-        max_latency_instr = max(self.kernel, key=lambda k: k["latency"])
+        max_latency_instr = max(self.kernel, key=lambda k: k.latency)
         if nx.algorithms.dag.is_directed_acyclic_graph(self.dg):
             longest_path = nx.algorithms.dag.dag_longest_path(self.dg, weight="latency")
             # TODO verify that we can remove the next two lince due to earlier initialization
@@ -243,7 +243,7 @@ class KernelDG(nx.DiGraph):
                 max_latency_instr["latency_cp"] = float(max_latency_instr["latency"])
                 return [max_latency_instr]
             else:
-                return [x for x in self.kernel if x["line_number"] in longest_path]
+                return [x for x in self.kernel if x.line_number in longest_path]
         else:
             # split to DAG
             raise NotImplementedError("Kernel is cyclic.")
@@ -285,16 +285,16 @@ class KernelDG(nx.DiGraph):
                 if isinstance(dst, RegisterOperand):
                     # read of register
                     if self.is_read(dst, instr_form):
-                        if dst.get("pre_indexed", False) or dst.get("post_indexed", False):
-                            yield instr_form, ["p_indexed"]
-                        else:
-                            yield instr_form, []
+                        #if dst.pre_indexed or dst.post_indexed:
+                            #yield instr_form, ["p_indexed"]
+                        #else:
+                        yield instr_form, []
                     # write to register -> abort
                     if self.is_written(dst, instr_form):
                         break
                 if (
                     not isinstance(dst, RegisterOperand)
-                    and not isinstance(dst, MemoryOperandOperand)
+                    and not isinstance(dst, MemoryOperand)
                     and "flag" in dst
                     and flag_dependencies
                 ):
@@ -306,7 +306,7 @@ class KernelDG(nx.DiGraph):
                         break
                 if isinstance(dst, MemoryOperand):
                     # base register is altered during memory access
-                    if dist.pre_indexed != None:
+                    if dst.pre_indexed != None:
                         if self.is_written(dst.base, instr_form):
                             break
                     # if dst.memory.base:
@@ -378,6 +378,7 @@ class KernelDG(nx.DiGraph):
             if (
                 not isinstance(src, RegisterOperand)
                 and not isinstance(src, MemoryOperand)
+                and not isinstance(src, ImmediateOperand)
                 and "flag" in src
             ):
                 is_read = self.parser.is_flag_dependend_of(register, src.flag) or is_read
@@ -403,29 +404,29 @@ class KernelDG(nx.DiGraph):
         if instruction_form.semantic_operands is None:
             return False
         for src in chain(
-            instruction_form.semantic_operands.source,
-            instruction_form.semantic_operands.src_dst,
+            instruction_form.semantic_operands["source"],
+            instruction_form.semantic_operands["src_dst"],
         ):
             # Here we check for mem dependecies only
-            if "memory" not in src:
+            if not isinstance(src, MemoryOperand):
                 continue
-            src = src.memory
+            #src = src.memory
 
             # determine absolute address change
             addr_change = 0
             if src.offset and "value" in src.offset:
-                addr_change += src.offset.value
+                addr_change += src.offset["value"]
             if mem.offset:
-                addr_change -= mem.offset.value
+                addr_change -= mem.offset["value"]
             if mem.base and src.base:
                 base_change = register_changes.get(
-                    src.base.get("prefix", "") + src.base.name,
-                    {"name": src.base.get("prefix", "") + src.base.name, "value": 0},
+                    src.base.prefix if src.base.prefix!=None else ""  + src.base.name,
+                    {"name": src.base.prefix if src.base.prefix!=None else "" + src.base.name, "value": 0},
                 )
                 if base_change is None:
                     # Unknown change occurred
                     continue
-                if mem.base.get("prefix", "") + mem.base["name"] != base_change["name"]:
+                if mem.base.prefix if mem.base.prefix!=None else "" + mem.base.name != base_change["name"]:
                     # base registers do not match
                     continue
                 addr_change += base_change["value"]
@@ -443,7 +444,7 @@ class KernelDG(nx.DiGraph):
                 if mem.scale != src.scale:
                     # scale factors do not match
                     continue
-                if mem.index.get("prefix", "") + mem.index["name"] != index_change["name"]:
+                if mem.index.prefix if mem.index.prefix!=None else "" + mem.index.name != index_change["name"]:
                     # index registers do not match
                     continue
                 addr_change += index_change["value"] * src.scale
@@ -495,7 +496,7 @@ class KernelDG(nx.DiGraph):
             instruction_form.semantic_operands["src_dst"],
         ):
             if isinstance(dst, MemoryOperand):
-                is_store = mem == dst["memory"] or is_store
+                is_store = mem == dst or is_store
         return is_store
 
     def export_graph(self, filepath=None):

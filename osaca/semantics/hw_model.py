@@ -20,13 +20,12 @@ from osaca.parser.register import RegisterOperand
 from osaca.parser.immediate import ImmediateOperand
 from osaca.parser.identifier import IdentifierOperand
 
-
 class MachineModel(object):
     WILDCARD = "*"
     INTERNAL_VERSION = 1  # increase whenever self._data format changes to invalidate cache!
     _runtime_cache = {}
 
-    def __init__(self, arch=None, path_to_yaml=None, isa=None, lazy=True):
+    def __init__(self, arch=None, path_to_yaml=None, isa=None, lazy=False):
         if not arch and not path_to_yaml:
             if not isa:
                 raise ValueError("One of arch, path_to_yaml and isa must be specified")
@@ -102,8 +101,15 @@ class MachineModel(object):
                 # Normalize instruction_form names (to UPPERCASE) and build dict for faster access:
                 self._data["instruction_forms_dict"] = defaultdict(list)
                 for iform in self._data["instruction_forms"]:
-                    print(iform)
                     iform["name"] = iform["name"].upper()
+                    if iform["operands"]!=[]:
+                        for o in iform["operands"]:
+                            if o["class"] == "register":
+                                o = RegisterOperand(NAME_ID=o["name"] if "name" in o else None,
+                                                    PREFIX_ID=o["prefix"] if "prefix" in o else None,
+                                                    MASK=o["mask"] if "mask" in o else False) 
+                            elif o["class"] == "memory":
+                                o = MemoryOperand(BASE_ID=o["base"],OFFSET_ID=o["offset"],INDEX_ID=o["index"],SCALE_ID=o["scale"])
                     self._data["instruction_forms_dict"][iform["name"]].append(iform)
                 self._data["internal_version"] = self.INTERNAL_VERSION
 
@@ -134,7 +140,7 @@ class MachineModel(object):
         if name is None:
             return None
         name_matched_iforms = self._data["instruction_forms_dict"].get(name.upper(), [])
-        # print(name_matched_iforms)
+
         try:
             return next(
                 instruction_form
@@ -461,40 +467,34 @@ class MachineModel(object):
     def _create_db_operand_aarch64(self, operand):
         """Create instruction form operand for DB out of operand string."""
         if operand == "i":
-            return {"class": "immediate", "imd": "int"}
+            return ImmediateOperand(TYPE_ID="int")
         elif operand in "wxbhsdq":
-            return {"class": "register", "prefix": operand}
+            return RegisterOperand(PREFIX_ID=operand)
         elif operand.startswith("v"):
-            return {"class": "register", "prefix": "v", "shape": operand[1:2]}
+            return RegisterOperand(PREFIX_ID="v",SHAPE=operand[1:2])
         elif operand.startswith("m"):
-            return {
-                "class": "memory",
-                "base": "x" if "b" in operand else None,
-                "offset": "imd" if "o" in operand else None,
-                "index": "gpr" if "i" in operand else None,
-                "scale": 8 if "s" in operand else 1,
-                "pre-indexed": True if "r" in operand else False,
-                "post-indexed": True if "p" in operand else False,
-            }
+            return MemoryOperand(BASE_ID = "x" if "b" in operand else None,
+                                OFFSET_ID = "imd" if "o" in operand else None,
+                                INDEX_ID = "gpr" if "i" in operand else None,
+                                SCALE_ID =8 if "s" in operand else 1,
+                                PRE_INDEXED = True if "r" in operand else False,
+                                POST_INDEXED = True if "p" in operand else False)
         else:
             raise ValueError("Parameter {} is not a valid operand code".format(operand))
 
     def _create_db_operand_x86(self, operand):
         """Create instruction form operand for DB out of operand string."""
         if operand == "r":
-            return {"class": "register", "name": "gpr"}
+            return RegisterOperand(NAME_ID="gpr")
         elif operand in "xyz":
-            return {"class": "register", "name": operand + "mm"}
+            return RegisterOperand(NAME_ID=operand + "mm")
         elif operand == "i":
-            return {"class": "immediate", "imd": "int"}
+            return ImmediateOperand(TYPE_ID="int")
         elif operand.startswith("m"):
-            return {
-                "class": "memory",
-                "base": "gpr" if "b" in operand else None,
-                "offset": "imd" if "o" in operand else None,
-                "index": "gpr" if "i" in operand else None,
-                "scale": 8 if "s" in operand else 1,
-            }
+            return MemoryOperand(BASE_ID = "gpr" if "b" in operand else None,
+                                OFFSET_ID = "imd" if "o" in operand else None,
+                                INDEX_ID = "gpr" if "i" in operand else None,
+                                SCALE_ID = 8 if "s" in operand else 1,)
         else:
             raise ValueError("Parameter {} is not a valid operand code".format(operand))
 
@@ -533,9 +533,7 @@ class MachineModel(object):
     def _check_operands(self, i_operand, operand):
         """Check if the types of operand ``i_operand`` and ``operand`` match."""
         # check for wildcard
-        if (isinstance(operand, Operand) and operand.name == self.WILDCARD) or (
-            not isinstance(operand, Operand) and self.WILDCARD in operand
-        ):
+        if (isinstance(operand, Operand) and operand.name == self.WILDCARD) or (not isinstance(operand, Operand) and self.WILDCARD in operand):
             if (
                 "class" in i_operand
                 and i_operand["class"] == "register"
@@ -610,8 +608,8 @@ class MachineModel(object):
 
     def _check_x86_operands(self, i_operand, operand):
         """Check if the types of operand ``i_operand`` and ``operand`` match."""
-        # if "class" in operand.name:
-        # compare two DB entries
+        #if "class" in operand.name:
+            # compare two DB entries
         #    return self._compare_db_entries(i_operand, operand)
         # register
         if isinstance(operand, RegisterOperand):
@@ -625,7 +623,7 @@ class MachineModel(object):
             return self._is_x86_mem_type(i_operand, operand)
         # immediate
         if isinstance(operand, ImmediateOperand):
-            # if "immediate" in operand.name or operand.value != None:
+        #if "immediate" in operand.name or operand.value != None:
             return i_operand["class"] == "immediate" and i_operand["imd"] == "int"
         # identifier (e.g., labels)
         if isinstance(operand, IdentifierOperand):
@@ -784,51 +782,52 @@ class MachineModel(object):
 
     def _is_x86_mem_type(self, i_mem, mem):
         """Check if memory addressing type match."""
+        i_mem = MemoryOperand(BASE_ID=i_mem["base"],OFFSET_ID=i_mem["offset"],INDEX_ID=i_mem["index"],SCALE_ID=i_mem["scale"])
         if (
             # check base
             (
-                (mem.base is None and i_mem["base"] is None)
-                or i_mem["base"] == self.WILDCARD
-                or self._is_x86_reg_type(i_mem["base"], mem.base)
+                (mem.base is None and i_mem.base is None)
+                or i_mem.base == self.WILDCARD
+                or self._is_x86_reg_type(i_mem.base, mem.base)
             )
             # check offset
             and (
-                mem.offset == i_mem["offset"]
-                or i_mem["offset"] == self.WILDCARD
+                mem.offset == i_mem.offset
+                or i_mem.offset == self.WILDCARD
                 or (
                     mem.offset is not None
                     and "identifier" in mem.offset
-                    and i_mem["offset"] == "identifier"
+                    and i_mem.offset == "identifier"
                 )
                 or (
                     mem.offset is not None
                     and "value" in mem.offset
                     and (
                         i_mem.offset == "imd"
-                        or (i_mem["offset"] is None and mem.offset["value"] == "0")
+                        or (i_mem.offset is None and mem.offset["value"] == "0")
                     )
                 )
                 or (
                     mem.offset is not None
                     and "identifier" in mem.offset
-                    and i_mem["offset"] == "id"
+                    and i_mem.offset == "id"
                 )
             )
             # check index
             and (
-                mem.index == i_mem["index"]
-                or i_mem["index"] == self.WILDCARD
+                mem.index == i_mem.index
+                or i_mem.index == self.WILDCARD
                 or (
                     mem.index is not None
                     and "name" in mem.index
-                    and self._is_x86_reg_type(i_mem["index"], mem.index)
+                    and self._is_x86_reg_type(i_mem.index, mem.index)
                 )
             )
             # check scale
             and (
-                mem.scale == i_mem["scale"]
-                or i_mem["scale"] == self.WILDCARD
-                or (mem.scale != 1 and i_mem["scale"] != 1)
+                mem.scale == i_mem.scale
+                or i_mem.scale == self.WILDCARD
+                or (mem.scale != 1 and i_mem.scale != 1)
             )
         ):
             return True

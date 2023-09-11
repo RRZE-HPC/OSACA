@@ -422,7 +422,7 @@ class ParserAArch64(BaseParser):
             if "shift" in memory_address["index"]:
                 if memory_address["index"]["shift_op"].lower() in valid_shift_ops:
                     scale = 2 ** int(memory_address["index"]["shift"][0]["value"])
-        new_dict = MemoryOperand(OFFSET_ID=offset, BASE_ID=base, INDEX_ID=index, SCALE_ID=scale)
+        new_dict = MemoryOperand(OFFSET_ID=offset, BASE_ID=RegisterOperand(NAME_ID = base["name"], PREFIX_ID = base["prefix"]), INDEX_ID=index, SCALE_ID=scale)
         if "pre_indexed" in memory_address:
             new_dict.pre_indexed = True
         if "post_indexed" in memory_address:
@@ -581,13 +581,13 @@ class ParserAArch64(BaseParser):
 
     def is_gpr(self, register):
         """Check if register is a general purpose register"""
-        if register["prefix"] in "wx":
+        if register.prefix in "wx":
             return True
         return False
 
     def is_vector_register(self, register):
         """Check if register is a vector register"""
-        if register["prefix"] in "bhsdqvz":
+        if register.prefix in "bhsdqvz":
             return True
         return False
 
@@ -603,13 +603,13 @@ class ParserAArch64(BaseParser):
         """Check if ``reg_a`` is dependent on ``reg_b``"""
         prefixes_gpr = "wx"
         prefixes_vec = "bhsdqvz"
-        if reg_a["name"] == reg_b["name"]:
-            if reg_a["prefix"].lower() in prefixes_gpr and reg_b["prefix"].lower() in prefixes_gpr:
+        if reg_a.name == reg_b.name:
+            if reg_a.prefix.lower() in prefixes_gpr and reg_b.prefix.lower() in prefixes_gpr:
                 return True
-            if reg_a["prefix"].lower() in prefixes_vec and reg_b["prefix"].lower() in prefixes_vec:
+            if reg_a.prefix.lower() in prefixes_vec and reg_b.prefix.lower() in prefixes_vec:
                 return True
         return False
 
     def get_reg_type(self, register):
         """Get register type"""
-        return register["prefix"]
+        return register.prefix
