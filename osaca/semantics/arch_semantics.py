@@ -257,12 +257,6 @@ class ArchSemantics(ISASemantics):
                             instruction_form.instruction[:suffix_start], operands
                         )
                     if instruction_data_reg:
-                        print(instruction_data_reg["operands"])
-                        for o in instruction_data_reg["operands"]:
-                                o = RegisterOperand(NAME_ID=o["name"] if "name" in o else None,
-                                                    PREFIX_ID=o["prefix"] if "prefix" in o else None,
-                                                    MASK=o["mask"] if "mask" in o else False) 
-                        print(instruction_data_reg["operands"])
                         assign_unknown = False
                         reg_type = self._parser.get_reg_type(
                             instruction_data_reg["operands"][
@@ -277,23 +271,23 @@ class ArchSemantics(ISASemantics):
                             # LOAD performance data
                             load_perf_data = self._machine_model.get_load_throughput(
                                 [
-                                    x["memory"]
+                                    x
                                     for x in instruction_form.semantic_operands["source"]
                                     + instruction_form.semantic_operands["src_dst"]
-                                    if "memory" in x
+                                    if isinstance(x,MemoryOperand)
                                 ][0]
                             )
                             # if multiple options, choose based on reg type
                             data_port_uops = [
-                                ldp["port_pressure"]
+                                ldp.port_pressure
                                 for ldp in load_perf_data
-                                if "dst" in ldp
+                                if ldp.dst!=None
                                 and self._machine_model._check_operands(
-                                    dummy_reg, {"register": {"name": ldp["dst"]}}
+                                    dummy_reg, RegisterOperand(NAME_ID=ldp.dst)
                                 )
                             ]
                             if len(data_port_uops) < 1:
-                                data_port_uops = load_perf_data[0]["port_pressure"]
+                                data_port_uops = load_perf_data[0].port_pressure
                             else:
                                 data_port_uops = data_port_uops[0]
                             data_port_pressure = self._machine_model.average_port_pressure(
@@ -311,9 +305,9 @@ class ArchSemantics(ISASemantics):
                                 + instruction_form.semantic_operands["src_dst"]
                             )
                             store_perf_data = self._machine_model.get_store_throughput(
-                                [x["memory"] for x in destinations if "memory" in x][0], dummy_reg
+                                [x for x in destinations if isinstance(x,MemoryOperand)][0], dummy_reg
                             )
-                            st_data_port_uops = store_perf_data[0]["port_pressure"]
+                            st_data_port_uops = store_perf_data[0].port_pressure
 
                             # zero data port pressure and remove HAS_ST flag if
                             #   - no mem operand in dst &&

@@ -15,6 +15,8 @@ class MemoryOperand(Operand):
         PRE_INDEXED=False,
         POST_INDEXED=False,
         INDEXED_VAL=None,
+        PORT_PRESSURE=[],
+        DST=None
     ):
         super().__init__("memory")
         self._OFFSET_ID = OFFSET_ID
@@ -26,6 +28,8 @@ class MemoryOperand(Operand):
         self._PRE_INDEXED = PRE_INDEXED
         self._POST_INDEXED = POST_INDEXED
         self._INDEXED_VAL = INDEXED_VAL
+        self._PORT_PRESSURE = PORT_PRESSURE
+        self._DST = DST
 
     @property
     def offset(self):
@@ -66,6 +70,22 @@ class MemoryOperand(Operand):
     @property
     def indexed_val(self):
         return self._INDEXED_VAL
+
+    @property
+    def port_pressure(self):
+        return self._PORT_PRESSURE
+
+    @property
+    def dst(self):
+        return self._DST
+
+    @dst.setter
+    def dst(self, dst):
+        self._DST = dst
+    
+    @port_pressure.setter
+    def port_pressure(self, port_pressure):
+        self._PORT_PRESSURE = port_pressure
 
     @segment_ext_id.setter
     def segment_ext_id(self, segment):
@@ -109,7 +129,7 @@ class MemoryOperand(Operand):
             f"BASE_ID={self._BASE_ID}, INDEX_ID={self._INDEX_ID}, SCALE_ID={self._SCALE_ID}, "
             f"SEGMENT_EXT_ID={self._SEGMENT_EXT_ID}, MASK={self._MASK}, "
             f"PRE_INDEXED={self._PRE_INDEXED}, POST_INDEXED={self._POST_INDEXED}, "
-            f"INDEXED_VAL={self._INDEXED_VAL})"
+            f"INDEXED_VAL={self._INDEXED_VAL}, PORT_PRESSURE={self._PORT_PRESSURE})"
         )
 
     def __repr__(self):
@@ -118,7 +138,7 @@ class MemoryOperand(Operand):
             f"BASE_ID={self._BASE_ID}, INDEX_ID={self._INDEX_ID}, SCALE_ID={self._SCALE_ID}, "
             f"SEGMENT_EXT_ID={self._SEGMENT_EXT_ID}, MASK={self._MASK}, "
             f"PRE_INDEXED={self._PRE_INDEXED}, POST_INDEXED={self._POST_INDEXED}, "
-            f"INDEXED_VAL={self._INDEXED_VAL})"
+            f"INDEXED_VAL={self._INDEXED_VAL}, PORT_PRESSURE={self._PORT_PRESSURE})"
         )
 
     def __eq__(self, other):

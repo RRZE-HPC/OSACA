@@ -265,6 +265,8 @@ class ISASemantics(object):
             return op_dict
 
         for i, op in enumerate(isa_data["operands"]):
+            if isinstance(op, RegisterOperand):
+                continue
             if op["source"] and op["destination"]:
                 op_dict["src_dst"].append(operands[i])
                 continue
