@@ -169,9 +169,7 @@ class ArchSemantics(ISASemantics):
                         if INSTR_FLAGS.HIDDEN_LD not in load_instr.flags
                     ]
                 )
-                load = [instr for instr in kernel if instr.line_number == min_distance_load[1]][
-                    0
-                ]
+                load = [instr for instr in kernel if instr.line_number == min_distance_load[1]][0]
                 # Hide load
                 load.flags += [INSTR_FLAGS.HIDDEN_LD]
                 load.port_pressure = self._nullify_data_ports(load.port_pressure)
@@ -263,7 +261,7 @@ class ArchSemantics(ISASemantics):
                                 operands.index(self._create_reg_wildcard())
                             ]
                         )
-                        #dummy_reg = {"class": "register", "name": reg_type}
+                        # dummy_reg = {"class": "register", "name": reg_type}
                         dummy_reg = RegisterOperand(NAME_ID=reg_type)
                         data_port_pressure = [0.0 for _ in range(port_number)]
                         data_port_uops = []
@@ -274,14 +272,14 @@ class ArchSemantics(ISASemantics):
                                     x
                                     for x in instruction_form.semantic_operands["source"]
                                     + instruction_form.semantic_operands["src_dst"]
-                                    if isinstance(x,MemoryOperand)
+                                    if isinstance(x, MemoryOperand)
                                 ][0]
                             )
                             # if multiple options, choose based on reg type
                             data_port_uops = [
                                 ldp.port_pressure
                                 for ldp in load_perf_data
-                                if ldp.dst!=None
+                                if ldp.dst != None
                                 and self._machine_model._check_operands(
                                     dummy_reg, RegisterOperand(NAME_ID=ldp.dst)
                                 )
@@ -305,7 +303,8 @@ class ArchSemantics(ISASemantics):
                                 + instruction_form.semantic_operands["src_dst"]
                             )
                             store_perf_data = self._machine_model.get_store_throughput(
-                                [x for x in destinations if isinstance(x,MemoryOperand)][0], dummy_reg
+                                [x for x in destinations if isinstance(x, MemoryOperand)][0],
+                                dummy_reg,
                             )
                             st_data_port_uops = store_perf_data[0].port_pressure
 
@@ -454,7 +453,7 @@ class ArchSemantics(ISASemantics):
             else:
                 register = RegisterOperand(NAME_ID=reg_type + reg_id)
         elif self._isa == "aarch64":
-            register = RegisterOperand(NAME_ID=reg_id,PREFIX_ID=reg_type)
+            register = RegisterOperand(NAME_ID=reg_id, PREFIX_ID=reg_type)
         return register
 
     def _nullify_data_ports(self, port_pressure):

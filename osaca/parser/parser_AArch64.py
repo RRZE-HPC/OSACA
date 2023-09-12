@@ -422,7 +422,12 @@ class ParserAArch64(BaseParser):
             if "shift" in memory_address["index"]:
                 if memory_address["index"]["shift_op"].lower() in valid_shift_ops:
                     scale = 2 ** int(memory_address["index"]["shift"][0]["value"])
-        new_dict = MemoryOperand(OFFSET_ID=offset, BASE_ID=RegisterOperand(NAME_ID = base["name"], PREFIX_ID = base["prefix"]), INDEX_ID=index, SCALE_ID=scale)
+        new_dict = MemoryOperand(
+            OFFSET_ID=offset,
+            BASE_ID=RegisterOperand(NAME_ID=base["name"], PREFIX_ID=base["prefix"]),
+            INDEX_ID=index,
+            SCALE_ID=scale,
+        )
         if "pre_indexed" in memory_address:
             new_dict.pre_indexed = True
         if "post_indexed" in memory_address:
