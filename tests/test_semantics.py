@@ -22,6 +22,7 @@ from osaca.semantics import (
 from osaca.parser.register import RegisterOperand
 from osaca.parser.memory import MemoryOperand
 
+
 class TestSemanticTools(unittest.TestCase):
     MODULE_DATA_DIR = os.path.join(
         os.path.dirname(os.path.split(os.path.abspath(__file__))[0]), "osaca/data/"
@@ -117,14 +118,14 @@ class TestSemanticTools(unittest.TestCase):
     ###########
     # Tests
     ###########
-    
+
     def test_creation_by_name(self):
         try:
             tmp_mm = MachineModel(arch="CSX")
             ArchSemantics(tmp_mm)
         except ValueError:
             self.fail()
-        '''
+        """
     def test_machine_model_various_functions(self):
         # check dummy MachineModel creation
         try:
@@ -184,8 +185,9 @@ class TestSemanticTools(unittest.TestCase):
             "fadd  register(prefix:v,shape:s),register(prefix:v,shape:s),"
             + "register(prefix:v,shape:s)",
         )
-        '''
-    '''
+        """
+
+    """
         # test get_store_tp
         self.assertEqual(
             test_mm_x86.get_store_throughput(
@@ -246,7 +248,8 @@ class TestSemanticTools(unittest.TestCase):
         with open("/dev/null", "w") as dev_null:
             test_mm_x86.dump(stream=dev_null)
             test_mm_arm.dump(stream=dev_null)
-    '''
+    """
+
     def test_src_dst_assignment_x86(self):
         for instruction_form in self.kernel_x86:
             with self.subTest(instruction_form=instruction_form):
@@ -272,7 +275,7 @@ class TestSemanticTools(unittest.TestCase):
                 self.assertTrue(instruction_form.latency != None)
                 self.assertIsInstance(instruction_form.port_pressure, list)
                 self.assertEqual(len(instruction_form.port_pressure), port_num)
- 
+
     def test_tp_lt_assignment_AArch64(self):
         self.assertTrue("ports" in self.machine_model_tx2)
         port_num = len(self.machine_model_tx2["ports"])
@@ -282,7 +285,8 @@ class TestSemanticTools(unittest.TestCase):
                 self.assertTrue(instruction_form.latency != None)
                 self.assertIsInstance(instruction_form.port_pressure, list)
                 self.assertEqual(len(instruction_form.port_pressure), port_num)
-    '''
+
+    """
     def test_optimal_throughput_assignment(self):
         # x86
         kernel_fixed = deepcopy(self.kernel_x86)
@@ -392,7 +396,8 @@ class TestSemanticTools(unittest.TestCase):
             dg.get_dependent_instruction_forms()
         # test dot creation
         dg.export_graph(filepath="/dev/null")
-    '''
+    """
+
     def test_kernelDG_SVE(self):
         KernelDG(
             self.kernel_aarch64_SVE,
@@ -401,7 +406,7 @@ class TestSemanticTools(unittest.TestCase):
             self.semantics_a64fx,
         )
         # TODO check for correct analysis
-    
+
     def test_hidden_load(self):
         machine_model_hld = MachineModel(
             path_to_yaml=self._find_file("hidden_load_machine_model.yml")
@@ -422,7 +427,7 @@ class TestSemanticTools(unittest.TestCase):
         self.assertEqual(num_hidden_loads, 1)
         self.assertEqual(num_hidden_loads_2, 0)
         self.assertEqual(num_hidden_loads_3, 1)
-    
+
     def test_cyclic_dag(self):
         dg = KernelDG(self.kernel_x86, self.parser_x86, self.machine_model_csx, self.semantics_csx)
         dg.dg.add_edge(100, 101, latency=1.0)
@@ -432,7 +437,8 @@ class TestSemanticTools(unittest.TestCase):
             dg.get_critical_path()
         with self.assertRaises(NotImplementedError):
             dg.get_loopcarried_dependencies()
-    '''
+
+    """
     def test_loop_carried_dependency_aarch64(self):
         dg = KernelDG(
             self.kernel_aarch64_memdep,
@@ -534,12 +540,13 @@ class TestSemanticTools(unittest.TestCase):
         self.assertTrue(time_10 > 10)
         self.assertTrue(2 < time_2)
         self.assertTrue(time_2 < (time_10 - 7))
-    '''
+    """
+
     def test_is_read_is_written_x86(self):
         # independent form HW model
         dag = KernelDG(self.kernel_x86, self.parser_x86, None, None)
-        reg_rcx = RegisterOperand(NAME_ID = "rcx")
-        reg_ymm1 = RegisterOperand(NAME_ID = "ymm1")
+        reg_rcx = RegisterOperand(NAME_ID="rcx")
+        reg_ymm1 = RegisterOperand(NAME_ID="ymm1")
 
         instr_form_r_c = self.parser_x86.parse_line("vmovsd  %xmm0, (%r15,%rcx,8)")
         self.semantics_csx.assign_src_dst(instr_form_r_c)
@@ -569,11 +576,11 @@ class TestSemanticTools(unittest.TestCase):
     def test_is_read_is_written_AArch64(self):
         # independent form HW model
         dag = KernelDG(self.kernel_AArch64, self.parser_AArch64, None, None)
-        reg_x1 = RegisterOperand(PREFIX_ID="x",NAME_ID="1")
-        reg_w1 = RegisterOperand(PREFIX_ID="w",NAME_ID="1")
-        reg_d1 = RegisterOperand(PREFIX_ID="d",NAME_ID="1")
-        reg_q1 = RegisterOperand(PREFIX_ID="q",NAME_ID="1")
-        reg_v1 = RegisterOperand(PREFIX_ID="v",NAME_ID="1",LANES="2",SHAPE="d")
+        reg_x1 = RegisterOperand(PREFIX_ID="x", NAME_ID="1")
+        reg_w1 = RegisterOperand(PREFIX_ID="w", NAME_ID="1")
+        reg_d1 = RegisterOperand(PREFIX_ID="d", NAME_ID="1")
+        reg_q1 = RegisterOperand(PREFIX_ID="q", NAME_ID="1")
+        reg_v1 = RegisterOperand(PREFIX_ID="v", NAME_ID="1", LANES="2", SHAPE="d")
         regs = [reg_d1, reg_q1, reg_v1]
         regs_gp = [reg_w1, reg_x1]
 
@@ -596,7 +603,7 @@ class TestSemanticTools(unittest.TestCase):
 
         for reg in regs:
             with self.subTest(reg=reg):
-                #self.assertTrue(dag.is_read(reg, instr_form_r_1))
+                # self.assertTrue(dag.is_read(reg, instr_form_r_1))
                 self.assertTrue(dag.is_read(reg, instr_form_r_2))
                 self.assertTrue(dag.is_read(reg, instr_form_rw_1))
                 self.assertFalse(dag.is_read(reg, instr_form_rw_2))
@@ -638,7 +645,12 @@ class TestSemanticTools(unittest.TestCase):
 
     def test_MachineModel_getter(self):
         sample_operands = [
-            MemoryOperand(OFFSET_ID=None,BASE_ID=RegisterOperand(NAME_ID = "r12"), INDEX_ID=RegisterOperand(NAME_ID="rcx"),SCALE_ID=8)
+            MemoryOperand(
+                OFFSET_ID=None,
+                BASE_ID=RegisterOperand(NAME_ID="r12"),
+                INDEX_ID=RegisterOperand(NAME_ID="rcx"),
+                SCALE_ID=8,
+            )
         ]
         self.assertIsNone(self.machine_model_csx.get_instruction("GETRESULT", sample_operands))
         self.assertIsNone(self.machine_model_tx2.get_instruction("GETRESULT", sample_operands))

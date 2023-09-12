@@ -13,6 +13,7 @@ from osaca.parser.memory import MemoryOperand
 from osaca.parser.register import RegisterOperand
 from osaca.parser.immediate import ImmediateOperand
 
+
 class KernelDG(nx.DiGraph):
     # threshold for checking dependency graph sequential or in parallel
     INSTRUCTION_THRESHOLD = 50
@@ -285,9 +286,9 @@ class KernelDG(nx.DiGraph):
                 if isinstance(dst, RegisterOperand):
                     # read of register
                     if self.is_read(dst, instr_form):
-                        #if dst.pre_indexed or dst.post_indexed:
-                            #yield instr_form, ["p_indexed"]
-                        #else:
+                        # if dst.pre_indexed or dst.post_indexed:
+                        # yield instr_form, ["p_indexed"]
+                        # else:
                         yield instr_form, []
                     # write to register -> abort
                     if self.is_written(dst, instr_form):
@@ -410,7 +411,7 @@ class KernelDG(nx.DiGraph):
             # Here we check for mem dependecies only
             if not isinstance(src, MemoryOperand):
                 continue
-            #src = src.memory
+            # src = src.memory
 
             # determine absolute address change
             addr_change = 0
@@ -420,13 +421,20 @@ class KernelDG(nx.DiGraph):
                 addr_change -= mem.offset["value"]
             if mem.base and src.base:
                 base_change = register_changes.get(
-                    src.base.prefix if src.base.prefix!=None else ""  + src.base.name,
-                    {"name": src.base.prefix if src.base.prefix!=None else "" + src.base.name, "value": 0},
+                    src.base.prefix if src.base.prefix != None else "" + src.base.name,
+                    {
+                        "name": src.base.prefix if src.base.prefix != None else "" + src.base.name,
+                        "value": 0,
+                    },
                 )
                 if base_change is None:
                     # Unknown change occurred
                     continue
-                if mem.base.prefix if mem.base.prefix!=None else "" + mem.base.name != base_change["name"]:
+                if (
+                    mem.base.prefix
+                    if mem.base.prefix != None
+                    else "" + mem.base.name != base_change["name"]
+                ):
                     # base registers do not match
                     continue
                 addr_change += base_change["value"]
@@ -444,7 +452,11 @@ class KernelDG(nx.DiGraph):
                 if mem.scale != src.scale:
                     # scale factors do not match
                     continue
-                if mem.index.prefix if mem.index.prefix!=None else "" + mem.index.name != index_change["name"]:
+                if (
+                    mem.index.prefix
+                    if mem.index.prefix != None
+                    else "" + mem.index.name != index_change["name"]
+                ):
                     # index registers do not match
                     continue
                 addr_change += index_change["value"] * src.scale

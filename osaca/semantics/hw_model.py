@@ -20,6 +20,7 @@ from osaca.parser.register import RegisterOperand
 from osaca.parser.immediate import ImmediateOperand
 from osaca.parser.identifier import IdentifierOperand
 
+
 class MachineModel(object):
     WILDCARD = "*"
     INTERNAL_VERSION = 1  # increase whenever self._data format changes to invalidate cache!
@@ -102,32 +103,55 @@ class MachineModel(object):
                 self._data["instruction_forms_dict"] = defaultdict(list)
                 for iform in self._data["instruction_forms"]:
                     iform["name"] = iform["name"].upper()
-                    if iform["operands"]!=[]:
-                        new_operands =[]
+                    if iform["operands"] != []:
+                        new_operands = []
                         for o in iform["operands"]:
                             if o["class"] == "register":
-                                new_operands.append(RegisterOperand(NAME_ID=o["name"] if "name" in o else None,
-                                                    PREFIX_ID=o["prefix"] if "prefix" in o else None,
-                                                    MASK=o["mask"] if "mask" in o else False) 
-                                                    )
+                                new_operands.append(
+                                    RegisterOperand(
+                                        NAME_ID=o["name"] if "name" in o else None,
+                                        PREFIX_ID=o["prefix"] if "prefix" in o else None,
+                                        MASK=o["mask"] if "mask" in o else False,
+                                    )
+                                )
                             elif o["class"] == "memory":
-                                new_operands.append(MemoryOperand(BASE_ID=o["base"],
-                                                                  OFFSET_ID=o["offset"],
-                                                                  INDEX_ID=o["index"],
-                                                                  SCALE_ID=o["scale"])
-                                                    )
+                                new_operands.append(
+                                    MemoryOperand(
+                                        BASE_ID=o["base"],
+                                        OFFSET_ID=o["offset"],
+                                        INDEX_ID=o["index"],
+                                        SCALE_ID=o["scale"],
+                                    )
+                                )
                         iform["operands"] = new_operands
                     self._data["instruction_forms_dict"][iform["name"]].append(iform)
-                new_throughputs =[]
-                if 'load_throughput' in self._data:
+                new_throughputs = []
+                if "load_throughput" in self._data:
                     for m in self._data["load_throughput"]:
-                        new_throughputs.append(MemoryOperand(BASE_ID=m['base'],OFFSET_ID=m['offset'],SCALE_ID=m['scale'],INDEX_ID=m['index'],PORT_PRESSURE=m['port_pressure'],DST=m['dst'] if 'dst' in m else None))
+                        new_throughputs.append(
+                            MemoryOperand(
+                                BASE_ID=m["base"],
+                                OFFSET_ID=m["offset"],
+                                SCALE_ID=m["scale"],
+                                INDEX_ID=m["index"],
+                                PORT_PRESSURE=m["port_pressure"],
+                                DST=m["dst"] if "dst" in m else None,
+                            )
+                        )
                     self._data["load_throughput"] = new_throughputs
 
-                new_throughputs =[]
-                if 'store_throughput' in self._data:
+                new_throughputs = []
+                if "store_throughput" in self._data:
                     for m in self._data["store_throughput"]:
-                        new_throughputs.append(MemoryOperand(BASE_ID=m['base'],OFFSET_ID=m['offset'],SCALE_ID=m['scale'],INDEX_ID=m['index'],PORT_PRESSURE=m['port_pressure']))
+                        new_throughputs.append(
+                            MemoryOperand(
+                                BASE_ID=m["base"],
+                                OFFSET_ID=m["offset"],
+                                SCALE_ID=m["scale"],
+                                INDEX_ID=m["index"],
+                                PORT_PRESSURE=m["port_pressure"],
+                            )
+                        )
                     self._data["store_throughput"] = new_throughputs
 
                 self._data["internal_version"] = self.INTERNAL_VERSION
@@ -491,14 +515,16 @@ class MachineModel(object):
         elif operand in "wxbhsdq":
             return RegisterOperand(PREFIX_ID=operand)
         elif operand.startswith("v"):
-            return RegisterOperand(PREFIX_ID="v",SHAPE=operand[1:2])
+            return RegisterOperand(PREFIX_ID="v", SHAPE=operand[1:2])
         elif operand.startswith("m"):
-            return MemoryOperand(BASE_ID = "x" if "b" in operand else None,
-                                OFFSET_ID = "imd" if "o" in operand else None,
-                                INDEX_ID = "gpr" if "i" in operand else None,
-                                SCALE_ID =8 if "s" in operand else 1,
-                                PRE_INDEXED = True if "r" in operand else False,
-                                POST_INDEXED = True if "p" in operand else False)
+            return MemoryOperand(
+                BASE_ID="x" if "b" in operand else None,
+                OFFSET_ID="imd" if "o" in operand else None,
+                INDEX_ID="gpr" if "i" in operand else None,
+                SCALE_ID=8 if "s" in operand else 1,
+                PRE_INDEXED=True if "r" in operand else False,
+                POST_INDEXED=True if "p" in operand else False,
+            )
         else:
             raise ValueError("Parameter {} is not a valid operand code".format(operand))
 
@@ -511,10 +537,12 @@ class MachineModel(object):
         elif operand == "i":
             return ImmediateOperand(TYPE_ID="int")
         elif operand.startswith("m"):
-            return MemoryOperand(BASE_ID = "gpr" if "b" in operand else None,
-                                OFFSET_ID = "imd" if "o" in operand else None,
-                                INDEX_ID = "gpr" if "i" in operand else None,
-                                SCALE_ID = 8 if "s" in operand else 1,)
+            return MemoryOperand(
+                BASE_ID="gpr" if "b" in operand else None,
+                OFFSET_ID="imd" if "o" in operand else None,
+                INDEX_ID="gpr" if "i" in operand else None,
+                SCALE_ID=8 if "s" in operand else 1,
+            )
         else:
             raise ValueError("Parameter {} is not a valid operand code".format(operand))
 
@@ -553,10 +581,10 @@ class MachineModel(object):
     def _check_operands(self, i_operand, operand):
         """Check if the types of operand ``i_operand`` and ``operand`` match."""
         # check for wildcard
-        if (isinstance(operand, Operand) and operand.name == self.WILDCARD) or (not isinstance(operand, Operand) and self.WILDCARD in operand):
-            if (
-                isinstance(i_operand, RegisterOperand)
-            ):
+        if (isinstance(operand, Operand) and operand.name == self.WILDCARD) or (
+            not isinstance(operand, Operand) and self.WILDCARD in operand
+        ):
+            if isinstance(i_operand, RegisterOperand):
                 return True
             else:
                 return False
@@ -626,8 +654,8 @@ class MachineModel(object):
 
     def _check_x86_operands(self, i_operand, operand):
         """Check if the types of operand ``i_operand`` and ``operand`` match."""
-        #if "class" in operand.name:
-            # compare two DB entries
+        # if "class" in operand.name:
+        # compare two DB entries
         #    return self._compare_db_entries(i_operand, operand)
         # register
         if isinstance(operand, RegisterOperand):
@@ -641,7 +669,7 @@ class MachineModel(object):
             return self._is_x86_mem_type(i_operand, operand)
         # immediate
         if isinstance(operand, ImmediateOperand):
-        #if "immediate" in operand.name or operand.value != None:
+            # if "immediate" in operand.name or operand.value != None:
             return i_operand["class"] == "immediate" and i_operand["imd"] == "int"
         # identifier (e.g., labels)
         if isinstance(operand, IdentifierOperand):
@@ -733,10 +761,7 @@ class MachineModel(object):
                             # one instruction is missing zeroing while the other has it
                             zero_ok = False
                             # check for wildcard
-                            if (
-                                i_reg.zeroing == self.WILDCARD
-                                or reg.zeroing == self.WILDCARD
-                            ):
+                            if i_reg.zeroing == self.WILDCARD or reg.zeroing == self.WILDCARD:
                                 zero_ok = True
                         if not mask_ok or not zero_ok:
                             return False
@@ -766,11 +791,7 @@ class MachineModel(object):
                     and "identifier" in mem.offset
                     and i_mem.offset == "identifier"
                 )
-                or (
-                    mem.offset is not None
-                    and "value" in mem.offset
-                    and i_mem.offset == "imd"
-                )
+                or (mem.offset is not None and "value" in mem.offset and i_mem.offset == "imd")
             )
             # check index
             and (
@@ -778,7 +799,7 @@ class MachineModel(object):
                 or i_mem.index == self.WILDCARD
                 or (
                     mem.index is not None
-                    and mem["index"].prefix!=None
+                    and mem["index"].prefix != None
                     and mem.index["prefix"] == i_mem.index
                 )
             )
@@ -790,13 +811,12 @@ class MachineModel(object):
             )
             # check pre-indexing
             and (
-                i_mem.pre-indexed == self.WILDCARD
-                or (mempre-indexed) == (i_mem.pre-indexed)
+                i_mem.pre - indexed == self.WILDCARD or (mempre - indexed) == (i_mem.pre - indexed)
             )
             # check post-indexing
             and (
-                i_mem.post-indexed == self.WILDCARD
-                or (mem.post-indexed) == (i_mem.post-indexed)
+                i_mem.post - indexed == self.WILDCARD
+                or (mem.post - indexed) == (i_mem.post - indexed)
             )
         ):
             return True
@@ -828,11 +848,7 @@ class MachineModel(object):
                         or (i_mem.offset is None and mem.offset["value"] == "0")
                     )
                 )
-                or (
-                    mem.offset is not None
-                    and "identifier" in mem.offset
-                    and i_mem.offset == "id"
-                )
+                or (mem.offset is not None and "identifier" in mem.offset and i_mem.offset == "id")
             )
             # check index
             and (
@@ -840,7 +856,7 @@ class MachineModel(object):
                 or i_mem.index == self.WILDCARD
                 or (
                     mem.index is not None
-                    and mem.index.name!=None
+                    and mem.index.name != None
                     and self._is_x86_reg_type(i_mem.index, mem.index)
                 )
             )

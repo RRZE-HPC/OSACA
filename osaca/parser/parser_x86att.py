@@ -338,10 +338,16 @@ class ParserX86ATT(BaseParser):
         elif offset is not None and "value" in offset:
             offset["value"] = int(offset["value"], 0)
         if base != None:
-            baseOp = RegisterOperand(NAME_ID=base['name'],PREFIX_ID=base['prefix'] if 'prefix' in base else None)
+            baseOp = RegisterOperand(
+                NAME_ID=base["name"], PREFIX_ID=base["prefix"] if "prefix" in base else None
+            )
         if index != None:
-            indexOp = RegisterOperand(NAME_ID=index['name'],PREFIX_ID=index['prefix'] if 'prefix' in index else None)
-        new_dict = MemoryOperand(OFFSET_ID=offset, BASE_ID=baseOp, INDEX_ID=indexOp, SCALE_ID=scale)
+            indexOp = RegisterOperand(
+                NAME_ID=index["name"], PREFIX_ID=index["prefix"] if "prefix" in index else None
+            )
+        new_dict = MemoryOperand(
+            OFFSET_ID=offset, BASE_ID=baseOp, INDEX_ID=indexOp, SCALE_ID=scale
+        )
         # Add segmentation extension if existing
         if self.SEGMENT_EXT_ID in memory_address:
             new_dict.segment_ext_id = memory_address[self.SEGMENT_EXT_ID]

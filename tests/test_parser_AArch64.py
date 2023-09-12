@@ -94,7 +94,7 @@ class TestParserAArch64(unittest.TestCase):
         instr7 = "fadd    v17.2d, v16.2d, v1.2d"
         instr8 = "mov.d   x0, v16.d[1]"
         instr9 = "ccmp    x0, x1, #4, cc"
-        
+
         parsed_1 = self.parser.parse_instruction(instr1)
         parsed_2 = self.parser.parse_instruction(instr2)
         parsed_3 = self.parser.parse_instruction(instr3)
@@ -104,19 +104,19 @@ class TestParserAArch64(unittest.TestCase):
         parsed_7 = self.parser.parse_instruction(instr7)
         parsed_8 = self.parser.parse_instruction(instr8)
         parsed_9 = self.parser.parse_instruction(instr9)
-        
+
         self.assertEqual(parsed_1.instruction, "vcvt.F32.S32")
         self.assertEqual(parsed_1.operands[0].name, "1")
         self.assertEqual(parsed_1.operands[0].prefix, "w")
         self.assertEqual(parsed_1.operands[1].name, "2")
         self.assertEqual(parsed_1.operands[1].prefix, "w")
         self.assertEqual(parsed_1.comment, "12.27")
-        
+
         self.assertEqual(parsed_2.instruction, "b.lo")
-        self.assertEqual(parsed_2.operands[0]['identifier']['name'], "..B1.4")
+        self.assertEqual(parsed_2.operands[0]["identifier"]["name"], "..B1.4")
         self.assertEqual(len(parsed_2.operands), 1)
         self.assertIsNone(parsed_2.comment)
-        
+
         self.assertEqual(parsed_3.instruction, "mov")
         self.assertEqual(parsed_3.operands[0].name, "2")
         self.assertEqual(parsed_3.operands[0].prefix, "x")
@@ -127,8 +127,8 @@ class TestParserAArch64(unittest.TestCase):
         self.assertIsNone(parsed_4.operands[1].offset)
         self.assertEqual(parsed_4.operands[1].base.name, "sp")
         self.assertEqual(parsed_4.operands[1].base.prefix, "x")
-        self.assertEqual(parsed_4.operands[1].index['name'], "1")
-        self.assertEqual(parsed_4.operands[1].index['prefix'], "x")
+        self.assertEqual(parsed_4.operands[1].index["name"], "1")
+        self.assertEqual(parsed_4.operands[1].index["prefix"], "x")
         self.assertEqual(parsed_4.operands[1].scale, 16)
         self.assertEqual(parsed_4.operands[0].name, "28")
         self.assertEqual(parsed_4.operands[0].prefix, "x")
@@ -137,8 +137,8 @@ class TestParserAArch64(unittest.TestCase):
         self.assertEqual(parsed_5.instruction, "ldr")
         self.assertEqual(parsed_5.operands[0].name, "0")
         self.assertEqual(parsed_5.operands[0].prefix, "x")
-        self.assertEqual(parsed_5.operands[1].offset['identifier']['name'], "q2c")
-        self.assertEqual(parsed_5.operands[1].offset['identifier']['relocation'], ":got_lo12:")
+        self.assertEqual(parsed_5.operands[1].offset["identifier"]["name"], "q2c")
+        self.assertEqual(parsed_5.operands[1].offset["identifier"]["relocation"], ":got_lo12:")
         self.assertEqual(parsed_5.operands[1].base.name, "0")
         self.assertEqual(parsed_5.operands[1].base.prefix, "x")
         self.assertIsNone(parsed_5.operands[1].index)
@@ -147,8 +147,8 @@ class TestParserAArch64(unittest.TestCase):
         self.assertEqual(parsed_6.instruction, "adrp")
         self.assertEqual(parsed_6.operands[0].name, "0")
         self.assertEqual(parsed_6.operands[0].prefix, "x")
-        self.assertEqual(parsed_6.operands[1]['identifier']['relocation'], ":got:")
-        self.assertEqual(parsed_6.operands[1]['identifier']['name'], "visited")
+        self.assertEqual(parsed_6.operands[1]["identifier"]["relocation"], ":got:")
+        self.assertEqual(parsed_6.operands[1]["identifier"]["name"], "visited")
 
         self.assertEqual(parsed_7.instruction, "fadd")
         self.assertEqual(parsed_7.operands[0].name, "17")
@@ -168,8 +168,7 @@ class TestParserAArch64(unittest.TestCase):
         self.assertEqual(parsed_9.instruction, "ccmp")
         self.assertEqual(parsed_9.operands[0].name, "0")
         self.assertEqual(parsed_9.operands[0].prefix, "x")
-        self.assertEqual(parsed_9.operands[3]['condition'], "CC")
-        
+        self.assertEqual(parsed_9.operands[3]["condition"], "CC")
 
     def test_parse_line(self):
         line_comment = "// -- Begin  main"
@@ -216,7 +215,7 @@ class TestParserAArch64(unittest.TestCase):
                 RegisterOperand(PREFIX_ID="s", NAME_ID="0"),
                 MemoryOperand(
                     OFFSET_ID=None,
-                    BASE_ID=RegisterOperand(PREFIX_ID = "x", NAME_ID ="11"),
+                    BASE_ID=RegisterOperand(PREFIX_ID="x", NAME_ID="11"),
                     INDEX_ID={
                         "prefix": "w",
                         "name": "10",
@@ -239,7 +238,7 @@ class TestParserAArch64(unittest.TestCase):
                 {"prfop": {"type": ["PLD"], "target": ["L1"], "policy": ["KEEP"]}},
                 MemoryOperand(
                     OFFSET_ID={"value": 2048},
-                    BASE_ID=RegisterOperand(PREFIX_ID = "x", NAME_ID ="26"),
+                    BASE_ID=RegisterOperand(PREFIX_ID="x", NAME_ID="26"),
                     INDEX_ID=None,
                     SCALE_ID=1,
                 ),
@@ -257,7 +256,7 @@ class TestParserAArch64(unittest.TestCase):
                 RegisterOperand(PREFIX_ID="x", NAME_ID="30"),
                 MemoryOperand(
                     OFFSET_ID={"value": -16},
-                    BASE_ID=RegisterOperand(NAME_ID = "sp", PREFIX_ID = "x"),
+                    BASE_ID=RegisterOperand(NAME_ID="sp", PREFIX_ID="x"),
                     INDEX_ID=None,
                     SCALE_ID=1,
                     PRE_INDEXED=True,
@@ -276,7 +275,7 @@ class TestParserAArch64(unittest.TestCase):
                 RegisterOperand(PREFIX_ID="q", NAME_ID="3"),
                 MemoryOperand(
                     OFFSET_ID=None,
-                    BASE_ID=RegisterOperand(NAME_ID = "11", PREFIX_ID = "x"),
+                    BASE_ID=RegisterOperand(NAME_ID="11", PREFIX_ID="x"),
                     INDEX_ID=None,
                     SCALE_ID=1,
                     POST_INDEXED={"value": 64},
@@ -317,7 +316,7 @@ class TestParserAArch64(unittest.TestCase):
             LINE="ccmn  x11, #1, #3, eq",
             LINE_NUMBER=9,
         )
-        
+
         parsed_1 = self.parser.parse_line(line_comment, 1)
         parsed_2 = self.parser.parse_line(line_label, 2)
         parsed_3 = self.parser.parse_line(line_directive, 3)
@@ -337,7 +336,6 @@ class TestParserAArch64(unittest.TestCase):
         self.assertEqual(parsed_7, instruction_form_7)
         self.assertEqual(parsed_8, instruction_form_8)
         self.assertEqual(parsed_9, instruction_form_9)
-        
 
     def test_parse_file(self):
         parsed = self.parser.parse_file(self.triad_code)
@@ -399,22 +397,22 @@ class TestParserAArch64(unittest.TestCase):
         # self.assertEqual(p_single.operands, reg_list_single)
 
     def test_reg_dependency(self):
-        reg_1_1 = RegisterOperand(PREFIX_ID = "b", NAME_ID = "1")
-        reg_1_2 = RegisterOperand(PREFIX_ID = "h", NAME_ID = "1")
-        reg_1_3 = RegisterOperand(PREFIX_ID = "s", NAME_ID = "1")
-        reg_1_4 = RegisterOperand(PREFIX_ID = "d", NAME_ID = "1")
-        reg_1_4 = RegisterOperand(PREFIX_ID = "q", NAME_ID = "1")
-        reg_2_1 = RegisterOperand(PREFIX_ID = "w", NAME_ID = "2")
-        reg_2_2 = RegisterOperand(PREFIX_ID = "x", NAME_ID = "2")
-        reg_v1_1 = RegisterOperand(PREFIX_ID = "v", NAME_ID = "11", LANES = "16", SHAPE = "b")
-        reg_v1_2 = RegisterOperand(PREFIX_ID = "v", NAME_ID = "11", LANES = "8", SHAPE = "h")
-        reg_v1_3 = RegisterOperand(PREFIX_ID = "v", NAME_ID = "11", LANES = "4", SHAPE = "s")
-        reg_v1_4 = RegisterOperand(PREFIX_ID = "v", NAME_ID = "11", LANES = "2", SHAPE = "d")
+        reg_1_1 = RegisterOperand(PREFIX_ID="b", NAME_ID="1")
+        reg_1_2 = RegisterOperand(PREFIX_ID="h", NAME_ID="1")
+        reg_1_3 = RegisterOperand(PREFIX_ID="s", NAME_ID="1")
+        reg_1_4 = RegisterOperand(PREFIX_ID="d", NAME_ID="1")
+        reg_1_4 = RegisterOperand(PREFIX_ID="q", NAME_ID="1")
+        reg_2_1 = RegisterOperand(PREFIX_ID="w", NAME_ID="2")
+        reg_2_2 = RegisterOperand(PREFIX_ID="x", NAME_ID="2")
+        reg_v1_1 = RegisterOperand(PREFIX_ID="v", NAME_ID="11", LANES="16", SHAPE="b")
+        reg_v1_2 = RegisterOperand(PREFIX_ID="v", NAME_ID="11", LANES="8", SHAPE="h")
+        reg_v1_3 = RegisterOperand(PREFIX_ID="v", NAME_ID="11", LANES="4", SHAPE="s")
+        reg_v1_4 = RegisterOperand(PREFIX_ID="v", NAME_ID="11", LANES="2", SHAPE="d")
 
-        reg_b5 = RegisterOperand(PREFIX_ID = "b", NAME_ID = "5")
-        reg_q15 = RegisterOperand(PREFIX_ID = "q", NAME_ID = "15")
-        reg_v10 = RegisterOperand(PREFIX_ID = "v", NAME_ID = "10", LANES = "2", SHAPE = "s")
-        reg_v20 = RegisterOperand(PREFIX_ID = "v", NAME_ID = "20", LANES = "2", SHAPE = "d")
+        reg_b5 = RegisterOperand(PREFIX_ID="b", NAME_ID="5")
+        reg_q15 = RegisterOperand(PREFIX_ID="q", NAME_ID="15")
+        reg_v10 = RegisterOperand(PREFIX_ID="v", NAME_ID="10", LANES="2", SHAPE="s")
+        reg_v20 = RegisterOperand(PREFIX_ID="v", NAME_ID="20", LANES="2", SHAPE="d")
 
         reg_1 = [reg_1_1, reg_1_2, reg_1_3, reg_1_4]
         reg_2 = [reg_2_1, reg_2_2]

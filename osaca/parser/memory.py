@@ -16,7 +16,7 @@ class MemoryOperand(Operand):
         POST_INDEXED=False,
         INDEXED_VAL=None,
         PORT_PRESSURE=[],
-        DST=None
+        DST=None,
     ):
         super().__init__("memory")
         self._OFFSET_ID = OFFSET_ID
@@ -82,7 +82,7 @@ class MemoryOperand(Operand):
     @dst.setter
     def dst(self, dst):
         self._DST = dst
-    
+
     @port_pressure.setter
     def port_pressure(self, port_pressure):
         self._PORT_PRESSURE = port_pressure
