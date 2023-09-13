@@ -5515,3 +5515,13 @@ instruction_forms:
   latency: 3
   port_pressure: [[1, '7']]
   throughput: 1.0
+- name: imul # uops.info
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: 3
+  port_pressure: [[1, '7']]
+  throughput: 1.0
+  uops: 1

@@ -91,7 +91,7 @@ The usage of OSACA can be listed as:
     	  [--ignore-unknown] [--lcd-timeout SECONDS]
     	  [--db-check] [--import MICROBENCH] [--insert-marker]
           [--export-graph GRAPHNAME] [--consider-flag-deps]
-          [--out OUT] [--verbose]
+          [--out OUT] [--yaml-out YAML_OUT] [--verbose]
           FILEPATH
 
 -h, --help
@@ -133,6 +133,8 @@ The usage of OSACA can be listed as:
   Increases verbosity level
 -o OUT, --out OUT
   Write analysis to this file (default to stdout)
+--yaml-out YAML_OUT
+  Write analysis as YAML representation to this file
 
 The **FILEPATH** describes the filepath to the file to work with and is always necessary, use "-" to read from stdin.
 
