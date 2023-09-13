@@ -8,6 +8,7 @@ import re
 from datetime import datetime as dt
 
 from osaca.semantics import INSTR_FLAGS, ArchSemantics, KernelDG, MachineModel
+from osaca.parser import AttrDict
 
 
 def _get_version(*file_paths):
@@ -200,6 +201,99 @@ class Frontend(object):
             + self._user_warnings_footer(lcd_warning)
             + self.loopcarried_dependencies(kernel_dg.get_loopcarried_dependencies())
         )
+
+    def full_analysis_dict(
+        self,
+        kernel,
+        kernel_dg: KernelDG,
+        arch_warning=False,
+        length_warning=False,
+        lcd_warning=False,
+    ):
+        """
+        Create a dictionary of the full analysis for machine-readable output.
+
+        :param kernel: kernel to report on
+        :type kernel: list
+        :param kernel_dg: directed graph containing CP and LCD
+        :type kernel_dg: :class:`~osaca.semantics.KernelDG`
+        :param arch_warning: flag for additional user warning to specify micro-arch
+        :type arch_warning: boolean, optional
+        :param length_warning: flag for additional user warning to specify kernel length with
+                                     --lines
+        :type length_warning: boolean, optional
+        :param lcd_warning: flag for additional user warning due to LCD analysis timed out
+        :type lcd_warning: boolean, optional
+
+        :returns: dict -- a dict of the analysis
+        """
+        warnings = []
+
+        if arch_warning:
+            warnings.append("ArchWarning")
+
+        if length_warning:
+            warnings.append("LengthWarning")
+
+        if lcd_warning:
+            warnings.append("LCDWarning")
+
+        if INSTR_FLAGS.TP_UNKWN in [flag for instr in kernel for flag in instr["flags"]]:
+            warnings.append("UnknownInstrWarning")
+
+        tp_sum = ArchSemantics.get_throughput_sum(kernel) or kernel[0]["port_pressure"]
+        cp_kernel = kernel_dg.get_critical_path()
+
+        dep_dict = kernel_dg.get_loopcarried_dependencies()
+        lcd_sum = 0.0
+        if dep_dict:
+            longest_lcd = max(dep_dict, key=lambda ln: dep_dict[ln]["latency"])
+            lcd_sum = dep_dict[longest_lcd]["latency"]
+        return {
+            "Header": self._header_report_dict(),
+            "Warnings": warnings,
+            "Kernel": [
+                {
+                    "Line": re.sub(r"\s+", " ", x["line"].strip()),
+                    "LineNumber": x["line_number"],
+                    "Flags": list(x["flags"]),
+                    "Instruction": x["instruction"],
+                    "Operands": AttrDict.get_dict(x["operands"]),
+                    "SemanticOperands": AttrDict.get_dict(x["semantic_operands"]),
+                    "Label": x["label"],
+                    "Directive": x["directive"],
+                    "Latency": float(x["latency"]),
+                    "LatencyCP": float(x["latency_cp"]),
+                    "LatencyLCD": float(x["latency_lcd"]),
+                    "Throughput": float(x["throughput"]),
+                    "LatencyWithoutLoad": float(x["latency_wo_load"]),
+                    "PortPressure": {
+                        self._machine_model.get_ports()[i]: v
+                        for i, v in enumerate(x["port_pressure"])
+                    },
+                    "PortUops": [
+                        {
+                            "Ports": list(y[1]),
+                            "Cycles": y[0],
+                        }
+                        for y in x["port_uops"]
+                    ],
+                    "Comment": x["comment"],
+                }
+                for x in kernel
+            ],
+            "Summary": {
+                "PortPressure": {
+                    self._machine_model.get_ports()[i]: v for i, v in enumerate(tp_sum)
+                },
+                "CriticalPath": sum([x["latency_cp"] for x in cp_kernel]),
+                "LCD": lcd_sum,
+            },
+            "Target": {
+                "Name": self._arch.upper(),
+                "Ports": list(self._machine_model.get_ports()),
+            },
+        }
 
     def combined_view(
         self,
@@ -448,6 +542,15 @@ class Frontend(object):
             dt.utcnow().strftime("%Y-%m-%d %H:%M:%S")
         )
         return header + "\n"
+
+    def _header_report_dict(self):
+        """Return header information in a dictionary format"""
+        return {
+            "Version": _get_version("__init__.py"),
+            "FileName": self._filename,
+            "Architecture": self._arch,
+            "Timestamp": dt.utcnow().strftime("%Y-%m-%d %H:%M:%S"),
+        }
 
     def _symbol_map(self):
         """Prints instruction flag map."""
