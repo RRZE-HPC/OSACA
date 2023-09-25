@@ -600,7 +600,7 @@ class ParserAArch64(BaseParser):
         """Check if ``flag_a`` is dependent on ``flag_b``"""
         # we assume flags are independent of each other, e.g., CF can be read while ZF gets written
         # TODO validate this assumption
-        if flag_a["name"] == flag_b["name"]:
+        if flag_a.name == flag_b["name"]:
             return True
         return False
 
