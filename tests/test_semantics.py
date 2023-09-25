@@ -125,7 +125,7 @@ class TestSemanticTools(unittest.TestCase):
             ArchSemantics(tmp_mm)
         except ValueError:
             self.fail()
-        """
+
     def test_machine_model_various_functions(self):
         # check dummy MachineModel creation
         try:
@@ -173,7 +173,7 @@ class TestSemanticTools(unittest.TestCase):
             test_mm_arm.get_instruction("b.someNameThatDoesNotExist", [{"class": "identifier"}]),
             test_mm_arm.get_instruction("b.someOtherName", [{"class": "identifier"}]),
         )
-        
+
         # test full instruction name
         self.assertEqual(
             MachineModel.get_full_instruction_name(instr_form_x86_1),
@@ -185,14 +185,12 @@ class TestSemanticTools(unittest.TestCase):
             "fadd  register(prefix:v,shape:s),register(prefix:v,shape:s),"
             + "register(prefix:v,shape:s)",
         )
-        """
 
-    """
         # test get_store_tp
         self.assertEqual(
             test_mm_x86.get_store_throughput(
                 MemoryOperand(BASE_ID=RegisterOperand(NAME_ID="x"), OFFSET_ID=None,INDEX_ID=None,SCALE_ID="1")
-            )[0]["port_pressure"],
+            )[0].port_pressure,
             [[2, "237"], [2, "4"]],
         )
 
@@ -248,7 +246,7 @@ class TestSemanticTools(unittest.TestCase):
         with open("/dev/null", "w") as dev_null:
             test_mm_x86.dump(stream=dev_null)
             test_mm_arm.dump(stream=dev_null)
-    """
+
 
     def test_src_dst_assignment_x86(self):
         for instruction_form in self.kernel_x86:
@@ -286,7 +284,6 @@ class TestSemanticTools(unittest.TestCase):
                 self.assertIsInstance(instruction_form.port_pressure, list)
                 self.assertEqual(len(instruction_form.port_pressure), port_num)
 
-    """
     def test_optimal_throughput_assignment(self):
         # x86
         kernel_fixed = deepcopy(self.kernel_x86)
@@ -396,7 +393,7 @@ class TestSemanticTools(unittest.TestCase):
             dg.get_dependent_instruction_forms()
         # test dot creation
         dg.export_graph(filepath="/dev/null")
-    """
+
 
     def test_kernelDG_SVE(self):
         KernelDG(
@@ -438,7 +435,7 @@ class TestSemanticTools(unittest.TestCase):
         with self.assertRaises(NotImplementedError):
             dg.get_loopcarried_dependencies()
 
-    """
+
     def test_loop_carried_dependency_aarch64(self):
         dg = KernelDG(
             self.kernel_aarch64_memdep,
@@ -540,7 +537,7 @@ class TestSemanticTools(unittest.TestCase):
         self.assertTrue(time_10 > 10)
         self.assertTrue(2 < time_2)
         self.assertTrue(time_2 < (time_10 - 7))
-    """
+
 
     def test_is_read_is_written_x86(self):
         # independent form HW model

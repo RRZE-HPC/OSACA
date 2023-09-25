@@ -320,13 +320,15 @@ class MachineModel(object):
     @staticmethod
     def get_full_instruction_name(instruction_form):
         """Get one instruction name string including the mnemonic and all operands."""
+        if instruction_form==None:
+            return ""
         operands = []
-        for op in instruction_form.operands:
+        for op in instruction_form["operands"]:
             op_attrs = [
-                y + ":" + str(op[y])
-                for y in list(filter(lambda x: True if x != "class" else False, op))
+                "name:" + op.name
+                #for y in list(filter(lambda x: True if x != "class" else False, op))
             ]
-            operands.append("{}({})".format(op["class"], ",".join(op_attrs)))
+            operands.append("{}({})".format("register", ",".join(op_attrs)))
         return "{}  {}".format(instruction_form["name"].lower(), ",".join(operands))
 
     @staticmethod
@@ -595,53 +597,53 @@ class MachineModel(object):
 
     def _check_AArch64_operands(self, i_operand, operand):
         """Check if the types of operand ``i_operand`` and ``operand`` match."""
-        if "class" in operand:
+        #if "class" in operand:
             # compare two DB entries
-            return self._compare_db_entries(i_operand, operand)
+        #    return self._compare_db_entries(i_operand, operand)
         # TODO support class wildcards
         # register
-        if "register" in operand:
-            if i_operand["class"] != "register":
+        if isinstance(operand, RegisterOperand):
+            if not isinstance(i_operand, RegisterOperand):
                 return False
-            return self._is_AArch64_reg_type(i_operand, operand["register"])
+            return self._is_AArch64_reg_type(i_operand, operand)
         # memory
-        if "memory" in operand:
-            if i_operand["class"] != "memory":
+        if isinstance(operand, MemoryOperand):
+            if not isinstance(i_operand, MemoryOperand):
                 return False
-            return self._is_AArch64_mem_type(i_operand, operand["memory"])
+            return self._is_AArch64_mem_type(i_operand, operand)
         # immediate
-        if i_operand["class"] == "immediate" and i_operand["imd"] == self.WILDCARD:
-            return "value" in operand or (
+        if isinstance(i_operand, ImmediateOperand) and i_operand.type == self.WILDCARD:
+            return "value" in operand.value or (
                 "immediate" in operand and "value" in operand["immediate"]
             )
-        if i_operand["class"] == "immediate" and i_operand["imd"] == "int":
+        if isinstance(i_operand, ImmediateOperand) and i_operand.type == "int":
             return ("value" in operand and operand.get("type", None) == "int") or (
                 "immediate" in operand
                 and "value" in operand["immediate"]
                 and operand["immediate"].get("type", None) == "int"
             )
-        if i_operand["class"] == "immediate" and i_operand["imd"] == "float":
+        if isinstance(i_operand, ImmediateOperand) and i_operand.type == "float":
             return ("float" in operand and operand.get("type", None) == "float") or (
                 "immediate" in operand
                 and "float" in operand["immediate"]
                 and operand["immediate"].get("type", None) == "float"
             )
-        if i_operand["class"] == "immediate" and i_operand["imd"] == "double":
+        if isinstance(i_operand, ImmediateOperand) and i_operand.type == "double":
             return ("double" in operand and operand.get("type", None) == "double") or (
                 "immediate" in operand
                 and "double" in operand["immediate"]
                 and operand["immediate"].get("type", None) == "double"
             )
         # identifier
-        if "identifier" in operand or (
-            "immediate" in operand and "identifier" in operand["immediate"]
+        if isinstance(operand, IdentifierOperand) or (
+            isinstance(operand, ImmediateOperand) and isinstance(operand, IdentifierOperand)
         ):
             return i_operand["class"] == "identifier"
         # prefetch option
-        if "prfop" in operand:
+        if not isinstance(operand, Operand) and "prfop" in operand:
             return i_operand["class"] == "prfop"
         # condition
-        if "condition" in operand:
+        if not isinstance(operand, Operand) and "condition" in operand:
             if i_operand["ccode"] == self.WILDCARD:
                 return True
             return i_operand["class"] == "condition" and (
@@ -698,27 +700,27 @@ class MachineModel(object):
     def _is_AArch64_reg_type(self, i_reg, reg):
         """Check if register type match."""
         # check for wildcards
-        if reg["prefix"] == self.WILDCARD or i_reg["prefix"] == self.WILDCARD:
-            if "shape" in reg:
-                if "shape" in i_reg and (
-                    reg["shape"] == i_reg["shape"]
-                    or self.WILDCARD in (reg["shape"] + i_reg["shape"])
+        if reg.prefix == self.WILDCARD or i_reg.prefix == self.WILDCARD:
+            if reg.shape!=None:
+                if i_reg.shape!=None and (
+                    reg.shape == i_reg.shape
+                    or self.WILDCARD in (reg.shape + i_reg.shape)
                 ):
                     return True
                 return False
             return True
         # check for prefix and shape
-        if reg["prefix"] != i_reg["prefix"]:
+        if reg.prefix != i_reg.prefix:
             return False
-        if "shape" in reg:
-            if "shape" in i_reg and (
-                reg["shape"] == i_reg["shape"] or self.WILDCARD in (reg["shape"] + i_reg["shape"])
+        if reg.shape!=None:
+            if i_reg.shape!=None and (
+                reg.shape == i_reg.shape or self.WILDCARD in (reg.shape + i_reg.shape)
             ):
                 return True
             return False
-        if "lanes" in reg:
-            if "lanes" in i_reg and (
-                reg["lanes"] == i_reg["lanes"] or self.WILDCARD in (reg["lanes"] + i_reg["lanes"])
+        if reg.lanes!=None:
+            if i_reg.lanes!=None and (
+                reg.lanes == i_reg.lanes or self.WILDCARD in (reg.lanes + i_reg.lanes)
             ):
                 return True
             return False
@@ -735,6 +737,8 @@ class MachineModel(object):
         else:
             i_reg_name = i_reg
         # check for wildcards
+        if isinstance(reg,str):
+            return False
         if i_reg_name == self.WILDCARD or reg.name == self.WILDCARD:
             return True
         # differentiate between vector registers (mm, xmm, ymm, zmm) and others (gpr)
@@ -780,7 +784,7 @@ class MachineModel(object):
             (
                 (mem.base is None and i_mem.base is None)
                 or i_mem.base == self.WILDCARD
-                or mem.base["prefix"] == i_mem.base
+                or mem.base.prefix == i_mem.base
             )
             # check offset
             and (
@@ -799,8 +803,8 @@ class MachineModel(object):
                 or i_mem.index == self.WILDCARD
                 or (
                     mem.index is not None
-                    and mem["index"].prefix != None
-                    and mem.index["prefix"] == i_mem.index
+                    and mem.index.prefix != None
+                    and mem.index.prefix == i_mem.index
                 )
             )
             # check scale
@@ -811,12 +815,12 @@ class MachineModel(object):
             )
             # check pre-indexing
             and (
-                i_mem.pre - indexed == self.WILDCARD or (mempre - indexed) == (i_mem.pre - indexed)
+                i_mem.pre_indexed == self.WILDCARD or (mem.pre_indexed) == (i_mem.pre_indexed)
             )
             # check post-indexing
             and (
-                i_mem.post - indexed == self.WILDCARD
-                or (mem.post - indexed) == (i_mem.post - indexed)
+                i_mem.post_indexed == self.WILDCARD
+                or (mem.post_indexed) == (i_mem.post_indexed)
             )
         ):
             return True
@@ -856,7 +860,7 @@ class MachineModel(object):
                 or i_mem.index == self.WILDCARD
                 or (
                     mem.index is not None
-                    and mem.index.name != None
+                    #and mem.index.name != None
                     and self._is_x86_reg_type(i_mem.index, mem.index)
                 )
             )
