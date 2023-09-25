@@ -111,6 +111,7 @@ class MachineModel(object):
                                     RegisterOperand(
                                         NAME_ID=o["name"] if "name" in o else None,
                                         PREFIX_ID=o["prefix"] if "prefix" in o else None,
+                                        SHAPE=o["shape"] if "shape" in o else None,
                                         MASK=o["mask"] if "mask" in o else False,
                                     )
                                 )
@@ -182,7 +183,6 @@ class MachineModel(object):
         if name is None:
             return None
         name_matched_iforms = self._data["instruction_forms_dict"].get(name.upper(), [])
-
         try:
             return next(
                 instruction_form
@@ -280,7 +280,6 @@ class MachineModel(object):
     def get_load_throughput(self, memory):
         """Return load thorughput for given register type."""
         ld_tp = [m for m in self._data["load_throughput"] if self._match_mem_entries(memory, m)]
-        print(ld_tp)
         if len(ld_tp) > 0:
             return ld_tp.copy()
         return [{"port_pressure": self._data["load_throughput_default"].copy()}]
@@ -292,13 +291,12 @@ class MachineModel(object):
 
     def get_store_throughput(self, memory, src_reg=None):
         """Return store throughput for a given destination and register type."""
-
         st_tp = [m for m in self._data["store_throughput"] if self._match_mem_entries(memory, m)]
         if src_reg is not None:
             st_tp = [
                 tp
                 for tp in st_tp
-                if "src" in tp and self._check_operands(src_reg, {"register": {"name": tp["src"]}})
+                if "src" in tp and self._check_operands(src_reg, RegisterOperand(NAME_ID=tp["src"]))
             ]
         if len(st_tp) > 0:
             return st_tp.copy()
@@ -320,14 +318,15 @@ class MachineModel(object):
     @staticmethod
     def get_full_instruction_name(instruction_form):
         """Get one instruction name string including the mnemonic and all operands."""
-        if instruction_form==None:
-            return ""
         operands = []
         for op in instruction_form["operands"]:
-            op_attrs = [
-                "name:" + op.name
-                #for y in list(filter(lambda x: True if x != "class" else False, op))
-            ]
+            op_attrs = []
+            if op.name!=None:
+                op_attrs.append("name:"+op.name)
+            if op.prefix!=None:
+                op_attrs.append("prefix:"+op.prefix)
+            if op.shape!=None:
+                op_attrs.append("shape:"+op.shape)
             operands.append("{}({})".format("register", ",".join(op_attrs)))
         return "{}  {}".format(instruction_form["name"].lower(), ",".join(operands))
 

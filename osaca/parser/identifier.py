@@ -4,7 +4,7 @@ from osaca.parser.operand import Operand
 
 
 class IdentifierOperand(Operand):
-    def __init__(self, name, OFFSET=None, RELOCATION=None):
+    def __init__(self, name=None, OFFSET=None, RELOCATION=None):
         super().__init__(name)
         self._OFFSET = OFFSET
         self._RELOCATION = RELOCATION
