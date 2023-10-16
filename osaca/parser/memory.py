@@ -17,6 +17,8 @@ class MemoryOperand(Operand):
         INDEXED_VAL=None,
         PORT_PRESSURE=[],
         DST=None,
+        SOURCE=False,
+        DESTINATION=False,
     ):
         super().__init__("memory")
         self._OFFSET_ID = OFFSET_ID
@@ -30,6 +32,8 @@ class MemoryOperand(Operand):
         self._INDEXED_VAL = INDEXED_VAL
         self._PORT_PRESSURE = PORT_PRESSURE
         self._DST = DST
+        self._SOURCE = SOURCE
+        self._DESTINATION = DESTINATION
 
     @property
     def offset(self):
@@ -123,13 +127,30 @@ class MemoryOperand(Operand):
     def indexed_val(self, value):
         self._INDEXED_VAL = value
 
+    @property
+    def source(self):
+        return self._SOURCE
+
+    @source.setter
+    def source(self, source):
+        self._SOURCE = source
+
+    @property
+    def destination(self):
+        return self._DESTINATION
+
+    @destination.setter
+    def destination(self, destination):
+        self._DESTINATION = destination
+
     def __str__(self):
         return (
             f"MemoryOperand(NAME_ID={self._NAME_ID}, OFFSET_ID={self._OFFSET_ID}, "
             f"BASE_ID={self._BASE_ID}, INDEX_ID={self._INDEX_ID}, SCALE_ID={self._SCALE_ID}, "
             f"SEGMENT_EXT_ID={self._SEGMENT_EXT_ID}, MASK={self._MASK}, "
             f"PRE_INDEXED={self._PRE_INDEXED}, POST_INDEXED={self._POST_INDEXED}, "
-            f"INDEXED_VAL={self._INDEXED_VAL}, PORT_PRESSURE={self._PORT_PRESSURE})"
+            f"INDEXED_VAL={self._INDEXED_VAL}, PORT_PRESSURE={self._PORT_PRESSURE}),"
+            f"SOURCE={self._SOURCE}, DESTINATION={self._DESTINATION})"
         )
 
     def __repr__(self):
@@ -138,7 +159,8 @@ class MemoryOperand(Operand):
             f"BASE_ID={self._BASE_ID}, INDEX_ID={self._INDEX_ID}, SCALE_ID={self._SCALE_ID}, "
             f"SEGMENT_EXT_ID={self._SEGMENT_EXT_ID}, MASK={self._MASK}, "
             f"PRE_INDEXED={self._PRE_INDEXED}, POST_INDEXED={self._POST_INDEXED}, "
-            f"INDEXED_VAL={self._INDEXED_VAL}, PORT_PRESSURE={self._PORT_PRESSURE})"
+            f"INDEXED_VAL={self._INDEXED_VAL}, PORT_PRESSURE={self._PORT_PRESSURE}),"
+            f"SOURCE={self._SOURCE}, DESTINATION={self._DESTINATION})"
         )
 
     def __eq__(self, other):

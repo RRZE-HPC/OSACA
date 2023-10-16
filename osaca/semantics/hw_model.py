@@ -113,6 +113,10 @@ class MachineModel(object):
                                         PREFIX_ID=o["prefix"] if "prefix" in o else None,
                                         SHAPE=o["shape"] if "shape" in o else None,
                                         MASK=o["mask"] if "mask" in o else False,
+                                        SOURCE=o["source"] if "source" in o else False,
+                                        DESTINATION=o["destination"]
+                                        if "destination" in o
+                                        else False,
                                     )
                                 )
                             elif o["class"] == "memory":
@@ -122,6 +126,10 @@ class MachineModel(object):
                                         OFFSET_ID=o["offset"],
                                         INDEX_ID=o["index"],
                                         SCALE_ID=o["scale"],
+                                        SOURCE=o["source"] if "source" in o else False,
+                                        DESTINATION=o["destination"]
+                                        if "destination" in o
+                                        else False,
                                     )
                                 )
                         iform["operands"] = new_operands
@@ -296,7 +304,8 @@ class MachineModel(object):
             st_tp = [
                 tp
                 for tp in st_tp
-                if "src" in tp and self._check_operands(src_reg, RegisterOperand(NAME_ID=tp["src"]))
+                if "src" in tp
+                and self._check_operands(src_reg, RegisterOperand(NAME_ID=tp["src"]))
             ]
         if len(st_tp) > 0:
             return st_tp.copy()
@@ -321,12 +330,12 @@ class MachineModel(object):
         operands = []
         for op in instruction_form["operands"]:
             op_attrs = []
-            if op.name!=None:
-                op_attrs.append("name:"+op.name)
-            if op.prefix!=None:
-                op_attrs.append("prefix:"+op.prefix)
-            if op.shape!=None:
-                op_attrs.append("shape:"+op.shape)
+            if op.name != None:
+                op_attrs.append("name:" + op.name)
+            if op.prefix != None:
+                op_attrs.append("prefix:" + op.prefix)
+            if op.shape != None:
+                op_attrs.append("shape:" + op.shape)
             operands.append("{}({})".format("register", ",".join(op_attrs)))
         return "{}  {}".format(instruction_form["name"].lower(), ",".join(operands))
 
@@ -596,8 +605,8 @@ class MachineModel(object):
 
     def _check_AArch64_operands(self, i_operand, operand):
         """Check if the types of operand ``i_operand`` and ``operand`` match."""
-        #if "class" in operand:
-            # compare two DB entries
+        # if "class" in operand:
+        # compare two DB entries
         #    return self._compare_db_entries(i_operand, operand)
         # TODO support class wildcards
         # register
@@ -700,10 +709,9 @@ class MachineModel(object):
         """Check if register type match."""
         # check for wildcards
         if reg.prefix == self.WILDCARD or i_reg.prefix == self.WILDCARD:
-            if reg.shape!=None:
-                if i_reg.shape!=None and (
-                    reg.shape == i_reg.shape
-                    or self.WILDCARD in (reg.shape + i_reg.shape)
+            if reg.shape != None:
+                if i_reg.shape != None and (
+                    reg.shape == i_reg.shape or self.WILDCARD in (reg.shape + i_reg.shape)
                 ):
                     return True
                 return False
@@ -711,14 +719,14 @@ class MachineModel(object):
         # check for prefix and shape
         if reg.prefix != i_reg.prefix:
             return False
-        if reg.shape!=None:
-            if i_reg.shape!=None and (
+        if reg.shape != None:
+            if i_reg.shape != None and (
                 reg.shape == i_reg.shape or self.WILDCARD in (reg.shape + i_reg.shape)
             ):
                 return True
             return False
-        if reg.lanes!=None:
-            if i_reg.lanes!=None and (
+        if reg.lanes != None:
+            if i_reg.lanes != None and (
                 reg.lanes == i_reg.lanes or self.WILDCARD in (reg.lanes + i_reg.lanes)
             ):
                 return True
@@ -736,7 +744,7 @@ class MachineModel(object):
         else:
             i_reg_name = i_reg
         # check for wildcards
-        if isinstance(reg,str):
+        if isinstance(reg, str):
             return False
         if i_reg_name == self.WILDCARD or reg.name == self.WILDCARD:
             return True
@@ -813,14 +821,9 @@ class MachineModel(object):
                 or (mem.scale != 1 and i_mem.scale != 1)
             )
             # check pre-indexing
-            and (
-                i_mem.pre_indexed == self.WILDCARD or (mem.pre_indexed) == (i_mem.pre_indexed)
-            )
+            and (i_mem.pre_indexed == self.WILDCARD or (mem.pre_indexed) == (i_mem.pre_indexed))
             # check post-indexing
-            and (
-                i_mem.post_indexed == self.WILDCARD
-                or (mem.post_indexed) == (i_mem.post_indexed)
-            )
+            and (i_mem.post_indexed == self.WILDCARD or (mem.post_indexed) == (i_mem.post_indexed))
         ):
             return True
         return False
@@ -859,7 +862,7 @@ class MachineModel(object):
                 or i_mem.index == self.WILDCARD
                 or (
                     mem.index is not None
-                    #and mem.index.name != None
+                    # and mem.index.name != None
                     and self._is_x86_reg_type(i_mem.index, mem.index)
                 )
             )

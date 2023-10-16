@@ -151,7 +151,7 @@ class InstructionForm:
         return f"InstructionForm(INSTRUCTION_ID={self._INSTRUCTION_ID}, OPERANDS_ID={self._OPERANDS_ID}, DIRECTIVE_ID={self._DIRECTIVE_ID}, COMMENT_ID={self._COMMENT_ID}, LABEL_ID={self._LABEL_ID}, LINE={self._LINE}, LINE_NUMBER={self._LINE_NUMBER}, SEMANTIC_OPERANDS={self._SEMANTIC_OPERANDS})"
 
     def __str__(self):
-        return f"Instruction: {self._INSTRUCTION_ID}\nOperands: {self._OPERANDS_ID}\nDirective: {self._DIRECTIVE_ID}\nComment: {self._COMMENT_ID}\nLabel: {self._LABEL_ID}\nLine: {self._LINE}\nLine Number: {self._LINE_NUMBER}\nSemantic Operands: {self._SEMANTIC_OPERANDS}"
+        return f"Instruction: {self._INSTRUCTION_ID}\nOperands: {self._OPERANDS_ID}\nDirective: {self._DIRECTIVE_ID}\nComment: {self._COMMENT_ID}\nLabel: {self._LABEL_ID}\nLine: {self._LINE}\nLine Number: {self._LINE_NUMBER}\nSemantic Operands: {self._SEMANTIC_OPERANDS}\nFlags: {self._FLAGS}"
 
     def __eq__(self, other):
         if isinstance(other, InstructionForm):

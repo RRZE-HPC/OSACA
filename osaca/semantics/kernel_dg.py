@@ -443,8 +443,13 @@ class KernelDG(nx.DiGraph):
                 continue
             if mem.index and src.index:
                 index_change = register_changes.get(
-                    src.index.prefix if src.index.prefix!=None else "" + src.index.name,
-                    {"name": src.index.prefix if src.index.prefix!=None else "" + src.index.name, "value": 0},
+                    src.index.prefix if src.index.prefix != None else "" + src.index.name,
+                    {
+                        "name": src.index.prefix
+                        if src.index.prefix != None
+                        else "" + src.index.name,
+                        "value": 0,
+                    },
                 )
                 if index_change is None:
                     # Unknown change occurred

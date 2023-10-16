@@ -142,6 +142,7 @@ class ISASemantics(object):
         # instruction_form.flags = (
         #    instruction_form.flags if "flags" in instruction_form else []
         # )
+
         if self._has_load(instruction_form):
             instruction_form.flags += [INSTR_FLAGS.HAS_LD]
         if self._has_store(instruction_form):
@@ -185,12 +186,12 @@ class ISASemantics(object):
 
         if only_postindexed:
             for o in instruction_form.operands:
-                if isinstance(o, MemoryOperand) and o.base!=None and o.post_indexed!=False:
-                    base_name = o.base.prefix if o.base.prefix!=None else "" + o.base.name
+                if isinstance(o, MemoryOperand) and o.base != None and o.post_indexed != False:
+                    base_name = o.base.prefix if o.base.prefix != None else "" + o.base.name
                     return {
                         base_name: {
-                            "name": o.base.prefix if o.base.prefix!=None else "" + o.base.name,
-                            "value": o.post_indexed['value'],
+                            "name": o.base.prefix if o.base.prefix != None else "" + o.base.name,
+                            "value": o.post_indexed["value"],
                         }
                     }
             return {}
@@ -253,30 +254,22 @@ class ISASemantics(object):
             op_dict["destination"] += operands
             if "hidden_operands" in isa_data:
                 op_dict["destination"] += [
-                        {
-                            hop["class"]: {
-                                k: hop[k] for k in ["name", "class", "source", "destination"]
-                            }
-                        }
-                    
+                    {hop["class"]: {k: hop[k] for k in ["name", "class", "source", "destination"]}}
                     for hop in isa_data["hidden_operands"]
                 ]
             return op_dict
 
         for i, op in enumerate(isa_data["operands"]):
-            if isinstance(op, RegisterOperand):
-                continue
-            '''
-            if op["source"] and op["destination"]:
+            if op.source and op.destination:
                 op_dict["src_dst"].append(operands[i])
                 continue
-            if op["source"]:
+            if op.source:
                 op_dict["source"].append(operands[i])
                 continue
-            if op["destination"]:
+            if op.destination:
                 op_dict["destination"].append(operands[i])
                 continue
-            '''
+
         # check for hidden operands like flags or registers
         if "hidden_operands" in isa_data:
             # add operand(s) to semantic_operands of instruction form
