@@ -17,6 +17,8 @@ class RegisterOperand(Operand):
         MASK=False,
         ZEROING=False,
         PREDICATION=None,
+        SOURCE=False,
+        DESTINATION=False,
     ):
         super().__init__(NAME_ID)
         self._WIDTH_ID = WIDTH_ID
@@ -29,6 +31,8 @@ class RegisterOperand(Operand):
         self._MASK = MASK
         self._ZEROING = ZEROING
         self._PREDICATION = PREDICATION
+        self._SOURCE = SOURCE
+        self._DESTINATION = DESTINATION
 
     @property
     def width(self):
@@ -110,12 +114,29 @@ class RegisterOperand(Operand):
     def zeroing(self, zeroing):
         self._ZEROING = zeroing
 
+    @property
+    def source(self):
+        return self._SOURCE
+
+    @source.setter
+    def source(self, source):
+        self._SOURCE = source
+
+    @property
+    def destination(self):
+        return self._DESTINATION
+
+    @destination.setter
+    def destination(self, destination):
+        self._DESTINATION = destination
+
     def __str__(self):
         return (
             f"RegisterOperand(NAME_ID={self._NAME_ID}, WIDTH_ID={self._WIDTH_ID}, "
             f"PREFIX_ID={self._PREFIX_ID}, REG_ID={self._REG_ID}, REGTYPE_ID={self._REGTYPE_ID}, "
             f"LANES={self._LANES}, SHAPE={self._SHAPE}, INDEX={self._INDEX}, "
-            f"MASK={self._MASK}, ZEROING={self._ZEROING})"
+            f"MASK={self._MASK}, ZEROING={self._ZEROING}),"
+            f"SOURCE={self._SOURCE}, DESTINATION={self._DESTINATION})"
         )
 
     def __repr__(self):
@@ -123,7 +144,8 @@ class RegisterOperand(Operand):
             f"RegisterOperand(NAME_ID={self._NAME_ID}, WIDTH_ID={self._WIDTH_ID}, "
             f"PREFIX_ID={self._PREFIX_ID}, REG_ID={self._REG_ID}, REGTYPE_ID={self._REGTYPE_ID}, "
             f"LANES={self._LANES}, SHAPE={self._SHAPE}, INDEX={self._INDEX}, "
-            f"MASK={self._MASK}, ZEROING={self._ZEROING})"
+            f"MASK={self._MASK}, ZEROING={self._ZEROING}),"
+            f"SOURCE={self._SOURCE}, DESTINATION={self._DESTINATION})"
         )
 
     def __eq__(self, other):
