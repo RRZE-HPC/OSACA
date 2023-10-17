@@ -290,7 +290,7 @@ class MachineModel(object):
         ld_tp = [m for m in self._data["load_throughput"] if self._match_mem_entries(memory, m)]
         if len(ld_tp) > 0:
             return ld_tp.copy()
-        return [{"port_pressure": self._data["load_throughput_default"].copy()}]
+        return [MemoryOperand(PORT_PRESSURE = self._data["load_throughput_default"].copy())]
 
     def get_store_latency(self, reg_type):
         """Return store latency for given register type."""
@@ -309,7 +309,7 @@ class MachineModel(object):
             ]
         if len(st_tp) > 0:
             return st_tp.copy()
-        return [{"port_pressure": self._data["store_throughput_default"].copy()}]
+        return [MemoryOperand(PORT_PRESSURE = self._data["store_throughput_default"].copy())]
 
     def _match_mem_entries(self, mem, i_mem):
         """Check if memory addressing ``mem`` and ``i_mem`` are of the same type."""
@@ -826,6 +826,7 @@ class MachineModel(object):
             and (i_mem.post_indexed == self.WILDCARD or (mem.post_indexed) == (i_mem.post_indexed))
         ):
             return True
+
         return False
 
     def _is_x86_mem_type(self, i_mem, mem):
