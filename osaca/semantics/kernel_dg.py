@@ -230,18 +230,18 @@ class KernelDG(nx.DiGraph):
             longest_path = nx.algorithms.dag.dag_longest_path(self.dg, weight="latency")
             # TODO verify that we can remove the next two lince due to earlier initialization
             for line_number in longest_path:
-                self._get_node_by_lineno(int(line_number))["latency_cp"] = 0
+                self._get_node_by_lineno(int(line_number)).latency_cp = 0
             # set cp latency to instruction
             path_latency = 0.0
             for s, d in nx.utils.pairwise(longest_path):
                 node = self._get_node_by_lineno(int(s))
-                node["latency_cp"] = self.dg.edges[(s, d)]["latency"]
-                path_latency += node["latency_cp"]
+                node.latency_cp = self.dg.edges[(s, d)]["latency"]
+                path_latency += node.latency_cp
             # add latency for last instruction
             node = self._get_node_by_lineno(int(longest_path[-1]))
-            node["latency_cp"] = node["latency"]
-            if max_latency_instr["latency"] > path_latency:
-                max_latency_instr["latency_cp"] = float(max_latency_instr["latency"])
+            node.latency_cp = node.latency
+            if max_latency_instr.latency > path_latency:
+                max_latency_instr.latency_cp = float(max_latency_instr.latency)
                 return [max_latency_instr]
             else:
                 return [x for x in self.kernel if x.line_number in longest_path]
