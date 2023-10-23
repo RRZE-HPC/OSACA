@@ -14,6 +14,7 @@ import ruamel.yaml
 from osaca import __version__, utils
 from osaca.parser import ParserX86ATT
 from ruamel.yaml.compat import StringIO
+from osaca.parser.instruction_form import InstructionForm
 from osaca.parser.operand import Operand
 from osaca.parser.memory import MemoryOperand
 from osaca.parser.register import RegisterOperand
@@ -101,75 +102,116 @@ class MachineModel(object):
                     self._data["instruction_forms"].remove(entry)
                 # Normalize instruction_form names (to UPPERCASE) and build dict for faster access:
                 self._data["instruction_forms_dict"] = defaultdict(list)
+
                 for iform in self._data["instruction_forms"]:
+                    if "hidden_operands" in iform:
+                        print("hidden")
+                    if "breaks_dependency_on_equal_operands" in iform:
+                        print("breaks")
                     iform["name"] = iform["name"].upper()
                     if iform["operands"] != []:
                         new_operands = []
+                        # Change operand types from dicts to classes
                         for o in iform["operands"]:
-                            if o["class"] == "register":
-                                new_operands.append(
-                                    RegisterOperand(
-                                        NAME_ID=o["name"] if "name" in o else None,
-                                        PREFIX_ID=o["prefix"] if "prefix" in o else None,
-                                        SHAPE=o["shape"] if "shape" in o else None,
-                                        MASK=o["mask"] if "mask" in o else False,
-                                        SOURCE=o["source"] if "source" in o else False,
-                                        DESTINATION=o["destination"]
-                                        if "destination" in o
-                                        else False,
-                                    )
-                                )
-                            elif o["class"] == "memory":
-                                new_operands.append(
-                                    MemoryOperand(
-                                        BASE_ID=o["base"],
-                                        OFFSET_ID=o["offset"],
-                                        INDEX_ID=o["index"],
-                                        SCALE_ID=o["scale"],
-                                        SOURCE=o["source"] if "source" in o else False,
-                                        DESTINATION=o["destination"]
-                                        if "destination" in o
-                                        else False,
-                                    )
-                                )
+                            self.operand_to_class(o, new_operands)
                         iform["operands"] = new_operands
-                    self._data["instruction_forms_dict"][iform["name"]].append(iform)
-                new_throughputs = []
-                if "load_throughput" in self._data:
-                    for m in self._data["load_throughput"]:
-                        new_throughputs.append(
-                            MemoryOperand(
-                                BASE_ID=m["base"],
-                                OFFSET_ID=m["offset"],
-                                SCALE_ID=m["scale"],
-                                INDEX_ID=m["index"],
-                                PORT_PRESSURE=m["port_pressure"],
-                                DST=m["dst"] if "dst" in m else None,
-                            )
-                        )
-                    self._data["load_throughput"] = new_throughputs
+                    # Change dict iform style to class style
+                    new_iform = InstructionForm(
+                        INSTRUCTION_ID=iform["name"].upper() if "name" in iform else None,
+                        OPERANDS_ID=new_operands if "operands" in iform else [],
+                        DIRECTIVE_ID=iform["directive"] if "directive" in iform else None,
+                        COMMENT_ID=iform["comment"] if "comment" in iform else [],
+                        LINE=iform["line"] if "line" in iform else None,
+                        LINE_NUMBER=iform["line_number"] if "line_number" in iform else None,
+                        LATENCY=iform["latency"] if "latency" in iform else None,
+                        THROUGHPUT=iform["throughput"] if "throughput" in iform else None,
+                        UOPS=iform["uops"] if "uops" in iform else None,
+                        PORT_PRESSURE=iform["port_pressure"] if "port_pressure" in iform else None,
+                        SEMANTIC_OPERANDS=iform["semantic_operands"]
+                        if "semantic_operands" in iform
+                        else {"source": [], "destination": [], "src_dst": []},
+                    )
+                    # List containing classes with same name/instruction
+                    self._data["instruction_forms_dict"][iform["name"]].append(new_iform)
 
-                new_throughputs = []
-                if "store_throughput" in self._data:
-                    for m in self._data["store_throughput"]:
-                        new_throughputs.append(
-                            MemoryOperand(
-                                BASE_ID=m["base"],
-                                OFFSET_ID=m["offset"],
-                                SCALE_ID=m["scale"],
-                                INDEX_ID=m["index"],
-                                PORT_PRESSURE=m["port_pressure"],
-                            )
-                        )
-                    self._data["store_throughput"] = new_throughputs
+                # Change memory dicts in load/store throughput to operand class
+                self.load_store_tp()
 
                 self._data["internal_version"] = self.INTERNAL_VERSION
+
                 if not lazy:
                     # cache internal representation for future use
                     self._write_in_cache(self._path)
             # Store in runtime cache
             if not lazy:
                 MachineModel._runtime_cache[self._path] = self._data
+
+    def load_store_tp(self):
+        new_throughputs = []
+        if "load_throughput" in self._data:
+            for m in self._data["load_throughput"]:
+                new_throughputs.append(
+                    MemoryOperand(
+                        BASE_ID=m["base"],
+                        OFFSET_ID=m["offset"],
+                        SCALE_ID=m["scale"],
+                        INDEX_ID=m["index"],
+                        PORT_PRESSURE=m["port_pressure"],
+                        DST=m["dst"] if "dst" in m else None,
+                    )
+                )
+            self._data["load_throughput"] = new_throughputs
+
+        new_throughputs = []
+        if "store_throughput" in self._data:
+            for m in self._data["store_throughput"]:
+                new_throughputs.append(
+                    MemoryOperand(
+                        BASE_ID=m["base"],
+                        OFFSET_ID=m["offset"],
+                        SCALE_ID=m["scale"],
+                        INDEX_ID=m["index"],
+                        PORT_PRESSURE=m["port_pressure"],
+                    )
+                )
+            self._data["store_throughput"] = new_throughputs
+
+    def operand_to_class(self, o, new_operands):
+        """Convert an operand from dict type to class"""
+        if o["class"] == "register":
+            new_operands.append(
+                RegisterOperand(
+                    NAME_ID=o["name"] if "name" in o else None,
+                    PREFIX_ID=o["prefix"] if "prefix" in o else None,
+                    SHAPE=o["shape"] if "shape" in o else None,
+                    MASK=o["mask"] if "mask" in o else False,
+                    SOURCE=o["source"] if "source" in o else False,
+                    DESTINATION=o["destination"] if "destination" in o else False,
+                )
+            )
+        elif o["class"] == "memory":
+            new_operands.append(
+                MemoryOperand(
+                    BASE_ID=o["base"],
+                    OFFSET_ID=o["offset"],
+                    INDEX_ID=o["index"],
+                    SCALE_ID=o["scale"],
+                    SOURCE=o["source"] if "source" in o else False,
+                    DESTINATION=o["destination"] if "destination" in o else False,
+                )
+            )
+        elif o["class"] == "immediate":
+            new_operands.append(
+                ImmediateOperand(
+                    TYPE_ID=o["imd"],
+                    SOURCE=o["source"] if "source" in o else False,
+                    DESTINATION=o["destination"] if "destination" in o else False,
+                )
+            )
+        elif o["class"] == "identifier":
+            new_operands.append(IdentifierOperand())
+        else:
+            new_operands.append(o)
 
     def get(self, key, default=None):
         """Return config entry for key or default/None."""
@@ -196,7 +238,7 @@ class MachineModel(object):
                 instruction_form
                 for instruction_form in name_matched_iforms
                 if self._match_operands(
-                    instruction_form["operands"] if "operands" in instruction_form else [],
+                    instruction_form.operands,
                     operands,
                 )
             )
@@ -225,7 +267,7 @@ class MachineModel(object):
 
     def set_instruction(
         self,
-        name,
+        instruction,
         operands=None,
         latency=None,
         port_pressure=None,
@@ -240,18 +282,18 @@ class MachineModel(object):
             self._data["instruction_forms"].append(instr_data)
             self._data["instruction_forms_dict"][name].append(instr_data)
 
-        instr_data["name"] = name
-        instr_data["operands"] = operands
-        instr_data["latency"] = latency
-        instr_data["port_pressure"] = port_pressure
-        instr_data["throughput"] = throughput
-        instr_data["uops"] = uops
+        instr_data.instruction = instruction
+        instr_data.operands = operands
+        instr_data.latency = latency
+        instr_data.port_pressure = port_pressure
+        instr_data.throughput = throughput
+        instr_data.uops = uops
 
     def set_instruction_entry(self, entry):
         """Import instruction as entry object form information."""
         self.set_instruction(
-            entry["name"],
-            entry["operands"] if "operands" in entry else None,
+            entry.instruction,
+            entry.operands if "operands" in entry else None,
             entry["latency"] if "latency" in entry else None,
             entry["port_pressure"] if "port_pressure" in entry else None,
             entry["throughput"] if "throughput" in entry else None,
@@ -290,7 +332,7 @@ class MachineModel(object):
         ld_tp = [m for m in self._data["load_throughput"] if self._match_mem_entries(memory, m)]
         if len(ld_tp) > 0:
             return ld_tp.copy()
-        return [MemoryOperand(PORT_PRESSURE = self._data["load_throughput_default"].copy())]
+        return [MemoryOperand(PORT_PRESSURE=self._data["load_throughput_default"].copy())]
 
     def get_store_latency(self, reg_type):
         """Return store latency for given register type."""
@@ -309,7 +351,7 @@ class MachineModel(object):
             ]
         if len(st_tp) > 0:
             return st_tp.copy()
-        return [MemoryOperand(PORT_PRESSURE = self._data["store_throughput_default"].copy())]
+        return [MemoryOperand(PORT_PRESSURE=self._data["store_throughput_default"].copy())]
 
     def _match_mem_entries(self, mem, i_mem):
         """Check if memory addressing ``mem`` and ``i_mem`` are of the same type."""
@@ -621,30 +663,32 @@ class MachineModel(object):
             return self._is_AArch64_mem_type(i_operand, operand)
         # immediate
         if isinstance(i_operand, ImmediateOperand) and i_operand.type == self.WILDCARD:
-            return "value" in operand.value or (
-                "immediate" in operand and "value" in operand["immediate"]
-            )
+            return isinstance(operand, ImmediateOperand) and (operand.value != None)
+
         if isinstance(i_operand, ImmediateOperand) and i_operand.type == "int":
-            return ("value" in operand and operand.get("type", None) == "int") or (
-                "immediate" in operand
-                and "value" in operand["immediate"]
-                and operand["immediate"].get("type", None) == "int"
+            return (
+                isinstance(operand, ImmediateOperand)
+                and operand.type == "int"
+                and operand.value != None
             )
+
         if isinstance(i_operand, ImmediateOperand) and i_operand.type == "float":
-            return ("float" in operand and operand.get("type", None) == "float") or (
-                "immediate" in operand
-                and "float" in operand["immediate"]
-                and operand["immediate"].get("type", None) == "float"
+            return (
+                isinstance(operand, ImmediateOperand)
+                and operand.type == "float"
+                and operand.value != None
             )
+
         if isinstance(i_operand, ImmediateOperand) and i_operand.type == "double":
-            return ("double" in operand and operand.get("type", None) == "double") or (
-                "immediate" in operand
-                and "double" in operand["immediate"]
-                and operand["immediate"].get("type", None) == "double"
+            return (
+                isinstance(operand, ImmediateOperand)
+                and operand.type == "double"
+                and operand.value != None
             )
+
         # identifier
         if isinstance(operand, IdentifierOperand) or (
-            isinstance(operand, ImmediateOperand) and isinstance(operand, IdentifierOperand)
+            isinstance(operand, ImmediateOperand) and operand.identifier != None
         ):
             return i_operand["class"] == "identifier"
         # prefetch option

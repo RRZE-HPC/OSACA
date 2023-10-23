@@ -80,7 +80,7 @@ class TestFrontend(unittest.TestCase):
         fe = Frontend(path_to_yaml=os.path.join(self.MODULE_DATA_DIR, "tx2.yml"))
         fe.full_analysis(self.kernel_AArch64, dg, verbose=True)
         # TODO compare output with checked string
- 
+
     def test_dict_output_x86(self):
         dg = KernelDG(self.kernel_x86, self.parser_x86, self.machine_model_csx, self.semantics_csx)
         fe = Frontend(path_to_yaml=os.path.join(self.MODULE_DATA_DIR, "csx.yml"))
@@ -111,7 +111,7 @@ class TestFrontend(unittest.TestCase):
             )
             self.assertEqual(line.flags, analysis_dict["Kernel"][i]["Flags"])
             self.assertEqual(line.line_number, analysis_dict["Kernel"][i]["LineNumber"])
-  
+
     def test_dict_output_AArch64(self):
         reduced_kernel = reduce_to_section(self.kernel_AArch64, self.semantics_tx2._isa)
         dg = KernelDG(

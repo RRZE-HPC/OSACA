@@ -10,6 +10,10 @@ from collections import OrderedDict
 import ruamel.yaml
 
 from osaca.semantics import MachineModel
+from osaca.parser import InstructionForm
+from osaca.parser.memory import MemoryOperand
+from osaca.parser.register import RegisterOperand
+from osaca.parser.immediate import ImmediateOperand
 
 
 def sanity_check(arch: str, verbose=False, internet_check=False, output_file=sys.stdout):
@@ -432,18 +436,20 @@ def _check_sanity_arch_db(arch_mm, isa_mm, internet_check=True):
 
         # Check operands
         for operand in instr_form["operands"]:
-            if operand["class"] == "register" and not ("name" in operand or "prefix" in operand):
+            if isinstance(operand, RegisterOperand) and not (
+                operand.name != None or operand.prefix != None
+            ):
                 # Missing 'name' key
                 bad_operand.append(instr_form)
-            elif operand["class"] == "memory" and (
-                "base" not in operand
-                or "offset" not in operand
-                or "index" not in operand
-                or "scale" not in operand
+            elif isinstance(operand, MemoryOperand) and (
+                operand.base is None
+                or operand.offset is None
+                or operand.index is None
+                or operand.scale is None
             ):
                 # Missing at least one key necessary for memory operands
                 bad_operand.append(instr_form)
-            elif operand["class"] == "immediate" and "imd" not in operand:
+            elif isinstance(operand, ImmediateOperand) and operand.imd == None:
                 # Missing 'imd' key
                 bad_operand.append(instr_form)
     # every entry exists twice --> uniquify
@@ -602,15 +608,19 @@ def _get_sanity_report_verbose(
 
 
 def _get_full_instruction_name(instruction_form):
-    """Get full instruction form name/identifier string out of given instruction form."""
+    """Get one instruction name string including the mnemonic and all operands."""
     operands = []
     for op in instruction_form["operands"]:
-        op_attrs = [
-            y + ":" + str(op[y])
-            for y in list(filter(lambda x: True if x != "class" else False, op))
-        ]
-        operands.append("{}({})".format(op["class"], ",".join(op_attrs)))
-    return "{}  {}".format(instruction_form["name"], ",".join(operands))
+        if isinstance(op, RegisterOperand):
+            op_attrs = []
+            if op.name != None:
+                op_attrs.append("name:" + op.name)
+            if op.prefix != None:
+                op_attrs.append("prefix:" + op.prefix)
+            if op.shape != None:
+                op_attrs.append("shape:" + op.shape)
+            operands.append("{}({})".format("register", ",".join(op_attrs)))
+    return "{}  {}".format(instruction_form["name"].lower(), ",".join(operands))
 
 
 def __represent_none(self, data):

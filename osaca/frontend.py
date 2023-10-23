@@ -237,7 +237,7 @@ class Frontend(object):
         if lcd_warning:
             warnings.append("LCDWarning")
 
-        #if INSTR_FLAGS.TP_UNKWN in [flag for instr in kernel for flag in instr.flags]:
+        # if INSTR_FLAGS.TP_UNKWN in [flag for instr in kernel for flag in instr.flags]:
         #    warnings.append("UnknownInstrWarning")
 
         tp_sum = ArchSemantics.get_throughput_sum(kernel) or kernel[0].port_pressure

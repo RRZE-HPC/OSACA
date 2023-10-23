@@ -257,7 +257,7 @@ class ArchSemantics(ISASemantics):
                     if instruction_data_reg:
                         assign_unknown = False
                         reg_type = self._parser.get_reg_type(
-                            instruction_data_reg["operands"][
+                            instruction_data_reg.operands[
                                 operands.index(self._create_reg_wildcard())
                             ]
                         )
@@ -318,10 +318,9 @@ class ArchSemantics(ISASemantics):
                                 not in instruction_form.semantic_operands["destination"]
                                 and all(
                                     [
-                                        "post_indexed" in op["memory"]
-                                        or "pre_indexed" in op["memory"]
+                                        op.post_indexed or op.pre_indexed
                                         for op in instruction_form.semantic_operands["src_dst"]
-                                        if "memory" in op
+                                        if isinstance(op, MemoryOperand)
                                     ]
                                 )
                             ):
@@ -343,10 +342,8 @@ class ArchSemantics(ISASemantics):
                                 sum(x) for x in zip(data_port_pressure, st_data_port_pressure)
                             ]
                             data_port_uops += st_data_port_uops
-                        throughput = max(
-                            max(data_port_pressure), instruction_data_reg["throughput"]
-                        )
-                        latency = instruction_data_reg["latency"]
+                        throughput = max(max(data_port_pressure), instruction_data_reg.throughput)
+                        latency = instruction_data_reg.latency
                         # Add LD and ST latency
                         latency += (
                             self._machine_model.get_load_latency(reg_type)
@@ -358,7 +355,7 @@ class ArchSemantics(ISASemantics):
                             if INSTR_FLAGS.HAS_ST in instruction_form.flags
                             else 0
                         )
-                        latency_wo_load = instruction_data_reg["latency"]
+                        latency_wo_load = instruction_data_reg.latency
                         # add latency of ADD if post- or pre-indexed load
                         # TODO more investigation: check dot-graph, wrong latency distribution!
                         # if (
@@ -379,12 +376,12 @@ class ArchSemantics(ISASemantics):
                             for x in zip(
                                 data_port_pressure,
                                 self._machine_model.average_port_pressure(
-                                    instruction_data_reg["port_pressure"]
+                                    instruction_data_reg.port_pressure
                                 ),
                             )
                         ]
                         instruction_form.port_uops = list(
-                            chain(instruction_data_reg["port_pressure"], data_port_uops)
+                            chain(instruction_data_reg.port_pressure, data_port_uops)
                         )
 
                 if assign_unknown:
@@ -410,11 +407,9 @@ class ArchSemantics(ISASemantics):
 
     def _handle_instruction_found(self, instruction_data, port_number, instruction_form, flags):
         """Apply performance data to instruction if it was found in the archDB"""
-        throughput = instruction_data["throughput"]
-        port_pressure = self._machine_model.average_port_pressure(
-            instruction_data["port_pressure"]
-        )
-        instruction_form.port_uops = instruction_data["port_pressure"]
+        throughput = instruction_data.throughput
+        port_pressure = self._machine_model.average_port_pressure(instruction_data.port_pressure)
+        instruction_form.port_uops = instruction_data.port_pressure
         try:
             assert isinstance(port_pressure, list)
             assert len(port_pressure) == port_number
@@ -434,7 +429,7 @@ class ArchSemantics(ISASemantics):
             # assume 0 cy and mark as unknown
             throughput = 0.0
             flags.append(INSTR_FLAGS.TP_UNKWN)
-        latency = instruction_data["latency"]
+        latency = instruction_data.latency
         latency_wo_load = latency
         if latency is None:
             # assume 0 cy and mark as unknown
