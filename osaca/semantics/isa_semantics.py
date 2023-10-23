@@ -5,6 +5,7 @@ from osaca import utils
 from osaca.parser import AttrDict, ParserAArch64, ParserX86ATT
 from osaca.parser.memory import MemoryOperand
 from osaca.parser.register import RegisterOperand
+from osaca.parser.immediate import ImmediateOperand
 
 from .hw_model import MachineModel
 
@@ -107,6 +108,7 @@ class ISASemantics(object):
                 if isa_data_reg:
                     assign_default = False
                     op_dict = self._apply_found_ISA_data(isa_data_reg, operands)
+
         if assign_default:
             # no irregular operand structure, apply default
             op_dict["source"] = self._get_regular_source_operands(instruction_form)
@@ -211,20 +213,20 @@ class ISASemantics(object):
                 reg_operand_names = {base_name: "op1"}
                 operand_state = {"op1": {"name": base_name, "value": o.offset["value"]}}
 
-        if isa_data is not None and "operation" in isa_data:
+        if isa_data is not None:
             for i, o in enumerate(instruction_form.operands):
                 operand_name = "op{}".format(i + 1)
                 if isinstance(o, RegisterOperand):
                     o_reg_name = o.prefix if o.prefix != None else "" + o.name
                     reg_operand_names[o_reg_name] = operand_name
                     operand_state[operand_name] = {"name": o_reg_name, "value": 0}
-                elif "immediate" in o:
-                    operand_state[operand_name] = {"value": o["immediate"]["value"]}
-                elif "memory" in o:
+                elif isinstance(o, ImmediateOperand):
+                    operand_state[operand_name] = {"value": o.value}
+                elif isinstance(o, MemoryOperand):
                     # TODO lea needs some thinking about
                     pass
 
-            exec(isa_data["operation"], {}, operand_state)
+            # exec(isa_data["operation"], {}, operand_state)
 
         change_dict = {
             reg_name: operand_state.get(reg_operand_names.get(reg_name))
@@ -250,6 +252,7 @@ class ISASemantics(object):
         op_dict["src_dst"] = []
 
         # handle dependency breaking instructions
+        """
         if "breaks_dependency_on_equal_operands" in isa_data and operands[1:] == operands[:-1]:
             op_dict["destination"] += operands
             if "hidden_operands" in isa_data:
@@ -258,8 +261,9 @@ class ISASemantics(object):
                     for hop in isa_data["hidden_operands"]
                 ]
             return op_dict
+        """
 
-        for i, op in enumerate(isa_data["operands"]):
+        for i, op in enumerate(isa_data.operands):
             if op.source and op.destination:
                 op_dict["src_dst"].append(operands[i])
                 continue
@@ -271,6 +275,7 @@ class ISASemantics(object):
                 continue
 
         # check for hidden operands like flags or registers
+        """
         if "hidden_operands" in isa_data:
             # add operand(s) to semantic_operands of instruction form
             for op in isa_data["hidden_operands"]:
@@ -287,6 +292,7 @@ class ISASemantics(object):
                     hidden_op[op["class"]][key] = op[key]
                 hidden_op = AttrDict.convert_dict(hidden_op)
                 op_dict[dict_key].append(hidden_op)
+        """
         return op_dict
 
     def _has_load(self, instruction_form):
