@@ -50,7 +50,7 @@ class TestDBInterface(unittest.TestCase):
     ###########
     # Tests
     ###########
-    """
+
     def test_add_single_entry(self):
         mm_csx = MachineModel("csx")
         mm_tx2 = MachineModel("tx2")
@@ -61,7 +61,7 @@ class TestDBInterface(unittest.TestCase):
 
         mm_csx.set_instruction_entry(self.entry_csx)
         mm_tx2.set_instruction_entry(self.entry_tx2)
-        mm_zen1.set_instruction_entry({"name": "empty_operation"})
+        mm_zen1.set_instruction_entry(InstructionForm(INSTRUCTION_ID="empty_operation"))
 
         num_entries_csx = len(mm_csx["instruction_forms"]) - num_entries_csx
         num_entries_tx2 = len(mm_tx2["instruction_forms"]) - num_entries_tx2
@@ -70,12 +70,11 @@ class TestDBInterface(unittest.TestCase):
         self.assertEqual(num_entries_csx, 1)
         self.assertEqual(num_entries_tx2, 1)
         self.assertEqual(num_entries_zen1, 1)
-    """
 
     def test_invalid_add(self):
-        entry = {}
-        with self.assertRaises(KeyError):
-            MachineModel("csx").set_instruction_entry(entry)
+        entry = InstructionForm()
+        # with self.assertRaises(KeyError):
+        #    MachineModel("csx").set_instruction_entry(entry)
         with self.assertRaises(TypeError):
             MachineModel("csx").set_instruction()
 

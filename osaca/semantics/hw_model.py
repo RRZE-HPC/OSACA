@@ -276,11 +276,11 @@ class MachineModel(object):
     ):
         """Import instruction form information."""
         # If it already exists. Overwrite information.
-        instr_data = self.get_instruction(name, operands)
+        instr_data = self.get_instruction(instruction, operands)
         if instr_data is None:
-            instr_data = {}
+            instr_data = InstructionForm()
             self._data["instruction_forms"].append(instr_data)
-            self._data["instruction_forms_dict"][name].append(instr_data)
+            self._data["instruction_forms_dict"][instruction].append(instr_data)
 
         instr_data.instruction = instruction
         instr_data.operands = operands
@@ -291,13 +291,15 @@ class MachineModel(object):
 
     def set_instruction_entry(self, entry):
         """Import instruction as entry object form information."""
+        if entry.instruction == None and entry.operands == []:
+            raise KeyError
         self.set_instruction(
             entry.instruction,
-            entry.operands if "operands" in entry else None,
-            entry["latency"] if "latency" in entry else None,
-            entry["port_pressure"] if "port_pressure" in entry else None,
-            entry["throughput"] if "throughput" in entry else None,
-            entry["uops"] if "uops" in entry else None,
+            entry.operands,
+            entry.latency,
+            entry.port_pressure,
+            entry.throughput,
+            entry.uops,
         )
 
     def add_port(self, port):
@@ -690,7 +692,7 @@ class MachineModel(object):
         if isinstance(operand, IdentifierOperand) or (
             isinstance(operand, ImmediateOperand) and operand.identifier != None
         ):
-            return i_operand["class"] == "identifier"
+            return isinstance(i_operand, IdentifierOperand)
         # prefetch option
         if not isinstance(operand, Operand) and "prfop" in operand:
             return i_operand["class"] == "prfop"
@@ -724,10 +726,10 @@ class MachineModel(object):
         # immediate
         if isinstance(operand, ImmediateOperand):
             # if "immediate" in operand.name or operand.value != None:
-            return i_operand["class"] == "immediate" and i_operand["imd"] == "int"
+            return isinstance(i_operand, ImmediateOperand) and i_operand.type == "int"
         # identifier (e.g., labels)
         if isinstance(operand, IdentifierOperand):
-            return i_operand["class"] == "identifier"
+            return isinstance(i_operand, IdentifierOperand)
         return self._compare_db_entries(i_operand, operand)
 
     def _compare_db_entries(self, operand_1, operand_2):
@@ -830,12 +832,13 @@ class MachineModel(object):
 
     def _is_AArch64_mem_type(self, i_mem, mem):
         """Check if memory addressing type match."""
+        print(mem)
         if (
             # check base
             (
                 (mem.base is None and i_mem.base is None)
                 or i_mem.base == self.WILDCARD
-                or mem.base.prefix == i_mem.base
+                or (isinstance(mem.base, RegisterOperand) and (mem.base.prefix == i_mem.base))
             )
             # check offset
             and (
