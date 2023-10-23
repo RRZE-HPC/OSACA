@@ -449,7 +449,7 @@ def _check_sanity_arch_db(arch_mm, isa_mm, internet_check=True):
             ):
                 # Missing at least one key necessary for memory operands
                 bad_operand.append(instr_form)
-            elif isinstance(operand, ImmediateOperand) and operand.imd == None:
+            elif isinstance(operand, ImmediateOperand) and operand.type == None:
                 # Missing 'imd' key
                 bad_operand.append(instr_form)
     # every entry exists twice --> uniquify
