@@ -8,15 +8,22 @@ class InstructionForm:
         self,
         INSTRUCTION_ID=None,
         OPERANDS_ID=[],
+        HIDDEN_OPERANDS=[],
         DIRECTIVE_ID=None,
         COMMENT_ID=None,
         LABEL_ID=None,
         LINE=None,
         LINE_NUMBER=None,
-        SEMANTIC_OPERANDS=None,
+        SEMANTIC_OPERANDS={"source": [], "destination": [], "src_dst": []},
+        THROUGHPUT = None,
+        LATENCY = None,
+        UOPS = None,
+        PORT_PRESSURE = None,
+        BREAKS_DEP = False
     ):
         self._INSTRUCTION_ID = INSTRUCTION_ID
         self._OPERANDS_ID = OPERANDS_ID
+        self._HIDDEN_OPERANDS = HIDDEN_OPERANDS
         self._DIRECTIVE_ID = DIRECTIVE_ID
         self._COMMENT_ID = COMMENT_ID
         self._LABEL_ID = LABEL_ID
@@ -24,14 +31,15 @@ class InstructionForm:
         self._LINE_NUMBER = LINE_NUMBER
 
         self._SEMANTIC_OPERANDS = SEMANTIC_OPERANDS
-        self._UOPS = None
+        self._UOPS = UOPS
+        self._BREAKS_DEP = BREAKS_DEP
         # self.semantic_operands = {"source": [], "destination": [], "src_dst": []}
-        self._LATENCY = None
-        self._THROUGHPUT = None
+        self._LATENCY = LATENCY
+        self._THROUGHPUT = THROUGHPUT
         self._LATENCY_CP = []
         self._LATENCY_LCD = []
         self._LATENCY_WO_LOAD = None
-        self._PORT_PRESSURE = []
+        self._PORT_PRESSURE = PORT_PRESSURE
         self._PORT_UOPS = []
         self._FLAGS = []
 
@@ -68,6 +76,10 @@ class InstructionForm:
         return self._OPERANDS_ID
 
     @property
+    def hidden_operands(self):
+        return self._HIDDEN_OPERANDS
+
+    @property
     def port_pressure(self):
         return self._PORT_PRESSURE
 
@@ -80,6 +92,10 @@ class InstructionForm:
         return self._FLAGS
 
     @property
+    def uops(self):
+        return self._UOPS
+
+    @property
     def throughput(self):
         return self._THROUGHPUT
 
@@ -90,6 +106,10 @@ class InstructionForm:
     @property
     def latency_wo_load(self):
         return self._LATENCY_WO_LOAD
+
+    @property
+    def breaks_dep(self):
+        return self._BREAKS_DEP
 
     @semantic_operands.setter
     def semantic_operands(self, semantic_operands):
@@ -110,6 +130,14 @@ class InstructionForm:
     @operands.setter
     def operands(self, operands):
         self._OPERANDS_ID = operands
+
+    @hidden_operands.setter
+    def hidden_operands(self, hidden_operands):
+        self._HIDDEN_OPERANDS = hidden_operands
+
+    @breaks_dep.setter
+    def breaks_dep(self, boolean):
+        self._BREAKS_DEP = boolean
 
     @instruction.setter
     def instruction(self, instruction):
@@ -134,6 +162,10 @@ class InstructionForm:
     @flags.setter
     def flags(self, flags):
         self._FLAGS = flags
+
+    @uops.setter
+    def uops(self, uops):
+        self._UOPS = uops
 
     @throughput.setter
     def throughput(self, throughput):
