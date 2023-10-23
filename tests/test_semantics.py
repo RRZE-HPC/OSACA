@@ -349,7 +349,7 @@ class TestSemanticTools(unittest.TestCase):
         tp_optimal = self.semantics_tx2.get_throughput_sum(kernel_optimal)
         self.assertNotEqual(tp_fixed, tp_optimal)
         self.assertTrue(max(tp_optimal) <= max(tp_fixed))
-        """
+
     def test_kernelDG_x86(self):
         #
         #  4
@@ -420,7 +420,7 @@ class TestSemanticTools(unittest.TestCase):
             dg.get_dependent_instruction_forms()
         # test dot creation
         dg.export_graph(filepath="/dev/null")
-        """
+
 
     def test_kernelDG_SVE(self):
         KernelDG(
@@ -463,7 +463,7 @@ class TestSemanticTools(unittest.TestCase):
         with self.assertRaises(NotImplementedError):
             dg.get_loopcarried_dependencies()
 
-        """
+
     def test_loop_carried_dependency_aarch64(self):
         dg = KernelDG(
             self.kernel_aarch64_memdep,
@@ -512,7 +512,7 @@ class TestSemanticTools(unittest.TestCase):
             [(iform.line_number, lat) for iform, lat in lc_deps[dep_path]["dependencies"]],
             [(4, 1.0), (5, 1.0), (10, 1.0), (11, 1.0), (12, 1.0)],
         )
-        """
+
 
     def test_loop_carried_dependency_x86(self):
         lcd_id = "8"

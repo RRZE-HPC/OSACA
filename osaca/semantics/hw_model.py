@@ -73,7 +73,7 @@ class MachineModel(object):
                 self._data = MachineModel._runtime_cache[self._path]
             # check if file is cached
             cached = self._get_cached(self._path) if not lazy else False
-            if cached:
+            if False:
                 self._data = cached
             else:
                 yaml = self._create_yaml_object()
@@ -104,10 +104,8 @@ class MachineModel(object):
                 self._data["instruction_forms_dict"] = defaultdict(list)
 
                 for iform in self._data["instruction_forms"]:
-                    if "hidden_operands" in iform:
-                        print("hidden")
                     if "breaks_dependency_on_equal_operands" in iform:
-                        print("breaks")
+                        print(iform["breaks_dependency_on_equal_operands"],"\n")
                     iform["name"] = iform["name"].upper()
                     if iform["operands"] != []:
                         new_operands = []
@@ -115,27 +113,34 @@ class MachineModel(object):
                         for o in iform["operands"]:
                             self.operand_to_class(o, new_operands)
                         iform["operands"] = new_operands
+                    # Do the same for hidden operands
+                    if iform["hidden_operands"] != []:
+                        new_operands = []
+                        # Change operand types from dicts to classes
+                        for o in iform["hidden_operands"]:
+                            self.operand_to_class(o, new_operands)
+                        iform["hidden_operands"] = new_operands         
+
                     # Change dict iform style to class style
                     new_iform = InstructionForm(
                         INSTRUCTION_ID=iform["name"].upper() if "name" in iform else None,
-                        OPERANDS_ID=new_operands if "operands" in iform else [],
+                        OPERANDS_ID=iform["operands"] if "operands" in iform else [],
+                        HIDDEN_OPERANDS=iform["hidden_operands"] if "hidden_operansd" in iform else [],
                         DIRECTIVE_ID=iform["directive"] if "directive" in iform else None,
-                        COMMENT_ID=iform["comment"] if "comment" in iform else [],
+                        COMMENT_ID=iform["comment"] if "comment" in iform else None,
                         LINE=iform["line"] if "line" in iform else None,
                         LINE_NUMBER=iform["line_number"] if "line_number" in iform else None,
                         LATENCY=iform["latency"] if "latency" in iform else None,
                         THROUGHPUT=iform["throughput"] if "throughput" in iform else None,
                         UOPS=iform["uops"] if "uops" in iform else None,
                         PORT_PRESSURE=iform["port_pressure"] if "port_pressure" in iform else None,
+                        BREAKS_DEP=iform["breaks_dependency_on_equal_operands"] if "breaks_dependency_on_equal_operands" in iform else False,
                         SEMANTIC_OPERANDS=iform["semantic_operands"]
                         if "semantic_operands" in iform
                         else {"source": [], "destination": [], "src_dst": []},
                     )
                     # List containing classes with same name/instruction
                     self._data["instruction_forms_dict"][iform["name"]].append(new_iform)
-
-                # Change memory dicts in load/store throughput to operand class
-                self.load_store_tp()
 
                 self._data["internal_version"] = self.INTERNAL_VERSION
 
@@ -832,7 +837,6 @@ class MachineModel(object):
 
     def _is_AArch64_mem_type(self, i_mem, mem):
         """Check if memory addressing type match."""
-        print(mem)
         if (
             # check base
             (
