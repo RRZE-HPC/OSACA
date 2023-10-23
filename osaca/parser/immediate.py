@@ -10,12 +10,16 @@ class ImmediateOperand(Operand):
         TYPE_ID=None,
         VALUE_ID=None,
         SHIFT_ID=None,
+        SOURCE=False,
+        DESTINATION=False
     ):
         super().__init__(str(VALUE_ID))
         self._IDENTIFIER_ID = IDENTIFIER_ID
         self._TYPE_ID = TYPE_ID
         self._VALUE_ID = VALUE_ID
         self._SHIFT_ID = SHIFT_ID
+        self._SOURCE = SOURCE
+        self._DESTINATION = DESTINATION
 
     @property
     def identifier(self):
@@ -32,6 +36,22 @@ class ImmediateOperand(Operand):
     @property
     def shift(self):
         return self._TYPE_ID
+
+    @property
+    def source(self):
+        return self._SOURCE
+
+    @source.setter
+    def source(self, source):
+        self._SOURCE = source
+
+    @property
+    def destination(self):
+        return self._DESTINATION
+
+    @destination.setter
+    def destination(self, destination):
+        self._DESTINATION = destination
 
     @identifier.setter
     def identifier(self, identifier):
