@@ -3,7 +3,7 @@
 from osaca.parser.operand import Operand
 
 
-class memoryOperand(Operand):
+class MemoryOperand(Operand):
     def __init__(
         self,
         offset_ID=None,
@@ -127,7 +127,7 @@ class memoryOperand(Operand):
 
     def __str__(self):
         return (
-            f"memoryOperand(name_id={self._name_id}, offset_ID={self._offset_ID}, "
+            f"MemoryOperand(name_id={self._name_id}, offset_ID={self._offset_ID}, "
             f"base_id={self._base_id}, index_id={self._index_id}, scale_id={self._scale_id}, "
             f"segment_ext_id={self._segment_ext_id}, mask={self._mask}, "
             f"pre_indexed={self._pre_indexed}, post_indexed={self._post_indexed}, "
@@ -137,7 +137,7 @@ class memoryOperand(Operand):
 
     def __repr__(self):
         return (
-            f"memoryOperand(name_id={self._name_id}, offset_ID={self._offset_ID}, "
+            f"MemoryOperand(name_id={self._name_id}, offset_ID={self._offset_ID}, "
             f"base_id={self._base_id}, index_id={self._index_id}, scale_id={self._scale_id}, "
             f"segment_ext_id={self._segment_ext_id}, mask={self._mask}, "
             f"pre_indexed={self._pre_indexed}, post_indexed={self._post_indexed}, "
@@ -146,7 +146,7 @@ class memoryOperand(Operand):
         )
 
     def __eq__(self, other):
-        if isinstance(other, memoryOperand):
+        if isinstance(other, MemoryOperand):
             return (
                 self._offset_ID == other._offset_ID
                 and self._base_id == other._base_id

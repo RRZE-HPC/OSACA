@@ -9,6 +9,7 @@ import unittest
 from osaca.frontend import Frontend
 from osaca.parser import ParserAArch64, ParserX86ATT
 from osaca.semantics import ArchSemantics, KernelDG, MachineModel, reduce_to_section
+from osaca.parser.operand import Operand
 
 
 class TestFrontend(unittest.TestCase):
@@ -41,6 +42,7 @@ class TestFrontend(unittest.TestCase):
             self.machine_model_tx2,
             path_to_yaml=os.path.join(self.MODULE_DATA_DIR, "isa/aarch64.yml"),
         )
+
         for i in range(len(self.kernel_x86)):
             self.semantics_csx.assign_src_dst(self.kernel_x86[i])
             self.semantics_csx.assign_tp_lt(self.kernel_x86[i])

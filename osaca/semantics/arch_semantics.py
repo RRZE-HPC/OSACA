@@ -9,10 +9,10 @@ from copy import deepcopy
 
 from .hw_model import MachineModel
 from .isa_semantics import INSTR_flags, ISASemantics
-from osaca.parser.memory import memoryOperand
-from osaca.parser.register import registerOperand
-from osaca.parser.immediate import immediateOperand
-from osaca.parser.identifier import identifierOperand
+from osaca.parser.memory import MemoryOperand
+from osaca.parser.register import RegisterOperand
+from osaca.parser.immediate import ImmediateOperand
+from osaca.parser.identifier import IdentifierOperand
 
 
 class ArchSemantics(ISASemantics):
@@ -55,9 +55,9 @@ class ArchSemantics(ISASemantics):
                 best_kernel_tp = sys.maxsize
                 for port_util_alt in list(instruction_form.port_uops.values())[1:]:
                     k_tmp = deepcopy(kernel)
-                    k_tmp[idx]["port_uops"] = deepcopy(port_util_alt)
-                    k_tmp[idx]["port_pressure"] = self._machine_model.average_port_pressure(
-                        k_tmp[idx]["port_uops"]
+                    k_tmp[idx].port_uops = deepcopy(port_util_alt)
+                    k_tmp[idx].port_pressure = self._machine_model.average_port_pressure(
+                        k_tmp[idx].port_uops
                     )
                     k_tmp.reverse()
                     self.assign_optimal_throughput(k_tmp, idx)
@@ -66,7 +66,7 @@ class ArchSemantics(ISASemantics):
                         best_kernel_tp = max(self.get_throughput_sum(best_kernel))
                 # check the first option in the main branch and compare against the best option later
                 multiple_assignments = True
-                kernel[idx]["port_uops"] = list(instruction_form.port_uops.values())[0]
+                kernel[idx].port_uops = list(instruction_form.port_uops.values())[0]
             for uop in instruction_form.port_uops:
                 cycles = uop[0]
                 ports = list(uop[1])
@@ -134,8 +134,8 @@ class ArchSemantics(ISASemantics):
         if multiple_assignments:
             if max(self.get_throughput_sum(kernel)) > best_kernel_tp:
                 for i, instr in enumerate(best_kernel):
-                    kernel[i]["port_uops"] = best_kernel[i]["port_uops"]
-                    kernel[i]["port_pressure"] = best_kernel[i]["port_pressure"]
+                    kernel[i].port_uops = best_kernel[i].port_uops
+                    kernel[i].port_pressure = best_kernel[i].port_pressure
 
     def set_hidden_loads(self, kernel):
         """Hide loads behind stores if architecture supports hidden loads (depricated)"""
@@ -262,7 +262,7 @@ class ArchSemantics(ISASemantics):
                             ]
                         )
                         # dummy_reg = {"class": "register", "name": reg_type}
-                        dummy_reg = registerOperand(name_id=reg_type)
+                        dummy_reg = RegisterOperand(name_id=reg_type)
                         data_port_pressure = [0.0 for _ in range(port_number)]
                         data_port_uops = []
                         if INSTR_flags.HAS_LD in instruction_form.flags:
@@ -272,7 +272,7 @@ class ArchSemantics(ISASemantics):
                                     x
                                     for x in instruction_form.semantic_operands["source"]
                                     + instruction_form.semantic_operands["src_dst"]
-                                    if isinstance(x, memoryOperand)
+                                    if isinstance(x, MemoryOperand)
                                 ][0]
                             )
                             # if multiple options, choose based on reg type
@@ -281,7 +281,7 @@ class ArchSemantics(ISASemantics):
                                 for ldp in load_perf_data
                                 if ldp.dst != None
                                 and self._machine_model._check_operands(
-                                    dummy_reg, registerOperand(name_id=ldp.dst)
+                                    dummy_reg, RegisterOperand(name_id=ldp.dst)
                                 )
                             ]
                             if len(data_port_uops) < 1:
@@ -303,7 +303,7 @@ class ArchSemantics(ISASemantics):
                                 + instruction_form.semantic_operands["src_dst"]
                             )
                             store_perf_data = self._machine_model.get_store_throughput(
-                                [x for x in destinations if isinstance(x, memoryOperand)][0],
+                                [x for x in destinations if isinstance(x, MemoryOperand)][0],
                                 dummy_reg,
                             )
                             st_data_port_uops = store_perf_data[0].port_pressure
@@ -320,7 +320,7 @@ class ArchSemantics(ISASemantics):
                                     [
                                         op.post_indexed or op.pre_indexed
                                         for op in instruction_form.semantic_operands["src_dst"]
-                                        if isinstance(op, memoryOperand)
+                                        if isinstance(op, MemoryOperand)
                                     ]
                                 )
                             ):
@@ -444,11 +444,11 @@ class ArchSemantics(ISASemantics):
         """Create register operand for a memory addressing operand"""
         if self._isa == "x86":
             if reg_type == "gpr":
-                register = registerOperand(name_id="r" + str(int(reg_id) + 9))
+                register = RegisterOperand(name_id="r" + str(int(reg_id) + 9))
             else:
-                register = registerOperand(name_id=reg_type + reg_id)
+                register = RegisterOperand(name_id=reg_type + reg_id)
         elif self._isa == "aarch64":
-            register = registerOperand(name_id=reg_id, prefix_id=reg_type)
+            register = RegisterOperand(name_id=reg_id, prefix_id=reg_type)
         return register
 
     def _nullify_data_ports(self, port_pressure):

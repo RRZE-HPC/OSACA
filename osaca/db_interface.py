@@ -11,9 +11,9 @@ import ruamel.yaml
 
 from osaca.semantics import MachineModel
 from osaca.parser import instructionForm
-from osaca.parser.memory import memoryOperand
-from osaca.parser.register import registerOperand
-from osaca.parser.immediate import immediateOperand
+from osaca.parser.memory import MemoryOperand
+from osaca.parser.register import RegisterOperand
+from osaca.parser.immediate import ImmediateOperand
 
 
 def sanity_check(arch: str, verbose=False, internet_check=False, output_file=sys.stdout):
@@ -436,12 +436,12 @@ def _check_sanity_arch_db(arch_mm, isa_mm, internet_check=True):
 
         # Check operands
         for operand in instr_form["operands"]:
-            if isinstance(operand, registerOperand) and not (
+            if isinstance(operand, RegisterOperand) and not (
                 operand.name != None or operand.prefix != None
             ):
                 # Missing 'name' key
                 bad_operand.append(instr_form)
-            elif isinstance(operand, memoryOperand) and (
+            elif isinstance(operand, MemoryOperand) and (
                 operand.base is None
                 or operand.offset is None
                 or operand.index is None
@@ -449,7 +449,7 @@ def _check_sanity_arch_db(arch_mm, isa_mm, internet_check=True):
             ):
                 # Missing at least one key necessary for memory operands
                 bad_operand.append(instr_form)
-            elif isinstance(operand, immediateOperand) and operand.type == None:
+            elif isinstance(operand, ImmediateOperand) and operand.type == None:
                 # Missing 'imd' key
                 bad_operand.append(instr_form)
     # every entry exists twice --> uniquify
@@ -611,7 +611,7 @@ def _get_full_instruction_name(instruction_form):
     """Get one instruction name string including the mnemonic and all operands."""
     operands = []
     for op in instruction_form["operands"]:
-        if isinstance(op, registerOperand):
+        if isinstance(op, RegisterOperand):
             op_attrs = []
             if op.name != None:
                 op_attrs.append("name:" + op.name)

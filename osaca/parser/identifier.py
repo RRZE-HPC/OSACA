@@ -3,7 +3,7 @@
 from osaca.parser.operand import Operand
 
 
-class identifierOperand(Operand):
+class IdentifierOperand(Operand):
     def __init__(self, name=None, offset=None, relocation=None):
         super().__init__(name)
         self._offset = offset
@@ -27,8 +27,8 @@ class identifierOperand(Operand):
 
     def __str__(self):
         return (
-            f"identifierOperand({self.name}, offset={self.offset}, relocation={self.relocation})"
+            f"IdentifierOperand({self.name}, offset={self.offset}, relocation={self.relocation})"
         )
 
     def __repr__(self):
-        return f"identifierOperand(name={self.name}, offset={self.offset}, relocation={self.relocation})"
+        return f"IdentifierOperand(name={self.name}, offset={self.offset}, relocation={self.relocation})"

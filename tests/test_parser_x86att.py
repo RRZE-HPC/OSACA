@@ -9,7 +9,7 @@ import unittest
 from pyparsing import ParseException
 
 from osaca.parser import ParserX86ATT, instructionForm
-from osaca.parser.register import registerOperand
+from osaca.parser.register import RegisterOperand
 
 
 class TestParserX86ATT(unittest.TestCase):
@@ -233,10 +233,10 @@ class TestParserX86ATT(unittest.TestCase):
         register_str_3 = "%xmm1"
         register_str_4 = "%rip"
 
-        parsed_reg_1 = registerOperand(name_id="rax")
-        parsed_reg_2 = registerOperand(name_id="r9")
-        parsed_reg_3 = registerOperand(name_id="xmm1")
-        parsed_reg_4 = registerOperand(name_id="rip")
+        parsed_reg_1 = RegisterOperand(name_id="rax")
+        parsed_reg_2 = RegisterOperand(name_id="r9")
+        parsed_reg_3 = RegisterOperand(name_id="xmm1")
+        parsed_reg_4 = RegisterOperand(name_id="rip")
 
         self.assertEqual(self.parser.parse_register(register_str_1), parsed_reg_1)
         self.assertEqual(self.parser.parse_register(register_str_2), parsed_reg_2)
@@ -259,22 +259,22 @@ class TestParserX86ATT(unittest.TestCase):
         )
 
     def test_reg_dependency(self):
-        reg_a1 = registerOperand(name_id="rax")
-        reg_a2 = registerOperand(name_id="eax")
-        reg_a3 = registerOperand(name_id="ax")
-        reg_a4 = registerOperand(name_id="al")
-        reg_r11 = registerOperand(name_id="r11")
-        reg_r11b = registerOperand(name_id="r11b")
-        reg_r11d = registerOperand(name_id="r11d")
-        reg_r11w = registerOperand(name_id="r11w")
-        reg_xmm1 = registerOperand(name_id="xmm1")
-        reg_ymm1 = registerOperand(name_id="ymm1")
-        reg_zmm1 = registerOperand(name_id="zmm1")
+        reg_a1 = RegisterOperand(name_id="rax")
+        reg_a2 = RegisterOperand(name_id="eax")
+        reg_a3 = RegisterOperand(name_id="ax")
+        reg_a4 = RegisterOperand(name_id="al")
+        reg_r11 = RegisterOperand(name_id="r11")
+        reg_r11b = RegisterOperand(name_id="r11b")
+        reg_r11d = RegisterOperand(name_id="r11d")
+        reg_r11w = RegisterOperand(name_id="r11w")
+        reg_xmm1 = RegisterOperand(name_id="xmm1")
+        reg_ymm1 = RegisterOperand(name_id="ymm1")
+        reg_zmm1 = RegisterOperand(name_id="zmm1")
 
-        reg_b1 = registerOperand(name_id="rbx")
-        reg_r15 = registerOperand(name_id="r15")
-        reg_xmm2 = registerOperand(name_id="xmm2")
-        reg_ymm3 = registerOperand(name_id="ymm3")
+        reg_b1 = RegisterOperand(name_id="rbx")
+        reg_r15 = RegisterOperand(name_id="r15")
+        reg_xmm2 = RegisterOperand(name_id="xmm2")
+        reg_ymm3 = RegisterOperand(name_id="ymm3")
 
         reg_a = [reg_a1, reg_a2, reg_a3, reg_a4]
         reg_r = [reg_r11, reg_r11b, reg_r11d, reg_r11w]

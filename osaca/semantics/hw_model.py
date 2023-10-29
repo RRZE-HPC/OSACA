@@ -16,10 +16,11 @@ from osaca.parser import ParserX86ATT
 from ruamel.yaml.compat import StringIO
 from osaca.parser.instruction_form import instructionForm
 from osaca.parser.operand import Operand
-from osaca.parser.memory import memoryOperand
-from osaca.parser.register import registerOperand
-from osaca.parser.immediate import immediateOperand
-from osaca.parser.identifier import identifierOperand
+from osaca.parser.memory import MemoryOperand
+from osaca.parser.register import RegisterOperand
+from osaca.parser.immediate import ImmediateOperand
+from osaca.parser.identifier import IdentifierOperand
+from osaca.parser.condition import ConditionOperand
 
 
 class MachineModel(object):
@@ -144,7 +145,7 @@ class MachineModel(object):
                     # List containing classes with same name/instruction
                     self._data["instruction_forms_dict"][iform["name"]].append(new_iform)
                 self._data["internal_version"] = self.INTERNAL_VERSION
-
+                self.load_store_tp()
                 if not lazy:
                     # cache internal representation for future use
                     self._write_in_cache(self._path)
@@ -157,13 +158,13 @@ class MachineModel(object):
         if "load_throughput" in self._data:
             for m in self._data["load_throughput"]:
                 new_throughputs.append(
-                    memoryOperand(
+                    MemoryOperand(
                         base_id=m["base"],
                         offset_ID=m["offset"],
                         scale_id=m["scale"],
                         index_id=m["index"],
                         port_pressure=m["port_pressure"],
-                        ds=m["dst"] if "dst" in m else None,
+                        dst=m["dst"] if "dst" in m else None,
                     )
                 )
             self._data["load_throughput"] = new_throughputs
@@ -172,7 +173,7 @@ class MachineModel(object):
         if "store_throughput" in self._data:
             for m in self._data["store_throughput"]:
                 new_throughputs.append(
-                    memoryOperand(
+                    MemoryOperand(
                         base_id=m["base"],
                         offset_ID=m["offset"],
                         scale_id=m["scale"],
@@ -186,7 +187,7 @@ class MachineModel(object):
         """Convert an operand from dict type to class"""
         if o["class"] == "register":
             new_operands.append(
-                registerOperand(
+                RegisterOperand(
                     name_id=o["name"] if "name" in o else None,
                     prefix_id=o["prefix"] if "prefix" in o else None,
                     shape=o["shape"] if "shape" in o else None,
@@ -197,7 +198,7 @@ class MachineModel(object):
             )
         elif o["class"] == "memory":
             new_operands.append(
-                memoryOperand(
+                MemoryOperand(
                     base_id=o["base"],
                     offset_ID=o["offset"],
                     index_id=o["index"],
@@ -208,14 +209,22 @@ class MachineModel(object):
             )
         elif o["class"] == "immediate":
             new_operands.append(
-                immediateOperand(
+                ImmediateOperand(
                     type_id=o["imd"],
                     source=o["source"] if "source" in o else False,
                     destination=o["destination"] if "destination" in o else False,
                 )
             )
         elif o["class"] == "identifier":
-            new_operands.append(identifierOperand())
+            new_operands.append(IdentifierOperand())
+        elif o["class"] == "condition":
+            new_operands.append(
+                ConditionOperand(
+                    ccode=o["ccode"],
+                    source=o["source"] if "source" in o else False,
+                    destination=o["destination"] if "destination" in o else False,
+                )
+            )
         else:
             new_operands.append(o)
 
@@ -340,7 +349,7 @@ class MachineModel(object):
         ld_tp = [m for m in self._data["load_throughput"] if self._match_mem_entries(memory, m)]
         if len(ld_tp) > 0:
             return ld_tp.copy()
-        return [memoryOperand(port_pressure=self._data["load_throughput_default"].copy())]
+        return [MemoryOperand(port_pressure=self._data["load_throughput_default"].copy())]
 
     def get_store_latency(self, reg_type):
         """Return store latency for given register type."""
@@ -355,11 +364,11 @@ class MachineModel(object):
                 tp
                 for tp in st_tp
                 if "src" in tp
-                and self._check_operands(src_reg, registerOperand(name_id=tp["src"]))
+                and self._check_operands(src_reg, RegisterOperand(name_id=tp["src"]))
             ]
         if len(st_tp) > 0:
             return st_tp.copy()
-        return [memoryOperand(port_pressure=self._data["store_throughput_default"].copy())]
+        return [MemoryOperand(port_pressure=self._data["store_throughput_default"].copy())]
 
     def _match_mem_entries(self, mem, i_mem):
         """Check if memory addressing ``mem`` and ``i_mem`` are of the same type."""
@@ -378,7 +387,7 @@ class MachineModel(object):
     def get_full_instruction_name(instruction_form):
         """Get one instruction name string including the mnemonic and all operands."""
         operands = []
-        for op in instruction_form["operands"]:
+        for op in instruction_form.operands:
             op_attrs = []
             if op.name != None:
                 op_attrs.append("name:" + op.name)
@@ -387,7 +396,7 @@ class MachineModel(object):
             if op.shape != None:
                 op_attrs.append("shape:" + op.shape)
             operands.append("{}({})".format("register", ",".join(op_attrs)))
-        return "{}  {}".format(instruction_form["name"].lower(), ",".join(operands))
+        return "{}  {}".format(instruction_form.instruction.lower(), ",".join(operands))
 
     @staticmethod
     def get_isa_for_arch(arch):
@@ -571,13 +580,13 @@ class MachineModel(object):
     def _create_db_operand_aarch64(self, operand):
         """Create instruction form operand for DB out of operand string."""
         if operand == "i":
-            return immediateOperand(type_id="int")
+            return ImmediateOperand(type_id="int")
         elif operand in "wxbhsdq":
-            return registerOperand(prefix_id=operand)
+            return RegisterOperand(prefix_id=operand)
         elif operand.startswith("v"):
-            return registerOperand(prefix_id="v", shape=operand[1:2])
+            return RegisterOperand(prefix_id="v", shape=operand[1:2])
         elif operand.startswith("m"):
-            return memoryOperand(
+            return MemoryOperand(
                 base_id="x" if "b" in operand else None,
                 offset_ID="imd" if "o" in operand else None,
                 index_id="gpr" if "i" in operand else None,
@@ -591,13 +600,13 @@ class MachineModel(object):
     def _create_db_operand_x86(self, operand):
         """Create instruction form operand for DB out of operand string."""
         if operand == "r":
-            return registerOperand(name_id="gpr")
+            return RegisterOperand(name_id="gpr")
         elif operand in "xyz":
-            return registerOperand(name_id=operand + "mm")
+            return RegisterOperand(name_id=operand + "mm")
         elif operand == "i":
-            return immediateOperand(type_id="int")
+            return ImmediateOperand(type_id="int")
         elif operand.startswith("m"):
-            return memoryOperand(
+            return MemoryOperand(
                 base_id="gpr" if "b" in operand else None,
                 offset_ID="imd" if "o" in operand else None,
                 index_id="gpr" if "i" in operand else None,
@@ -644,7 +653,7 @@ class MachineModel(object):
         if (isinstance(operand, Operand) and operand.name == self.WILDCARD) or (
             not isinstance(operand, Operand) and self.WILDCARD in operand
         ):
-            if isinstance(i_operand, registerOperand):
+            if isinstance(i_operand, RegisterOperand):
                 return True
             else:
                 return False
@@ -660,57 +669,52 @@ class MachineModel(object):
         #    return self._compare_db_entries(i_operand, operand)
         # TODO support class wildcards
         # register
-        if isinstance(operand, registerOperand):
-            if not isinstance(i_operand, registerOperand):
+        if isinstance(operand, RegisterOperand):
+            if not isinstance(i_operand, RegisterOperand):
                 return False
             return self._is_AArch64_reg_type(i_operand, operand)
         # memory
-        if isinstance(operand, memoryOperand):
-            if not isinstance(i_operand, memoryOperand):
+        if isinstance(operand, MemoryOperand):
+            if not isinstance(i_operand, MemoryOperand):
                 return False
             return self._is_AArch64_mem_type(i_operand, operand)
         # immediate
-        if isinstance(i_operand, immediateOperand) and i_operand.type == self.WILDCARD:
-            return isinstance(operand, immediateOperand) and (operand.value != None)
+        if isinstance(i_operand, ImmediateOperand) and i_operand.type == self.WILDCARD:
+            return isinstance(operand, ImmediateOperand) and (operand.value != None)
 
-        if isinstance(i_operand, immediateOperand) and i_operand.type == "int":
+        if isinstance(i_operand, ImmediateOperand) and i_operand.type == "int":
             return (
-                isinstance(operand, immediateOperand)
+                isinstance(operand, ImmediateOperand)
                 and operand.type == "int"
                 and operand.value != None
             )
 
-        if isinstance(i_operand, immediateOperand) and i_operand.type == "float":
+        if isinstance(i_operand, ImmediateOperand) and i_operand.type == "float":
             return (
-                isinstance(operand, immediateOperand)
+                isinstance(operand, ImmediateOperand)
                 and operand.type == "float"
                 and operand.value != None
             )
 
-        if isinstance(i_operand, immediateOperand) and i_operand.type == "double":
+        if isinstance(i_operand, ImmediateOperand) and i_operand.type == "double":
             return (
-                isinstance(operand, immediateOperand)
+                isinstance(operand, ImmediateOperand)
                 and operand.type == "double"
                 and operand.value != None
             )
 
         # identifier
-        if isinstance(operand, identifierOperand) or (
-            isinstance(operand, immediateOperand) and operand.identifier != None
+        if isinstance(operand, IdentifierOperand) or (
+            isinstance(operand, ImmediateOperand) and operand.identifier != None
         ):
-            return isinstance(i_operand, identifierOperand)
+            return isinstance(i_operand, IdentifierOperand)
         # prefetch option
         if not isinstance(operand, Operand) and "prfop" in operand:
             return i_operand["class"] == "prfop"
         # condition
-        if not isinstance(operand, Operand) and "condition" in operand:
-            if i_operand["ccode"] == self.WILDCARD:
-                return True
-            return i_operand["class"] == "condition" and (
-                operand.get("condition", None) == i_operand.get("ccode", None).upper()
-                if isinstance(i_operand.get("ccode", None), str)
-                else i_operand.get("ccode", None)
-            )
+        if isinstance(operand, ConditionOperand):
+            if isinstance(i_operand, ConditionOperand):
+                return (i_operand.ccode == self.WILDCARD) or (i_operand.ccode == operand.ccode)
         # no match
         return False
 
@@ -720,22 +724,22 @@ class MachineModel(object):
         # compare two DB entries
         #    return self._compare_db_entries(i_operand, operand)
         # register
-        if isinstance(operand, registerOperand):
-            if not isinstance(i_operand, registerOperand):
+        if isinstance(operand, RegisterOperand):
+            if not isinstance(i_operand, RegisterOperand):
                 return False
             return self._is_x86_reg_type(i_operand, operand, consider_masking=False)
         # memory
-        if isinstance(operand, memoryOperand):
-            if not isinstance(i_operand, memoryOperand):
+        if isinstance(operand, MemoryOperand):
+            if not isinstance(i_operand, MemoryOperand):
                 return False
             return self._is_x86_mem_type(i_operand, operand)
         # immediate
-        if isinstance(operand, immediateOperand):
+        if isinstance(operand, ImmediateOperand):
             # if "immediate" in operand.name or operand.value != None:
-            return isinstance(i_operand, immediateOperand) and i_operand.type == "int"
+            return isinstance(i_operand, ImmediateOperand) and i_operand.type == "int"
         # identifier (e.g., labels)
-        if isinstance(operand, identifierOperand):
-            return isinstance(i_operand, identifierOperand)
+        if isinstance(operand, IdentifierOperand):
+            return isinstance(i_operand, IdentifierOperand)
         return self._compare_db_entries(i_operand, operand)
 
     def _compare_db_entries(self, operand_1, operand_2):
@@ -791,7 +795,7 @@ class MachineModel(object):
             if i_reg is None:
                 return True
             return False
-        if isinstance(i_reg, registerOperand):
+        if isinstance(i_reg, RegisterOperand):
             i_reg_name = i_reg.name
         else:
             i_reg_name = i_reg
@@ -843,7 +847,7 @@ class MachineModel(object):
             (
                 (mem.base is None and i_mem.base is None)
                 or i_mem.base == self.WILDCARD
-                or (isinstance(mem.base, registerOperand) and (mem.base.prefix == i_mem.base))
+                or (isinstance(mem.base, RegisterOperand) and (mem.base.prefix == i_mem.base))
             )
             # check offset
             and (

@@ -8,12 +8,12 @@ import pyparsing as pp
 from osaca.parser import BaseParser
 from osaca.parser.instruction_form import instructionForm
 from osaca.parser.operand import Operand
-from osaca.parser.directive import directiveOperand
-from osaca.parser.memory import memoryOperand
-from osaca.parser.label import labelOperand
-from osaca.parser.register import registerOperand
-from osaca.parser.identifier import identifierOperand
-from osaca.parser.immediate import immediateOperand
+from osaca.parser.directive import DirectiveOperand
+from osaca.parser.memory import MemoryOperand
+from osaca.parser.label import LabelOperand
+from osaca.parser.register import RegisterOperand
+from osaca.parser.identifier import IdentifierOperand
+from osaca.parser.immediate import ImmediateOperand
 
 
 class ParserX86ATT(BaseParser):
@@ -233,7 +233,7 @@ class ParserX86ATT(BaseParser):
                 result = self.process_operand(
                     self.directive.parseString(line, parseAll=True).asDict()
                 )
-                instruction_form.directive = directiveOperand(
+                instruction_form.directive = DirectiveOperand(
                     name_id=result.name,
                     parameter_id=result.parameters,
                 )
@@ -299,7 +299,7 @@ class ParserX86ATT(BaseParser):
         if self.directive_id in operand:
             return self.process_directive(operand[self.directive_id])
         if self.REGISTER_ID in operand:
-            return registerOperand(
+            return RegisterOperand(
                 prefix_id=operand["register"]["prefix"]
                 if "prefix" in operand["register"]
                 else None,
@@ -314,7 +314,7 @@ class ParserX86ATT(BaseParser):
         return operand
 
     def process_directive(self, directive):
-        directive_new = directiveOperand(name_id=directive["name"], parameter_id=[])
+        directive_new = DirectiveOperand(name_id=directive["name"], parameter_id=[])
         if "parameters" in directive:
             directive_new.parameters = directive["parameters"]
         if "comment" in directive:
@@ -338,14 +338,14 @@ class ParserX86ATT(BaseParser):
         elif offset is not None and "value" in offset:
             offset["value"] = int(offset["value"], 0)
         if base != None:
-            baseOp = registerOperand(
+            baseOp = RegisterOperand(
                 name_id=base["name"], prefix_id=base["prefix"] if "prefix" in base else None
             )
         if index != None:
-            indexOp = registerOperand(
+            indexOp = RegisterOperand(
                 name_id=index["name"], prefix_id=index["prefix"] if "prefix" in index else None
             )
-        new_dict = memoryOperand(
+        new_dict = MemoryOperand(
             offset_ID=offset, base_id=baseOp, index_id=indexOp, scale_id=scale
         )
         # Add segmentation extension if existing
@@ -357,7 +357,7 @@ class ParserX86ATT(BaseParser):
         """Post-process label asm line"""
         # remove duplicated 'name' level due to identifier
         label["name"] = label["name"][0]["name"]
-        new_label = labelOperand(
+        new_label = LabelOperand(
             name_id=label["name"], comment_id=label["comment"] if "comment" in label else None
         )
         return new_label
