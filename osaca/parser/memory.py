@@ -3,41 +3,39 @@
 from osaca.parser.operand import Operand
 
 
-class MemoryOperand(Operand):
+class memoryOperand(Operand):
     def __init__(
         self,
-        OFFSET_ID=None,
-        BASE_ID=None,
-        INDEX_ID=None,
-        SCALE_ID=1,
-        SEGMENT_EXT_ID=None,
-        MASK=None,
-        PRE_INDEXED=False,
-        POST_INDEXED=False,
-        INDEXED_VAL=None,
-        PORT_PRESSURE=[],
-        DST=None,
-        SOURCE=False,
-        DESTINATION=False,
+        offset_ID=None,
+        base_id=None,
+        index_id=None,
+        scale_id=1,
+        segment_ext_id=None,
+        mask=None,
+        pre_indexed=False,
+        post_indexed=False,
+        indexed_val=None,
+        port_pressure=[],
+        dst=None,
+        source=False,
+        destination=False,
     ):
-        super().__init__("memory")
-        self._OFFSET_ID = OFFSET_ID
-        self._BASE_ID = BASE_ID
-        self._INDEX_ID = INDEX_ID
-        self._SCALE_ID = SCALE_ID
-        self._SEGMENT_EXT_ID = SEGMENT_EXT_ID
-        self._MASK = MASK
-        self._PRE_INDEXED = PRE_INDEXED
-        self._POST_INDEXED = POST_INDEXED
-        self._INDEXED_VAL = INDEXED_VAL
-        self._PORT_PRESSURE = PORT_PRESSURE
-        self._DST = DST
-        self._SOURCE = SOURCE
-        self._DESTINATION = DESTINATION
+        super().__init__("memory", source, destination)
+        self._offset_ID = offset_ID
+        self._base_id = base_id
+        self._index_id = index_id
+        self._scale_id = scale_id
+        self._segment_ext_id = segment_ext_id
+        self._mask = mask
+        self._pre_indexed = pre_indexed
+        self._post_indexed = post_indexed
+        self._indexed_val = indexed_val
+        self._port_pressure = port_pressure
+        self._dst = dst
 
     @property
     def offset(self):
-        return self._OFFSET_ID
+        return self._offset_ID
 
     @property
     def immediate(self):
@@ -45,135 +43,119 @@ class MemoryOperand(Operand):
 
     @property
     def base(self):
-        return self._BASE_ID
+        return self._base_id
 
     @property
     def index(self):
-        return self._INDEX_ID
+        return self._index_id
 
     @property
     def scale(self):
-        return self._SCALE_ID
+        return self._scale_id
 
     @property
     def segment_ext_id(self):
-        return self._SEGMENT_EXT_ID
+        return self._segment_ext_id
 
     @property
     def mask(self):
-        return self._MASK
+        return self._mask
 
     @property
     def pre_indexed(self):
-        return self._PRE_INDEXED
+        return self._pre_indexed
 
     @property
     def post_indexed(self):
-        return self._POST_INDEXED
+        return self._post_indexed
 
     @property
     def indexed_val(self):
-        return self._INDEXED_VAL
+        return self._indexed_val
 
     @property
     def port_pressure(self):
-        return self._PORT_PRESSURE
+        return self._port_pressure
 
     @property
     def dst(self):
-        return self._DST
+        return self._dst
 
     @dst.setter
     def dst(self, dst):
-        self._DST = dst
+        self._dst = dst
 
     @port_pressure.setter
     def port_pressure(self, port_pressure):
-        self._PORT_PRESSURE = port_pressure
+        self._port_pressure = port_pressure
 
     @segment_ext_id.setter
     def segment_ext_id(self, segment):
-        self._SEGMENT_EXT_ID = segment
+        self._segment_ext_id = segment
 
     @offset.setter
     def offset(self, offset):
-        self._OFFSET_ID = offset
+        self._offset_ID = offset
 
     @base.setter
     def base(self, base):
-        self._BASE_ID = base
+        self._base_id = base
 
     @index.setter
     def index(self, index):
-        self._INDEX_ID = index
+        self._index_id = index
 
     @scale.setter
     def scale(self, scale):
-        self._SCALE_ID = scale
+        self._scale_id = scale
 
     @mask.setter
     def mask(self, mask):
-        self._MASK = mask
+        self._mask = mask
 
     @pre_indexed.setter
     def pre_indexed(self, pre_indexed):
-        self._PRE_INDEXED = pre_indexed
+        self._pre_indexed = pre_indexed
 
     @post_indexed.setter
     def post_indexed(self, post_indexed):
-        self._POST_INDEXED = post_indexed
+        self._post_indexed = post_indexed
 
     @indexed_val.setter
     def indexed_val(self, value):
-        self._INDEXED_VAL = value
-
-    @property
-    def source(self):
-        return self._SOURCE
-
-    @source.setter
-    def source(self, source):
-        self._SOURCE = source
-
-    @property
-    def destination(self):
-        return self._DESTINATION
-
-    @destination.setter
-    def destination(self, destination):
-        self._DESTINATION = destination
+        self._indexed_val = value
 
     def __str__(self):
         return (
-            f"MemoryOperand(NAME_ID={self._NAME_ID}, OFFSET_ID={self._OFFSET_ID}, "
-            f"BASE_ID={self._BASE_ID}, INDEX_ID={self._INDEX_ID}, SCALE_ID={self._SCALE_ID}, "
-            f"SEGMENT_EXT_ID={self._SEGMENT_EXT_ID}, MASK={self._MASK}, "
-            f"PRE_INDEXED={self._PRE_INDEXED}, POST_INDEXED={self._POST_INDEXED}, "
-            f"INDEXED_VAL={self._INDEXED_VAL}, PORT_PRESSURE={self._PORT_PRESSURE}),"
-            f"SOURCE={self._SOURCE}, DESTINATION={self._DESTINATION})"
+            f"memoryOperand(name_id={self._name_id}, offset_ID={self._offset_ID}, "
+            f"base_id={self._base_id}, index_id={self._index_id}, scale_id={self._scale_id}, "
+            f"segment_ext_id={self._segment_ext_id}, mask={self._mask}, "
+            f"pre_indexed={self._pre_indexed}, post_indexed={self._post_indexed}, "
+            f"indexed_val={self._indexed_val}, port_pressure={self._port_pressure}),"
+            f"source={self._source}, destination={self._destination})"
         )
 
     def __repr__(self):
         return (
-            f"MemoryOperand(NAME_ID={self._NAME_ID}, OFFSET_ID={self._OFFSET_ID}, "
-            f"BASE_ID={self._BASE_ID}, INDEX_ID={self._INDEX_ID}, SCALE_ID={self._SCALE_ID}, "
-            f"SEGMENT_EXT_ID={self._SEGMENT_EXT_ID}, MASK={self._MASK}, "
-            f"PRE_INDEXED={self._PRE_INDEXED}, POST_INDEXED={self._POST_INDEXED}, "
-            f"INDEXED_VAL={self._INDEXED_VAL}, PORT_PRESSURE={self._PORT_PRESSURE}),"
-            f"SOURCE={self._SOURCE}, DESTINATION={self._DESTINATION})"
+            f"memoryOperand(name_id={self._name_id}, offset_ID={self._offset_ID}, "
+            f"base_id={self._base_id}, index_id={self._index_id}, scale_id={self._scale_id}, "
+            f"segment_ext_id={self._segment_ext_id}, mask={self._mask}, "
+            f"pre_indexed={self._pre_indexed}, post_indexed={self._post_indexed}, "
+            f"indexed_val={self._indexed_val}, port_pressure={self._port_pressure}),"
+            f"source={self._source}, destination={self._destination})"
         )
 
     def __eq__(self, other):
-        if isinstance(other, MemoryOperand):
+        if isinstance(other, memoryOperand):
             return (
-                self._OFFSET_ID == other._OFFSET_ID
-                and self._BASE_ID == other._BASE_ID
-                and self._INDEX_ID == other._INDEX_ID
-                and self._SCALE_ID == other._SCALE_ID
-                and self._SEGMENT_EXT_ID == other._SEGMENT_EXT_ID
-                and self._MASK == other._MASK
-                and self._PRE_INDEXED == other._PRE_INDEXED
-                and self._POST_INDEXED == other._POST_INDEXED
-                and self._INDEXED_VAL == other._INDEXED_VAL
+                self._offset_ID == other._offset_ID
+                and self._base_id == other._base_id
+                and self._index_id == other._index_id
+                and self._scale_id == other._scale_id
+                and self._segment_ext_id == other._segment_ext_id
+                and self._mask == other._mask
+                and self._pre_indexed == other._pre_indexed
+                and self._post_indexed == other._post_indexed
+                and self._indexed_val == other._indexed_val
             )
         return False

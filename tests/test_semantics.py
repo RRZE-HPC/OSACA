@@ -12,16 +12,16 @@ import networkx as nx
 from osaca.osaca import get_unmatched_instruction_ratio
 from osaca.parser import AttrDict, ParserAArch64, ParserX86ATT
 from osaca.semantics import (
-    INSTR_FLAGS,
+    INSTR_flags,
     ArchSemantics,
     ISASemantics,
     KernelDG,
     MachineModel,
     reduce_to_section,
 )
-from osaca.parser.register import RegisterOperand
-from osaca.parser.memory import MemoryOperand
-from osaca.parser.identifier import IdentifierOperand
+from osaca.parser.register import registerOperand
+from osaca.parser.memory import memoryOperand
+from osaca.parser.identifier import identifierOperand
 
 
 class TestSemanticTools(unittest.TestCase):
@@ -148,31 +148,31 @@ class TestSemanticTools(unittest.TestCase):
         self.assertIsNone(test_mm_arm.get_instruction("NOT_IN_DB", []))
         name_x86_1 = "vaddpd"
         operands_x86_1 = [
-            RegisterOperand(NAME_ID="xmm"),
-            RegisterOperand(NAME_ID="xmm"),
-            RegisterOperand(NAME_ID="xmm"),
+            registerOperand(name_id="xmm"),
+            registerOperand(name_id="xmm"),
+            registerOperand(name_id="xmm"),
         ]
         instr_form_x86_1 = test_mm_x86.get_instruction(name_x86_1, operands_x86_1)
         self.assertEqual(instr_form_x86_1, test_mm_x86.get_instruction(name_x86_1, operands_x86_1))
         self.assertEqual(
-            test_mm_x86.get_instruction("jg", [IdentifierOperand()]),
-            test_mm_x86.get_instruction("jg", [IdentifierOperand()]),
+            test_mm_x86.get_instruction("jg", [identifierOperand()]),
+            test_mm_x86.get_instruction("jg", [identifierOperand()]),
         )
         name_arm_1 = "fadd"
         operands_arm_1 = [
-            RegisterOperand(PREFIX_ID="v", SHAPE="s"),
-            RegisterOperand(PREFIX_ID="v", SHAPE="s"),
-            RegisterOperand(PREFIX_ID="v", SHAPE="s"),
+            registerOperand(prefix_id="v", shape="s"),
+            registerOperand(prefix_id="v", shape="s"),
+            registerOperand(prefix_id="v", shape="s"),
         ]
         instr_form_arm_1 = test_mm_arm.get_instruction(name_arm_1, operands_arm_1)
         self.assertEqual(instr_form_arm_1, test_mm_arm.get_instruction(name_arm_1, operands_arm_1))
         self.assertEqual(
-            test_mm_arm.get_instruction("b.ne", [IdentifierOperand()]),
-            test_mm_arm.get_instruction("b.ne", [IdentifierOperand()]),
+            test_mm_arm.get_instruction("b.ne", [identifierOperand()]),
+            test_mm_arm.get_instruction("b.ne", [identifierOperand()]),
         )
         self.assertEqual(
-            test_mm_arm.get_instruction("b.someNameThatDoesNotExist", [IdentifierOperand()]),
-            test_mm_arm.get_instruction("b.someOtherName", [IdentifierOperand()]),
+            test_mm_arm.get_instruction("b.someNameThatDoesNotExist", [identifierOperand()]),
+            test_mm_arm.get_instruction("b.someOtherName", [identifierOperand()]),
         )
 
         # test full instruction name
@@ -189,8 +189,8 @@ class TestSemanticTools(unittest.TestCase):
         # test get_store_tp
         self.assertEqual(
             test_mm_x86.get_store_throughput(
-                MemoryOperand(
-                    BASE_ID=RegisterOperand(NAME_ID="x"), OFFSET_ID=None, INDEX_ID=None, SCALE_ID=1
+                memoryOperand(
+                    base_id=registerOperand(name_id="x"), offset_ID=None, index_id=None, scale_id=1
                 )
             )[0].port_pressure,
             [[2, "237"], [2, "4"]],
@@ -198,11 +198,11 @@ class TestSemanticTools(unittest.TestCase):
 
         self.assertEqual(
             test_mm_x86.get_store_throughput(
-                MemoryOperand(
-                    BASE_ID=RegisterOperand(PREFIX_ID="NOT_IN_DB"),
-                    OFFSET_ID=None,
-                    INDEX_ID="NOT_NONE",
-                    SCALE_ID=1,
+                memoryOperand(
+                    base_id=registerOperand(prefix_id="NOT_IN_DB"),
+                    offset_ID=None,
+                    index_id="NOT_NONE",
+                    scale_id=1,
                 )
             )[0].port_pressure,
             [[1, "23"], [1, "4"]],
@@ -210,11 +210,11 @@ class TestSemanticTools(unittest.TestCase):
 
         self.assertEqual(
             test_mm_arm.get_store_throughput(
-                MemoryOperand(
-                    BASE_ID=RegisterOperand(PREFIX_ID="x"),
-                    OFFSET_ID=None,
-                    INDEX_ID=None,
-                    SCALE_ID=1,
+                memoryOperand(
+                    base_id=registerOperand(prefix_id="x"),
+                    offset_ID=None,
+                    index_id=None,
+                    scale_id=1,
                 )
             )[0].port_pressure,
             [[2, "34"], [2, "5"]],
@@ -222,11 +222,11 @@ class TestSemanticTools(unittest.TestCase):
 
         self.assertEqual(
             test_mm_arm.get_store_throughput(
-                MemoryOperand(
-                    BASE_ID=RegisterOperand(PREFIX_ID="NOT_IN_DB"),
-                    OFFSET_ID=None,
-                    INDEX_ID=None,
-                    SCALE_ID=1,
+                memoryOperand(
+                    base_id=registerOperand(prefix_id="NOT_IN_DB"),
+                    offset_ID=None,
+                    index_id=None,
+                    scale_id=1,
                 )
             )[0].port_pressure,
             [[1, "34"], [1, "5"]],
@@ -234,19 +234,19 @@ class TestSemanticTools(unittest.TestCase):
         # test get_store_lt
         self.assertEqual(
             test_mm_x86.get_store_latency(
-                MemoryOperand(
-                    BASE_ID=RegisterOperand(NAME_ID="x"), OFFSET_ID=None, INDEX_ID=None, SCALE_ID=1
+                memoryOperand(
+                    base_id=registerOperand(name_id="x"), offset_ID=None, index_id=None, scale_id=1
                 )
             ),
             0,
         )
         self.assertEqual(
             test_mm_arm.get_store_latency(
-                MemoryOperand(
-                    BASE_ID=RegisterOperand(PREFIX_ID="x"),
-                    OFFSET_ID=None,
-                    INDEX_ID=None,
-                    SCALE_ID=1,
+                memoryOperand(
+                    base_id=registerOperand(prefix_id="x"),
+                    offset_ID=None,
+                    index_id=None,
+                    scale_id=1,
                 )
             ),
             0,
@@ -258,8 +258,8 @@ class TestSemanticTools(unittest.TestCase):
         # test default load tp
         self.assertEqual(
             test_mm_x86.get_load_throughput(
-                MemoryOperand(
-                    BASE_ID=RegisterOperand(NAME_ID="x"), OFFSET_ID=None, INDEX_ID=None, SCALE_ID=1
+                memoryOperand(
+                    base_id=registerOperand(name_id="x"), offset_ID=None, index_id=None, scale_id=1
                 )
             )[0].port_pressure,
             [[1, "23"], [1, ["2D", "3D"]]],
@@ -389,7 +389,7 @@ class TestSemanticTools(unittest.TestCase):
             dg.get_dependent_instruction_forms()
         # test dot creation
         dg.export_graph(filepath="/dev/null")
- 
+
     def test_kernelDG_AArch64(self):
         dg = KernelDG(
             self.kernel_AArch64,
@@ -421,7 +421,6 @@ class TestSemanticTools(unittest.TestCase):
         # test dot creation
         dg.export_graph(filepath="/dev/null")
 
-
     def test_kernelDG_SVE(self):
         KernelDG(
             self.kernel_aarch64_SVE,
@@ -446,9 +445,9 @@ class TestSemanticTools(unittest.TestCase):
         semantics_hld.add_semantics(kernel_hld_2)
         semantics_hld.add_semantics(kernel_hld_3)
 
-        num_hidden_loads = len([x for x in kernel_hld if INSTR_FLAGS.HIDDEN_LD in x.flags])
-        num_hidden_loads_2 = len([x for x in kernel_hld_2 if INSTR_FLAGS.HIDDEN_LD in x.flags])
-        num_hidden_loads_3 = len([x for x in kernel_hld_3 if INSTR_FLAGS.HIDDEN_LD in x.flags])
+        num_hidden_loads = len([x for x in kernel_hld if INSTR_flags.HIDDEN_LD in x.flags])
+        num_hidden_loads_2 = len([x for x in kernel_hld_2 if INSTR_flags.HIDDEN_LD in x.flags])
+        num_hidden_loads_3 = len([x for x in kernel_hld_3 if INSTR_flags.HIDDEN_LD in x.flags])
         self.assertEqual(num_hidden_loads, 1)
         self.assertEqual(num_hidden_loads_2, 0)
         self.assertEqual(num_hidden_loads_3, 1)
@@ -462,7 +461,6 @@ class TestSemanticTools(unittest.TestCase):
             dg.get_critical_path()
         with self.assertRaises(NotImplementedError):
             dg.get_loopcarried_dependencies()
-
 
     def test_loop_carried_dependency_aarch64(self):
         dg = KernelDG(
@@ -512,7 +510,6 @@ class TestSemanticTools(unittest.TestCase):
             [(iform.line_number, lat) for iform, lat in lc_deps[dep_path]["dependencies"]],
             [(4, 1.0), (5, 1.0), (10, 1.0), (11, 1.0), (12, 1.0)],
         )
-
 
     def test_loop_carried_dependency_x86(self):
         lcd_id = "8"
@@ -571,8 +568,8 @@ class TestSemanticTools(unittest.TestCase):
     def test_is_read_is_written_x86(self):
         # independent form HW model
         dag = KernelDG(self.kernel_x86, self.parser_x86, None, None)
-        reg_rcx = RegisterOperand(NAME_ID="rcx")
-        reg_ymm1 = RegisterOperand(NAME_ID="ymm1")
+        reg_rcx = registerOperand(name_id="rcx")
+        reg_ymm1 = registerOperand(name_id="ymm1")
 
         instr_form_r_c = self.parser_x86.parse_line("vmovsd  %xmm0, (%r15,%rcx,8)")
         self.semantics_csx.assign_src_dst(instr_form_r_c)
@@ -602,11 +599,11 @@ class TestSemanticTools(unittest.TestCase):
     def test_is_read_is_written_AArch64(self):
         # independent form HW model
         dag = KernelDG(self.kernel_AArch64, self.parser_AArch64, None, None)
-        reg_x1 = RegisterOperand(PREFIX_ID="x", NAME_ID="1")
-        reg_w1 = RegisterOperand(PREFIX_ID="w", NAME_ID="1")
-        reg_d1 = RegisterOperand(PREFIX_ID="d", NAME_ID="1")
-        reg_q1 = RegisterOperand(PREFIX_ID="q", NAME_ID="1")
-        reg_v1 = RegisterOperand(PREFIX_ID="v", NAME_ID="1", LANES="2", SHAPE="d")
+        reg_x1 = registerOperand(prefix_id="x", name_id="1")
+        reg_w1 = registerOperand(prefix_id="w", name_id="1")
+        reg_d1 = registerOperand(prefix_id="d", name_id="1")
+        reg_q1 = registerOperand(prefix_id="q", name_id="1")
+        reg_v1 = registerOperand(prefix_id="v", name_id="1", lanes="2", shape="d")
         regs = [reg_d1, reg_q1, reg_v1]
         regs_gp = [reg_w1, reg_x1]
 
@@ -671,11 +668,11 @@ class TestSemanticTools(unittest.TestCase):
 
     def test_MachineModel_getter(self):
         sample_operands = [
-            MemoryOperand(
-                OFFSET_ID=None,
-                BASE_ID=RegisterOperand(NAME_ID="r12"),
-                INDEX_ID=RegisterOperand(NAME_ID="rcx"),
-                SCALE_ID=8,
+            memoryOperand(
+                offset_ID=None,
+                base_id=registerOperand(name_id="r12"),
+                index_id=registerOperand(name_id="rcx"),
+                scale_id=8,
             )
         ]
         self.assertIsNone(self.machine_model_csx.get_instruction("GETRESULT", sample_operands))

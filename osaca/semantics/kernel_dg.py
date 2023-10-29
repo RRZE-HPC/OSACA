@@ -8,10 +8,10 @@ from itertools import chain
 from multiprocessing import Manager, Process, cpu_count
 
 import networkx as nx
-from osaca.semantics import INSTR_FLAGS, ArchSemantics, MachineModel
-from osaca.parser.memory import MemoryOperand
-from osaca.parser.register import RegisterOperand
-from osaca.parser.immediate import ImmediateOperand
+from osaca.semantics import INSTR_flags, ArchSemantics, MachineModel
+from osaca.parser.memory import memoryOperand
+from osaca.parser.register import registerOperand
+from osaca.parser.immediate import immediateOperand
 
 
 class KernelDG(nx.DiGraph):
@@ -66,8 +66,8 @@ class KernelDG(nx.DiGraph):
             dg.nodes[instruction_form.line_number]["instruction_form"] = instruction_form
             # add load as separate node if existent
             if (
-                INSTR_FLAGS.HAS_LD in instruction_form.flags
-                and INSTR_FLAGS.LD not in instruction_form.flags
+                INSTR_flags.HAS_LD in instruction_form.flags
+                and INSTR_flags.LD not in instruction_form.flags
             ):
                 # add new node
                 dg.add_node(instruction_form.line_number + 0.1)
@@ -283,7 +283,7 @@ class KernelDG(nx.DiGraph):
             for i, instr_form in enumerate(instructions):
                 self._update_reg_changes(instr_form, register_changes)
                 # print("  TO", instr_form.line, register_changes)
-                if isinstance(dst, RegisterOperand):
+                if isinstance(dst, registerOperand):
                     # read of register
                     if self.is_read(dst, instr_form):
                         # if dst.pre_indexed or dst.post_indexed:
@@ -294,8 +294,8 @@ class KernelDG(nx.DiGraph):
                     if self.is_written(dst, instr_form):
                         break
                 if (
-                    not isinstance(dst, RegisterOperand)
-                    and not isinstance(dst, MemoryOperand)
+                    not isinstance(dst, registerOperand)
+                    and not isinstance(dst, memoryOperand)
                     and "flag" in dst
                     and flag_dependencies
                 ):
@@ -305,7 +305,7 @@ class KernelDG(nx.DiGraph):
                     # write to flag -> abort
                     if self.is_written(dst.flag, instr_form):
                         break
-                if isinstance(dst, MemoryOperand):
+                if isinstance(dst, memoryOperand):
                     # base register is altered during memory access
                     if dst.pre_indexed != None:
                         if self.is_written(dst.base, instr_form):
@@ -374,16 +374,16 @@ class KernelDG(nx.DiGraph):
             instruction_form.semantic_operands["source"],
             instruction_form.semantic_operands["src_dst"],
         ):
-            if isinstance(src, RegisterOperand):
+            if isinstance(src, registerOperand):
                 is_read = self.parser.is_reg_dependend_of(register, src) or is_read
             if (
-                not isinstance(src, RegisterOperand)
-                and not isinstance(src, MemoryOperand)
-                and not isinstance(src, ImmediateOperand)
+                not isinstance(src, registerOperand)
+                and not isinstance(src, memoryOperand)
+                and not isinstance(src, immediateOperand)
                 and "flag" in src
             ):
                 is_read = self.parser.is_flag_dependend_of(register, src.flag) or is_read
-            if isinstance(src, MemoryOperand):
+            if isinstance(src, memoryOperand):
                 if src.base is not None:
                     is_read = self.parser.is_reg_dependend_of(register, src.base) or is_read
                 if src.index is not None:
@@ -393,7 +393,7 @@ class KernelDG(nx.DiGraph):
             instruction_form.semantic_operands["destination"],
             instruction_form.semantic_operands["src_dst"],
         ):
-            if isinstance(dst, MemoryOperand):
+            if isinstance(dst, memoryOperand):
                 if dst.base is not None:
                     is_read = self.parser.is_reg_dependend_of(register, dst.base) or is_read
                 if dst.index is not None:
@@ -409,7 +409,7 @@ class KernelDG(nx.DiGraph):
             instruction_form.semantic_operands["src_dst"],
         ):
             # Here we check for mem dependecies only
-            if not isinstance(src, MemoryOperand):
+            if not isinstance(src, memoryOperand):
                 continue
             # src = src.memory
 
@@ -482,15 +482,15 @@ class KernelDG(nx.DiGraph):
             instruction_form.semantic_operands["destination"],
             instruction_form.semantic_operands["src_dst"],
         ):
-            if isinstance(dst, RegisterOperand):
+            if isinstance(dst, registerOperand):
                 is_written = self.parser.is_reg_dependend_of(register, dst) or is_written
             if (
-                not isinstance(dst, RegisterOperand)
-                and not isinstance(dst, MemoryOperand)
+                not isinstance(dst, registerOperand)
+                and not isinstance(dst, memoryOperand)
                 and "flag" in dst
             ):
                 is_written = self.parser.is_flag_dependend_of(register, dst.flag) or is_written
-            if isinstance(dst, MemoryOperand):
+            if isinstance(dst, memoryOperand):
                 if dst.pre_indexed or dst.post_indexed:
                     is_written = self.parser.is_reg_dependend_of(register, dst.base) or is_written
         # Check also for possible pre- or post-indexing in memory addresses
@@ -498,7 +498,7 @@ class KernelDG(nx.DiGraph):
             instruction_form.semantic_operands["source"],
             instruction_form.semantic_operands["src_dst"],
         ):
-            if isinstance(src, MemoryOperand):
+            if isinstance(src, memoryOperand):
                 if src.pre_indexed or src.post_indexed:
                     is_written = self.parser.is_reg_dependend_of(register, src.base) or is_written
         return is_written
@@ -512,7 +512,7 @@ class KernelDG(nx.DiGraph):
             instruction_form.semantic_operands["destination"],
             instruction_form.semantic_operands["src_dst"],
         ):
-            if isinstance(dst, MemoryOperand):
+            if isinstance(dst, memoryOperand):
                 is_store = mem == dst or is_store
         return is_store
 

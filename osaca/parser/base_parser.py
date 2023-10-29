@@ -6,16 +6,16 @@ import re
 
 class BaseParser(object):
     # Identifiers for operand types
-    COMMENT_ID = "comment"
-    DIRECTIVE_ID = "directive"
+    comment_id = "comment"
+    directive_id = "directive"
     IMMEDIATE_ID = "immediate"
-    LABEL_ID = "label"
+    label_id = "label"
     IDENTIFIER_ID = "identifier"
     MEMORY_ID = "memory"
     REGISTER_ID = "register"
-    SEGMENT_EXT_ID = "segment_extension"
-    INSTRUCTION_ID = "instruction"
-    OPERANDS_ID = "operands"
+    segment_ext_id = "segment_extension"
+    instruction_id = "instruction"
+    operands_id = "operands"
     _parser_constructed = False
 
     def __init__(self):

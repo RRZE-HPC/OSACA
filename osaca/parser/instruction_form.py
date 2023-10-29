@@ -1,200 +1,200 @@
 #!/usr/bin/env python3
 
-from osaca.parser.directive import DirectiveOperand
+from osaca.parser.directive import directiveOperand
 
 
-class InstructionForm:
+class instructionForm:
     def __init__(
         self,
-        INSTRUCTION_ID=None,
-        OPERANDS_ID=[],
-        HIDDEN_OPERANDS=[],
-        DIRECTIVE_ID=None,
-        COMMENT_ID=None,
-        LABEL_ID=None,
-        LINE=None,
-        LINE_NUMBER=None,
-        SEMANTIC_OPERANDS={"source": [], "destination": [], "src_dst": []},
-        THROUGHPUT = None,
-        LATENCY = None,
-        UOPS = None,
-        PORT_PRESSURE = None,
-        BREAKS_DEP = False
+        instruction_id=None,
+        operands_id=[],
+        hidden_operands=[],
+        directive_id=None,
+        comment_id=None,
+        label_id=None,
+        line=None,
+        line_number=None,
+        semantic_operands={"source": [], "destination": [], "src_dst": []},
+        throughput=None,
+        latency=None,
+        uops=None,
+        port_pressure=None,
+        breaks_dep=False,
     ):
-        self._INSTRUCTION_ID = INSTRUCTION_ID
-        self._OPERANDS_ID = OPERANDS_ID
-        self._HIDDEN_OPERANDS = HIDDEN_OPERANDS
-        self._DIRECTIVE_ID = DIRECTIVE_ID
-        self._COMMENT_ID = COMMENT_ID
-        self._LABEL_ID = LABEL_ID
-        self._LINE = LINE
-        self._LINE_NUMBER = LINE_NUMBER
+        self._instruction_id = instruction_id
+        self._operands_id = operands_id
+        self._hidden_operands = hidden_operands
+        self._directive_id = directive_id
+        self._comment_id = comment_id
+        self._label_id = label_id
+        self._line = line
+        self._line_number = line_number
 
-        self._SEMANTIC_OPERANDS = SEMANTIC_OPERANDS
-        self._UOPS = UOPS
-        self._BREAKS_DEP = BREAKS_DEP
+        self._semantic_operands = semantic_operands
+        self._uops = uops
+        self._breaks_dep = breaks_dep
         # self.semantic_operands = {"source": [], "destination": [], "src_dst": []}
-        self._LATENCY = LATENCY
-        self._THROUGHPUT = THROUGHPUT
-        self._LATENCY_CP = []
-        self._LATENCY_LCD = []
-        self._LATENCY_WO_LOAD = None
-        self._PORT_PRESSURE = PORT_PRESSURE
-        self._PORT_UOPS = []
-        self._FLAGS = []
+        self._latency = latency
+        self._throughput = throughput
+        self._latency_cp = []
+        self._latency_lcd = []
+        self._latency_wo_load = None
+        self._port_pressure = port_pressure
+        self._port_uops = []
+        self._flags = []
 
     @property
     def semantic_operands(self):
-        return self._SEMANTIC_OPERANDS
+        return self._semantic_operands
 
     @property
     def instruction(self):
-        return self._INSTRUCTION_ID
+        return self._instruction_id
 
     @property
     def label(self):
-        return self._LABEL_ID
+        return self._label_id
 
     @property
     def comment(self):
-        return self._COMMENT_ID
+        return self._comment_id
 
     @property
     def directive(self):
-        return self._DIRECTIVE_ID
+        return self._directive_id
 
     @property
     def line_number(self):
-        return self._LINE_NUMBER
+        return self._line_number
 
     @property
     def line(self):
-        return self._LINE
+        return self._line
 
     @property
     def operands(self):
-        return self._OPERANDS_ID
+        return self._operands_id
 
     @property
     def hidden_operands(self):
-        return self._HIDDEN_OPERANDS
+        return self._hidden_operands
 
     @property
     def port_pressure(self):
-        return self._PORT_PRESSURE
+        return self._port_pressure
 
     @property
     def port_uops(self):
-        return self._PORT_UOPS
+        return self._port_uops
 
     @property
     def flags(self):
-        return self._FLAGS
+        return self._flags
 
     @property
     def uops(self):
-        return self._UOPS
+        return self._uops
 
     @property
     def throughput(self):
-        return self._THROUGHPUT
+        return self._throughput
 
     @property
     def latency(self):
-        return self._LATENCY
+        return self._latency
 
     @property
     def latency_wo_load(self):
-        return self._LATENCY_WO_LOAD
+        return self._latency_wo_load
 
     @property
     def breaks_dep(self):
-        return self._BREAKS_DEP
+        return self._breaks_dep
 
     @semantic_operands.setter
     def semantic_operands(self, semantic_operands):
-        self._SEMANTIC_OPERANDS = semantic_operands
+        self._semantic_operands = semantic_operands
 
     @directive.setter
     def directive(self, directive):
-        self._DIRECTIVE_ID = directive
+        self._directive_id = directive
 
     @line_number.setter
     def line_number(self, line_number):
-        self._LINE_NUMBER = line_number
+        self._line_number = line_number
 
     @line.setter
     def line(self, line):
-        self._LINE = line
+        self._line = line
 
     @operands.setter
     def operands(self, operands):
-        self._OPERANDS_ID = operands
+        self._operands_id = operands
 
     @hidden_operands.setter
     def hidden_operands(self, hidden_operands):
-        self._HIDDEN_OPERANDS = hidden_operands
+        self._hidden_operands = hidden_operands
 
     @breaks_dep.setter
     def breaks_dep(self, boolean):
-        self._BREAKS_DEP = boolean
+        self._breaks_dep = boolean
 
     @instruction.setter
     def instruction(self, instruction):
-        self._INSTRUCTION_ID = instruction
+        self._instruction_id = instruction
 
     @label.setter
     def label(self, label):
-        self._LABEL_ID = label
+        self._label_id = label
 
     @comment.setter
     def comment(self, comment):
-        self._COMMENT_ID = comment
+        self._comment_id = comment
 
     @port_pressure.setter
     def port_pressure(self, port_pressure):
-        self._PORT_PRESSURE = port_pressure
+        self._port_pressure = port_pressure
 
     @port_uops.setter
     def port_uops(self, port_uops):
-        self._PORT_UOPS = port_uops
+        self._port_uops = port_uops
 
     @flags.setter
     def flags(self, flags):
-        self._FLAGS = flags
+        self._flags = flags
 
     @uops.setter
     def uops(self, uops):
-        self._UOPS = uops
+        self._uops = uops
 
     @throughput.setter
     def throughput(self, throughput):
-        self._THROUGHPUT = throughput
+        self._throughput = throughput
 
     @latency.setter
     def latency(self, latency):
-        self._LATENCY = latency
+        self._latency = latency
 
     @latency_wo_load.setter
     def latency_wo_load(self, latency_wo_load):
-        self._LATENCY_WO_LOAD = latency_wo_load
+        self._latency_wo_load = latency_wo_load
 
     def __repr__(self):
-        return f"InstructionForm(INSTRUCTION_ID={self._INSTRUCTION_ID}, OPERANDS_ID={self._OPERANDS_ID}, DIRECTIVE_ID={self._DIRECTIVE_ID}, COMMENT_ID={self._COMMENT_ID}, LABEL_ID={self._LABEL_ID}, LINE={self._LINE}, LINE_NUMBER={self._LINE_NUMBER}, SEMANTIC_OPERANDS={self._SEMANTIC_OPERANDS})"
+        return f"instructionForm(instruction_id={self._instruction_id}, operands_id={self._operands_id}, directive_id={self._directive_id}, comment_id={self._comment_id}, label_id={self._label_id}, line={self._line}, line_number={self._line_number}, semantic_operands={self._semantic_operands})"
 
     def __str__(self):
-        return f"Instruction: {self._INSTRUCTION_ID}\nOperands: {self._OPERANDS_ID}\nDirective: {self._DIRECTIVE_ID}\nComment: {self._COMMENT_ID}\nLabel: {self._LABEL_ID}\nLine: {self._LINE}\nLine Number: {self._LINE_NUMBER}\nSemantic Operands: {self._SEMANTIC_OPERANDS}\nFlags: {self._FLAGS}"
+        return f"Instruction: {self._instruction_id}\nOperands: {self._operands_id}\nDirective: {self._directive_id}\nComment: {self._comment_id}\nLabel: {self._label_id}\nLine: {self._line}\nLine Number: {self._line_number}\nSemantic Operands: {self._semantic_operands}\nFlags: {self._flags}"
 
     def __eq__(self, other):
-        if isinstance(other, InstructionForm):
+        if isinstance(other, instructionForm):
             return (
-                self._INSTRUCTION_ID == other._INSTRUCTION_ID
-                and self._OPERANDS_ID == other._OPERANDS_ID
-                and self._DIRECTIVE_ID == other._DIRECTIVE_ID
-                and self._COMMENT_ID == other._COMMENT_ID
-                and self._LABEL_ID == other._LABEL_ID
-                and self._LINE == other._LINE
-                and self._LINE_NUMBER == other._LINE_NUMBER
-                and self._SEMANTIC_OPERANDS == other._SEMANTIC_OPERANDS
+                self._instruction_id == other._instruction_id
+                and self._operands_id == other._operands_id
+                and self._directive_id == other._directive_id
+                and self._comment_id == other._comment_id
+                and self._label_id == other._label_id
+                and self._line == other._line
+                and self._line_number == other._line_number
+                and self._semantic_operands == other._semantic_operands
             )
         return False

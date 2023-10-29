@@ -3,29 +3,29 @@
 from osaca.parser.operand import Operand
 
 
-class LabelOperand(Operand):
-    def __init__(self, NAME_ID=None, COMMENT_ID=None):
-        super().__init__(NAME_ID)
-        self._COMMENT_ID = COMMENT_ID
+class labelOperand(Operand):
+    def __init__(self, name_id=None, comment_id=None):
+        super().__init__(name_id)
+        self._comment_id = comment_id
 
     @property
     def comment(self):
-        return self._COMMENT_ID
+        return self._comment_id
 
     @comment.setter
     def comment(self, comment):
-        self._COMMENT_ID = comment
+        self._comment_id = comment
 
     def __iter__(self):
         return self
 
     def __next__(self):
-        if not self._COMMENT_ID:
+        if not self._comment_id:
             raise StopIteration
-        return self._COMMENT_ID.pop(0)
+        return self._comment_id.pop(0)
 
     def __str__(self):
-        return f"LabelOperand(NAME_ID={self._NAME_ID}, COMMENT={self._COMMENT_ID})"
+        return f"labelOperand(name_id={self._name_id}, comment={self._comment_id})"
 
     def __repr__(self):
-        return f"LabelOperand(NAME_ID={self._NAME_ID}, COMMENT={self._COMMENT_ID})"
+        return f"labelOperand(name_id={self._name_id}, comment={self._comment_id})"

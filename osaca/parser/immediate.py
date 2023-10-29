@@ -3,90 +3,72 @@
 from osaca.parser.operand import Operand
 
 
-class ImmediateOperand(Operand):
+class immediateOperand(Operand):
     def __init__(
         self,
-        IDENTIFIER_ID=None,
-        TYPE_ID=None,
-        VALUE_ID=None,
-        SHIFT_ID=None,
-        SOURCE=False,
-        DESTINATION=False
+        identifier_id=None,
+        type_id=None,
+        value_id=None,
+        shift_id=None,
+        source=False,
+        destination=False,
     ):
-        super().__init__(str(VALUE_ID))
-        self._IDENTIFIER_ID = IDENTIFIER_ID
-        self._TYPE_ID = TYPE_ID
-        self._VALUE_ID = VALUE_ID
-        self._SHIFT_ID = SHIFT_ID
-        self._SOURCE = SOURCE
-        self._DESTINATION = DESTINATION
+        super().__init__(str(value_id), source, destination)
+        self._identifier_id = identifier_id
+        self._type_id = type_id
+        self._value_id = value_id
+        self._shift_id = shift_id
 
     @property
     def identifier(self):
-        return self._IDENTIFIER_ID
+        return self._identifier_id
 
     @property
     def type(self):
-        return self._TYPE_ID
+        return self._type_id
 
     @property
     def value(self):
-        return self._VALUE_ID
+        return self._value_id
 
     @property
     def shift(self):
-        return self._TYPE_ID
-
-    @property
-    def source(self):
-        return self._SOURCE
-
-    @source.setter
-    def source(self, source):
-        self._SOURCE = source
-
-    @property
-    def destination(self):
-        return self._DESTINATION
-
-    @destination.setter
-    def destination(self, destination):
-        self._DESTINATION = destination
+        return self._type_id
 
     @identifier.setter
     def identifier(self, identifier):
-        self._IDENTIFIER_ID = identifier
+        self._identifier_id = identifier
 
     @type.setter
     def type(self, type):
-        self._TYPE_ID = type
+        self._type_id = type
 
     @value.setter
     def value(self, value):
-        self._VALUE_ID = value
+        self._value_id = value
 
     @shift.setter
     def index(self, shift):
-        self._SHIFT_ID = shift
+        self._shift_id = shift
 
     def __str__(self):
         return (
-            f"ImmediateOperand(IDENTIFIER_ID={self._IDENTIFIER_ID}, TYPE_ID={self._TYPE_ID}, "
-            f"VALUE_ID={self._VALUE_ID}, SHIFT_ID={self._SHIFT_ID})"
+            f"immediateOperand(identifier_id={self._identifier_id}, type_id={self._type_id}, "
+            f"value_id={self._value_id}, shift_id={self._shift_id})"
         )
 
     def __repr__(self):
         return (
-            f"ImmediateOperand(IDENTIFIER_ID={self._IDENTIFIER_ID}, TYPE_ID={self._TYPE_ID}, "
-            f"VALUE_ID={self._VALUE_ID}, SHIFT_ID={self._SHIFT_ID})"
+            f"immediateOperand(identifier_id={self._identifier_id}, type_id={self._type_id}, "
+            f"value_id={self._value_id}, shift_id={self._shift_id})"
         )
 
     def __eq__(self, other):
-        if isinstance(other, ImmediateOperand):
+        if isinstance(other, immediateOperand):
             return (
-                self._IDENTIFIER_ID == other._IDENTIFIER_ID
-                and self._TYPE_ID == other._TYPE_ID
-                and self._VALUE_ID == other._VALUE_ID
-                and self._SHIFT_ID == other._SHIFT_ID
+                self._identifier_id == other._identifier_id
+                and self._type_id == other._type_id
+                and self._value_id == other._value_id
+                and self._shift_id == other._shift_id
             )
         return False
