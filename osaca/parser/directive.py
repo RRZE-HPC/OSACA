@@ -3,7 +3,7 @@
 from osaca.parser.operand import Operand
 
 
-class directiveOperand(Operand):
+class DirectiveOperand(Operand):
     def __init__(self, name_id=None, parameter_id=None, comment_id=None):
         super().__init__(name_id)
         self._parameter_id = parameter_id
@@ -34,7 +34,7 @@ class directiveOperand(Operand):
         self._comment_id = comment
 
     def __eq__(self, other):
-        if isinstance(other, directiveOperand):
+        if isinstance(other, DirectiveOperand):
             return (
                 self._name_id == other._name_id
                 and self._parameter_id == other._parameter_id
@@ -48,4 +48,4 @@ class directiveOperand(Operand):
         return f"Directive(name_id={self._name_id}, parameters={self._parameter_id}, comment={self._comment_id})"
 
     def __repr__(self):
-        return f"directiveOperand(name_id={self._name_id}, parameters={self._parameter_id}, comment={self._comment_id})"
+        return f"DirectiveOperand(name_id={self._name_id}, parameters={self._parameter_id}, comment={self._comment_id})"

@@ -3,7 +3,7 @@
 from osaca.parser.operand import Operand
 
 
-class immediateOperand(Operand):
+class ImmediateOperand(Operand):
     def __init__(
         self,
         identifier_id=None,
@@ -53,18 +53,18 @@ class immediateOperand(Operand):
 
     def __str__(self):
         return (
-            f"immediateOperand(identifier_id={self._identifier_id}, type_id={self._type_id}, "
+            f"ImmediateOperand(identifier_id={self._identifier_id}, type_id={self._type_id}, "
             f"value_id={self._value_id}, shift_id={self._shift_id})"
         )
 
     def __repr__(self):
         return (
-            f"immediateOperand(identifier_id={self._identifier_id}, type_id={self._type_id}, "
+            f"ImmediateOperand(identifier_id={self._identifier_id}, type_id={self._type_id}, "
             f"value_id={self._value_id}, shift_id={self._shift_id})"
         )
 
     def __eq__(self, other):
-        if isinstance(other, immediateOperand):
+        if isinstance(other, ImmediateOperand):
             return (
                 self._identifier_id == other._identifier_id
                 and self._type_id == other._type_id

@@ -3,7 +3,7 @@
 from osaca.parser.operand import Operand
 
 
-class registerOperand(Operand):
+class RegisterOperand(Operand):
     def __init__(
         self,
         name_id=None,
@@ -114,7 +114,7 @@ class registerOperand(Operand):
 
     def __str__(self):
         return (
-            f"registerOperand(name_id={self._name_id}, width_id={self._width_id}, "
+            f"RegisterOperand(name_id={self._name_id}, width_id={self._width_id}, "
             f"prefix_id={self._prefix_id}, reg_id={self._reg_id}, REGtype_id={self._regtype_id}, "
             f"lanes={self._lanes}, shape={self._shape}, index={self._index}, "
             f"mask={self._mask}, zeroing={self._zeroing})"
@@ -122,14 +122,14 @@ class registerOperand(Operand):
 
     def __repr__(self):
         return (
-            f"registerOperand(name_id={self._name_id}, width_id={self._width_id}, "
+            f"RegisterOperand(name_id={self._name_id}, width_id={self._width_id}, "
             f"prefix_id={self._prefix_id}, reg_id={self._reg_id}, REGtype_id={self._regtype_id}, "
             f"lanes={self._lanes}, shape={self._shape}, index={self._index}, "
             f"mask={self._mask}, zeroing={self._zeroing})"
         )
 
     def __eq__(self, other):
-        if isinstance(other, registerOperand):
+        if isinstance(other, RegisterOperand):
             return (
                 self._name_id == other._name_id
                 and self._width_id == other._width_id

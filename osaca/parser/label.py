@@ -3,7 +3,7 @@
 from osaca.parser.operand import Operand
 
 
-class labelOperand(Operand):
+class LabelOperand(Operand):
     def __init__(self, name_id=None, comment_id=None):
         super().__init__(name_id)
         self._comment_id = comment_id
@@ -25,7 +25,7 @@ class labelOperand(Operand):
         return self._comment_id.pop(0)
 
     def __str__(self):
-        return f"labelOperand(name_id={self._name_id}, comment={self._comment_id})"
+        return f"LabelOperand(name_id={self._name_id}, comment={self._comment_id})"
 
     def __repr__(self):
-        return f"labelOperand(name_id={self._name_id}, comment={self._comment_id})"
+        return f"LabelOperand(name_id={self._name_id}, comment={self._comment_id})"

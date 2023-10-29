@@ -10,8 +10,8 @@ import osaca.db_interface as dbi
 from osaca.db_interface import sanity_check
 from osaca.semantics import MachineModel
 from osaca.parser import instructionForm
-from osaca.parser.memory import memoryOperand
-from osaca.parser.register import registerOperand
+from osaca.parser.memory import MemoryOperand
+from osaca.parser.register import RegisterOperand
 import copy
 
 
@@ -21,8 +21,8 @@ class TestDBInterface(unittest.TestCase):
         sample_entry = instructionForm(
             instruction_id="DoItRightAndDoItFast",
             operands_id=[
-                memoryOperand(offset_ID="imd", base_id="gpr", index_id="gpr", scale_id=8),
-                registerOperand(name_id="xmm"),
+                MemoryOperand(offset_ID="imd", base_id="gpr", index_id="gpr", scale_id=8),
+                RegisterOperand(name_id="xmm"),
             ],
             throughput=1.25,
             latency=125,

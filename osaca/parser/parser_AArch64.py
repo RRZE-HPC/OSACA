@@ -5,12 +5,12 @@ import pyparsing as pp
 from osaca.parser import BaseParser
 from osaca.parser.instruction_form import instructionForm
 from osaca.parser.operand import Operand
-from osaca.parser.directive import directiveOperand
-from osaca.parser.memory import memoryOperand
-from osaca.parser.label import labelOperand
-from osaca.parser.register import registerOperand
-from osaca.parser.identifier import identifierOperand
-from osaca.parser.immediate import immediateOperand
+from osaca.parser.directive import DirectiveOperand
+from osaca.parser.memory import MemoryOperand
+from osaca.parser.label import LabelOperand
+from osaca.parser.register import RegisterOperand
+from osaca.parser.identifier import IdentifierOperand
+from osaca.parser.immediate import ImmediateOperand
 
 
 class ParserAArch64(BaseParser):
@@ -301,7 +301,7 @@ class ParserAArch64(BaseParser):
                 result = self.process_operand(
                     self.directive.parseString(line, parseAll=True).asDict()
                 )
-                instruction_form.directive = directiveOperand(
+                instruction_form.directive = DirectiveOperand(
                     name_id=result.name, parameter_id=result.parameters
                 )
                 if result.comment is not None:
@@ -383,7 +383,7 @@ class ParserAArch64(BaseParser):
         if self.REGISTER_ID in operand:
             return self.process_register_operand(operand[self.REGISTER_ID])
         if self.directive_id in operand:
-            return directiveOperand(
+            return DirectiveOperand(
                 name_id=operand["directive"]["name"],
                 parameter_id=operand["directive"]["parameters"],
                 comment_id=operand["directive"]["comment"]
@@ -393,7 +393,7 @@ class ParserAArch64(BaseParser):
         return operand
 
     def process_register_operand(self, operand):
-        return registerOperand(
+        return RegisterOperand(
             prefix_id=operand["prefix"],
             name_id=operand["name"],
             shape=operand["shape"] if "shape" in operand else None,
@@ -422,9 +422,9 @@ class ParserAArch64(BaseParser):
             if "shift" in memory_address["index"]:
                 if memory_address["index"]["shift_op"].lower() in valid_shift_ops:
                     scale = 2 ** int(memory_address["index"]["shift"][0]["value"])
-        new_dict = memoryOperand(
+        new_dict = MemoryOperand(
             offset_ID=offset,
-            base_id=registerOperand(name_id=base["name"], prefix_id=base["prefix"]),
+            base_id=RegisterOperand(name_id=base["name"], prefix_id=base["prefix"]),
             index_id=index,
             scale_id=scale,
         )
@@ -440,7 +440,7 @@ class ParserAArch64(BaseParser):
     def process_sp_register(self, register):
         """Post-process stack pointer register"""
         # reg = register
-        new_reg = registerOperand(prefix_id="x", name_id="sp")
+        new_reg = RegisterOperand(prefix_id="x", name_id="sp")
         # reg["prefix"] = "x"
         return new_reg
 
@@ -509,7 +509,7 @@ class ParserAArch64(BaseParser):
             immediate["type"] = "int"
             # convert hex/bin immediates to dec
             immediate["value"] = self.normalize_imd(immediate)
-            return immediateOperand(type_id=immediate["type"], value_id=immediate["value"])
+            return ImmediateOperand(type_id=immediate["type"], value_id=immediate["value"])
         if "base_immediate" in immediate:
             # arithmetic immediate, add calculated value as value
             immediate["shift"] = immediate["shift"][0]
@@ -517,7 +517,7 @@ class ParserAArch64(BaseParser):
                 immediate["shift"]["value"]
             )
             immediate["type"] = "int"
-            return immediateOperand(
+            return ImmediateOperand(
                 type_id=immediate["type"], value_id=immediate["value"], shift_id=immediate["shift"]
             )
         if "float" in immediate:
@@ -526,16 +526,16 @@ class ParserAArch64(BaseParser):
             dict_name = "double"
         if "exponent" in immediate[dict_name]:
             immediate["type"] = dict_name
-            return immediateOperand(type_id=immediate["type"])
+            return ImmediateOperand(type_id=immediate["type"])
         else:
             # change 'mantissa' key to 'value'
-            return immediateOperand(value_id=immediate[dict_name]["mantissa"], type_id=dict_name)
+            return ImmediateOperand(value_id=immediate[dict_name]["mantissa"], type_id=dict_name)
 
     def process_label(self, label):
         """Post-process label asm line"""
         # remove duplicated 'name' level due to identifier
         # label["name"] = label["name"]["name"]
-        new_label = labelOperand(
+        new_label = LabelOperand(
             name_id=label["name"]["name"],
             comment_id=label["comment"] if self.comment_id in label else None,
         )
@@ -546,7 +546,7 @@ class ParserAArch64(BaseParser):
         # remove value if it consists of symbol+offset
         if "value" in identifier:
             del identifier["value"]
-        return identifierOperand(offset=identifier["offset"], RELOCATION=identifier["relocation"])
+        return IdentifierOperand(offset=identifier["offset"], RELOCATION=identifier["relocation"])
 
     def get_full_reg_name(self, register):
         """Return one register name string including all attributes"""

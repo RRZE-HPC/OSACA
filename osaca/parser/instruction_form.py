@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-from osaca.parser.directive import directiveOperand
+from osaca.parser.directive import DirectiveOperand
 
 
 class instructionForm:
@@ -179,11 +179,28 @@ class instructionForm:
     def latency_wo_load(self, latency_wo_load):
         self._latency_wo_load = latency_wo_load
 
-    def __repr__(self):
-        return f"instructionForm(instruction_id={self._instruction_id}, operands_id={self._operands_id}, directive_id={self._directive_id}, comment_id={self._comment_id}, label_id={self._label_id}, line={self._line}, line_number={self._line_number}, semantic_operands={self._semantic_operands})"
-
     def __str__(self):
-        return f"Instruction: {self._instruction_id}\nOperands: {self._operands_id}\nDirective: {self._directive_id}\nComment: {self._comment_id}\nLabel: {self._label_id}\nLine: {self._line}\nLine Number: {self._line_number}\nSemantic Operands: {self._semantic_operands}\nFlags: {self._flags}"
+        attributes = {
+            "instruction_id": self.instruction,
+            "operands_id": self.operands,
+            "hidden_operands": self.hidden_operands,
+            "directive_id": self.directive,
+            "comment_id": self.comment,
+            "label_id": self.label,
+            "line": self.line,
+            "line_number": self.line_number,
+            "semantic_operands": self.semantic_operands,
+            "throughput": self.throughput,
+            "latency": self.latency,
+            "uops": self.uops,
+            "port_pressure": self.port_pressure,
+            "breaks_dep": self.breaks_dep,
+        }
+        attr_str = "\n ".join(f"{key}={value}" for key, value in attributes.items())
+        return f"instructionForm({attr_str})"
+
+    def __repr__(self):
+        return self.__str__()
 
     def __eq__(self, other):
         if isinstance(other, instructionForm):

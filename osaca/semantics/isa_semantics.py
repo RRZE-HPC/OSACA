@@ -3,9 +3,9 @@ from itertools import chain
 
 from osaca import utils
 from osaca.parser import AttrDict, ParserAArch64, ParserX86ATT
-from osaca.parser.memory import memoryOperand
-from osaca.parser.register import registerOperand
-from osaca.parser.immediate import immediateOperand
+from osaca.parser.memory import MemoryOperand
+from osaca.parser.register import RegisterOperand
+from osaca.parser.immediate import ImmediateOperand
 
 from .hw_model import MachineModel
 
@@ -81,7 +81,7 @@ class ISASemantics(object):
             # Couldn't found instruction form in ISA DB
             assign_default = True
             # check for equivalent register-operands DB entry if LD/ST
-            if any([isinstance(op, memoryOperand) for op in operands]):
+            if any([isinstance(op, MemoryOperand) for op in operands]):
                 operands_reg = self.substitute_mem_address(instruction_form.operands)
                 isa_data_reg = self._isa_model.get_instruction(
                     instruction_form.instruction, operands_reg
@@ -116,7 +116,7 @@ class ISASemantics(object):
             op_dict["src_dst"] = []
         # post-process pre- and post-indexing for aarch64 memory operands
         if self._isa == "aarch64":
-            for operand in [op for op in op_dict["source"] if isinstance(op, memoryOperand)]:
+            for operand in [op for op in op_dict["source"] if isinstance(op, MemoryOperand)]:
                 post_indexed = operand.post_indexed
                 pre_indexed = operand.pre_indexed
                 if post_indexed or pre_indexed:
@@ -127,7 +127,7 @@ class ISASemantics(object):
                             "post_indexed": post_indexed,
                         }
                     )
-            for operand in [op for op in op_dict["destination"] if isinstance(op, memoryOperand)]:
+            for operand in [op for op in op_dict["destination"] if isinstance(op, MemoryOperand)]:
                 post_indexed = operand.post_indexed
                 pre_indexed = operand.pre_indexed
                 if post_indexed or pre_indexed:
@@ -165,7 +165,7 @@ class ISASemantics(object):
                 instruction_form.semantic_operands["destination"],
                 instruction_form.semantic_operands["src_dst"],
             )
-            if isinstance(op, registerOperand)
+            if isinstance(op, RegisterOperand)
         ]
         isa_data = self._isa_model.get_instruction(
             instruction_form.instruction, instruction_form.operands
@@ -188,7 +188,7 @@ class ISASemantics(object):
 
         if only_postindexed:
             for o in instruction_form.operands:
-                if isinstance(o, memoryOperand) and o.base != None and o.post_indexed != False:
+                if isinstance(o, MemoryOperand) and o.base != None and o.post_indexed != False:
                     base_name = o.base.prefix if o.base.prefix != None else "" + o.base.name
                     return {
                         base_name: {
@@ -202,7 +202,7 @@ class ISASemantics(object):
         operand_state = {}  # e.g., {'op1': {'name': 'rax', 'value': 0}}  0 means unchanged
 
         for o in instruction_form.operands:
-            if isinstance(o, memoryOperand) and o.pre_indexed:
+            if isinstance(o, MemoryOperand) and o.pre_indexed:
                 # Assuming no isa_data.operation
                 if isa_data is not None and isa_data.get("operation", None) is not None:
                     raise ValueError(
@@ -216,13 +216,13 @@ class ISASemantics(object):
         if isa_data is not None:
             for i, o in enumerate(instruction_form.operands):
                 operand_name = "op{}".format(i + 1)
-                if isinstance(o, registerOperand):
+                if isinstance(o, RegisterOperand):
                     o_reg_name = o.prefix if o.prefix != None else "" + o.name
                     reg_operand_names[o_reg_name] = operand_name
                     operand_state[operand_name] = {"name": o_reg_name, "value": 0}
-                elif isinstance(o, immediateOperand):
+                elif isinstance(o, ImmediateOperand):
                     operand_state[operand_name] = {"value": o.value}
-                elif isinstance(o, memoryOperand):
+                elif isinstance(o, MemoryOperand):
                     # TODO lea needs some thinking about
                     pass
 
@@ -253,12 +253,12 @@ class ISASemantics(object):
 
         # handle dependency breaking instructions
         """
-        if "breaks_dependency_on_equal_operands" in isa_data and operands[1:] == operands[:-1]:
+        if isa_data.breaks_dep and operands[1:] == operands[:-1]:
             op_dict["destination"] += operands
-            if "hidden_operands" in isa_data:
+            if isa_data.hidden_operands!=[]:
                 op_dict["destination"] += [
                     {hop["class"]: {k: hop[k] for k in ["name", "class", "source", "destination"]}}
-                    for hop in isa_data["hidden_operands"]
+                    for hop in isa_data.hidden_operands
                 ]
             return op_dict
         """
@@ -276,21 +276,20 @@ class ISASemantics(object):
 
         # check for hidden operands like flags or registers
         """
-        if "hidden_operands" in isa_data:
+        if isa_data.hidden_operands!=[]:
             # add operand(s) to semantic_operands of instruction form
-            for op in isa_data["hidden_operands"]:
+            for op in isa_data.hidden_operands:
                 dict_key = (
                     "src_dst"
-                    if op["source"] and op["destination"]
+                    if op.source and op.destination
                     else "source"
-                    if op["source"]
+                    if op.source
                     else "destination"
                 )
                 hidden_op = {op["class"]: {}}
                 key_filter = ["class", "source", "destination"]
                 for key in [k for k in op.keys() if k not in key_filter]:
                     hidden_op[op["class"]][key] = op[key]
-                hidden_op = AttrDict.convert_dict(hidden_op)
                 op_dict[dict_key].append(hidden_op)
         """
         return op_dict
@@ -301,7 +300,7 @@ class ISASemantics(object):
             instruction_form.semantic_operands["source"],
             instruction_form.semantic_operands["src_dst"],
         ):
-            if isinstance(operand, memoryOperand):
+            if isinstance(operand, MemoryOperand):
                 return True
         return False
 
@@ -311,7 +310,7 @@ class ISASemantics(object):
             instruction_form.semantic_operands["destination"],
             instruction_form.semantic_operands["src_dst"],
         ):
-            if isinstance(operand, memoryOperand):
+            if isinstance(operand, MemoryOperand):
                 return True
         return False
 
@@ -345,7 +344,7 @@ class ISASemantics(object):
     def substitute_mem_address(self, operands):
         """Create memory wildcard for all memory operands"""
         return [
-            self._create_reg_wildcard() if isinstance(op, memoryOperand) else op for op in operands
+            self._create_reg_wildcard() if isinstance(op, MemoryOperand) else op for op in operands
         ]
 
     def _create_reg_wildcard(self):
