@@ -3363,7 +3363,7 @@ instruction_forms:
           name: "rsp"
           source: true
           destination: true
-        # All of EFLAGS and RFLAGS, without VM and RF
+        # All of Eflags and Rflags, without VM and RF
         - class: "flag"
           name: "CF"
           source: true

@@ -7,12 +7,12 @@ from .attr_dict import AttrDict
 from .base_parser import BaseParser
 from .parser_x86att import ParserX86ATT
 from .parser_AArch64 import ParserAArch64
-from .instruction_form import InstructionForm
+from .instruction_form import instructionForm
 from .operand import Operand
 
 __all__ = [
     "Operand",
-    "InstructionForm",
+    "instructionForm",
     "AttrDict",
     "BaseParser",
     "ParserX86ATT",

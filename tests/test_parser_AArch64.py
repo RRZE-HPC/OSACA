@@ -8,12 +8,12 @@ import unittest
 
 from pyparsing import ParseException
 
-from osaca.parser import ParserAArch64, InstructionForm
+from osaca.parser import ParserAArch64, instructionForm
 from osaca.parser.operand import Operand
-from osaca.parser.directive import DirectiveOperand
-from osaca.parser.memory import MemoryOperand
-from osaca.parser.register import RegisterOperand
-from osaca.parser.immediate import ImmediateOperand
+from osaca.parser.directive import directiveOperand
+from osaca.parser.memory import memoryOperand
+from osaca.parser.register import registerOperand
+from osaca.parser.immediate import immediateOperand
 
 
 class TestParserAArch64(unittest.TestCase):
@@ -181,140 +181,140 @@ class TestParserAArch64(unittest.TestCase):
         line_5_operands = "fcmla z26.d, p0/m, z29.d, z21.d, #90"
         line_conditions = "ccmn  x11, #1, #3, eq"
 
-        instruction_form_1 = InstructionForm(
-            INSTRUCTION_ID=None,
-            OPERANDS_ID=[],
-            DIRECTIVE_ID=None,
-            COMMENT_ID="-- Begin main",
-            LABEL_ID=None,
-            LINE="// -- Begin  main",
-            LINE_NUMBER=1,
+        instruction_form_1 = instructionForm(
+            instruction_id=None,
+            operands_id=[],
+            directive_id=None,
+            comment_id="-- Begin main",
+            label_id=None,
+            line="// -- Begin  main",
+            line_number=1,
         )
 
-        instruction_form_2 = InstructionForm(
-            INSTRUCTION_ID=None,
-            OPERANDS_ID=[],
-            DIRECTIVE_ID=None,
-            COMMENT_ID="=>This Inner Loop Header: Depth=1",
-            LABEL_ID=".LBB0_1",
-            LINE=".LBB0_1:              // =>This Inner Loop Header: Depth=1",
-            LINE_NUMBER=2,
+        instruction_form_2 = instructionForm(
+            instruction_id=None,
+            operands_id=[],
+            directive_id=None,
+            comment_id="=>This Inner Loop Header: Depth=1",
+            label_id=".LBB0_1",
+            line=".LBB0_1:              // =>This Inner Loop Header: Depth=1",
+            line_number=2,
         )
-        instruction_form_3 = InstructionForm(
-            INSTRUCTION_ID=None,
-            OPERANDS_ID=[],
-            DIRECTIVE_ID=DirectiveOperand(NAME_ID="cfi_def_cfa", PARAMETER_ID=["w29", "-16"]),
-            COMMENT_ID=None,
-            LABEL_ID=None,
-            LINE=".cfi_def_cfa w29, -16",
-            LINE_NUMBER=3,
+        instruction_form_3 = instructionForm(
+            instruction_id=None,
+            operands_id=[],
+            directive_id=directiveOperand(name_id="cfi_def_cfa", parameter_id=["w29", "-16"]),
+            comment_id=None,
+            label_id=None,
+            line=".cfi_def_cfa w29, -16",
+            line_number=3,
         )
-        instruction_form_4 = InstructionForm(
-            INSTRUCTION_ID="ldr",
-            OPERANDS_ID=[
-                RegisterOperand(PREFIX_ID="s", NAME_ID="0"),
-                MemoryOperand(
-                    OFFSET_ID=None,
-                    BASE_ID=RegisterOperand(PREFIX_ID="x", NAME_ID="11"),
-                    INDEX_ID={
+        instruction_form_4 = instructionForm(
+            instruction_id="ldr",
+            operands_id=[
+                registerOperand(prefix_id="s", name_id="0"),
+                memoryOperand(
+                    offset_ID=None,
+                    base_id=registerOperand(prefix_id="x", name_id="11"),
+                    index_id={
                         "prefix": "w",
                         "name": "10",
                         "shift_op": "sxtw",
                         "immediate": {"value": "2"},
                         "shift": [{"value": "2"}],
                     },
-                    SCALE_ID=4,
+                    scale_id=4,
                 ),
             ],
-            DIRECTIVE_ID=None,
-            COMMENT_ID="= <<2",
-            LABEL_ID=None,
-            LINE="ldr s0, [x11, w10, sxtw #2]    // = <<2",
-            LINE_NUMBER=4,
+            directive_id=None,
+            comment_id="= <<2",
+            label_id=None,
+            line="ldr s0, [x11, w10, sxtw #2]    // = <<2",
+            line_number=4,
         )
-        instruction_form_5 = InstructionForm(
-            INSTRUCTION_ID="prfm",
-            OPERANDS_ID=[
+        instruction_form_5 = instructionForm(
+            instruction_id="prfm",
+            operands_id=[
                 {"prfop": {"type": ["PLD"], "target": ["L1"], "policy": ["KEEP"]}},
-                MemoryOperand(
-                    OFFSET_ID={"value": 2048},
-                    BASE_ID=RegisterOperand(PREFIX_ID="x", NAME_ID="26"),
-                    INDEX_ID=None,
-                    SCALE_ID=1,
+                memoryOperand(
+                    offset_ID={"value": 2048},
+                    base_id=registerOperand(prefix_id="x", name_id="26"),
+                    index_id=None,
+                    scale_id=1,
                 ),
             ],
-            DIRECTIVE_ID=None,
-            COMMENT_ID="HPL",
-            LABEL_ID=None,
-            LINE="prfm    pldl1keep, [x26, #2048] //HPL",
-            LINE_NUMBER=5,
+            directive_id=None,
+            comment_id="HPL",
+            label_id=None,
+            line="prfm    pldl1keep, [x26, #2048] //HPL",
+            line_number=5,
         )
-        instruction_form_6 = InstructionForm(
-            INSTRUCTION_ID="stp",
-            OPERANDS_ID=[
-                RegisterOperand(PREFIX_ID="x", NAME_ID="29"),
-                RegisterOperand(PREFIX_ID="x", NAME_ID="30"),
-                MemoryOperand(
-                    OFFSET_ID={"value": -16},
-                    BASE_ID=RegisterOperand(NAME_ID="sp", PREFIX_ID="x"),
-                    INDEX_ID=None,
-                    SCALE_ID=1,
-                    PRE_INDEXED=True,
+        instruction_form_6 = instructionForm(
+            instruction_id="stp",
+            operands_id=[
+                registerOperand(prefix_id="x", name_id="29"),
+                registerOperand(prefix_id="x", name_id="30"),
+                memoryOperand(
+                    offset_ID={"value": -16},
+                    base_id=registerOperand(name_id="sp", prefix_id="x"),
+                    index_id=None,
+                    scale_id=1,
+                    pre_indexed=True,
                 ),
             ],
-            DIRECTIVE_ID=None,
-            COMMENT_ID=None,
-            LABEL_ID=None,
-            LINE="stp x29, x30, [sp, #-16]!",
-            LINE_NUMBER=6,
+            directive_id=None,
+            comment_id=None,
+            label_id=None,
+            line="stp x29, x30, [sp, #-16]!",
+            line_number=6,
         )
-        instruction_form_7 = InstructionForm(
-            INSTRUCTION_ID="ldp",
-            OPERANDS_ID=[
-                RegisterOperand(PREFIX_ID="q", NAME_ID="2"),
-                RegisterOperand(PREFIX_ID="q", NAME_ID="3"),
-                MemoryOperand(
-                    OFFSET_ID=None,
-                    BASE_ID=RegisterOperand(NAME_ID="11", PREFIX_ID="x"),
-                    INDEX_ID=None,
-                    SCALE_ID=1,
-                    POST_INDEXED={"value": 64},
+        instruction_form_7 = instructionForm(
+            instruction_id="ldp",
+            operands_id=[
+                registerOperand(prefix_id="q", name_id="2"),
+                registerOperand(prefix_id="q", name_id="3"),
+                memoryOperand(
+                    offset_ID=None,
+                    base_id=registerOperand(name_id="11", prefix_id="x"),
+                    index_id=None,
+                    scale_id=1,
+                    post_indexed={"value": 64},
                 ),
             ],
-            DIRECTIVE_ID=None,
-            COMMENT_ID=None,
-            LABEL_ID=None,
-            LINE="ldp q2, q3, [x11], #64",
-            LINE_NUMBER=7,
+            directive_id=None,
+            comment_id=None,
+            label_id=None,
+            line="ldp q2, q3, [x11], #64",
+            line_number=7,
         )
-        instruction_form_8 = InstructionForm(
-            INSTRUCTION_ID="fcmla",
-            OPERANDS_ID=[
-                RegisterOperand(PREFIX_ID="z", NAME_ID="26", SHAPE="d"),
-                RegisterOperand(PREFIX_ID="p", NAME_ID="0", PREDICATION="m"),
-                RegisterOperand(PREFIX_ID="z", NAME_ID="29", SHAPE="d"),
-                RegisterOperand(PREFIX_ID="z", NAME_ID="21", SHAPE="d"),
-                ImmediateOperand(VALUE_ID=90, TYPE_ID="int"),
+        instruction_form_8 = instructionForm(
+            instruction_id="fcmla",
+            operands_id=[
+                registerOperand(prefix_id="z", name_id="26", shape="d"),
+                registerOperand(prefix_id="p", name_id="0", predication="m"),
+                registerOperand(prefix_id="z", name_id="29", shape="d"),
+                registerOperand(prefix_id="z", name_id="21", shape="d"),
+                immediateOperand(value_id=90, type_id="int"),
             ],
-            DIRECTIVE_ID=None,
-            COMMENT_ID=None,
-            LABEL_ID=None,
-            LINE="fcmla z26.d, p0/m, z29.d, z21.d, #90",
-            LINE_NUMBER=8,
+            directive_id=None,
+            comment_id=None,
+            label_id=None,
+            line="fcmla z26.d, p0/m, z29.d, z21.d, #90",
+            line_number=8,
         )
-        instruction_form_9 = InstructionForm(
-            INSTRUCTION_ID="ccmn",
-            OPERANDS_ID=[
-                RegisterOperand(PREFIX_ID="x", NAME_ID="11"),
-                ImmediateOperand(VALUE_ID=1, TYPE_ID="int"),
-                ImmediateOperand(VALUE_ID=3, TYPE_ID="int"),
+        instruction_form_9 = instructionForm(
+            instruction_id="ccmn",
+            operands_id=[
+                registerOperand(prefix_id="x", name_id="11"),
+                immediateOperand(value_id=1, type_id="int"),
+                immediateOperand(value_id=3, type_id="int"),
                 {"condition": "EQ"},
             ],
-            DIRECTIVE_ID=None,
-            COMMENT_ID=None,
-            LABEL_ID=None,
-            LINE="ccmn  x11, #1, #3, eq",
-            LINE_NUMBER=9,
+            directive_id=None,
+            comment_id=None,
+            label_id=None,
+            line="ccmn  x11, #1, #3, eq",
+            line_number=9,
         )
 
         parsed_1 = self.parser.parse_line(line_comment, 1)
@@ -372,17 +372,17 @@ class TestParserAArch64(unittest.TestCase):
         instr_list_with_index = "ld4 {v0.S, v1.S, v2.S, v3.S}[2]"
         instr_range_single = "dummy  { z1.d }"
         reg_list = [
-            RegisterOperand(PREFIX_ID="x", NAME_ID="5"),
-            RegisterOperand(PREFIX_ID="x", NAME_ID="6"),
-            RegisterOperand(PREFIX_ID="x", NAME_ID="7"),
+            registerOperand(prefix_id="x", name_id="5"),
+            registerOperand(prefix_id="x", name_id="6"),
+            registerOperand(prefix_id="x", name_id="7"),
         ]
         reg_list_idx = [
-            RegisterOperand(PREFIX_ID="v", NAME_ID="0", SHAPE="S", INDEX=2),
-            RegisterOperand(PREFIX_ID="v", NAME_ID="1", SHAPE="S", INDEX=2),
-            RegisterOperand(PREFIX_ID="v", NAME_ID="2", SHAPE="S", INDEX=2),
-            RegisterOperand(PREFIX_ID="v", NAME_ID="3", SHAPE="S", INDEX=2),
+            registerOperand(prefix_id="v", name_id="0", shape="S", index=2),
+            registerOperand(prefix_id="v", name_id="1", shape="S", index=2),
+            registerOperand(prefix_id="v", name_id="2", shape="S", index=2),
+            registerOperand(prefix_id="v", name_id="3", shape="S", index=2),
         ]
-        reg_list_single = [RegisterOperand(PREFIX_ID="z", NAME_ID="1", SHAPE="d")]
+        reg_list_single = [registerOperand(prefix_id="z", name_id="1", shape="d")]
 
         prange = self.parser.parse_line(instr_range)
         plist = self.parser.parse_line(instr_list)
@@ -397,22 +397,22 @@ class TestParserAArch64(unittest.TestCase):
         # self.assertEqual(p_single.operands, reg_list_single)
 
     def test_reg_dependency(self):
-        reg_1_1 = RegisterOperand(PREFIX_ID="b", NAME_ID="1")
-        reg_1_2 = RegisterOperand(PREFIX_ID="h", NAME_ID="1")
-        reg_1_3 = RegisterOperand(PREFIX_ID="s", NAME_ID="1")
-        reg_1_4 = RegisterOperand(PREFIX_ID="d", NAME_ID="1")
-        reg_1_4 = RegisterOperand(PREFIX_ID="q", NAME_ID="1")
-        reg_2_1 = RegisterOperand(PREFIX_ID="w", NAME_ID="2")
-        reg_2_2 = RegisterOperand(PREFIX_ID="x", NAME_ID="2")
-        reg_v1_1 = RegisterOperand(PREFIX_ID="v", NAME_ID="11", LANES="16", SHAPE="b")
-        reg_v1_2 = RegisterOperand(PREFIX_ID="v", NAME_ID="11", LANES="8", SHAPE="h")
-        reg_v1_3 = RegisterOperand(PREFIX_ID="v", NAME_ID="11", LANES="4", SHAPE="s")
-        reg_v1_4 = RegisterOperand(PREFIX_ID="v", NAME_ID="11", LANES="2", SHAPE="d")
+        reg_1_1 = registerOperand(prefix_id="b", name_id="1")
+        reg_1_2 = registerOperand(prefix_id="h", name_id="1")
+        reg_1_3 = registerOperand(prefix_id="s", name_id="1")
+        reg_1_4 = registerOperand(prefix_id="d", name_id="1")
+        reg_1_4 = registerOperand(prefix_id="q", name_id="1")
+        reg_2_1 = registerOperand(prefix_id="w", name_id="2")
+        reg_2_2 = registerOperand(prefix_id="x", name_id="2")
+        reg_v1_1 = registerOperand(prefix_id="v", name_id="11", lanes="16", shape="b")
+        reg_v1_2 = registerOperand(prefix_id="v", name_id="11", lanes="8", shape="h")
+        reg_v1_3 = registerOperand(prefix_id="v", name_id="11", lanes="4", shape="s")
+        reg_v1_4 = registerOperand(prefix_id="v", name_id="11", lanes="2", shape="d")
 
-        reg_b5 = RegisterOperand(PREFIX_ID="b", NAME_ID="5")
-        reg_q15 = RegisterOperand(PREFIX_ID="q", NAME_ID="15")
-        reg_v10 = RegisterOperand(PREFIX_ID="v", NAME_ID="10", LANES="2", SHAPE="s")
-        reg_v20 = RegisterOperand(PREFIX_ID="v", NAME_ID="20", LANES="2", SHAPE="d")
+        reg_b5 = registerOperand(prefix_id="b", name_id="5")
+        reg_q15 = registerOperand(prefix_id="q", name_id="15")
+        reg_v10 = registerOperand(prefix_id="v", name_id="10", lanes="2", shape="s")
+        reg_v20 = registerOperand(prefix_id="v", name_id="20", lanes="2", shape="d")
 
         reg_1 = [reg_1_1, reg_1_2, reg_1_3, reg_1_4]
         reg_2 = [reg_2_1, reg_2_2]

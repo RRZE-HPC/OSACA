@@ -7,7 +7,7 @@ import os
 import re
 from datetime import datetime as dt
 
-from osaca.semantics import INSTR_FLAGS, ArchSemantics, KernelDG, MachineModel
+from osaca.semantics import INSTR_flags, ArchSemantics, KernelDG, MachineModel
 
 
 def _get_version(*file_paths):
@@ -116,7 +116,7 @@ class Frontend(object):
                     separator,
                     instruction_form.latency_cp,
                     separator,
-                    "X" if INSTR_FLAGS.LT_UNKWN in instruction_form.flags else " ",
+                    "X" if INSTR_flags.LT_UNKWN in instruction_form.flags else " ",
                     separator,
                     instruction_form.line,
                 )
@@ -237,7 +237,7 @@ class Frontend(object):
         if lcd_warning:
             warnings.append("LCDWarning")
 
-        # if INSTR_FLAGS.TP_UNKWN in [flag for instr in kernel for flag in instr.flags]:
+        # if INSTR_flags.TP_UNKWN in [flag for instr in kernel for flag in instr.flags]:
         #    warnings.append("UnknownInstrWarning")
 
         tp_sum = ArchSemantics.get_throughput_sum(kernel) or kernel[0].port_pressure
@@ -373,11 +373,11 @@ class Frontend(object):
             )
         s += "\n"
         # check for unknown instructions and throw warning if called without --ignore-unknown
-        if not ignore_unknown and INSTR_FLAGS.TP_UNKWN in [
+        if not ignore_unknown and INSTR_flags.TP_UNKWN in [
             flag for instr in kernel for flag in instr.flags
         ]:
             num_missing = len(
-                [instr.flags for instr in kernel if INSTR_FLAGS.TP_UNKWN in instr.flags]
+                [instr.flags for instr in kernel if INSTR_flags.TP_UNKWN in instr.flags]
             )
             s += self._missing_instruction_error(num_missing)
         else:
@@ -471,9 +471,9 @@ class Frontend(object):
     def _get_flag_symbols(self, flag_obj):
         """Returns flags for a flag object of an instruction"""
         string_result = ""
-        string_result += "*" if INSTR_FLAGS.NOT_BOUND in flag_obj else ""
-        string_result += "X" if INSTR_FLAGS.TP_UNKWN in flag_obj else ""
-        string_result += "P" if INSTR_FLAGS.HIDDEN_LD in flag_obj else ""
+        string_result += "*" if INSTR_flags.NOT_BOUND in flag_obj else ""
+        string_result += "X" if INSTR_flags.TP_UNKWN in flag_obj else ""
+        string_result += "P" if INSTR_flags.HIDDEN_LD in flag_obj else ""
         # TODO add other flags
         string_result += " " if len(string_result) == 0 else ""
         return string_result
@@ -554,10 +554,10 @@ class Frontend(object):
     def _symbol_map(self):
         """Prints instruction flag map."""
         symbol_dict = {
-            INSTR_FLAGS.NOT_BOUND: "Instruction micro-ops not bound to a port",
-            INSTR_FLAGS.TP_UNKWN: "No throughput/latency information for this instruction in "
+            INSTR_flags.NOT_BOUND: "Instruction micro-ops not bound to a port",
+            INSTR_flags.TP_UNKWN: "No throughput/latency information for this instruction in "
             + "data file",
-            INSTR_FLAGS.HIDDEN_LD: "Throughput of LOAD operation can be hidden behind a past "
+            INSTR_flags.HIDDEN_LD: "Throughput of LOAD operation can be hidden behind a past "
             + "or future STORE instruction",
         }
         symbol_map = ""

@@ -8,8 +8,8 @@ import unittest
 
 from pyparsing import ParseException
 
-from osaca.parser import ParserX86ATT, InstructionForm
-from osaca.parser.register import RegisterOperand
+from osaca.parser import ParserX86ATT, instructionForm
+from osaca.parser.register import registerOperand
 
 
 class TestParserX86ATT(unittest.TestCase):
@@ -165,36 +165,36 @@ class TestParserX86ATT(unittest.TestCase):
         line_directive = ".quad   .2.3_2__kmpc_loc_pack.2 #qed"
         line_instruction = "lea       2(%rax,%rax), %ecx #12.9"
 
-        instruction_form_1 = InstructionForm(
-            INSTRUCTION_ID=None,
-            OPERANDS_ID=[],
-            DIRECTIVE_ID=None,
-            COMMENT_ID="-- Begin main",
-            LABEL_ID=None,
-            LINE="# -- Begin  main",
-            LINE_NUMBER=1,
+        instruction_form_1 = instructionForm(
+            instruction_id=None,
+            operands_id=[],
+            directive_id=None,
+            comment_id="-- Begin main",
+            label_id=None,
+            line="# -- Begin  main",
+            line_number=1,
         )
-        instruction_form_2 = InstructionForm(
-            INSTRUCTION_ID=None,
-            OPERANDS_ID=[],
-            DIRECTIVE_ID=None,
-            COMMENT_ID="Preds ..B1.6",
-            LABEL_ID="..B1.7",
-            LINE="..B1.7:                         # Preds ..B1.6",
-            LINE_NUMBER=2,
+        instruction_form_2 = instructionForm(
+            instruction_id=None,
+            operands_id=[],
+            directive_id=None,
+            comment_id="Preds ..B1.6",
+            label_id="..B1.7",
+            line="..B1.7:                         # Preds ..B1.6",
+            line_number=2,
         )
-        instruction_form_3 = InstructionForm(
-            INSTRUCTION_ID=None,
-            OPERANDS_ID=[],
-            DIRECTIVE_ID={"name": "quad", "parameters": [".2.3_2__kmpc_loc_pack.2"]},
-            COMMENT_ID="qed",
-            LABEL_ID=None,
-            LINE=".quad   .2.3_2__kmpc_loc_pack.2 #qed",
-            LINE_NUMBER=3,
+        instruction_form_3 = instructionForm(
+            instruction_id=None,
+            operands_id=[],
+            directive_id={"name": "quad", "parameters": [".2.3_2__kmpc_loc_pack.2"]},
+            comment_id="qed",
+            label_id=None,
+            line=".quad   .2.3_2__kmpc_loc_pack.2 #qed",
+            line_number=3,
         )
-        instruction_form_4 = InstructionForm(
-            INSTRUCTION_ID="lea",
-            OPERANDS_ID=[
+        instruction_form_4 = instructionForm(
+            instruction_id="lea",
+            operands_id=[
                 {
                     "memory": {
                         "offset": {"value": 2},
@@ -205,11 +205,11 @@ class TestParserX86ATT(unittest.TestCase):
                 },
                 {"register": {"name": "ecx"}},
             ],
-            DIRECTIVE_ID=None,
-            COMMENT_ID="12.9",
-            LABEL_ID=None,
-            LINE="lea       2(%rax,%rax), %ecx #12.9",
-            LINE_NUMBER=4,
+            directive_id=None,
+            comment_id="12.9",
+            label_id=None,
+            line="lea       2(%rax,%rax), %ecx #12.9",
+            line_number=4,
         )
 
         parsed_1 = self.parser.parse_line(line_comment, 1)
@@ -233,10 +233,10 @@ class TestParserX86ATT(unittest.TestCase):
         register_str_3 = "%xmm1"
         register_str_4 = "%rip"
 
-        parsed_reg_1 = RegisterOperand(NAME_ID="rax")
-        parsed_reg_2 = RegisterOperand(NAME_ID="r9")
-        parsed_reg_3 = RegisterOperand(NAME_ID="xmm1")
-        parsed_reg_4 = RegisterOperand(NAME_ID="rip")
+        parsed_reg_1 = registerOperand(name_id="rax")
+        parsed_reg_2 = registerOperand(name_id="r9")
+        parsed_reg_3 = registerOperand(name_id="xmm1")
+        parsed_reg_4 = registerOperand(name_id="rip")
 
         self.assertEqual(self.parser.parse_register(register_str_1), parsed_reg_1)
         self.assertEqual(self.parser.parse_register(register_str_2), parsed_reg_2)
@@ -259,22 +259,22 @@ class TestParserX86ATT(unittest.TestCase):
         )
 
     def test_reg_dependency(self):
-        reg_a1 = RegisterOperand(NAME_ID="rax")
-        reg_a2 = RegisterOperand(NAME_ID="eax")
-        reg_a3 = RegisterOperand(NAME_ID="ax")
-        reg_a4 = RegisterOperand(NAME_ID="al")
-        reg_r11 = RegisterOperand(NAME_ID="r11")
-        reg_r11b = RegisterOperand(NAME_ID="r11b")
-        reg_r11d = RegisterOperand(NAME_ID="r11d")
-        reg_r11w = RegisterOperand(NAME_ID="r11w")
-        reg_xmm1 = RegisterOperand(NAME_ID="xmm1")
-        reg_ymm1 = RegisterOperand(NAME_ID="ymm1")
-        reg_zmm1 = RegisterOperand(NAME_ID="zmm1")
+        reg_a1 = registerOperand(name_id="rax")
+        reg_a2 = registerOperand(name_id="eax")
+        reg_a3 = registerOperand(name_id="ax")
+        reg_a4 = registerOperand(name_id="al")
+        reg_r11 = registerOperand(name_id="r11")
+        reg_r11b = registerOperand(name_id="r11b")
+        reg_r11d = registerOperand(name_id="r11d")
+        reg_r11w = registerOperand(name_id="r11w")
+        reg_xmm1 = registerOperand(name_id="xmm1")
+        reg_ymm1 = registerOperand(name_id="ymm1")
+        reg_zmm1 = registerOperand(name_id="zmm1")
 
-        reg_b1 = RegisterOperand(NAME_ID="rbx")
-        reg_r15 = RegisterOperand(NAME_ID="r15")
-        reg_xmm2 = RegisterOperand(NAME_ID="xmm2")
-        reg_ymm3 = RegisterOperand(NAME_ID="ymm3")
+        reg_b1 = registerOperand(name_id="rbx")
+        reg_r15 = registerOperand(name_id="r15")
+        reg_xmm2 = registerOperand(name_id="xmm2")
+        reg_ymm3 = registerOperand(name_id="ymm3")
 
         reg_a = [reg_a1, reg_a2, reg_a3, reg_a4]
         reg_r = [reg_r11, reg_r11b, reg_r11d, reg_r11w]

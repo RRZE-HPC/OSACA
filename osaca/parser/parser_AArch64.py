@@ -3,14 +3,14 @@ from copy import deepcopy
 import pyparsing as pp
 
 from osaca.parser import BaseParser
-from osaca.parser.instruction_form import InstructionForm
+from osaca.parser.instruction_form import instructionForm
 from osaca.parser.operand import Operand
-from osaca.parser.directive import DirectiveOperand
-from osaca.parser.memory import MemoryOperand
-from osaca.parser.label import LabelOperand
-from osaca.parser.register import RegisterOperand
-from osaca.parser.identifier import IdentifierOperand
-from osaca.parser.immediate import ImmediateOperand
+from osaca.parser.directive import directiveOperand
+from osaca.parser.memory import memoryOperand
+from osaca.parser.label import labelOperand
+from osaca.parser.register import registerOperand
+from osaca.parser.identifier import identifierOperand
+from osaca.parser.immediate import immediateOperand
 
 
 class ParserAArch64(BaseParser):
@@ -32,7 +32,7 @@ class ParserAArch64(BaseParser):
         symbol_comment = "//"
         self.comment = pp.Literal(symbol_comment) + pp.Group(
             pp.ZeroOrMore(pp.Word(pp.printables))
-        ).setResultsName(self.COMMENT_ID)
+        ).setResultsName(self.comment_id)
         # Define ARM assembly identifier
         decimal_number = pp.Combine(
             pp.Optional(pp.Literal("-")) + pp.Word(pp.nums)
@@ -54,7 +54,7 @@ class ParserAArch64(BaseParser):
         # Label
         self.label = pp.Group(
             identifier.setResultsName("name") + pp.Literal(":") + pp.Optional(self.comment)
-        ).setResultsName(self.LABEL_ID)
+        ).setResultsName(self.label_id)
         # Directive
         directive_option = pp.Combine(
             pp.Word(pp.alphas + "#@.%", exact=1)
@@ -69,7 +69,7 @@ class ParserAArch64(BaseParser):
             + pp.Word(pp.alphanums + "_").setResultsName("name")
             + (pp.OneOrMore(directive_parameter) ^ commaSeparatedList).setResultsName("parameters")
             + pp.Optional(self.comment)
-        ).setResultsName(self.DIRECTIVE_ID)
+        ).setResultsName(self.directive_id)
         # LLVM-MCA markers
         self.llvm_markers = pp.Group(
             pp.Literal("#")
@@ -78,7 +78,7 @@ class ParserAArch64(BaseParser):
                 + (pp.CaselessLiteral("BEGIN") | pp.CaselessLiteral("END"))
             )
             + pp.Optional(self.comment)
-        ).setResultsName(self.COMMENT_ID)
+        ).setResultsName(self.comment_id)
 
         ##############################
         # Instructions
@@ -260,21 +260,21 @@ class ParserAArch64(BaseParser):
         :type line_number: int, optional
         :return: `dict` -- parsed asm line (comment, label, directive or instruction form)
         """
-        instruction_form = InstructionForm(
-            INSTRUCTION_ID=None,
-            OPERANDS_ID=[],
-            DIRECTIVE_ID=None,
-            COMMENT_ID=None,
-            LABEL_ID=None,
-            LINE=line,
-            LINE_NUMBER=line_number,
+        instruction_form = instructionForm(
+            instruction_id=None,
+            operands_id=[],
+            directive_id=None,
+            comment_id=None,
+            label_id=None,
+            line=line,
+            line_number=line_number,
         )
         result = None
 
         # 1. Parse comment
         try:
             result = self.process_operand(self.comment.parseString(line, parseAll=True).asDict())
-            instruction_form.comment = " ".join(result[self.COMMENT_ID])
+            instruction_form.comment = " ".join(result[self.comment_id])
         except pp.ParseException:
             pass
         # 1.2 check for llvm-mca marker
@@ -282,7 +282,7 @@ class ParserAArch64(BaseParser):
             result = self.process_operand(
                 self.llvm_markers.parseString(line, parseAll=True).asDict()
             )
-            instruction_form.comment = " ".join(result[self.COMMENT_ID])
+            instruction_form.comment = " ".join(result[self.comment_id])
         except pp.ParseException:
             pass
         # 2. Parse label
@@ -301,8 +301,8 @@ class ParserAArch64(BaseParser):
                 result = self.process_operand(
                     self.directive.parseString(line, parseAll=True).asDict()
                 )
-                instruction_form.directive = DirectiveOperand(
-                    NAME_ID=result.name, PARAMETER_ID=result.parameters
+                instruction_form.directive = directiveOperand(
+                    name_id=result.name, parameter_id=result.parameters
                 )
                 if result.comment is not None:
                     instruction_form.comment = " ".join(result.comment)
@@ -353,10 +353,10 @@ class ParserAArch64(BaseParser):
         if "operand5" in result:
             operand = self.process_operand(result["operand5"])
             operands.extend(operand) if isinstance(operand, list) else operands.append(operand)
-        return_dict = InstructionForm(
-            INSTRUCTION_ID=result["mnemonic"],
-            OPERANDS_ID=operands,
-            COMMENT_ID=" ".join(result[self.COMMENT_ID]) if self.COMMENT_ID in result else None,
+        return_dict = instructionForm(
+            instruction_id=result["mnemonic"],
+            operands_id=operands,
+            comment_id=" ".join(result[self.comment_id]) if self.comment_id in result else None,
         )
         return return_dict
 
@@ -376,30 +376,30 @@ class ParserAArch64(BaseParser):
         # add value attribute to floating point immediates without exponent
         if self.IMMEDIATE_ID in operand:
             return self.process_immediate(operand[self.IMMEDIATE_ID])
-        if self.LABEL_ID in operand:
-            return self.process_label(operand[self.LABEL_ID])
+        if self.label_id in operand:
+            return self.process_label(operand[self.label_id])
         if self.IDENTIFIER_ID in operand:
             return self.process_identifier(operand[self.IDENTIFIER_ID])
         if self.REGISTER_ID in operand:
             return self.process_register_operand(operand[self.REGISTER_ID])
-        if self.DIRECTIVE_ID in operand:
-            return DirectiveOperand(
-                NAME_ID=operand["directive"]["name"],
-                PARAMETER_ID=operand["directive"]["parameters"],
-                COMMENT_ID=operand["directive"]["comment"]
+        if self.directive_id in operand:
+            return directiveOperand(
+                name_id=operand["directive"]["name"],
+                parameter_id=operand["directive"]["parameters"],
+                comment_id=operand["directive"]["comment"]
                 if "comment" in operand["directive"]
                 else None,
             )
         return operand
 
     def process_register_operand(self, operand):
-        return RegisterOperand(
-            PREFIX_ID=operand["prefix"],
-            NAME_ID=operand["name"],
-            SHAPE=operand["shape"] if "shape" in operand else None,
-            LANES=operand["lanes"] if "lanes" in operand else None,
-            INDEX=operand["index"] if "index" in operand else None,
-            PREDICATION=operand["predication"] if "predication" in operand else None,
+        return registerOperand(
+            prefix_id=operand["prefix"],
+            name_id=operand["name"],
+            shape=operand["shape"] if "shape" in operand else None,
+            lanes=operand["lanes"] if "lanes" in operand else None,
+            index=operand["index"] if "index" in operand else None,
+            predication=operand["predication"] if "predication" in operand else None,
         )
 
     def process_memory_address(self, memory_address):
@@ -422,11 +422,11 @@ class ParserAArch64(BaseParser):
             if "shift" in memory_address["index"]:
                 if memory_address["index"]["shift_op"].lower() in valid_shift_ops:
                     scale = 2 ** int(memory_address["index"]["shift"][0]["value"])
-        new_dict = MemoryOperand(
-            OFFSET_ID=offset,
-            BASE_ID=RegisterOperand(NAME_ID=base["name"], PREFIX_ID=base["prefix"]),
-            INDEX_ID=index,
-            SCALE_ID=scale,
+        new_dict = memoryOperand(
+            offset_ID=offset,
+            base_id=registerOperand(name_id=base["name"], prefix_id=base["prefix"]),
+            index_id=index,
+            scale_id=scale,
         )
         if "pre_indexed" in memory_address:
             new_dict.pre_indexed = True
@@ -440,7 +440,7 @@ class ParserAArch64(BaseParser):
     def process_sp_register(self, register):
         """Post-process stack pointer register"""
         # reg = register
-        new_reg = RegisterOperand(PREFIX_ID="x", NAME_ID="sp")
+        new_reg = registerOperand(prefix_id="x", name_id="sp")
         # reg["prefix"] = "x"
         return new_reg
 
@@ -509,7 +509,7 @@ class ParserAArch64(BaseParser):
             immediate["type"] = "int"
             # convert hex/bin immediates to dec
             immediate["value"] = self.normalize_imd(immediate)
-            return ImmediateOperand(TYPE_ID=immediate["type"], VALUE_ID=immediate["value"])
+            return immediateOperand(type_id=immediate["type"], value_id=immediate["value"])
         if "base_immediate" in immediate:
             # arithmetic immediate, add calculated value as value
             immediate["shift"] = immediate["shift"][0]
@@ -517,8 +517,8 @@ class ParserAArch64(BaseParser):
                 immediate["shift"]["value"]
             )
             immediate["type"] = "int"
-            return ImmediateOperand(
-                TYPE_ID=immediate["type"], VALUE_ID=immediate["value"], SHIFT_ID=immediate["shift"]
+            return immediateOperand(
+                type_id=immediate["type"], value_id=immediate["value"], shift_id=immediate["shift"]
             )
         if "float" in immediate:
             dict_name = "float"
@@ -526,18 +526,18 @@ class ParserAArch64(BaseParser):
             dict_name = "double"
         if "exponent" in immediate[dict_name]:
             immediate["type"] = dict_name
-            return ImmediateOperand(TYPE_ID=immediate["type"])
+            return immediateOperand(type_id=immediate["type"])
         else:
             # change 'mantissa' key to 'value'
-            return ImmediateOperand(VALUE_ID=immediate[dict_name]["mantissa"], TYPE_ID=dict_name)
+            return immediateOperand(value_id=immediate[dict_name]["mantissa"], type_id=dict_name)
 
     def process_label(self, label):
         """Post-process label asm line"""
         # remove duplicated 'name' level due to identifier
         # label["name"] = label["name"]["name"]
-        new_label = LabelOperand(
-            NAME_ID=label["name"]["name"],
-            COMMENT_ID=label["comment"] if self.COMMENT_ID in label else None,
+        new_label = labelOperand(
+            name_id=label["name"]["name"],
+            comment_id=label["comment"] if self.comment_id in label else None,
         )
         return new_label
 
@@ -546,7 +546,7 @@ class ParserAArch64(BaseParser):
         # remove value if it consists of symbol+offset
         if "value" in identifier:
             del identifier["value"]
-        return IdentifierOperand(OFFSET=identifier["offset"], RELOCATION=identifier["relocation"])
+        return identifierOperand(offset=identifier["offset"], RELOCATION=identifier["relocation"])
 
     def get_full_reg_name(self, register):
         """Return one register name string including all attributes"""

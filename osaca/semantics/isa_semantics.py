@@ -3,14 +3,14 @@ from itertools import chain
 
 from osaca import utils
 from osaca.parser import AttrDict, ParserAArch64, ParserX86ATT
-from osaca.parser.memory import MemoryOperand
-from osaca.parser.register import RegisterOperand
-from osaca.parser.immediate import ImmediateOperand
+from osaca.parser.memory import memoryOperand
+from osaca.parser.register import registerOperand
+from osaca.parser.immediate import immediateOperand
 
 from .hw_model import MachineModel
 
 
-class INSTR_FLAGS:
+class INSTR_flags:
     """
     Flags used for unknown or special instructions
     """
@@ -81,7 +81,7 @@ class ISASemantics(object):
             # Couldn't found instruction form in ISA DB
             assign_default = True
             # check for equivalent register-operands DB entry if LD/ST
-            if any([isinstance(op, MemoryOperand) for op in operands]):
+            if any([isinstance(op, memoryOperand) for op in operands]):
                 operands_reg = self.substitute_mem_address(instruction_form.operands)
                 isa_data_reg = self._isa_model.get_instruction(
                     instruction_form.instruction, operands_reg
@@ -116,7 +116,7 @@ class ISASemantics(object):
             op_dict["src_dst"] = []
         # post-process pre- and post-indexing for aarch64 memory operands
         if self._isa == "aarch64":
-            for operand in [op for op in op_dict["source"] if isinstance(op, MemoryOperand)]:
+            for operand in [op for op in op_dict["source"] if isinstance(op, memoryOperand)]:
                 post_indexed = operand.post_indexed
                 pre_indexed = operand.pre_indexed
                 if post_indexed or pre_indexed:
@@ -127,7 +127,7 @@ class ISASemantics(object):
                             "post_indexed": post_indexed,
                         }
                     )
-            for operand in [op for op in op_dict["destination"] if isinstance(op, MemoryOperand)]:
+            for operand in [op for op in op_dict["destination"] if isinstance(op, memoryOperand)]:
                 post_indexed = operand.post_indexed
                 pre_indexed = operand.pre_indexed
                 if post_indexed or pre_indexed:
@@ -146,9 +146,9 @@ class ISASemantics(object):
         # )
 
         if self._has_load(instruction_form):
-            instruction_form.flags += [INSTR_FLAGS.HAS_LD]
+            instruction_form.flags += [INSTR_flags.HAS_LD]
         if self._has_store(instruction_form):
-            instruction_form.flags += [INSTR_FLAGS.HAS_ST]
+            instruction_form.flags += [INSTR_flags.HAS_ST]
 
     def get_reg_changes(self, instruction_form, only_postindexed=False):
         """
@@ -165,7 +165,7 @@ class ISASemantics(object):
                 instruction_form.semantic_operands["destination"],
                 instruction_form.semantic_operands["src_dst"],
             )
-            if isinstance(op, RegisterOperand)
+            if isinstance(op, registerOperand)
         ]
         isa_data = self._isa_model.get_instruction(
             instruction_form.instruction, instruction_form.operands
@@ -188,7 +188,7 @@ class ISASemantics(object):
 
         if only_postindexed:
             for o in instruction_form.operands:
-                if isinstance(o, MemoryOperand) and o.base != None and o.post_indexed != False:
+                if isinstance(o, memoryOperand) and o.base != None and o.post_indexed != False:
                     base_name = o.base.prefix if o.base.prefix != None else "" + o.base.name
                     return {
                         base_name: {
@@ -202,7 +202,7 @@ class ISASemantics(object):
         operand_state = {}  # e.g., {'op1': {'name': 'rax', 'value': 0}}  0 means unchanged
 
         for o in instruction_form.operands:
-            if isinstance(o, MemoryOperand) and o.pre_indexed:
+            if isinstance(o, memoryOperand) and o.pre_indexed:
                 # Assuming no isa_data.operation
                 if isa_data is not None and isa_data.get("operation", None) is not None:
                     raise ValueError(
@@ -216,13 +216,13 @@ class ISASemantics(object):
         if isa_data is not None:
             for i, o in enumerate(instruction_form.operands):
                 operand_name = "op{}".format(i + 1)
-                if isinstance(o, RegisterOperand):
+                if isinstance(o, registerOperand):
                     o_reg_name = o.prefix if o.prefix != None else "" + o.name
                     reg_operand_names[o_reg_name] = operand_name
                     operand_state[operand_name] = {"name": o_reg_name, "value": 0}
-                elif isinstance(o, ImmediateOperand):
+                elif isinstance(o, immediateOperand):
                     operand_state[operand_name] = {"value": o.value}
-                elif isinstance(o, MemoryOperand):
+                elif isinstance(o, memoryOperand):
                     # TODO lea needs some thinking about
                     pass
 
@@ -301,7 +301,7 @@ class ISASemantics(object):
             instruction_form.semantic_operands["source"],
             instruction_form.semantic_operands["src_dst"],
         ):
-            if isinstance(operand, MemoryOperand):
+            if isinstance(operand, memoryOperand):
                 return True
         return False
 
@@ -311,7 +311,7 @@ class ISASemantics(object):
             instruction_form.semantic_operands["destination"],
             instruction_form.semantic_operands["src_dst"],
         ):
-            if isinstance(operand, MemoryOperand):
+            if isinstance(operand, memoryOperand):
                 return True
         return False
 
@@ -345,7 +345,7 @@ class ISASemantics(object):
     def substitute_mem_address(self, operands):
         """Create memory wildcard for all memory operands"""
         return [
-            self._create_reg_wildcard() if isinstance(op, MemoryOperand) else op for op in operands
+            self._create_reg_wildcard() if isinstance(op, memoryOperand) else op for op in operands
         ]
 
     def _create_reg_wildcard(self):
