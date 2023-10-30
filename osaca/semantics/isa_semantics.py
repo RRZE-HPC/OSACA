@@ -209,6 +209,7 @@ class ISASemantics(object):
                         "ISA information for pre-indexed instruction {!r} has operation set."
                         "This is currently not supprted.".format(instruction_form.line)
                     )
+
                 base_name = o.base.prefix if o.base.prefix != None else "" + o.base.name
                 reg_operand_names = {base_name: "op1"}
                 operand_state = {"op1": {"name": base_name, "value": o.offset["value"]}}

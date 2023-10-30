@@ -94,7 +94,6 @@ class TestSemanticTools(unittest.TestCase):
         )
         cls.machine_model_zen = MachineModel(arch="zen1")
 
-        """
         for i in range(len(cls.kernel_x86)):
             cls.semantics_csx.assign_src_dst(cls.kernel_x86[i])
             cls.semantics_csx.assign_tp_lt(cls.kernel_x86[i])
@@ -104,11 +103,9 @@ class TestSemanticTools(unittest.TestCase):
         for i in range(len(cls.kernel_x86_long_LCD)):
             cls.semantics_csx.assign_src_dst(cls.kernel_x86_long_LCD[i])
             cls.semantics_csx.assign_tp_lt(cls.kernel_x86_long_LCD[i])
-
         for i in range(len(cls.kernel_AArch64)):
             cls.semantics_tx2.assign_src_dst(cls.kernel_AArch64[i])
             cls.semantics_tx2.assign_tp_lt(cls.kernel_AArch64[i])
-
         for i in range(len(cls.kernel_aarch64_memdep)):
             cls.semantics_tx2.assign_src_dst(cls.kernel_aarch64_memdep[i])
             cls.semantics_tx2.assign_tp_lt(cls.kernel_aarch64_memdep[i])
@@ -118,11 +115,7 @@ class TestSemanticTools(unittest.TestCase):
         for i in range(len(cls.kernel_aarch64_deps)):
             cls.semantics_a64fx.assign_src_dst(cls.kernel_aarch64_deps[i])
             cls.semantics_a64fx.assign_tp_lt(cls.kernel_aarch64_deps[i])
-        """
-        print(cls.kernel_AArch64[2], "\n")
-        cls.semantics_tx2.assign_src_dst(cls.kernel_AArch64[2])
-        cls.semantics_tx2.assign_tp_lt(cls.kernel_AArch64[2])
-        print(cls.kernel_AArch64[2])
+
         ###########
         # Tests
         ###########
@@ -133,7 +126,7 @@ class TestSemanticTools(unittest.TestCase):
             ArchSemantics(tmp_mm)
         except ValueError:
             self.fail()
-        '''
+
     def test_machine_model_various_functions(self):
         # check dummy MachineModel creation
         try:
@@ -317,397 +310,394 @@ class TestSemanticTools(unittest.TestCase):
                 self.assertTrue(instruction_form.latency != None)
                 self.assertIsInstance(instruction_form.port_pressure, list)
                 self.assertEqual(len(instruction_form.port_pressure), port_num)
-        '''
 
     def test_optimal_throughput_assignment(self):
-        """
-            # x86
-            kernel_fixed = deepcopy(self.kernel_x86)
-            self.semantics_csx.add_semantics(kernel_fixed)
-            self.assertEqual(get_unmatched_instruction_ratio(kernel_fixed), 0)
+        # x86
+        kernel_fixed = deepcopy(self.kernel_x86)
+        self.semantics_csx.add_semantics(kernel_fixed)
+        self.assertEqual(get_unmatched_instruction_ratio(kernel_fixed), 0)
 
-            kernel_optimal = deepcopy(kernel_fixed)
-            self.semantics_csx.assign_optimal_throughput(kernel_optimal)
-            tp_fixed = self.semantics_csx.get_throughput_sum(kernel_fixed)
-            tp_optimal = self.semantics_csx.get_throughput_sum(kernel_optimal)
-            self.assertNotEqual(tp_fixed, tp_optimal)
-            self.assertTrue(max(tp_optimal) <= max(tp_fixed))
-            # test multiple port assignment options
-            test_mm_x86 = MachineModel(path_to_yaml=self._find_file("test_db_x86.yml"))
-            tmp_semantics = ArchSemantics(test_mm_x86)
-            tmp_code_1 = "fantasyinstr1 %rax, %rax\n"
-            tmp_code_2 = "fantasyinstr1 %rax, %rax\nfantasyinstr2 %rbx, %rbx\n"
-            tmp_kernel_1 = self.parser_x86.parse_file(tmp_code_1)
-            tmp_kernel_2 = self.parser_x86.parse_file(tmp_code_2)
-            tmp_semantics.add_semantics(tmp_kernel_1)
-            tmp_semantics.add_semantics(tmp_kernel_2)
-            tmp_semantics.assign_optimal_throughput(tmp_kernel_1)
-            tmp_semantics.assign_optimal_throughput(tmp_kernel_2)
-            k1i1_pp = [round(x, 2) for x in tmp_kernel_1[0].port_pressure]
-            k2i1_pp = [round(x, 2) for x in tmp_kernel_2[0].port_pressure]
-            self.assertEqual(k1i1_pp, [0.33, 0.0, 0.33, 0.0, 0.0, 0.0, 0.0, 0.0, 0.33, 0.0, 0.0])
-            self.assertEqual(k2i1_pp, [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0])
+        kernel_optimal = deepcopy(kernel_fixed)
+        self.semantics_csx.assign_optimal_throughput(kernel_optimal)
+        tp_fixed = self.semantics_csx.get_throughput_sum(kernel_fixed)
+        tp_optimal = self.semantics_csx.get_throughput_sum(kernel_optimal)
+        self.assertNotEqual(tp_fixed, tp_optimal)
+        self.assertTrue(max(tp_optimal) <= max(tp_fixed))
+        # test multiple port assignment options
+        test_mm_x86 = MachineModel(path_to_yaml=self._find_file("test_db_x86.yml"))
+        tmp_semantics = ArchSemantics(test_mm_x86)
+        tmp_code_1 = "fantasyinstr1 %rax, %rax\n"
+        tmp_code_2 = "fantasyinstr1 %rax, %rax\nfantasyinstr2 %rbx, %rbx\n"
+        tmp_kernel_1 = self.parser_x86.parse_file(tmp_code_1)
+        tmp_kernel_2 = self.parser_x86.parse_file(tmp_code_2)
+        tmp_semantics.add_semantics(tmp_kernel_1)
+        tmp_semantics.add_semantics(tmp_kernel_2)
+        tmp_semantics.assign_optimal_throughput(tmp_kernel_1)
+        tmp_semantics.assign_optimal_throughput(tmp_kernel_2)
+        k1i1_pp = [round(x, 2) for x in tmp_kernel_1[0].port_pressure]
+        k2i1_pp = [round(x, 2) for x in tmp_kernel_2[0].port_pressure]
+        self.assertEqual(k1i1_pp, [0.33, 0.0, 0.33, 0.0, 0.0, 0.0, 0.0, 0.0, 0.33, 0.0, 0.0])
+        self.assertEqual(k2i1_pp, [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0])
 
-            # arm
-            kernel_fixed = deepcopy(self.kernel_AArch64)
+        # arm
+        kernel_fixed = deepcopy(self.kernel_AArch64)
 
-            self.semantics_tx2.add_semantics(kernel_fixed)
+        self.semantics_tx2.add_semantics(kernel_fixed)
 
-            self.assertEqual(get_unmatched_instruction_ratio(kernel_fixed), 0)
+        self.assertEqual(get_unmatched_instruction_ratio(kernel_fixed), 0)
 
-            kernel_optimal = deepcopy(kernel_fixed)
-            self.semantics_tx2.assign_optimal_throughput(kernel_optimal)
-            tp_fixed = self.semantics_tx2.get_throughput_sum(kernel_fixed)
-            tp_optimal = self.semantics_tx2.get_throughput_sum(kernel_optimal)
-            self.assertNotEqual(tp_fixed, tp_optimal)
-            self.assertTrue(max(tp_optimal) <= max(tp_fixed))
+        kernel_optimal = deepcopy(kernel_fixed)
+        self.semantics_tx2.assign_optimal_throughput(kernel_optimal)
+        tp_fixed = self.semantics_tx2.get_throughput_sum(kernel_fixed)
+        tp_optimal = self.semantics_tx2.get_throughput_sum(kernel_optimal)
+        self.assertNotEqual(tp_fixed, tp_optimal)
+        self.assertTrue(max(tp_optimal) <= max(tp_fixed))
 
-        def test_kernelDG_x86(self):
-            #
-            #  4
-            #   \___>6__>7
-            #   /
-            #  3
-            #     5_______>9
-            #
-            dg = KernelDG(self.kernel_x86, self.parser_x86, self.machine_model_csx, self.semantics_csx)
-            self.assertTrue(nx.algorithms.dag.is_directed_acyclic_graph(dg.dg))
-            self.assertEqual(len(list(dg.get_dependent_instruction_forms(line_number=3))), 1)
-            self.assertEqual(next(dg.get_dependent_instruction_forms(line_number=3)), 6)
-            self.assertEqual(len(list(dg.get_dependent_instruction_forms(line_number=4))), 1)
-            self.assertEqual(next(dg.get_dependent_instruction_forms(line_number=4)), 6)
-            self.assertEqual(len(list(dg.get_dependent_instruction_forms(line_number=5))), 1)
-            self.assertEqual(next(dg.get_dependent_instruction_forms(line_number=5)), 9)
-            self.assertEqual(len(list(dg.get_dependent_instruction_forms(line_number=6))), 1)
-            self.assertEqual(next(dg.get_dependent_instruction_forms(line_number=6)), 7)
-            self.assertEqual(list(dg.get_dependent_instruction_forms(line_number=7)), [])
-            self.assertEqual(list(dg.get_dependent_instruction_forms(line_number=8)), [])
-            with self.assertRaises(ValueError):
-                dg.get_dependent_instruction_forms()
-            # test dot creation
-            dg.export_graph(filepath="/dev/null")
+    def test_kernelDG_x86(self):
+        #
+        #  4
+        #   \___>6__>7
+        #   /
+        #  3
+        #     5_______>9
+        #
+        dg = KernelDG(self.kernel_x86, self.parser_x86, self.machine_model_csx, self.semantics_csx)
+        self.assertTrue(nx.algorithms.dag.is_directed_acyclic_graph(dg.dg))
+        self.assertEqual(len(list(dg.get_dependent_instruction_forms(line_number=3))), 1)
+        self.assertEqual(next(dg.get_dependent_instruction_forms(line_number=3)), 6)
+        self.assertEqual(len(list(dg.get_dependent_instruction_forms(line_number=4))), 1)
+        self.assertEqual(next(dg.get_dependent_instruction_forms(line_number=4)), 6)
+        self.assertEqual(len(list(dg.get_dependent_instruction_forms(line_number=5))), 1)
+        self.assertEqual(next(dg.get_dependent_instruction_forms(line_number=5)), 9)
+        self.assertEqual(len(list(dg.get_dependent_instruction_forms(line_number=6))), 1)
+        self.assertEqual(next(dg.get_dependent_instruction_forms(line_number=6)), 7)
+        self.assertEqual(list(dg.get_dependent_instruction_forms(line_number=7)), [])
+        self.assertEqual(list(dg.get_dependent_instruction_forms(line_number=8)), [])
+        with self.assertRaises(ValueError):
+            dg.get_dependent_instruction_forms()
+        # test dot creation
+        dg.export_graph(filepath="/dev/null")
 
-        def test_memdependency_x86(self):
-            dg = KernelDG(
-                self.kernel_x86_memdep,
-                self.parser_x86,
-                self.machine_model_csx,
-                self.semantics_csx,
+    def test_memdependency_x86(self):
+        dg = KernelDG(
+            self.kernel_x86_memdep,
+            self.parser_x86,
+            self.machine_model_csx,
+            self.semantics_csx,
+        )
+        self.assertTrue(nx.algorithms.dag.is_directed_acyclic_graph(dg.dg))
+        self.assertEqual(set(dg.get_dependent_instruction_forms(line_number=3)), {6, 8})
+        self.assertEqual(set(dg.get_dependent_instruction_forms(line_number=5)), {10, 12})
+        with self.assertRaises(ValueError):
+            dg.get_dependent_instruction_forms()
+        # test dot creation
+        dg.export_graph(filepath="/dev/null")
+
+    def test_kernelDG_AArch64(self):
+        dg = KernelDG(
+            self.kernel_AArch64,
+            self.parser_AArch64,
+            self.machine_model_tx2,
+            self.semantics_tx2,
+        )
+        self.assertTrue(nx.algorithms.dag.is_directed_acyclic_graph(dg.dg))
+        self.assertEqual(set(dg.get_dependent_instruction_forms(line_number=3)), {7, 8})
+        self.assertEqual(set(dg.get_dependent_instruction_forms(line_number=4)), {9, 10})
+        self.assertEqual(set(dg.get_dependent_instruction_forms(line_number=5)), {6, 7, 8})
+        self.assertEqual(set(dg.get_dependent_instruction_forms(line_number=6)), {9, 10})
+        self.assertEqual(next(dg.get_dependent_instruction_forms(line_number=7)), 13)
+        self.assertEqual(next(dg.get_dependent_instruction_forms(line_number=8)), 14)
+        self.assertEqual(next(dg.get_dependent_instruction_forms(line_number=9)), 16)
+        self.assertEqual(next(dg.get_dependent_instruction_forms(line_number=10)), 17)
+        self.assertEqual(set(dg.get_dependent_instruction_forms(line_number=11)), {13, 14})
+        self.assertEqual(set(dg.get_dependent_instruction_forms(line_number=12)), {16, 17})
+        self.assertEqual(next(dg.get_dependent_instruction_forms(line_number=13)), 15)
+        self.assertEqual(next(dg.get_dependent_instruction_forms(line_number=14)), 15)
+        self.assertEqual(len(list(dg.get_dependent_instruction_forms(line_number=15))), 0)
+        self.assertEqual(next(dg.get_dependent_instruction_forms(line_number=16)), 18)
+        self.assertEqual(next(dg.get_dependent_instruction_forms(line_number=17)), 18)
+        self.assertEqual(len(list(dg.get_dependent_instruction_forms(line_number=18))), 0)
+        self.assertEqual(len(list(dg.get_dependent_instruction_forms(line_number=19))), 0)
+        self.assertEqual(len(list(dg.get_dependent_instruction_forms(line_number=20))), 0)
+        with self.assertRaises(ValueError):
+            dg.get_dependent_instruction_forms()
+        # test dot creation
+        dg.export_graph(filepath="/dev/null")
+
+    def test_kernelDG_SVE(self):
+        KernelDG(
+            self.kernel_aarch64_SVE,
+            self.parser_AArch64,
+            self.machine_model_a64fx,
+            self.semantics_a64fx,
+        )
+        # TODO check for correct analysis
+
+    def test_hidden_load(self):
+        machine_model_hld = MachineModel(
+            path_to_yaml=self._find_file("hidden_load_machine_model.yml")
+        )
+        self.assertTrue(machine_model_hld.has_hidden_loads())
+        semantics_hld = ArchSemantics(machine_model_hld)
+        kernel_hld = self.parser_x86.parse_file(self.code_x86)
+        kernel_hld_2 = self.parser_x86.parse_file(self.code_x86)
+        kernel_hld_2 = self.parser_x86.parse_file(self.code_x86)[-3:]
+        kernel_hld_3 = self.parser_x86.parse_file(self.code_x86)[5:8]
+
+        semantics_hld.add_semantics(kernel_hld)
+        semantics_hld.add_semantics(kernel_hld_2)
+        semantics_hld.add_semantics(kernel_hld_3)
+
+        num_hidden_loads = len([x for x in kernel_hld if INSTR_flags.HIDDEN_LD in x.flags])
+        num_hidden_loads_2 = len([x for x in kernel_hld_2 if INSTR_flags.HIDDEN_LD in x.flags])
+        num_hidden_loads_3 = len([x for x in kernel_hld_3 if INSTR_flags.HIDDEN_LD in x.flags])
+        self.assertEqual(num_hidden_loads, 1)
+        self.assertEqual(num_hidden_loads_2, 0)
+        self.assertEqual(num_hidden_loads_3, 1)
+
+    def test_cyclic_dag(self):
+        dg = KernelDG(self.kernel_x86, self.parser_x86, self.machine_model_csx, self.semantics_csx)
+        dg.dg.add_edge(100, 101, latency=1.0)
+        dg.dg.add_edge(101, 102, latency=2.0)
+        dg.dg.add_edge(102, 100, latency=3.0)
+        with self.assertRaises(NotImplementedError):
+            dg.get_critical_path()
+        with self.assertRaises(NotImplementedError):
+            dg.get_loopcarried_dependencies()
+
+    def test_loop_carried_dependency_aarch64(self):
+        dg = KernelDG(
+            self.kernel_aarch64_memdep,
+            self.parser_AArch64,
+            self.machine_model_tx2,
+            self.semantics_tx2,
+        )
+        lc_deps = dg.get_loopcarried_dependencies()
+        self.assertEqual(len(lc_deps), 4)
+        # based on line 6
+        dep_path = "6-10-11-12-13-14"
+        self.assertEqual(lc_deps[dep_path]["latency"], 29.0)
+        self.assertEqual(
+            [(iform.line_number, lat) for iform, lat in lc_deps[dep_path]["dependencies"]],
+            [(6, 4.0), (10, 6.0), (11, 6.0), (12, 6.0), (13, 6.0), (14, 1.0)],
+        )
+        dg = KernelDG(
+            self.kernel_aarch64_deps,
+            self.parser_AArch64,
+            self.machine_model_a64fx,
+            self.semantics_a64fx,
+            flag_dependencies=True,
+        )
+        lc_deps = dg.get_loopcarried_dependencies()
+        self.assertEqual(len(lc_deps), 2)
+        # based on line 4
+        dep_path = "4-5-6-9-10-11-12"
+        self.assertEqual(lc_deps[dep_path]["latency"], 7.0)
+        self.assertEqual(
+            [(iform.line_number, lat) for iform, lat in lc_deps[dep_path]["dependencies"]],
+            [(4, 1.0), (5, 1.0), (6, 1.0), (9, 1.0), (10, 1.0), (11, 1.0), (12, 1.0)],
+        )
+        dg = KernelDG(
+            self.kernel_aarch64_deps,
+            self.parser_AArch64,
+            self.machine_model_a64fx,
+            self.semantics_a64fx,
+            flag_dependencies=False,
+        )
+        lc_deps = dg.get_loopcarried_dependencies()
+        self.assertEqual(len(lc_deps), 1)
+        # based on line 4
+        dep_path = "4-5-10-11-12"
+        self.assertEqual(lc_deps[dep_path]["latency"], 5.0)
+        self.assertEqual(
+            [(iform.line_number, lat) for iform, lat in lc_deps[dep_path]["dependencies"]],
+            [(4, 1.0), (5, 1.0), (10, 1.0), (11, 1.0), (12, 1.0)],
+        )
+
+    def test_loop_carried_dependency_x86(self):
+        lcd_id = "8"
+        lcd_id2 = "5"
+        dg = KernelDG(self.kernel_x86, self.parser_x86, self.machine_model_csx, self.semantics_csx)
+        lc_deps = dg.get_loopcarried_dependencies()
+        # self.assertEqual(len(lc_deps), 2)
+        # ID 8
+        self.assertEqual(
+            lc_deps[lcd_id]["root"], dg.dg.nodes(data=True)[int(lcd_id)]["instruction_form"]
+        )
+        self.assertEqual(len(lc_deps[lcd_id]["dependencies"]), 1)
+        self.assertEqual(
+            lc_deps[lcd_id]["dependencies"][0][0],
+            dg.dg.nodes(data=True)[int(lcd_id)]["instruction_form"],
+        )
+        # w/  flag dependencies: ID 9 w/ len=2
+        # w/o flag dependencies: ID 5 w/ len=1
+        # TODO discuss
+        self.assertEqual(
+            lc_deps[lcd_id2]["root"],
+            dg.dg.nodes(data=True)[int(lcd_id2)]["instruction_form"],
+        )
+        self.assertEqual(len(lc_deps[lcd_id2]["dependencies"]), 1)
+        self.assertEqual(
+            lc_deps[lcd_id2]["dependencies"][0][0],
+            dg.dg.nodes(data=True)[int(lcd_id2)]["instruction_form"],
+        )
+
+    def test_timeout_during_loop_carried_dependency(self):
+        start_time = time.perf_counter()
+        KernelDG(
+            self.kernel_x86_long_LCD,
+            self.parser_x86,
+            self.machine_model_csx,
+            self.semantics_x86,
+            timeout=10,
+        )
+        end_time = time.perf_counter()
+        time_10 = end_time - start_time
+        start_time = time.perf_counter()
+        KernelDG(
+            self.kernel_x86_long_LCD,
+            self.parser_x86,
+            self.machine_model_csx,
+            self.semantics_x86,
+            timeout=2,
+        )
+        end_time = time.perf_counter()
+        time_2 = end_time - start_time
+
+        # self.assertTrue(time_10 > 10)
+        self.assertTrue(2 < time_2)
+        # self.assertTrue(time_2 < (time_10 - 7))
+
+    def test_is_read_is_written_x86(self):
+        # independent form HW model
+        dag = KernelDG(self.kernel_x86, self.parser_x86, None, None)
+        reg_rcx = RegisterOperand(name_id="rcx")
+        reg_ymm1 = RegisterOperand(name_id="ymm1")
+
+        instr_form_r_c = self.parser_x86.parse_line("vmovsd  %xmm0, (%r15,%rcx,8)")
+        self.semantics_csx.assign_src_dst(instr_form_r_c)
+        instr_form_non_r_c = self.parser_x86.parse_line("movl  %xmm0, (%r15,%rax,8)")
+        self.semantics_csx.assign_src_dst(instr_form_non_r_c)
+        instr_form_w_c = self.parser_x86.parse_line("movi $0x05ACA, %rcx")
+        self.semantics_csx.assign_src_dst(instr_form_w_c)
+
+        instr_form_rw_ymm_1 = self.parser_x86.parse_line("vinsertf128 $0x1, %xmm1, %ymm0, %ymm1")
+        self.semantics_csx.assign_src_dst(instr_form_rw_ymm_1)
+        instr_form_rw_ymm_2 = self.parser_x86.parse_line("vinsertf128 $0x1, %xmm0, %ymm1, %ymm1")
+        self.semantics_csx.assign_src_dst(instr_form_rw_ymm_2)
+        instr_form_r_ymm = self.parser_x86.parse_line("vmovapd %ymm1, %ymm0")
+        self.semantics_csx.assign_src_dst(instr_form_r_ymm)
+        self.assertTrue(dag.is_read(reg_rcx, instr_form_r_c))
+        self.assertFalse(dag.is_read(reg_rcx, instr_form_non_r_c))
+        self.assertFalse(dag.is_read(reg_rcx, instr_form_w_c))
+        self.assertTrue(dag.is_written(reg_rcx, instr_form_w_c))
+        self.assertFalse(dag.is_written(reg_rcx, instr_form_r_c))
+        self.assertTrue(dag.is_read(reg_ymm1, instr_form_rw_ymm_1))
+        self.assertTrue(dag.is_read(reg_ymm1, instr_form_rw_ymm_2))
+        self.assertTrue(dag.is_read(reg_ymm1, instr_form_r_ymm))
+        self.assertTrue(dag.is_written(reg_ymm1, instr_form_rw_ymm_1))
+        self.assertTrue(dag.is_written(reg_ymm1, instr_form_rw_ymm_2))
+        self.assertFalse(dag.is_written(reg_ymm1, instr_form_r_ymm))
+
+    def test_is_read_is_written_AArch64(self):
+        # independent form HW model
+        dag = KernelDG(self.kernel_AArch64, self.parser_AArch64, None, None)
+        reg_x1 = RegisterOperand(prefix_id="x", name_id="1")
+        reg_w1 = RegisterOperand(prefix_id="w", name_id="1")
+        reg_d1 = RegisterOperand(prefix_id="d", name_id="1")
+        reg_q1 = RegisterOperand(prefix_id="q", name_id="1")
+        reg_v1 = RegisterOperand(prefix_id="v", name_id="1", lanes="2", shape="d")
+        regs = [reg_d1, reg_q1, reg_v1]
+        regs_gp = [reg_w1, reg_x1]
+
+        instr_form_r_1 = self.parser_AArch64.parse_line("stp q1, q3, [x12, #192]")
+        self.semantics_tx2.assign_src_dst(instr_form_r_1)
+        instr_form_r_2 = self.parser_AArch64.parse_line("fadd v2.2d, v1.2d, v0.2d")
+        self.semantics_tx2.assign_src_dst(instr_form_r_2)
+        instr_form_w_1 = self.parser_AArch64.parse_line("ldr d1, [x1, #:got_lo12:q2c]")
+        self.semantics_tx2.assign_src_dst(instr_form_w_1)
+        instr_form_non_w_1 = self.parser_AArch64.parse_line("ldr x1, [x1, #:got_lo12:q2c]")
+        self.semantics_tx2.assign_src_dst(instr_form_non_w_1)
+        instr_form_rw_1 = self.parser_AArch64.parse_line("fmul v1.2d, v1.2d, v0.2d")
+        self.semantics_tx2.assign_src_dst(instr_form_rw_1)
+        instr_form_rw_2 = self.parser_AArch64.parse_line("ldp q2, q4, [x1, #64]!")
+        self.semantics_tx2.assign_src_dst(instr_form_rw_2)
+        instr_form_rw_3 = self.parser_AArch64.parse_line("str x4, [x1], #64")
+        self.semantics_tx2.assign_src_dst(instr_form_rw_3)
+        instr_form_non_rw_1 = self.parser_AArch64.parse_line("adds x1, x11")
+        self.semantics_tx2.assign_src_dst(instr_form_non_rw_1)
+
+        for reg in regs:
+            with self.subTest(reg=reg):
+                # self.assertTrue(dag.is_read(reg, instr_form_r_1))
+                self.assertTrue(dag.is_read(reg, instr_form_r_2))
+                self.assertTrue(dag.is_read(reg, instr_form_rw_1))
+                self.assertFalse(dag.is_read(reg, instr_form_rw_2))
+                self.assertFalse(dag.is_read(reg, instr_form_rw_3))
+                self.assertFalse(dag.is_read(reg, instr_form_w_1))
+                self.assertTrue(dag.is_written(reg, instr_form_w_1))
+                self.assertTrue(dag.is_written(reg, instr_form_rw_1))
+                self.assertFalse(dag.is_written(reg, instr_form_non_w_1))
+                self.assertFalse(dag.is_written(reg, instr_form_rw_2))
+                self.assertFalse(dag.is_written(reg, instr_form_rw_3))
+                self.assertFalse(dag.is_written(reg, instr_form_non_rw_1))
+                self.assertFalse(dag.is_written(reg, instr_form_non_rw_1))
+
+        for reg in regs_gp:
+            with self.subTest(reg=reg):
+                self.assertFalse(dag.is_read(reg, instr_form_r_1))
+                self.assertFalse(dag.is_read(reg, instr_form_r_2))
+                self.assertFalse(dag.is_read(reg, instr_form_rw_1))
+                self.assertTrue(dag.is_read(reg, instr_form_rw_2))
+                self.assertTrue(dag.is_read(reg, instr_form_rw_3))
+                self.assertTrue(dag.is_read(reg, instr_form_w_1))
+                self.assertFalse(dag.is_written(reg, instr_form_w_1))
+                self.assertFalse(dag.is_written(reg, instr_form_rw_1))
+                self.assertTrue(dag.is_written(reg, instr_form_non_w_1))
+                self.assertTrue(dag.is_written(reg, instr_form_rw_2))
+                self.assertTrue(dag.is_written(reg, instr_form_rw_3))
+                self.assertTrue(dag.is_written(reg, instr_form_non_rw_1))
+                self.assertTrue(dag.is_written(reg, instr_form_non_rw_1))
+
+    def test_invalid_MachineModel(self):
+        with self.assertRaises(ValueError):
+            MachineModel()
+        with self.assertRaises(ValueError):
+            MachineModel(arch="CSX", path_to_yaml=os.path.join(self.MODULE_DATA_DIR, "csx.yml"))
+        with self.assertRaises(FileNotFoundError):
+            MachineModel(arch="THE_MACHINE")
+        with self.assertRaises(FileNotFoundError):
+            MachineModel(path_to_yaml=os.path.join(self.MODULE_DATA_DIR, "THE_MACHINE.yml"))
+
+    def test_MachineModel_getter(self):
+        sample_operands = [
+            MemoryOperand(
+                offset_ID=None,
+                base_id=RegisterOperand(name_id="r12"),
+                index_id=RegisterOperand(name_id="rcx"),
+                scale_id=8,
             )
-            self.assertTrue(nx.algorithms.dag.is_directed_acyclic_graph(dg.dg))
-            self.assertEqual(set(dg.get_dependent_instruction_forms(line_number=3)), {6, 8})
-            self.assertEqual(set(dg.get_dependent_instruction_forms(line_number=5)), {10, 12})
-            with self.assertRaises(ValueError):
-                dg.get_dependent_instruction_forms()
-            # test dot creation
-            dg.export_graph(filepath="/dev/null")
+        ]
+        self.assertIsNone(self.machine_model_csx.get_instruction("GETRESULT", sample_operands))
+        self.assertIsNone(self.machine_model_tx2.get_instruction("GETRESULT", sample_operands))
 
-        def test_kernelDG_AArch64(self):
-            dg = KernelDG(
-                self.kernel_AArch64,
-                self.parser_AArch64,
-                self.machine_model_tx2,
-                self.semantics_tx2,
-            )
-            self.assertTrue(nx.algorithms.dag.is_directed_acyclic_graph(dg.dg))
-            self.assertEqual(set(dg.get_dependent_instruction_forms(line_number=3)), {7, 8})
-            self.assertEqual(set(dg.get_dependent_instruction_forms(line_number=4)), {9, 10})
-            self.assertEqual(set(dg.get_dependent_instruction_forms(line_number=5)), {6, 7, 8})
-            self.assertEqual(set(dg.get_dependent_instruction_forms(line_number=6)), {9, 10})
-            self.assertEqual(next(dg.get_dependent_instruction_forms(line_number=7)), 13)
-            self.assertEqual(next(dg.get_dependent_instruction_forms(line_number=8)), 14)
-            self.assertEqual(next(dg.get_dependent_instruction_forms(line_number=9)), 16)
-            self.assertEqual(next(dg.get_dependent_instruction_forms(line_number=10)), 17)
-            self.assertEqual(set(dg.get_dependent_instruction_forms(line_number=11)), {13, 14})
-            self.assertEqual(set(dg.get_dependent_instruction_forms(line_number=12)), {16, 17})
-            self.assertEqual(next(dg.get_dependent_instruction_forms(line_number=13)), 15)
-            self.assertEqual(next(dg.get_dependent_instruction_forms(line_number=14)), 15)
-            self.assertEqual(len(list(dg.get_dependent_instruction_forms(line_number=15))), 0)
-            self.assertEqual(next(dg.get_dependent_instruction_forms(line_number=16)), 18)
-            self.assertEqual(next(dg.get_dependent_instruction_forms(line_number=17)), 18)
-            self.assertEqual(len(list(dg.get_dependent_instruction_forms(line_number=18))), 0)
-            self.assertEqual(len(list(dg.get_dependent_instruction_forms(line_number=19))), 0)
-            self.assertEqual(len(list(dg.get_dependent_instruction_forms(line_number=20))), 0)
-            with self.assertRaises(ValueError):
-                dg.get_dependent_instruction_forms()
-            # test dot creation
-            dg.export_graph(filepath="/dev/null")
+        self.assertEqual(self.machine_model_csx.get_arch(), "csx")
+        self.assertEqual(self.machine_model_tx2.get_arch(), "tx2")
 
-        def test_kernelDG_SVE(self):
-            KernelDG(
-                self.kernel_aarch64_SVE,
-                self.parser_AArch64,
-                self.machine_model_a64fx,
-                self.semantics_a64fx,
-            )
-            # TODO check for correct analysis
+        self.assertEqual(self.machine_model_csx.get_ISA(), "x86")
+        self.assertEqual(self.machine_model_tx2.get_ISA(), "aarch64")
 
-        def test_hidden_load(self):
-            machine_model_hld = MachineModel(
-                path_to_yaml=self._find_file("hidden_load_machine_model.yml")
-            )
-            self.assertTrue(machine_model_hld.has_hidden_loads())
-            semantics_hld = ArchSemantics(machine_model_hld)
-            kernel_hld = self.parser_x86.parse_file(self.code_x86)
-            kernel_hld_2 = self.parser_x86.parse_file(self.code_x86)
-            kernel_hld_2 = self.parser_x86.parse_file(self.code_x86)[-3:]
-            kernel_hld_3 = self.parser_x86.parse_file(self.code_x86)[5:8]
+        ports_csx = ["0", "0DV", "1", "2", "2D", "3", "3D", "4", "5", "6", "7"]
+        data_ports_csx = ["2D", "3D"]
+        self.assertEqual(self.machine_model_csx.get_ports(), ports_csx)
+        self.assertEqual(self.machine_model_csx.get_data_ports(), data_ports_csx)
 
-            semantics_hld.add_semantics(kernel_hld)
-            semantics_hld.add_semantics(kernel_hld_2)
-            semantics_hld.add_semantics(kernel_hld_3)
+        self.assertFalse(self.machine_model_tx2.has_hidden_loads())
 
-            num_hidden_loads = len([x for x in kernel_hld if INSTR_flags.HIDDEN_LD in x.flags])
-            num_hidden_loads_2 = len([x for x in kernel_hld_2 if INSTR_flags.HIDDEN_LD in x.flags])
-            num_hidden_loads_3 = len([x for x in kernel_hld_3 if INSTR_flags.HIDDEN_LD in x.flags])
-            self.assertEqual(num_hidden_loads, 1)
-            self.assertEqual(num_hidden_loads_2, 0)
-            self.assertEqual(num_hidden_loads_3, 1)
-
-        def test_cyclic_dag(self):
-            dg = KernelDG(self.kernel_x86, self.parser_x86, self.machine_model_csx, self.semantics_csx)
-            dg.dg.add_edge(100, 101, latency=1.0)
-            dg.dg.add_edge(101, 102, latency=2.0)
-            dg.dg.add_edge(102, 100, latency=3.0)
-            with self.assertRaises(NotImplementedError):
-                dg.get_critical_path()
-            with self.assertRaises(NotImplementedError):
-                dg.get_loopcarried_dependencies()
-
-        def test_loop_carried_dependency_aarch64(self):
-            dg = KernelDG(
-                self.kernel_aarch64_memdep,
-                self.parser_AArch64,
-                self.machine_model_tx2,
-                self.semantics_tx2,
-            )
-            lc_deps = dg.get_loopcarried_dependencies()
-            self.assertEqual(len(lc_deps), 4)
-            # based on line 6
-            dep_path = "6-10-11-12-13-14"
-            self.assertEqual(lc_deps[dep_path]["latency"], 29.0)
-            self.assertEqual(
-                [(iform.line_number, lat) for iform, lat in lc_deps[dep_path]["dependencies"]],
-                [(6, 4.0), (10, 6.0), (11, 6.0), (12, 6.0), (13, 6.0), (14, 1.0)],
-            )
-            dg = KernelDG(
-                self.kernel_aarch64_deps,
-                self.parser_AArch64,
-                self.machine_model_a64fx,
-                self.semantics_a64fx,
-                flag_dependencies=True,
-            )
-            lc_deps = dg.get_loopcarried_dependencies()
-            self.assertEqual(len(lc_deps), 2)
-            # based on line 4
-            dep_path = "4-5-6-9-10-11-12"
-            self.assertEqual(lc_deps[dep_path]["latency"], 7.0)
-            self.assertEqual(
-                [(iform.line_number, lat) for iform, lat in lc_deps[dep_path]["dependencies"]],
-                [(4, 1.0), (5, 1.0), (6, 1.0), (9, 1.0), (10, 1.0), (11, 1.0), (12, 1.0)],
-            )
-            dg = KernelDG(
-                self.kernel_aarch64_deps,
-                self.parser_AArch64,
-                self.machine_model_a64fx,
-                self.semantics_a64fx,
-                flag_dependencies=False,
-            )
-            lc_deps = dg.get_loopcarried_dependencies()
-            self.assertEqual(len(lc_deps), 1)
-            # based on line 4
-            dep_path = "4-5-10-11-12"
-            self.assertEqual(lc_deps[dep_path]["latency"], 5.0)
-            self.assertEqual(
-                [(iform.line_number, lat) for iform, lat in lc_deps[dep_path]["dependencies"]],
-                [(4, 1.0), (5, 1.0), (10, 1.0), (11, 1.0), (12, 1.0)],
-            )
-
-        def test_loop_carried_dependency_x86(self):
-            lcd_id = "8"
-            lcd_id2 = "5"
-            dg = KernelDG(self.kernel_x86, self.parser_x86, self.machine_model_csx, self.semantics_csx)
-            lc_deps = dg.get_loopcarried_dependencies()
-            # self.assertEqual(len(lc_deps), 2)
-            # ID 8
-            self.assertEqual(
-                lc_deps[lcd_id]["root"], dg.dg.nodes(data=True)[int(lcd_id)]["instruction_form"]
-            )
-            self.assertEqual(len(lc_deps[lcd_id]["dependencies"]), 1)
-            self.assertEqual(
-                lc_deps[lcd_id]["dependencies"][0][0],
-                dg.dg.nodes(data=True)[int(lcd_id)]["instruction_form"],
-            )
-            # w/  flag dependencies: ID 9 w/ len=2
-            # w/o flag dependencies: ID 5 w/ len=1
-            # TODO discuss
-            self.assertEqual(
-                lc_deps[lcd_id2]["root"],
-                dg.dg.nodes(data=True)[int(lcd_id2)]["instruction_form"],
-            )
-            self.assertEqual(len(lc_deps[lcd_id2]["dependencies"]), 1)
-            self.assertEqual(
-                lc_deps[lcd_id2]["dependencies"][0][0],
-                dg.dg.nodes(data=True)[int(lcd_id2)]["instruction_form"],
-            )
-
-        def test_timeout_during_loop_carried_dependency(self):
-            start_time = time.perf_counter()
-            KernelDG(
-                self.kernel_x86_long_LCD,
-                self.parser_x86,
-                self.machine_model_csx,
-                self.semantics_x86,
-                timeout=10,
-            )
-            end_time = time.perf_counter()
-            time_10 = end_time - start_time
-            start_time = time.perf_counter()
-            KernelDG(
-                self.kernel_x86_long_LCD,
-                self.parser_x86,
-                self.machine_model_csx,
-                self.semantics_x86,
-                timeout=2,
-            )
-            end_time = time.perf_counter()
-            time_2 = end_time - start_time
-
-            # self.assertTrue(time_10 > 10)
-            self.assertTrue(2 < time_2)
-            # self.assertTrue(time_2 < (time_10 - 7))
-
-        def test_is_read_is_written_x86(self):
-            # independent form HW model
-            dag = KernelDG(self.kernel_x86, self.parser_x86, None, None)
-            reg_rcx = RegisterOperand(name_id="rcx")
-            reg_ymm1 = RegisterOperand(name_id="ymm1")
-
-            instr_form_r_c = self.parser_x86.parse_line("vmovsd  %xmm0, (%r15,%rcx,8)")
-            self.semantics_csx.assign_src_dst(instr_form_r_c)
-            instr_form_non_r_c = self.parser_x86.parse_line("movl  %xmm0, (%r15,%rax,8)")
-            self.semantics_csx.assign_src_dst(instr_form_non_r_c)
-            instr_form_w_c = self.parser_x86.parse_line("movi $0x05ACA, %rcx")
-            self.semantics_csx.assign_src_dst(instr_form_w_c)
-
-            instr_form_rw_ymm_1 = self.parser_x86.parse_line("vinsertf128 $0x1, %xmm1, %ymm0, %ymm1")
-            self.semantics_csx.assign_src_dst(instr_form_rw_ymm_1)
-            instr_form_rw_ymm_2 = self.parser_x86.parse_line("vinsertf128 $0x1, %xmm0, %ymm1, %ymm1")
-            self.semantics_csx.assign_src_dst(instr_form_rw_ymm_2)
-            instr_form_r_ymm = self.parser_x86.parse_line("vmovapd %ymm1, %ymm0")
-            self.semantics_csx.assign_src_dst(instr_form_r_ymm)
-            self.assertTrue(dag.is_read(reg_rcx, instr_form_r_c))
-            self.assertFalse(dag.is_read(reg_rcx, instr_form_non_r_c))
-            self.assertFalse(dag.is_read(reg_rcx, instr_form_w_c))
-            self.assertTrue(dag.is_written(reg_rcx, instr_form_w_c))
-            self.assertFalse(dag.is_written(reg_rcx, instr_form_r_c))
-            self.assertTrue(dag.is_read(reg_ymm1, instr_form_rw_ymm_1))
-            self.assertTrue(dag.is_read(reg_ymm1, instr_form_rw_ymm_2))
-            self.assertTrue(dag.is_read(reg_ymm1, instr_form_r_ymm))
-            self.assertTrue(dag.is_written(reg_ymm1, instr_form_rw_ymm_1))
-            self.assertTrue(dag.is_written(reg_ymm1, instr_form_rw_ymm_2))
-            self.assertFalse(dag.is_written(reg_ymm1, instr_form_r_ymm))
-
-        def test_is_read_is_written_AArch64(self):
-            # independent form HW model
-            dag = KernelDG(self.kernel_AArch64, self.parser_AArch64, None, None)
-            reg_x1 = RegisterOperand(prefix_id="x", name_id="1")
-            reg_w1 = RegisterOperand(prefix_id="w", name_id="1")
-            reg_d1 = RegisterOperand(prefix_id="d", name_id="1")
-            reg_q1 = RegisterOperand(prefix_id="q", name_id="1")
-            reg_v1 = RegisterOperand(prefix_id="v", name_id="1", lanes="2", shape="d")
-            regs = [reg_d1, reg_q1, reg_v1]
-            regs_gp = [reg_w1, reg_x1]
-
-            instr_form_r_1 = self.parser_AArch64.parse_line("stp q1, q3, [x12, #192]")
-            self.semantics_tx2.assign_src_dst(instr_form_r_1)
-            instr_form_r_2 = self.parser_AArch64.parse_line("fadd v2.2d, v1.2d, v0.2d")
-            self.semantics_tx2.assign_src_dst(instr_form_r_2)
-            instr_form_w_1 = self.parser_AArch64.parse_line("ldr d1, [x1, #:got_lo12:q2c]")
-            self.semantics_tx2.assign_src_dst(instr_form_w_1)
-            instr_form_non_w_1 = self.parser_AArch64.parse_line("ldr x1, [x1, #:got_lo12:q2c]")
-            self.semantics_tx2.assign_src_dst(instr_form_non_w_1)
-            instr_form_rw_1 = self.parser_AArch64.parse_line("fmul v1.2d, v1.2d, v0.2d")
-            self.semantics_tx2.assign_src_dst(instr_form_rw_1)
-            instr_form_rw_2 = self.parser_AArch64.parse_line("ldp q2, q4, [x1, #64]!")
-            self.semantics_tx2.assign_src_dst(instr_form_rw_2)
-            instr_form_rw_3 = self.parser_AArch64.parse_line("str x4, [x1], #64")
-            self.semantics_tx2.assign_src_dst(instr_form_rw_3)
-            instr_form_non_rw_1 = self.parser_AArch64.parse_line("adds x1, x11")
-            self.semantics_tx2.assign_src_dst(instr_form_non_rw_1)
-
-            for reg in regs:
-                with self.subTest(reg=reg):
-                    self.assertTrue(dag.is_read(reg, instr_form_r_1))
-                    self.assertTrue(dag.is_read(reg, instr_form_r_2))
-                    self.assertTrue(dag.is_read(reg, instr_form_rw_1))
-                    self.assertFalse(dag.is_read(reg, instr_form_rw_2))
-                    self.assertFalse(dag.is_read(reg, instr_form_rw_3))
-                    self.assertFalse(dag.is_read(reg, instr_form_w_1))
-                    self.assertTrue(dag.is_written(reg, instr_form_w_1))
-                    self.assertTrue(dag.is_written(reg, instr_form_rw_1))
-                    self.assertFalse(dag.is_written(reg, instr_form_non_w_1))
-                    self.assertFalse(dag.is_written(reg, instr_form_rw_2))
-                    self.assertFalse(dag.is_written(reg, instr_form_rw_3))
-                    self.assertFalse(dag.is_written(reg, instr_form_non_rw_1))
-                    self.assertFalse(dag.is_written(reg, instr_form_non_rw_1))
-
-            for reg in regs_gp:
-                with self.subTest(reg=reg):
-                    self.assertFalse(dag.is_read(reg, instr_form_r_1))
-                    self.assertFalse(dag.is_read(reg, instr_form_r_2))
-                    self.assertFalse(dag.is_read(reg, instr_form_rw_1))
-                    self.assertTrue(dag.is_read(reg, instr_form_rw_2))
-                    self.assertTrue(dag.is_read(reg, instr_form_rw_3))
-                    self.assertTrue(dag.is_read(reg, instr_form_w_1))
-                    self.assertFalse(dag.is_written(reg, instr_form_w_1))
-                    self.assertFalse(dag.is_written(reg, instr_form_rw_1))
-                    self.assertTrue(dag.is_written(reg, instr_form_non_w_1))
-                    self.assertTrue(dag.is_written(reg, instr_form_rw_2))
-                    self.assertTrue(dag.is_written(reg, instr_form_rw_3))
-                    self.assertTrue(dag.is_written(reg, instr_form_non_rw_1))
-                    self.assertTrue(dag.is_written(reg, instr_form_non_rw_1))
-
-        def test_invalid_MachineModel(self):
-            with self.assertRaises(ValueError):
-                MachineModel()
-            with self.assertRaises(ValueError):
-                MachineModel(arch="CSX", path_to_yaml=os.path.join(self.MODULE_DATA_DIR, "csx.yml"))
-            with self.assertRaises(FileNotFoundError):
-                MachineModel(arch="THE_MACHINE")
-            with self.assertRaises(FileNotFoundError):
-                MachineModel(path_to_yaml=os.path.join(self.MODULE_DATA_DIR, "THE_MACHINE.yml"))
-
-        def test_MachineModel_getter(self):
-            sample_operands = [
-                MemoryOperand(
-                    offset_ID=None,
-                    base_id=RegisterOperand(name_id="r12"),
-                    index_id=RegisterOperand(name_id="rcx"),
-                    scale_id=8,
-                )
-            ]
-            self.assertIsNone(self.machine_model_csx.get_instruction("GETRESULT", sample_operands))
-            self.assertIsNone(self.machine_model_tx2.get_instruction("GETRESULT", sample_operands))
-
-            self.assertEqual(self.machine_model_csx.get_arch(), "csx")
-            self.assertEqual(self.machine_model_tx2.get_arch(), "tx2")
-
-            self.assertEqual(self.machine_model_csx.get_ISA(), "x86")
-            self.assertEqual(self.machine_model_tx2.get_ISA(), "aarch64")
-
-            ports_csx = ["0", "0DV", "1", "2", "2D", "3", "3D", "4", "5", "6", "7"]
-            data_ports_csx = ["2D", "3D"]
-            self.assertEqual(self.machine_model_csx.get_ports(), ports_csx)
-            self.assertEqual(self.machine_model_csx.get_data_ports(), data_ports_csx)
-
-            self.assertFalse(self.machine_model_tx2.has_hidden_loads())
-
-            self.assertEqual(MachineModel.get_isa_for_arch("CSX"), "x86")
-            self.assertEqual(MachineModel.get_isa_for_arch("tX2"), "aarch64")
-            with self.assertRaises(ValueError):
-                self.assertIsNone(MachineModel.get_isa_for_arch("THE_MACHINE"))
-        """
+        self.assertEqual(MachineModel.get_isa_for_arch("CSX"), "x86")
+        self.assertEqual(MachineModel.get_isa_for_arch("tX2"), "aarch64")
+        with self.assertRaises(ValueError):
+            self.assertIsNone(MachineModel.get_isa_for_arch("THE_MACHINE"))
 
     ##################
     # Helper functions

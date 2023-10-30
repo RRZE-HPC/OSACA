@@ -205,6 +205,8 @@ class MachineModel(object):
                     scale_id=o["scale"],
                     source=o["source"] if "source" in o else False,
                     destination=o["destination"] if "destination" in o else False,
+                    pre_indexed=o["pre_indexed"] if "pre_indexed" in o else False,
+                    post_indexed=o["post_indexed"] if "post_indexed" in o else False,
                 )
             )
         elif o["class"] == "immediate":
@@ -247,6 +249,7 @@ class MachineModel(object):
         # For use with dict instead of list as DB
         if name is None:
             return None
+
         name_matched_iforms = self._data["instruction_forms_dict"].get(name.upper(), [])
         try:
             return next(
@@ -650,9 +653,7 @@ class MachineModel(object):
     def _check_operands(self, i_operand, operand):
         """Check if the types of operand ``i_operand`` and ``operand`` match."""
         # check for wildcard
-        if (isinstance(operand, Operand) and operand.name == self.WILDCARD) or (
-            not isinstance(operand, Operand) and self.WILDCARD in operand
-        ):
+        if isinstance(operand, dict) and self.WILDCARD in operand:
             if isinstance(i_operand, RegisterOperand):
                 return True
             else:
@@ -877,12 +878,11 @@ class MachineModel(object):
                 or (mem.scale != 1 and i_mem.scale != 1)
             )
             # check pre-indexing
-            and (i_mem.pre_indexed == self.WILDCARD or (mem.pre_indexed) == (i_mem.pre_indexed))
+            # and (i_mem.pre_indexed == self.WILDCARD or (mem.pre_indexed == i_mem.pre_indexed))
             # check post-indexing
-            and (i_mem.post_indexed == self.WILDCARD or (mem.post_indexed) == (i_mem.post_indexed))
+            # and (i_mem.post_indexed == self.WILDCARD or (mem.post_indexed == i_mem.post_indexed))
         ):
             return True
-
         return False
 
     def _is_x86_mem_type(self, i_mem, mem):

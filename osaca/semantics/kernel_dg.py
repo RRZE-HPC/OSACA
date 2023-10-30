@@ -386,7 +386,7 @@ class KernelDG(nx.DiGraph):
             if isinstance(src, MemoryOperand):
                 if src.base is not None:
                     is_read = self.parser.is_reg_dependend_of(register, src.base) or is_read
-                if src.index is not None:
+                if src.index is not None and isinstance(src.index, RegisterOperand):
                     is_read = self.parser.is_reg_dependend_of(register, src.index) or is_read
         # Check also if read in destination memory address
         for dst in chain(
