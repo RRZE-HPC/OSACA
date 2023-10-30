@@ -191,7 +191,6 @@ class ArchSemantics(ISASemantics):
             instruction_data = self._machine_model.get_instruction(
                 instruction_form.instruction, instruction_form.operands
             )
-
             if (
                 not instruction_data
                 and self._isa == "x86"
