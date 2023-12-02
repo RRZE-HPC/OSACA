@@ -14,7 +14,7 @@ from osaca.parser.directive import DirectiveOperand
 from osaca.parser.memory import MemoryOperand
 from osaca.parser.register import RegisterOperand
 from osaca.parser.immediate import ImmediateOperand
-
+from osaca.parser.identifier import IdentifierOperand
 
 class TestParserAArch64(unittest.TestCase):
     @classmethod
@@ -113,7 +113,7 @@ class TestParserAArch64(unittest.TestCase):
         self.assertEqual(parsed_1.comment, "12.27")
 
         self.assertEqual(parsed_2.instruction, "b.lo")
-        self.assertEqual(parsed_2.operands[0]["identifier"]["name"], "..B1.4")
+        self.assertEqual(parsed_2.operands[0].name, "..B1.4")
         self.assertEqual(len(parsed_2.operands), 1)
         self.assertIsNone(parsed_2.comment)
 
@@ -137,8 +137,8 @@ class TestParserAArch64(unittest.TestCase):
         self.assertEqual(parsed_5.instruction, "ldr")
         self.assertEqual(parsed_5.operands[0].name, "0")
         self.assertEqual(parsed_5.operands[0].prefix, "x")
-        self.assertEqual(parsed_5.operands[1].offset["identifier"]["name"], "q2c")
-        self.assertEqual(parsed_5.operands[1].offset["identifier"]["relocation"], ":got_lo12:")
+        self.assertEqual(parsed_5.operands[1].offset.name, "q2c")
+        self.assertEqual(parsed_5.operands[1].offset.relocation, ":got_lo12:")
         self.assertEqual(parsed_5.operands[1].base.name, "0")
         self.assertEqual(parsed_5.operands[1].base.prefix, "x")
         self.assertIsNone(parsed_5.operands[1].index)
@@ -147,8 +147,8 @@ class TestParserAArch64(unittest.TestCase):
         self.assertEqual(parsed_6.instruction, "adrp")
         self.assertEqual(parsed_6.operands[0].name, "0")
         self.assertEqual(parsed_6.operands[0].prefix, "x")
-        self.assertEqual(parsed_6.operands[1]["identifier"]["relocation"], ":got:")
-        self.assertEqual(parsed_6.operands[1]["identifier"]["name"], "visited")
+        self.assertEqual(parsed_6.operands[1].relocation, ":got:")
+        self.assertEqual(parsed_6.operands[1].name, "visited")
 
         self.assertEqual(parsed_7.instruction, "fadd")
         self.assertEqual(parsed_7.operands[0].name, "17")
@@ -237,7 +237,7 @@ class TestParserAArch64(unittest.TestCase):
             operands_id=[
                 {"prfop": {"type": ["PLD"], "target": ["L1"], "policy": ["KEEP"]}},
                 MemoryOperand(
-                    offset_ID={"value": 2048},
+                    offset_ID=ImmediateOperand(value_id=2048), 
                     base_id=RegisterOperand(prefix_id="x", name_id="26"),
                     index_id=None,
                     scale_id=1,
@@ -255,7 +255,7 @@ class TestParserAArch64(unittest.TestCase):
                 RegisterOperand(prefix_id="x", name_id="29"),
                 RegisterOperand(prefix_id="x", name_id="30"),
                 MemoryOperand(
-                    offset_ID={"value": -16},
+                    offset_ID=ImmediateOperand(value_id=-16),
                     base_id=RegisterOperand(name_id="sp", prefix_id="x"),
                     index_id=None,
                     scale_id=1,
@@ -343,15 +343,15 @@ class TestParserAArch64(unittest.TestCase):
         self.assertEqual(len(parsed), 645)
 
     def test_normalize_imd(self):
-        imd_decimal_1 = {"value": "79"}
-        imd_hex_1 = {"value": "0x4f"}
-        imd_decimal_2 = {"value": "8"}
-        imd_hex_2 = {"value": "0x8"}
-        imd_float_11 = {"float": {"mantissa": "0.79", "e_sign": "+", "exponent": "2"}}
-        imd_float_12 = {"float": {"mantissa": "790.0", "e_sign": "-", "exponent": "1"}}
-        imd_double_11 = {"double": {"mantissa": "0.79", "e_sign": "+", "exponent": "2"}}
-        imd_double_12 = {"double": {"mantissa": "790.0", "e_sign": "-", "exponent": "1"}}
-        identifier = {"identifier": {"name": "..B1.4"}}
+        imd_decimal_1 = ImmediateOperand(value_id="79")
+        imd_hex_1 = ImmediateOperand(value_id="0x4f")
+        imd_decimal_2 = ImmediateOperand(value_id="8")
+        imd_hex_2 = ImmediateOperand(value_id="0x8")
+        imd_float_11 = ImmediateOperand(type_id="float",value_id={"mantissa": "0.79", "e_sign": "+", "exponent": "2"})
+        imd_float_12 = ImmediateOperand(type_id="float",value_id={"mantissa": "790.0", "e_sign": "-", "exponent": "1"})
+        imd_double_11 = ImmediateOperand(type_id="double",value_id={"mantissa": "0.79", "e_sign": "+", "exponent": "2"})
+        imd_double_12 = ImmediateOperand(type_id="double",value_id={"mantissa": "790.0", "e_sign": "-", "exponent": "1"})
+        identifier = IdentifierOperand(name="..B1.4")
 
         value1 = self.parser.normalize_imd(imd_decimal_1)
         self.assertEqual(value1, self.parser.normalize_imd(imd_hex_1))

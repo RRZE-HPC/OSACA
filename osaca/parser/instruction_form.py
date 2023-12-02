@@ -19,6 +19,7 @@ class instructionForm:
         latency=None,
         uops=None,
         port_pressure=None,
+        operation=None,
         breaks_dep=False,
     ):
         self._instruction_id = instruction_id
@@ -31,6 +32,7 @@ class instructionForm:
         self._line_number = line_number
 
         self._semantic_operands = semantic_operands
+        self._operation = operation
         self._uops = uops
         self._breaks_dep = breaks_dep
         # self.semantic_operands = {"source": [], "destination": [], "src_dst": []}
@@ -108,6 +110,10 @@ class instructionForm:
         return self._latency_wo_load
 
     @property
+    def operation(self):
+        return self._operation
+
+    @property
     def breaks_dep(self):
         return self._breaks_dep
 
@@ -171,6 +177,10 @@ class instructionForm:
     def throughput(self, throughput):
         self._throughput = throughput
 
+    @operation.setter
+    def operation(self, operation):
+        self._operation = operation
+
     @latency.setter
     def latency(self, latency):
         self._latency = latency
@@ -194,6 +204,7 @@ class instructionForm:
             "latency": self.latency,
             "uops": self.uops,
             "port_pressure": self.port_pressure,
+            "operation": self.operation,
             "breaks_dep": self.breaks_dep,
         }
         attr_str = "\n ".join(f"{key}={value}" for key, value in attributes.items())

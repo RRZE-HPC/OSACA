@@ -4,7 +4,8 @@ from collections import OrderedDict
 from osaca.parser import ParserAArch64, ParserX86ATT, get_parser
 
 COMMENT_MARKER = {"start": "OSACA-BEGIN", "end": "OSACA-END"}
-
+from osaca.parser.identifier import IdentifierOperand
+from osaca.parser.immediate import ImmediateOperand
 
 def reduce_to_section(kernel, isa):
     """
@@ -147,8 +148,8 @@ def find_marked_section(
                 destination = line.operands[1 if not reverse else 0]
                 # instruction pair matches, check for operands
                 if (
-                    "immediate" in source
-                    and parser.normalize_imd(source.immediate) == mov_vals[0]
+                    isinstance(source, ImmediateOperand)
+                    and parser.normalize_imd(source) == mov_vals[0]
                     and "register" in destination
                     and parser.get_full_reg_name(destination["register"]) == mov_reg
                 ):
@@ -252,9 +253,9 @@ def find_basic_blocks(lines):
             terminate = False
             blocks[label].append(line)
             # Find end of block by searching for references to valid jump labels
-            if line.instruction and line.operands:
-                for operand in [o for o in line.operands if "identifier" in o]:
-                    if operand["identifier"]["name"] in valid_jump_labels:
+            if line.instruction!=None and line.operands!=[]:
+                for operand in [o for o in line.operands if isinstance(o, IdentifierOperand)]:
+                    if operand.name in valid_jump_labels:
                         terminate = True
             elif line.label is not None:
                 terminate = True
@@ -281,15 +282,15 @@ def find_basic_loop_bodies(lines):
             terminate = False
             current_block.append(line)
             # Find end of block by searching for references to valid jump labels
-            if line.instruction and line.operands:
+            if line.instruction!=None and line.operands!=[]:
                 # Ignore `b.none` instructions (relevant von ARM SVE code)
                 # This branch instruction is often present _within_ inner loop blocks, but usually
                 # do not terminate
                 if line.instruction == "b.none":
                     continue
-                for operand in [o for o in line.operands if "identifier" in o]:
-                    if operand["identifier"]["name"] in valid_jump_labels:
-                        if operand["identifier"]["name"] == label:
+                for operand in [o for o in line.operands if isinstance(o, IdentifierOperand)]:
+                    if operand.name in valid_jump_labels:
+                        if operand.name == label:
                             loop_bodies[label] = current_block
                         terminate = True
                         break

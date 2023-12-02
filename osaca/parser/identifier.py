@@ -4,8 +4,8 @@ from osaca.parser.operand import Operand
 
 
 class IdentifierOperand(Operand):
-    def __init__(self, name=None, offset=None, relocation=None):
-        super().__init__(name)
+    def __init__(self, name=None, offset=None, relocation=None, source=False, destination=False):
+        super().__init__(name, source, destination)
         self._offset = offset
         self._relocation = relocation
 
@@ -31,4 +31,4 @@ class IdentifierOperand(Operand):
         )
 
     def __repr__(self):
-        return f"IdentifierOperand(name={self.name}, offset={self.offset}, relocation={self.relocation})"
+        return f"IdentifierOperand(name={self.name}, offset={self.offset}, relocation={self.relocation}, source =relocation={self.source}, destination =relocation={self.destination})"

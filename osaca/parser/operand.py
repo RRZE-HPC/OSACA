@@ -23,7 +23,7 @@ class Operand:
     def name(self, name):
         self._name_id = name
 
-    @name.setter
+    @source.setter
     def source(self, source):
         self._source = source
 
