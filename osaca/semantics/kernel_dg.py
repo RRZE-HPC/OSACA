@@ -12,7 +12,7 @@ from osaca.semantics import INSTR_flags, ArchSemantics, MachineModel
 from osaca.parser.memory import MemoryOperand
 from osaca.parser.register import RegisterOperand
 from osaca.parser.immediate import ImmediateOperand
-
+from osaca.parser.operand import Operand
 
 class KernelDG(nx.DiGraph):
     # threshold for checking dependency graph sequential or in parallel
@@ -78,6 +78,7 @@ class KernelDG(nx.DiGraph):
                     instruction_form.line_number,
                     latency=instruction_form.latency - instruction_form.latency_wo_load,
                 )
+
             for dep, dep_flags in self.find_depending(
                 instruction_form, kernel[i + 1 :], flag_dependencies
             ):
@@ -286,10 +287,10 @@ class KernelDG(nx.DiGraph):
                 if isinstance(dst, RegisterOperand):
                     # read of register
                     if self.is_read(dst, instr_form):
-                        # if dst.pre_indexed or dst.post_indexed:
-                        # yield instr_form, ["p_indexed"]
-                        # else:
-                        yield instr_form, []
+                        if dst.pre_indexed or dst.post_indexed:
+                            yield instr_form, ["p_indexed"]
+                        else:
+                            yield instr_form, []
                     # write to register -> abort
                     if self.is_written(dst, instr_form):
                         break
@@ -316,7 +317,7 @@ class KernelDG(nx.DiGraph):
                     # if dst.memory.index:
                     #    if self.is_read(dst.memory.index, instr_form):
                     #        yield instr_form, []
-                    if dst.post_indexed:
+                    if dst.post_indexed!=None:
                         # Check for read of base register until overwrite
                         if self.is_written(dst.base, instr_form):
                             break
@@ -377,9 +378,7 @@ class KernelDG(nx.DiGraph):
             if isinstance(src, RegisterOperand):
                 is_read = self.parser.is_reg_dependend_of(register, src) or is_read
             if (
-                not isinstance(src, RegisterOperand)
-                and not isinstance(src, MemoryOperand)
-                and not isinstance(src, ImmediateOperand)
+                not isinstance(src, Operand)
                 and "flag" in src
             ):
                 is_read = self.parser.is_flag_dependend_of(register, src.flag) or is_read
@@ -415,10 +414,10 @@ class KernelDG(nx.DiGraph):
 
             # determine absolute address change
             addr_change = 0
-            if src.offset and "value" in src.offset:
-                addr_change += src.offset["value"]
+            if isinstance(src.offset, ImmediateOperand) and src.offset.value!=None:
+                addr_change += src.offset.value
             if mem.offset:
-                addr_change -= mem.offset["value"]
+                addr_change -= mem.offset.value
             if mem.base and src.base:
                 base_change = register_changes.get(
                     src.base.prefix if src.base.prefix != None else "" + src.base.name,
@@ -485,8 +484,7 @@ class KernelDG(nx.DiGraph):
             if isinstance(dst, RegisterOperand):
                 is_written = self.parser.is_reg_dependend_of(register, dst) or is_written
             if (
-                not isinstance(dst, RegisterOperand)
-                and not isinstance(dst, MemoryOperand)
+                not isinstance(dst, Operand)
                 and "flag" in dst
             ):
                 is_written = self.parser.is_flag_dependend_of(register, dst.flag) or is_written

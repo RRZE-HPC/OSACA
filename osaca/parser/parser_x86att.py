@@ -14,7 +14,7 @@ from osaca.parser.label import LabelOperand
 from osaca.parser.register import RegisterOperand
 from osaca.parser.identifier import IdentifierOperand
 from osaca.parser.immediate import ImmediateOperand
-
+from osaca.parser.operand import Operand
 
 class ParserX86ATT(BaseParser):
     _instance = None
@@ -311,6 +311,8 @@ class ParserX86ATT(BaseParser):
                 if "predication" in operand["register"]
                 else None,
             )
+        if self.IDENTIFIER_ID in operand:
+            return IdentifierOperand(name=operand[self.IDENTIFIER_ID]["name"])
         return operand
 
     def process_directive(self, directive):
@@ -332,11 +334,11 @@ class ParserX86ATT(BaseParser):
         scale = 1 if "scale" not in memory_address else int(memory_address["scale"], 0)
         if isinstance(offset, str) and base is None and index is None:
             try:
-                offset = {"value": int(offset, 0)}
+                offset = ImmediateOperand(value_id=int(offset, 0))
             except ValueError:
-                offset = {"value": offset}
+                offset = ImmediateOperand(value_id=offset)
         elif offset is not None and "value" in offset:
-            offset["value"] = int(offset["value"], 0)
+            offset = ImmediateOperand(value_id=int(offset["value"], 0))
         if base != None:
             baseOp = RegisterOperand(
                 name_id=base["name"], prefix_id=base["prefix"] if "prefix" in base else None
@@ -345,6 +347,8 @@ class ParserX86ATT(BaseParser):
             indexOp = RegisterOperand(
                 name_id=index["name"], prefix_id=index["prefix"] if "prefix" in index else None
             )
+        if isinstance(offset, dict) and "identifier" in offset:
+            offset = IdentifierOperand(name=offset["identifier"]["name"])
         new_dict = MemoryOperand(
             offset_ID=offset, base_id=baseOp, index_id=indexOp, scale_id=scale
         )
@@ -368,8 +372,9 @@ class ParserX86ATT(BaseParser):
             # actually an identifier, change declaration
             return immediate
         # otherwise just make sure the immediate is a decimal
-        immediate["value"] = int(immediate["value"], 0)
-        return immediate
+        #immediate["value"] = int(immediate["value"], 0)
+        new_immediate = ImmediateOperand(value_id = int(immediate["value"], 0))
+        return new_immediate
 
     def get_full_reg_name(self, register):
         """Return one register name string including all attributes"""
@@ -378,12 +383,14 @@ class ParserX86ATT(BaseParser):
 
     def normalize_imd(self, imd):
         """Normalize immediate to decimal based representation"""
-        if "value" in imd:
-            if isinstance(imd["value"], str):
+        if isinstance(imd, IdentifierOperand):
+            return imd
+        if imd.value!=None:
+            if isinstance(imd.value, str):
                 # return decimal
-                return int(imd["value"], 0)
+                return int(imd.value, 0)
             else:
-                return imd["value"]
+                return imd.value
         # identifier
         return imd
 

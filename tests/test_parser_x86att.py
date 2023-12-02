@@ -10,7 +10,8 @@ from pyparsing import ParseException
 
 from osaca.parser import ParserX86ATT, instructionForm
 from osaca.parser.register import RegisterOperand
-
+from osaca.parser.immediate import ImmediateOperand
+from osaca.parser.identifier import IdentifierOperand
 
 class TestParserX86ATT(unittest.TestCase):
     @classmethod
@@ -124,16 +125,16 @@ class TestParserX86ATT(unittest.TestCase):
         self.assertEqual(parsed_1.comment, "12.27")
 
         self.assertEqual(parsed_2.instruction, "jb")
-        self.assertEqual(parsed_2.operands[0]["identifier"]["name"], "..B1.4")
+        self.assertEqual(parsed_2.operands[0].name, "..B1.4")
         self.assertEqual(len(parsed_2.operands), 1)
         self.assertIsNone(parsed_2.comment)
         self.assertEqual(parsed_3.instruction, "movl")
-        self.assertEqual(parsed_3.operands[0]["value"], 222)
+        self.assertEqual(parsed_3.operands[0].value, 222)
         self.assertEqual(parsed_3.operands[1].name, "ebx")
         self.assertEqual(parsed_3.comment, "IACA END")
 
         self.assertEqual(parsed_4.instruction, "vmovss")
-        self.assertEqual(parsed_4.operands[1].offset["value"], -4)
+        self.assertEqual(parsed_4.operands[1].offset.value, -4)
         self.assertEqual(parsed_4.operands[1].base.name, "rsp")
         self.assertEqual(parsed_4.operands[1].index.name, "rax")
         self.assertEqual(parsed_4.operands[1].scale, 8)
@@ -141,7 +142,7 @@ class TestParserX86ATT(unittest.TestCase):
         self.assertEqual(parsed_4.comment, "12.9")
 
         self.assertEqual(parsed_5.instruction, "mov")
-        self.assertEqual(parsed_5.operands[1].offset["identifier"]["name"], "var")
+        self.assertEqual(parsed_5.operands[1].offset.name, "var")
         self.assertIsNone(parsed_5.operands[1].base)
         self.assertIsNone(parsed_5.operands[1].index)
         self.assertEqual(parsed_5.operands[1].scale, 1)
@@ -154,7 +155,7 @@ class TestParserX86ATT(unittest.TestCase):
         self.assertEqual(parsed_6.operands[0].scale, 8)
         self.assertEqual(parsed_6.operands[1].name, "rbx")
 
-        self.assertEqual(parsed_7.operands[0]["value"], 0x1)
+        self.assertEqual(parsed_7.operands[0].value, 0x1)
         self.assertEqual(parsed_7.operands[1].name, "xmm0")
         self.assertEqual(parsed_7.operands[2].name, "ymm1")
         self.assertEqual(parsed_7.operands[3].name, "ymm1")
@@ -245,10 +246,10 @@ class TestParserX86ATT(unittest.TestCase):
         self.assertIsNone(self.parser.parse_register("rax"))
 
     def test_normalize_imd(self):
-        imd_decimal_1 = {"value": "79"}
-        imd_hex_1 = {"value": "0x4f"}
-        imd_decimal_2 = {"value": "8"}
-        imd_hex_2 = {"value": "8"}
+        imd_decimal_1 = ImmediateOperand(value_id="79")
+        imd_hex_1 = ImmediateOperand(value_id="0x4f")
+        imd_decimal_2 = ImmediateOperand(value_id="8")
+        imd_hex_2 = ImmediateOperand(value_id="8")
         self.assertEqual(
             self.parser.normalize_imd(imd_decimal_1),
             self.parser.normalize_imd(imd_hex_1),

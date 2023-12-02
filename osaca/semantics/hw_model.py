@@ -125,7 +125,7 @@ class MachineModel(object):
                         instruction_id=iform["name"].upper() if "name" in iform else None,
                         operands_id=iform["operands"] if "operands" in iform else [],
                         hidden_operands=iform["hidden_operands"]
-                        if "hidden_operansd" in iform
+                        if "hidden_operands" in iform
                         else [],
                         directive_id=iform["directive"] if "directive" in iform else None,
                         comment_id=iform["comment"] if "comment" in iform else None,
@@ -135,6 +135,7 @@ class MachineModel(object):
                         throughput=iform["throughput"] if "throughput" in iform else None,
                         uops=iform["uops"] if "uops" in iform else None,
                         port_pressure=iform["port_pressure"] if "port_pressure" in iform else None,
+                        operation=iform["operation"] if "operation" in iform else None,
                         breaks_dep=iform["breaks_dependency_on_equal_operands"]
                         if "breaks_dependency_on_equal_operands" in iform
                         else False,
@@ -192,11 +193,15 @@ class MachineModel(object):
                     prefix_id=o["prefix"] if "prefix" in o else None,
                     shape=o["shape"] if "shape" in o else None,
                     mask=o["mask"] if "mask" in o else False,
+                    pre_indexed=o["pre_indexed"] if "pre_indexed" in o else False,
+                    post_indexed=o["post_indexed"] if "post_indexed" in o else False,
                     source=o["source"] if "source" in o else False,
                     destination=o["destination"] if "destination" in o else False,
                 )
             )
         elif o["class"] == "memory":
+            if isinstance(o["base"], dict):
+                o["base"] = RegisterOperand(name_id = o["base"]["name"])
             new_operands.append(
                 MemoryOperand(
                     base_id=o["base"],
@@ -218,7 +223,12 @@ class MachineModel(object):
                 )
             )
         elif o["class"] == "identifier":
-            new_operands.append(IdentifierOperand())
+            new_operands.append(IdentifierOperand(
+                    name=o["name"] if "name" in o else None,
+                    source=o["source"] if "source" in o else False,
+                    destination=o["destination"] if "destination" in o else False,
+                )
+            )
         elif o["class"] == "condition":
             new_operands.append(
                 ConditionOperand(
@@ -249,8 +259,8 @@ class MachineModel(object):
         # For use with dict instead of list as DB
         if name is None:
             return None
-
         name_matched_iforms = self._data["instruction_forms_dict"].get(name.upper(), [])
+
         try:
             return next(
                 instruction_form
@@ -575,9 +585,9 @@ class MachineModel(object):
             operand_string += (
                 "s" if operand["scale"] == self.WILDCARD or operand["scale"] > 1 else ""
             )
-            if "pre-indexed" in operand:
-                operand_string += "r" if operand["pre-indexed"] else ""
-                operand_string += "p" if operand["post-indexed"] else ""
+            if "pre_indexed" in operand:
+                operand_string += "r" if operand["pre_indexed"] else ""
+                operand_string += "p" if operand["post_indexed"] else ""
         return operand_string
 
     def _create_db_operand_aarch64(self, operand):
@@ -670,6 +680,8 @@ class MachineModel(object):
         #    return self._compare_db_entries(i_operand, operand)
         # TODO support class wildcards
         # register
+        #print(operand)
+        #print(i_operand)
         if isinstance(operand, RegisterOperand):
             if not isinstance(i_operand, RegisterOperand):
                 return False
@@ -856,10 +868,10 @@ class MachineModel(object):
                 or i_mem.offset == self.WILDCARD
                 or (
                     mem.offset is not None
-                    and "identifier" in mem.offset
-                    and i_mem.offset == "identifier"
+                    and isinstance(mem.offset, IdentifierOperand)
+                    and isinstance(i_mem.offset, IdentifierOperand)
                 )
-                or (mem.offset is not None and "value" in mem.offset and i_mem.offset == "imd")
+                or (mem.offset is not None and isinstance(mem.offset, ImmediateOperand) and isinstance(i_mem.offset, ImmediateOperand))
             )
             # check index
             and (
@@ -878,9 +890,9 @@ class MachineModel(object):
                 or (mem.scale != 1 and i_mem.scale != 1)
             )
             # check pre-indexing
-            # and (i_mem.pre_indexed == self.WILDCARD or (mem.pre_indexed == i_mem.pre_indexed))
+            and (i_mem.pre_indexed == self.WILDCARD or mem.pre_indexed == i_mem.pre_indexed)
             # check post-indexing
-            # and (i_mem.post_indexed == self.WILDCARD or (mem.post_indexed == i_mem.post_indexed))
+            and (i_mem.post_indexed == self.WILDCARD or mem.post_indexed == i_mem.post_indexed or (type(mem.post_indexed) == dict and i_mem.post_indexed == True))
         ):
             return True
         return False
@@ -900,18 +912,18 @@ class MachineModel(object):
                 or i_mem.offset == self.WILDCARD
                 or (
                     mem.offset is not None
-                    and "identifier" in mem.offset
-                    and i_mem.offset == "identifier"
+                    and isinstance(mem.offset, IdentifierOperand)
+                    and isinstance(i_mem.offset, IdentifierOperand)
                 )
                 or (
                     mem.offset is not None
-                    and "value" in mem.offset
+                    and isinstance(mem.offset, ImmediateOperand)
                     and (
-                        i_mem.offset == "imd"
-                        or (i_mem.offset is None and mem.offset["value"] == "0")
+                        isinstance(i_mem.offset, ImmediateOperand)
+                        or (i_mem.offset is None and mem.offset.value == "0")
                     )
                 )
-                or (mem.offset is not None and "identifier" in mem.offset and i_mem.offset == "id")
+                or (isinstance(mem.offset, IdentifierOperand) and isinstance(i_mem.offset, IdentifierOperand))
             )
             # check index
             and (

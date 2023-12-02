@@ -320,7 +320,6 @@ class ParserAArch64(BaseParser):
             instruction_form.instruction = result.instruction
             instruction_form.operands = result.operands
             instruction_form.comment = result.comment
-
         return instruction_form
 
     def parse_instruction(self, instruction):
@@ -409,7 +408,9 @@ class ParserAArch64(BaseParser):
         if isinstance(offset, list) and len(offset) == 1:
             offset = offset[0]
         if offset is not None and "value" in offset:
-            offset["value"] = int(offset["value"], 0)
+            offset = ImmediateOperand(value_id=int(offset["value"], 0))
+        if isinstance(offset, dict) and "identifier" in offset:
+            offset = self.process_identifier(offset["identifier"])
         base = memory_address.get("base", None)
         index = memory_address.get("index", None)
         scale = 1
@@ -503,30 +504,29 @@ class ParserAArch64(BaseParser):
         dict_name = ""
         if "identifier" in immediate:
             # actually an identifier, change declaration
-            return immediate
+            return self.process_identifier(immediate["identifier"])
         if "value" in immediate:
             # normal integer value
             immediate["type"] = "int"
             # convert hex/bin immediates to dec
-            immediate["value"] = self.normalize_imd(immediate)
-            return ImmediateOperand(type_id=immediate["type"], value_id=immediate["value"])
+            new_immediate = ImmediateOperand(type_id=immediate["type"], value_id=immediate["value"])
+            new_immediate.value = self.normalize_imd(new_immediate)
+            return new_immediate
         if "base_immediate" in immediate:
             # arithmetic immediate, add calculated value as value
             immediate["shift"] = immediate["shift"][0]
-            immediate["value"] = self.normalize_imd(immediate["base_immediate"]) << int(
-                immediate["shift"]["value"]
-            )
+            temp_immediate = ImmediateOperand(value_id=immediate["base_immediate"]["value"])
             immediate["type"] = "int"
-            return ImmediateOperand(
-                type_id=immediate["type"], value_id=immediate["value"], shift_id=immediate["shift"]
-            )
+            new_immediate = ImmediateOperand(type_id=immediate["type"], value_id=None, shift_id=immediate["shift"])
+            new_immediate.value = self.normalize_imd(temp_immediate) << int(immediate["shift"]["value"])
+            return new_immediate
         if "float" in immediate:
             dict_name = "float"
         if "double" in immediate:
             dict_name = "double"
         if "exponent" in immediate[dict_name]:
             immediate["type"] = dict_name
-            return ImmediateOperand(type_id=immediate["type"])
+            return ImmediateOperand(type_id=immediate["type"], value_id = immediate[immediate["type"]])
         else:
             # change 'mantissa' key to 'value'
             return ImmediateOperand(value_id=immediate[dict_name]["mantissa"], type_id=dict_name)
@@ -546,7 +546,7 @@ class ParserAArch64(BaseParser):
         # remove value if it consists of symbol+offset
         if "value" in identifier:
             del identifier["value"]
-        return IdentifierOperand(offset=identifier["offset"], RELOCATION=identifier["relocation"])
+        return IdentifierOperand(name=identifier["name"] if "name" in identifier else None,offset=identifier["offset"] if "offset" in identifier else None, relocation=identifier["relocation"] if "relocation" in identifier else None)
 
     def get_full_reg_name(self, register):
         """Return one register name string including all attributes"""
@@ -561,16 +561,18 @@ class ParserAArch64(BaseParser):
 
     def normalize_imd(self, imd):
         """Normalize immediate to decimal based representation"""
-        if "value" in imd:
-            if isinstance(imd["value"], str):
+        if isinstance(imd, IdentifierOperand):
+            return imd
+        if imd.value!=None and imd.type=="float":
+            return self.ieee_to_float(imd.value)
+        elif imd.value!=None and imd.type=="double":
+            return self.ieee_to_float(imd.value)
+        elif imd.value!=None:
+            if isinstance(imd.value, str):
                 # hex or bin, return decimal
-                return int(imd["value"], 0)
+                return int(imd.value, 0)
             else:
-                return imd["value"]
-        elif "float" in imd:
-            return self.ieee_to_float(imd["float"])
-        elif "double" in imd:
-            return self.ieee_to_float(imd["double"])
+                return imd.value        
         # identifier
         return imd
 

@@ -19,6 +19,8 @@ class RegisterOperand(Operand):
         predication=None,
         source=False,
         destination=False,
+        pre_indexed=False,
+        post_indexed=False,
     ):
         super().__init__(name_id, source, destination)
         self._width_id = width_id
@@ -31,6 +33,8 @@ class RegisterOperand(Operand):
         self._mask = mask
         self._zeroing = zeroing
         self._predication = predication
+        self._pre_indexed = pre_indexed
+        self._post_indexed = post_indexed
 
     @property
     def width(self):
@@ -51,6 +55,14 @@ class RegisterOperand(Operand):
     @property
     def regtype(self):
         return self._regtype_id
+
+    @property
+    def pre_indexed(self):
+        return self._pre_indexed
+
+    @property
+    def post_indexed(self):
+        return self._post_indexed
 
     @regtype.setter
     def regtype(self, regtype):
@@ -104,6 +116,14 @@ class RegisterOperand(Operand):
     def mask(self, mask):
         self._mask = mask
 
+    @pre_indexed.setter
+    def pre_indexed(self, pre_indexed):
+        self._pre_indexed = pre_indexed
+
+    @post_indexed.setter
+    def post_indexed(self, post_indexed):
+        self._post_indexed = post_indexed
+
     @property
     def zeroing(self):
         return self._zeroing
@@ -117,16 +137,13 @@ class RegisterOperand(Operand):
             f"RegisterOperand(name_id={self._name_id}, width_id={self._width_id}, "
             f"prefix_id={self._prefix_id}, reg_id={self._reg_id}, REGtype_id={self._regtype_id}, "
             f"lanes={self._lanes}, shape={self._shape}, index={self._index}, "
-            f"mask={self._mask}, zeroing={self._zeroing})"
+            f"mask={self._mask}, zeroing={self._zeroing},source={self._source},destination={self._destination},"
+            f"pre_indexed={self._pre_indexed}, post_indexed={self._post_indexed}) "
         )
 
     def __repr__(self):
-        return (
-            f"RegisterOperand(name_id={self._name_id}, width_id={self._width_id}, "
-            f"prefix_id={self._prefix_id}, reg_id={self._reg_id}, REGtype_id={self._regtype_id}, "
-            f"lanes={self._lanes}, shape={self._shape}, index={self._index}, "
-            f"mask={self._mask}, zeroing={self._zeroing})"
-        )
+        return self.__str__()
+
 
     def __eq__(self, other):
         if isinstance(other, RegisterOperand):

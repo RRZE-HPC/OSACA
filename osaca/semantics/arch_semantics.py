@@ -309,12 +309,11 @@ class ArchSemantics(ISASemantics):
 
                             # zero data port pressure and remove HAS_ST flag if
                             #   - no mem operand in dst &&
-                            #   - all mem operands in src_dst are pre-/post-indexed
+                            #   - all mem operands in src_dst are pre-/post_indexed
                             # since it is no mem store
                             if (
                                 self._isa == "aarch64"
-                                and "memory"
-                                not in instruction_form.semantic_operands["destination"]
+                                and not isinstance(instruction_form.semantic_operands["destination"], MemoryOperand)
                                 and all(
                                     [
                                         op.post_indexed or op.pre_indexed
@@ -355,7 +354,7 @@ class ArchSemantics(ISASemantics):
                             else 0
                         )
                         latency_wo_load = instruction_data_reg.latency
-                        # add latency of ADD if post- or pre-indexed load
+                        # add latency of ADD if post- or pre_indexed load
                         # TODO more investigation: check dot-graph, wrong latency distribution!
                         # if (
                         #     latency_wo_load == 0

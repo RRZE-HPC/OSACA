@@ -54,14 +54,11 @@ class ImmediateOperand(Operand):
     def __str__(self):
         return (
             f"ImmediateOperand(identifier_id={self._identifier_id}, type_id={self._type_id}, "
-            f"value_id={self._value_id}, shift_id={self._shift_id})"
+            f"value_id={self._value_id}, shift_id={self._shift_id}, source={self._source}, destination={self._destination})"
         )
 
     def __repr__(self):
-        return (
-            f"ImmediateOperand(identifier_id={self._identifier_id}, type_id={self._type_id}, "
-            f"value_id={self._value_id}, shift_id={self._shift_id})"
-        )
+        return self.__str__()
 
     def __eq__(self, other):
         if isinstance(other, ImmediateOperand):

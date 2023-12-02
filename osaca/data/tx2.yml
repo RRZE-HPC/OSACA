@@ -9,19 +9,19 @@ hidden_loads: false
 load_latency: {w: 4.0, x: 4.0, b: 4.0, h: 4.0, s: 4.0, d: 4.0, q: 4.0, v: 4.0}
 p_index_latency: 1
 load_throughput:
-- {base: x, index: ~, offset: ~, scale: 1, pre-indexed: false, post-indexed: false, port_pressure:   [[1, '34'], [1, '012']]}
-- {base: x, index: ~, offset: imd, scale: 1, pre-indexed: false, post-indexed: true, port_pressure:  [[1, '34'], [1, '012']]}
-- {base: x, index: ~, offset: imd, scale: 1, pre-indexed: false, post-indexed: false, port_pressure: [[1, '34'], [1, '012']]}
-- {base: x, index: ~, offset: imd, scale: 1, pre-indexed: true, post-indexed: true, port_pressure:   [[1, '34'], [1, '012']]}
-- {base: x, index: ~, offset: imd, scale: 1, pre-indexed: true, post-indexed: false, port_pressure:  [[1, '34'], [1, '012']]}
-- {base: x, index: x, offset: ~, scale: 1, pre-indexed: false, post-indexed: true, port_pressure:    [[1, '34'], [1, '012']]}
-- {base: x, index: x, offset: ~, scale: 1, pre-indexed: false, post-indexed: false, port_pressure:   [[1, '34'], [1, '012']]}
-- {base: x, index: x, offset: ~, scale: 1, pre-indexed: true, post-indexed: true, port_pressure:     [[1, '34'], [1, '012']]}
-- {base: x, index: x, offset: ~, scale: 1, pre-indexed: true, post-indexed: false, port_pressure:    [[1, '34'], [1, '012']]}
-- {base: x, index: x, offset: imd, scale: 1, pre-indexed: false, post-indexed: true, port_pressure:  [[1, '34'], [1, '012']]}
-- {base: x, index: x, offset: imd, scale: 1, pre-indexed: false, post-indexed: false, port_pressure: [[1, '34'], [1, '012']]}
-- {base: x, index: x, offset: imd, scale: 1, pre-indexed: true, post-indexed: true, port_pressure:   [[1, '34'], [1, '012']]}
-- {base: x, index: x, offset: imd, scale: 1, pre-indexed: true, post-indexed: false, port_pressure:  [[1, '34'], [1, '012']]}
+- {base: x, index: ~, offset: ~, scale: 1, pre_indexed: false, post_indexed: false, port_pressure:   [[1, '34'], [1, '012']]}
+- {base: x, index: ~, offset: imd, scale: 1, pre_indexed: false, post_indexed: true, port_pressure:  [[1, '34'], [1, '012']]}
+- {base: x, index: ~, offset: imd, scale: 1, pre_indexed: false, post_indexed: false, port_pressure: [[1, '34'], [1, '012']]}
+- {base: x, index: ~, offset: imd, scale: 1, pre_indexed: true, post_indexed: true, port_pressure:   [[1, '34'], [1, '012']]}
+- {base: x, index: ~, offset: imd, scale: 1, pre_indexed: true, post_indexed: false, port_pressure:  [[1, '34'], [1, '012']]}
+- {base: x, index: x, offset: ~, scale: 1, pre_indexed: false, post_indexed: true, port_pressure:    [[1, '34'], [1, '012']]}
+- {base: x, index: x, offset: ~, scale: 1, pre_indexed: false, post_indexed: false, port_pressure:   [[1, '34'], [1, '012']]}
+- {base: x, index: x, offset: ~, scale: 1, pre_indexed: true, post_indexed: true, port_pressure:     [[1, '34'], [1, '012']]}
+- {base: x, index: x, offset: ~, scale: 1, pre_indexed: true, post_indexed: false, port_pressure:    [[1, '34'], [1, '012']]}
+- {base: x, index: x, offset: imd, scale: 1, pre_indexed: false, post_indexed: true, port_pressure:  [[1, '34'], [1, '012']]}
+- {base: x, index: x, offset: imd, scale: 1, pre_indexed: false, post_indexed: false, port_pressure: [[1, '34'], [1, '012']]}
+- {base: x, index: x, offset: imd, scale: 1, pre_indexed: true, post_indexed: true, port_pressure:   [[1, '34'], [1, '012']]}
+- {base: x, index: x, offset: imd, scale: 1, pre_indexed: true, post_indexed: false, port_pressure:  [[1, '34'], [1, '012']]}
 load_throughput_default: [[1, '34'], [1, '012']]
 store_throughput: []
 store_throughput_default: [[1, '34'], [1, '5']]
@@ -539,8 +539,8 @@ instruction_forms:
     offset: imd
     index: ~
     scale: 1
-    pre-indexed: false
-    post-indexed: false
+    pre_indexed: false
+    post_indexed: false
   throughput: 1.0
   latency: 4.0  # 	2*p34
   port_pressure: [[1, '012'], [2.0, '34']]
@@ -555,8 +555,8 @@ instruction_forms:
     offset: imd
     index: ~
     scale: 1
-    pre-indexed: false
-    post-indexed: true
+    pre_indexed: false
+    post_indexed: true
   throughput: 1.0
   latency: 4.0  # 	2*p34
   port_pressure: [[2.0, '34'], [1, '012']]
@@ -571,8 +571,8 @@ instruction_forms:
     offset: '*'
     index: '*'
     scale: 1
-    pre-indexed: false
-    post-indexed: false
+    pre_indexed: false
+    post_indexed: false
   throughput: 1.0
   latency: 4.0  # 	2*p34
   port_pressure: [[1, '012'], [2.0, '34']]
@@ -587,8 +587,8 @@ instruction_forms:
     offset: ~
     index: ~
     scale: 1
-    pre-indexed: false
-    post-indexed: true
+    pre_indexed: false
+    post_indexed: true
   throughput: 1.0
   latency: 4.0  # 	2*p34
   port_pressure: [[2.0, '34'], [1, '012']]
@@ -603,8 +603,8 @@ instruction_forms:
     offset: '*'
     index: '*'
     scale: '*'
-    pre-indexed: false
-    post-indexed: false
+    pre_indexed: false
+    post_indexed: false
   throughput: 1.0
   latency: 4.0  # 	2*p34
   port_pressure: [[1, '012'], [2.0, '34']]
@@ -619,8 +619,8 @@ instruction_forms:
     offset: '*'
     index: '*'
     scale: '*'
-    pre-indexed: false
-    post-indexed: false
+    pre_indexed: false
+    post_indexed: false
   throughput: 1.0
   latency: 4.0  # 	2*p34
   port_pressure: [[1, '012'], [2.0, '34']]
@@ -635,8 +635,8 @@ instruction_forms:
     offset: '*'
     index: '*'
     scale: '*'
-    pre-indexed: true
-    post-indexed: false
+    pre_indexed: true
+    post_indexed: false
   throughput: 1.0
   latency: 4.0  # 	2*p34
   port_pressure: [[2.0, '34'], [1, '012']]
@@ -651,8 +651,8 @@ instruction_forms:
     offset: '*'
     index: '*'
     scale: '*'
-    pre-indexed: false
-    post-indexed: true
+    pre_indexed: false
+    post_indexed: true
   throughput: 1.0
   latency: 4.0  # 	2*p34
   port_pressure: [[2.0, '34'], [1, '012']]
@@ -665,8 +665,8 @@ instruction_forms:
     offset: '*'
     index: '*'
     scale: '*'
-    post-indexed: false
-    pre-indexed: false
+    post_indexed: false
+    pre_indexed: false
   throughput: 0.5
   latency: 4.0  # 	1*p34
   port_pressure: [[1, '012'], [1.0, '34']]
@@ -679,8 +679,8 @@ instruction_forms:
     offset: '*'
     index: '*'
     scale: '*'
-    post-indexed: false
-    pre-indexed: false
+    post_indexed: false
+    pre_indexed: false
   throughput: 0.5
   latency: 4.0  # 	1*p34
   port_pressure: [[1, '012'], [1.0, '34']]
@@ -693,8 +693,8 @@ instruction_forms:
     offset: '*'
     index: '*'
     scale: '*'
-    post-indexed: false
-    pre-indexed: false
+    post_indexed: false
+    pre_indexed: false
   throughput: 0.5
   latency: 4.0  # 	1*p34
   port_pressure: [[1, '012'], [1.0, '34']]
@@ -707,8 +707,8 @@ instruction_forms:
     offset: '*'
     index: '*'
     scale: '*'
-    post-indexed: false
-    pre-indexed: false
+    post_indexed: false
+    pre_indexed: false
   throughput: 0.5
   latency: 4.0  # 	1*p34
   port_pressure: [[1, '012'], [1.0, '34']]
@@ -721,8 +721,8 @@ instruction_forms:
     offset: imd
     index: '*'
     scale: '*'
-    post-indexed: false
-    pre-indexed: false
+    post_indexed: false
+    pre_indexed: false
   throughput: 0.5
   latency: 4.0  # 	1*p34
   port_pressure: [[1, '012'], [1.0, '34']]
@@ -735,8 +735,8 @@ instruction_forms:
     offset: '*'
     index: '*'
     scale: '*'
-    post-indexed: false
-    pre-indexed: false
+    post_indexed: false
+    pre_indexed: false
   throughput: 0.5
   latency: 4.0  # 	1*p34
   port_pressure: [[1, '012'], [1.0, '34']]
@@ -834,8 +834,8 @@ instruction_forms:
     offset: imd
     index: ~
     scale: 1
-    pre-indexed: false
-    post-indexed: false
+    pre_indexed: false
+    post_indexed: false
   throughput: ~
   latency: ~
   port_pressure: []
@@ -855,8 +855,8 @@ instruction_forms:
     offset: '*'
     index: '*'
     scale: '*'
-    pre-indexed: false
-    post-indexed: false
+    pre_indexed: false
+    post_indexed: false
   throughput: 1.0
   latency: 0  # 	2*p34+1*p5
   port_pressure: [[2, '34'], [1, '5']]
@@ -871,8 +871,8 @@ instruction_forms:
     offset: '*'
     index: '*'
     scale: '*'
-    pre-indexed: false
-    post-indexed: false
+    pre_indexed: false
+    post_indexed: false
   throughput: 1.0
   latency: 0  # 	2*p34+1*p5
   port_pressure: [[2, '34'], [1, '5']]
@@ -887,8 +887,8 @@ instruction_forms:
     offset: '*'
     index: '*'
     scale: '*'
-    pre-indexed: false
-    post-indexed: false
+    pre_indexed: false
+    post_indexed: false
   throughput: 2.0
   latency: 0  # 	2*p34+2*p5
   port_pressure: [[2.0, '34'], [2.0, '5']]
@@ -903,8 +903,8 @@ instruction_forms:
     offset: '*'
     index: '*'
     scale: '*'
-    pre-indexed: false
-    post-indexed: true
+    pre_indexed: false
+    post_indexed: true
   throughput: 2.0
   latency: 0  # 	2*p34+2*p5+1*012
   port_pressure: [[2.0, '34'], [2.0, '5'], [1, '012']]
@@ -919,8 +919,8 @@ instruction_forms:
     offset: '*'
     index: '*'
     scale: '*'
-    pre-indexed: false
-    post-indexed: false
+    pre_indexed: false
+    post_indexed: false
   throughput: 2.0
   latency: 0  # 	2*p34+2*p5
   port_pressure: [[2.0, '34'], [2.0, '5']]
@@ -933,8 +933,8 @@ instruction_forms:
     offset: '*'
     index: '*'
     scale: '*'
-    pre-indexed: false
-    post-indexed: false
+    pre_indexed: false
+    post_indexed: false
   throughput: 1.0
   latency: 4.0  # 	1*p34+1*p5
   port_pressure: [[1.0, '34'], [1.0, '5']]
@@ -947,8 +947,8 @@ instruction_forms:
     offset: '*'
     index: '*'
     scale: '*'
-    pre-indexed: false
-    post-indexed: false
+    pre_indexed: false
+    post_indexed: false
   throughput: 1.0
   latency: 4.0  # 	1*p34+1*p5
   port_pressure: [[1.0, '34'], [1.0, '5']]
@@ -961,8 +961,8 @@ instruction_forms:
     offset: '*'
     index: '*'
     scale: '*'
-    pre-indexed: false
-    post-indexed: false
+    pre_indexed: false
+    post_indexed: false
   throughput: 1.0
   latency: 0  # 	1*p34+1*p5
   port_pressure: [[1.0, '34'], [1.0, '5']]
@@ -975,8 +975,8 @@ instruction_forms:
     offset: '*'
     index: '*'
     scale: '*'
-    pre-indexed: false
-    post-indexed: false
+    pre_indexed: false
+    post_indexed: false
   throughput: 1.0
   latency: 0  # 	1*p34+1*p5
   port_pressure: [[1.0, '34'], [1.0, '5']]
@@ -989,8 +989,8 @@ instruction_forms:
     offset: '*'
     index: '*'
     scale: '*'
-    pre-indexed: false
-    post-indexed: false
+    pre_indexed: false
+    post_indexed: false
   throughput: 1.0
   latency: 0  # 	1*p34+1*p5
   port_pressure: [[1.0, '34'], [1.0, '5']]
@@ -1003,8 +1003,8 @@ instruction_forms:
     offset: '*'
     index: '*'
     scale: '*'
-    pre-indexed: false
-    post-indexed: true
+    pre_indexed: false
+    post_indexed: true
   throughput: 1.0
   latency: 0  # 	1*p34+1*p5
   port_pressure: [[1.0, '34'], [1.0, '5'], [1, '012']]
@@ -1017,8 +1017,8 @@ instruction_forms:
     offset: '*'
     index: '*'
     scale: '*'
-    pre-indexed: true
-    post-indexed: false
+    pre_indexed: true
+    post_indexed: false
   throughput: 1.0
   latency: 0  # 	1*p34+1*p5
   port_pressure: [[1.0, '34'], [1.0, '5'], [1, '012']]
@@ -1031,8 +1031,8 @@ instruction_forms:
     offset: '*'
     index: '*'
     scale: 1
-    pre-indexed: false
-    post-indexed: false
+    pre_indexed: false
+    post_indexed: false
   throughput: 1.0
   latency: 0  # 	1*p34+1*p5
   port_pressure: [[1.0, '34'], [1.0, '5']]
@@ -1045,8 +1045,8 @@ instruction_forms:
     offset: '*'
     index: '*'
     scale: '*'
-    pre-indexed: false
-    post-indexed: true
+    pre_indexed: false
+    post_indexed: true
   throughput: 1.0
   latency: 0  # 	1*p34+1*p5
   port_pressure: [[1.0, '34'], [1.0, '5'], [1, '012']]
@@ -1059,8 +1059,8 @@ instruction_forms:
     offset: '*'
     index: '*'
     scale: '*'
-    pre-indexed: false
-    post-indexed: true
+    pre_indexed: false
+    post_indexed: true
   throughput: 1.0
   latency: 0  # 	1*p34+1*p5
   port_pressure: [[1.0, '34'], [1.0, '5'], [1, '012']]

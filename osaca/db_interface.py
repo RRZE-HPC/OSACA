@@ -255,8 +255,8 @@ def _create_db_operand_aarch64(operand):
             "offset": "imd" if "o" in operand else None,
             "index": "gpr" if "i" in operand else None,
             "scale": 8 if "s" in operand else 1,
-            "pre-indexed": True if "r" in operand else False,
-            "post-indexed": True if "p" in operand else False,
+            "pre_indexed": True if "r" in operand else False,
+            "post_indexed": True if "p" in operand else False,
         }
     else:
         raise ValueError("Parameter {} is not a valid operand code".format(operand))
