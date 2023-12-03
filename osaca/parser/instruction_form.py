@@ -1,7 +1,5 @@
 #!/usr/bin/env python3
 
-from osaca.parser.directive import DirectiveOperand
-
 
 class instructionForm:
     def __init__(

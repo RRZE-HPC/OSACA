@@ -9,7 +9,6 @@ import unittest
 from pyparsing import ParseException
 
 from osaca.parser import ParserAArch64, instructionForm
-from osaca.parser.operand import Operand
 from osaca.parser.directive import DirectiveOperand
 from osaca.parser.memory import MemoryOperand
 from osaca.parser.register import RegisterOperand
@@ -169,7 +168,7 @@ class TestParserAArch64(unittest.TestCase):
         self.assertEqual(parsed_9.instruction, "ccmp")
         self.assertEqual(parsed_9.operands[0].name, "0")
         self.assertEqual(parsed_9.operands[0].prefix, "x")
-        self.assertEqual(parsed_9.operands[3]["condition"], "CC")
+        self.assertEqual(parsed_9.operands[3].ccode, "CC")
 
     def test_parse_line(self):
         line_comment = "// -- Begin  main"
@@ -403,7 +402,7 @@ class TestParserAArch64(unittest.TestCase):
         self.assertEqual(plist.operands, reg_list)
         self.assertEqual(p_idx_range.operands, reg_list_idx)
         self.assertEqual(p_idx_list.operands, reg_list_idx)
-        # self.assertEqual(p_single.operands, reg_list_single)
+        self.assertEqual(p_single.operands, reg_list_single)
 
     def test_reg_dependency(self):
         reg_1_1 = RegisterOperand(prefix_id="b", name="1")
@@ -472,7 +471,7 @@ class TestParserAArch64(unittest.TestCase):
     def _get_condition(self, parser, condition):
         return parser.process_operand(
             parser.condition.parseString(condition, parseAll=True).asDict()
-        )["condition"]
+        ).ccode
 
     @staticmethod
     def _find_file(name):

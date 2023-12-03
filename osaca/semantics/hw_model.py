@@ -233,7 +233,7 @@ class MachineModel(object):
         elif o["class"] == "condition":
             new_operands.append(
                 ConditionOperand(
-                    ccode=o["ccode"],
+                    ccode=o["ccode"].upper(),
                     source=o["source"] if "source" in o else False,
                     destination=o["destination"] if "destination" in o else False,
                 )
@@ -319,7 +319,7 @@ class MachineModel(object):
 
     def set_instruction_entry(self, entry):
         """Import instruction as entry object form information."""
-        if entry.instruction == None and entry.operands == []:
+        if entry.instruction is None and entry.operands == []:
             raise KeyError
         self.set_instruction(
             entry.instruction,
@@ -401,11 +401,11 @@ class MachineModel(object):
         operands = []
         for op in instruction_form.operands:
             op_attrs = []
-            if op.name != None:
+            if op.name is not None:
                 op_attrs.append("name:" + op.name)
-            if op.prefix != None:
+            if op.prefix is not None:
                 op_attrs.append("prefix:" + op.prefix)
-            if op.shape != None:
+            if op.shape is not None:
                 op_attrs.append("shape:" + op.shape)
             operands.append("{}({})".format("register", ",".join(op_attrs)))
         return "{}  {}".format(instruction_form.instruction.lower(), ",".join(operands))
@@ -465,7 +465,7 @@ class MachineModel(object):
             formatted_load_throughput.append(cm)
 
         # Create YAML object
-        yaml = self._create_yaml_object()
+        # yaml = self._create_yaml_object()
         if not stream:
             stream = StringIO()
         """
@@ -701,32 +701,32 @@ class MachineModel(object):
             return self._is_AArch64_mem_type(i_operand, operand)
         # immediate
         if isinstance(i_operand, ImmediateOperand) and i_operand.type == self.WILDCARD:
-            return isinstance(operand, ImmediateOperand) and (operand.value != None)
+            return isinstance(operand, ImmediateOperand) and (operand.value is not None)
 
         if isinstance(i_operand, ImmediateOperand) and i_operand.type == "int":
             return (
                 isinstance(operand, ImmediateOperand)
                 and operand.type == "int"
-                and operand.value != None
+                and operand.value is not None
             )
 
         if isinstance(i_operand, ImmediateOperand) and i_operand.type == "float":
             return (
                 isinstance(operand, ImmediateOperand)
                 and operand.type == "float"
-                and operand.value != None
+                and operand.value is not None
             )
 
         if isinstance(i_operand, ImmediateOperand) and i_operand.type == "double":
             return (
                 isinstance(operand, ImmediateOperand)
                 and operand.type == "double"
-                and operand.value != None
+                and operand.value is not None
             )
 
         # identifier
         if isinstance(operand, IdentifierOperand) or (
-            isinstance(operand, ImmediateOperand) and operand.identifier != None
+            isinstance(operand, ImmediateOperand) and operand.identifier is not None
         ):
             return isinstance(i_operand, IdentifierOperand)
         # prefetch option
@@ -786,8 +786,8 @@ class MachineModel(object):
         """Check if register type match."""
         # check for wildcards
         if reg.prefix == self.WILDCARD or i_reg.prefix == self.WILDCARD:
-            if reg.shape != None:
-                if i_reg.shape != None and (
+            if reg.shape is not None:
+                if i_reg.shape is not None and (
                     reg.shape == i_reg.shape or self.WILDCARD in (reg.shape + i_reg.shape)
                 ):
                     return True
@@ -796,14 +796,14 @@ class MachineModel(object):
         # check for prefix and shape
         if reg.prefix != i_reg.prefix:
             return False
-        if reg.shape != None:
-            if i_reg.shape != None and (
+        if reg.shape is not None:
+            if i_reg.shape is not None and (
                 reg.shape == i_reg.shape or self.WILDCARD in (reg.shape + i_reg.shape)
             ):
                 return True
             return False
-        if reg.lanes != None:
-            if i_reg.lanes != None and (
+        if reg.lanes is not None:
+            if i_reg.lanes is not None and (
                 reg.lanes == i_reg.lanes or self.WILDCARD in (reg.lanes + i_reg.lanes)
             ):
                 return True
@@ -832,13 +832,13 @@ class MachineModel(object):
                 # Consider masking and zeroing for AVX512
                 if consider_masking:
                     mask_ok = zero_ok = True
-                    if reg.mask != None or i_reg.mask != None:
+                    if reg.mask is not None or i_reg.mask is not None:
                         # one instruction is missing the masking while the other has it
                         mask_ok = False
                         # check for wildcard
                         if (
                             (
-                                reg.mask != None
+                                reg.mask is not None
                                 and reg.mask.rstrip(string.digits).lower() == i_reg.mask
                             )
                             or reg.mask == self.WILDCARD
@@ -891,7 +891,7 @@ class MachineModel(object):
                 or i_mem.index == self.WILDCARD
                 or (
                     mem.index is not None
-                    and mem.index.prefix != None
+                    and mem.index.prefix is not None
                     and mem.index.prefix == i_mem.index
                 )
             )
@@ -907,7 +907,7 @@ class MachineModel(object):
             and (
                 i_mem.post_indexed == self.WILDCARD
                 or mem.post_indexed == i_mem.post_indexed
-                or (type(mem.post_indexed) == dict and i_mem.post_indexed == True)
+                or (isinstance(mem.post_indexed, dict) and i_mem.post_indexed)
             )
         ):
             return True

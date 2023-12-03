@@ -14,7 +14,6 @@ from osaca.parser.label import LabelOperand
 from osaca.parser.register import RegisterOperand
 from osaca.parser.identifier import IdentifierOperand
 from osaca.parser.immediate import ImmediateOperand
-from osaca.parser.operand import Operand
 
 
 class ParserX86ATT(BaseParser):
@@ -223,7 +222,7 @@ class ParserX86ATT(BaseParser):
             try:
                 result = self.process_operand(self.label.parseString(line, parseAll=True).asDict())
                 instruction_form.label = result.name
-                if result.comment != None:
+                if result.comment is not None:
                     instruction_form.comment = " ".join(result.comment)
             except pp.ParseException:
                 pass
@@ -239,7 +238,7 @@ class ParserX86ATT(BaseParser):
                     parameter_id=result.parameters,
                 )
 
-                if result.comment != None:
+                if result.comment is not None:
                     instruction_form.comment = " ".join(result.comment)
             except pp.ParseException:
                 pass
@@ -340,11 +339,11 @@ class ParserX86ATT(BaseParser):
                 offset = ImmediateOperand(value_id=offset)
         elif offset is not None and "value" in offset:
             offset = ImmediateOperand(value_id=int(offset["value"], 0))
-        if base != None:
+        if base is not None:
             baseOp = RegisterOperand(
                 name=base["name"], prefix_id=base["prefix"] if "prefix" in base else None
             )
-        if index != None:
+        if index is not None:
             indexOp = RegisterOperand(
                 name=index["name"], prefix_id=index["prefix"] if "prefix" in index else None
             )
@@ -386,7 +385,7 @@ class ParserX86ATT(BaseParser):
         """Normalize immediate to decimal based representation"""
         if isinstance(imd, IdentifierOperand):
             return imd
-        if imd.value != None:
+        if imd.value is not None:
             if isinstance(imd.value, str):
                 # return decimal
                 return int(imd.value, 0)

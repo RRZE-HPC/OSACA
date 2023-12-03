@@ -11,8 +11,6 @@ from .hw_model import MachineModel
 from .isa_semantics import INSTR_flags, ISASemantics
 from osaca.parser.memory import MemoryOperand
 from osaca.parser.register import RegisterOperand
-from osaca.parser.immediate import ImmediateOperand
-from osaca.parser.identifier import IdentifierOperand
 
 
 class ArchSemantics(ISASemantics):
@@ -278,7 +276,7 @@ class ArchSemantics(ISASemantics):
                             data_port_uops = [
                                 ldp.port_pressure
                                 for ldp in load_perf_data
-                                if ldp.dst != None
+                                if ldp.dst is not None
                                 and self._machine_model._check_operands(
                                     dummy_reg, RegisterOperand(name=ldp.dst)
                                 )
@@ -391,7 +389,7 @@ class ArchSemantics(ISASemantics):
                     latency = 0.0
                     latency_wo_load = latency
                     instruction_form.port_pressure = [0.0 for i in range(port_number)]
-                    instruction_formport_uops = []
+                    # instruction_formport_uops = []
                     flags += [INSTR_flags.TP_UNKWN, INSTR_flags.LT_UNKWN]
         # flatten flag list
         flags = list(set(flags))

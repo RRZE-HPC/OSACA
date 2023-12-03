@@ -124,7 +124,6 @@ class TestCLI(unittest.TestCase):
         # remove copy again
         os.remove(name_copy)
 
-    """
     def test_examples(self):
         kernels = [
             "add",
@@ -157,7 +156,6 @@ class TestCLI(unittest.TestCase):
                         output = StringIO()
                         osaca.run(args, output_file=output)
                         self.assertTrue("WARNING" not in output.getvalue())
-    """
 
     def test_architectures(self):
         parser = osaca.create_parser()
@@ -171,7 +169,6 @@ class TestCLI(unittest.TestCase):
                 output = StringIO()
                 osaca.run(args, output_file=output)
 
-    """
     def test_architectures_sanity(self):
         # Run sanity check for all architectures
         archs = osaca.SUPPORTED_ARCHS
@@ -180,7 +177,6 @@ class TestCLI(unittest.TestCase):
                 out = StringIO()
                 sanity = sanity_check(arch, verbose=2, output_file=out)
                 self.assertTrue(sanity, msg=out)
-    """
 
     def test_without_arch(self):
         # Run test kernels without --arch flag

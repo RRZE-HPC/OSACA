@@ -10,7 +10,7 @@ from copy import deepcopy
 
 import networkx as nx
 from osaca.osaca import get_unmatched_instruction_ratio
-from osaca.parser import AttrDict, ParserAArch64, ParserX86ATT
+from osaca.parser import ParserAArch64, ParserX86ATT
 from osaca.semantics import (
     INSTR_flags,
     ArchSemantics,
@@ -22,7 +22,6 @@ from osaca.semantics import (
 from osaca.parser.register import RegisterOperand
 from osaca.parser.memory import MemoryOperand
 from osaca.parser.identifier import IdentifierOperand
-from osaca.parser.operand import Operand
 
 
 class TestSemanticTools(unittest.TestCase):
@@ -296,8 +295,8 @@ class TestSemanticTools(unittest.TestCase):
         port_num = len(self.machine_model_csx["ports"])
         for instruction_form in self.kernel_x86:
             with self.subTest(instruction_form=instruction_form):
-                self.assertTrue(instruction_form.throughput != None)
-                self.assertTrue(instruction_form.latency != None)
+                self.assertTrue(instruction_form.throughput is not None)
+                self.assertTrue(instruction_form.latency is not None)
                 self.assertIsInstance(instruction_form.port_pressure, list)
                 self.assertEqual(len(instruction_form.port_pressure), port_num)
 
@@ -306,8 +305,8 @@ class TestSemanticTools(unittest.TestCase):
         port_num = len(self.machine_model_tx2["ports"])
         for instruction_form in self.kernel_AArch64:
             with self.subTest(instruction_form=instruction_form):
-                self.assertTrue(instruction_form.throughput != None)
-                self.assertTrue(instruction_form.latency != None)
+                self.assertTrue(instruction_form.throughput is not None)
+                self.assertTrue(instruction_form.latency is not None)
                 self.assertIsInstance(instruction_form.port_pressure, list)
                 self.assertEqual(len(instruction_form.port_pressure), port_num)
 
