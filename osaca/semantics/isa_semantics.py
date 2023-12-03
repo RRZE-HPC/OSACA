@@ -2,7 +2,7 @@
 from itertools import chain
 
 from osaca import utils
-from osaca.parser import AttrDict, ParserAArch64, ParserX86ATT
+from osaca.parser import ParserAArch64, ParserX86ATT
 from osaca.parser.memory import MemoryOperand
 from osaca.parser.operand import Operand
 from osaca.parser.register import RegisterOperand
@@ -164,7 +164,7 @@ class ISASemantics(object):
         if instruction_form.instruction is None:
             return {}
         dest_reg_names = [
-            (op.prefix if op.prefix != None else "") + op.name
+            (op.prefix if op.prefix is not None else "") + op.name
             for op in chain(
                 instruction_form.semantic_operands["destination"],
                 instruction_form.semantic_operands["src_dst"],
@@ -194,13 +194,13 @@ class ISASemantics(object):
             for o in instruction_form.operands:
                 if (
                     isinstance(o, MemoryOperand)
-                    and o.base != None
+                    and o.base is not None
                     and isinstance(o.post_indexed, dict)
                 ):
-                    base_name = (o.base.prefix if o.base.prefix != None else "") + o.base.name
+                    base_name = (o.base.prefix if o.base.prefix is not None else "") + o.base.name
                     return {
                         base_name: {
-                            "name": (o.base.prefix if o.base.prefix != None else "") + o.base.name,
+                            "name": (o.base.prefix if o.base.prefix is not None else "") + o.base.name,
                             "value": o.post_indexed["value"],
                         }
                     }
@@ -218,7 +218,7 @@ class ISASemantics(object):
                         "This is currently not supprted.".format(instruction_form.line)
                     )
 
-                base_name = (o.base.prefix if o.base.prefix != None else "") + o.base.name
+                base_name = (o.base.prefix if o.base.prefix is not None else "") + o.base.name
                 reg_operand_names = {base_name: "op1"}
                 operand_state = {"op1": {"name": base_name, "value": o.offset.value}}
 
@@ -227,7 +227,7 @@ class ISASemantics(object):
                 operand_name = "op{}".format(i + 1)
 
                 if isinstance(o, RegisterOperand):
-                    o_reg_name = (o.prefix if o.prefix != None else "") + o.name
+                    o_reg_name = (o.prefix if o.prefix is not None else "") + o.name
                     reg_operand_names[o_reg_name] = operand_name
                     operand_state[operand_name] = {"name": o_reg_name, "value": 0}
                 elif isinstance(o, ImmediateOperand):

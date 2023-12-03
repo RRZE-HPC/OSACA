@@ -13,6 +13,7 @@ class BaseParser(object):
     IDENTIFIER_ID = "identifier"
     MEMORY_ID = "memory"
     REGISTER_ID = "register"
+    CONDITION_ID = "condition"
     segment_ext_id = "segment_extension"
     instruction_id = "instruction"
     operands_id = "operands"

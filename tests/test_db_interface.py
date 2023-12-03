@@ -33,13 +33,13 @@ class TestDBInterface(unittest.TestCase):
         self.entry_tx2 = copy.copy(sample_entry)
         self.entry_zen1 = copy.copy(sample_entry)
 
-        # self.entry_csx['port_pressure'] = [1.25, 0, 1.25, 0.5, 0.5, 0.5, 0.5, 0, 1.25, 1.25, 0]
+        self.entry_csx.port_pressure = [1.25, 0, 1.25, 0.5, 0.5, 0.5, 0.5, 0, 1.25, 1.25, 0]
         self.entry_csx.port_pressure = [[5, "0156"], [1, "23"], [1, ["2D", "3D"]]]
-        # self.entry_tx2['port_pressure'] = [2.5, 2.5, 0, 0, 0.5, 0.5]
+        self.entry_tx2.port_pressure = [2.5, 2.5, 0, 0, 0.5, 0.5]
         self.entry_tx2.port_pressure = [[5, "01"], [1, "45"]]
         self.entry_tx2.operands[1].name = None
         self.entry_tx2.operands[1].prefix = "x"
-        # self.entry_zen1['port_pressure'] = [1, 1, 1, 1, 0, 1, 0, 0, 0, 0.5, 1, 0.5, 1]
+        self.entry_zen1.port_pressure = [1, 1, 1, 1, 0, 1, 0, 0, 0, 0.5, 1, 0.5, 1]
         self.entry_zen1.port_pressure = [
             [4, "0123"],
             [1, "4"],
@@ -73,8 +73,8 @@ class TestDBInterface(unittest.TestCase):
 
     def test_invalid_add(self):
         entry = instructionForm()
-        # with self.assertRaises(KeyError):
-        #    MachineModel("csx").set_instruction_entry(entry)
+        with self.assertRaises(KeyError):
+            MachineModel("csx").set_instruction_entry(entry)
         with self.assertRaises(TypeError):
             MachineModel("csx").set_instruction()
 

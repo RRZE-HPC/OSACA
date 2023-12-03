@@ -291,7 +291,7 @@ class ParserAArch64(BaseParser):
             try:
                 result = self.process_operand(self.label.parseString(line, parseAll=True).asDict())
                 instruction_form.label = result.name
-                if result.comment != None:
+                if result.comment is not None:
                     instruction_form.comment = " ".join(result.comment)
             except pp.ParseException:
                 pass
@@ -390,8 +390,8 @@ class ParserAArch64(BaseParser):
                 if "comment" in operand["directive"]
                 else None,
             )
-        if "condition" in operand:
-            return self.process_condition(operand["condition"])
+        if self.CONDITION_ID in operand:
+            return self.process_condition(operand[self.CONDITION_ID])
         return operand
 
     def process_register_operand(self, operand):
@@ -449,7 +449,7 @@ class ParserAArch64(BaseParser):
         return new_reg
 
     def process_condition(self, condition):
-        return ConditionOperand(ccode=condition.lower())
+        return ConditionOperand(ccode=condition.upper())
 
     def resolve_range_list(self, operand):
         """
@@ -502,7 +502,7 @@ class ParserAArch64(BaseParser):
         index = register_list.get("index", None)
         new_dict = {dict_name: rlist, "index": index}
         if len(new_dict[dict_name]) == 1:
-            return {self.REGISTER_ID: new_dict[dict_name][0]}
+            return {self.REGISTER_ID: new_dict}
         return {self.REGISTER_ID: new_dict}
 
     def process_immediate(self, immediate):
@@ -581,11 +581,11 @@ class ParserAArch64(BaseParser):
         """Normalize immediate to decimal based representation"""
         if isinstance(imd, IdentifierOperand):
             return imd
-        if imd.value != None and imd.type == "float":
+        if imd.value is not None and imd.type == "float":
             return self.ieee_to_float(imd.value)
-        elif imd.value != None and imd.type == "double":
+        elif imd.value is not None and imd.type == "double":
             return self.ieee_to_float(imd.value)
-        elif imd.value != None:
+        elif imd.value is not None:
             if isinstance(imd.value, str):
                 # hex or bin, return decimal
                 return int(imd.value, 0)

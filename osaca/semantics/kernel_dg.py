@@ -85,7 +85,7 @@ class KernelDG(nx.DiGraph):
                 # print(instruction_form.line_number,"\t",dep.line_number,"\n")
                 edge_weight = (
                     instruction_form.latency
-                    if "mem_dep" in dep_flags or instruction_form.latency_wo_load == None
+                    if "mem_dep" in dep_flags or instruction_form.latency_wo_load is None
                     else instruction_form.latency_wo_load
                 )
                 if "storeload_dep" in dep_flags and self.model is not None:
@@ -299,7 +299,7 @@ class KernelDG(nx.DiGraph):
                     # write to register -> abort
                     if self.is_written(dst, instr_form):
                         break
-                if not isinstance(dst, Operand) and dst["class"] == "flag" and flag_dependencies:
+                if not isinstance(dst, Operand) and ("flag" in dst or dst["class"] == "flag" if "class" in dst else False) and flag_dependencies:
                     # read of flag
                     if self.is_read(dst, instr_form):
                         yield instr_form, []
@@ -317,7 +317,7 @@ class KernelDG(nx.DiGraph):
                     # if dst.memory.index:
                     #    if self.is_read(dst.memory.index, instr_form):
                     #        yield instr_form, []
-                    if dst.post_indexed != False:
+                    if dst.post_indexed:
                         # Check for read of base register until overwrite
                         if self.is_written(dst.base, instr_form):
                             break
@@ -377,7 +377,7 @@ class KernelDG(nx.DiGraph):
         ):
             if isinstance(src, RegisterOperand):
                 is_read = self.parser.is_reg_dependend_of(register, src) or is_read
-            if not isinstance(src, Operand) and src["class"] == "flag":
+            if not isinstance(src, Operand) and ("flag" in src or src["class"] == "flag" if "class" in src else False):
                 is_read = self.parser.is_flag_dependend_of(register, src) or is_read
             if isinstance(src, MemoryOperand):
                 if src.base is not None:
@@ -411,15 +411,15 @@ class KernelDG(nx.DiGraph):
 
             # determine absolute address change
             addr_change = 0
-            if isinstance(src.offset, ImmediateOperand) and src.offset.value != None:
+            if isinstance(src.offset, ImmediateOperand) and src.offset.value is not None:
                 addr_change += src.offset.value
             if mem.offset:
                 addr_change -= mem.offset.value
             if mem.base and src.base:
                 base_change = register_changes.get(
-                    (src.base.prefix if src.base.prefix != None else "") + src.base.name,
+                    (src.base.prefix if src.base.prefix is not None else "") + src.base.name,
                     {
-                        "name": (src.base.prefix if src.base.prefix != None else "")
+                        "name": (src.base.prefix if src.base.prefix is not None else "")
                         + src.base.name,
                         "value": 0,
                     },
@@ -429,7 +429,7 @@ class KernelDG(nx.DiGraph):
                     continue
                 if (
                     mem.base.prefix
-                    if mem.base.prefix != None
+                    if mem.base.prefix is not None
                     else "" + mem.base.name != base_change["name"]
                 ):
                     # base registers do not match
@@ -440,9 +440,9 @@ class KernelDG(nx.DiGraph):
                 continue
             if mem.index and src.index:
                 index_change = register_changes.get(
-                    (src.index.prefix if src.index.prefix != None else "") + src.index.name,
+                    (src.index.prefix if src.index.prefix is not None else "") + src.index.name,
                     {
-                        "name": (src.index.prefix if src.index.prefix != None else "")
+                        "name": (src.index.prefix if src.index.prefix is not None else "")
                         + src.index.name,
                         "value": 0,
                     },
@@ -455,7 +455,7 @@ class KernelDG(nx.DiGraph):
                     continue
                 if (
                     mem.index.prefix
-                    if mem.index.prefix != None
+                    if mem.index.prefix is not None
                     else "" + mem.index.name != index_change["name"]
                 ):
                     # index registers do not match
@@ -480,7 +480,7 @@ class KernelDG(nx.DiGraph):
         ):
             if isinstance(dst, RegisterOperand):
                 is_written = self.parser.is_reg_dependend_of(register, dst) or is_written
-            if not isinstance(dst, Operand) and dst["class"] == "flag":
+            if not isinstance(dst, Operand) and ("flag" in dst or dst["class"] == "flag" if "class" in dst else False):
                 is_written = self.parser.is_flag_dependend_of(register, dst) or is_written
             if isinstance(dst, MemoryOperand):
                 if dst.pre_indexed or dst.post_indexed:
@@ -591,9 +591,9 @@ class KernelDG(nx.DiGraph):
                 if node.instruction is not None:
                     mapping[n] = "{}: {}".format(n, node.instruction)
                 else:
-                    label = "label" if node.label != None else None
-                    label = "directive" if node.directive != None else label
-                    label = "comment" if node.comment != None and label is None else label
+                    label = "label" if node.label is not None else None
+                    label = "directive" if node.directive is not None else label
+                    label = "comment" if node.comment is not None and label is None else label
                     mapping[n] = "{}: {}".format(n, label)
                     graph.nodes[n]["fontname"] = "italic"
                     graph.nodes[n]["fontsize"] = 11.0

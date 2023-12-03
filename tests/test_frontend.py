@@ -9,7 +9,6 @@ import unittest
 from osaca.frontend import Frontend
 from osaca.parser import ParserAArch64, ParserX86ATT
 from osaca.semantics import ArchSemantics, KernelDG, MachineModel, reduce_to_section
-from osaca.parser.operand import Operand
 
 
 class TestFrontend(unittest.TestCase):

@@ -11,7 +11,6 @@ from pyparsing import ParseException
 from osaca.parser import ParserX86ATT, instructionForm
 from osaca.parser.register import RegisterOperand
 from osaca.parser.immediate import ImmediateOperand
-from osaca.parser.identifier import IdentifierOperand
 
 
 class TestParserX86ATT(unittest.TestCase):
@@ -222,7 +221,7 @@ class TestParserX86ATT(unittest.TestCase):
         self.assertEqual(parsed_1, instruction_form_1)
         self.assertEqual(parsed_2, instruction_form_2)
         self.assertEqual(parsed_3, instruction_form_3)
-        # self.assertEqual(parsed_4, instruction_form_4)
+        self.assertEqual(parsed_4, instruction_form_4)
 
     def test_parse_file(self):
         parsed = self.parser.parse_file(self.triad_code)

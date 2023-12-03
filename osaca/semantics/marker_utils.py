@@ -2,11 +2,11 @@
 from collections import OrderedDict
 
 from osaca.parser import ParserAArch64, ParserX86ATT, get_parser
-
-COMMENT_MARKER = {"start": "OSACA-BEGIN", "end": "OSACA-END"}
 from osaca.parser.register import RegisterOperand
 from osaca.parser.identifier import IdentifierOperand
 from osaca.parser.immediate import ImmediateOperand
+
+COMMENT_MARKER = {"start": "OSACA-BEGIN", "end": "OSACA-END"}
 
 
 def reduce_to_section(kernel, isa):
@@ -255,7 +255,7 @@ def find_basic_blocks(lines):
             terminate = False
             blocks[label].append(line)
             # Find end of block by searching for references to valid jump labels
-            if line.instruction != None and line.operands != []:
+            if line.instruction is not None and line.operands != []:
                 for operand in [o for o in line.operands if isinstance(o, IdentifierOperand)]:
                     if operand.name in valid_jump_labels:
                         terminate = True
@@ -284,7 +284,7 @@ def find_basic_loop_bodies(lines):
             terminate = False
             current_block.append(line)
             # Find end of block by searching for references to valid jump labels
-            if line.instruction != None and line.operands != []:
+            if line.instruction is not None and line.operands != []:
                 # Ignore `b.none` instructions (relevant von ARM SVE code)
                 # This branch instruction is often present _within_ inner loop blocks, but usually
                 # do not terminate
