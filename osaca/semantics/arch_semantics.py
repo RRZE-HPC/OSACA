@@ -313,7 +313,10 @@ class ArchSemantics(ISASemantics):
                             # since it is no mem store
                             if (
                                 self._isa == "aarch64"
-                                and not isinstance(instruction_form.semantic_operands["destination"], MemoryOperand)
+                                and not isinstance(
+                                    instruction_form.semantic_operands["destination"],
+                                    MemoryOperand,
+                                )
                                 and all(
                                     [
                                         op.post_indexed or op.pre_indexed

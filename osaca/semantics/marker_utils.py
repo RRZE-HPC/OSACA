@@ -8,6 +8,7 @@ from osaca.parser.register import RegisterOperand
 from osaca.parser.identifier import IdentifierOperand
 from osaca.parser.immediate import ImmediateOperand
 
+
 def reduce_to_section(kernel, isa):
     """
     Finds OSACA markers in given kernel and returns marked section
@@ -254,7 +255,7 @@ def find_basic_blocks(lines):
             terminate = False
             blocks[label].append(line)
             # Find end of block by searching for references to valid jump labels
-            if line.instruction!=None and line.operands!=[]:
+            if line.instruction != None and line.operands != []:
                 for operand in [o for o in line.operands if isinstance(o, IdentifierOperand)]:
                     if operand.name in valid_jump_labels:
                         terminate = True
@@ -283,7 +284,7 @@ def find_basic_loop_bodies(lines):
             terminate = False
             current_block.append(line)
             # Find end of block by searching for references to valid jump labels
-            if line.instruction!=None and line.operands!=[]:
+            if line.instruction != None and line.operands != []:
                 # Ignore `b.none` instructions (relevant von ARM SVE code)
                 # This branch instruction is often present _within_ inner loop blocks, but usually
                 # do not terminate
