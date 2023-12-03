@@ -77,7 +77,6 @@ class MachineModel(object):
             if cached:
                 self._data = cached
             else:
-                
                 yaml = self._create_yaml_object()
                 # otherwise load
                 with open(self._path, "r") as f:
@@ -202,7 +201,7 @@ class MachineModel(object):
             )
         elif o["class"] == "memory":
             if isinstance(o["base"], dict):
-                o["base"] = RegisterOperand(name = o["base"]["name"])
+                o["base"] = RegisterOperand(name=o["base"]["name"])
             new_operands.append(
                 MemoryOperand(
                     base_id=o["base"],
@@ -224,7 +223,8 @@ class MachineModel(object):
                 )
             )
         elif o["class"] == "identifier":
-            new_operands.append(IdentifierOperand(
+            new_operands.append(
+                IdentifierOperand(
                     name=o["name"] if "name" in o else None,
                     source=o["source"] if "source" in o else False,
                     destination=o["destination"] if "destination" in o else False,
@@ -364,7 +364,6 @@ class MachineModel(object):
             return ld_tp.copy()
         return [MemoryOperand(port_pressure=self._data["load_throughput_default"].copy())]
 
-
     def get_store_latency(self, reg_type):
         """Return store latency for given register type."""
         # assume 0 for now, since load-store-dependencies currently not detectable
@@ -377,8 +376,7 @@ class MachineModel(object):
             st_tp = [
                 tp
                 for tp in st_tp
-                if "src" in tp
-                and self._check_operands(src_reg, RegisterOperand(name=tp["src"]))
+                if "src" in tp and self._check_operands(src_reg, RegisterOperand(name=tp["src"]))
             ]
         if len(st_tp) > 0:
             return st_tp.copy()
@@ -470,7 +468,7 @@ class MachineModel(object):
         yaml = self._create_yaml_object()
         if not stream:
             stream = StringIO()
-        '''
+        """
         yaml.dump(
             {
                 k: v
@@ -488,12 +486,18 @@ class MachineModel(object):
 
         yaml.dump({"load_throughput": formatted_load_throughput}, stream)
         yaml.dump({"instruction_forms": formatted_instruction_forms}, stream)
-        '''
+        """
         if isinstance(stream, StringIO):
             return stream.getvalue()
-    
+
     def operand_to_dict(self, mem):
-        return {'base':mem.base, 'offset':mem.offset, 'index':mem.index, 'scale':mem.scale, 'port_pressure':mem.port_pressure}
+        return {
+            "base": mem.base,
+            "offset": mem.offset,
+            "index": mem.index,
+            "scale": mem.scale,
+            "port_pressure": mem.port_pressure,
+        }
 
     ######################################################
 
@@ -875,7 +879,11 @@ class MachineModel(object):
                     and isinstance(mem.offset, IdentifierOperand)
                     and isinstance(i_mem.offset, IdentifierOperand)
                 )
-                or (mem.offset is not None and isinstance(mem.offset, ImmediateOperand) and isinstance(i_mem.offset, ImmediateOperand))
+                or (
+                    mem.offset is not None
+                    and isinstance(mem.offset, ImmediateOperand)
+                    and i_mem.offset == "imd"
+                )
             )
             # check index
             and (
@@ -896,7 +904,11 @@ class MachineModel(object):
             # check pre-indexing
             and (i_mem.pre_indexed == self.WILDCARD or mem.pre_indexed == i_mem.pre_indexed)
             # check post-indexing
-            and (i_mem.post_indexed == self.WILDCARD or mem.post_indexed == i_mem.post_indexed or (type(mem.post_indexed) == dict and i_mem.post_indexed == True))
+            and (
+                i_mem.post_indexed == self.WILDCARD
+                or mem.post_indexed == i_mem.post_indexed
+                or (type(mem.post_indexed) == dict and i_mem.post_indexed == True)
+            )
         ):
             return True
         return False
@@ -923,8 +935,7 @@ class MachineModel(object):
                     mem.offset is not None
                     and isinstance(mem.offset, ImmediateOperand)
                     and (
-                        i_mem.offset == "imd"
-                        or (i_mem.offset is None and mem.offset.value == "0")
+                        i_mem.offset == "imd" or (i_mem.offset is None and mem.offset.value == "0")
                     )
                 )
                 or (isinstance(mem.offset, IdentifierOperand) and i_mem.offset == "id")
@@ -946,7 +957,6 @@ class MachineModel(object):
                 or (mem.scale != 1 and i_mem.scale != 1)
             )
         ):
-
             return True
         return False
 

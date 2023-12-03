@@ -121,23 +121,27 @@ class ISASemantics(object):
             for operand in [op for op in op_dict["source"] if isinstance(op, MemoryOperand)]:
                 post_indexed = operand.post_indexed
                 pre_indexed = operand.pre_indexed
-                if post_indexed or pre_indexed or (isinstance(post_indexed, dict) and "value" in post_indexed):
+                if (
+                    post_indexed
+                    or pre_indexed
+                    or (isinstance(post_indexed, dict) and "value" in post_indexed)
+                ):
                     new_op = operand.base
                     new_op.pre_indexed = pre_indexed
                     new_op.post_indexed = post_indexed
-                    op_dict["src_dst"].append(
-                        new_op
-                    )
+                    op_dict["src_dst"].append(new_op)
             for operand in [op for op in op_dict["destination"] if isinstance(op, MemoryOperand)]:
                 post_indexed = operand.post_indexed
                 pre_indexed = operand.pre_indexed
-                if post_indexed or pre_indexed or (isinstance(post_indexed, dict) and "value" in post_indexed):
+                if (
+                    post_indexed
+                    or pre_indexed
+                    or (isinstance(post_indexed, dict) and "value" in post_indexed)
+                ):
                     new_op = operand.base
                     new_op.pre_indexed = pre_indexed
                     new_op.post_indexed = post_indexed
-                    op_dict["src_dst"].append(
-                        new_op
-                    )
+                    op_dict["src_dst"].append(new_op)
         # store operand list in dict and reassign operand key/value pair
         instruction_form.semantic_operands = op_dict
         # assign LD/ST flags
@@ -188,7 +192,11 @@ class ISASemantics(object):
 
         if only_postindexed:
             for o in instruction_form.operands:
-                if isinstance(o, MemoryOperand) and o.base != None and isinstance(o.post_indexed, dict):
+                if (
+                    isinstance(o, MemoryOperand)
+                    and o.base != None
+                    and isinstance(o.post_indexed, dict)
+                ):
                     base_name = (o.base.prefix if o.base.prefix != None else "") + o.base.name
                     return {
                         base_name: {
@@ -217,7 +225,7 @@ class ISASemantics(object):
         if isa_data is not None and isa_data.operation is not None:
             for i, o in enumerate(instruction_form.operands):
                 operand_name = "op{}".format(i + 1)
-                
+
                 if isinstance(o, RegisterOperand):
                     o_reg_name = (o.prefix if o.prefix != None else "") + o.name
                     reg_operand_names[o_reg_name] = operand_name
@@ -251,15 +259,12 @@ class ISASemantics(object):
         op_dict["source"] = []
         op_dict["destination"] = []
         op_dict["src_dst"] = []
-        
+
         # handle dependency breaking instructions
         if isa_data.breaks_dep and operands[1:] == operands[:-1]:
             op_dict["destination"] += operands
-            if isa_data.hidden_operands!=[]:
-                op_dict["destination"] += [
-                    hop
-                    for hop in isa_data.hidden_operands
-                ]
+            if isa_data.hidden_operands != []:
+                op_dict["destination"] += [hop for hop in isa_data.hidden_operands]
             return op_dict
 
         for i, op in enumerate(isa_data.operands):
@@ -272,9 +277,9 @@ class ISASemantics(object):
             if op.destination:
                 op_dict["destination"].append(operands[i])
                 continue
-        
+
         # check for hidden operands like flags or registers
-        if isa_data.hidden_operands!=[]:
+        if isa_data.hidden_operands != []:
             # add operand(s) to semantic_operands of instruction form
             for op in isa_data.hidden_operands:
                 if isinstance(op, Operand):
@@ -286,15 +291,15 @@ class ISASemantics(object):
                         else "destination"
                     )
                 else:
-                     dict_key = (
+                    dict_key = (
                         "src_dst"
                         if op["source"] and op["destination"]
                         else "source"
                         if op["source"]
                         else "destination"
-                    )                   
+                    )
                 op_dict[dict_key].append(op)
-        
+
         return op_dict
 
     def _has_load(self, instruction_form):

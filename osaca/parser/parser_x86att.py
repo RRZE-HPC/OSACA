@@ -16,6 +16,7 @@ from osaca.parser.identifier import IdentifierOperand
 from osaca.parser.immediate import ImmediateOperand
 from osaca.parser.operand import Operand
 
+
 class ParserX86ATT(BaseParser):
     _instance = None
 
@@ -372,8 +373,8 @@ class ParserX86ATT(BaseParser):
             # actually an identifier, change declaration
             return immediate
         # otherwise just make sure the immediate is a decimal
-        #immediate["value"] = int(immediate["value"], 0)
-        new_immediate = ImmediateOperand(value_id = int(immediate["value"], 0))
+        # immediate["value"] = int(immediate["value"], 0)
+        new_immediate = ImmediateOperand(value_id=int(immediate["value"], 0))
         return new_immediate
 
     def get_full_reg_name(self, register):
@@ -385,7 +386,7 @@ class ParserX86ATT(BaseParser):
         """Normalize immediate to decimal based representation"""
         if isinstance(imd, IdentifierOperand):
             return imd
-        if imd.value!=None:
+        if imd.value != None:
             if isinstance(imd.value, str):
                 # return decimal
                 return int(imd.value, 0)
@@ -399,9 +400,9 @@ class ParserX86ATT(BaseParser):
         # we assume flags are independent of each other, e.g., CF can be read while ZF gets written
         # TODO validate this assumption
         if isinstance(flag_b, Operand):
-            return (flag_a.name == flag_b.name)
+            return flag_a.name == flag_b.name
         else:
-            return (flag_a.name == flag_b["name"])
+            return flag_a.name == flag_b["name"]
         if flag_a.name == flag_b.name:
             return True
         return False

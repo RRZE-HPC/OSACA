@@ -13,6 +13,7 @@ from osaca.parser.identifier import IdentifierOperand
 from osaca.parser.immediate import ImmediateOperand
 from osaca.parser.condition import ConditionOperand
 
+
 class ParserAArch64(BaseParser):
     _instance = None
 
@@ -446,7 +447,7 @@ class ParserAArch64(BaseParser):
         new_reg = RegisterOperand(prefix_id="x", name="sp")
         # reg["prefix"] = "x"
         return new_reg
-    
+
     def process_condition(self, condition):
         return ConditionOperand(ccode=condition.lower())
 
@@ -514,7 +515,9 @@ class ParserAArch64(BaseParser):
             # normal integer value
             immediate["type"] = "int"
             # convert hex/bin immediates to dec
-            new_immediate = ImmediateOperand(type_id=immediate["type"], value_id=immediate["value"])
+            new_immediate = ImmediateOperand(
+                type_id=immediate["type"], value_id=immediate["value"]
+            )
             new_immediate.value = self.normalize_imd(new_immediate)
             return new_immediate
         if "base_immediate" in immediate:
@@ -522,8 +525,12 @@ class ParserAArch64(BaseParser):
             immediate["shift"] = immediate["shift"][0]
             temp_immediate = ImmediateOperand(value_id=immediate["base_immediate"]["value"])
             immediate["type"] = "int"
-            new_immediate = ImmediateOperand(type_id=immediate["type"], value_id=None, shift_id=immediate["shift"])
-            new_immediate.value = self.normalize_imd(temp_immediate) << int(immediate["shift"]["value"])
+            new_immediate = ImmediateOperand(
+                type_id=immediate["type"], value_id=None, shift_id=immediate["shift"]
+            )
+            new_immediate.value = self.normalize_imd(temp_immediate) << int(
+                immediate["shift"]["value"]
+            )
             return new_immediate
         if "float" in immediate:
             dict_name = "float"
@@ -531,7 +538,9 @@ class ParserAArch64(BaseParser):
             dict_name = "double"
         if "exponent" in immediate[dict_name]:
             immediate["type"] = dict_name
-            return ImmediateOperand(type_id=immediate["type"], value_id = immediate[immediate["type"]])
+            return ImmediateOperand(
+                type_id=immediate["type"], value_id=immediate[immediate["type"]]
+            )
         else:
             # change 'mantissa' key to 'value'
             return ImmediateOperand(value_id=immediate[dict_name]["mantissa"], type_id=dict_name)
@@ -551,7 +560,11 @@ class ParserAArch64(BaseParser):
         # remove value if it consists of symbol+offset
         if "value" in identifier:
             del identifier["value"]
-        return IdentifierOperand(name=identifier["name"] if "name" in identifier else None,offset=identifier["offset"] if "offset" in identifier else None, relocation=identifier["relocation"] if "relocation" in identifier else None)
+        return IdentifierOperand(
+            name=identifier["name"] if "name" in identifier else None,
+            offset=identifier["offset"] if "offset" in identifier else None,
+            relocation=identifier["relocation"] if "relocation" in identifier else None,
+        )
 
     def get_full_reg_name(self, register):
         """Return one register name string including all attributes"""
@@ -568,16 +581,16 @@ class ParserAArch64(BaseParser):
         """Normalize immediate to decimal based representation"""
         if isinstance(imd, IdentifierOperand):
             return imd
-        if imd.value!=None and imd.type=="float":
+        if imd.value != None and imd.type == "float":
             return self.ieee_to_float(imd.value)
-        elif imd.value!=None and imd.type=="double":
+        elif imd.value != None and imd.type == "double":
             return self.ieee_to_float(imd.value)
-        elif imd.value!=None:
+        elif imd.value != None:
             if isinstance(imd.value, str):
                 # hex or bin, return decimal
                 return int(imd.value, 0)
             else:
-                return imd.value        
+                return imd.value
         # identifier
         return imd
 
@@ -608,10 +621,10 @@ class ParserAArch64(BaseParser):
         # we assume flags are independent of each other, e.g., CF can be read while ZF gets written
         # TODO validate this assumption
         if isinstance(flag_a, Operand):
-            return (flag_a.name == flag_b["name"])
+            return flag_a.name == flag_b["name"]
         else:
-            return (flag_a["name"] == flag_b["name"])
-            
+            return flag_a["name"] == flag_b["name"]
+
         if flag_a.name == flag_b["name"]:
             return True
         return False

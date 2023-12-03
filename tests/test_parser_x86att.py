@@ -13,6 +13,7 @@ from osaca.parser.register import RegisterOperand
 from osaca.parser.immediate import ImmediateOperand
 from osaca.parser.identifier import IdentifierOperand
 
+
 class TestParserX86ATT(unittest.TestCase):
     @classmethod
     def setUpClass(self):

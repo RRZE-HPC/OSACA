@@ -16,6 +16,7 @@ from osaca.parser.register import RegisterOperand
 from osaca.parser.immediate import ImmediateOperand
 from osaca.parser.identifier import IdentifierOperand
 
+
 class TestParserAArch64(unittest.TestCase):
     @classmethod
     def setUpClass(self):
@@ -237,7 +238,7 @@ class TestParserAArch64(unittest.TestCase):
             operands_id=[
                 {"prfop": {"type": ["PLD"], "target": ["L1"], "policy": ["KEEP"]}},
                 MemoryOperand(
-                    offset_ID=ImmediateOperand(value_id=2048), 
+                    offset_ID=ImmediateOperand(value_id=2048),
                     base_id=RegisterOperand(prefix_id="x", name="26"),
                     index_id=None,
                     scale_id=1,
@@ -347,10 +348,18 @@ class TestParserAArch64(unittest.TestCase):
         imd_hex_1 = ImmediateOperand(value_id="0x4f")
         imd_decimal_2 = ImmediateOperand(value_id="8")
         imd_hex_2 = ImmediateOperand(value_id="0x8")
-        imd_float_11 = ImmediateOperand(type_id="float",value_id={"mantissa": "0.79", "e_sign": "+", "exponent": "2"})
-        imd_float_12 = ImmediateOperand(type_id="float",value_id={"mantissa": "790.0", "e_sign": "-", "exponent": "1"})
-        imd_double_11 = ImmediateOperand(type_id="double",value_id={"mantissa": "0.79", "e_sign": "+", "exponent": "2"})
-        imd_double_12 = ImmediateOperand(type_id="double",value_id={"mantissa": "790.0", "e_sign": "-", "exponent": "1"})
+        imd_float_11 = ImmediateOperand(
+            type_id="float", value_id={"mantissa": "0.79", "e_sign": "+", "exponent": "2"}
+        )
+        imd_float_12 = ImmediateOperand(
+            type_id="float", value_id={"mantissa": "790.0", "e_sign": "-", "exponent": "1"}
+        )
+        imd_double_11 = ImmediateOperand(
+            type_id="double", value_id={"mantissa": "0.79", "e_sign": "+", "exponent": "2"}
+        )
+        imd_double_12 = ImmediateOperand(
+            type_id="double", value_id={"mantissa": "790.0", "e_sign": "-", "exponent": "1"}
+        )
         identifier = IdentifierOperand(name="..B1.4")
 
         value1 = self.parser.normalize_imd(imd_decimal_1)

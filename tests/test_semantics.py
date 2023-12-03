@@ -24,6 +24,7 @@ from osaca.parser.memory import MemoryOperand
 from osaca.parser.identifier import IdentifierOperand
 from osaca.parser.operand import Operand
 
+
 class TestSemanticTools(unittest.TestCase):
     MODULE_DATA_DIR = os.path.join(
         os.path.dirname(os.path.split(os.path.abspath(__file__))[0]), "osaca/data/"
@@ -94,7 +95,6 @@ class TestSemanticTools(unittest.TestCase):
         )
         cls.machine_model_zen = MachineModel(arch="zen1")
 
-
         for i in range(len(cls.kernel_x86)):
             cls.semantics_csx.assign_src_dst(cls.kernel_x86[i])
             cls.semantics_csx.assign_tp_lt(cls.kernel_x86[i])
@@ -116,7 +116,6 @@ class TestSemanticTools(unittest.TestCase):
         for i in range(len(cls.kernel_aarch64_deps)):
             cls.semantics_a64fx.assign_src_dst(cls.kernel_aarch64_deps[i])
             cls.semantics_a64fx.assign_tp_lt(cls.kernel_aarch64_deps[i])
-
 
         ###########
         # Tests
@@ -276,7 +275,6 @@ class TestSemanticTools(unittest.TestCase):
             test_mm_x86.dump(stream=dev_null)
             test_mm_arm.dump(stream=dev_null)
 
-
     def test_src_dst_assignment_x86(self):
         for instruction_form in self.kernel_x86:
             with self.subTest(instruction_form=instruction_form):
@@ -340,7 +338,7 @@ class TestSemanticTools(unittest.TestCase):
         k2i1_pp = [round(x, 2) for x in tmp_kernel_2[0].port_pressure]
         self.assertEqual(k1i1_pp, [0.33, 0.0, 0.33, 0.0, 0.0, 0.0, 0.0, 0.0, 0.33, 0.0, 0.0])
         self.assertEqual(k2i1_pp, [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0])
- 
+
         # arm
         kernel_fixed = deepcopy(self.kernel_AArch64)
         self.semantics_tx2.add_semantics(kernel_fixed)
@@ -378,9 +376,8 @@ class TestSemanticTools(unittest.TestCase):
             dg.get_dependent_instruction_forms()
         # test dot creation
         dg.export_graph(filepath="/dev/null")
- 
-    def test_memdependency_x86(self):
 
+    def test_memdependency_x86(self):
         dg = KernelDG(
             self.kernel_x86_memdep,
             self.parser_x86,
@@ -468,7 +465,6 @@ class TestSemanticTools(unittest.TestCase):
             dg.get_loopcarried_dependencies()
 
     def test_loop_carried_dependency_aarch64(self):
-
         dg = KernelDG(
             self.kernel_aarch64_memdep,
             self.parser_AArch64,
@@ -520,7 +516,6 @@ class TestSemanticTools(unittest.TestCase):
             [(iform.line_number, lat) for iform, lat in lc_deps[dep_path]["dependencies"]],
             [(4, 1.0), (5, 1.0), (10, 1.0), (11, 1.0), (12, 1.0)],
         )
-
 
     def test_loop_carried_dependency_x86(self):
         lcd_id = "8"

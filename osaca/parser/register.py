@@ -144,7 +144,6 @@ class RegisterOperand(Operand):
     def __repr__(self):
         return self.__str__()
 
-
     def __eq__(self, other):
         if isinstance(other, RegisterOperand):
             return (
