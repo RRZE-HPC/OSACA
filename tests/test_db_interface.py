@@ -22,7 +22,7 @@ class TestDBInterface(unittest.TestCase):
             instruction_id="DoItRightAndDoItFast",
             operands_id=[
                 MemoryOperand(offset_ID="imd", base_id="gpr", index_id="gpr", scale_id=8),
-                RegisterOperand(name_id="xmm"),
+                RegisterOperand(name="xmm"),
             ],
             throughput=1.25,
             latency=125,

@@ -261,7 +261,7 @@ class ArchSemantics(ISASemantics):
                             ]
                         )
                         # dummy_reg = {"class": "register", "name": reg_type}
-                        dummy_reg = RegisterOperand(name_id=reg_type)
+                        dummy_reg = RegisterOperand(name=reg_type)
                         data_port_pressure = [0.0 for _ in range(port_number)]
                         data_port_uops = []
                         if INSTR_flags.HAS_LD in instruction_form.flags:
@@ -280,7 +280,7 @@ class ArchSemantics(ISASemantics):
                                 for ldp in load_perf_data
                                 if ldp.dst != None
                                 and self._machine_model._check_operands(
-                                    dummy_reg, RegisterOperand(name_id=ldp.dst)
+                                    dummy_reg, RegisterOperand(name=ldp.dst)
                                 )
                             ]
                             if len(data_port_uops) < 1:
@@ -442,11 +442,11 @@ class ArchSemantics(ISASemantics):
         """Create register operand for a memory addressing operand"""
         if self._isa == "x86":
             if reg_type == "gpr":
-                register = RegisterOperand(name_id="r" + str(int(reg_id) + 9))
+                register = RegisterOperand(name="r" + str(int(reg_id) + 9))
             else:
-                register = RegisterOperand(name_id=reg_type + reg_id)
+                register = RegisterOperand(name=reg_type + reg_id)
         elif self._isa == "aarch64":
-            register = RegisterOperand(name_id=reg_id, prefix_id=reg_type)
+            register = RegisterOperand(name=reg_id, prefix_id=reg_type)
         return register
 
     def _nullify_data_ports(self, port_pressure):

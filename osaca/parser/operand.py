@@ -2,14 +2,14 @@
 
 
 class Operand:
-    def __init__(self, name_id, source=False, destination=False):
-        self._name_id = name_id
+    def __init__(self, name, source=False, destination=False):
+        self._name = name
         self._source = source
         self._destination = destination
 
     @property
     def name(self):
-        return self._name_id
+        return self._name
 
     @property
     def source(self):
@@ -21,7 +21,7 @@ class Operand:
 
     @name.setter
     def name(self, name):
-        self._name_id = name
+        self._name = name
 
     @source.setter
     def source(self, source):
@@ -32,7 +32,7 @@ class Operand:
         self._destination = destination
 
     def __repr__(self):
-        return f"Operand(name_id={self._name_id},source={self._source},destination={self._destination})"
+        return f"Operand(name={self._name},source={self._source},destination={self._destination})"
 
     def __str__(self):
-        return f"Name: {self._name_id}, Source: {self._source}, Destination: {self._destination}"
+        return f"Name: {self._name}, Source: {self._source}, Destination: {self._destination}"

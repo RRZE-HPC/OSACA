@@ -217,7 +217,6 @@ class instructionForm:
         if isinstance(other, instructionForm):
             return (
                 self._instruction_id == other._instruction_id
-                and self._operands_id == other._operands_id
                 and self._directive_id == other._directive_id
                 and self._comment_id == other._comment_id
                 and self._label_id == other._label_id

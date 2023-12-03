@@ -234,10 +234,10 @@ class TestParserX86ATT(unittest.TestCase):
         register_str_3 = "%xmm1"
         register_str_4 = "%rip"
 
-        parsed_reg_1 = RegisterOperand(name_id="rax")
-        parsed_reg_2 = RegisterOperand(name_id="r9")
-        parsed_reg_3 = RegisterOperand(name_id="xmm1")
-        parsed_reg_4 = RegisterOperand(name_id="rip")
+        parsed_reg_1 = RegisterOperand(name="rax")
+        parsed_reg_2 = RegisterOperand(name="r9")
+        parsed_reg_3 = RegisterOperand(name="xmm1")
+        parsed_reg_4 = RegisterOperand(name="rip")
 
         self.assertEqual(self.parser.parse_register(register_str_1), parsed_reg_1)
         self.assertEqual(self.parser.parse_register(register_str_2), parsed_reg_2)
@@ -260,22 +260,22 @@ class TestParserX86ATT(unittest.TestCase):
         )
 
     def test_reg_dependency(self):
-        reg_a1 = RegisterOperand(name_id="rax")
-        reg_a2 = RegisterOperand(name_id="eax")
-        reg_a3 = RegisterOperand(name_id="ax")
-        reg_a4 = RegisterOperand(name_id="al")
-        reg_r11 = RegisterOperand(name_id="r11")
-        reg_r11b = RegisterOperand(name_id="r11b")
-        reg_r11d = RegisterOperand(name_id="r11d")
-        reg_r11w = RegisterOperand(name_id="r11w")
-        reg_xmm1 = RegisterOperand(name_id="xmm1")
-        reg_ymm1 = RegisterOperand(name_id="ymm1")
-        reg_zmm1 = RegisterOperand(name_id="zmm1")
+        reg_a1 = RegisterOperand(name="rax")
+        reg_a2 = RegisterOperand(name="eax")
+        reg_a3 = RegisterOperand(name="ax")
+        reg_a4 = RegisterOperand(name="al")
+        reg_r11 = RegisterOperand(name="r11")
+        reg_r11b = RegisterOperand(name="r11b")
+        reg_r11d = RegisterOperand(name="r11d")
+        reg_r11w = RegisterOperand(name="r11w")
+        reg_xmm1 = RegisterOperand(name="xmm1")
+        reg_ymm1 = RegisterOperand(name="ymm1")
+        reg_zmm1 = RegisterOperand(name="zmm1")
 
-        reg_b1 = RegisterOperand(name_id="rbx")
-        reg_r15 = RegisterOperand(name_id="r15")
-        reg_xmm2 = RegisterOperand(name_id="xmm2")
-        reg_ymm3 = RegisterOperand(name_id="ymm3")
+        reg_b1 = RegisterOperand(name="rbx")
+        reg_r15 = RegisterOperand(name="r15")
+        reg_xmm2 = RegisterOperand(name="xmm2")
+        reg_ymm3 = RegisterOperand(name="ymm3")
 
         reg_a = [reg_a1, reg_a2, reg_a3, reg_a4]
         reg_r = [reg_r11, reg_r11b, reg_r11d, reg_r11w]

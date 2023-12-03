@@ -234,7 +234,7 @@ class ParserX86ATT(BaseParser):
                     self.directive.parseString(line, parseAll=True).asDict()
                 )
                 instruction_form.directive = DirectiveOperand(
-                    name_id=result.name,
+                    name=result.name,
                     parameter_id=result.parameters,
                 )
 
@@ -303,7 +303,7 @@ class ParserX86ATT(BaseParser):
                 prefix_id=operand["register"]["prefix"]
                 if "prefix" in operand["register"]
                 else None,
-                name_id=operand["register"]["name"],
+                name=operand["register"]["name"],
                 shape=operand["register"]["shape"] if "shape" in operand["register"] else None,
                 lanes=operand["register"]["lanes"] if "lanes" in operand["register"] else None,
                 index=operand["register"]["index"] if "index" in operand["register"] else None,
@@ -316,7 +316,7 @@ class ParserX86ATT(BaseParser):
         return operand
 
     def process_directive(self, directive):
-        directive_new = DirectiveOperand(name_id=directive["name"], parameter_id=[])
+        directive_new = DirectiveOperand(name=directive["name"], parameter_id=[])
         if "parameters" in directive:
             directive_new.parameters = directive["parameters"]
         if "comment" in directive:
@@ -341,11 +341,11 @@ class ParserX86ATT(BaseParser):
             offset = ImmediateOperand(value_id=int(offset["value"], 0))
         if base != None:
             baseOp = RegisterOperand(
-                name_id=base["name"], prefix_id=base["prefix"] if "prefix" in base else None
+                name=base["name"], prefix_id=base["prefix"] if "prefix" in base else None
             )
         if index != None:
             indexOp = RegisterOperand(
-                name_id=index["name"], prefix_id=index["prefix"] if "prefix" in index else None
+                name=index["name"], prefix_id=index["prefix"] if "prefix" in index else None
             )
         if isinstance(offset, dict) and "identifier" in offset:
             offset = IdentifierOperand(name=offset["identifier"]["name"])
@@ -362,7 +362,7 @@ class ParserX86ATT(BaseParser):
         # remove duplicated 'name' level due to identifier
         label["name"] = label["name"][0]["name"]
         new_label = LabelOperand(
-            name_id=label["name"], comment_id=label["comment"] if "comment" in label else None
+            name=label["name"], comment_id=label["comment"] if "comment" in label else None
         )
         return new_label
 
@@ -398,6 +398,10 @@ class ParserX86ATT(BaseParser):
         """Check if ``flag_a`` is dependent on ``flag_b``"""
         # we assume flags are independent of each other, e.g., CF can be read while ZF gets written
         # TODO validate this assumption
+        if isinstance(flag_b, Operand):
+            return (flag_a.name == flag_b.name)
+        else:
+            return (flag_a.name == flag_b["name"])
         if flag_a.name == flag_b.name:
             return True
         return False

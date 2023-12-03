@@ -94,7 +94,7 @@ class TestSemanticTools(unittest.TestCase):
         )
         cls.machine_model_zen = MachineModel(arch="zen1")
 
-        
+
         for i in range(len(cls.kernel_x86)):
             cls.semantics_csx.assign_src_dst(cls.kernel_x86[i])
             cls.semantics_csx.assign_tp_lt(cls.kernel_x86[i])
@@ -118,11 +118,10 @@ class TestSemanticTools(unittest.TestCase):
             cls.semantics_a64fx.assign_tp_lt(cls.kernel_aarch64_deps[i])
 
 
-
         ###########
         # Tests
         ###########
-    '''
+
     def test_creation_by_name(self):
         try:
             tmp_mm = MachineModel(arch="CSX")
@@ -151,9 +150,9 @@ class TestSemanticTools(unittest.TestCase):
         self.assertIsNone(test_mm_arm.get_instruction("NOT_IN_DB", []))
         name_x86_1 = "vaddpd"
         operands_x86_1 = [
-            RegisterOperand(name_id="xmm"),
-            RegisterOperand(name_id="xmm"),
-            RegisterOperand(name_id="xmm"),
+            RegisterOperand(name="xmm"),
+            RegisterOperand(name="xmm"),
+            RegisterOperand(name="xmm"),
         ]
         instr_form_x86_1 = test_mm_x86.get_instruction(name_x86_1, operands_x86_1)
         self.assertEqual(instr_form_x86_1, test_mm_x86.get_instruction(name_x86_1, operands_x86_1))
@@ -193,7 +192,7 @@ class TestSemanticTools(unittest.TestCase):
         self.assertEqual(
             test_mm_x86.get_store_throughput(
                 MemoryOperand(
-                    base_id=RegisterOperand(name_id="x"), offset_ID=None, index_id=None, scale_id=1
+                    base_id=RegisterOperand(name="x"), offset_ID=None, index_id=None, scale_id=1
                 )
             )[0].port_pressure,
             [[2, "237"], [2, "4"]],
@@ -238,7 +237,7 @@ class TestSemanticTools(unittest.TestCase):
         self.assertEqual(
             test_mm_x86.get_store_latency(
                 MemoryOperand(
-                    base_id=RegisterOperand(name_id="x"), offset_ID=None, index_id=None, scale_id=1
+                    base_id=RegisterOperand(name="x"), offset_ID=None, index_id=None, scale_id=1
                 )
             ),
             0,
@@ -262,7 +261,7 @@ class TestSemanticTools(unittest.TestCase):
         self.assertEqual(
             test_mm_x86.get_load_throughput(
                 MemoryOperand(
-                    base_id=RegisterOperand(name_id="x"), offset_ID=None, index_id=None, scale_id=1
+                    base_id=RegisterOperand(name="x"), offset_ID=None, index_id=None, scale_id=1
                 )
             )[0].port_pressure,
             [[1, "23"], [1, ["2D", "3D"]]],
@@ -271,12 +270,12 @@ class TestSemanticTools(unittest.TestCase):
         # test adding port
         test_mm_x86.add_port("dummyPort")
         test_mm_arm.add_port("dummyPort")
-        """
+
         # test dump of DB
         with open("/dev/null", "w") as dev_null:
             test_mm_x86.dump(stream=dev_null)
             test_mm_arm.dump(stream=dev_null)
-        """
+
 
     def test_src_dst_assignment_x86(self):
         for instruction_form in self.kernel_x86:
@@ -379,8 +378,9 @@ class TestSemanticTools(unittest.TestCase):
             dg.get_dependent_instruction_forms()
         # test dot creation
         dg.export_graph(filepath="/dev/null")
-
+ 
     def test_memdependency_x86(self):
+
         dg = KernelDG(
             self.kernel_x86_memdep,
             self.parser_x86,
@@ -466,18 +466,15 @@ class TestSemanticTools(unittest.TestCase):
             dg.get_critical_path()
         with self.assertRaises(NotImplementedError):
             dg.get_loopcarried_dependencies()
-    '''
+
     def test_loop_carried_dependency_aarch64(self):
-        '''
+
         dg = KernelDG(
             self.kernel_aarch64_memdep,
             self.parser_AArch64,
             self.machine_model_tx2,
             self.semantics_tx2,
         )
-        print(len(self.kernel_aarch64_memdep))
-        for i in self.kernel_aarch64_memdep:
-            print(i)
 
         lc_deps = dg.get_loopcarried_dependencies()
         self.assertEqual(len(lc_deps), 4)
@@ -489,6 +486,7 @@ class TestSemanticTools(unittest.TestCase):
             [(iform.line_number, lat) for iform, lat in lc_deps[dep_path]["dependencies"]],
             [(6, 4.0), (10, 6.0), (11, 6.0), (12, 6.0), (13, 6.0), (14, 1.0)],
         )
+
         dg = KernelDG(
             self.kernel_aarch64_deps,
             self.parser_AArch64,
@@ -505,6 +503,7 @@ class TestSemanticTools(unittest.TestCase):
             [(iform.line_number, lat) for iform, lat in lc_deps[dep_path]["dependencies"]],
             [(4, 1.0), (5, 1.0), (6, 1.0), (9, 1.0), (10, 1.0), (11, 1.0), (12, 1.0)],
         )
+
         dg = KernelDG(
             self.kernel_aarch64_deps,
             self.parser_AArch64,
@@ -521,8 +520,8 @@ class TestSemanticTools(unittest.TestCase):
             [(iform.line_number, lat) for iform, lat in lc_deps[dep_path]["dependencies"]],
             [(4, 1.0), (5, 1.0), (10, 1.0), (11, 1.0), (12, 1.0)],
         )
-        '''
-    '''
+
+
     def test_loop_carried_dependency_x86(self):
         lcd_id = "8"
         lcd_id2 = "5"
@@ -573,15 +572,15 @@ class TestSemanticTools(unittest.TestCase):
         end_time = time.perf_counter()
         time_2 = end_time - start_time
 
-        #self.assertTrue(time_10 > 10)
-        #self.assertTrue(2 < time_2)
-        #self.assertTrue(time_2 < (time_10 - 7))
+        self.assertTrue(time_10 > 10)
+        self.assertTrue(2 < time_2)
+        self.assertTrue(time_2 < (time_10 - 7))
 
     def test_is_read_is_written_x86(self):
         # independent form HW model
         dag = KernelDG(self.kernel_x86, self.parser_x86, None, None)
-        reg_rcx = RegisterOperand(name_id="rcx")
-        reg_ymm1 = RegisterOperand(name_id="ymm1")
+        reg_rcx = RegisterOperand(name="rcx")
+        reg_ymm1 = RegisterOperand(name="ymm1")
 
         instr_form_r_c = self.parser_x86.parse_line("vmovsd  %xmm0, (%r15,%rcx,8)")
         self.semantics_csx.assign_src_dst(instr_form_r_c)
@@ -611,11 +610,11 @@ class TestSemanticTools(unittest.TestCase):
     def test_is_read_is_written_AArch64(self):
         # independent form HW model
         dag = KernelDG(self.kernel_AArch64, self.parser_AArch64, None, None)
-        reg_x1 = RegisterOperand(prefix_id="x", name_id="1")
-        reg_w1 = RegisterOperand(prefix_id="w", name_id="1")
-        reg_d1 = RegisterOperand(prefix_id="d", name_id="1")
-        reg_q1 = RegisterOperand(prefix_id="q", name_id="1")
-        reg_v1 = RegisterOperand(prefix_id="v", name_id="1", lanes="2", shape="d")
+        reg_x1 = RegisterOperand(prefix_id="x", name="1")
+        reg_w1 = RegisterOperand(prefix_id="w", name="1")
+        reg_d1 = RegisterOperand(prefix_id="d", name="1")
+        reg_q1 = RegisterOperand(prefix_id="q", name="1")
+        reg_v1 = RegisterOperand(prefix_id="v", name="1", lanes="2", shape="d")
         regs = [reg_d1, reg_q1, reg_v1]
         regs_gp = [reg_w1, reg_x1]
 
@@ -682,8 +681,8 @@ class TestSemanticTools(unittest.TestCase):
         sample_operands = [
             MemoryOperand(
                 offset_ID=None,
-                base_id=RegisterOperand(name_id="r12"),
-                index_id=RegisterOperand(name_id="rcx"),
+                base_id=RegisterOperand(name="r12"),
+                index_id=RegisterOperand(name="rcx"),
                 scale_id=8,
             )
         ]
@@ -707,7 +706,7 @@ class TestSemanticTools(unittest.TestCase):
         self.assertEqual(MachineModel.get_isa_for_arch("tX2"), "aarch64")
         with self.assertRaises(ValueError):
             self.assertIsNone(MachineModel.get_isa_for_arch("THE_MACHINE"))
-    '''
+
     ##################
     # Helper functions
     ##################
