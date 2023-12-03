@@ -77,6 +77,7 @@ class MachineModel(object):
             if cached:
                 self._data = cached
             else:
+                
                 yaml = self._create_yaml_object()
                 # otherwise load
                 with open(self._path, "r") as f:
@@ -189,7 +190,7 @@ class MachineModel(object):
         if o["class"] == "register":
             new_operands.append(
                 RegisterOperand(
-                    name_id=o["name"] if "name" in o else None,
+                    name=o["name"] if "name" in o else None,
                     prefix_id=o["prefix"] if "prefix" in o else None,
                     shape=o["shape"] if "shape" in o else None,
                     mask=o["mask"] if "mask" in o else False,
@@ -201,7 +202,7 @@ class MachineModel(object):
             )
         elif o["class"] == "memory":
             if isinstance(o["base"], dict):
-                o["base"] = RegisterOperand(name_id = o["base"]["name"])
+                o["base"] = RegisterOperand(name = o["base"]["name"])
             new_operands.append(
                 MemoryOperand(
                     base_id=o["base"],
@@ -260,7 +261,6 @@ class MachineModel(object):
         if name is None:
             return None
         name_matched_iforms = self._data["instruction_forms_dict"].get(name.upper(), [])
-
         try:
             return next(
                 instruction_form
@@ -364,6 +364,7 @@ class MachineModel(object):
             return ld_tp.copy()
         return [MemoryOperand(port_pressure=self._data["load_throughput_default"].copy())]
 
+
     def get_store_latency(self, reg_type):
         """Return store latency for given register type."""
         # assume 0 for now, since load-store-dependencies currently not detectable
@@ -377,7 +378,7 @@ class MachineModel(object):
                 tp
                 for tp in st_tp
                 if "src" in tp
-                and self._check_operands(src_reg, RegisterOperand(name_id=tp["src"]))
+                and self._check_operands(src_reg, RegisterOperand(name=tp["src"]))
             ]
         if len(st_tp) > 0:
             return st_tp.copy()
@@ -460,6 +461,7 @@ class MachineModel(object):
         # Replace load_throughput with styled version for RoundtripDumper
         formatted_load_throughput = []
         for lt in self._data["load_throughput"]:
+            lt = self.operand_to_dict(lt)
             cm = ruamel.yaml.comments.CommentedMap(lt)
             cm.fa.set_flow_style()
             formatted_load_throughput.append(cm)
@@ -468,7 +470,7 @@ class MachineModel(object):
         yaml = self._create_yaml_object()
         if not stream:
             stream = StringIO()
-
+        '''
         yaml.dump(
             {
                 k: v
@@ -483,11 +485,15 @@ class MachineModel(object):
             },
             stream,
         )
+
         yaml.dump({"load_throughput": formatted_load_throughput}, stream)
         yaml.dump({"instruction_forms": formatted_instruction_forms}, stream)
-
+        '''
         if isinstance(stream, StringIO):
             return stream.getvalue()
+    
+    def operand_to_dict(self, mem):
+        return {'base':mem.base, 'offset':mem.offset, 'index':mem.index, 'scale':mem.scale, 'port_pressure':mem.port_pressure}
 
     ######################################################
 
@@ -613,9 +619,9 @@ class MachineModel(object):
     def _create_db_operand_x86(self, operand):
         """Create instruction form operand for DB out of operand string."""
         if operand == "r":
-            return RegisterOperand(name_id="gpr")
+            return RegisterOperand(name="gpr")
         elif operand in "xyz":
-            return RegisterOperand(name_id=operand + "mm")
+            return RegisterOperand(name=operand + "mm")
         elif operand == "i":
             return ImmediateOperand(type_id="int")
         elif operand.startswith("m"):
@@ -680,8 +686,6 @@ class MachineModel(object):
         #    return self._compare_db_entries(i_operand, operand)
         # TODO support class wildcards
         # register
-        #print(operand)
-        #print(i_operand)
         if isinstance(operand, RegisterOperand):
             if not isinstance(i_operand, RegisterOperand):
                 return False
@@ -919,11 +923,11 @@ class MachineModel(object):
                     mem.offset is not None
                     and isinstance(mem.offset, ImmediateOperand)
                     and (
-                        isinstance(i_mem.offset, ImmediateOperand)
+                        i_mem.offset == "imd"
                         or (i_mem.offset is None and mem.offset.value == "0")
                     )
                 )
-                or (isinstance(mem.offset, IdentifierOperand) and isinstance(i_mem.offset, IdentifierOperand))
+                or (isinstance(mem.offset, IdentifierOperand) and i_mem.offset == "id")
             )
             # check index
             and (
@@ -942,6 +946,7 @@ class MachineModel(object):
                 or (mem.scale != 1 and i_mem.scale != 1)
             )
         ):
+
             return True
         return False
 

@@ -6,7 +6,7 @@ from osaca.parser.operand import Operand
 class RegisterOperand(Operand):
     def __init__(
         self,
-        name_id=None,
+        name=None,
         width_id=None,
         prefix_id=None,
         reg_id=None,
@@ -22,7 +22,7 @@ class RegisterOperand(Operand):
         pre_indexed=False,
         post_indexed=False,
     ):
-        super().__init__(name_id, source, destination)
+        super().__init__(name, source, destination)
         self._width_id = width_id
         self._prefix_id = prefix_id
         self._reg_id = reg_id
@@ -134,7 +134,7 @@ class RegisterOperand(Operand):
 
     def __str__(self):
         return (
-            f"RegisterOperand(name_id={self._name_id}, width_id={self._width_id}, "
+            f"RegisterOperand(name={self._name}, width_id={self._width_id}, "
             f"prefix_id={self._prefix_id}, reg_id={self._reg_id}, REGtype_id={self._regtype_id}, "
             f"lanes={self._lanes}, shape={self._shape}, index={self._index}, "
             f"mask={self._mask}, zeroing={self._zeroing},source={self._source},destination={self._destination},"
@@ -148,7 +148,7 @@ class RegisterOperand(Operand):
     def __eq__(self, other):
         if isinstance(other, RegisterOperand):
             return (
-                self._name_id == other._name_id
+                self._name == other._name
                 and self._width_id == other._width_id
                 and self._prefix_id == other._prefix_id
                 and self._reg_id == other._reg_id

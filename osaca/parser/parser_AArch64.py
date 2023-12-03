@@ -11,7 +11,7 @@ from osaca.parser.label import LabelOperand
 from osaca.parser.register import RegisterOperand
 from osaca.parser.identifier import IdentifierOperand
 from osaca.parser.immediate import ImmediateOperand
-
+from osaca.parser.condition import ConditionOperand
 
 class ParserAArch64(BaseParser):
     _instance = None
@@ -302,7 +302,7 @@ class ParserAArch64(BaseParser):
                     self.directive.parseString(line, parseAll=True).asDict()
                 )
                 instruction_form.directive = DirectiveOperand(
-                    name_id=result.name, parameter_id=result.parameters
+                    name=result.name, parameter_id=result.parameters
                 )
                 if result.comment is not None:
                     instruction_form.comment = " ".join(result.comment)
@@ -383,18 +383,20 @@ class ParserAArch64(BaseParser):
             return self.process_register_operand(operand[self.REGISTER_ID])
         if self.directive_id in operand:
             return DirectiveOperand(
-                name_id=operand["directive"]["name"],
+                name=operand["directive"]["name"],
                 parameter_id=operand["directive"]["parameters"],
                 comment_id=operand["directive"]["comment"]
                 if "comment" in operand["directive"]
                 else None,
             )
+        if "condition" in operand:
+            return self.process_condition(operand["condition"])
         return operand
 
     def process_register_operand(self, operand):
         return RegisterOperand(
             prefix_id=operand["prefix"],
-            name_id=operand["name"],
+            name=operand["name"],
             shape=operand["shape"] if "shape" in operand else None,
             lanes=operand["lanes"] if "lanes" in operand else None,
             index=operand["index"] if "index" in operand else None,
@@ -425,7 +427,7 @@ class ParserAArch64(BaseParser):
                     scale = 2 ** int(memory_address["index"]["shift"][0]["value"])
         new_dict = MemoryOperand(
             offset_ID=offset,
-            base_id=RegisterOperand(name_id=base["name"], prefix_id=base["prefix"]),
+            base_id=RegisterOperand(name=base["name"], prefix_id=base["prefix"]),
             index_id=index,
             scale_id=scale,
         )
@@ -441,9 +443,12 @@ class ParserAArch64(BaseParser):
     def process_sp_register(self, register):
         """Post-process stack pointer register"""
         # reg = register
-        new_reg = RegisterOperand(prefix_id="x", name_id="sp")
+        new_reg = RegisterOperand(prefix_id="x", name="sp")
         # reg["prefix"] = "x"
         return new_reg
+    
+    def process_condition(self, condition):
+        return ConditionOperand(ccode=condition.lower())
 
     def resolve_range_list(self, operand):
         """
@@ -536,7 +541,7 @@ class ParserAArch64(BaseParser):
         # remove duplicated 'name' level due to identifier
         # label["name"] = label["name"]["name"]
         new_label = LabelOperand(
-            name_id=label["name"]["name"],
+            name=label["name"]["name"],
             comment_id=label["comment"] if self.comment_id in label else None,
         )
         return new_label
@@ -602,12 +607,19 @@ class ParserAArch64(BaseParser):
         """Check if ``flag_a`` is dependent on ``flag_b``"""
         # we assume flags are independent of each other, e.g., CF can be read while ZF gets written
         # TODO validate this assumption
+        if isinstance(flag_a, Operand):
+            return (flag_a.name == flag_b["name"])
+        else:
+            return (flag_a["name"] == flag_b["name"])
+            
         if flag_a.name == flag_b["name"]:
             return True
         return False
 
     def is_reg_dependend_of(self, reg_a, reg_b):
         """Check if ``reg_a`` is dependent on ``reg_b``"""
+        if not isinstance(reg_a, Operand):
+            reg_a = RegisterOperand(name=reg_a["name"])
         prefixes_gpr = "wx"
         prefixes_vec = "bhsdqvz"
         if reg_a.name == reg_b.name:

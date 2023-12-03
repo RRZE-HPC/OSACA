@@ -333,7 +333,7 @@ def inspect(args, output_file=sys.stdout):
     # Reduce to marked kernel or chosen section and add semantics
     if args.lines:
         line_range = get_line_range(args.lines)
-        kernel = [line for line in parsed_code if line["line_number"] in line_range]
+        kernel = [line for line in parsed_code if line.line_number in line_range]
         print_length_warning = False
     else:
         kernel = reduce_to_section(parsed_code, isa)

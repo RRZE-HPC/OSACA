@@ -203,7 +203,7 @@ class TestParserAArch64(unittest.TestCase):
         instruction_form_3 = instructionForm(
             instruction_id=None,
             operands_id=[],
-            directive_id=DirectiveOperand(name_id="cfi_def_cfa", parameter_id=["w29", "-16"]),
+            directive_id=DirectiveOperand(name="cfi_def_cfa", parameter_id=["w29", "-16"]),
             comment_id=None,
             label_id=None,
             line=".cfi_def_cfa w29, -16",
@@ -212,10 +212,10 @@ class TestParserAArch64(unittest.TestCase):
         instruction_form_4 = instructionForm(
             instruction_id="ldr",
             operands_id=[
-                RegisterOperand(prefix_id="s", name_id="0"),
+                RegisterOperand(prefix_id="s", name="0"),
                 MemoryOperand(
                     offset_ID=None,
-                    base_id=RegisterOperand(prefix_id="x", name_id="11"),
+                    base_id=RegisterOperand(prefix_id="x", name="11"),
                     index_id={
                         "prefix": "w",
                         "name": "10",
@@ -238,7 +238,7 @@ class TestParserAArch64(unittest.TestCase):
                 {"prfop": {"type": ["PLD"], "target": ["L1"], "policy": ["KEEP"]}},
                 MemoryOperand(
                     offset_ID=ImmediateOperand(value_id=2048), 
-                    base_id=RegisterOperand(prefix_id="x", name_id="26"),
+                    base_id=RegisterOperand(prefix_id="x", name="26"),
                     index_id=None,
                     scale_id=1,
                 ),
@@ -252,11 +252,11 @@ class TestParserAArch64(unittest.TestCase):
         instruction_form_6 = instructionForm(
             instruction_id="stp",
             operands_id=[
-                RegisterOperand(prefix_id="x", name_id="29"),
-                RegisterOperand(prefix_id="x", name_id="30"),
+                RegisterOperand(prefix_id="x", name="29"),
+                RegisterOperand(prefix_id="x", name="30"),
                 MemoryOperand(
                     offset_ID=ImmediateOperand(value_id=-16),
-                    base_id=RegisterOperand(name_id="sp", prefix_id="x"),
+                    base_id=RegisterOperand(name="sp", prefix_id="x"),
                     index_id=None,
                     scale_id=1,
                     pre_indexed=True,
@@ -271,11 +271,11 @@ class TestParserAArch64(unittest.TestCase):
         instruction_form_7 = instructionForm(
             instruction_id="ldp",
             operands_id=[
-                RegisterOperand(prefix_id="q", name_id="2"),
-                RegisterOperand(prefix_id="q", name_id="3"),
+                RegisterOperand(prefix_id="q", name="2"),
+                RegisterOperand(prefix_id="q", name="3"),
                 MemoryOperand(
                     offset_ID=None,
-                    base_id=RegisterOperand(name_id="11", prefix_id="x"),
+                    base_id=RegisterOperand(name="11", prefix_id="x"),
                     index_id=None,
                     scale_id=1,
                     post_indexed={"value": 64},
@@ -290,10 +290,10 @@ class TestParserAArch64(unittest.TestCase):
         instruction_form_8 = instructionForm(
             instruction_id="fcmla",
             operands_id=[
-                RegisterOperand(prefix_id="z", name_id="26", shape="d"),
-                RegisterOperand(prefix_id="p", name_id="0", predication="m"),
-                RegisterOperand(prefix_id="z", name_id="29", shape="d"),
-                RegisterOperand(prefix_id="z", name_id="21", shape="d"),
+                RegisterOperand(prefix_id="z", name="26", shape="d"),
+                RegisterOperand(prefix_id="p", name="0", predication="m"),
+                RegisterOperand(prefix_id="z", name="29", shape="d"),
+                RegisterOperand(prefix_id="z", name="21", shape="d"),
                 ImmediateOperand(value_id=90, type_id="int"),
             ],
             directive_id=None,
@@ -305,7 +305,7 @@ class TestParserAArch64(unittest.TestCase):
         instruction_form_9 = instructionForm(
             instruction_id="ccmn",
             operands_id=[
-                RegisterOperand(prefix_id="x", name_id="11"),
+                RegisterOperand(prefix_id="x", name="11"),
                 ImmediateOperand(value_id=1, type_id="int"),
                 ImmediateOperand(value_id=3, type_id="int"),
                 {"condition": "EQ"},
@@ -372,17 +372,17 @@ class TestParserAArch64(unittest.TestCase):
         instr_list_with_index = "ld4 {v0.S, v1.S, v2.S, v3.S}[2]"
         instr_range_single = "dummy  { z1.d }"
         reg_list = [
-            RegisterOperand(prefix_id="x", name_id="5"),
-            RegisterOperand(prefix_id="x", name_id="6"),
-            RegisterOperand(prefix_id="x", name_id="7"),
+            RegisterOperand(prefix_id="x", name="5"),
+            RegisterOperand(prefix_id="x", name="6"),
+            RegisterOperand(prefix_id="x", name="7"),
         ]
         reg_list_idx = [
-            RegisterOperand(prefix_id="v", name_id="0", shape="S", index=2),
-            RegisterOperand(prefix_id="v", name_id="1", shape="S", index=2),
-            RegisterOperand(prefix_id="v", name_id="2", shape="S", index=2),
-            RegisterOperand(prefix_id="v", name_id="3", shape="S", index=2),
+            RegisterOperand(prefix_id="v", name="0", shape="S", index=2),
+            RegisterOperand(prefix_id="v", name="1", shape="S", index=2),
+            RegisterOperand(prefix_id="v", name="2", shape="S", index=2),
+            RegisterOperand(prefix_id="v", name="3", shape="S", index=2),
         ]
-        reg_list_single = [RegisterOperand(prefix_id="z", name_id="1", shape="d")]
+        reg_list_single = [RegisterOperand(prefix_id="z", name="1", shape="d")]
 
         prange = self.parser.parse_line(instr_range)
         plist = self.parser.parse_line(instr_list)
@@ -397,22 +397,22 @@ class TestParserAArch64(unittest.TestCase):
         # self.assertEqual(p_single.operands, reg_list_single)
 
     def test_reg_dependency(self):
-        reg_1_1 = RegisterOperand(prefix_id="b", name_id="1")
-        reg_1_2 = RegisterOperand(prefix_id="h", name_id="1")
-        reg_1_3 = RegisterOperand(prefix_id="s", name_id="1")
-        reg_1_4 = RegisterOperand(prefix_id="d", name_id="1")
-        reg_1_4 = RegisterOperand(prefix_id="q", name_id="1")
-        reg_2_1 = RegisterOperand(prefix_id="w", name_id="2")
-        reg_2_2 = RegisterOperand(prefix_id="x", name_id="2")
-        reg_v1_1 = RegisterOperand(prefix_id="v", name_id="11", lanes="16", shape="b")
-        reg_v1_2 = RegisterOperand(prefix_id="v", name_id="11", lanes="8", shape="h")
-        reg_v1_3 = RegisterOperand(prefix_id="v", name_id="11", lanes="4", shape="s")
-        reg_v1_4 = RegisterOperand(prefix_id="v", name_id="11", lanes="2", shape="d")
+        reg_1_1 = RegisterOperand(prefix_id="b", name="1")
+        reg_1_2 = RegisterOperand(prefix_id="h", name="1")
+        reg_1_3 = RegisterOperand(prefix_id="s", name="1")
+        reg_1_4 = RegisterOperand(prefix_id="d", name="1")
+        reg_1_4 = RegisterOperand(prefix_id="q", name="1")
+        reg_2_1 = RegisterOperand(prefix_id="w", name="2")
+        reg_2_2 = RegisterOperand(prefix_id="x", name="2")
+        reg_v1_1 = RegisterOperand(prefix_id="v", name="11", lanes="16", shape="b")
+        reg_v1_2 = RegisterOperand(prefix_id="v", name="11", lanes="8", shape="h")
+        reg_v1_3 = RegisterOperand(prefix_id="v", name="11", lanes="4", shape="s")
+        reg_v1_4 = RegisterOperand(prefix_id="v", name="11", lanes="2", shape="d")
 
-        reg_b5 = RegisterOperand(prefix_id="b", name_id="5")
-        reg_q15 = RegisterOperand(prefix_id="q", name_id="15")
-        reg_v10 = RegisterOperand(prefix_id="v", name_id="10", lanes="2", shape="s")
-        reg_v20 = RegisterOperand(prefix_id="v", name_id="20", lanes="2", shape="d")
+        reg_b5 = RegisterOperand(prefix_id="b", name="5")
+        reg_q15 = RegisterOperand(prefix_id="q", name="15")
+        reg_v10 = RegisterOperand(prefix_id="v", name="10", lanes="2", shape="s")
+        reg_v20 = RegisterOperand(prefix_id="v", name="20", lanes="2", shape="d")
 
         reg_1 = [reg_1_1, reg_1_2, reg_1_3, reg_1_4]
         reg_2 = [reg_2_1, reg_2_2]

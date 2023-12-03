@@ -127,7 +127,7 @@ class MemoryOperand(Operand):
 
     def __str__(self):
         return (
-            f"MemoryOperand(name_id={self._name_id}, offset_ID={self._offset_ID}, "
+            f"MemoryOperand(name={self._name}, offset_ID={self._offset_ID}, "
             f"base_id={self._base_id}, index_id={self._index_id}, scale_id={self._scale_id}, "
             f"segment_ext_id={self._segment_ext_id}, mask={self._mask}, "
             f"pre_indexed={self._pre_indexed}, post_indexed={self._post_indexed}, "
@@ -137,7 +137,7 @@ class MemoryOperand(Operand):
 
     def __repr__(self):
         return (
-            f"MemoryOperand(name_id={self._name_id}, offset_ID={self._offset_ID}, "
+            f"MemoryOperand(name={self._name}, offset_ID={self._offset_ID}, "
             f"base_id={self._base_id}, index_id={self._index_id}, scale_id={self._scale_id}, "
             f"segment_ext_id={self._segment_ext_id}, mask={self._mask}, "
             f"pre_indexed={self._pre_indexed}, post_indexed={self._post_indexed}, "

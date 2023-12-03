@@ -4,6 +4,7 @@ from collections import OrderedDict
 from osaca.parser import ParserAArch64, ParserX86ATT, get_parser
 
 COMMENT_MARKER = {"start": "OSACA-BEGIN", "end": "OSACA-END"}
+from osaca.parser.register import RegisterOperand
 from osaca.parser.identifier import IdentifierOperand
 from osaca.parser.immediate import ImmediateOperand
 
@@ -150,8 +151,8 @@ def find_marked_section(
                 if (
                     isinstance(source, ImmediateOperand)
                     and parser.normalize_imd(source) == mov_vals[0]
-                    and "register" in destination
-                    and parser.get_full_reg_name(destination["register"]) == mov_reg
+                    and isinstance(destination, RegisterOperand)
+                    and parser.get_full_reg_name(destination) == mov_reg
                 ):
                     # operands of first instruction match start, check for second one
                     match, line_count = match_bytes(lines, i + 1, nop_bytes)
@@ -159,10 +160,10 @@ def find_marked_section(
                         # return first line after the marker
                         index_start = i + 1 + line_count
                 elif (
-                    "immediate" in source
-                    and parser.normalize_imd(source.immediate) == mov_vals[1]
-                    and "register" in destination
-                    and parser.get_full_reg_name(destination["register"]) == mov_reg
+                    isinstance(source, ImmediateOperand)
+                    and parser.normalize_imd(source) == mov_vals[1]
+                    and isinstance(destination, RegisterOperand)
+                    and parser.get_full_reg_name(destination) == mov_reg
                 ):
                     # operand of first instruction match end, check for second one
                     match, line_count = match_bytes(lines, i + 1, nop_bytes)

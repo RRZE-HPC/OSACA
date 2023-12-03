@@ -20,3 +20,6 @@ class ConditionOperand(Operand):
     @ccode.setter
     def ccode(self, ccode):
         self._ccode = ccode
+
+    def __str__(self):
+        return f"ConditionOperand(ccode={self._ccode}, source={self._source}, destination={self._destination})"
