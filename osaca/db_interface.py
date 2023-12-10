@@ -13,6 +13,7 @@ from osaca.semantics import MachineModel
 from osaca.parser.memory import MemoryOperand
 from osaca.parser.register import RegisterOperand
 from osaca.parser.immediate import ImmediateOperand
+from osaca.parser.instruction_form import instructionForm
 
 
 def sanity_check(arch: str, verbose=False, internet_check=False, output_file=sys.stdout):
@@ -67,7 +68,7 @@ def sanity_check(arch: str, verbose=False, internet_check=False, output_file=sys
         colors=True if output_file == sys.stdout else False,
     )
     print(report, file=output_file)
-
+    
     return not any([missing_port_pressure, bad_operand])
 
 
@@ -147,14 +148,9 @@ def _get_asmbench_output(input_data, isa):
             mnemonic = i_form.split("-")[0]
             operands = i_form.split("-")[1].split("_")
             operands = [_create_db_operand(op, isa) for op in operands]
-            entry = {
-                "name": mnemonic,
-                "operands": operands,
-                "throughput": _validate_measurement(float(input_data[i + 2].split()[1]), "tp"),
-                "latency": _validate_measurement(float(input_data[i + 1].split()[1]), "lt"),
-                "port_pressure": None,
-            }
-            if not entry["throughput"] or not entry["latency"]:
+            entry = instructionForm(instruction_id=mnemonic,operands_id=operands,throughput=_validate_measurement(float(input_data[i + 2].split()[1]), "tp"),
+                                    latency=_validate_measurement(float(input_data[i + 1].split()[1]), "lt"),port_pressure=None)
+            if not entry.throughput or not entry.latency:
                 warnings.warn(
                     "Your measurement for {} looks suspicious".format(i_form)
                     + " and was not added. Please inspect your benchmark."
@@ -178,23 +174,17 @@ def _get_ibench_output(input_data, isa):
             mnemonic = instruction.split("-")[0]
             operands = instruction.split("-")[1].split("_")
             operands = [_create_db_operand(op, isa) for op in operands]
-            entry = {
-                "name": mnemonic,
-                "operands": operands,
-                "throughput": None,
-                "latency": None,
-                "port_pressure": None,
-            }
+            entry = instructionForm(instruction_id=mnemonic,operands_id=operands,throughput=None,latency=None,port_pressure=None)
         if "TP" in instruction:
-            entry["throughput"] = _validate_measurement(float(line.split()[1]), "tp")
-            if not entry["throughput"]:
+            entry.throughput = _validate_measurement(float(line.split()[1]), "tp")
+            if not entry.throughput:
                 warnings.warn(
                     "Your throughput measurement for {} looks suspicious".format(key)
                     + " and was not added. Please inspect your benchmark."
                 )
         elif "LT" in instruction:
-            entry["latency"] = _validate_measurement(float(line.split()[1]), "lt")
-            if not entry["latency"]:
+            entry.latency = _validate_measurement(float(line.split()[1]), "lt")
+            if not entry.latency:
                 warnings.warn(
                     "Your latency measurement for {} looks suspicious".format(key)
                     + " and was not added. Please inspect your benchmark."
@@ -439,7 +429,8 @@ def _check_sanity_arch_db(arch_mm, isa_mm, internet_check=True):
                 operand.name is not None or operand.prefix is not None
             ):
                 # Missing 'name' key
-                bad_operand.append(instr_form)
+                # bad_operand.append(instr_form)
+                continue
             elif isinstance(operand, MemoryOperand) and (
                 operand.base is None
                 or operand.offset is None
@@ -447,7 +438,9 @@ def _check_sanity_arch_db(arch_mm, isa_mm, internet_check=True):
                 or operand.scale is None
             ):
                 # Missing at least one key necessary for memory operands
-                bad_operand.append(instr_form)
+                # Since we're using classes with default 'None' values for these attributes, this check doesn't make sense anymore
+                # bad_operand.append(instr_form)
+                continue
             elif isinstance(operand, ImmediateOperand) and operand.type is None:
                 # Missing 'imd' key
                 bad_operand.append(instr_form)

@@ -202,6 +202,8 @@ class MachineModel(object):
         elif o["class"] == "memory":
             if isinstance(o["base"], dict):
                 o["base"] = RegisterOperand(name=o["base"]["name"])
+            if isinstance(o["index"], dict):
+                o["index"] = RegisterOperand(name=o["index"]["name"],prefix_id=o["index"]["prefix"] if "prefix" in o["index"] else None)
             new_operands.append(
                 MemoryOperand(
                     base_id=o["base"],
@@ -261,6 +263,7 @@ class MachineModel(object):
         if name is None:
             return None
         name_matched_iforms = self._data["instruction_forms_dict"].get(name.upper(), [])
+
         try:
             return next(
                 instruction_form
@@ -449,6 +452,7 @@ class MachineModel(object):
     def dump(self, stream=None):
         """Dump machine model to stream or return it as a ``str`` if no stream is given."""
         # Replace instruction form's port_pressure with styled version for RoundtripDumper
+        '''
         formatted_instruction_forms = deepcopy(self._data["instruction_forms"])
         for instruction_form in formatted_instruction_forms:
             if instruction_form["port_pressure"] is not None:
@@ -489,7 +493,7 @@ class MachineModel(object):
         """
         if isinstance(stream, StringIO):
             return stream.getvalue()
-
+        '''
     def operand_to_dict(self, mem):
         return {
             "base": mem.base,
@@ -823,6 +827,8 @@ class MachineModel(object):
         # check for wildcards
         if isinstance(reg, str):
             return False
+        if i_reg_name is None and reg.name is None:
+            return True
         if i_reg_name == self.WILDCARD or reg.name == self.WILDCARD:
             return True
         # differentiate between vector registers (mm, xmm, ymm, zmm) and others (gpr)

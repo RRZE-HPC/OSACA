@@ -97,15 +97,15 @@ class TestDBInterface(unittest.TestCase):
             entries = dbi._get_ibench_output(input_data, "x86")
             self.assertEqual(len(entries), 3)
             for _, e in entries.items():
-                self.assertIsNotNone(e["throughput"])
-                self.assertIsNotNone(e["latency"])
+                self.assertIsNotNone(e.throughput)
+                self.assertIsNotNone(e.latency)
         with open(self._find_file("ibench_import_aarch64.dat")) as input_file:
             input_data = input_file.readlines()
             entries = dbi._get_ibench_output(input_data, "aarch64")
             self.assertEqual(len(entries), 4)
             for _, e in entries.items():
-                self.assertIsNotNone(e["throughput"])
-                self.assertIsNotNone(e["latency"])
+                self.assertIsNotNone(e.throughput)
+                self.assertIsNotNone(e.latency)
 
     def test_asmbench_import(self):
         # only check import without dumping the DB file (takes too much time)
@@ -114,15 +114,15 @@ class TestDBInterface(unittest.TestCase):
             entries = dbi._get_asmbench_output(input_data, "x86")
             self.assertEqual(len(entries), 3)
             for _, e in entries.items():
-                self.assertIsNotNone(e["throughput"])
-                self.assertIsNotNone(e["latency"])
+                self.assertIsNotNone(e.throughput)
+                self.assertIsNotNone(e.latency)
         with open(self._find_file("asmbench_import_aarch64.dat")) as input_file:
             input_data = input_file.readlines()
             entries = dbi._get_asmbench_output(input_data, "aarch64")
             self.assertEqual(len(entries), 4)
             for _, e in entries.items():
-                self.assertIsNotNone(e["throughput"])
-                self.assertIsNotNone(e["latency"])
+                self.assertIsNotNone(e.throughput)
+                self.assertIsNotNone(e.latency)
             # remove empty line => no import since broken format
             del input_data[3]
             entries = dbi._get_asmbench_output(input_data, "aarch64")

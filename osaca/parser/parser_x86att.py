@@ -254,7 +254,6 @@ class ParserX86ATT(BaseParser):
             instruction_form.instruction = result.instruction
             instruction_form.operands = result.operands
             instruction_form.comment = result.comment
-
         return instruction_form
 
     def parse_instruction(self, instruction):
@@ -312,7 +311,7 @@ class ParserX86ATT(BaseParser):
                 else None,
             )
         if self.IDENTIFIER_ID in operand:
-            return IdentifierOperand(name=operand[self.IDENTIFIER_ID]["name"])
+            return self.process_identifier(operand[self.IDENTIFIER_ID])
         return operand
 
     def process_directive(self, directive):
@@ -370,11 +369,14 @@ class ParserX86ATT(BaseParser):
         """Post-process immediate operand"""
         if "identifier" in immediate:
             # actually an identifier, change declaration
-            return immediate
+            return self.process_identifier(immediate["identifier"])
         # otherwise just make sure the immediate is a decimal
         # immediate["value"] = int(immediate["value"], 0)
         new_immediate = ImmediateOperand(value_id=int(immediate["value"], 0))
         return new_immediate
+    
+    def process_identifier(self, identifier):
+        return IdentifierOperand(name=identifier["name"])
 
     def get_full_reg_name(self, register):
         """Return one register name string including all attributes"""
@@ -466,7 +468,7 @@ class ParserX86ATT(BaseParser):
 
     def is_vector_register(self, register):
         """Check if register is a vector register"""
-        if register is None:
+        if register is None or register.name is None:
             return False
         if register.name.rstrip(string.digits).lower() in [
             "mm",
