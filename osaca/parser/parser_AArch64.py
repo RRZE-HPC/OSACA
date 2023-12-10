@@ -427,7 +427,9 @@ class ParserAArch64(BaseParser):
                 if memory_address["index"]["shift_op"].lower() in valid_shift_ops:
                     scale = 2 ** int(memory_address["index"]["shift"][0]["value"])
         if index is not None:
-            index = RegisterOperand(name=index["name"], prefix_id=index["prefix"] if "prefix" in index else None)
+            index = RegisterOperand(
+                name=index["name"], prefix_id=index["prefix"] if "prefix" in index else None
+            )
         new_dict = MemoryOperand(
             offset_ID=offset,
             base_id=RegisterOperand(name=base["name"], prefix_id=base["prefix"]),
@@ -631,7 +633,7 @@ class ParserAArch64(BaseParser):
 
     def is_reg_dependend_of(self, reg_a, reg_b):
         """Check if ``reg_a`` is dependent on ``reg_b``"""
-        #if not isinstance(reg_b, Operand):
+        # if not isinstance(reg_b, Operand):
         #    print(reg_b)
         if not isinstance(reg_a, Operand):
             reg_a = RegisterOperand(name=reg_a["name"])

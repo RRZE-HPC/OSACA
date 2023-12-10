@@ -200,7 +200,8 @@ class ISASemantics(object):
                     base_name = (o.base.prefix if o.base.prefix is not None else "") + o.base.name
                     return {
                         base_name: {
-                            "name": (o.base.prefix if o.base.prefix is not None else "") + o.base.name,
+                            "name": (o.base.prefix if o.base.prefix is not None else "")
+                            + o.base.name,
                             "value": o.post_indexed["value"],
                         }
                     }
@@ -225,7 +226,7 @@ class ISASemantics(object):
         if isa_data is not None and isa_data.operation is not None:
             for i, o in enumerate(instruction_form.operands):
                 operand_name = "op{}".format(i + 1)
-                
+
                 if isinstance(o, RegisterOperand):
                     o_reg_name = (o.prefix if o.prefix is not None else "") + o.name
                     reg_operand_names[o_reg_name] = operand_name

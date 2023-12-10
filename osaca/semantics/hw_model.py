@@ -6,14 +6,12 @@ import pickle
 import re
 import string
 from collections import defaultdict
-from copy import deepcopy
 from itertools import product
 from pathlib import Path
 
 import ruamel.yaml
 from osaca import __version__, utils
 from osaca.parser import ParserX86ATT
-from ruamel.yaml.compat import StringIO
 from osaca.parser.instruction_form import instructionForm
 from osaca.parser.operand import Operand
 from osaca.parser.memory import MemoryOperand
@@ -203,7 +201,10 @@ class MachineModel(object):
             if isinstance(o["base"], dict):
                 o["base"] = RegisterOperand(name=o["base"]["name"])
             if isinstance(o["index"], dict):
-                o["index"] = RegisterOperand(name=o["index"]["name"],prefix_id=o["index"]["prefix"] if "prefix" in o["index"] else None)
+                o["index"] = RegisterOperand(
+                    name=o["index"]["name"],
+                    prefix_id=o["index"]["prefix"] if "prefix" in o["index"] else None,
+                )
             new_operands.append(
                 MemoryOperand(
                     base_id=o["base"],
@@ -494,6 +495,7 @@ class MachineModel(object):
         if isinstance(stream, StringIO):
             return stream.getvalue()
         '''
+
     def operand_to_dict(self, mem):
         return {
             "base": mem.base,

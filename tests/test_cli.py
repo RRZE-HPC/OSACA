@@ -230,7 +230,6 @@ class TestCLI(unittest.TestCase):
         osaca.run(args, output_file=output)
         self.assertTrue(output.getvalue().count("WARNING: LCD analysis timed out") == 0)
 
-
     def test_lines_arg(self):
         # Run tests with --lines option
         parser = osaca.create_parser()
