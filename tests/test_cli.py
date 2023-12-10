@@ -199,6 +199,7 @@ class TestCLI(unittest.TestCase):
         )
         output = StringIO()
         osaca.run(args, output_file=output)
+
         # WARNING for length
         self.assertTrue(
             output.getvalue().count(
@@ -228,6 +229,7 @@ class TestCLI(unittest.TestCase):
         output = StringIO()
         osaca.run(args, output_file=output)
         self.assertTrue(output.getvalue().count("WARNING: LCD analysis timed out") == 0)
+
 
     def test_lines_arg(self):
         # Run tests with --lines option
