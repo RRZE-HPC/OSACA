@@ -68,7 +68,7 @@ def sanity_check(arch: str, verbose=False, internet_check=False, output_file=sys
         colors=True if output_file == sys.stdout else False,
     )
     print(report, file=output_file)
-    
+
     return not any([missing_port_pressure, bad_operand])
 
 
@@ -148,8 +148,13 @@ def _get_asmbench_output(input_data, isa):
             mnemonic = i_form.split("-")[0]
             operands = i_form.split("-")[1].split("_")
             operands = [_create_db_operand(op, isa) for op in operands]
-            entry = instructionForm(instruction_id=mnemonic,operands_id=operands,throughput=_validate_measurement(float(input_data[i + 2].split()[1]), "tp"),
-                                    latency=_validate_measurement(float(input_data[i + 1].split()[1]), "lt"),port_pressure=None)
+            entry = instructionForm(
+                instruction_id=mnemonic,
+                operands_id=operands,
+                throughput=_validate_measurement(float(input_data[i + 2].split()[1]), "tp"),
+                latency=_validate_measurement(float(input_data[i + 1].split()[1]), "lt"),
+                port_pressure=None,
+            )
             if not entry.throughput or not entry.latency:
                 warnings.warn(
                     "Your measurement for {} looks suspicious".format(i_form)
@@ -174,7 +179,13 @@ def _get_ibench_output(input_data, isa):
             mnemonic = instruction.split("-")[0]
             operands = instruction.split("-")[1].split("_")
             operands = [_create_db_operand(op, isa) for op in operands]
-            entry = instructionForm(instruction_id=mnemonic,operands_id=operands,throughput=None,latency=None,port_pressure=None)
+            entry = instructionForm(
+                instruction_id=mnemonic,
+                operands_id=operands,
+                throughput=None,
+                latency=None,
+                port_pressure=None,
+            )
         if "TP" in instruction:
             entry.throughput = _validate_measurement(float(line.split()[1]), "tp")
             if not entry.throughput:

@@ -374,7 +374,7 @@ class ParserX86ATT(BaseParser):
         # immediate["value"] = int(immediate["value"], 0)
         new_immediate = ImmediateOperand(value_id=int(immediate["value"], 0))
         return new_immediate
-    
+
     def process_identifier(self, identifier):
         return IdentifierOperand(name=identifier["name"])
 

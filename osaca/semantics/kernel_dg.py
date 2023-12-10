@@ -299,7 +299,11 @@ class KernelDG(nx.DiGraph):
                     # write to register -> abort
                     if self.is_written(dst, instr_form):
                         break
-                if not isinstance(dst, Operand) and ("flag" in dst or dst["class"] == "flag" if "class" in dst else False) and flag_dependencies:
+                if (
+                    not isinstance(dst, Operand)
+                    and ("flag" in dst or dst["class"] == "flag" if "class" in dst else False)
+                    and flag_dependencies
+                ):
                     # read of flag
                     if self.is_read(dst, instr_form):
                         yield instr_form, []
@@ -377,7 +381,9 @@ class KernelDG(nx.DiGraph):
         ):
             if isinstance(src, RegisterOperand):
                 is_read = self.parser.is_reg_dependend_of(register, src) or is_read
-            if not isinstance(src, Operand) and ("flag" in src or src["class"] == "flag" if "class" in src else False):
+            if not isinstance(src, Operand) and (
+                "flag" in src or src["class"] == "flag" if "class" in src else False
+            ):
                 is_read = self.parser.is_flag_dependend_of(register, src) or is_read
             if isinstance(src, MemoryOperand):
                 if src.base is not None:
@@ -480,7 +486,9 @@ class KernelDG(nx.DiGraph):
         ):
             if isinstance(dst, RegisterOperand):
                 is_written = self.parser.is_reg_dependend_of(register, dst) or is_written
-            if not isinstance(dst, Operand) and ("flag" in dst or dst["class"] == "flag" if "class" in dst else False):
+            if not isinstance(dst, Operand) and (
+                "flag" in dst or dst["class"] == "flag" if "class" in dst else False
+            ):
                 is_written = self.parser.is_flag_dependend_of(register, dst) or is_written
             if isinstance(dst, MemoryOperand):
                 if dst.pre_indexed or dst.post_indexed:
