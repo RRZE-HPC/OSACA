@@ -850,7 +850,7 @@ instruction_forms:
           shape: "*"
           source: true
           destination: false
-    - name: ldp
+    - name: [ldp, ldnp]
       operands:
         - class: register
           prefix: "*"
@@ -895,7 +895,7 @@ instruction_forms:
         source: true
         destination: false
       operation: "op1['name'] = op2['name']; op1['value'] = op2['value']"
-    - name: stp
+    - name: [stp, stnp]
       operands:
         - class: register
           prefix: "*"
