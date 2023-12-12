@@ -3427,16 +3427,6 @@ instruction_forms:
   port_pressure: [[1, '015']]                                        # model_importer.py instructions.xml ICL
   throughput: 0.3333333333333333                                     # model_importer.py instructions.xml ICL
   uops: 1                                                            # model_importer.py instructions.xml ICL
-- name: VBROADCASTSD                                                 # model_importer.py instructions.xml ICL
-  operands:                                                          # model_importer.py instructions.xml ICL
-  - class: register                                                  # model_importer.py instructions.xml ICL
-    name: xmm                                                        # model_importer.py instructions.xml ICL
-  - class: register                                                  # model_importer.py instructions.xml ICL
-    name: ymm                                                        # model_importer.py instructions.xml ICL
-  latency: 3                                                         # model_importer.py instructions.xml ICL
-  port_pressure: [[1, '5']]                                          # model_importer.py instructions.xml ICL
-  throughput: 1.0                                                    # model_importer.py instructions.xml ICL
-  uops: 1                                                            # model_importer.py instructions.xml ICL
 - name: VBROADCASTSS                                                 # model_importer.py instructions.xml ICL
   operands:                                                          # model_importer.py instructions.xml ICL
   - class: register                                                  # model_importer.py instructions.xml ICL
@@ -3447,7 +3437,7 @@ instruction_forms:
   port_pressure: [[1, '5']]                                          # model_importer.py instructions.xml ICL
   throughput: 1.0                                                    # model_importer.py instructions.xml ICL
   uops: 1                                                            # model_importer.py instructions.xml ICL
-- name: VBROADCASTSS                                                 # model_importer.py instructions.xml ICL
+- name: [VBROADCASTSD, VBROADCASTSS]                                 # model_importer.py instructions.xml ICL
   operands:                                                          # model_importer.py instructions.xml ICL
   - class: register                                                  # model_importer.py instructions.xml ICL
     name: xmm                                                        # model_importer.py instructions.xml ICL
@@ -3456,6 +3446,137 @@ instruction_forms:
   latency: 3                                                         # model_importer.py instructions.xml ICL
   port_pressure: [[1, '5']]                                          # model_importer.py instructions.xml ICL
   throughput: 1.0                                                    # model_importer.py instructions.xml ICL
+  uops: 1                                                            # model_importer.py instructions.xml ICL
+- name: [VBROADCASTSD, VBROADCASTSS]                                 # model_importer.py instructions.xml ICL
+  operands:                                                          # model_importer.py instructions.xml ICL
+  - class: register                                                  # model_importer.py instructions.xml ICL
+    name: xmm                                                        # model_importer.py instructions.xml ICL
+  - class: register                                                  # model_importer.py instructions.xml ICL
+    name: zmm                                                        # model_importer.py instructions.xml ICL
+  latency: 3                                                         # model_importer.py instructions.xml ICL
+  port_pressure: [[1, '5']]                                          # model_importer.py instructions.xml ICL
+  throughput: 1.0                                                    # model_importer.py instructions.xml ICL
+  uops: 1                                                            # model_importer.py instructions.xml ICL
+- name: [VBROADCASTSD, VBROADCASTSS]                                 # model_importer.py instructions.xml ICL
+  operands:                                                          # model_importer.py instructions.xml ICL
+  - class: memory
+    base: "*"
+    offset: "*"
+    index: "*"
+    scale: "*"
+  - class: register                                                  # model_importer.py instructions.xml ICL
+    name: ymm                                                        # model_importer.py instructions.xml ICL
+  latency: 5                                                         # model_importer.py instructions.xml ICL
+  port_pressure: [[1, '23'], [1, ['2D', '3D']], [1, '015']]            # model_importer.py instructions.xml ICL
+  throughput: 1.0                                                    # model_importer.py instructions.xml ICL
+  uops: 1                                                            # model_importer.py instructions.xml ICL
+- name: [VBROADCASTSD, VBROADCASTSS]                                 # model_importer.py instructions.xml ICL
+  operands:                                                          # model_importer.py instructions.xml ICL
+  - class: memory
+    base: "*"
+    offset: "*"
+    index: "*"
+    scale: "*"
+  - class: register                                                  # model_importer.py instructions.xml ICL
+    name: zmm                                                        # model_importer.py instructions.xml ICL
+  latency: 5                                                         # model_importer.py instructions.xml ICL
+  port_pressure: [[1, '23'], [1, ['2D', '3D']], [1, '015']]            # model_importer.py instructions.xml ICL
+  throughput: 1.0                                                    # model_importer.py instructions.xml ICL
+  uops: 1                                                            # model_importer.py instructions.xml ICL
+- name: VBROADCASTI32X2                                                 # model_importer.py instructions.xml ICL
+  operands:                                                          # model_importer.py instructions.xml ICL
+  - class: register                                                  # model_importer.py instructions.xml ICL
+    name: xmm                                                        # model_importer.py instructions.xml ICL
+  - class: register                                                  # model_importer.py instructions.xml ICL
+    name: xmm                                                        # model_importer.py instructions.xml ICL
+  latency: 1                                                         # model_importer.py instructions.xml ICL
+  port_pressure: [[1, '5']]                                          # model_importer.py instructions.xml ICL
+  throughput: 1.0                                                    # model_importer.py instructions.xml ICL
+  uops: 1                                                            # model_importer.py instructions.xml ICL
+- name: VBROADCASTI32X2                                 # model_importer.py instructions.xml ICL
+  operands:                                                          # model_importer.py instructions.xml ICL
+  - class: register                                                  # model_importer.py instructions.xml ICL
+    name: xmm                                                        # model_importer.py instructions.xml ICL
+  - class: register                                                  # model_importer.py instructions.xml ICL
+    name: ymm                                                        # model_importer.py instructions.xml ICL
+  latency: 3                                                         # model_importer.py instructions.xml ICL
+  port_pressure: [[1, '5']]                                          # model_importer.py instructions.xml ICL
+  throughput: 1.0                                                    # model_importer.py instructions.xml ICL
+  uops: 1                                                            # model_importer.py instructions.xml ICL
+- name: VBROADCASTI32X2                                 # model_importer.py instructions.xml ICL
+  operands:                                                          # model_importer.py instructions.xml ICL
+  - class: register                                                  # model_importer.py instructions.xml ICL
+    name: xmm                                                        # model_importer.py instructions.xml ICL
+  - class: register                                                  # model_importer.py instructions.xml ICL
+    name: zmm                                                        # model_importer.py instructions.xml ICL
+  latency: 3                                                         # model_importer.py instructions.xml ICL
+  port_pressure: [[1, '5']]                                          # model_importer.py instructions.xml ICL
+  throughput: 1.0                                                    # model_importer.py instructions.xml ICL
+  uops: 1                                                            # model_importer.py instructions.xml ICL
+- name: [VBROADCASTI32X4, VBROADCASTI32X2, VBROADCASTI64X2]          # model_importer.py instructions.xml ICL
+  operands:                                                          # model_importer.py instructions.xml ICL
+  - class: memory
+    base: "*"
+    offset: "*"
+    index: "*"
+    scale: "*"
+  - class: register                                                  # model_importer.py instructions.xml ICL
+    name: ymm                                                        # model_importer.py instructions.xml ICL
+  latency: 5                                                         # model_importer.py instructions.xml ICL
+  port_pressure: [[1, '23'], [1, ['2D', '3D']], [1, '015']]            # model_importer.py instructions.xml ICL
+  throughput: 1.0                                                    # model_importer.py instructions.xml ICL
+  uops: 1                                                            # model_importer.py instructions.xml ICL
+- name: [VBROADCASTI32X8, VBROADCASTI32X4, VBROADCASTI32X2, VBROADCASTI64X2, VBROADCASTI64X4] # model_importer.py instructions.xml ICL
+  operands:                                                          # model_importer.py instructions.xml ICL
+  - class: memory
+    base: "*"
+    offset: "*"
+    index: "*"
+    scale: "*"
+  - class: register                                                  # model_importer.py instructions.xml ICL
+    name: zmm                                                        # model_importer.py instructions.xml ICL
+  latency: 5                                                         # model_importer.py instructions.xml ICL
+  port_pressure: [[1, '23'], [1, ['2D', '3D']], [1, '015']]            # model_importer.py instructions.xml ICL
+  throughput: 1.0                                                    # model_importer.py instructions.xml ICL
+  uops: 1                                                            # model_importer.py instructions.xml ICL
+- name: VBROADCASTF64X4                                              # model_importer.py instructions.xml ICL
+  operands:                                                          # model_importer.py instructions.xml ICL
+  - class: memory
+    base: "*"
+    offset: "*"
+    index: "*"
+    scale: "*"
+  - class: register                                                  # model_importer.py instructions.xml ICL
+    name: zmm                                                        # model_importer.py instructions.xml ICL
+  latency: 5                                                         # model_importer.py instructions.xml ICL
+  port_pressure: [[1, '23'], [1, ['2D', '3D']], [1, '015']]            # model_importer.py instructions.xml ICL
+  throughput: 0.5                                                    # model_importer.py instructions.xml ICL
+  uops: 1                                                            # model_importer.py instructions.xml ICL
+- name: VBROADCASTF64X2                                              # model_importer.py instructions.xml ICL
+  operands:                                                          # model_importer.py instructions.xml ICL
+  - class: memory
+    base: "*"
+    offset: "*"
+    index: "*"
+    scale: "*"
+  - class: register                                                  # model_importer.py instructions.xml ICL
+    name: ymm                                                        # model_importer.py instructions.xml ICL
+  latency: 5                                                         # model_importer.py instructions.xml ICL
+  port_pressure: [[1, '23'], [1, ['2D', '3D']], [1, '015']]            # model_importer.py instructions.xml ICL
+  throughput: 0.5                                                    # model_importer.py instructions.xml ICL
+  uops: 1                                                            # model_importer.py instructions.xml ICL
+- name: VBROADCASTF64X2                                              # model_importer.py instructions.xml ICL
+  operands:                                                          # model_importer.py instructions.xml ICL
+  - class: memory
+    base: "*"
+    offset: "*"
+    index: "*"
+    scale: "*"
+  - class: register                                                  # model_importer.py instructions.xml ICL
+    name: zmm                                                        # model_importer.py instructions.xml ICL
+  latency: 5                                                         # model_importer.py instructions.xml ICL
+  port_pressure: [[1, '23'], [1, ['2D', '3D']], [1, '015']]            # model_importer.py instructions.xml ICL
+  throughput: 0.5                                                    # model_importer.py instructions.xml ICL
   uops: 1                                                            # model_importer.py instructions.xml ICL
 - name: VEXTRACTI128                                                 # model_importer.py instructions.xml ICL
   operands:                                                          # model_importer.py instructions.xml ICL
@@ -36296,4 +36417,3 @@ instruction_forms:
   port_pressure: [[1, '015'], [2, '5']]                              # model_importer.py instructions.xml ICL
   throughput: 2.3333333333333335                                     # model_importer.py instructions.xml ICL
   uops: 3                                                            # model_importer.py instructions.xml ICL
-
