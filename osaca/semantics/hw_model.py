@@ -281,6 +281,7 @@ class MachineModel(object):
             "a72": "aarch64",
             "tx2": "aarch64",
             "n1": "aarch64",
+            "m1": "aarch64",
             "zen1": "x86",
             "zen+": "x86",
             "zen2": "x86",
@@ -589,7 +590,7 @@ class MachineModel(object):
             return i_operand["class"] == "prfop"
         # condition
         if "condition" in operand:
-            if i_operand["ccode"] == self.WILDCARD:
+            if i_operand["class"] == "condition" and i_operand["ccode"] == self.WILDCARD:
                 return True
             return i_operand["class"] == "condition" and (
                 operand.get("condition", None) == i_operand.get("ccode", None).upper()
