@@ -382,7 +382,7 @@ class ParserAArch64(BaseParser):
         ):
             # resolve ranges and lists
             return self.resolve_range_list(self.process_register_list(operand[self.REGISTER_ID]))
-        if self.REGISTER_ID in operand and operand[self.REGISTER_ID]["name"] == "sp":
+        if self.REGISTER_ID in operand and operand[self.REGISTER_ID]["name"].lower() == "sp":
             return self.process_sp_register(operand[self.REGISTER_ID])
         # add value attribute to floating point immediates without exponent
         if self.IMMEDIATE_ID in operand:
@@ -404,9 +404,13 @@ class ParserAArch64(BaseParser):
         base = memory_address.get("base", None)
         index = memory_address.get("index", None)
         scale = 1
-        if base is not None and "name" in base and base["name"] == "sp":
+        if base is not None and "name" in base and base["name"].lower() == "sp":
             base["prefix"] = "x"
-        if index is not None and "name" in index and index["name"] == "sp":
+        if index is not None and "name" in index and index["name"].lower() == "sp":
+            index["prefix"] = "x"
+        if base is not None and "name" in base and base["name"].lower() == "zr":
+            base["prefix"] = "x"
+        if index is not None and "name" in index and index["name"].lower() == "zr":
             index["prefix"] = "x"
         valid_shift_ops = ["lsl", "uxtw", "uxtb", "sxtw"]
         if "index" in memory_address:
