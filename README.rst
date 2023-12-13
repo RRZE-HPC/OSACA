@@ -138,6 +138,54 @@ The usage of OSACA can be listed as:
 
 The **FILEPATH** describes the filepath to the file to work with and is always necessary, use "-" to read from stdin.
 
+Supported microarchitectures
+-----------------------------
+**x86 CPUs**
+
++---------+----------------+------------+
+|Designer | Model/microarch| OSACA flag |
++=========+================+============+
+| |       | Sandy Bridge   |  ``SNB``   |
+| |       +----------------+------------+
+| |       | Ivy Bridge     |  ``IVB``   |
+| |       +----------------+------------+
+| |       | Haswell        |  ``HSW``   |
+| | Intel +----------------+------------+
+| |       | Broadwell      |  ``BDW``   |
+|         +----------------+------------+
+|         | Skylake-X      |  ``SKX``   |
+|         +----------------+------------+
+|         | Cascadelake-X  |  ``CSX``   |
+|         +----------------+------------+
+|         | Icelake client |  ``ICL``   |
+|         +----------------+------------+
+|         | Icelake server |  ``ICX``   |
++---------+----------------+------------+
+| |       | Naples / Zen 1 |  ``ZEN1``  |
+|         +----------------+------------+
+| | AMD   | Rome / Zen 2   |  ``ZEN2``  |
+|         +----------------+------------+
+| |       | Milan / Zen 3  |  ``ZEN3``  |
++---------+----------------+------------+
+
+**ARM AArch64 CPUs**
+
++---------+----------------+------------+
+|Designer | Model/microarch| OSACA flag |
++=========+================+============+
+| |       | Cortex-A72     |  ``A72``   |
+|         +----------------+------------+
+| | ARM   | Neoverse N1    |  ``N1``    |
++---------+----------------+------------+
+| Marvell | ThunderX2      |  ``TX2``   |
++---------+----------------+------------+
+| Fujitsu | FX700/A64FX    |  ``A64FX`` |
++---------+----------------+------------+
+|HiSilicon| TaiShan v110   |  ``TSV110``|
++---------+----------------+------------+
+| Apple   | M1-Firestorm   |  ``M1``    |
++---------+----------------+------------+
+
 ______________________
 
 Hereinafter OSACA's scope of function will be described.
