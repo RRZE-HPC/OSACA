@@ -423,6 +423,7 @@ class MachineModel(object):
             "a72": "aarch64",
             "tx2": "aarch64",
             "n1": "aarch64",
+            "m1": "aarch64",
             "zen1": "x86",
             "zen+": "x86",
             "zen2": "x86",
