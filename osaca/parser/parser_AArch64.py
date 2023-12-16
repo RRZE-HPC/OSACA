@@ -383,16 +383,19 @@ class ParserAArch64(BaseParser):
         if self.REGISTER_ID in operand:
             return self.process_register_operand(operand[self.REGISTER_ID])
         if self.directive_id in operand:
-            return DirectiveOperand(
-                name=operand["directive"]["name"],
-                parameter_id=operand["directive"]["parameters"],
-                comment_id=operand["directive"]["comment"]
-                if "comment" in operand["directive"]
-                else None,
-            )
+            return self.process_directive_operand(operand[self.directive_id])
         if self.CONDITION_ID in operand:
             return self.process_condition(operand[self.CONDITION_ID])
         return operand
+
+    def process_directive_operand(self, operand):
+        return DirectiveOperand(
+                name=operand["name"],
+                parameter_id=operand["parameters"],
+                comment_id=operand["comment"]
+                if "comment" in operand
+                else None,
+            )
 
     def process_register_operand(self, operand):
         return RegisterOperand(
@@ -451,8 +454,7 @@ class ParserAArch64(BaseParser):
 
     def process_sp_register(self, register):
         """Post-process stack pointer register"""
-        new_reg = RegisterOperand(prefix_id="x", name="sp")
-        return new_reg
+        return RegisterOperand(prefix_id="x", name="sp")
 
     def process_condition(self, condition):
         return ConditionOperand(ccode=condition.upper())
@@ -507,8 +509,6 @@ class ParserAArch64(BaseParser):
             rlist.append(self.list_element.parseString(r, parseAll=True).asDict())
         index = register_list.get("index", None)
         new_dict = {dict_name: rlist, "index": index}
-        if len(new_dict[dict_name]) == 1:
-            return {self.REGISTER_ID: new_dict}
         return {self.REGISTER_ID: new_dict}
 
     def process_immediate(self, immediate):
@@ -554,18 +554,13 @@ class ParserAArch64(BaseParser):
     def process_label(self, label):
         """Post-process label asm line"""
         # remove duplicated 'name' level due to identifier
-        # label["name"] = label["name"]["name"]
-        new_label = LabelOperand(
+        return LabelOperand(
             name=label["name"]["name"],
             comment_id=label["comment"] if self.comment_id in label else None,
         )
-        return new_label
 
     def process_identifier(self, identifier):
         """Post-process identifier operand"""
-        # remove value if it consists of symbol+offset
-        if "value" in identifier:
-            del identifier["value"]
         return IdentifierOperand(
             name=identifier["name"] if "name" in identifier else None,
             offset=identifier["offset"] if "offset" in identifier else None,

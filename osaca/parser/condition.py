@@ -22,4 +22,7 @@ class ConditionOperand(Operand):
         self._ccode = ccode
 
     def __str__(self):
-        return f"ConditionOperand(ccode={self._ccode}, source={self._source}, destination={self._destination})"
+        return f"Condition(ccode={self._ccode}, source={self._source}, destination={self._destination})"
+
+    def __repr__(self):
+        return self.__str__()

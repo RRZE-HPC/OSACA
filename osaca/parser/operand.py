@@ -31,8 +31,8 @@ class Operand:
     def destination(self, destination):
         self._destination = destination
 
-    def __repr__(self):
-        return f"Operand(name={self._name},source={self._source},destination={self._destination})"
-
     def __str__(self):
-        return f"Name: {self._name}, Source: {self._source}, Destination: {self._destination}"
+        return f"Operand(Name: {self._name}, Source: {self._source}, Destination: {self._destination})"
+
+    def __repr__(self):
+        return self.__str__()

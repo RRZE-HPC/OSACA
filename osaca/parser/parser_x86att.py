@@ -298,21 +298,24 @@ class ParserX86ATT(BaseParser):
         if self.directive_id in operand:
             return self.process_directive(operand[self.directive_id])
         if self.REGISTER_ID in operand:
-            return RegisterOperand(
-                prefix_id=operand["register"]["prefix"]
-                if "prefix" in operand["register"]
-                else None,
-                name=operand["register"]["name"],
-                shape=operand["register"]["shape"] if "shape" in operand["register"] else None,
-                lanes=operand["register"]["lanes"] if "lanes" in operand["register"] else None,
-                index=operand["register"]["index"] if "index" in operand["register"] else None,
-                predication=operand["register"]["predication"]
-                if "predication" in operand["register"]
-                else None,
-            )
+            return self.process_register(operand[self.REGISTER_ID])
         if self.IDENTIFIER_ID in operand:
             return self.process_identifier(operand[self.IDENTIFIER_ID])
         return operand
+
+    def process_register(self, operand):
+        return RegisterOperand(
+                prefix_id=operand["prefix"]
+                if "prefix" in operand
+                else None,
+                name=operand["name"],
+                shape=operand["shape"] if "shape" in operand else None,
+                lanes=operand["lanes"] if "lanes" in operand else None,
+                index=operand["index"] if "index" in operand else None,
+                predication=operand["predication"]
+                if "predication" in operand
+                else None,
+            )
 
     def process_directive(self, directive):
         directive_new = DirectiveOperand(name=directive["name"], parameter_id=[])
@@ -360,10 +363,10 @@ class ParserX86ATT(BaseParser):
         """Post-process label asm line"""
         # remove duplicated 'name' level due to identifier
         label["name"] = label["name"][0]["name"]
-        new_label = LabelOperand(
+        return LabelOperand(
             name=label["name"], comment_id=label["comment"] if "comment" in label else None
         )
-        return new_label
+
 
     def process_immediate(self, immediate):
         """Post-process immediate operand"""

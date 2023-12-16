@@ -33,7 +33,6 @@ class instructionForm:
         self._operation = operation
         self._uops = uops
         self._breaks_dep = breaks_dep
-        # self.semantic_operands = {"source": [], "destination": [], "src_dst": []}
         self._latency = latency
         self._throughput = throughput
         self._latency_cp = []
