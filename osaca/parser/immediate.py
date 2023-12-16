@@ -35,13 +35,13 @@ class ImmediateOperand(Operand):
     def shift(self):
         return self._type_id
 
-    @identifier.setter
-    def identifier(self, identifier):
-        self._identifier_id = identifier
-
     @type.setter
     def type(self, type):
         self._type_id = type
+
+    @identifier.setter
+    def identifier(self, identifier):
+        self._identifier_id = identifier
 
     @value.setter
     def value(self, value):
@@ -53,7 +53,7 @@ class ImmediateOperand(Operand):
 
     def __str__(self):
         return (
-            f"ImmediateOperand(identifier_id={self._identifier_id}, type_id={self._type_id}, "
+            f"Immediate(identifier_id={self._identifier_id}, type_id={self._type_id}, "
             f"value_id={self._value_id}, shift_id={self._shift_id}, source={self._source}, destination={self._destination})"
         )
 

@@ -134,7 +134,7 @@ class RegisterOperand(Operand):
 
     def __str__(self):
         return (
-            f"RegisterOperand(name={self._name}, width_id={self._width_id}, "
+            f"Register(name={self._name}, width_id={self._width_id}, "
             f"prefix_id={self._prefix_id}, reg_id={self._reg_id}, REGtype_id={self._regtype_id}, "
             f"lanes={self._lanes}, shape={self._shape}, index={self._index}, "
             f"mask={self._mask}, zeroing={self._zeroing},source={self._source},destination={self._destination},"

@@ -25,7 +25,7 @@ class LabelOperand(Operand):
         return self._comment_id.pop(0)
 
     def __str__(self):
-        return f"LabelOperand(name={self._name}, comment={self._comment_id})"
+        return f"Label(name={self._name}, comment={self._comment_id})"
 
     def __repr__(self):
-        return f"LabelOperand(name={self._name}, comment={self._comment_id})"
+        return self.__str__()

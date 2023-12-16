@@ -48,4 +48,4 @@ class DirectiveOperand(Operand):
         return f"Directive(name={self._name}, parameters={self._parameter_id}, comment={self._comment_id})"
 
     def __repr__(self):
-        return f"DirectiveOperand(name={self._name}, parameters={self._parameter_id}, comment={self._comment_id})"
+        return self.__str__()

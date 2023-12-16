@@ -13,13 +13,13 @@ class IdentifierOperand(Operand):
     def offset(self):
         return self._offset
 
-    @offset.setter
-    def offset(self, offset):
-        self._offset = offset
-
     @property
     def relocation(self):
         return self._relocation
+
+    @offset.setter
+    def offset(self, offset):
+        self._offset = offset
 
     @relocation.setter
     def relocation(self, relocation):
@@ -27,8 +27,8 @@ class IdentifierOperand(Operand):
 
     def __str__(self):
         return (
-            f"IdentifierOperand({self.name}, offset={self.offset}, relocation={self.relocation})"
+            f"Identifier(name={self._name}, offset={self._offset}, relocation={self._relocation})"
         )
 
     def __repr__(self):
-        return f"IdentifierOperand(name={self.name}, offset={self.offset}, relocation={self.relocation}, source =relocation={self.source}, destination =relocation={self.destination})"
+        return self.__str__()
