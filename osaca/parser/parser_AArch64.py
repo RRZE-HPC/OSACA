@@ -390,12 +390,10 @@ class ParserAArch64(BaseParser):
 
     def process_directive_operand(self, operand):
         return DirectiveOperand(
-                name=operand["name"],
-                parameter_id=operand["parameters"],
-                comment_id=operand["comment"]
-                if "comment" in operand
-                else None,
-            )
+            name=operand["name"],
+            parameter_id=operand["parameters"],
+            comment_id=operand["comment"] if "comment" in operand else None,
+        )
 
     def process_register_operand(self, operand):
         return RegisterOperand(
@@ -435,7 +433,9 @@ class ParserAArch64(BaseParser):
                     scale = 2 ** int(memory_address["index"]["shift"][0]["value"])
         if index is not None:
             index = RegisterOperand(
-                name=index["name"], prefix_id=index["prefix"] if "prefix" in index else None
+                name=index["name"], prefix_id=index["prefix"] if "prefix" in index else None,
+                shift=index["shift"] if "shift" in index else None,
+                shift_op=index["shift_op"] if "shift_op" in index else None
             )
         new_dict = MemoryOperand(
             offset_ID=offset,

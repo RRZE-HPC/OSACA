@@ -216,13 +216,7 @@ class TestParserAArch64(unittest.TestCase):
                 MemoryOperand(
                     offset_ID=None,
                     base_id=RegisterOperand(prefix_id="x", name="11"),
-                    index_id={
-                        "prefix": "w",
-                        "name": "10",
-                        "shift_op": "sxtw",
-                        "immediate": {"value": "2"},
-                        "shift": [{"value": "2"}],
-                    },
+                    index_id=RegisterOperand(prefix_id="w", name="10", shift_op="sxtw", shift=[{"value": "2"}]),
                     scale_id=4,
                 ),
             ],

@@ -305,17 +305,13 @@ class ParserX86ATT(BaseParser):
 
     def process_register(self, operand):
         return RegisterOperand(
-                prefix_id=operand["prefix"]
-                if "prefix" in operand
-                else None,
-                name=operand["name"],
-                shape=operand["shape"] if "shape" in operand else None,
-                lanes=operand["lanes"] if "lanes" in operand else None,
-                index=operand["index"] if "index" in operand else None,
-                predication=operand["predication"]
-                if "predication" in operand
-                else None,
-            )
+            prefix_id=operand["prefix"] if "prefix" in operand else None,
+            name=operand["name"],
+            shape=operand["shape"] if "shape" in operand else None,
+            lanes=operand["lanes"] if "lanes" in operand else None,
+            index=operand["index"] if "index" in operand else None,
+            predication=operand["predication"] if "predication" in operand else None,
+        )
 
     def process_directive(self, directive):
         directive_new = DirectiveOperand(name=directive["name"], parameter_id=[])
@@ -366,7 +362,6 @@ class ParserX86ATT(BaseParser):
         return LabelOperand(
             name=label["name"], comment_id=label["comment"] if "comment" in label else None
         )
-
 
     def process_immediate(self, immediate):
         """Post-process immediate operand"""

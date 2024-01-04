@@ -21,6 +21,8 @@ class RegisterOperand(Operand):
         destination=False,
         pre_indexed=False,
         post_indexed=False,
+        shift=False,
+        shift_op=False
     ):
         super().__init__(name, source, destination)
         self._width_id = width_id
@@ -35,6 +37,8 @@ class RegisterOperand(Operand):
         self._predication = predication
         self._pre_indexed = pre_indexed
         self._post_indexed = post_indexed
+        self._shift = shift
+        self._shift_op = shift_op
 
     @property
     def width(self):
@@ -43,6 +47,22 @@ class RegisterOperand(Operand):
     @width.setter
     def width(self, width):
         self._width_id = width
+
+    @property
+    def shift(self):
+        return self._shift
+
+    @shift.setter
+    def shift(self, shift):
+        self._shift = shift
+
+    @property
+    def shift_op(self):
+        return self._shift_op
+
+    @shift_op.setter
+    def shift_op(self, shift_op):
+        self._shift_op = shift_op
 
     @property
     def predication(self):
