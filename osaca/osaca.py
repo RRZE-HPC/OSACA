@@ -13,7 +13,7 @@ from osaca.db_interface import import_benchmark_output, sanity_check
 from osaca.frontend import Frontend
 from osaca.parser import BaseParser, ParserAArch64, ParserX86ATT
 from osaca.semantics import (
-    INSTR_flags,
+    INSTR_FLAGS,
     ArchSemantics,
     KernelDG,
     MachineModel,
@@ -431,7 +431,7 @@ def get_unmatched_instruction_ratio(kernel):
     """Return ratio of unmatched from total instructions in kernel."""
     unmatched_counter = 0
     for instruction in kernel:
-        if INSTR_flags.TP_UNKWN in instruction.flags and INSTR_flags.LT_UNKWN in instruction.flags:
+        if INSTR_FLAGS.TP_UNKWN in instruction.flags and INSTR_FLAGS.LT_UNKWN in instruction.flags:
             unmatched_counter += 1
     return unmatched_counter / len(kernel)
 

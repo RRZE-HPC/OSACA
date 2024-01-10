@@ -11,7 +11,7 @@ from osaca.parser.immediate import ImmediateOperand
 from .hw_model import MachineModel
 
 
-class INSTR_flags:
+class INSTR_FLAGS:
     """
     Flags used for unknown or special instructions
     """
@@ -150,9 +150,9 @@ class ISASemantics(object):
         # )
 
         if self._has_load(instruction_form):
-            instruction_form.flags += [INSTR_flags.HAS_LD]
+            instruction_form.flags += [INSTR_FLAGS.HAS_LD]
         if self._has_store(instruction_form):
-            instruction_form.flags += [INSTR_flags.HAS_ST]
+            instruction_form.flags += [INSTR_FLAGS.HAS_ST]
 
     def get_reg_changes(self, instruction_form, only_postindexed=False):
         """

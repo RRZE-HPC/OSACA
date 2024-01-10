@@ -8,7 +8,7 @@ from itertools import chain
 from multiprocessing import Manager, Process, cpu_count
 
 import networkx as nx
-from osaca.semantics import INSTR_flags, ArchSemantics, MachineModel
+from osaca.semantics import INSTR_FLAGS, ArchSemantics, MachineModel
 from osaca.parser.memory import MemoryOperand
 from osaca.parser.register import RegisterOperand
 from osaca.parser.immediate import ImmediateOperand
@@ -67,8 +67,8 @@ class KernelDG(nx.DiGraph):
             dg.nodes[instruction_form.line_number]["instruction_form"] = instruction_form
             # add load as separate node if existent
             if (
-                INSTR_flags.HAS_LD in instruction_form.flags
-                and INSTR_flags.LD not in instruction_form.flags
+                INSTR_FLAGS.HAS_LD in instruction_form.flags
+                and INSTR_FLAGS.LD not in instruction_form.flags
             ):
                 # add new node
                 dg.add_node(instruction_form.line_number + 0.1)
