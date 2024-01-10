@@ -12,7 +12,7 @@ import networkx as nx
 from osaca.osaca import get_unmatched_instruction_ratio
 from osaca.parser import ParserAArch64, ParserX86ATT
 from osaca.semantics import (
-    INSTR_flags,
+    INSTR_FLAGS,
     ArchSemantics,
     ISASemantics,
     KernelDG,
@@ -116,9 +116,9 @@ class TestSemanticTools(unittest.TestCase):
             cls.semantics_a64fx.assign_src_dst(cls.kernel_aarch64_deps[i])
             cls.semantics_a64fx.assign_tp_lt(cls.kernel_aarch64_deps[i])
 
-        ###########
-        # Tests
-        ###########
+    ###########
+    # Tests
+    ###########
 
     def test_creation_by_name(self):
         try:
@@ -446,9 +446,9 @@ class TestSemanticTools(unittest.TestCase):
         semantics_hld.add_semantics(kernel_hld_2)
         semantics_hld.add_semantics(kernel_hld_3)
 
-        num_hidden_loads = len([x for x in kernel_hld if INSTR_flags.HIDDEN_LD in x.flags])
-        num_hidden_loads_2 = len([x for x in kernel_hld_2 if INSTR_flags.HIDDEN_LD in x.flags])
-        num_hidden_loads_3 = len([x for x in kernel_hld_3 if INSTR_flags.HIDDEN_LD in x.flags])
+        num_hidden_loads = len([x for x in kernel_hld if INSTR_FLAGS.HIDDEN_LD in x.flags])
+        num_hidden_loads_2 = len([x for x in kernel_hld_2 if INSTR_FLAGS.HIDDEN_LD in x.flags])
+        num_hidden_loads_3 = len([x for x in kernel_hld_3 if INSTR_FLAGS.HIDDEN_LD in x.flags])
         self.assertEqual(num_hidden_loads, 1)
         self.assertEqual(num_hidden_loads_2, 0)
         self.assertEqual(num_hidden_loads_3, 1)

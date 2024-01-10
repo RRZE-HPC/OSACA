@@ -8,7 +8,7 @@ from operator import itemgetter
 from copy import deepcopy
 
 from .hw_model import MachineModel
-from .isa_semantics import INSTR_flags, ISASemantics
+from .isa_semantics import INSTR_FLAGS, ISASemantics
 from osaca.parser.memory import MemoryOperand
 from osaca.parser.register import RegisterOperand
 
@@ -137,8 +137,8 @@ class ArchSemantics(ISASemantics):
 
     def set_hidden_loads(self, kernel):
         """Hide loads behind stores if architecture supports hidden loads (depricated)"""
-        loads = [instr for instr in kernel if INSTR_flags.HAS_LD in instr.flags]
-        stores = [instr for instr in kernel if INSTR_flags.HAS_ST in instr.flags]
+        loads = [instr for instr in kernel if INSTR_FLAGS.HAS_LD in instr.flags]
+        stores = [instr for instr in kernel if INSTR_FLAGS.HAS_ST in instr.flags]
         # Filter instructions including load and store
         load_ids = [instr.line_number for instr in loads]
         store_ids = [instr.line_number for instr in stores]
@@ -152,7 +152,7 @@ class ArchSemantics(ISASemantics):
         if len(loads) <= len(stores):
             # Hide all loads
             for load in loads:
-                load.flags += [INSTR_flags.HIDDEN_LD]
+                load.flags += [INSTR_FLAGS.HIDDEN_LD]
                 load.port_pressure = self._nullify_data_ports(load.port_pressure)
         else:
             for store in stores:
@@ -164,12 +164,12 @@ class ArchSemantics(ISASemantics):
                             load_instr.line_number,
                         )
                         for load_instr in loads
-                        if INSTR_flags.HIDDEN_LD not in load_instr.flags
+                        if INSTR_FLAGS.HIDDEN_LD not in load_instr.flags
                     ]
                 )
                 load = [instr for instr in kernel if instr.line_number == min_distance_load[1]][0]
                 # Hide load
-                load.flags += [INSTR_flags.HIDDEN_LD]
+                load.flags += [INSTR_FLAGS.HIDDEN_LD]
                 load.port_pressure = self._nullify_data_ports(load.port_pressure)
 
     # get parser result and assign throughput and latency value to instruction form
@@ -223,8 +223,8 @@ class ArchSemantics(ISASemantics):
                 assign_unknown = True
                 # check for equivalent register-operands DB entry if LD
                 if (
-                    INSTR_flags.HAS_LD in instruction_form.flags
-                    or INSTR_flags.HAS_ST in instruction_form.flags
+                    INSTR_FLAGS.HAS_LD in instruction_form.flags
+                    or INSTR_FLAGS.HAS_ST in instruction_form.flags
                 ):
                     # dynamically combine LD/ST and reg form of instruction form
                     # substitute mem and look for reg-only variant
@@ -262,7 +262,7 @@ class ArchSemantics(ISASemantics):
                         dummy_reg = RegisterOperand(name=reg_type)
                         data_port_pressure = [0.0 for _ in range(port_number)]
                         data_port_uops = []
-                        if INSTR_flags.HAS_LD in instruction_form.flags:
+                        if INSTR_FLAGS.HAS_LD in instruction_form.flags:
                             # LOAD performance data
                             load_perf_data = self._machine_model.get_load_throughput(
                                 [
@@ -293,7 +293,7 @@ class ArchSemantics(ISASemantics):
                                     reg_type
                                 ]
                                 data_port_pressure = [pp * multiplier for pp in data_port_pressure]
-                        if INSTR_flags.HAS_ST in instruction_form.flags:
+                        if INSTR_FLAGS.HAS_ST in instruction_form.flags:
                             # STORE performance data
                             destinations = (
                                 instruction_form.semantic_operands["destination"]
@@ -324,7 +324,7 @@ class ArchSemantics(ISASemantics):
                                 )
                             ):
                                 st_data_port_uops = []
-                                instruction_form.flags.remove(INSTR_flags.HAS_ST)
+                                instruction_form.flags.remove(INSTR_FLAGS.HAS_ST)
 
                             # sum up all data ports in case for LOAD and STORE
                             st_data_port_pressure = self._machine_model.average_port_pressure(
@@ -346,12 +346,12 @@ class ArchSemantics(ISASemantics):
                         # Add LD and ST latency
                         latency += (
                             self._machine_model.get_load_latency(reg_type)
-                            if INSTR_flags.HAS_LD in instruction_form.flags
+                            if INSTR_FLAGS.HAS_LD in instruction_form.flags
                             else 0
                         )
                         latency += (
                             self._machine_model.get_store_latency(reg_type)
-                            if INSTR_flags.HAS_ST in instruction_form.flags
+                            if INSTR_FLAGS.HAS_ST in instruction_form.flags
                             else 0
                         )
                         latency_wo_load = instruction_data_reg.latency
@@ -390,7 +390,7 @@ class ArchSemantics(ISASemantics):
                     latency_wo_load = latency
                     instruction_form.port_pressure = [0.0 for i in range(port_number)]
                     # instruction_formport_uops = []
-                    flags += [INSTR_flags.TP_UNKWN, INSTR_flags.LT_UNKWN]
+                    flags += [INSTR_FLAGS.TP_UNKWN, INSTR_FLAGS.LT_UNKWN]
         # flatten flag list
         flags = list(set(flags))
         if instruction_form.flags == []:
@@ -415,7 +415,7 @@ class ArchSemantics(ISASemantics):
             instruction_form.port_pressure = port_pressure
             if sum(port_pressure) == 0 and throughput is not None:
                 # port pressure on all ports 0 --> not bound to a port
-                flags.append(INSTR_flags.NOT_BOUND)
+                flags.append(INSTR_FLAGS.NOT_BOUND)
         except AssertionError:
             warnings.warn(
                 "Port pressure could not be imported correctly from database. "
@@ -423,20 +423,20 @@ class ArchSemantics(ISASemantics):
             )
             instruction_form.port_pressure = [0.0 for i in range(port_number)]
             instruction_form.port_uops = []
-            flags.append(INSTR_flags.TP_UNKWN)
+            flags.append(INSTR_FLAGS.TP_UNKWN)
         if throughput is None:
             # assume 0 cy and mark as unknown
             throughput = 0.0
-            flags.append(INSTR_flags.TP_UNKWN)
+            flags.append(INSTR_FLAGS.TP_UNKWN)
         latency = instruction_data.latency
         latency_wo_load = latency
         if latency is None:
             # assume 0 cy and mark as unknown
             latency = 0.0
             latency_wo_load = latency
-            flags.append(INSTR_flags.LT_UNKWN)
-        if INSTR_flags.HAS_LD in instruction_form.flags:
-            flags.append(INSTR_flags.LD)
+            flags.append(INSTR_FLAGS.LT_UNKWN)
+        if INSTR_FLAGS.HAS_LD in instruction_form.flags:
+            flags.append(INSTR_FLAGS.LD)
         return throughput, port_pressure, latency, latency_wo_load
 
     def convert_op_to_reg(self, reg_type, reg_id="0"):

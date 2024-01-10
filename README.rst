@@ -87,7 +87,7 @@ The usage of OSACA can be listed as:
 
 .. code:: bash
 
-    osaca [-h] [-V] [--arch ARCH] [--fixed] [--lines lineS]
+    osaca [-h] [-V] [--arch ARCH] [--fixed] [--lines LINES]
     	  [--ignore-unknown] [--lcd-timeout SECONDS]
     	  [--db-check] [--import MICROBENCH] [--insert-marker]
           [--export-graph GRAPHNAME] [--consider-flag-deps]
