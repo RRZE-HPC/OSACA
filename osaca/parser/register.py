@@ -22,7 +22,7 @@ class RegisterOperand(Operand):
         pre_indexed=False,
         post_indexed=False,
         shift=False,
-        shift_op=False
+        shift_op=False,
     ):
         super().__init__(name, source, destination)
         self._width_id = width_id
