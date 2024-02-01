@@ -262,7 +262,7 @@ instruction_forms:
   throughput: 1.0
   latency: 0.0
   port_pressure: [[1, '7']]
-- name: [b, bl, bcc, bcs, bgt, bhi, b.lo, b.ne, b.any, b.none, bal, b.al, b.lt, b.eq, b.hs, b.gt, b.hi, bne, beq]
+- name: [b, bl, bcc, bcs, bgt, bhi, b.lo, b.ne, b.any, b.none, bal, b.al, b.lt, b.eq, b.hs, b.gt, b.hi, bne, beq, bge]
   operands:
   - class: identifier
   throughput: 1.0
