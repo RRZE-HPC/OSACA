@@ -13,7 +13,7 @@ from osaca.semantics import MachineModel
 from osaca.parser.memory import MemoryOperand
 from osaca.parser.register import RegisterOperand
 from osaca.parser.immediate import ImmediateOperand
-from osaca.parser.instruction_form import instructionForm
+from osaca.parser.instruction_form import InstructionForm
 
 
 def sanity_check(arch: str, verbose=False, internet_check=False, output_file=sys.stdout):
@@ -145,11 +145,11 @@ def _get_asmbench_output(input_data, isa):
             break
         else:
             i_form = input_data[i].strip()
-            mnemonic = i_form.split("-")[0]
+            mnemonic_parsed = i_form.split("-")[0]
             operands = i_form.split("-")[1].split("_")
             operands = [_create_db_operand(op, isa) for op in operands]
-            entry = instructionForm(
-                instruction_id=mnemonic,
+            entry = InstructionForm(
+                mnemonic=mnemonic_parsed,
                 operands_id=operands,
                 throughput=_validate_measurement(float(input_data[i + 2].split()[1]), "tp"),
                 latency=_validate_measurement(float(input_data[i + 1].split()[1]), "lt"),
@@ -176,11 +176,11 @@ def _get_ibench_output(input_data, isa):
             # add only TP/LT value
             entry = db_entries[key]
         else:
-            mnemonic = instruction.split("-")[0]
+            mnemonic_parsed = instruction.split("-")[0]
             operands = instruction.split("-")[1].split("_")
             operands = [_create_db_operand(op, isa) for op in operands]
-            entry = instructionForm(
-                instruction_id=mnemonic,
+            entry = InstructionForm(
+                mnemonic=mnemonic_parsed,
                 operands_id=operands,
                 throughput=None,
                 latency=None,
@@ -434,27 +434,6 @@ def _check_sanity_arch_db(arch_mm, isa_mm, internet_check=True):
         if arch_mm._check_for_duplicate(instr_form["name"], instr_form["operands"]):
             duplicate_instr_arch.append(instr_form)
 
-        # Check operands
-        for operand in instr_form["operands"]:
-            if isinstance(operand, RegisterOperand) and not (
-                operand.name is not None or operand.prefix is not None
-            ):
-                # Missing 'name' key
-                # bad_operand.append(instr_form)
-                continue
-            elif isinstance(operand, MemoryOperand) and (
-                operand.base is None
-                or operand.offset is None
-                or operand.index is None
-                or operand.scale is None
-            ):
-                # Missing at least one key necessary for memory operands
-                # Since we're using classes with default 'None' values for these attributes, this check doesn't make sense anymore
-                # bad_operand.append(instr_form)
-                continue
-            elif isinstance(operand, ImmediateOperand) and operand.type is None:
-                # Missing 'imd' key
-                bad_operand.append(instr_form)
     # every entry exists twice --> uniquify
     tmp_list = []
     for _ in range(0, len(duplicate_instr_arch)):
