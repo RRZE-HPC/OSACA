@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 
 
-class instructionForm:
+class InstructionForm:
     def __init__(
         self,
-        instruction_id=None,
+        mnemonic=None,
         operands_id=[],
         hidden_operands=[],
         directive_id=None,
@@ -18,9 +18,9 @@ class instructionForm:
         uops=None,
         port_pressure=None,
         operation=None,
-        breaks_dep=False,
+        breaks_dependency_on_equal_operands=False,
     ):
-        self._instruction_id = instruction_id
+        self._mnemonic = mnemonic
         self._operands_id = operands_id
         self._hidden_operands = hidden_operands
         self._directive_id = directive_id
@@ -32,7 +32,7 @@ class instructionForm:
         self._semantic_operands = semantic_operands
         self._operation = operation
         self._uops = uops
-        self._breaks_dep = breaks_dep
+        self._breaks_dependency_on_equal_operands = breaks_dependency_on_equal_operands
         self._latency = latency
         self._throughput = throughput
         self._latency_cp = []
@@ -48,7 +48,7 @@ class instructionForm:
 
     @property
     def instruction(self):
-        return self._instruction_id
+        return self._mnemonic
 
     @property
     def label(self):
@@ -111,8 +111,8 @@ class instructionForm:
         return self._operation
 
     @property
-    def breaks_dep(self):
-        return self._breaks_dep
+    def breaks_dependency_on_equal_operands(self):
+        return self._breaks_dependency_on_equal_operands
 
     @semantic_operands.setter
     def semantic_operands(self, semantic_operands):
@@ -138,13 +138,13 @@ class instructionForm:
     def hidden_operands(self, hidden_operands):
         self._hidden_operands = hidden_operands
 
-    @breaks_dep.setter
-    def breaks_dep(self, boolean):
-        self._breaks_dep = boolean
+    @breaks_dependency_on_equal_operands.setter
+    def breaks_dependency_on_equal_operands(self, boolean):
+        self._breaks_dependency_on_equal_operands = boolean
 
     @instruction.setter
     def instruction(self, instruction):
-        self._instruction_id = instruction
+        self._mnemonic = instruction
 
     @label.setter
     def label(self, label):
@@ -188,7 +188,7 @@ class instructionForm:
 
     def __str__(self):
         attributes = {
-            "instruction_id": self.instruction,
+            "mnemonic": self.instruction,
             "operands_id": self.operands,
             "hidden_operands": self.hidden_operands,
             "directive_id": self.directive,
@@ -202,18 +202,18 @@ class instructionForm:
             "uops": self.uops,
             "port_pressure": self.port_pressure,
             "operation": self.operation,
-            "breaks_dep": self.breaks_dep,
+            "breaks_dependency_on_equal_operands": self.breaks_dependency_on_equal_operands,
         }
         attr_str = "\n ".join(f"{key}={value}" for key, value in attributes.items())
-        return f"instructionForm({attr_str})"
+        return f"InstructionForm({attr_str})"
 
     def __repr__(self):
         return self.__str__()
 
     def __eq__(self, other):
-        if isinstance(other, instructionForm):
+        if isinstance(other, InstructionForm):
             return (
-                self._instruction_id == other._instruction_id
+                self._mnemonic == other._mnemonic
                 and self._directive_id == other._directive_id
                 and self._comment_id == other._comment_id
                 and self._label_id == other._label_id
