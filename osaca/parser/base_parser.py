@@ -8,14 +8,14 @@ class BaseParser(object):
     # Identifiers for operand types
     comment_id = "comment"
     directive_id = "directive"
-    IMMEDIATE_ID = "immediate"
+    immediate_id = "immediate"
     label_id = "label"
-    IDENTIFIER_ID = "identifier"
-    MEMORY_ID = "memory"
-    REGISTER_ID = "register"
-    CONDITION_ID = "condition"
-    segment_ext_id = "segment_extension"
-    instruction_id = "instruction"
+    identifier_id = "identifier"
+    memory_id = "memory"
+    register_id = "register"
+    condition_id = "condition"
+    segment_ext = "segment_extension"
+    mnemonic = "instruction"
     operands_id = "operands"
     _parser_constructed = False
 
