@@ -12,13 +12,14 @@ from pathlib import Path
 import ruamel.yaml
 from osaca import __version__, utils
 from osaca.parser import ParserX86ATT
-from osaca.parser.instruction_form import instructionForm
+from osaca.parser.instruction_form import InstructionForm
 from osaca.parser.operand import Operand
 from osaca.parser.memory import MemoryOperand
 from osaca.parser.register import RegisterOperand
 from osaca.parser.immediate import ImmediateOperand
 from osaca.parser.identifier import IdentifierOperand
 from osaca.parser.condition import ConditionOperand
+from osaca.parser.flag import FlagOperand
 
 
 class MachineModel(object):
@@ -71,8 +72,8 @@ class MachineModel(object):
             if self._path in MachineModel._runtime_cache and not lazy:
                 self._data = MachineModel._runtime_cache[self._path]
             # check if file is cached
-            cached = self._get_cached(self._path) if not lazy else False
-            if cached:
+            # cached = self._get_cached(self._path) if not lazy else False
+            if False:
                 self._data = cached
             else:
                 yaml = self._create_yaml_object()
@@ -119,8 +120,8 @@ class MachineModel(object):
                         iform["hidden_operands"] = new_operands
 
                     # Change dict iform style to class style
-                    new_iform = instructionForm(
-                        instruction_id=iform["name"].upper() if "name" in iform else None,
+                    new_iform = InstructionForm(
+                        mnemonic=iform["name"].upper() if "name" in iform else None,
                         operands_id=iform["operands"] if "operands" in iform else [],
                         hidden_operands=iform["hidden_operands"]
                         if "hidden_operands" in iform
@@ -134,7 +135,7 @@ class MachineModel(object):
                         uops=iform["uops"] if "uops" in iform else None,
                         port_pressure=iform["port_pressure"] if "port_pressure" in iform else None,
                         operation=iform["operation"] if "operation" in iform else None,
-                        breaks_dep=iform["breaks_dependency_on_equal_operands"]
+                        breaks_dependency_on_equal_operands=iform["breaks_dependency_on_equal_operands"]
                         if "breaks_dependency_on_equal_operands" in iform
                         else False,
                         semantic_operands=iform["semantic_operands"]
@@ -158,10 +159,10 @@ class MachineModel(object):
             for m in self._data["load_throughput"]:
                 new_throughputs.append(
                     MemoryOperand(
-                        base_id=m["base"],
-                        offset_ID=m["offset"],
-                        scale_id=m["scale"],
-                        index_id=m["index"],
+                        base=m["base"],
+                        offset=m["offset"],
+                        scale=m["scale"],
+                        index=m["index"],
                         port_pressure=m["port_pressure"],
                         dst=m["dst"] if "dst" in m else None,
                     )
@@ -173,10 +174,10 @@ class MachineModel(object):
             for m in self._data["store_throughput"]:
                 new_throughputs.append(
                     MemoryOperand(
-                        base_id=m["base"],
-                        offset_ID=m["offset"],
-                        scale_id=m["scale"],
-                        index_id=m["index"],
+                        base=m["base"],
+                        offset=m["offset"],
+                        scale=m["scale"],
+                        index=m["index"],
                         port_pressure=m["port_pressure"],
                     )
                 )
@@ -188,7 +189,7 @@ class MachineModel(object):
             new_operands.append(
                 RegisterOperand(
                     name=o["name"] if "name" in o else None,
-                    prefix_id=o["prefix"] if "prefix" in o else None,
+                    prefix=o["prefix"] if "prefix" in o else None,
                     shape=o["shape"] if "shape" in o else None,
                     mask=o["mask"] if "mask" in o else False,
                     pre_indexed=o["pre_indexed"] if "pre_indexed" in o else False,
@@ -203,14 +204,14 @@ class MachineModel(object):
             if isinstance(o["index"], dict):
                 o["index"] = RegisterOperand(
                     name=o["index"]["name"],
-                    prefix_id=o["index"]["prefix"] if "prefix" in o["index"] else None,
+                    prefix=o["index"]["prefix"] if "prefix" in o["index"] else None,
                 )
             new_operands.append(
                 MemoryOperand(
-                    base_id=o["base"],
-                    offset_ID=o["offset"],
-                    index_id=o["index"],
-                    scale_id=o["scale"],
+                    base=o["base"],
+                    offset=o["offset"],
+                    index=o["index"],
+                    scale=o["scale"],
                     source=o["source"] if "source" in o else False,
                     destination=o["destination"] if "destination" in o else False,
                     pre_indexed=o["pre_indexed"] if "pre_indexed" in o else False,
@@ -237,6 +238,14 @@ class MachineModel(object):
             new_operands.append(
                 ConditionOperand(
                     ccode=o["ccode"].upper(),
+                    source=o["source"] if "source" in o else False,
+                    destination=o["destination"] if "destination" in o else False,
+                )
+            )
+        elif o["class"] == "flag":
+            new_operands.append(
+                FlagOperand(
+                    name=o["name"],
                     source=o["source"] if "source" in o else False,
                     destination=o["destination"] if "destination" in o else False,
                 )
@@ -310,7 +319,7 @@ class MachineModel(object):
         # If it already exists. Overwrite information.
         instr_data = self.get_instruction(instruction, operands)
         if instr_data is None:
-            instr_data = instructionForm()
+            instr_data = InstructionForm()
             self._data["instruction_forms"].append(instr_data)
             self._data["instruction_forms_dict"][instruction].append(instr_data)
 
@@ -491,7 +500,7 @@ class MachineModel(object):
         )
 
         yaml.dump({"load_throughput": formatted_load_throughput}, stream)
-        yaml.dump({"instruction_forms": formatted_instruction_forms}, stream)
+        yaml.dump({"instruction_forms": formatted_instruction_forms                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           }, stream)
         """
         if isinstance(stream, StringIO):
             return stream.getvalue()
@@ -612,15 +621,15 @@ class MachineModel(object):
         if operand == "i":
             return ImmediateOperand(type_id="int")
         elif operand in "wxbhsdq":
-            return RegisterOperand(prefix_id=operand)
+            return RegisterOperand(prefix=operand)
         elif operand.startswith("v"):
-            return RegisterOperand(prefix_id="v", shape=operand[1:2])
+            return RegisterOperand(prefix="v", shape=operand[1:2])
         elif operand.startswith("m"):
             return MemoryOperand(
-                base_id="x" if "b" in operand else None,
-                offset_ID="imd" if "o" in operand else None,
-                index_id="gpr" if "i" in operand else None,
-                scale_id=8 if "s" in operand else 1,
+                base="x" if "b" in operand else None,
+                offset="imd" if "o" in operand else None,
+                index="gpr" if "i" in operand else None,
+                scale=8 if "s" in operand else 1,
                 pre_indexed=True if "r" in operand else False,
                 post_indexed=True if "p" in operand else False,
             )
@@ -637,10 +646,10 @@ class MachineModel(object):
             return ImmediateOperand(type_id="int")
         elif operand.startswith("m"):
             return MemoryOperand(
-                base_id="gpr" if "b" in operand else None,
-                offset_ID="imd" if "o" in operand else None,
-                index_id="gpr" if "i" in operand else None,
-                scale_id=8 if "s" in operand else 1,
+                base="gpr" if "b" in operand else None,
+                offset="imd" if "o" in operand else None,
+                index="gpr" if "i" in operand else None,
+                scale=8 if "s" in operand else 1,
             )
         else:
             raise ValueError("Parameter {} is not a valid operand code".format(operand))

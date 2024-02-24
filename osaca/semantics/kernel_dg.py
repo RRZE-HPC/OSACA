@@ -13,6 +13,7 @@ from osaca.parser.memory import MemoryOperand
 from osaca.parser.register import RegisterOperand
 from osaca.parser.immediate import ImmediateOperand
 from osaca.parser.operand import Operand
+from osaca.parser.flag import FlagOperand
 
 
 class KernelDG(nx.DiGraph):
@@ -300,8 +301,7 @@ class KernelDG(nx.DiGraph):
                     if self.is_written(dst, instr_form):
                         break
                 if (
-                    not isinstance(dst, Operand)
-                    and ("flag" in dst or dst["class"] == "flag" if "class" in dst else False)
+                    isinstance(dst, FlagOperand)
                     and flag_dependencies
                 ):
                     # read of flag
@@ -381,9 +381,7 @@ class KernelDG(nx.DiGraph):
         ):
             if isinstance(src, RegisterOperand):
                 is_read = self.parser.is_reg_dependend_of(register, src) or is_read
-            if not isinstance(src, Operand) and (
-                "flag" in src or src["class"] == "flag" if "class" in src else False
-            ):
+            if isinstance(src, FlagOperand):
                 is_read = self.parser.is_flag_dependend_of(register, src) or is_read
             if isinstance(src, MemoryOperand):
                 if src.base is not None:
@@ -486,9 +484,7 @@ class KernelDG(nx.DiGraph):
         ):
             if isinstance(dst, RegisterOperand):
                 is_written = self.parser.is_reg_dependend_of(register, dst) or is_written
-            if not isinstance(dst, Operand) and (
-                "flag" in dst or dst["class"] == "flag" if "class" in dst else False
-            ):
+            if isinstance(dst, FlagOperand):
                 is_written = self.parser.is_flag_dependend_of(register, dst) or is_written
             if isinstance(dst, MemoryOperand):
                 if dst.pre_indexed or dst.post_indexed:
