@@ -6,12 +6,12 @@ Only the parser below will be exported, so please add new parsers to __all__.
 from .base_parser import BaseParser
 from .parser_x86att import ParserX86ATT
 from .parser_AArch64 import ParserAArch64
-from .instruction_form import instructionForm
+from .instruction_form import InstructionForm
 from .operand import Operand
 
 __all__ = [
     "Operand",
-    "instructionForm",
+    "InstructionForm",
     "BaseParser",
     "ParserX86ATT",
     "ParserAArch64",

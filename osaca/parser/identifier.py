@@ -5,9 +5,18 @@ from osaca.parser.operand import Operand
 
 class IdentifierOperand(Operand):
     def __init__(self, name=None, offset=None, relocation=None, source=False, destination=False):
-        super().__init__(name, source, destination)
+        super().__init__(source, destination)
+        self._name = name
         self._offset = offset
         self._relocation = relocation
+
+    @property
+    def name(self):
+        return self._name
+
+    @name.setter
+    def name(self, name):
+        self._name = name
 
     @property
     def offset(self):

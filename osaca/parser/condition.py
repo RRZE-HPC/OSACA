@@ -10,7 +10,7 @@ class ConditionOperand(Operand):
         source=False,
         destination=False,
     ):
-        super().__init__("condition", source, destination)
+        super().__init__(source, destination)
         self._ccode = ccode
 
     @property
