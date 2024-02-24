@@ -13,7 +13,7 @@ class ImmediateOperand(Operand):
         source=False,
         destination=False,
     ):
-        super().__init__(str(value_id), source, destination)
+        super().__init__(source, destination)
         self._identifier_id = identifier_id
         self._type_id = type_id
         self._value_id = value_id

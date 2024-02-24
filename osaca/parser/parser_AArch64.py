@@ -306,7 +306,7 @@ class ParserAArch64(BaseParser):
                     self.directive.parseString(line, parseAll=True).asDict()
                 )
                 instruction_form.directive = DirectiveOperand(
-                    name=result[0].name, parameter_id=result[0].parameters
+                    name=result[0].name, parameters=result[0].parameters
                 )
                 if result[1] is not None:
                     instruction_form.comment = " ".join(result[1])
@@ -394,7 +394,7 @@ class ParserAArch64(BaseParser):
     def process_directive_operand(self, operand):
         return DirectiveOperand(
             name=operand["name"],
-            parameter_id=operand["parameters"],
+            parameters=operand["parameters"],
         ), operand["comment"] if "comment" in operand else None
 
     def process_register_operand(self, operand):

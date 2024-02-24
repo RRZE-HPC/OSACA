@@ -20,7 +20,7 @@ class MemoryOperand(Operand):
         source=False,
         destination=False,
     ):
-        super().__init__("memory", source, destination)
+        super().__init__(source, destination)
         self._offset = offset
         self._base = base
         self._index = index
@@ -127,7 +127,7 @@ class MemoryOperand(Operand):
 
     def __str__(self):
         return (
-            f"MemoryOperand(name={self._name}, offset={self._offset}, "
+            f"MemoryOperand(offset={self._offset}, "
             f"base={self._base}, index={self._index}, scale={self._scale}, "
             f"segment_ext={self._segment_ext}, mask={self._mask}, "
             f"pre_indexed={self._pre_indexed}, post_indexed={self._post_indexed}, "

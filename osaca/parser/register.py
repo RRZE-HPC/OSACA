@@ -23,7 +23,8 @@ class RegisterOperand(Operand):
         shift=False,
         shift_op=False,
     ):
-        super().__init__(name, source, destination)
+        super().__init__(source, destination)
+        self._name = name
         self._width = width
         self._prefix = prefix
         self._regtype = regtype
@@ -38,6 +39,14 @@ class RegisterOperand(Operand):
         self._shift = shift
         self._shift_op = shift_op
 
+    @property
+    def name(self):
+        return self._name
+
+    @name.setter
+    def name(self, name):
+        self._name = name
+        
     @property
     def width(self):
         return self._width

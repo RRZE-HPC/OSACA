@@ -47,7 +47,7 @@ class InstructionForm:
         return self._semantic_operands
 
     @property
-    def instruction(self):
+    def mnemonic(self):
         return self._mnemonic
 
     @property
@@ -142,9 +142,9 @@ class InstructionForm:
     def breaks_dependency_on_equal_operands(self, boolean):
         self._breaks_dependency_on_equal_operands = boolean
 
-    @instruction.setter
-    def instruction(self, instruction):
-        self._mnemonic = instruction
+    @mnemonic.setter
+    def mnemonic(self, mnemonic):
+        self._mnemonic = mnemonic
 
     @label.setter
     def label(self, label):
@@ -188,7 +188,7 @@ class InstructionForm:
 
     def __str__(self):
         attributes = {
-            "mnemonic": self.instruction,
+            "mnemonic": self.mnemonic,
             "operands_id": self.operands,
             "hidden_operands": self.hidden_operands,
             "directive_id": self.directive,

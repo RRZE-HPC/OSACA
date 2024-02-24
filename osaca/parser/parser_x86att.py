@@ -238,7 +238,7 @@ class ParserX86ATT(BaseParser):
                 )
                 instruction_form.directive = DirectiveOperand(
                     name=result[0].name,
-                    parameter_id=result[0].parameters,
+                    parameters=result[0].parameters,
                 )
 
                 if result[1] is not None:
@@ -317,7 +317,7 @@ class ParserX86ATT(BaseParser):
         )
 
     def process_directive(self, directive):
-        directive_new = DirectiveOperand(name=directive["name"], parameter_id=directive["parameters"] if "parameters" in directive else [])
+        directive_new = DirectiveOperand(name=directive["name"], parameters=directive["parameters"] if "parameters" in directive else [])
         return directive_new, directive["comment"] if "comment" in directive else None
 
     def process_memory_address(self, memory_address):

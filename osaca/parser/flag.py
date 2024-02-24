@@ -5,7 +5,16 @@ from osaca.parser.operand import Operand
 
 class FlagOperand(Operand):
     def __init__(self, name=None, source=False, destination=False):
-        super().__init__(name, source, destination)
+        self._name = name
+        super().__init__(source, destination)
+
+    @property
+    def name(self):
+        return self._name
+
+    @name.setter
+    def name(self, name):
+        self._name = name
 
     def __str__(self):
         return (
