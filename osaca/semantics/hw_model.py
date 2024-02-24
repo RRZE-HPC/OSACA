@@ -145,43 +145,44 @@ class MachineModel(object):
                     # List containing classes with same name/instruction
                     self._data["instruction_forms_dict"][iform["name"]].append(new_iform)
                 self._data["internal_version"] = self.INTERNAL_VERSION
-                self.load_store_tp()
+
+                # Convert load and store throughput memory operands to classes
+                new_throughputs = []
+                if "load_throughput" in self._data:
+                    for m in self._data["load_throughput"]:
+                        new_throughputs.append(
+                            MemoryOperand(
+                                base=m["base"],
+                                offset=m["offset"],
+                                scale=m["scale"],
+                                index=m["index"],
+                                port_pressure=m["port_pressure"],
+                                dst=m["dst"] if "dst" in m else None,
+                            )
+                        )
+                    self._data["load_throughput"] = new_throughputs
+
+                new_throughputs = []
+                if "store_throughput" in self._data:
+                    for m in self._data["store_throughput"]:
+                        new_throughputs.append(
+                            MemoryOperand(
+                                base=m["base"],
+                                offset=m["offset"],
+                                scale=m["scale"],
+                                index=m["index"],
+                                port_pressure=m["port_pressure"],
+                            )
+                        )
+                    self._data["store_throughput"] = new_throughputs
+
+
                 if not lazy:
                     # cache internal representation for future use
                     self._write_in_cache(self._path)
             # Store in runtime cache
             if not lazy:
                 MachineModel._runtime_cache[self._path] = self._data
-
-    def load_store_tp(self):
-        new_throughputs = []
-        if "load_throughput" in self._data:
-            for m in self._data["load_throughput"]:
-                new_throughputs.append(
-                    MemoryOperand(
-                        base=m["base"],
-                        offset=m["offset"],
-                        scale=m["scale"],
-                        index=m["index"],
-                        port_pressure=m["port_pressure"],
-                        dst=m["dst"] if "dst" in m else None,
-                    )
-                )
-            self._data["load_throughput"] = new_throughputs
-
-        new_throughputs = []
-        if "store_throughput" in self._data:
-            for m in self._data["store_throughput"]:
-                new_throughputs.append(
-                    MemoryOperand(
-                        base=m["base"],
-                        offset=m["offset"],
-                        scale=m["scale"],
-                        index=m["index"],
-                        port_pressure=m["port_pressure"],
-                    )
-                )
-            self._data["store_throughput"] = new_throughputs
 
     def operand_to_class(self, o, new_operands):
         """Convert an operand from dict type to class"""
