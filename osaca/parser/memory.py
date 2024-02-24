@@ -15,7 +15,6 @@ class MemoryOperand(Operand):
         pre_indexed=False,
         post_indexed=False,
         indexed_val=None,
-        port_pressure=[],
         dst=None,
         source=False,
         destination=False,
@@ -30,7 +29,6 @@ class MemoryOperand(Operand):
         self._pre_indexed = pre_indexed
         self._post_indexed = post_indexed
         self._indexed_val = indexed_val
-        self._port_pressure = port_pressure
         self._dst = dst
 
     @property
@@ -74,20 +72,12 @@ class MemoryOperand(Operand):
         return self._indexed_val
 
     @property
-    def port_pressure(self):
-        return self._port_pressure
-
-    @property
     def dst(self):
         return self._dst
 
     @dst.setter
     def dst(self, dst):
         self._dst = dst
-
-    @port_pressure.setter
-    def port_pressure(self, port_pressure):
-        self._port_pressure = port_pressure
 
     @segment_ext.setter
     def segment_ext(self, segment):
@@ -131,7 +121,7 @@ class MemoryOperand(Operand):
             f"base={self._base}, index={self._index}, scale={self._scale}, "
             f"segment_ext={self._segment_ext}, mask={self._mask}, "
             f"pre_indexed={self._pre_indexed}, post_indexed={self._post_indexed}, "
-            f"indexed_val={self._indexed_val}, port_pressure={self._port_pressure}),"
+            f"indexed_val={self._indexed_val},"
             f"source={self._source}, destination={self._destination})"
         )
 

@@ -47,7 +47,6 @@ class MachineModel(object):
                         "index": i,
                         "offset": o,
                         "scale": s,
-                        "port_pressure": [],
                     }
                     for b, i, o, s in product(["gpr"], ["gpr", None], ["imd", None], [1, 8])
                 ],
@@ -150,29 +149,29 @@ class MachineModel(object):
                 new_throughputs = []
                 if "load_throughput" in self._data:
                     for m in self._data["load_throughput"]:
-                        new_throughputs.append(
+                        new_throughputs.append((
                             MemoryOperand(
                                 base=m["base"],
                                 offset=m["offset"],
                                 scale=m["scale"],
                                 index=m["index"],
-                                port_pressure=m["port_pressure"],
                                 dst=m["dst"] if "dst" in m else None,
                             )
+                            , m["port_pressure"])
                         )
                     self._data["load_throughput"] = new_throughputs
 
                 new_throughputs = []
                 if "store_throughput" in self._data:
                     for m in self._data["store_throughput"]:
-                        new_throughputs.append(
+                        new_throughputs.append((
                             MemoryOperand(
                                 base=m["base"],
                                 offset=m["offset"],
                                 scale=m["scale"],
                                 index=m["index"],
-                                port_pressure=m["port_pressure"],
                             )
+                            , m["port_pressure"])
                         )
                     self._data["store_throughput"] = new_throughputs
 
@@ -309,7 +308,7 @@ class MachineModel(object):
 
     def set_instruction(
         self,
-        instruction,
+        mnemonic,
         operands=None,
         latency=None,
         port_pressure=None,
@@ -318,13 +317,13 @@ class MachineModel(object):
     ):
         """Import instruction form information."""
         # If it already exists. Overwrite information.
-        instr_data = self.get_instruction(instruction, operands)
+        instr_data = self.get_instruction(mnemonic, operands)
         if instr_data is None:
             instr_data = InstructionForm()
             self._data["instruction_forms"].append(instr_data)
-            self._data["instruction_forms_dict"][instruction].append(instr_data)
+            self._data["instruction_forms_dict"][mnemonic].append(instr_data)
 
-        instr_data.instruction = instruction
+        instr_data.mnemonic = mnemonic
         instr_data.operands = operands
         instr_data.latency = latency
         instr_data.port_pressure = port_pressure
@@ -333,10 +332,10 @@ class MachineModel(object):
 
     def set_instruction_entry(self, entry):
         """Import instruction as entry object form information."""
-        if entry.instruction is None and entry.operands == []:
+        if entry.mnemonic is None and entry.operands == []:
             raise KeyError
         self.set_instruction(
-            entry.instruction,
+            entry.mnemonic,
             entry.operands,
             entry.latency,
             entry.port_pressure,
@@ -373,10 +372,10 @@ class MachineModel(object):
 
     def get_load_throughput(self, memory):
         """Return load thorughput for given register type."""
-        ld_tp = [m for m in self._data["load_throughput"] if self._match_mem_entries(memory, m)]
+        ld_tp = [m for m in self._data["load_throughput"] if self._match_mem_entries(memory, m[0])]
         if len(ld_tp) > 0:
             return ld_tp.copy()
-        return [MemoryOperand(port_pressure=self._data["load_throughput_default"].copy())]
+        return (memory, self._data["load_throughput_default"].copy())
 
     def get_store_latency(self, reg_type):
         """Return store latency for given register type."""
@@ -385,16 +384,16 @@ class MachineModel(object):
 
     def get_store_throughput(self, memory, src_reg=None):
         """Return store throughput for a given destination and register type."""
-        st_tp = [m for m in self._data["store_throughput"] if self._match_mem_entries(memory, m)]
+        st_tp = [m for m in self._data["store_throughput"] if self._match_mem_entries(memory, m[0])]
         if src_reg is not None:
             st_tp = [
                 tp
                 for tp in st_tp
-                if "src" in tp and self._check_operands(src_reg, RegisterOperand(name=tp["src"]))
+                if "src" in tp[0] and self._check_operands(src_reg, RegisterOperand(name=tp[0]["src"]))
             ]
         if len(st_tp) > 0:
             return st_tp.copy()
-        return [MemoryOperand(port_pressure=self._data["store_throughput_default"].copy())]
+        return [(memory, self._data["store_throughput_default"].copy())]
 
     def _match_mem_entries(self, mem, i_mem):
         """Check if memory addressing ``mem`` and ``i_mem`` are of the same type."""
@@ -422,7 +421,7 @@ class MachineModel(object):
             if op.shape is not None:
                 op_attrs.append("shape:" + op.shape)
             operands.append("{}({})".format("register", ",".join(op_attrs)))
-        return "{}  {}".format(instruction_form.instruction.lower(), ",".join(operands))
+        return "{}  {}".format(instruction_form.mnemonic.lower(), ",".join(operands))
 
     @staticmethod
     def get_isa_for_arch(arch):
