@@ -160,9 +160,9 @@ class TestSemanticTools(unittest.TestCase):
         )
         name_arm_1 = "fadd"
         operands_arm_1 = [
-            RegisterOperand(prefix_id="v", shape="s"),
-            RegisterOperand(prefix_id="v", shape="s"),
-            RegisterOperand(prefix_id="v", shape="s"),
+            RegisterOperand(prefix="v", shape="s"),
+            RegisterOperand(prefix="v", shape="s"),
+            RegisterOperand(prefix="v", shape="s"),
         ]
         instr_form_arm_1 = test_mm_arm.get_instruction(name_arm_1, operands_arm_1)
         self.assertEqual(instr_form_arm_1, test_mm_arm.get_instruction(name_arm_1, operands_arm_1))
@@ -190,52 +190,53 @@ class TestSemanticTools(unittest.TestCase):
         self.assertEqual(
             test_mm_x86.get_store_throughput(
                 MemoryOperand(
-                    base_id=RegisterOperand(name="x"), offset_ID=None, index_id=None, scale_id=1
+                    base=RegisterOperand(name="x"), offset=None, index=None, scale=1
                 )
-            )[0].port_pressure,
+            )[0][1],
             [[2, "237"], [2, "4"]],
         )
-
+        
         self.assertEqual(
             test_mm_x86.get_store_throughput(
                 MemoryOperand(
-                    base_id=RegisterOperand(prefix_id="NOT_IN_DB"),
-                    offset_ID=None,
-                    index_id="NOT_NONE",
-                    scale_id=1,
+                    base=RegisterOperand(prefix="NOT_IN_DB"),
+                    offset=None,
+                    index="NOT_NONE",
+                    scale=1,
                 )
-            )[0].port_pressure,
+            )[0][1],
             [[1, "23"], [1, "4"]],
         )
-
+        
         self.assertEqual(
             test_mm_arm.get_store_throughput(
                 MemoryOperand(
-                    base_id=RegisterOperand(prefix_id="x"),
-                    offset_ID=None,
-                    index_id=None,
-                    scale_id=1,
+                    base=RegisterOperand(prefix="x"),
+                    offset=None,
+                    index=None,
+                    scale=1,
                 )
-            )[0].port_pressure,
+            )[0][1],
             [[2, "34"], [2, "5"]],
         )
 
         self.assertEqual(
             test_mm_arm.get_store_throughput(
                 MemoryOperand(
-                    base_id=RegisterOperand(prefix_id="NOT_IN_DB"),
-                    offset_ID=None,
-                    index_id=None,
-                    scale_id=1,
+                    base=RegisterOperand(prefix="NOT_IN_DB"),
+                    offset=None,
+                    index=None,
+                    scale=1,
                 )
-            )[0].port_pressure,
+            )[0][1],
             [[1, "34"], [1, "5"]],
         )
+
         # test get_store_lt
         self.assertEqual(
             test_mm_x86.get_store_latency(
                 MemoryOperand(
-                    base_id=RegisterOperand(name="x"), offset_ID=None, index_id=None, scale_id=1
+                    base=RegisterOperand(name="x"), offset=None, index=None, scale=1
                 )
             ),
             0,
@@ -243,10 +244,10 @@ class TestSemanticTools(unittest.TestCase):
         self.assertEqual(
             test_mm_arm.get_store_latency(
                 MemoryOperand(
-                    base_id=RegisterOperand(prefix_id="x"),
-                    offset_ID=None,
-                    index_id=None,
-                    scale_id=1,
+                    base=RegisterOperand(prefix="x"),
+                    offset=None,
+                    index=None,
+                    scale=1,
                 )
             ),
             0,
@@ -259,9 +260,9 @@ class TestSemanticTools(unittest.TestCase):
         self.assertEqual(
             test_mm_x86.get_load_throughput(
                 MemoryOperand(
-                    base_id=RegisterOperand(name="x"), offset_ID=None, index_id=None, scale_id=1
+                    base=RegisterOperand(name="x"), offset=None, index=None, scale=1
                 )
-            )[0].port_pressure,
+            )[0][1],
             [[1, "23"], [1, ["2D", "3D"]]],
         )
 
@@ -604,11 +605,11 @@ class TestSemanticTools(unittest.TestCase):
     def test_is_read_is_written_AArch64(self):
         # independent form HW model
         dag = KernelDG(self.kernel_AArch64, self.parser_AArch64, None, None)
-        reg_x1 = RegisterOperand(prefix_id="x", name="1")
-        reg_w1 = RegisterOperand(prefix_id="w", name="1")
-        reg_d1 = RegisterOperand(prefix_id="d", name="1")
-        reg_q1 = RegisterOperand(prefix_id="q", name="1")
-        reg_v1 = RegisterOperand(prefix_id="v", name="1", lanes="2", shape="d")
+        reg_x1 = RegisterOperand(prefix="x", name="1")
+        reg_w1 = RegisterOperand(prefix="w", name="1")
+        reg_d1 = RegisterOperand(prefix="d", name="1")
+        reg_q1 = RegisterOperand(prefix="q", name="1")
+        reg_v1 = RegisterOperand(prefix="v", name="1", lanes="2", shape="d")
         regs = [reg_d1, reg_q1, reg_v1]
         regs_gp = [reg_w1, reg_x1]
 
@@ -674,10 +675,10 @@ class TestSemanticTools(unittest.TestCase):
     def test_MachineModel_getter(self):
         sample_operands = [
             MemoryOperand(
-                offset_ID=None,
-                base_id=RegisterOperand(name="r12"),
-                index_id=RegisterOperand(name="rcx"),
-                scale_id=8,
+                offset=None,
+                base=RegisterOperand(name="r12"),
+                index=RegisterOperand(name="rcx"),
+                scale=8,
             )
         ]
         self.assertIsNone(self.machine_model_csx.get_instruction("GETRESULT", sample_operands))
