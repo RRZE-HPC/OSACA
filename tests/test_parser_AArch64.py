@@ -8,7 +8,7 @@ import unittest
 
 from pyparsing import ParseException
 
-from osaca.parser import ParserAArch64, instructionForm
+from osaca.parser import ParserAArch64, InstructionForm
 from osaca.parser.directive import DirectiveOperand
 from osaca.parser.memory import MemoryOperand
 from osaca.parser.register import RegisterOperand
@@ -38,40 +38,40 @@ class TestParserAArch64(unittest.TestCase):
         )
 
     def test_label_parser(self):
-        self.assertEqual(self._get_label(self.parser, "main:").name, "main")
-        self.assertEqual(self._get_label(self.parser, "..B1.10:").name, "..B1.10")
-        self.assertEqual(self._get_label(self.parser, ".2.3_2_pack.3:").name, ".2.3_2_pack.3")
-        self.assertEqual(self._get_label(self.parser, ".L1:\t\t\t//label1").name, ".L1")
+        self.assertEqual(self._get_label(self.parser, "main:")[0].name, "main")
+        self.assertEqual(self._get_label(self.parser, "..B1.10:")[0].name, "..B1.10")
+        self.assertEqual(self._get_label(self.parser, ".2.3_2_pack.3:")[0].name, ".2.3_2_pack.3")
+        self.assertEqual(self._get_label(self.parser, ".L1:\t\t\t//label1")[0].name, ".L1")
         self.assertEqual(
-            " ".join(self._get_label(self.parser, ".L1:\t\t\t//label1").comment),
+            " ".join(self._get_label(self.parser, ".L1:\t\t\t//label1")[1]),
             "label1",
         )
         with self.assertRaises(ParseException):
             self._get_label(self.parser, "\t.cfi_startproc")
 
     def test_directive_parser(self):
-        self.assertEqual(self._get_directive(self.parser, "\t.text").name, "text")
-        self.assertEqual(len(self._get_directive(self.parser, "\t.text").parameters), 0)
-        self.assertEqual(self._get_directive(self.parser, "\t.align\t16,0x90").name, "align")
-        self.assertEqual(len(self._get_directive(self.parser, "\t.align\t16,0x90").parameters), 2)
+        self.assertEqual(self._get_directive(self.parser, "\t.text")[0].name, "text")
+        self.assertEqual(len(self._get_directive(self.parser, "\t.text")[0].parameters), 0)
+        self.assertEqual(self._get_directive(self.parser, "\t.align\t16,0x90")[0].name, "align")
+        self.assertEqual(len(self._get_directive(self.parser, "\t.align\t16,0x90")[0].parameters), 2)
         self.assertEqual(
-            self._get_directive(self.parser, "\t.align\t16,0x90").parameters[1], "0x90"
+            self._get_directive(self.parser, "\t.align\t16,0x90")[0].parameters[1], "0x90"
         )
         self.assertEqual(
-            self._get_directive(self.parser, "        .byte 100,103,144       //IACA START").name,
+            self._get_directive(self.parser, "        .byte 100,103,144       //IACA START")[0].name,
             "byte",
         )
         self.assertEqual(
             self._get_directive(
                 self.parser, "        .byte 100,103,144       //IACA START"
-            ).parameters[2],
+            )[0].parameters[2],
             "144",
         )
         self.assertEqual(
             " ".join(
                 self._get_directive(
                     self.parser, "        .byte 100,103,144       //IACA START"
-                ).comment
+                )[1]
             ),
             "IACA START",
         )
@@ -105,25 +105,25 @@ class TestParserAArch64(unittest.TestCase):
         parsed_8 = self.parser.parse_instruction(instr8)
         parsed_9 = self.parser.parse_instruction(instr9)
 
-        self.assertEqual(parsed_1.instruction, "vcvt.F32.S32")
+        self.assertEqual(parsed_1.mnemonic, "vcvt.F32.S32")
         self.assertEqual(parsed_1.operands[0].name, "1")
         self.assertEqual(parsed_1.operands[0].prefix, "w")
         self.assertEqual(parsed_1.operands[1].name, "2")
         self.assertEqual(parsed_1.operands[1].prefix, "w")
         self.assertEqual(parsed_1.comment, "12.27")
 
-        self.assertEqual(parsed_2.instruction, "b.lo")
+        self.assertEqual(parsed_2.mnemonic, "b.lo")
         self.assertEqual(parsed_2.operands[0].name, "..B1.4")
         self.assertEqual(len(parsed_2.operands), 1)
         self.assertIsNone(parsed_2.comment)
 
-        self.assertEqual(parsed_3.instruction, "mov")
+        self.assertEqual(parsed_3.mnemonic, "mov")
         self.assertEqual(parsed_3.operands[0].name, "2")
         self.assertEqual(parsed_3.operands[0].prefix, "x")
         self.assertEqual(parsed_3.operands[1].value, int("0x222", 0))
         self.assertEqual(parsed_3.comment, "NOT IACA END")
 
-        self.assertEqual(parsed_4.instruction, "str")
+        self.assertEqual(parsed_4.mnemonic, "str")
         self.assertIsNone(parsed_4.operands[1].offset)
         self.assertEqual(parsed_4.operands[1].base.name, "sp")
         self.assertEqual(parsed_4.operands[1].base.prefix, "x")
@@ -134,7 +134,7 @@ class TestParserAArch64(unittest.TestCase):
         self.assertEqual(parsed_4.operands[0].prefix, "x")
         self.assertEqual(parsed_4.comment, "12.9")
 
-        self.assertEqual(parsed_5.instruction, "ldr")
+        self.assertEqual(parsed_5.mnemonic, "ldr")
         self.assertEqual(parsed_5.operands[0].name, "0")
         self.assertEqual(parsed_5.operands[0].prefix, "x")
         self.assertEqual(parsed_5.operands[1].offset.name, "q2c")
@@ -144,20 +144,20 @@ class TestParserAArch64(unittest.TestCase):
         self.assertIsNone(parsed_5.operands[1].index)
         self.assertEqual(parsed_5.operands[1].scale, 1)
 
-        self.assertEqual(parsed_6.instruction, "adrp")
+        self.assertEqual(parsed_6.mnemonic, "adrp")
         self.assertEqual(parsed_6.operands[0].name, "0")
         self.assertEqual(parsed_6.operands[0].prefix, "x")
         self.assertEqual(parsed_6.operands[1].relocation, ":got:")
         self.assertEqual(parsed_6.operands[1].name, "visited")
 
-        self.assertEqual(parsed_7.instruction, "fadd")
+        self.assertEqual(parsed_7.mnemonic, "fadd")
         self.assertEqual(parsed_7.operands[0].name, "17")
         self.assertEqual(parsed_7.operands[0].prefix, "v")
         self.assertEqual(parsed_7.operands[0].lanes, "2")
         self.assertEqual(parsed_7.operands[0].shape, "d")
         self.assertEqual(self.parser.get_full_reg_name(parsed_7.operands[2]), "v1.2d")
 
-        self.assertEqual(parsed_8.instruction, "mov.d")
+        self.assertEqual(parsed_8.mnemonic, "mov.d")
         self.assertEqual(parsed_8.operands[0].name, "0")
         self.assertEqual(parsed_8.operands[0].prefix, "x")
         self.assertEqual(parsed_8.operands[1].name, "16")
@@ -165,7 +165,7 @@ class TestParserAArch64(unittest.TestCase):
         self.assertEqual(parsed_8.operands[1].index, "1")
         self.assertEqual(self.parser.get_full_reg_name(parsed_8.operands[1]), "v16.d[1]")
 
-        self.assertEqual(parsed_9.instruction, "ccmp")
+        self.assertEqual(parsed_9.mnemonic, "ccmp")
         self.assertEqual(parsed_9.operands[0].name, "0")
         self.assertEqual(parsed_9.operands[0].prefix, "x")
         self.assertEqual(parsed_9.operands[3].ccode, "CC")
@@ -181,8 +181,8 @@ class TestParserAArch64(unittest.TestCase):
         line_5_operands = "fcmla z26.d, p0/m, z29.d, z21.d, #90"
         line_conditions = "ccmn  x11, #1, #3, eq"
 
-        instruction_form_1 = instructionForm(
-            instruction_id=None,
+        instruction_form_1 = InstructionForm(
+            mnemonic=None,
             operands_id=[],
             directive_id=None,
             comment_id="-- Begin main",
@@ -191,8 +191,8 @@ class TestParserAArch64(unittest.TestCase):
             line_number=1,
         )
 
-        instruction_form_2 = instructionForm(
-            instruction_id=None,
+        instruction_form_2 = InstructionForm(
+            mnemonic=None,
             operands_id=[],
             directive_id=None,
             comment_id="=>This Inner Loop Header: Depth=1",
@@ -200,8 +200,8 @@ class TestParserAArch64(unittest.TestCase):
             line=".LBB0_1:              // =>This Inner Loop Header: Depth=1",
             line_number=2,
         )
-        instruction_form_3 = instructionForm(
-            instruction_id=None,
+        instruction_form_3 = InstructionForm(
+            mnemonic=None,
             operands_id=[],
             directive_id=DirectiveOperand(name="cfi_def_cfa", parameter_id=["w29", "-16"]),
             comment_id=None,
@@ -209,17 +209,17 @@ class TestParserAArch64(unittest.TestCase):
             line=".cfi_def_cfa w29, -16",
             line_number=3,
         )
-        instruction_form_4 = instructionForm(
-            instruction_id="ldr",
+        instruction_form_4 = InstructionForm(
+            mnemonic="ldr",
             operands_id=[
-                RegisterOperand(prefix_id="s", name="0"),
+                RegisterOperand(prefix="s", name="0"),
                 MemoryOperand(
-                    offset_ID=None,
-                    base_id=RegisterOperand(prefix_id="x", name="11"),
-                    index_id=RegisterOperand(
-                        prefix_id="w", name="10", shift_op="sxtw", shift=[{"value": "2"}]
+                    offset=None,
+                    base=RegisterOperand(prefix="x", name="11"),
+                    index=RegisterOperand(
+                        prefix="w", name="10", shift_op="sxtw", shift=[{"value": "2"}]
                     ),
-                    scale_id=4,
+                    scale=4,
                 ),
             ],
             directive_id=None,
@@ -228,15 +228,15 @@ class TestParserAArch64(unittest.TestCase):
             line="ldr s0, [x11, w10, sxtw #2]    // = <<2",
             line_number=4,
         )
-        instruction_form_5 = instructionForm(
-            instruction_id="prfm",
+        instruction_form_5 = InstructionForm(
+            mnemonic="prfm",
             operands_id=[
                 {"prfop": {"type": ["PLD"], "target": ["L1"], "policy": ["KEEP"]}},
                 MemoryOperand(
-                    offset_ID=ImmediateOperand(value_id=2048),
-                    base_id=RegisterOperand(prefix_id="x", name="26"),
-                    index_id=None,
-                    scale_id=1,
+                    offset=ImmediateOperand(value_id=2048),
+                    base=RegisterOperand(prefix="x", name="26"),
+                    index=None,
+                    scale=1,
                 ),
             ],
             directive_id=None,
@@ -245,16 +245,16 @@ class TestParserAArch64(unittest.TestCase):
             line="prfm    pldl1keep, [x26, #2048] //HPL",
             line_number=5,
         )
-        instruction_form_6 = instructionForm(
-            instruction_id="stp",
+        instruction_form_6 = InstructionForm(
+            mnemonic="stp",
             operands_id=[
-                RegisterOperand(prefix_id="x", name="29"),
-                RegisterOperand(prefix_id="x", name="30"),
+                RegisterOperand(prefix="x", name="29"),
+                RegisterOperand(prefix="x", name="30"),
                 MemoryOperand(
-                    offset_ID=ImmediateOperand(value_id=-16),
-                    base_id=RegisterOperand(name="sp", prefix_id="x"),
-                    index_id=None,
-                    scale_id=1,
+                    offset=ImmediateOperand(value_id=-16),
+                    base=RegisterOperand(name="sp", prefix="x"),
+                    index=None,
+                    scale=1,
                     pre_indexed=True,
                 ),
             ],
@@ -264,16 +264,16 @@ class TestParserAArch64(unittest.TestCase):
             line="stp x29, x30, [sp, #-16]!",
             line_number=6,
         )
-        instruction_form_7 = instructionForm(
-            instruction_id="ldp",
+        instruction_form_7 = InstructionForm(
+            mnemonic="ldp",
             operands_id=[
-                RegisterOperand(prefix_id="q", name="2"),
-                RegisterOperand(prefix_id="q", name="3"),
+                RegisterOperand(prefix="q", name="2"),
+                RegisterOperand(prefix="q", name="3"),
                 MemoryOperand(
-                    offset_ID=None,
-                    base_id=RegisterOperand(name="11", prefix_id="x"),
-                    index_id=None,
-                    scale_id=1,
+                    offset=None,
+                    base=RegisterOperand(name="11", prefix="x"),
+                    index=None,
+                    scale=1,
                     post_indexed={"value": 64},
                 ),
             ],
@@ -283,13 +283,13 @@ class TestParserAArch64(unittest.TestCase):
             line="ldp q2, q3, [x11], #64",
             line_number=7,
         )
-        instruction_form_8 = instructionForm(
-            instruction_id="fcmla",
+        instruction_form_8 = InstructionForm(
+            mnemonic="fcmla",
             operands_id=[
-                RegisterOperand(prefix_id="z", name="26", shape="d"),
-                RegisterOperand(prefix_id="p", name="0", predication="m"),
-                RegisterOperand(prefix_id="z", name="29", shape="d"),
-                RegisterOperand(prefix_id="z", name="21", shape="d"),
+                RegisterOperand(prefix="z", name="26", shape="d"),
+                RegisterOperand(prefix="p", name="0", predication="m"),
+                RegisterOperand(prefix="z", name="29", shape="d"),
+                RegisterOperand(prefix="z", name="21", shape="d"),
                 ImmediateOperand(value_id=90, type_id="int"),
             ],
             directive_id=None,
@@ -298,10 +298,10 @@ class TestParserAArch64(unittest.TestCase):
             line="fcmla z26.d, p0/m, z29.d, z21.d, #90",
             line_number=8,
         )
-        instruction_form_9 = instructionForm(
-            instruction_id="ccmn",
+        instruction_form_9 = InstructionForm(
+            mnemonic="ccmn",
             operands_id=[
-                RegisterOperand(prefix_id="x", name="11"),
+                RegisterOperand(prefix="x", name="11"),
                 ImmediateOperand(value_id=1, type_id="int"),
                 ImmediateOperand(value_id=3, type_id="int"),
                 {"condition": "EQ"},
@@ -376,17 +376,17 @@ class TestParserAArch64(unittest.TestCase):
         instr_list_with_index = "ld4 {v0.S, v1.S, v2.S, v3.S}[2]"
         instr_range_single = "dummy  { z1.d }"
         reg_list = [
-            RegisterOperand(prefix_id="x", name="5"),
-            RegisterOperand(prefix_id="x", name="6"),
-            RegisterOperand(prefix_id="x", name="7"),
+            RegisterOperand(prefix="x", name="5"),
+            RegisterOperand(prefix="x", name="6"),
+            RegisterOperand(prefix="x", name="7"),
         ]
         reg_list_idx = [
-            RegisterOperand(prefix_id="v", name="0", shape="S", index=2),
-            RegisterOperand(prefix_id="v", name="1", shape="S", index=2),
-            RegisterOperand(prefix_id="v", name="2", shape="S", index=2),
-            RegisterOperand(prefix_id="v", name="3", shape="S", index=2),
+            RegisterOperand(prefix="v", name="0", shape="S", index=2),
+            RegisterOperand(prefix="v", name="1", shape="S", index=2),
+            RegisterOperand(prefix="v", name="2", shape="S", index=2),
+            RegisterOperand(prefix="v", name="3", shape="S", index=2),
         ]
-        reg_list_single = [RegisterOperand(prefix_id="z", name="1", shape="d")]
+        reg_list_single = [RegisterOperand(prefix="z", name="1", shape="d")]
 
         prange = self.parser.parse_line(instr_range)
         plist = self.parser.parse_line(instr_list)
@@ -401,22 +401,22 @@ class TestParserAArch64(unittest.TestCase):
         self.assertEqual(p_single.operands, reg_list_single)
 
     def test_reg_dependency(self):
-        reg_1_1 = RegisterOperand(prefix_id="b", name="1")
-        reg_1_2 = RegisterOperand(prefix_id="h", name="1")
-        reg_1_3 = RegisterOperand(prefix_id="s", name="1")
-        reg_1_4 = RegisterOperand(prefix_id="d", name="1")
-        reg_1_4 = RegisterOperand(prefix_id="q", name="1")
-        reg_2_1 = RegisterOperand(prefix_id="w", name="2")
-        reg_2_2 = RegisterOperand(prefix_id="x", name="2")
-        reg_v1_1 = RegisterOperand(prefix_id="v", name="11", lanes="16", shape="b")
-        reg_v1_2 = RegisterOperand(prefix_id="v", name="11", lanes="8", shape="h")
-        reg_v1_3 = RegisterOperand(prefix_id="v", name="11", lanes="4", shape="s")
-        reg_v1_4 = RegisterOperand(prefix_id="v", name="11", lanes="2", shape="d")
+        reg_1_1 = RegisterOperand(prefix="b", name="1")
+        reg_1_2 = RegisterOperand(prefix="h", name="1")
+        reg_1_3 = RegisterOperand(prefix="s", name="1")
+        reg_1_4 = RegisterOperand(prefix="d", name="1")
+        reg_1_4 = RegisterOperand(prefix="q", name="1")
+        reg_2_1 = RegisterOperand(prefix="w", name="2")
+        reg_2_2 = RegisterOperand(prefix="x", name="2")
+        reg_v1_1 = RegisterOperand(prefix="v", name="11", lanes="16", shape="b")
+        reg_v1_2 = RegisterOperand(prefix="v", name="11", lanes="8", shape="h")
+        reg_v1_3 = RegisterOperand(prefix="v", name="11", lanes="4", shape="s")
+        reg_v1_4 = RegisterOperand(prefix="v", name="11", lanes="2", shape="d")
 
-        reg_b5 = RegisterOperand(prefix_id="b", name="5")
-        reg_q15 = RegisterOperand(prefix_id="q", name="15")
-        reg_v10 = RegisterOperand(prefix_id="v", name="10", lanes="2", shape="s")
-        reg_v20 = RegisterOperand(prefix_id="v", name="20", lanes="2", shape="d")
+        reg_b5 = RegisterOperand(prefix="b", name="5")
+        reg_q15 = RegisterOperand(prefix="q", name="15")
+        reg_v10 = RegisterOperand(prefix="v", name="10", lanes="2", shape="s")
+        reg_v20 = RegisterOperand(prefix="v", name="20", lanes="2", shape="d")
 
         reg_1 = [reg_1_1, reg_1_2, reg_1_3, reg_1_4]
         reg_2 = [reg_2_1, reg_2_2]

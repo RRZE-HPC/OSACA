@@ -3,7 +3,7 @@ from copy import deepcopy
 import pyparsing as pp
 
 from osaca.parser import BaseParser
-from osaca.parser.instruction_form import instructionForm
+from osaca.parser.instruction_form import InstructionForm
 from osaca.parser.operand import Operand
 from osaca.parser.directive import DirectiveOperand
 from osaca.parser.memory import MemoryOperand
@@ -12,6 +12,7 @@ from osaca.parser.register import RegisterOperand
 from osaca.parser.identifier import IdentifierOperand
 from osaca.parser.immediate import ImmediateOperand
 from osaca.parser.condition import ConditionOperand
+from osaca.parser.flag import FlagOperand
 
 
 class ParserAArch64(BaseParser):
@@ -51,7 +52,7 @@ class ParserAArch64(BaseParser):
                 pp.Suppress(pp.Literal("+"))
                 + (hex_number | decimal_number).setResultsName("offset")
             )
-        ).setResultsName(self.IDENTIFIER_ID)
+        ).setResultsName(self.identifier_id)
         # Label
         self.label = pp.Group(
             identifier.setResultsName("name") + pp.Literal(":") + pp.Optional(self.comment)
@@ -105,7 +106,7 @@ class ParserAArch64(BaseParser):
             pp.Optional(pp.Literal(symbol_immediate))
             + (hex_number ^ decimal_number ^ float_ ^ double_)
             | (pp.Optional(pp.Literal(symbol_immediate)) + identifier)
-        ).setResultsName(self.IMMEDIATE_ID)
+        ).setResultsName(self.immediate_id)
         shift_op = (
             pp.CaselessLiteral("lsl")
             ^ pp.CaselessLiteral("lsr")
@@ -121,7 +122,7 @@ class ParserAArch64(BaseParser):
             + pp.Suppress(pp.Literal(","))
             + shift_op.setResultsName("shift_op")
             + pp.Optional(immediate).setResultsName("shift")
-        ).setResultsName(self.IMMEDIATE_ID)
+        ).setResultsName(self.immediate_id)
         # Register:
         # scalar: [XWBHSDQ][0-9]{1,2}  |   vector: [VZ][0-9]{1,2}(\.[12468]{1,2}[BHSD])?
         #  | predicate: P[0-9]{1,2}(/[ZM])?
@@ -179,7 +180,7 @@ class ParserAArch64(BaseParser):
                 + shift_op.setResultsName("shift_op")
                 + pp.Optional(immediate).setResultsName("shift")
             )
-        ).setResultsName(self.REGISTER_ID)
+        ).setResultsName(self.register_id)
         self.register = register
         # Memory
         register_index = register.setResultsName("index") + pp.Optional(
@@ -195,7 +196,7 @@ class ParserAArch64(BaseParser):
                 pp.Literal("!").setResultsName("pre_indexed")
                 | (pp.Suppress(pp.Literal(",")) + immediate.setResultsName("post_indexed"))
             )
-        ).setResultsName(self.MEMORY_ID)
+        ).setResultsName(self.memory_id)
         prefetch_op = pp.Group(
             pp.Group(pp.CaselessLiteral("PLD") ^ pp.CaselessLiteral("PST")).setResultsName("type")
             + pp.Group(
@@ -261,8 +262,8 @@ class ParserAArch64(BaseParser):
         :type line_number: int, optional
         :return: `dict` -- parsed asm line (comment, label, directive or instruction form)
         """
-        instruction_form = instructionForm(
-            instruction_id=None,
+        instruction_form = InstructionForm(
+            mnemonic=None,
             operands_id=[],
             directive_id=None,
             comment_id=None,
@@ -289,24 +290,26 @@ class ParserAArch64(BaseParser):
         # 2. Parse label
         if result is None:
             try:
+                # returns tuple with label operand and comment, if any
                 result = self.process_operand(self.label.parseString(line, parseAll=True).asDict())
-                instruction_form.label = result.name
-                if result.comment is not None:
-                    instruction_form.comment = " ".join(result.comment)
+                instruction_form.label = result[0].name
+                if result[1] is not None:
+                    instruction_form.comment = " ".join(result[1])
             except pp.ParseException:
                 pass
 
         # 3. Parse directive
         if result is None:
             try:
+                # returns directive with label operand and comment, if any
                 result = self.process_operand(
                     self.directive.parseString(line, parseAll=True).asDict()
                 )
                 instruction_form.directive = DirectiveOperand(
-                    name=result.name, parameter_id=result.parameters
+                    name=result[0].name, parameter_id=result[0].parameters
                 )
-                if result.comment is not None:
-                    instruction_form.comment = " ".join(result.comment)
+                if result[1] is not None:
+                    instruction_form.comment = " ".join(result[1])
             except pp.ParseException:
                 pass
 
@@ -318,7 +321,7 @@ class ParserAArch64(BaseParser):
                 raise ValueError(
                     "Unable to parse {!r} on line {}".format(line, line_number)
                 ) from e
-            instruction_form.instruction = result.instruction
+            instruction_form.mnemonic = result.mnemonic
             instruction_form.operands = result.operands
             instruction_form.comment = result.comment
         return instruction_form
@@ -353,8 +356,8 @@ class ParserAArch64(BaseParser):
         if "operand5" in result:
             operand = self.process_operand(result["operand5"])
             operands.extend(operand) if isinstance(operand, list) else operands.append(operand)
-        return_dict = instructionForm(
-            instruction_id=result["mnemonic"],
+        return_dict = InstructionForm(
+            mnemonic=result["mnemonic"],
             operands_id=operands,
             comment_id=" ".join(result[self.comment_id]) if self.comment_id in result else None,
         )
@@ -363,41 +366,40 @@ class ParserAArch64(BaseParser):
     def process_operand(self, operand):
         """Post-process operand"""
         # structure memory addresses
-        if self.MEMORY_ID in operand:
-            return self.process_memory_address(operand[self.MEMORY_ID])
+        if self.memory_id in operand:
+            return self.process_memory_address(operand[self.memory_id])
         # structure register lists
-        if self.REGISTER_ID in operand and (
-            "list" in operand[self.REGISTER_ID] or "range" in operand[self.REGISTER_ID]
+        if self.register_id in operand and (
+            "list" in operand[self.register_id] or "range" in operand[self.register_id]
         ):
             # resolve ranges and lists
-            return self.resolve_range_list(self.process_register_list(operand[self.REGISTER_ID]))
-        if self.REGISTER_ID in operand and operand[self.REGISTER_ID]["name"].lower() == "sp":
-            return self.process_sp_register(operand[self.REGISTER_ID])
+            return self.resolve_range_list(self.process_register_list(operand[self.register_id]))
+        if self.register_id in operand and operand[self.register_id]["name"].lower() == "sp":
+            return self.process_sp_register(operand[self.register_id])
         # add value attribute to floating point immediates without exponent
-        if self.IMMEDIATE_ID in operand:
-            return self.process_immediate(operand[self.IMMEDIATE_ID])
+        if self.immediate_id in operand:
+            return self.process_immediate(operand[self.immediate_id])
         if self.label_id in operand:
             return self.process_label(operand[self.label_id])
-        if self.IDENTIFIER_ID in operand:
-            return self.process_identifier(operand[self.IDENTIFIER_ID])
-        if self.REGISTER_ID in operand:
-            return self.process_register_operand(operand[self.REGISTER_ID])
+        if self.identifier_id in operand:
+            return self.process_identifier(operand[self.identifier_id])
+        if self.register_id in operand:
+            return self.process_register_operand(operand[self.register_id])
         if self.directive_id in operand:
             return self.process_directive_operand(operand[self.directive_id])
-        if self.CONDITION_ID in operand:
-            return self.process_condition(operand[self.CONDITION_ID])
+        if self.condition_id in operand:
+            return self.process_condition(operand[self.condition_id])
         return operand
 
     def process_directive_operand(self, operand):
         return DirectiveOperand(
             name=operand["name"],
             parameter_id=operand["parameters"],
-            comment_id=operand["comment"] if "comment" in operand else None,
-        )
+        ), operand["comment"] if "comment" in operand else None
 
     def process_register_operand(self, operand):
         return RegisterOperand(
-            prefix_id=operand["prefix"],
+            prefix=operand["prefix"],
             name=operand["name"],
             shape=operand["shape"] if "shape" in operand else None,
             lanes=operand["lanes"] if "lanes" in operand else None,
@@ -434,15 +436,15 @@ class ParserAArch64(BaseParser):
         if index is not None:
             index = RegisterOperand(
                 name=index["name"],
-                prefix_id=index["prefix"] if "prefix" in index else None,
+                prefix=index["prefix"] if "prefix" in index else None,
                 shift=index["shift"] if "shift" in index else None,
                 shift_op=index["shift_op"] if "shift_op" in index else None,
             )
         new_dict = MemoryOperand(
-            offset_ID=offset,
-            base_id=RegisterOperand(name=base["name"], prefix_id=base["prefix"]),
-            index_id=index,
-            scale_id=scale,
+            offset=offset,
+            base=RegisterOperand(name=base["name"], prefix=base["prefix"]),
+            index=index,
+            scale=scale,
         )
         if "pre_indexed" in memory_address:
             new_dict.pre_indexed = True
@@ -455,7 +457,7 @@ class ParserAArch64(BaseParser):
 
     def process_sp_register(self, register):
         """Post-process stack pointer register"""
-        return RegisterOperand(prefix_id="x", name="sp")
+        return RegisterOperand(prefix="x", name="sp")
 
     def process_condition(self, condition):
         return ConditionOperand(ccode=condition.upper())
@@ -510,7 +512,7 @@ class ParserAArch64(BaseParser):
             rlist.append(self.list_element.parseString(r, parseAll=True).asDict())
         index = register_list.get("index", None)
         new_dict = {dict_name: rlist, "index": index}
-        return {self.REGISTER_ID: new_dict}
+        return {self.register_id: new_dict}
 
     def process_immediate(self, immediate):
         """Post-process immediate operand"""
@@ -555,10 +557,7 @@ class ParserAArch64(BaseParser):
     def process_label(self, label):
         """Post-process label asm line"""
         # remove duplicated 'name' level due to identifier
-        return LabelOperand(
-            name=label["name"]["name"],
-            comment_id=label["comment"] if self.comment_id in label else None,
-        )
+        return LabelOperand(name=label["name"]["name"]), label["comment"] if self.comment_id in label else None
 
     def process_identifier(self, identifier):
         """Post-process identifier operand"""
@@ -622,14 +621,7 @@ class ParserAArch64(BaseParser):
         """Check if ``flag_a`` is dependent on ``flag_b``"""
         # we assume flags are independent of each other, e.g., CF can be read while ZF gets written
         # TODO validate this assumption
-        if isinstance(flag_a, Operand):
-            return flag_a.name == flag_b["name"]
-        else:
-            return flag_a["name"] == flag_b["name"]
-
-        if flag_a.name == flag_b["name"]:
-            return True
-        return False
+        return flag_a.name == flag_b.name
 
     def is_reg_dependend_of(self, reg_a, reg_b):
         """Check if ``reg_a`` is dependent on ``reg_b``"""
