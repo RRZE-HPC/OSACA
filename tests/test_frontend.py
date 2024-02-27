@@ -96,7 +96,7 @@ class TestFrontend(unittest.TestCase):
                 line.latency_wo_load, analysis_dict["Kernel"][i]["LatencyWithoutLoad"]
             )
             self.assertEqual(line.latency_cp, analysis_dict["Kernel"][i]["LatencyCP"])
-            self.assertEqual(line.instruction, analysis_dict["Kernel"][i]["Instruction"])
+            self.assertEqual(line.mnemonic, analysis_dict["Kernel"][i]["Instruction"])
             self.assertEqual(len(line.operands), len(analysis_dict["Kernel"][i]["Operands"]))
             self.assertEqual(
                 len(line.semantic_operands["source"]),
@@ -133,7 +133,7 @@ class TestFrontend(unittest.TestCase):
                 line.latency_wo_load, analysis_dict["Kernel"][i]["LatencyWithoutLoad"]
             )
             self.assertEqual(line.latency_cp, analysis_dict["Kernel"][i]["LatencyCP"])
-            self.assertEqual(line.instruction, analysis_dict["Kernel"][i]["Instruction"])
+            self.assertEqual(line.mnemonic, analysis_dict["Kernel"][i]["Instruction"])
             self.assertEqual(len(line.operands), len(analysis_dict["Kernel"][i]["Operands"]))
             self.assertEqual(
                 len(line.semantic_operands["source"]),

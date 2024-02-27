@@ -49,28 +49,28 @@ class ISASemantics(object):
     def assign_src_dst(self, instruction_form):
         """Update instruction form dictionary with source, destination and flag information."""
         # if the instruction form doesn't have operands or is None, there's nothing to do
-        if instruction_form.operands is None or instruction_form.instruction is None:
+        if instruction_form.operands is None or instruction_form.mnemonic is None:
             instruction_form.semantic_operands = {"source": [], "destination": [], "src_dst": []}
             return
         # check if instruction form is in ISA yaml, otherwise apply standard operand assignment
         # (one dest, others source)
         isa_data = self._isa_model.get_instruction(
-            instruction_form.instruction, instruction_form.operands
+            instruction_form.mnemonic, instruction_form.operands
         )
         if (
             isa_data is None
             and self._isa == "x86"
-            and instruction_form.instruction[-1] in self.GAS_SUFFIXES
+            and instruction_form.mnemonic[-1] in self.GAS_SUFFIXES
         ):
             # Check for instruction without GAS suffix
             isa_data = self._isa_model.get_instruction(
-                instruction_form.instruction[:-1], instruction_form.operands
+                instruction_form.mnemonic[:-1], instruction_form.operands
             )
-        if isa_data is None and self._isa == "aarch64" and "." in instruction_form.instruction:
+        if isa_data is None and self._isa == "aarch64" and "." in instruction_form.mnemonic:
             # Check for instruction without shape/cc suffix
-            suffix_start = instruction_form.instruction.index(".")
+            suffix_start = instruction_form.mnemonic.index(".")
             isa_data = self._isa_model.get_instruction(
-                instruction_form.instruction[:suffix_start], instruction_form.operands
+                instruction_form.mnemonic[:suffix_start], instruction_form.operands
             )
         operands = instruction_form.operands
         op_dict = {}
@@ -86,26 +86,26 @@ class ISASemantics(object):
             if any([isinstance(op, MemoryOperand) for op in operands]):
                 operands_reg = self.substitute_mem_address(instruction_form.operands)
                 isa_data_reg = self._isa_model.get_instruction(
-                    instruction_form.instruction, operands_reg
+                    instruction_form.mnemonic, operands_reg
                 )
                 if (
                     isa_data_reg is None
                     and self._isa == "x86"
-                    and instruction_form.instruction[-1] in self.GAS_SUFFIXES
+                    and instruction_form.mnemonic[-1] in self.GAS_SUFFIXES
                 ):
                     # Check for instruction without GAS suffix
                     isa_data_reg = self._isa_model.get_instruction(
-                        instruction_form.instruction[:-1], operands_reg
+                        instruction_form.mnemonic[:-1], operands_reg
                     )
                 if (
                     isa_data_reg is None
                     and self._isa == "aarch64"
-                    and "." in instruction_form.instruction
+                    and "." in instruction_form.mnemonic
                 ):
                     # Check for instruction without shape/cc suffix
-                    suffix_start = instruction_form.instruction.index(".")
+                    suffix_start = instruction_form.mnemonic.index(".")
                     isa_data_reg = self._isa_model.get_instruction(
-                        instruction_form.instruction[:suffix_start], operands_reg
+                        instruction_form.mnemonic[:suffix_start], operands_reg
                     )
                 if isa_data_reg:
                     assign_default = False
@@ -161,7 +161,7 @@ class ISASemantics(object):
         Empty dict if no changes of registers occured. None for registers with unknown changes.
         If only_postindexed is True, only considers changes due to post_indexed memory references.
         """
-        if instruction_form.instruction is None:
+        if instruction_form.mnemonic is None:
             return {}
         dest_reg_names = [
             (op.prefix if op.prefix is not None else "") + op.name
@@ -172,22 +172,22 @@ class ISASemantics(object):
             if isinstance(op, RegisterOperand)
         ]
         isa_data = self._isa_model.get_instruction(
-            instruction_form.instruction, instruction_form.operands
+            instruction_form.mnemonic, instruction_form.operands
         )
         if (
             isa_data is None
             and self._isa == "x86"
-            and instruction_form.instruction[-1] in self.GAS_SUFFIXES
+            and instruction_form.mnemonic[-1] in self.GAS_SUFFIXES
         ):
             # Check for instruction without GAS suffix
             isa_data = self._isa_model.get_instruction(
-                instruction_form.instruction[:-1], instruction_form.operands
+                instruction_form.mnemonic[:-1], instruction_form.operands
             )
-        if isa_data is None and self._isa == "aarch64" and "." in instruction_form.instruction:
+        if isa_data is None and self._isa == "aarch64" and "." in instruction_form.mnemonic:
             # Check for instruction without shape/cc suffix
-            suffix_start = instruction_form.instruction.index(".")
+            suffix_start = instruction_form.mnemonic.index(".")
             isa_data = self._isa_model.get_instruction(
-                instruction_form.instruction[:suffix_start], instruction_form.operands
+                instruction_form.mnemonic[:suffix_start], instruction_form.operands
             )
 
         if only_postindexed:
@@ -262,7 +262,7 @@ class ISASemantics(object):
         op_dict["src_dst"] = []
 
         # handle dependency breaking instructions
-        if isa_data.breaks_dep and operands[1:] == operands[:-1]:
+        if isa_data.breaks_dependency_on_equal_operands and operands[1:] == operands[:-1]:
             op_dict["destination"] += operands
             if isa_data.hidden_operands != []:
                 op_dict["destination"] += [hop for hop in isa_data.hidden_operands]

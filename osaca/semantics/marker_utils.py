@@ -136,13 +136,13 @@ def find_marked_section(
     index_end = -1
     for i, line in enumerate(lines):
         try:
-            if line.instruction is None and comments is not None and line.comment is not None:
+            if line.mnemonic is None and comments is not None and line.comment is not None:
                 if comments["start"] == line.comment:
                     index_start = i + 1
                 elif comments["end"] == line.comment:
                     index_end = i
             elif (
-                line.instruction in mov_instr
+                line.mnemonic in mov_instr
                 and len(lines) > i + 1
                 and lines[i + 1].directive is not None
             ):
@@ -172,8 +172,7 @@ def find_marked_section(
                         # return line of the marker
                         index_end = i
         except TypeError:
-            pass
-        #    print("TESTER",i, line)
+            print(i, line)
         if index_start != -1 and index_end != -1:
             break
     return index_start, index_end
@@ -226,9 +225,9 @@ def find_jump_labels(lines):
     for label in list(labels):
         if all(
             [
-                line.instruction.startswith(".")
+                line.mnemonic.startswith(".")
                 for line in lines[labels[label][0] : labels[label][1]]
-                if line.instruction is not None
+                if line.mnemonic is not None
             ]
         ):
             del labels[label]
@@ -255,7 +254,7 @@ def find_basic_blocks(lines):
             terminate = False
             blocks[label].append(line)
             # Find end of block by searching for references to valid jump labels
-            if line.instruction is not None and line.operands != []:
+            if line.mnemonic is not None and line.operands != []:
                 for operand in [o for o in line.operands if isinstance(o, IdentifierOperand)]:
                     if operand.name in valid_jump_labels:
                         terminate = True
@@ -284,11 +283,11 @@ def find_basic_loop_bodies(lines):
             terminate = False
             current_block.append(line)
             # Find end of block by searching for references to valid jump labels
-            if line.instruction is not None and line.operands != []:
+            if line.mnemonic is not None and line.operands != []:
                 # Ignore `b.none` instructions (relevant von ARM SVE code)
                 # This branch instruction is often present _within_ inner loop blocks, but usually
                 # do not terminate
-                if line.instruction == "b.none":
+                if line.mnemonic == "b.none":
                     continue
                 for operand in [o for o in line.operands if isinstance(o, IdentifierOperand)]:
                     if operand.name in valid_jump_labels:

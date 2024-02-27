@@ -592,8 +592,8 @@ class KernelDG(nx.DiGraph):
                 graph.nodes[n]["fontsize"] = 11.0
             else:
                 node = graph.nodes[n]["instruction_form"]
-                if node.instruction is not None:
-                    mapping[n] = "{}: {}".format(n, node.instruction)
+                if node.mnemonic is not None:
+                    mapping[n] = "{}: {}".format(n, node.mnemonic)
                 else:
                     label = "label" if node.label is not None else None
                     label = "directive" if node.directive is not None else label
