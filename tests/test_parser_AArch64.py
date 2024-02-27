@@ -203,7 +203,7 @@ class TestParserAArch64(unittest.TestCase):
         instruction_form_3 = InstructionForm(
             mnemonic=None,
             operands_id=[],
-            directive_id=DirectiveOperand(name="cfi_def_cfa", parameter_id=["w29", "-16"]),
+            directive_id=DirectiveOperand(name="cfi_def_cfa", parameters=["w29", "-16"]),
             comment_id=None,
             label_id=None,
             line=".cfi_def_cfa w29, -16",

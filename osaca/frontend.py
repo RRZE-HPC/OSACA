@@ -53,7 +53,7 @@ class Frontend(object):
         :type instruction_form: `dict`
         :returns: `True` if comment line, `False` otherwise
         """
-        return instruction_form.comment is not None and instruction_form.instruction is None
+        return instruction_form.comment is not None and instruction_form.mnemonic is None
 
     def throughput_analysis(self, kernel, show_lineno=False, show_cmnts=True):
         """
@@ -86,7 +86,7 @@ class Frontend(object):
                     instruction_form.port_pressure, port_len, separator=sep_list
                 ),
                 self._get_flag_symbols(instruction_form.flags)
-                if instruction_form.instruction is not None
+                if instruction_form.mnemonic is not None
                 else " ",
                 instruction_form.line.strip().replace("\t", " "),
             )
@@ -256,7 +256,7 @@ class Frontend(object):
                     "Line": re.sub(r"\s+", " ", x.line.strip()),
                     "LineNumber": x.line_number,
                     "Flags": list(x.flags),
-                    "Instruction": x.instruction,
+                    "Instruction": x.mnemonic,
                     "Operands": x.operands,
                     "SemanticOperands": x.semantic_operands,
                     "Label": x.label,
@@ -367,7 +367,7 @@ class Frontend(object):
                     lcd_lines.get(line_number),
                 ),
                 self._get_flag_symbols(instruction_form.flags)
-                if instruction_form.instruction is not None
+                if instruction_form.mnemonic is not None
                 else " ",
                 instruction_form.line.strip().replace("\t", " "),
             )

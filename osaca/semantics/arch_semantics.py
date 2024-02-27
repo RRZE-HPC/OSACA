@@ -178,7 +178,7 @@ class ArchSemantics(ISASemantics):
         """Assign throughput and latency to an instruction form."""
         flags = []
         port_number = len(self._machine_model["ports"])
-        if instruction_form.instruction is None:
+        if instruction_form.mnemonic is None:
             # No instruction (label, comment, ...) --> ignore
             throughput = 0.0
             latency = 0.0
@@ -187,26 +187,26 @@ class ArchSemantics(ISASemantics):
             instruction_form.port_uops = []
         else:
             instruction_data = self._machine_model.get_instruction(
-                instruction_form.instruction, instruction_form.operands
+                instruction_form.mnemonic, instruction_form.operands
             )
             if (
                 not instruction_data
                 and self._isa == "x86"
-                and instruction_form.instruction[-1] in self.GAS_SUFFIXES
+                and instruction_form.mnemonic[-1] in self.GAS_SUFFIXES
             ):
                 # check for instruction without GAS suffix
                 instruction_data = self._machine_model.get_instruction(
-                    instruction_form.instruction[:-1], instruction_form.operands
+                    instruction_form.mnemonic[:-1], instruction_form.operands
                 )
             if (
                 instruction_data is None
                 and self._isa == "aarch64"
-                and "." in instruction_form.instruction
+                and "." in instruction_form.mnemonic
             ):
                 # Check for instruction without shape/cc suffix
-                suffix_start = instruction_form.instruction.index(".")
+                suffix_start = instruction_form.mnemonic.index(".")
                 instruction_data = self._machine_model.get_instruction(
-                    instruction_form.instruction[:suffix_start], instruction_form.operands
+                    instruction_form.mnemonic[:suffix_start], instruction_form.operands
                 )
             if instruction_data:
                 # instruction form in DB
@@ -230,26 +230,26 @@ class ArchSemantics(ISASemantics):
                     # substitute mem and look for reg-only variant
                     operands = self.substitute_mem_address(instruction_form.operands)
                     instruction_data_reg = self._machine_model.get_instruction(
-                        instruction_form.instruction, operands
+                        instruction_form.mnemonic, operands
                     )
                     if (
                         not instruction_data_reg
                         and self._isa == "x86"
-                        and instruction_form.instruction[-1] in self.GAS_SUFFIXES
+                        and instruction_form.mnemonic[-1] in self.GAS_SUFFIXES
                     ):
                         # check for instruction without GAS suffix
                         instruction_data_reg = self._machine_model.get_instruction(
-                            instruction_form.instruction[:-1], operands
+                            instruction_form.mnemonic[:-1], operands
                         )
                     if (
                         instruction_data_reg is None
                         and self._isa == "aarch64"
-                        and "." in instruction_form.instruction
+                        and "." in instruction_form.mnemonic
                     ):
                         # Check for instruction without shape/cc suffix
-                        suffix_start = instruction_form.instruction.index(".")
+                        suffix_start = instruction_form.mnemonic.index(".")
                         instruction_data_reg = self._machine_model.get_instruction(
-                            instruction_form.instruction[:suffix_start], operands
+                            instruction_form.mnemonic[:suffix_start], operands
                         )
                     if instruction_data_reg:
                         assign_unknown = False
@@ -270,19 +270,19 @@ class ArchSemantics(ISASemantics):
                                     for x in instruction_form.semantic_operands["source"]
                                     + instruction_form.semantic_operands["src_dst"]
                                     if isinstance(x, MemoryOperand)
-                                ][0]
+                                ]
                             )
                             # if multiple options, choose based on reg type
                             data_port_uops = [
-                                ldp.port_pressure
+                                ldp[1]
                                 for ldp in load_perf_data
-                                if ldp.dst is not None
+                                if ldp[0].dst is not None
                                 and self._machine_model._check_operands(
-                                    dummy_reg, RegisterOperand(name=ldp.dst)
+                                    dummy_reg, RegisterOperand(name=ldp[0].dst)
                                 )
                             ]
                             if len(data_port_uops) < 1:
-                                data_port_uops = load_perf_data[0].port_pressure
+                                data_port_uops = load_perf_data[0][1]
                             else:
                                 data_port_uops = data_port_uops[0]
                             data_port_pressure = self._machine_model.average_port_pressure(
@@ -303,7 +303,7 @@ class ArchSemantics(ISASemantics):
                                 [x for x in destinations if isinstance(x, MemoryOperand)][0],
                                 dummy_reg,
                             )
-                            st_data_port_uops = store_perf_data[0].port_pressure
+                            st_data_port_uops = store_perf_data[0][1]
 
                             # zero data port pressure and remove HAS_ST flag if
                             #   - no mem operand in dst &&
@@ -439,15 +439,15 @@ class ArchSemantics(ISASemantics):
             flags.append(INSTR_FLAGS.LD)
         return throughput, port_pressure, latency, latency_wo_load
 
-    def convert_op_to_reg(self, reg_type, reg_id="0"):
+    def convert_op_to_reg(self, reg_type, regtype="0"):
         """Create register operand for a memory addressing operand"""
         if self._isa == "x86":
             if reg_type == "gpr":
-                register = RegisterOperand(name="r" + str(int(reg_id) + 9))
+                register = RegisterOperand(name="r" + str(int(regtype) + 9))
             else:
-                register = RegisterOperand(name=reg_type + reg_id)
+                register = RegisterOperand(name=reg_type + regtype)
         elif self._isa == "aarch64":
-            register = RegisterOperand(name=reg_id, prefix_id=reg_type)
+            register = RegisterOperand(name=regtype, prefix=reg_type)
         return register
 
     def _nullify_data_ports(self, port_pressure):
