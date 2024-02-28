@@ -582,9 +582,9 @@ class ParserAArch64(BaseParser):
         """Normalize immediate to decimal based representation"""
         if isinstance(imd, IdentifierOperand):
             return imd
-        if imd.value is not None and imd.type == "float":
+        if imd.value is not None and imd.imd_type == "float":
             return self.ieee_to_float(imd.value)
-        elif imd.value is not None and imd.type == "double":
+        elif imd.value is not None and imd.imd_type == "double":
             return self.ieee_to_float(imd.value)
         elif imd.value is not None:
             if isinstance(imd.value, str):
