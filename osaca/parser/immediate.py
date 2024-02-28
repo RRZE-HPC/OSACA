@@ -6,55 +6,55 @@ from osaca.parser.operand import Operand
 class ImmediateOperand(Operand):
     def __init__(
         self,
-        identifier_id=None,
-        type_id=None,
-        value_id=None,
-        shift_id=None,
+        identifier=None,
+        imd_type=None,
+        value=None,
+        shift=None,
         source=False,
         destination=False,
     ):
         super().__init__(source, destination)
-        self._identifier_id = identifier_id
-        self._type_id = type_id
-        self._value_id = value_id
-        self._shift_id = shift_id
+        self._identifier = identifier
+        self._imd_type = imd_type
+        self._value = value
+        self._shift = shift
 
     @property
     def identifier(self):
-        return self._identifier_id
+        return self._identifier
 
     @property
-    def type(self):
-        return self._type_id
+    def imd_type(self):
+        return self._imd_type
 
     @property
     def value(self):
-        return self._value_id
+        return self._value
 
     @property
     def shift(self):
-        return self._type_id
+        return self._imd_type
 
-    @type.setter
-    def type(self, type):
-        self._type_id = type
+    @imd_type.setter
+    def imd_type(self, type):
+        self._imd_type = imd_type
 
     @identifier.setter
     def identifier(self, identifier):
-        self._identifier_id = identifier
+        self._identifier = identifier
 
     @value.setter
     def value(self, value):
-        self._value_id = value
+        self._value = value
 
     @shift.setter
-    def index(self, shift):
-        self._shift_id = shift
+    def shift(self, shift):
+        self._shift = shift
 
     def __str__(self):
         return (
-            f"Immediate(identifier_id={self._identifier_id}, type_id={self._type_id}, "
-            f"value_id={self._value_id}, shift_id={self._shift_id}, source={self._source}, destination={self._destination})"
+            f"Immediate(identifier={self._identifier}, imd_type={self._imd_type}, "
+            f"value={self._value}, shift={self._shift}, source={self._source}, destination={self._destination})"
         )
 
     def __repr__(self):
@@ -63,9 +63,9 @@ class ImmediateOperand(Operand):
     def __eq__(self, other):
         if isinstance(other, ImmediateOperand):
             return (
-                self._identifier_id == other._identifier_id
-                and self._type_id == other._type_id
-                and self._value_id == other._value_id
-                and self._shift_id == other._shift_id
+                self._identifier == other._identifier
+                and self._imd_type == other._imd_type
+                and self._value == other._value
+                and self._shift == other._shift
             )
         return False

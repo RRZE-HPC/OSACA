@@ -11,6 +11,7 @@ from pathlib import Path
 
 import ruamel.yaml
 from osaca import __version__, utils
+from copy import deepcopy
 from osaca.parser import ParserX86ATT
 from osaca.parser.instruction_form import InstructionForm
 from osaca.parser.operand import Operand
@@ -20,6 +21,7 @@ from osaca.parser.immediate import ImmediateOperand
 from osaca.parser.identifier import IdentifierOperand
 from osaca.parser.condition import ConditionOperand
 from osaca.parser.flag import FlagOperand
+from ruamel.yaml.compat import StringIO
 
 
 class MachineModel(object):
@@ -375,7 +377,7 @@ class MachineModel(object):
         ld_tp = [m for m in self._data["load_throughput"] if self._match_mem_entries(memory, m[0])]
         if len(ld_tp) > 0:
             return ld_tp.copy()
-        return (memory, self._data["load_throughput_default"].copy())
+        return [memory, self._data["load_throughput_default"].copy()]
 
     def get_store_latency(self, reg_type):
         """Return store latency for given register type."""
@@ -466,6 +468,8 @@ class MachineModel(object):
         '''
         formatted_instruction_forms = deepcopy(self._data["instruction_forms"])
         for instruction_form in formatted_instruction_forms:
+            for op in instruction_form.operands:
+                op = dict((key.lstrip("_"), value) for key, value in op.__dict__.iteritems() if not callable(value) and not key.startswith('__'))
             if instruction_form["port_pressure"] is not None:
                 cs = ruamel.yaml.comments.CommentedSeq(instruction_form["port_pressure"])
                 cs.fa.set_flow_style()
@@ -474,16 +478,17 @@ class MachineModel(object):
         # Replace load_throughput with styled version for RoundtripDumper
         formatted_load_throughput = []
         for lt in self._data["load_throughput"]:
-            lt = self.operand_to_dict(lt)
-            cm = ruamel.yaml.comments.CommentedMap(lt)
+            cm = dict((key, value) for key, value in lt[0].__dict__.iteritems() if not callable(value) and not key.startswith('__'))
+            cm["port_pressure"] = lt[1]
+            cm = ruamel.yaml.comments.CommentedMap(cm)
             cm.fa.set_flow_style()
             formatted_load_throughput.append(cm)
 
         # Create YAML object
-        # yaml = self._create_yaml_object()
+        yaml = self._create_yaml_object()
         if not stream:
             stream = StringIO()
-        """
+
         yaml.dump(
             {
                 k: v
@@ -500,20 +505,11 @@ class MachineModel(object):
         )
 
         yaml.dump({"load_throughput": formatted_load_throughput}, stream)
-        yaml.dump({"instruction_forms": formatted_instruction_forms                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           }, stream)
-        """
+        yaml.dump({"instruction_forms": formatted_instruction_forms}, stream)
+        '''
         if isinstance(stream, StringIO):
             return stream.getvalue()
-        '''
 
-    def operand_to_dict(self, mem):
-        return {
-            "base": mem.base,
-            "offset": mem.offset,
-            "index": mem.index,
-            "scale": mem.scale,
-            "port_pressure": mem.port_pressure,
-        }
 
     ######################################################
 
@@ -716,27 +712,27 @@ class MachineModel(object):
                 return False
             return self._is_AArch64_mem_type(i_operand, operand)
         # immediate
-        if isinstance(i_operand, ImmediateOperand) and i_operand.type == self.WILDCARD:
+        if isinstance(i_operand, ImmediateOperand) and i_operand.imd_type == self.WILDCARD:
             return isinstance(operand, ImmediateOperand) and (operand.value is not None)
 
-        if isinstance(i_operand, ImmediateOperand) and i_operand.type == "int":
+        if isinstance(i_operand, ImmediateOperand) and i_operand.imd_type == "int":
             return (
                 isinstance(operand, ImmediateOperand)
-                and operand.type == "int"
+                and operand.imd_type == "int"
                 and operand.value is not None
             )
 
-        if isinstance(i_operand, ImmediateOperand) and i_operand.type == "float":
+        if isinstance(i_operand, ImmediateOperand) and i_operand.imd_type == "float":
             return (
                 isinstance(operand, ImmediateOperand)
-                and operand.type == "float"
+                and operand.imd_type == "float"
                 and operand.value is not None
             )
 
-        if isinstance(i_operand, ImmediateOperand) and i_operand.type == "double":
+        if isinstance(i_operand, ImmediateOperand) and i_operand.imd_type == "double":
             return (
                 isinstance(operand, ImmediateOperand)
-                and operand.type == "double"
+                and operand.imd_type == "double"
                 and operand.value is not None
             )
 
@@ -773,7 +769,7 @@ class MachineModel(object):
         # immediate
         if isinstance(operand, ImmediateOperand):
             # if "immediate" in operand.name or operand.value != None:
-            return isinstance(i_operand, ImmediateOperand) and i_operand.type == "int"
+            return isinstance(i_operand, ImmediateOperand) and i_operand.imd_type == "int"
         # identifier (e.g., labels)
         if isinstance(operand, IdentifierOperand):
             return isinstance(i_operand, IdentifierOperand)
