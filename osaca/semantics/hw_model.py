@@ -73,8 +73,8 @@ class MachineModel(object):
             if self._path in MachineModel._runtime_cache and not lazy:
                 self._data = MachineModel._runtime_cache[self._path]
             # check if file is cached
-            # cached = self._get_cached(self._path) if not lazy else False
-            if False:
+            cached = self._get_cached(self._path) if not lazy else False
+            if cached:
                 self._data = cached
             else:
                 yaml = self._create_yaml_object()
