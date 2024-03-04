@@ -63,7 +63,7 @@ class TestBaseParser(unittest.TestCase):
             self.parser.get_full_reg_name(reg_a1)
 
     def test_normalize_imd(self):
-        imd_hex_1 = ImmediateOperand(value_id="0x4f")
+        imd_hex_1 = ImmediateOperand(value="0x4f")
         with self.assertRaises(NotImplementedError):
             self.parser.normalize_imd(imd_hex_1)
 

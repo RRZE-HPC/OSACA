@@ -270,7 +270,7 @@ class ArchSemantics(ISASemantics):
                                     for x in instruction_form.semantic_operands["source"]
                                     + instruction_form.semantic_operands["src_dst"]
                                     if isinstance(x, MemoryOperand)
-                                ]
+                                ][0]
                             )
                             # if multiple options, choose based on reg type
                             data_port_uops = [

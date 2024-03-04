@@ -10,7 +10,7 @@ class BaseParser(object):
     directive_id = "directive"
     immediate_id = "immediate"
     label_id = "label"
-    identifier_id = "identifier"
+    identifier = "identifier"
     memory_id = "memory"
     register_id = "register"
     condition_id = "condition"

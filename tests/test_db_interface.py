@@ -7,9 +7,9 @@ import unittest
 from io import StringIO
 
 import osaca.db_interface as dbi
-from osaca.db_interface import sanity_check
+from osaca.db_interface import sanity_check, _get_full_instruction_name
 from osaca.semantics import MachineModel
-from osaca.parser import instructionForm
+from osaca.parser import InstructionForm
 from osaca.parser.memory import MemoryOperand
 from osaca.parser.register import RegisterOperand
 import copy
@@ -18,10 +18,10 @@ import copy
 class TestDBInterface(unittest.TestCase):
     @classmethod
     def setUpClass(self):
-        sample_entry = instructionForm(
-            instruction_id="DoItRightAndDoItFast",
+        sample_entry = InstructionForm(
+            mnemonic="DoItRightAndDoItFast",
             operands_id=[
-                MemoryOperand(offset_ID="imd", base_id="gpr", index_id="gpr", scale_id=8),
+                MemoryOperand(offset="imd", base="gpr", index="gpr", scale=8),
                 RegisterOperand(name="xmm"),
             ],
             throughput=1.25,
@@ -61,7 +61,7 @@ class TestDBInterface(unittest.TestCase):
 
         mm_csx.set_instruction_entry(self.entry_csx)
         mm_tx2.set_instruction_entry(self.entry_tx2)
-        mm_zen1.set_instruction_entry(instructionForm(instruction_id="empty_operation"))
+        mm_zen1.set_instruction_entry(InstructionForm(mnemonic="empty_operation"))
 
         num_entries_csx = len(mm_csx["instruction_forms"]) - num_entries_csx
         num_entries_tx2 = len(mm_tx2["instruction_forms"]) - num_entries_tx2
@@ -72,7 +72,7 @@ class TestDBInterface(unittest.TestCase):
         self.assertEqual(num_entries_zen1, 1)
 
     def test_invalid_add(self):
-        entry = instructionForm()
+        entry = InstructionForm()
         with self.assertRaises(KeyError):
             MachineModel("csx").set_instruction_entry(entry)
         with self.assertRaises(TypeError):

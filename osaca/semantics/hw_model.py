@@ -223,7 +223,7 @@ class MachineModel(object):
         elif o["class"] == "immediate":
             new_operands.append(
                 ImmediateOperand(
-                    type_id=o["imd"],
+                    imd_type=o["imd"],
                     source=o["source"] if "source" in o else False,
                     destination=o["destination"] if "destination" in o else False,
                 )
@@ -377,7 +377,7 @@ class MachineModel(object):
         ld_tp = [m for m in self._data["load_throughput"] if self._match_mem_entries(memory, m[0])]
         if len(ld_tp) > 0:
             return ld_tp.copy()
-        return [memory, self._data["load_throughput_default"].copy()]
+        return [(memory, self._data["load_throughput_default"].copy())]
 
     def get_store_latency(self, reg_type):
         """Return store latency for given register type."""
@@ -615,7 +615,7 @@ class MachineModel(object):
     def _create_db_operand_aarch64(self, operand):
         """Create instruction form operand for DB out of operand string."""
         if operand == "i":
-            return ImmediateOperand(type_id="int")
+            return ImmediateOperand(imd_type="int")
         elif operand in "wxbhsdq":
             return RegisterOperand(prefix=operand)
         elif operand.startswith("v"):
@@ -639,7 +639,7 @@ class MachineModel(object):
         elif operand in "xyz":
             return RegisterOperand(name=operand + "mm")
         elif operand == "i":
-            return ImmediateOperand(type_id="int")
+            return ImmediateOperand(imd_type="int")
         elif operand.startswith("m"):
             return MemoryOperand(
                 base="gpr" if "b" in operand else None,

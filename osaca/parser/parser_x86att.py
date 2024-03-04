@@ -302,8 +302,8 @@ class ParserX86ATT(BaseParser):
             return self.process_directive(operand[self.directive_id])
         if self.register_id in operand:
             return self.process_register(operand[self.register_id])
-        if self.identifier_id in operand:
-            return self.process_identifier(operand[self.identifier_id])
+        if self.identifier in operand:
+            return self.process_identifier(operand[self.identifier])
         return operand
 
     def process_register(self, operand):
@@ -331,11 +331,11 @@ class ParserX86ATT(BaseParser):
         scale = 1 if "scale" not in memory_address else int(memory_address["scale"], 0)
         if isinstance(offset, str) and base is None and index is None:
             try:
-                offset = ImmediateOperand(value_id=int(offset, 0))
+                offset = ImmediateOperand(value=int(offset, 0))
             except ValueError:
-                offset = ImmediateOperand(value_id=offset)
+                offset = ImmediateOperand(value=offset)
         elif offset is not None and "value" in offset:
-            offset = ImmediateOperand(value_id=int(offset["value"], 0))
+            offset = ImmediateOperand(value=int(offset["value"], 0))
         if base is not None:
             baseOp = RegisterOperand(
                 name=base["name"], prefix=base["prefix"] if "prefix" in base else None
@@ -366,7 +366,7 @@ class ParserX86ATT(BaseParser):
             # actually an identifier, change declaration
             return self.process_identifier(immediate["identifier"])
         # otherwise just make sure the immediate is a decimal
-        new_immediate = ImmediateOperand(value_id=int(immediate["value"], 0))
+        new_immediate = ImmediateOperand(value=int(immediate["value"], 0))
         return new_immediate
 
     def process_identifier(self, identifier):

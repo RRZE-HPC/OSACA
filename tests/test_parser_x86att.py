@@ -246,10 +246,10 @@ class TestParserX86ATT(unittest.TestCase):
         self.assertIsNone(self.parser.parse_register("rax"))
 
     def test_normalize_imd(self):
-        imd_decimal_1 = ImmediateOperand(value_id="79")
-        imd_hex_1 = ImmediateOperand(value_id="0x4f")
-        imd_decimal_2 = ImmediateOperand(value_id="8")
-        imd_hex_2 = ImmediateOperand(value_id="8")
+        imd_decimal_1 = ImmediateOperand(value="79")
+        imd_hex_1 = ImmediateOperand(value="0x4f")
+        imd_decimal_2 = ImmediateOperand(value="8")
+        imd_hex_2 = ImmediateOperand(value="8")
         self.assertEqual(
             self.parser.normalize_imd(imd_decimal_1),
             self.parser.normalize_imd(imd_hex_1),
