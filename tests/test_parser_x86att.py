@@ -168,7 +168,7 @@ class TestParserX86ATT(unittest.TestCase):
 
         instruction_form_1 = InstructionForm(
             mnemonic=None,
-            operands_id=[],
+            operands=[],
             directive_id=None,
             comment_id="-- Begin main",
             label_id=None,
@@ -177,7 +177,7 @@ class TestParserX86ATT(unittest.TestCase):
         )
         instruction_form_2 = InstructionForm(
             mnemonic=None,
-            operands_id=[],
+            operands=[],
             directive_id=None,
             comment_id="Preds ..B1.6",
             label_id="..B1.7",
@@ -186,7 +186,7 @@ class TestParserX86ATT(unittest.TestCase):
         )
         instruction_form_3 = InstructionForm(
             mnemonic=None,
-            operands_id=[],
+            operands=[],
             directive_id={"name": "quad", "parameters": [".2.3_2__kmpc_loc_pack.2"]},
             comment_id="qed",
             label_id=None,
@@ -195,7 +195,7 @@ class TestParserX86ATT(unittest.TestCase):
         )
         instruction_form_4 = InstructionForm(
             mnemonic="lea",
-            operands_id=[
+            operands=[
                 {
                     "memory": {
                         "offset": {"value": 2},

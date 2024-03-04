@@ -183,7 +183,7 @@ class TestParserAArch64(unittest.TestCase):
 
         instruction_form_1 = InstructionForm(
             mnemonic=None,
-            operands_id=[],
+            operands=[],
             directive_id=None,
             comment_id="-- Begin main",
             label_id=None,
@@ -193,7 +193,7 @@ class TestParserAArch64(unittest.TestCase):
 
         instruction_form_2 = InstructionForm(
             mnemonic=None,
-            operands_id=[],
+            operands=[],
             directive_id=None,
             comment_id="=>This Inner Loop Header: Depth=1",
             label_id=".LBB0_1",
@@ -202,7 +202,7 @@ class TestParserAArch64(unittest.TestCase):
         )
         instruction_form_3 = InstructionForm(
             mnemonic=None,
-            operands_id=[],
+            operands=[],
             directive_id=DirectiveOperand(name="cfi_def_cfa", parameters=["w29", "-16"]),
             comment_id=None,
             label_id=None,
@@ -211,7 +211,7 @@ class TestParserAArch64(unittest.TestCase):
         )
         instruction_form_4 = InstructionForm(
             mnemonic="ldr",
-            operands_id=[
+            operands=[
                 RegisterOperand(prefix="s", name="0"),
                 MemoryOperand(
                     offset=None,
@@ -230,7 +230,7 @@ class TestParserAArch64(unittest.TestCase):
         )
         instruction_form_5 = InstructionForm(
             mnemonic="prfm",
-            operands_id=[
+            operands=[
                 {"prfop": {"type": ["PLD"], "target": ["L1"], "policy": ["KEEP"]}},
                 MemoryOperand(
                     offset=ImmediateOperand(value=2048),
@@ -247,7 +247,7 @@ class TestParserAArch64(unittest.TestCase):
         )
         instruction_form_6 = InstructionForm(
             mnemonic="stp",
-            operands_id=[
+            operands=[
                 RegisterOperand(prefix="x", name="29"),
                 RegisterOperand(prefix="x", name="30"),
                 MemoryOperand(
@@ -266,7 +266,7 @@ class TestParserAArch64(unittest.TestCase):
         )
         instruction_form_7 = InstructionForm(
             mnemonic="ldp",
-            operands_id=[
+            operands=[
                 RegisterOperand(prefix="q", name="2"),
                 RegisterOperand(prefix="q", name="3"),
                 MemoryOperand(
@@ -285,7 +285,7 @@ class TestParserAArch64(unittest.TestCase):
         )
         instruction_form_8 = InstructionForm(
             mnemonic="fcmla",
-            operands_id=[
+            operands=[
                 RegisterOperand(prefix="z", name="26", shape="d"),
                 RegisterOperand(prefix="p", name="0", predication="m"),
                 RegisterOperand(prefix="z", name="29", shape="d"),
@@ -300,7 +300,7 @@ class TestParserAArch64(unittest.TestCase):
         )
         instruction_form_9 = InstructionForm(
             mnemonic="ccmn",
-            operands_id=[
+            operands=[
                 RegisterOperand(prefix="x", name="11"),
                 ImmediateOperand(value=1, imd_type="int"),
                 ImmediateOperand(value=3, imd_type="int"),

@@ -16,7 +16,7 @@ class BaseParser(object):
     condition_id = "condition"
     segment_ext = "segment_extension"
     mnemonic = "instruction"
-    operands_id = "operands"
+    operands = "operands"
     _parser_constructed = False
 
     def __init__(self):

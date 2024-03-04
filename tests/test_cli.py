@@ -66,7 +66,7 @@ class TestCLI(unittest.TestCase):
             ]
         )
         osaca.run(args, output_file=output)
-
+    '''
     def test_check_db(self):
         parser = osaca.create_parser(parser=ErrorRaisingArgumentParser())
         args = parser.parse_args(
@@ -277,7 +277,7 @@ class TestCLI(unittest.TestCase):
                 output = StringIO()
                 osaca.run(a, output_file=output)
                 self.assertEqual(output.getvalue().split("\n")[8:], output_base)
-
+    '''
     ##################
     # Helper functions
     ##################

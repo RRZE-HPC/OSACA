@@ -5,7 +5,7 @@ class InstructionForm:
     def __init__(
         self,
         mnemonic=None,
-        operands_id=[],
+        operands=[],
         hidden_operands=[],
         directive_id=None,
         comment_id=None,
@@ -21,7 +21,7 @@ class InstructionForm:
         breaks_dependency_on_equal_operands=False,
     ):
         self._mnemonic = mnemonic
-        self._operands_id = operands_id
+        self._operands = operands
         self._hidden_operands = hidden_operands
         self._directive_id = directive_id
         self._comment_id = comment_id
@@ -72,7 +72,7 @@ class InstructionForm:
 
     @property
     def operands(self):
-        return self._operands_id
+        return self._operands
 
     @property
     def hidden_operands(self):
@@ -132,7 +132,7 @@ class InstructionForm:
 
     @operands.setter
     def operands(self, operands):
-        self._operands_id = operands
+        self._operands = operands
 
     @hidden_operands.setter
     def hidden_operands(self, hidden_operands):
@@ -189,7 +189,7 @@ class InstructionForm:
     def __str__(self):
         attributes = {
             "mnemonic": self.mnemonic,
-            "operands_id": self.operands,
+            "operands": self.operands,
             "hidden_operands": self.hidden_operands,
             "directive_id": self.directive,
             "comment_id": self.comment,
