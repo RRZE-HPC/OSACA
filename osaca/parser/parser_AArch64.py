@@ -52,7 +52,7 @@ class ParserAArch64(BaseParser):
                 pp.Suppress(pp.Literal("+"))
                 + (hex_number | decimal_number).setResultsName("offset")
             )
-        ).setResultsName(self.identifier_id)
+        ).setResultsName(self.identifier)
         # Label
         self.label = pp.Group(
             identifier.setResultsName("name") + pp.Literal(":") + pp.Optional(self.comment)
@@ -381,8 +381,8 @@ class ParserAArch64(BaseParser):
             return self.process_immediate(operand[self.immediate_id])
         if self.label_id in operand:
             return self.process_label(operand[self.label_id])
-        if self.identifier_id in operand:
-            return self.process_identifier(operand[self.identifier_id])
+        if self.identifier in operand:
+            return self.process_identifier(operand[self.identifier])
         if self.register_id in operand:
             return self.process_register_operand(operand[self.register_id])
         if self.directive_id in operand:
@@ -414,7 +414,7 @@ class ParserAArch64(BaseParser):
         if isinstance(offset, list) and len(offset) == 1:
             offset = offset[0]
         if offset is not None and "value" in offset:
-            offset = ImmediateOperand(value_id=int(offset["value"], 0))
+            offset = ImmediateOperand(value=int(offset["value"], 0))
         if isinstance(offset, dict) and "identifier" in offset:
             offset = self.process_identifier(offset["identifier"])
         base = memory_address.get("base", None)
@@ -525,17 +525,17 @@ class ParserAArch64(BaseParser):
             immediate["type"] = "int"
             # convert hex/bin immediates to dec
             new_immediate = ImmediateOperand(
-                type_id=immediate["type"], value_id=immediate["value"]
+                imd_type=immediate["type"], value=immediate["value"]
             )
             new_immediate.value = self.normalize_imd(new_immediate)
             return new_immediate
         if "base_immediate" in immediate:
             # arithmetic immediate, add calculated value as value
             immediate["shift"] = immediate["shift"][0]
-            temp_immediate = ImmediateOperand(value_id=immediate["base_immediate"]["value"])
+            temp_immediate = ImmediateOperand(value=immediate["base_immediate"]["value"])
             immediate["type"] = "int"
             new_immediate = ImmediateOperand(
-                type_id=immediate["type"], value_id=None, shift_id=immediate["shift"]
+                imd_type=immediate["type"], value=None, shift=immediate["shift"]
             )
             new_immediate.value = self.normalize_imd(temp_immediate) << int(
                 immediate["shift"]["value"]
@@ -548,11 +548,11 @@ class ParserAArch64(BaseParser):
         if "exponent" in immediate[dict_name]:
             immediate["type"] = dict_name
             return ImmediateOperand(
-                type_id=immediate["type"], value_id=immediate[immediate["type"]]
+                imd_type=immediate["type"], value=immediate[immediate["type"]]
             )
         else:
             # change 'mantissa' key to 'value'
-            return ImmediateOperand(value_id=immediate[dict_name]["mantissa"], type_id=dict_name)
+            return ImmediateOperand(value=immediate[dict_name]["mantissa"], imd_type=dict_name)
 
     def process_label(self, label):
         """Post-process label asm line"""

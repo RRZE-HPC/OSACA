@@ -233,7 +233,7 @@ class TestParserAArch64(unittest.TestCase):
             operands_id=[
                 {"prfop": {"type": ["PLD"], "target": ["L1"], "policy": ["KEEP"]}},
                 MemoryOperand(
-                    offset=ImmediateOperand(value_id=2048),
+                    offset=ImmediateOperand(value=2048),
                     base=RegisterOperand(prefix="x", name="26"),
                     index=None,
                     scale=1,
@@ -251,7 +251,7 @@ class TestParserAArch64(unittest.TestCase):
                 RegisterOperand(prefix="x", name="29"),
                 RegisterOperand(prefix="x", name="30"),
                 MemoryOperand(
-                    offset=ImmediateOperand(value_id=-16),
+                    offset=ImmediateOperand(value=-16),
                     base=RegisterOperand(name="sp", prefix="x"),
                     index=None,
                     scale=1,
@@ -290,7 +290,7 @@ class TestParserAArch64(unittest.TestCase):
                 RegisterOperand(prefix="p", name="0", predication="m"),
                 RegisterOperand(prefix="z", name="29", shape="d"),
                 RegisterOperand(prefix="z", name="21", shape="d"),
-                ImmediateOperand(value_id=90, type_id="int"),
+                ImmediateOperand(value=90, imd_type="int"),
             ],
             directive_id=None,
             comment_id=None,
@@ -302,8 +302,8 @@ class TestParserAArch64(unittest.TestCase):
             mnemonic="ccmn",
             operands_id=[
                 RegisterOperand(prefix="x", name="11"),
-                ImmediateOperand(value_id=1, type_id="int"),
-                ImmediateOperand(value_id=3, type_id="int"),
+                ImmediateOperand(value=1, imd_type="int"),
+                ImmediateOperand(value=3, imd_type="int"),
                 {"condition": "EQ"},
             ],
             directive_id=None,
@@ -339,21 +339,21 @@ class TestParserAArch64(unittest.TestCase):
         self.assertEqual(len(parsed), 645)
 
     def test_normalize_imd(self):
-        imd_decimal_1 = ImmediateOperand(value_id="79")
-        imd_hex_1 = ImmediateOperand(value_id="0x4f")
-        imd_decimal_2 = ImmediateOperand(value_id="8")
-        imd_hex_2 = ImmediateOperand(value_id="0x8")
+        imd_decimal_1 = ImmediateOperand(value="79")
+        imd_hex_1 = ImmediateOperand(value="0x4f")
+        imd_decimal_2 = ImmediateOperand(value="8")
+        imd_hex_2 = ImmediateOperand(value="0x8")
         imd_float_11 = ImmediateOperand(
-            type_id="float", value_id={"mantissa": "0.79", "e_sign": "+", "exponent": "2"}
+            imd_type="float", value={"mantissa": "0.79", "e_sign": "+", "exponent": "2"}
         )
         imd_float_12 = ImmediateOperand(
-            type_id="float", value_id={"mantissa": "790.0", "e_sign": "-", "exponent": "1"}
+            imd_type="float", value={"mantissa": "790.0", "e_sign": "-", "exponent": "1"}
         )
         imd_double_11 = ImmediateOperand(
-            type_id="double", value_id={"mantissa": "0.79", "e_sign": "+", "exponent": "2"}
+            imd_type="double", value={"mantissa": "0.79", "e_sign": "+", "exponent": "2"}
         )
         imd_double_12 = ImmediateOperand(
-            type_id="double", value_id={"mantissa": "790.0", "e_sign": "-", "exponent": "1"}
+            imd_type="double", value={"mantissa": "790.0", "e_sign": "-", "exponent": "1"}
         )
         identifier = IdentifierOperand(name="..B1.4")
 
