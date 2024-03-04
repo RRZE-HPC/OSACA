@@ -150,7 +150,7 @@ def _get_asmbench_output(input_data, isa):
             operands = [_create_db_operand(op, isa) for op in operands]
             entry = InstructionForm(
                 mnemonic=mnemonic_parsed,
-                operands_id=operands,
+                operands=operands,
                 throughput=_validate_measurement(float(input_data[i + 2].split()[1]), "tp"),
                 latency=_validate_measurement(float(input_data[i + 1].split()[1]), "lt"),
                 port_pressure=None,
@@ -181,7 +181,7 @@ def _get_ibench_output(input_data, isa):
             operands = [_create_db_operand(op, isa) for op in operands]
             entry = InstructionForm(
                 mnemonic=mnemonic_parsed,
-                operands_id=operands,
+                operands=operands,
                 throughput=None,
                 latency=None,
                 port_pressure=None,

@@ -20,7 +20,7 @@ class TestDBInterface(unittest.TestCase):
     def setUpClass(self):
         sample_entry = InstructionForm(
             mnemonic="DoItRightAndDoItFast",
-            operands_id=[
+            operands=[
                 MemoryOperand(offset="imd", base="gpr", index="gpr", scale=8),
                 RegisterOperand(name="xmm"),
             ],

@@ -123,7 +123,7 @@ class MachineModel(object):
                     # Change dict iform style to class style
                     new_iform = InstructionForm(
                         mnemonic=iform["name"].upper() if "name" in iform else None,
-                        operands_id=iform["operands"] if "operands" in iform else [],
+                        operands=iform["operands"] if "operands" in iform else [],
                         hidden_operands=iform["hidden_operands"]
                         if "hidden_operands" in iform
                         else [],
@@ -461,34 +461,62 @@ class MachineModel(object):
             return arch_dict[arch].lower()
         else:
             raise ValueError("Unknown architecture {!r}.".format(arch))
+    
+    def class_to_dict(self, op):
+        """Need to convert operand classes to dicts for the dump. Memory operand types may have their index/base/offset as a register operand/"""
+        if isinstance(op, Operand):
+            dict_op = dict((key.lstrip('_'), value) for key, value in op.__dict__.items() if not callable(value) and not key.startswith('__'))
+            if isinstance(op, MemoryOperand):
+                if isinstance(dict_op["index"], Operand):
+                    dict_op["index"] = dict((key.lstrip('_'), value) for key, value in dict_op["index"].__dict__.items() if not callable(value) and not key.startswith('__'))
+                if isinstance(dict_op["offset"], Operand):
+                    dict_op["offset"] = dict((key.lstrip('_'), value) for key, value in dict_op["offset"].__dict__.items() if not callable(value) and not key.startswith('__'))
+                if isinstance(dict_op["base"], Operand):
+                    dict_op["base"] = dict((key.lstrip('_'), value) for key, value in dict_op["base"].__dict__.items() if not callable(value) and not key.startswith('__'))
+            return dict_op
+        return op
+
 
     def dump(self, stream=None):
         """Dump machine model to stream or return it as a ``str`` if no stream is given."""
         # Replace instruction form's port_pressure with styled version for RoundtripDumper
-        '''
-        formatted_instruction_forms = deepcopy(self._data["instruction_forms"])
-        for instruction_form in formatted_instruction_forms:
-            for op in instruction_form.operands:
-                op = dict((key.lstrip("_"), value) for key, value in op.__dict__.iteritems() if not callable(value) and not key.startswith('__'))
+        formatted_instruction_forms = []
+        for instruction_form in self._data["instruction_forms"]:
+            if isinstance(instruction_form, InstructionForm):
+                instruction_form = dict((key.lstrip('_'), value) for key, value in instruction_form.__dict__.items() if not callable(value) and not key.startswith('__'))
             if instruction_form["port_pressure"] is not None:
                 cs = ruamel.yaml.comments.CommentedSeq(instruction_form["port_pressure"])
                 cs.fa.set_flow_style()
                 instruction_form["port_pressure"] = cs
+            dict_operands = []
+            for op in instruction_form["operands"]:
+                dict_operands.append(self.class_to_dict(op))
+            instruction_form["operands"] = dict_operands
+            formatted_instruction_forms.append(instruction_form)
 
         # Replace load_throughput with styled version for RoundtripDumper
         formatted_load_throughput = []
         for lt in self._data["load_throughput"]:
-            cm = dict((key, value) for key, value in lt[0].__dict__.iteritems() if not callable(value) and not key.startswith('__'))
+            cm = self.class_to_dict(lt[0])
             cm["port_pressure"] = lt[1]
             cm = ruamel.yaml.comments.CommentedMap(cm)
             cm.fa.set_flow_style()
             formatted_load_throughput.append(cm)
 
+        # Replace store_throughput with styled version for RoundtripDumper
+        formatted_store_throughput = []
+        for st in self._data["store_throughput"]:
+            cm = self.class_to_dict(st[0])
+            cm["port_pressure"] = st[1]
+            cm = ruamel.yaml.comments.CommentedMap(cm)
+            cm.fa.set_flow_style()
+            formatted_store_throughput.append(cm)
+
         # Create YAML object
         yaml = self._create_yaml_object()
         if not stream:
             stream = StringIO()
-
+        
         yaml.dump(
             {
                 k: v
@@ -498,18 +526,19 @@ class MachineModel(object):
                     "instruction_forms",
                     "instruction_forms_dict",
                     "load_throughput",
+                    "store_throughput",
                     "internal_version",
                 ]
             },
             stream,
         )
-
+        
         yaml.dump({"load_throughput": formatted_load_throughput}, stream)
+        yaml.dump({"store_throughput": formatted_store_throughput}, stream)
         yaml.dump({"instruction_forms": formatted_instruction_forms}, stream)
-        '''
+
         if isinstance(stream, StringIO):
             return stream.getvalue()
-
 
     ######################################################
 

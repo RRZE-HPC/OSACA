@@ -264,7 +264,7 @@ class ParserAArch64(BaseParser):
         """
         instruction_form = InstructionForm(
             mnemonic=None,
-            operands_id=[],
+            operands=[],
             directive_id=None,
             comment_id=None,
             label_id=None,
@@ -358,7 +358,7 @@ class ParserAArch64(BaseParser):
             operands.extend(operand) if isinstance(operand, list) else operands.append(operand)
         return_dict = InstructionForm(
             mnemonic=result["mnemonic"],
-            operands_id=operands,
+            operands=operands,
             comment_id=" ".join(result[self.comment_id]) if self.comment_id in result else None,
         )
         return return_dict
