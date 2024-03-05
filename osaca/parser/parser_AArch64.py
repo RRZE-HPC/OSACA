@@ -392,10 +392,13 @@ class ParserAArch64(BaseParser):
         return operand
 
     def process_directive_operand(self, operand):
-        return DirectiveOperand(
-            name=operand["name"],
-            parameters=operand["parameters"],
-        ), operand["comment"] if "comment" in operand else None
+        return (
+            DirectiveOperand(
+                name=operand["name"],
+                parameters=operand["parameters"],
+            ),
+            operand["comment"] if "comment" in operand else None,
+        )
 
     def process_register_operand(self, operand):
         return RegisterOperand(
@@ -524,9 +527,7 @@ class ParserAArch64(BaseParser):
             # normal integer value
             immediate["type"] = "int"
             # convert hex/bin immediates to dec
-            new_immediate = ImmediateOperand(
-                imd_type=immediate["type"], value=immediate["value"]
-            )
+            new_immediate = ImmediateOperand(imd_type=immediate["type"], value=immediate["value"])
             new_immediate.value = self.normalize_imd(new_immediate)
             return new_immediate
         if "base_immediate" in immediate:
@@ -547,9 +548,7 @@ class ParserAArch64(BaseParser):
             dict_name = "double"
         if "exponent" in immediate[dict_name]:
             immediate["type"] = dict_name
-            return ImmediateOperand(
-                imd_type=immediate["type"], value=immediate[immediate["type"]]
-            )
+            return ImmediateOperand(imd_type=immediate["type"], value=immediate[immediate["type"]])
         else:
             # change 'mantissa' key to 'value'
             return ImmediateOperand(value=immediate[dict_name]["mantissa"], imd_type=dict_name)
@@ -557,7 +556,10 @@ class ParserAArch64(BaseParser):
     def process_label(self, label):
         """Post-process label asm line"""
         # remove duplicated 'name' level due to identifier
-        return LabelOperand(name=label["name"]["name"]), label["comment"] if self.comment_id in label else None
+        return (
+            LabelOperand(name=label["name"]["name"]),
+            label["comment"] if self.comment_id in label else None,
+        )
 
     def process_identifier(self, identifier):
         """Post-process identifier operand"""

@@ -317,7 +317,10 @@ class ParserX86ATT(BaseParser):
         )
 
     def process_directive(self, directive):
-        directive_new = DirectiveOperand(name=directive["name"], parameters=directive["parameters"] if "parameters" in directive else [])
+        directive_new = DirectiveOperand(
+            name=directive["name"],
+            parameters=directive["parameters"] if "parameters" in directive else [],
+        )
         return directive_new, directive["comment"] if "comment" in directive else None
 
     def process_memory_address(self, memory_address):
@@ -346,9 +349,7 @@ class ParserX86ATT(BaseParser):
             )
         if isinstance(offset, dict) and "identifier" in offset:
             offset = IdentifierOperand(name=offset["identifier"]["name"])
-        new_dict = MemoryOperand(
-            offset=offset, base=baseOp, index=indexOp, scale=scale
-        )
+        new_dict = MemoryOperand(offset=offset, base=baseOp, index=indexOp, scale=scale)
         # Add segmentation extension if existing
         if self.segment_ext in memory_address:
             new_dict.segment_ext = memory_address[self.segment_ext]

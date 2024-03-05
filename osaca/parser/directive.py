@@ -24,13 +24,9 @@ class DirectiveOperand(Operand):
     def parameters(self, parameters):
         self._parameters = parameters
 
-
     def __eq__(self, other):
         if isinstance(other, DirectiveOperand):
-            return (
-                self._name == other._name
-                and self._parameters == other._parameters
-            )
+            return self._name == other._name and self._parameters == other._parameters
         elif isinstance(other, dict):
             return self._name == other["name"] and self._parameters == other["parameters"]
         return False
