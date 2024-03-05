@@ -48,7 +48,9 @@ class TestParserX86ATT(unittest.TestCase):
         self.assertEqual(self._get_directive(self.parser, "\t.text")[0].name, "text")
         self.assertEqual(len(self._get_directive(self.parser, "\t.text")[0].parameters), 0)
         self.assertEqual(self._get_directive(self.parser, "\t.align\t16,0x90")[0].name, "align")
-        self.assertEqual(len(self._get_directive(self.parser, "\t.align\t16,0x90")[0].parameters), 2)
+        self.assertEqual(
+            len(self._get_directive(self.parser, "\t.align\t16,0x90")[0].parameters), 2
+        )
         self.assertEqual(len(self._get_directive(self.parser, ".text")[0].parameters), 0)
         self.assertEqual(
             len(self._get_directive(self.parser, '.file\t1 "path/to/file.c"')[0].parameters),
@@ -75,29 +77,29 @@ class TestParserX86ATT(unittest.TestCase):
             ],
         )
         self.assertEqual(
-            self._get_directive(
-                self.parser, "\t.section\t__TEXT,__literal16,16byte_literals"
-            )[0].parameters,
+            self._get_directive(self.parser, "\t.section\t__TEXT,__literal16,16byte_literals")[
+                0
+            ].parameters,
             ["__TEXT", "__literal16", "16byte_literals"],
         )
         self.assertEqual(
             self._get_directive(self.parser, "\t.align\t16,0x90")[0].parameters[1], "0x90"
         )
         self.assertEqual(
-            self._get_directive(self.parser, "        .byte 100,103,144       #IACA START")[0].name,
+            self._get_directive(self.parser, "        .byte 100,103,144       #IACA START")[
+                0
+            ].name,
             "byte",
         )
         self.assertEqual(
-            self._get_directive(
-                self.parser, "        .byte 100,103,144       #IACA START"
-            )[0].parameters[2],
+            self._get_directive(self.parser, "        .byte 100,103,144       #IACA START")[
+                0
+            ].parameters[2],
             "144",
         )
         self.assertEqual(
             " ".join(
-                self._get_directive(
-                    self.parser, "        .byte 100,103,144       #IACA START"
-                )[1]
+                self._get_directive(self.parser, "        .byte 100,103,144       #IACA START")[1]
             ),
             "IACA START",
         )

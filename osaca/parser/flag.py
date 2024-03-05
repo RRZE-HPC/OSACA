@@ -17,9 +17,7 @@ class FlagOperand(Operand):
         self._name = name
 
     def __str__(self):
-        return (
-            f"Flag(name={self._name}, source={self._source}, relocation={self._destination})"
-        )
+        return f"Flag(name={self._name}, source={self._source}, relocation={self._destination})"
 
     def __repr__(self):
         return self.__str__()

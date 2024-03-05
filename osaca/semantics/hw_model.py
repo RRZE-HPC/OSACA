@@ -136,7 +136,9 @@ class MachineModel(object):
                         uops=iform["uops"] if "uops" in iform else None,
                         port_pressure=iform["port_pressure"] if "port_pressure" in iform else None,
                         operation=iform["operation"] if "operation" in iform else None,
-                        breaks_dependency_on_equal_operands=iform["breaks_dependency_on_equal_operands"]
+                        breaks_dependency_on_equal_operands=iform[
+                            "breaks_dependency_on_equal_operands"
+                        ]
                         if "breaks_dependency_on_equal_operands" in iform
                         else False,
                         semantic_operands=iform["semantic_operands"]
@@ -151,32 +153,35 @@ class MachineModel(object):
                 new_throughputs = []
                 if "load_throughput" in self._data:
                     for m in self._data["load_throughput"]:
-                        new_throughputs.append((
-                            MemoryOperand(
-                                base=m["base"],
-                                offset=m["offset"],
-                                scale=m["scale"],
-                                index=m["index"],
-                                dst=m["dst"] if "dst" in m else None,
+                        new_throughputs.append(
+                            (
+                                MemoryOperand(
+                                    base=m["base"],
+                                    offset=m["offset"],
+                                    scale=m["scale"],
+                                    index=m["index"],
+                                    dst=m["dst"] if "dst" in m else None,
+                                ),
+                                m["port_pressure"],
                             )
-                            , m["port_pressure"])
                         )
                     self._data["load_throughput"] = new_throughputs
 
                 new_throughputs = []
                 if "store_throughput" in self._data:
                     for m in self._data["store_throughput"]:
-                        new_throughputs.append((
-                            MemoryOperand(
-                                base=m["base"],
-                                offset=m["offset"],
-                                scale=m["scale"],
-                                index=m["index"],
+                        new_throughputs.append(
+                            (
+                                MemoryOperand(
+                                    base=m["base"],
+                                    offset=m["offset"],
+                                    scale=m["scale"],
+                                    index=m["index"],
+                                ),
+                                m["port_pressure"],
                             )
-                            , m["port_pressure"])
                         )
                     self._data["store_throughput"] = new_throughputs
-
 
                 if not lazy:
                     # cache internal representation for future use
@@ -386,12 +391,15 @@ class MachineModel(object):
 
     def get_store_throughput(self, memory, src_reg=None):
         """Return store throughput for a given destination and register type."""
-        st_tp = [m for m in self._data["store_throughput"] if self._match_mem_entries(memory, m[0])]
+        st_tp = [
+            m for m in self._data["store_throughput"] if self._match_mem_entries(memory, m[0])
+        ]
         if src_reg is not None:
             st_tp = [
                 tp
                 for tp in st_tp
-                if "src" in tp[0] and self._check_operands(src_reg, RegisterOperand(name=tp[0]["src"]))
+                if "src" in tp[0]
+                and self._check_operands(src_reg, RegisterOperand(name=tp[0]["src"]))
             ]
         if len(st_tp) > 0:
             return st_tp.copy()
@@ -461,21 +469,36 @@ class MachineModel(object):
             return arch_dict[arch].lower()
         else:
             raise ValueError("Unknown architecture {!r}.".format(arch))
-    
+
     def class_to_dict(self, op):
         """Need to convert operand classes to dicts for the dump. Memory operand types may have their index/base/offset as a register operand/"""
         if isinstance(op, Operand):
-            dict_op = dict((key.lstrip('_'), value) for key, value in op.__dict__.items() if not callable(value) and not key.startswith('__'))
+            dict_op = dict(
+                (key.lstrip("_"), value)
+                for key, value in op.__dict__.items()
+                if not callable(value) and not key.startswith("__")
+            )
             if isinstance(op, MemoryOperand):
                 if isinstance(dict_op["index"], Operand):
-                    dict_op["index"] = dict((key.lstrip('_'), value) for key, value in dict_op["index"].__dict__.items() if not callable(value) and not key.startswith('__'))
+                    dict_op["index"] = dict(
+                        (key.lstrip("_"), value)
+                        for key, value in dict_op["index"].__dict__.items()
+                        if not callable(value) and not key.startswith("__")
+                    )
                 if isinstance(dict_op["offset"], Operand):
-                    dict_op["offset"] = dict((key.lstrip('_'), value) for key, value in dict_op["offset"].__dict__.items() if not callable(value) and not key.startswith('__'))
+                    dict_op["offset"] = dict(
+                        (key.lstrip("_"), value)
+                        for key, value in dict_op["offset"].__dict__.items()
+                        if not callable(value) and not key.startswith("__")
+                    )
                 if isinstance(dict_op["base"], Operand):
-                    dict_op["base"] = dict((key.lstrip('_'), value) for key, value in dict_op["base"].__dict__.items() if not callable(value) and not key.startswith('__'))
+                    dict_op["base"] = dict(
+                        (key.lstrip("_"), value)
+                        for key, value in dict_op["base"].__dict__.items()
+                        if not callable(value) and not key.startswith("__")
+                    )
             return dict_op
         return op
-
 
     def dump(self, stream=None):
         """Dump machine model to stream or return it as a ``str`` if no stream is given."""
@@ -483,7 +506,11 @@ class MachineModel(object):
         formatted_instruction_forms = []
         for instruction_form in self._data["instruction_forms"]:
             if isinstance(instruction_form, InstructionForm):
-                instruction_form = dict((key.lstrip('_'), value) for key, value in instruction_form.__dict__.items() if not callable(value) and not key.startswith('__'))
+                instruction_form = dict(
+                    (key.lstrip("_"), value)
+                    for key, value in instruction_form.__dict__.items()
+                    if not callable(value) and not key.startswith("__")
+                )
             if instruction_form["port_pressure"] is not None:
                 cs = ruamel.yaml.comments.CommentedSeq(instruction_form["port_pressure"])
                 cs.fa.set_flow_style()
@@ -516,7 +543,7 @@ class MachineModel(object):
         yaml = self._create_yaml_object()
         if not stream:
             stream = StringIO()
-        
+
         yaml.dump(
             {
                 k: v
@@ -532,7 +559,7 @@ class MachineModel(object):
             },
             stream,
         )
-        
+
         yaml.dump({"load_throughput": formatted_load_throughput}, stream)
         yaml.dump({"store_throughput": formatted_store_throughput}, stream)
         yaml.dump({"instruction_forms": formatted_instruction_forms}, stream)

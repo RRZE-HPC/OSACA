@@ -189,13 +189,11 @@ class TestSemanticTools(unittest.TestCase):
         # test get_store_tp
         self.assertEqual(
             test_mm_x86.get_store_throughput(
-                MemoryOperand(
-                    base=RegisterOperand(name="x"), offset=None, index=None, scale=1
-                )
+                MemoryOperand(base=RegisterOperand(name="x"), offset=None, index=None, scale=1)
             )[0][1],
             [[2, "237"], [2, "4"]],
         )
-        
+
         self.assertEqual(
             test_mm_x86.get_store_throughput(
                 MemoryOperand(
@@ -207,7 +205,7 @@ class TestSemanticTools(unittest.TestCase):
             )[0][1],
             [[1, "23"], [1, "4"]],
         )
-        
+
         self.assertEqual(
             test_mm_arm.get_store_throughput(
                 MemoryOperand(
@@ -235,9 +233,7 @@ class TestSemanticTools(unittest.TestCase):
         # test get_store_lt
         self.assertEqual(
             test_mm_x86.get_store_latency(
-                MemoryOperand(
-                    base=RegisterOperand(name="x"), offset=None, index=None, scale=1
-                )
+                MemoryOperand(base=RegisterOperand(name="x"), offset=None, index=None, scale=1)
             ),
             0,
         )
@@ -259,9 +255,7 @@ class TestSemanticTools(unittest.TestCase):
         # test default load tp
         self.assertEqual(
             test_mm_x86.get_load_throughput(
-                MemoryOperand(
-                    base=RegisterOperand(name="x"), offset=None, index=None, scale=1
-                )
+                MemoryOperand(base=RegisterOperand(name="x"), offset=None, index=None, scale=1)
             )[0][1],
             [[1, "23"], [1, ["2D", "3D"]]],
         )

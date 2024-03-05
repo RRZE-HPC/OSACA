@@ -46,7 +46,7 @@ class RegisterOperand(Operand):
     @name.setter
     def name(self, name):
         self._name = name
-        
+
     @property
     def width(self):
         return self._width

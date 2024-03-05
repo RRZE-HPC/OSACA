@@ -300,10 +300,7 @@ class KernelDG(nx.DiGraph):
                     # write to register -> abort
                     if self.is_written(dst, instr_form):
                         break
-                if (
-                    isinstance(dst, FlagOperand)
-                    and flag_dependencies
-                ):
+                if isinstance(dst, FlagOperand) and flag_dependencies:
                     # read of flag
                     if self.is_read(dst, instr_form):
                         yield instr_form, []
