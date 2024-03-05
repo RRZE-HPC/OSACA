@@ -303,6 +303,7 @@ class MachineModel(object):
             "cfl": "x86",
             "icl": "x86",
             "icx": "x86",
+            "spr": "x86",
         }
         arch = arch.lower()
         if arch in arch_dict:

@@ -30,6 +30,7 @@ SUPPORTED_ARCHS = [
     "CSX",
     "ICL",
     "ICX",
+    "SPR",
     "ZEN1",
     "ZEN2",
     "ZEN3",
@@ -102,8 +103,8 @@ def create_parser(parser=None):
     parser.add_argument(
         "--arch",
         type=str,
-        help="Define architecture (SNB, IVB, HSW, BDW, SKX, CSX, ICL, ICX, ZEN1, ZEN2, ZEN3, TX2, N1, "
-        "A64FX, TSV110, A72, M1, V2). If no architecture is given, OSACA assumes a default uarch for "
+        help="Define architecture (SNB, IVB, HSW, BDW, SKX, CSX, ICL, ICX, SPR, ZEN1, ZEN2, ZEN3, "
+        "TX2, N1, A64FX, TSV110, A72, M1, V2). If no architecture is given, OSACA assumes a default uarch for "
         "x86/AArch64.",
     )
     parser.add_argument(
