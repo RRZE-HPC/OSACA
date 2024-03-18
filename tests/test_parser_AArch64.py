@@ -14,6 +14,7 @@ from osaca.parser.memory import MemoryOperand
 from osaca.parser.register import RegisterOperand
 from osaca.parser.immediate import ImmediateOperand
 from osaca.parser.identifier import IdentifierOperand
+from osaca.parser.prefetch import PrefetchOperand
 
 
 class TestParserAArch64(unittest.TestCase):
@@ -233,7 +234,7 @@ class TestParserAArch64(unittest.TestCase):
         instruction_form_5 = InstructionForm(
             mnemonic="prfm",
             operands=[
-                {"prfop": {"type": ["PLD"], "target": ["L1"], "policy": ["KEEP"]}},
+                PrefetchOperand(type_id=["PLD"],target=["L1"],policy=["KEEP"]),
                 MemoryOperand(
                     offset=ImmediateOperand(value=2048),
                     base=RegisterOperand(prefix="x", name="26"),

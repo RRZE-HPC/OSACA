@@ -21,6 +21,7 @@ from osaca.parser.immediate import ImmediateOperand
 from osaca.parser.identifier import IdentifierOperand
 from osaca.parser.condition import ConditionOperand
 from osaca.parser.flag import FlagOperand
+from osaca.parser.prefetch import PrefetchOperand
 from ruamel.yaml.compat import StringIO
 
 
@@ -256,6 +257,14 @@ class MachineModel(object):
                     source=o["source"] if "source" in o else False,
                     destination=o["destination"] if "destination" in o else False,
                 )
+            )
+        elif o["class"] == "prfop":
+            new_operands.append(
+                PrefetchOperand(
+                type_id=o["type"] if "type" in o else None,
+                target=o["target"] if "target" in o else None,
+                policy=o["policy"] if "policy" in o else None,
+            )
             )
         else:
             new_operands.append(o)
@@ -798,8 +807,8 @@ class MachineModel(object):
         ):
             return isinstance(i_operand, IdentifierOperand)
         # prefetch option
-        if not isinstance(operand, Operand) and "prfop" in operand:
-            return i_operand["class"] == "prfop"
+        if isinstance(operand, PrefetchOperand):
+            return isinstance(i_operand, PrefetchOperand)
         # condition
         if isinstance(operand, ConditionOperand):
             if isinstance(i_operand, ConditionOperand):

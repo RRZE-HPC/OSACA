@@ -17,6 +17,7 @@ class BaseParser(object):
     segment_ext = "segment_extension"
     mnemonic = "instruction"
     operands = "operands"
+    prefetch = "prfop"
     _parser_constructed = False
 
     def __init__(self):
