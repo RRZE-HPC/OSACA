@@ -13,6 +13,7 @@ from osaca.parser.identifier import IdentifierOperand
 from osaca.parser.immediate import ImmediateOperand
 from osaca.parser.condition import ConditionOperand
 from osaca.parser.flag import FlagOperand
+from osaca.parser.prefetch import PrefetchOperand
 
 
 class ParserAArch64(BaseParser):
@@ -389,7 +390,16 @@ class ParserAArch64(BaseParser):
             return self.process_directive_operand(operand[self.directive_id])
         if self.condition_id in operand:
             return self.process_condition(operand[self.condition_id])
+        if self.prefetch in operand:
+            return self.process_prefetch_operand(operand[self.prefetch])
         return operand
+
+    def process_prefetch_operand(self, operand):
+        return PrefetchOperand(
+            type_id=operand["type"] if "type" in operand else None,
+            target=operand["target"] if "target" in operand else None,
+            policy=operand["policy"] if "policy" in operand else None,
+        )
 
     def process_directive_operand(self, operand):
         return (
