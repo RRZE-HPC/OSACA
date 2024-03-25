@@ -9,14 +9,14 @@ hidden_loads: false
 load_latency: {w: 3.0, x: 3.0, b: 3.0, h: 3.0, s: 3.0, d: 3.0, q: 3.0, v: 3.0}
 p_index_latency: 1
 load_throughput:
-- {base: '*', index: '*', offset: '*', scale: '*', pre-indexed: false, post-indexed: false, port_pressure: [[1, '467']]}
-- {base: '*', index: '*', offset: '*', scale: '*', pre-indexed: false, post-indexed: true, port_pressure:  [[1, '467'], [1, ['8', '9', '10', '12', '13']]]}
-- {base: '*', index: '*', offset: '*', scale: '*', pre-indexed: true, post-indexed: false, port_pressure:  [[1, '467'], [1, ['8', '9', '10', '12', '13']]]}
+- {base: '*', index: '*', offset: '*', scale: '*', pre_indexed: false, post_indexed: false, port_pressure: [[1, '467']]}
+- {base: '*', index: '*', offset: '*', scale: '*', pre_indexed: false, post_indexed: true, port_pressure:  [[1, '467'], [1, ['8', '9', '10', '12', '13']]]}
+- {base: '*', index: '*', offset: '*', scale: '*', pre_indexed: true, post_indexed: false, port_pressure:  [[1, '467'], [1, ['8', '9', '10', '12', '13']]]}
 load_throughput_default: [[1, '467']]
 store_throughput:
-- {base: '*', index: '*', offset: '*', scale: '*', pre-indexed: false, post-indexed: false, port_pressure: [[1, '45']]}
-- {base: '*', index: '*', offset: '*', scale: '*', pre-indexed: false, post-indexed: true, port_pressure:  [[1, '45'], [1, ['8', '9', '10', '12', '13']]]}
-- {base: '*', index: '*', offset: '*', scale: '*', pre-indexed: true, post-indexed: false, port_pressure:  [[1, '45'], [1, ['8', '9', '10', '12', '13']]]}
+- {base: '*', index: '*', offset: '*', scale: '*', pre_indexed: false, post_indexed: false, port_pressure: [[1, '45']]}
+- {base: '*', index: '*', offset: '*', scale: '*', pre_indexed: false, post_indexed: true, port_pressure:  [[1, '45'], [1, ['8', '9', '10', '12', '13']]]}
+- {base: '*', index: '*', offset: '*', scale: '*', pre_indexed: true, post_indexed: false, port_pressure:  [[1, '45'], [1, ['8', '9', '10', '12', '13']]]}
 store_throughput_default: [[1, '45']]
 ports: ['0', '1', '2', '3', '3DV', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13']
 port_model_scheme: |
@@ -405,8 +405,8 @@ instruction_forms:
     offset: '*'
     index: ~
     scale: ~
-    post-indexed: false
-    pre-indexed: false
+    post_indexed: false
+    pre_indexed: false
   throughput: 0.3333333
   latency: 3.0  # 	1*p467
   port_pressure: [[1, '467']]
@@ -419,8 +419,8 @@ instruction_forms:
     offset: '*'
     index: '*'
     scale: '*'
-    post-indexed: false
-    pre-indexed: false
+    post_indexed: false
+    pre_indexed: false
   throughput: 0.3333333
   latency: 4.0  # 	1*p467
   port_pressure: [[1, '467']]
@@ -433,8 +433,8 @@ instruction_forms:
     offset: '*'
     index: ~
     scale: ~
-    post-indexed: true
-    pre-indexed: false
+    post_indexed: true
+    pre_indexed: false
   throughput: 0.3333333
   latency: 3.0  # 	1*p467
   port_pressure: [[1, '467'], [1, ['8', '9', '10']]]
@@ -447,8 +447,8 @@ instruction_forms:
     offset: '*'
     index: '*'
     scale: '*'
-    post-indexed: true
-    pre-indexed: false
+    post_indexed: true
+    pre_indexed: false
   throughput: 0.3333333
   latency: 4.0  # 	1*p467
   port_pressure: [[1, '467'], [1, ['8', '9', '10']]]
@@ -461,8 +461,8 @@ instruction_forms:
     offset: '*'
     index: ~
     scale: ~
-    post-indexed: false
-    pre-indexed: true
+    post_indexed: false
+    pre_indexed: true
   throughput: 0.3333333
   latency: 3.0  # 	1*p467
   port_pressure: [[1, '467'], [1, ['8', '9', '10']]]
@@ -475,8 +475,8 @@ instruction_forms:
     offset: '*'
     index: '*'
     scale: '*'
-    post-indexed: false
-    pre-indexed: true
+    post_indexed: false
+    pre_indexed: true
   throughput: 0.3333333
   latency: 4.0  # 	1*p467
   port_pressure: [[1, '467'], [1, ['8', '9', '10']]]
@@ -491,8 +491,8 @@ instruction_forms:
     offset: '*'
     index: ~
     scale: ~
-    post-indexed: false
-    pre-indexed: false
+    post_indexed: false
+    pre_indexed: false
   throughput: 0.3333333
   latency: 3.0  # 	1*p467
   port_pressure: [[1, '467']]
@@ -507,8 +507,8 @@ instruction_forms:
     offset: '*'
     index: '*'
     scale: '*'
-    post-indexed: false
-    pre-indexed: false
+    post_indexed: false
+    pre_indexed: false
   throughput: 0.3333333
   latency: 4.0  # 	1*p467
   port_pressure: [[1, '467']]
@@ -523,8 +523,8 @@ instruction_forms:
     offset: '*'
     index: ~
     scale: ~
-    post-indexed: true
-    pre-indexed: false
+    post_indexed: true
+    pre_indexed: false
   throughput: 0.3333333
   latency: 3.0  # 	1*p467
   port_pressure: [[1, '467'], [1, ['8', '9', '10']]]
@@ -539,8 +539,8 @@ instruction_forms:
     offset: '*'
     index: '*'
     scale: '*'
-    post-indexed: true
-    pre-indexed: false
+    post_indexed: true
+    pre_indexed: false
   throughput: 0.3333333
   latency: 4.0  # 	1*p467
   port_pressure: [[1, '467'], [1, ['8', '9', '10']]]
@@ -555,8 +555,8 @@ instruction_forms:
     offset: '*'
     index: ~
     scale: ~
-    post-indexed: false
-    pre-indexed: true
+    post_indexed: false
+    pre_indexed: true
   throughput: 0.3333333
   latency: 3.0  # 	1*p467
   port_pressure: [[1, '467'], [1, ['8', '9', '10']]]
@@ -571,8 +571,8 @@ instruction_forms:
     offset: '*'
     index: '*'
     scale: '*'
-    post-indexed: false
-    pre-indexed: true
+    post_indexed: false
+    pre_indexed: true
   throughput: 0.3333333
   latency: 4.0  # 	1*p467
   port_pressure: [[1, '467'], [1, ['8', '9', '10']]]
@@ -587,8 +587,8 @@ instruction_forms:
     offset: '*'
     index: ~
     scale: ~
-    post-indexed: false
-    pre-indexed: false
+    post_indexed: false
+    pre_indexed: false
   throughput: 0.3333333
   latency: 3.0  # 	1*p467
   port_pressure: [[1, '467']]
@@ -603,8 +603,8 @@ instruction_forms:
     offset: '*'
     index: '*'
     scale: '*'
-    post-indexed: false
-    pre-indexed: false
+    post_indexed: false
+    pre_indexed: false
   throughput: 0.3333333
   latency: 4.0  # 	1*p467
   port_pressure: [[1, '467']]
@@ -619,8 +619,8 @@ instruction_forms:
     offset: '*'
     index: ~
     scale: ~
-    post-indexed: true
-    pre-indexed: false
+    post_indexed: true
+    pre_indexed: false
   throughput: 0.3333333
   latency: 3.0  # 	1*p467
   port_pressure: [[1, '467'], [1, ['8', '9', '10']]]
@@ -635,8 +635,8 @@ instruction_forms:
     offset: '*'
     index: '*'
     scale: '*'
-    post-indexed: true
-    pre-indexed: false
+    post_indexed: true
+    pre_indexed: false
   throughput: 0.3333333
   latency: 4.0  # 	1*p467
   port_pressure: [[1, '467'], [1, ['8', '9', '10']]]
@@ -651,8 +651,8 @@ instruction_forms:
     offset: '*'
     index: ~
     scale: ~
-    post-indexed: false
-    pre-indexed: true
+    post_indexed: false
+    pre_indexed: true
   throughput: 0.3333333
   latency: 3.0  # 	1*p467
   port_pressure: [[1, '467'], [1, ['8', '9', '10']]]
@@ -667,8 +667,8 @@ instruction_forms:
     offset: '*'
     index: '*'
     scale: '*'
-    post-indexed: false
-    pre-indexed: true
+    post_indexed: false
+    pre_indexed: true
   throughput: 0.3333333
   latency: 4.0  # 	1*p467
   port_pressure: [[1, '467'], [1, ['8', '9', '10']]]
@@ -683,8 +683,8 @@ instruction_forms:
     offset: '*'
     index: ~
     scale: ~
-    post-indexed: false
-    pre-indexed: false
+    post_indexed: false
+    pre_indexed: false
   throughput: 0.3333333
   latency: 3.0  # 	1*p467
   port_pressure: [[1, '467']]
@@ -699,8 +699,8 @@ instruction_forms:
     offset: '*'
     index: '*'
     scale: '*'
-    post-indexed: false
-    pre-indexed: false
+    post_indexed: false
+    pre_indexed: false
   throughput: 0.3333333
   latency: 4.0  # 	1*p467
   port_pressure: [[1, '467']]
@@ -715,8 +715,8 @@ instruction_forms:
     offset: '*'
     index: ~
     scale: ~
-    post-indexed: true
-    pre-indexed: false
+    post_indexed: true
+    pre_indexed: false
   throughput: 0.3333333
   latency: 3.0  # 	1*p467
   port_pressure: [[1, '467'], [1, ['8', '9', '10']]]
@@ -731,8 +731,8 @@ instruction_forms:
     offset: '*'
     index: '*'
     scale: '*'
-    post-indexed: true
-    pre-indexed: false
+    post_indexed: true
+    pre_indexed: false
   throughput: 0.3333333
   latency: 4.0  # 	1*p467
   port_pressure: [[1, '467'], [1, ['8', '9', '10']]]
@@ -747,8 +747,8 @@ instruction_forms:
     offset: '*'
     index: ~
     scale: ~
-    post-indexed: false
-    pre-indexed: true
+    post_indexed: false
+    pre_indexed: true
   throughput: 0.3333333
   latency: 3.0  # 	1*p467
   port_pressure: [[1, '467'], [1, ['8', '9', '10']]]
@@ -763,8 +763,8 @@ instruction_forms:
     offset: '*'
     index: '*'
     scale: '*'
-    post-indexed: false
-    pre-indexed: true
+    post_indexed: false
+    pre_indexed: true
   throughput: 0.3333333
   latency: 4.0  # 	1*p467
   port_pressure: [[1, '467'], [1, ['8', '9', '10']]]
@@ -779,8 +779,8 @@ instruction_forms:
     offset: '*'
     index: ~
     scale: ~
-    post-indexed: false
-    pre-indexed: false
+    post_indexed: false
+    pre_indexed: false
   throughput: 0.3333333
   latency: 3.0  # 	2*p467
   port_pressure: [[2, '467']]
@@ -795,8 +795,8 @@ instruction_forms:
     offset: '*'
     index: '*'
     scale: '*'
-    post-indexed: false
-    pre-indexed: false
+    post_indexed: false
+    pre_indexed: false
   throughput: 0.3333333
   latency: 4.0  # 	2*p467
   port_pressure: [[2, '467']]
@@ -811,8 +811,8 @@ instruction_forms:
     offset: '*'
     index: ~
     scale: ~
-    post-indexed: true
-    pre-indexed: false
+    post_indexed: true
+    pre_indexed: false
   throughput: 0.3333333
   latency: 3.0  # 	2*p467
   port_pressure: [[2, '467'], [1, ['8', '9', '10']]]
@@ -827,8 +827,8 @@ instruction_forms:
     offset: '*'
     index: '*'
     scale: '*'
-    post-indexed: true
-    pre-indexed: false
+    post_indexed: true
+    pre_indexed: false
   throughput: 0.3333333
   latency: 4.0  # 	2*p467
   port_pressure: [[2, '467'], [1, ['8', '9', '10']]]
@@ -843,8 +843,8 @@ instruction_forms:
     offset: '*'
     index: ~
     scale: ~
-    post-indexed: false
-    pre-indexed: true
+    post_indexed: false
+    pre_indexed: true
   throughput: 0.3333333
   latency: 3.0  # 	2*p467
   port_pressure: [[2, '467'], [1, ['8', '9', '10']]]
@@ -857,8 +857,8 @@ instruction_forms:
     offset: '*'
     index: '*'
     scale: '*'
-    post-indexed: false
-    pre-indexed: true
+    post_indexed: false
+    pre_indexed: true
   throughput: 0.3333333
   latency: 4.0  # 	2*p467
   port_pressure: [[2, '467'], [1, ['8', '9', '10']]]
@@ -873,8 +873,8 @@ instruction_forms:
     offset: '*'
     index: ~
     scale: ~
-    post-indexed: false
-    pre-indexed: false
+    post_indexed: false
+    pre_indexed: false
   throughput: 0.3333333
   latency: 3.0  # 	1*p467
   port_pressure: [[1, '467']]
@@ -889,8 +889,8 @@ instruction_forms:
     offset: '*'
     index: '*'
     scale: '*'
-    post-indexed: false
-    pre-indexed: false
+    post_indexed: false
+    pre_indexed: false
   throughput: 0.3333333
   latency: 4.0  # 	1*p467
   port_pressure: [[1, '467']]
@@ -905,8 +905,8 @@ instruction_forms:
     offset: '*'
     index: ~
     scale: ~
-    post-indexed: true
-    pre-indexed: false
+    post_indexed: true
+    pre_indexed: false
   throughput: 0.3333333
   latency: 3.0  # 	1*p467
   port_pressure: [[1, '467'], [1, ['8', '9', '10']]]
@@ -921,8 +921,8 @@ instruction_forms:
     offset: '*'
     index: '*'
     scale: '*'
-    post-indexed: true
-    pre-indexed: false
+    post_indexed: true
+    pre_indexed: false
   throughput: 0.3333333
   latency: 4.0  # 	1*p467
   port_pressure: [[1, '467'], [1, ['8', '9', '10']]]
@@ -937,8 +937,8 @@ instruction_forms:
     offset: '*'
     index: ~
     scale: ~
-    post-indexed: false
-    pre-indexed: true
+    post_indexed: false
+    pre_indexed: true
   throughput: 0.3333333
   latency: 3.0  # 	1*p467
   port_pressure: [[1, '467'], [1, ['8', '9', '10']]]
@@ -953,8 +953,8 @@ instruction_forms:
     offset: '*'
     index: '*'
     scale: '*'
-    post-indexed: false
-    pre-indexed: true
+    post_indexed: false
+    pre_indexed: true
   throughput: 0.3333333
   latency: 4.0  # 	1*p467
   port_pressure: [[1, '467'], [1, ['8', '9', '10']]]
@@ -963,8 +963,8 @@ instruction_forms:
   - class: register
     prefix: "*"
   - class: identifier
-    post-indexed: false
-    pre-indexed: false
+    post_indexed: false
+    pre_indexed: false
   throughput: 0.3333333
   latency: 3.0  # 	1*p467
   port_pressure: [[1, '467']]
@@ -973,8 +973,8 @@ instruction_forms:
   - class: register
     prefix: "*"
   - class: identifier
-    post-indexed: false
-    pre-indexed: false
+    post_indexed: false
+    pre_indexed: false
   throughput: 0.3333333
   latency: 4.0  # 	1*p467
   port_pressure: [[1, '467']]
@@ -983,8 +983,8 @@ instruction_forms:
   - class: register
     prefix: "*"
   - class: identifier
-    post-indexed: true
-    pre-indexed: false
+    post_indexed: true
+    pre_indexed: false
   throughput: 0.3333333
   latency: 3.0  # 	1*p467
   port_pressure: [[1, '467'], [1, ['8', '9', '10']]]
@@ -993,8 +993,8 @@ instruction_forms:
   - class: register
     prefix: "*"
   - class: identifier
-    post-indexed: true
-    pre-indexed: false
+    post_indexed: true
+    pre_indexed: false
   throughput: 0.3333333
   latency: 4.0  # 	1*p467
   port_pressure: [[1, '467'], [1, ['8', '9', '10']]]
@@ -1003,8 +1003,8 @@ instruction_forms:
   - class: register
     prefix: "*"
   - class: identifier
-    post-indexed: false
-    pre-indexed: true
+    post_indexed: false
+    pre_indexed: true
   throughput: 0.3333333
   latency: 3.0  # 	1*p467
   port_pressure: [[1, '467'], [1, ['8', '9', '10']]]
@@ -1013,8 +1013,8 @@ instruction_forms:
   - class: register
     prefix: "*"
   - class: identifier
-    post-indexed: false
-    pre-indexed: true
+    post_indexed: false
+    pre_indexed: true
   throughput: 0.3333333
   latency: 4.0  # 	1*p467
   port_pressure: [[1, '467'], [1, ['8', '9', '10']]]
@@ -1025,8 +1025,8 @@ instruction_forms:
   - class: register
     prefix: x
   - class: identifier
-    post-indexed: false
-    pre-indexed: false
+    post_indexed: false
+    pre_indexed: false
   throughput: 0.3333333
   latency: 3.0  # 	1*p467
   port_pressure: [[1, '467']]
@@ -1037,8 +1037,8 @@ instruction_forms:
   - class: register
     prefix: x
   - class: identifier
-    post-indexed: false
-    pre-indexed: false
+    post_indexed: false
+    pre_indexed: false
   throughput: 0.3333333
   latency: 4.0  # 	1*p467
   port_pressure: [[1, '467']]
@@ -1049,8 +1049,8 @@ instruction_forms:
   - class: register
     prefix: x
   - class: identifier
-    post-indexed: true
-    pre-indexed: false
+    post_indexed: true
+    pre_indexed: false
   throughput: 0.3333333
   latency: 3.0  # 	1*p467
   port_pressure: [[1, '467'], [1, ['8', '9', '10']]]
@@ -1061,8 +1061,8 @@ instruction_forms:
   - class: register
     prefix: x
   - class: identifier
-    post-indexed: true
-    pre-indexed: false
+    post_indexed: true
+    pre_indexed: false
   throughput: 0.3333333
   latency: 4.0  # 	1*p467
   port_pressure: [[1, '467'], [1, ['8', '9', '10']]]
@@ -1073,8 +1073,8 @@ instruction_forms:
   - class: register
     prefix: x
   - class: identifier
-    post-indexed: false
-    pre-indexed: true
+    post_indexed: false
+    pre_indexed: true
   throughput: 0.3333333
   latency: 3.0  # 	1*p467
   port_pressure: [[1, '467'], [1, ['8', '9', '10']]]
@@ -1085,8 +1085,8 @@ instruction_forms:
   - class: register
     prefix: x
   - class: identifier
-    post-indexed: false
-    pre-indexed: true
+    post_indexed: false
+    pre_indexed: true
   throughput: 0.3333333
   latency: 4.0  # 	1*p467
   port_pressure: [[1, '467'], [1, ['8', '9', '10']]]
@@ -1097,8 +1097,8 @@ instruction_forms:
   - class: register
     prefix: w
   - class: identifier
-    post-indexed: false
-    pre-indexed: false
+    post_indexed: false
+    pre_indexed: false
   throughput: 0.3333333
   latency: 3.0  # 	1*p467
   port_pressure: [[1, '467']]
@@ -1109,8 +1109,8 @@ instruction_forms:
   - class: register
     prefix: w
   - class: identifier
-    post-indexed: false
-    pre-indexed: false
+    post_indexed: false
+    pre_indexed: false
   throughput: 0.3333333
   latency: 4.0  # 	1*p467
   port_pressure: [[1, '467']]
@@ -1121,8 +1121,8 @@ instruction_forms:
   - class: register
     prefix: w
   - class: identifier
-    post-indexed: true
-    pre-indexed: false
+    post_indexed: true
+    pre_indexed: false
   throughput: 0.3333333
   latency: 3.0  # 	1*p467
   port_pressure: [[1, '467'], [1, ['8', '9', '10']]]
@@ -1133,8 +1133,8 @@ instruction_forms:
   - class: register
     prefix: w
   - class: identifier
-    post-indexed: true
-    pre-indexed: false
+    post_indexed: true
+    pre_indexed: false
   throughput: 0.3333333
   latency: 4.0  # 	1*p467
   port_pressure: [[1, '467'], [1, ['8', '9', '10']]]
@@ -1145,8 +1145,8 @@ instruction_forms:
   - class: register
     prefix: w
   - class: identifier
-    post-indexed: false
-    pre-indexed: true
+    post_indexed: false
+    pre_indexed: true
   throughput: 0.3333333
   latency: 3.0  # 	1*p467
   port_pressure: [[1, '467'], [1, ['8', '9', '10']]]
@@ -1157,8 +1157,8 @@ instruction_forms:
   - class: register
     prefix: w
   - class: identifier
-    post-indexed: false
-    pre-indexed: true
+    post_indexed: false
+    pre_indexed: true
   throughput: 0.3333333
   latency: 4.0  # 	1*p467
   port_pressure: [[1, '467'], [1, ['8', '9', '10']]]
@@ -1169,8 +1169,8 @@ instruction_forms:
   - class: register
     prefix: d
   - class: identifier
-    post-indexed: false
-    pre-indexed: false
+    post_indexed: false
+    pre_indexed: false
   throughput: 0.3333333
   latency: 3.0  # 	1*p467
   port_pressure: [[1, '467']]
@@ -1181,8 +1181,8 @@ instruction_forms:
   - class: register
     prefix: d
   - class: identifier
-    post-indexed: false
-    pre-indexed: false
+    post_indexed: false
+    pre_indexed: false
   throughput: 0.3333333
   latency: 4.0  # 	1*p467
   port_pressure: [[1, '467']]
@@ -1193,8 +1193,8 @@ instruction_forms:
   - class: register
     prefix: d
   - class: identifier
-    post-indexed: true
-    pre-indexed: false
+    post_indexed: true
+    pre_indexed: false
   throughput: 0.3333333
   latency: 3.0  # 	1*p467
   port_pressure: [[1, '467'], [1, ['8', '9', '10']]]
@@ -1205,8 +1205,8 @@ instruction_forms:
   - class: register
     prefix: d
   - class: identifier
-    post-indexed: true
-    pre-indexed: false
+    post_indexed: true
+    pre_indexed: false
   throughput: 0.3333333
   latency: 4.0  # 	1*p467
   port_pressure: [[1, '467'], [1, ['8', '9', '10']]]
@@ -1217,8 +1217,8 @@ instruction_forms:
   - class: register
     prefix: d
   - class: identifier
-    post-indexed: false
-    pre-indexed: true
+    post_indexed: false
+    pre_indexed: true
   throughput: 0.3333333
   latency: 3.0  # 	1*p467
   port_pressure: [[1, '467'], [1, ['8', '9', '10']]]
@@ -1229,8 +1229,8 @@ instruction_forms:
   - class: register
     prefix: d
   - class: identifier
-    post-indexed: false
-    pre-indexed: true
+    post_indexed: false
+    pre_indexed: true
   throughput: 0.3333333
   latency: 4.0  # 	1*p467
   port_pressure: [[1, '467'], [1, ['8', '9', '10']]]
@@ -1241,8 +1241,8 @@ instruction_forms:
   - class: register
     prefix: q
   - class: identifier
-    post-indexed: false
-    pre-indexed: false
+    post_indexed: false
+    pre_indexed: false
   throughput: 0.3333333
   latency: 3.0  # 	2*p467
   port_pressure: [[2, '467']]
@@ -1253,8 +1253,8 @@ instruction_forms:
   - class: register
     prefix: q
   - class: identifier
-    post-indexed: false
-    pre-indexed: false
+    post_indexed: false
+    pre_indexed: false
   throughput: 0.3333333
   latency: 4.0  # 	2*p467
   port_pressure: [[2, '467']]
@@ -1265,8 +1265,8 @@ instruction_forms:
   - class: register
     prefix: q
   - class: identifier
-    post-indexed: true
-    pre-indexed: false
+    post_indexed: true
+    pre_indexed: false
   throughput: 0.3333333
   latency: 3.0  # 	2*p467
   port_pressure: [[2, '467'], [1, ['8', '9', '10']]]
@@ -1277,8 +1277,8 @@ instruction_forms:
   - class: register
     prefix: q
   - class: identifier
-    post-indexed: true
-    pre-indexed: false
+    post_indexed: true
+    pre_indexed: false
   throughput: 0.3333333
   latency: 4.0  # 	2*p467
   port_pressure: [[2, '467'], [1, ['8', '9', '10']]]
@@ -1289,8 +1289,8 @@ instruction_forms:
   - class: register
     prefix: q
   - class: identifier
-    post-indexed: false
-    pre-indexed: true
+    post_indexed: false
+    pre_indexed: true
   throughput: 0.3333333
   latency: 3.0  # 	2*p467
   port_pressure: [[2, '467'], [1, ['8', '9', '10']]]
@@ -1299,8 +1299,8 @@ instruction_forms:
   - class: register
     prefix: q
   - class: identifier
-    post-indexed: false
-    pre-indexed: true
+    post_indexed: false
+    pre_indexed: true
   throughput: 0.3333333
   latency: 4.0  # 	2*p467
   port_pressure: [[2, '467'], [1, ['8', '9', '10']]]
@@ -1311,8 +1311,8 @@ instruction_forms:
   - class: register
     prefix: s
   - class: identifier
-    post-indexed: false
-    pre-indexed: false
+    post_indexed: false
+    pre_indexed: false
   throughput: 0.3333333
   latency: 3.0  # 	1*p467
   port_pressure: [[1, '467']]
@@ -1323,8 +1323,8 @@ instruction_forms:
   - class: register
     prefix: s
   - class: identifier
-    post-indexed: false
-    pre-indexed: false
+    post_indexed: false
+    pre_indexed: false
   throughput: 0.3333333
   latency: 4.0  # 	1*p467
   port_pressure: [[1, '467']]
@@ -1335,8 +1335,8 @@ instruction_forms:
   - class: register
     prefix: s
   - class: identifier
-    post-indexed: true
-    pre-indexed: false
+    post_indexed: true
+    pre_indexed: false
   throughput: 0.3333333
   latency: 3.0  # 	1*p467
   port_pressure: [[1, '467'], [1, ['8', '9', '10']]]
@@ -1347,8 +1347,8 @@ instruction_forms:
   - class: register
     prefix: s
   - class: identifier
-    post-indexed: true
-    pre-indexed: false
+    post_indexed: true
+    pre_indexed: false
   throughput: 0.3333333
   latency: 4.0  # 	1*p467
   port_pressure: [[1, '467'], [1, ['8', '9', '10']]]
@@ -1359,8 +1359,8 @@ instruction_forms:
   - class: register
     prefix: s
   - class: identifier
-    post-indexed: false
-    pre-indexed: true
+    post_indexed: false
+    pre_indexed: true
   throughput: 0.3333333
   latency: 3.0  # 	1*p467
   port_pressure: [[1, '467'], [1, ['8', '9', '10']]]
@@ -1371,8 +1371,8 @@ instruction_forms:
   - class: register
     prefix: s
   - class: identifier
-    post-indexed: false
-    pre-indexed: true
+    post_indexed: false
+    pre_indexed: true
   throughput: 0.3333333
   latency: 4.0  # 	1*p467
   port_pressure: [[1, '467'], [1, ['8', '9', '10']]]
@@ -1753,8 +1753,8 @@ instruction_forms:
     offset: '*'
     index: ~
     scale: ~
-    post-indexed: false
-    pre-indexed: false
+    post_indexed: false
+    pre_indexed: false
   throughput: 0.5
   latency: 0.0  # 	1*p45
   port_pressure: [[1, '45']]
@@ -1767,8 +1767,8 @@ instruction_forms:
     offset: '*'
     index: '*'
     scale: '*'
-    post-indexed: false
-    pre-indexed: false
+    post_indexed: false
+    pre_indexed: false
   throughput: 0.5
   latency: 0.0  # 	1*p45
   port_pressure: [[1, '45']]
@@ -1781,8 +1781,8 @@ instruction_forms:
     offset: '*'
     index: ~
     scale: ~
-    post-indexed: true
-    pre-indexed: false
+    post_indexed: true
+    pre_indexed: false
   throughput: 0.5
   latency: 0.0  # 	1*p45
   port_pressure: [[1, '45'], [1, ['8', '9', '10']]]
@@ -1795,8 +1795,8 @@ instruction_forms:
     offset: '*'
     index: '*'
     scale: '*'
-    post-indexed: true
-    pre-indexed: false
+    post_indexed: true
+    pre_indexed: false
   throughput: 0.5
   latency: 0.0  # 	1*p45
   port_pressure: [[1, '45'], [1, ['8', '9', '10']]]
@@ -1809,8 +1809,8 @@ instruction_forms:
     offset: '*'
     index: ~
     scale: ~
-    post-indexed: false
-    pre-indexed: true
+    post_indexed: false
+    pre_indexed: true
   throughput: 0.5
   latency: 0.0  # 	1*p45
   port_pressure: [[1, '45'], [1, ['8', '9', '10']]]
@@ -1823,8 +1823,8 @@ instruction_forms:
     offset: '*'
     index: '*'
     scale: '*'
-    post-indexed: false
-    pre-indexed: true
+    post_indexed: false
+    pre_indexed: true
   throughput: 0.5
   latency: 0.0  # 	1*p45
   port_pressure: [[1, '45'], [1, ['8', '9', '10']]]
@@ -1839,8 +1839,8 @@ instruction_forms:
     offset: '*'
     index: ~
     scale: ~
-    post-indexed: false
-    pre-indexed: false
+    post_indexed: false
+    pre_indexed: false
   throughput: 0.5
   latency: 0.0  # 	1*p45
   port_pressure: [[1, '45']]
@@ -1855,8 +1855,8 @@ instruction_forms:
     offset: '*'
     index: '*'
     scale: '*'
-    post-indexed: false
-    pre-indexed: false
+    post_indexed: false
+    pre_indexed: false
   throughput: 0.5
   latency: 0.0  # 	1*p45
   port_pressure: [[1, '45']]
@@ -1871,8 +1871,8 @@ instruction_forms:
     offset: '*'
     index: ~
     scale: ~
-    post-indexed: true
-    pre-indexed: false
+    post_indexed: true
+    pre_indexed: false
   throughput: 0.5
   latency: 0.0  # 	1*p45
   port_pressure: [[1, '45'], [1, ['8', '9', '10']]]
@@ -1887,8 +1887,8 @@ instruction_forms:
     offset: '*'
     index: '*'
     scale: '*'
-    post-indexed: true
-    pre-indexed: false
+    post_indexed: true
+    pre_indexed: false
   throughput: 0.5
   latency: 0.0  # 	1*p45
   port_pressure: [[1, '45'], [1, ['8', '9', '10']]]
@@ -1903,8 +1903,8 @@ instruction_forms:
     offset: '*'
     index: ~
     scale: ~
-    post-indexed: false
-    pre-indexed: true
+    post_indexed: false
+    pre_indexed: true
   throughput: 0.5
   latency: 0.0  # 	1*p45
   port_pressure: [[1, '45'], [1, ['8', '9', '10']]]
@@ -1919,8 +1919,8 @@ instruction_forms:
     offset: '*'
     index: '*'
     scale: '*'
-    post-indexed: false
-    pre-indexed: true
+    post_indexed: false
+    pre_indexed: true
   throughput: 0.5
   latency: 0.0  # 	1*p45
   port_pressure: [[1, '45'], [1, ['8', '9', '10']]]
@@ -1935,8 +1935,8 @@ instruction_forms:
     offset: '*'
     index: ~
     scale: ~
-    post-indexed: false
-    pre-indexed: false
+    post_indexed: false
+    pre_indexed: false
   throughput: 0.5
   latency: 0.0  # 	1*p45
   port_pressure: [[1, '45']]
@@ -1951,8 +1951,8 @@ instruction_forms:
     offset: '*'
     index: '*'
     scale: '*'
-    post-indexed: false
-    pre-indexed: false
+    post_indexed: false
+    pre_indexed: false
   throughput: 0.5
   latency: 0.0  # 	1*p45
   port_pressure: [[1, '45']]
@@ -1967,8 +1967,8 @@ instruction_forms:
     offset: '*'
     index: ~
     scale: ~
-    post-indexed: true
-    pre-indexed: false
+    post_indexed: true
+    pre_indexed: false
   throughput: 0.5
   latency: 0.0  # 	1*p45
   port_pressure: [[1, '45'], [1, ['8', '9', '10']]]
@@ -1983,8 +1983,8 @@ instruction_forms:
     offset: '*'
     index: '*'
     scale: '*'
-    post-indexed: true
-    pre-indexed: false
+    post_indexed: true
+    pre_indexed: false
   throughput: 0.5
   latency: 0.0  # 	1*p45
   port_pressure: [[1, '45'], [1, ['8', '9', '10']]]
@@ -1999,8 +1999,8 @@ instruction_forms:
     offset: '*'
     index: ~
     scale: ~
-    post-indexed: false
-    pre-indexed: true
+    post_indexed: false
+    pre_indexed: true
   throughput: 0.5
   latency: 0.0  # 	1*p45
   port_pressure: [[1, '45'], [1, ['8', '9', '10']]]
@@ -2015,8 +2015,8 @@ instruction_forms:
     offset: '*'
     index: '*'
     scale: '*'
-    post-indexed: false
-    pre-indexed: true
+    post_indexed: false
+    pre_indexed: true
   throughput: 0.5
   latency: 0.0  # 	1*p45
   port_pressure: [[1, '45'], [1, ['8', '9', '10']]]
@@ -2031,8 +2031,8 @@ instruction_forms:
     offset: '*'
     index: ~
     scale: ~
-    post-indexed: false
-    pre-indexed: false
+    post_indexed: false
+    pre_indexed: false
   throughput: 0.5
   latency: 0.0  # 	1*p45
   port_pressure: [[1, '45']]
@@ -2047,8 +2047,8 @@ instruction_forms:
     offset: '*'
     index: '*'
     scale: '*'
-    post-indexed: false
-    pre-indexed: false
+    post_indexed: false
+    pre_indexed: false
   throughput: 0.5
   latency: 0.0  # 	1*p45
   port_pressure: [[1, '45']]
@@ -2063,8 +2063,8 @@ instruction_forms:
     offset: '*'
     index: ~
     scale: ~
-    post-indexed: true
-    pre-indexed: false
+    post_indexed: true
+    pre_indexed: false
   throughput: 0.5
   latency: 0.0  # 	1*p45
   port_pressure: [[1, '45'], [1, ['8', '9', '10']]]
@@ -2079,8 +2079,8 @@ instruction_forms:
     offset: '*'
     index: '*'
     scale: '*'
-    post-indexed: true
-    pre-indexed: false
+    post_indexed: true
+    pre_indexed: false
   throughput: 0.5
   latency: 0.0  # 	1*p45
   port_pressure: [[1, '45'], [1, ['8', '9', '10']]]
@@ -2095,8 +2095,8 @@ instruction_forms:
     offset: '*'
     index: ~
     scale: ~
-    post-indexed: false
-    pre-indexed: true
+    post_indexed: false
+    pre_indexed: true
   throughput: 0.5
   latency: 0.0  # 	1*p45
   port_pressure: [[1, '45'], [1, ['8', '9', '10']]]
@@ -2111,8 +2111,8 @@ instruction_forms:
     offset: '*'
     index: '*'
     scale: '*'
-    post-indexed: false
-    pre-indexed: true
+    post_indexed: false
+    pre_indexed: true
   throughput: 0.5
   latency: 0.0  # 	1*p45
   port_pressure: [[1, '45'], [1, ['8', '9', '10']]]
@@ -2127,8 +2127,8 @@ instruction_forms:
     offset: '*'
     index: ~
     scale: ~
-    post-indexed: false
-    pre-indexed: false
+    post_indexed: false
+    pre_indexed: false
   throughput: 0.5
   latency: 0.0  # 	2*p45
   port_pressure: [[2, '45']]
@@ -2143,8 +2143,8 @@ instruction_forms:
     offset: '*'
     index: '*'
     scale: '*'
-    post-indexed: false
-    pre-indexed: false
+    post_indexed: false
+    pre_indexed: false
   throughput: 0.5
   latency: 0.0  # 	2*p45
   port_pressure: [[2, '45']]
@@ -2159,8 +2159,8 @@ instruction_forms:
     offset: '*'
     index: ~
     scale: ~
-    post-indexed: true
-    pre-indexed: false
+    post_indexed: true
+    pre_indexed: false
   throughput: 0.5
   latency: 0.0  # 	2*p45
   port_pressure: [[2, '45'], [1, ['8', '9', '10']]]
@@ -2175,8 +2175,8 @@ instruction_forms:
     offset: '*'
     index: '*'
     scale: '*'
-    post-indexed: true
-    pre-indexed: false
+    post_indexed: true
+    pre_indexed: false
   throughput: 0.5
   latency: 0.0  # 	2*p45
   port_pressure: [[2, '45'], [1, ['8', '9', '10']]]
@@ -2191,8 +2191,8 @@ instruction_forms:
     offset: '*'
     index: ~
     scale: ~
-    post-indexed: false
-    pre-indexed: true
+    post_indexed: false
+    pre_indexed: true
   throughput: 0.5
   latency: 0.0  # 	2*p45
   port_pressure: [[2, '45'], [1, ['8', '9', '10']]]
@@ -2207,8 +2207,8 @@ instruction_forms:
     offset: '*'
     index: '*'
     scale: '*'
-    post-indexed: false
-    pre-indexed: true
+    post_indexed: false
+    pre_indexed: true
   throughput: 0.5
   latency: 4.0  # 	2*p467
   port_pressure: [[2, '467'], [1, ['8', '9', '10']]]
@@ -2223,8 +2223,8 @@ instruction_forms:
     offset: '*'
     index: ~
     scale: ~
-    post-indexed: false
-    pre-indexed: false
+    post_indexed: false
+    pre_indexed: false
   throughput: 0.5
   latency: 0.0  # 	1*p45
   port_pressure: [[1, '45']]
@@ -2239,8 +2239,8 @@ instruction_forms:
     offset: '*'
     index: '*'
     scale: '*'
-    post-indexed: false
-    pre-indexed: false
+    post_indexed: false
+    pre_indexed: false
   throughput: 0.5
   latency: 0.0  # 	1*p45
   port_pressure: [[1, '45']]
@@ -2255,8 +2255,8 @@ instruction_forms:
     offset: '*'
     index: ~
     scale: ~
-    post-indexed: true
-    pre-indexed: false
+    post_indexed: true
+    pre_indexed: false
   throughput: 0.5
   latency: 0.0  # 	1*p45
   port_pressure: [[1, '45'], [1, ['8', '9', '10']]]
@@ -2271,8 +2271,8 @@ instruction_forms:
     offset: '*'
     index: '*'
     scale: '*'
-    post-indexed: true
-    pre-indexed: false
+    post_indexed: true
+    pre_indexed: false
   throughput: 0.5
   latency: 0.0  # 	1*p45
   port_pressure: [[1, '45'], [1, ['8', '9', '10']]]
@@ -2287,8 +2287,8 @@ instruction_forms:
     offset: '*'
     index: ~
     scale: ~
-    post-indexed: false
-    pre-indexed: true
+    post_indexed: false
+    pre_indexed: true
   throughput: 0.5
   latency: 0.0  # 	1*p45
   port_pressure: [[1, '45'], [1, ['8', '9', '10']]]
@@ -2297,8 +2297,8 @@ instruction_forms:
   - class: register
     prefix: "*"
   - class: identifier
-    post-indexed: false
-    pre-indexed: false
+    post_indexed: false
+    pre_indexed: false
   throughput: 0.5
   latency: 0.0  # 	1*p45
   port_pressure: [[1, '45']]
@@ -2307,8 +2307,8 @@ instruction_forms:
   - class: register
     prefix: "*"
   - class: identifier
-    post-indexed: false
-    pre-indexed: false
+    post_indexed: false
+    pre_indexed: false
   throughput: 0.5
   latency: 0.0  # 	1*p45
   port_pressure: [[1, '45']]
@@ -2317,8 +2317,8 @@ instruction_forms:
   - class: register
     prefix: "*"
   - class: identifier
-    post-indexed: true
-    pre-indexed: false
+    post_indexed: true
+    pre_indexed: false
   throughput: 0.5
   latency: 0.0  # 	1*p45
   port_pressure: [[1, '45'], [1, ['8', '9', '10']]]
@@ -2327,8 +2327,8 @@ instruction_forms:
   - class: register
     prefix: "*"
   - class: identifier
-    post-indexed: true
-    pre-indexed: false
+    post_indexed: true
+    pre_indexed: false
   throughput: 0.5
   latency: 0.0  # 	1*p45
   port_pressure: [[1, '45'], [1, ['8', '9', '10']]]
@@ -2337,8 +2337,8 @@ instruction_forms:
   - class: register
     prefix: "*"
   - class: identifier
-    post-indexed: false
-    pre-indexed: true
+    post_indexed: false
+    pre_indexed: true
   throughput: 0.5
   latency: 0.0  # 	1*p45
   port_pressure: [[1, '45'], [1, ['8', '9', '10']]]
@@ -2347,8 +2347,8 @@ instruction_forms:
   - class: register
     prefix: "*"
   - class: identifier
-    post-indexed: false
-    pre-indexed: true
+    post_indexed: false
+    pre_indexed: true
   throughput: 0.5
   latency: 0.0  # 	1*p45
   port_pressure: [[1, '45'], [1, ['8', '9', '10']]]
@@ -2359,8 +2359,8 @@ instruction_forms:
   - class: register
     prefix: x
   - class: identifier
-    post-indexed: false
-    pre-indexed: false
+    post_indexed: false
+    pre_indexed: false
   throughput: 0.5
   latency: 0.0  # 	1*p45
   port_pressure: [[1, '45']]
@@ -2371,8 +2371,8 @@ instruction_forms:
   - class: register
     prefix: x
   - class: identifier
-    post-indexed: false
-    pre-indexed: false
+    post_indexed: false
+    pre_indexed: false
   throughput: 0.5
   latency: 0.0  # 	1*p45
   port_pressure: [[1, '45']]
@@ -2383,8 +2383,8 @@ instruction_forms:
   - class: register
     prefix: x
   - class: identifier
-    post-indexed: true
-    pre-indexed: false
+    post_indexed: true
+    pre_indexed: false
   throughput: 0.5
   latency: 0.0  # 	1*p45
   port_pressure: [[1, '45'], [1, ['8', '9', '10']]]
@@ -2395,8 +2395,8 @@ instruction_forms:
   - class: register
     prefix: x
   - class: identifier
-    post-indexed: true
-    pre-indexed: false
+    post_indexed: true
+    pre_indexed: false
   throughput: 0.5
   latency: 0.0  # 	1*p45
   port_pressure: [[1, '45'], [1, ['8', '9', '10']]]
@@ -2407,8 +2407,8 @@ instruction_forms:
   - class: register
     prefix: x
   - class: identifier
-    post-indexed: false
-    pre-indexed: true
+    post_indexed: false
+    pre_indexed: true
   throughput: 0.5
   latency: 0.0  # 	1*p45
   port_pressure: [[1, '45'], [1, ['8', '9', '10']]]
@@ -2419,8 +2419,8 @@ instruction_forms:
   - class: register
     prefix: x
   - class: identifier
-    post-indexed: false
-    pre-indexed: true
+    post_indexed: false
+    pre_indexed: true
   throughput: 0.5
   latency: 0.0  # 	1*p45
   port_pressure: [[1, '45'], [1, ['8', '9', '10']]]
@@ -2431,8 +2431,8 @@ instruction_forms:
   - class: register
     prefix: w
   - class: identifier
-    post-indexed: false
-    pre-indexed: false
+    post_indexed: false
+    pre_indexed: false
   throughput: 0.5
   latency: 0.0  # 	1*p45
   port_pressure: [[1, '45']]
@@ -2443,8 +2443,8 @@ instruction_forms:
   - class: register
     prefix: w
   - class: identifier
-    post-indexed: false
-    pre-indexed: false
+    post_indexed: false
+    pre_indexed: false
   throughput: 0.5
   latency: 0.0  # 	1*p45
   port_pressure: [[1, '45']]
@@ -2455,8 +2455,8 @@ instruction_forms:
   - class: register
     prefix: w
   - class: identifier
-    post-indexed: true
-    pre-indexed: false
+    post_indexed: true
+    pre_indexed: false
   throughput: 0.5
   latency: 0.0  # 	1*p45
   port_pressure: [[1, '45'], [1, ['8', '9', '10']]]
@@ -2467,8 +2467,8 @@ instruction_forms:
   - class: register
     prefix: w
   - class: identifier
-    post-indexed: true
-    pre-indexed: false
+    post_indexed: true
+    pre_indexed: false
   throughput: 0.5
   latency: 0.0  # 	1*p45
   port_pressure: [[1, '45'], [1, ['8', '9', '10']]]
@@ -2479,8 +2479,8 @@ instruction_forms:
   - class: register
     prefix: w
   - class: identifier
-    post-indexed: false
-    pre-indexed: true
+    post_indexed: false
+    pre_indexed: true
   throughput: 0.5
   latency: 0.0  # 	1*p45
   port_pressure: [[1, '45'], [1, ['8', '9', '10']]]
@@ -2491,8 +2491,8 @@ instruction_forms:
   - class: register
     prefix: w
   - class: identifier
-    post-indexed: false
-    pre-indexed: true
+    post_indexed: false
+    pre_indexed: true
   throughput: 0.5
   latency: 0.0  # 	1*p45
   port_pressure: [[1, '45'], [1, ['8', '9', '10']]]
@@ -2503,8 +2503,8 @@ instruction_forms:
   - class: register
     prefix: d
   - class: identifier
-    post-indexed: false
-    pre-indexed: false
+    post_indexed: false
+    pre_indexed: false
   throughput: 0.5
   latency: 0.0  # 	1*p45
   port_pressure: [[1, '45']]
@@ -2515,8 +2515,8 @@ instruction_forms:
   - class: register
     prefix: d
   - class: identifier
-    post-indexed: false
-    pre-indexed: false
+    post_indexed: false
+    pre_indexed: false
   throughput: 0.5
   latency: 0.0  # 	1*p45
   port_pressure: [[1, '45']]
@@ -2527,8 +2527,8 @@ instruction_forms:
   - class: register
     prefix: d
   - class: identifier
-    post-indexed: true
-    pre-indexed: false
+    post_indexed: true
+    pre_indexed: false
   throughput: 0.5
   latency: 0.0  # 	1*p45
   port_pressure: [[1, '45'], [1, ['8', '9', '10']]]
@@ -2539,8 +2539,8 @@ instruction_forms:
   - class: register
     prefix: d
   - class: identifier
-    post-indexed: true
-    pre-indexed: false
+    post_indexed: true
+    pre_indexed: false
   throughput: 0.5
   latency: 0.0  # 	1*p45
   port_pressure: [[1, '45'], [1, ['8', '9', '10']]]
@@ -2551,8 +2551,8 @@ instruction_forms:
   - class: register
     prefix: d
   - class: identifier
-    post-indexed: false
-    pre-indexed: true
+    post_indexed: false
+    pre_indexed: true
   throughput: 0.5
   latency: 0.0  # 	1*p45
   port_pressure: [[1, '45'], [1, ['8', '9', '10']]]
@@ -2563,8 +2563,8 @@ instruction_forms:
   - class: register
     prefix: d
   - class: identifier
-    post-indexed: false
-    pre-indexed: true
+    post_indexed: false
+    pre_indexed: true
   throughput: 0.5
   latency: 0.0  # 	1*p45
   port_pressure: [[1, '45'], [1, ['8', '9', '10']]]
@@ -2575,8 +2575,8 @@ instruction_forms:
   - class: register
     prefix: q
   - class: identifier
-    post-indexed: false
-    pre-indexed: false
+    post_indexed: false
+    pre_indexed: false
   throughput: 0.5
   latency: 0.0  # 	2*p45
   port_pressure: [[2, '45']]
@@ -2587,8 +2587,8 @@ instruction_forms:
   - class: register
     prefix: q
   - class: identifier
-    post-indexed: false
-    pre-indexed: false
+    post_indexed: false
+    pre_indexed: false
   throughput: 0.5
   latency: 0.0  # 	2*p45
   port_pressure: [[2, '45']]
@@ -2599,8 +2599,8 @@ instruction_forms:
   - class: register
     prefix: q
   - class: identifier
-    post-indexed: true
-    pre-indexed: false
+    post_indexed: true
+    pre_indexed: false
   throughput: 0.5
   latency: 0.0  # 	2*p45
   port_pressure: [[2, '45'], [1, ['8', '9', '10']]]
@@ -2611,8 +2611,8 @@ instruction_forms:
   - class: register
     prefix: q
   - class: identifier
-    post-indexed: true
-    pre-indexed: false
+    post_indexed: true
+    pre_indexed: false
   throughput: 0.5
   latency: 0.0  # 	2*p45
   port_pressure: [[2, '45'], [1, ['8', '9', '10']]]
@@ -2623,8 +2623,8 @@ instruction_forms:
   - class: register
     prefix: q
   - class: identifier
-    post-indexed: false
-    pre-indexed: true
+    post_indexed: false
+    pre_indexed: true
   throughput: 0.5
   latency: 0.0  # 	2*p45
   port_pressure: [[2, '45'], [1, ['8', '9', '10']]]
@@ -2635,8 +2635,8 @@ instruction_forms:
   - class: register
     prefix: q
   - class: identifier
-    post-indexed: false
-    pre-indexed: true
+    post_indexed: false
+    pre_indexed: true
   throughput: 0.5
   latency: 4.0  # 	2*p467
   port_pressure: [[2, '467'], [1, ['8', '9', '10']]]
@@ -2647,8 +2647,8 @@ instruction_forms:
   - class: register
     prefix: s
   - class: identifier
-    post-indexed: false
-    pre-indexed: false
+    post_indexed: false
+    pre_indexed: false
   throughput: 0.5
   latency: 0.0  # 	1*p45
   port_pressure: [[1, '45']]
@@ -2659,8 +2659,8 @@ instruction_forms:
   - class: register
     prefix: s
   - class: identifier
-    post-indexed: false
-    pre-indexed: false
+    post_indexed: false
+    pre_indexed: false
   throughput: 0.5
   latency: 0.0  # 	1*p45
   port_pressure: [[1, '45']]
@@ -2671,8 +2671,8 @@ instruction_forms:
   - class: register
     prefix: s
   - class: identifier
-    post-indexed: true
-    pre-indexed: false
+    post_indexed: true
+    pre_indexed: false
   throughput: 0.5
   latency: 0.0  # 	1*p45
   port_pressure: [[1, '45'], [1, ['8', '9', '10']]]
@@ -2683,8 +2683,8 @@ instruction_forms:
   - class: register
     prefix: s
   - class: identifier
-    post-indexed: true
-    pre-indexed: false
+    post_indexed: true
+    pre_indexed: false
   throughput: 0.5
   latency: 0.0  # 	1*p45
   port_pressure: [[1, '45'], [1, ['8', '9', '10']]]
@@ -2695,8 +2695,8 @@ instruction_forms:
   - class: register
     prefix: s
   - class: identifier
-    post-indexed: false
-    pre-indexed: true
+    post_indexed: false
+    pre_indexed: true
   throughput: 0.5
   latency: 0.0  # 	1*p45
   port_pressure: [[1, '45'], [1, ['8', '9', '10']]]
@@ -2707,8 +2707,8 @@ instruction_forms:
   - class: register
     prefix: s
   - class: identifier
-    post-indexed: false
-    pre-indexed: true
+    post_indexed: false
+    pre_indexed: true
   throughput: 0.5
   latency: 0.0  # 	1*p45
   port_pressure: [[1, '45'], [1, ['8', '9', '10']]]
@@ -2723,8 +2723,8 @@ instruction_forms:
     offset: '*'
     index: '*'
     scale: '*'
-    post-indexed: false
-    pre-indexed: true
+    post_indexed: false
+    pre_indexed: true
   throughput: 0.5
   latency: 0.0  # 	1*p45
   port_pressure: [[1, '45'], [1, ['8', '9', '10']]]

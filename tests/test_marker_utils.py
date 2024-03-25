@@ -285,6 +285,7 @@ class TestMarkerUtils(unittest.TestCase):
             else:
                 kernel_start = 0
             parsed_kernel = self.parser_x86.parse_file(kernel, start_line=kernel_start)
+
             self.assertEqual(
                 test_kernel,
                 parsed_kernel,
@@ -356,7 +357,7 @@ class TestMarkerUtils(unittest.TestCase):
     def test_find_basic_blocks(self):
         self.assertEqual(
             [
-                (k, v[0]["line_number"], v[-1]["line_number"])
+                (k, v[0].line_number, v[-1].line_number)
                 for k, v in find_basic_blocks(self.parsed_x86).items()
             ],
             [
@@ -380,7 +381,7 @@ class TestMarkerUtils(unittest.TestCase):
 
         self.assertEqual(
             [
-                (k, v[0]["line_number"], v[-1]["line_number"])
+                (k, v[0].line_number, v[-1].line_number)
                 for k, v in find_basic_blocks(self.parsed_AArch).items()
             ],
             [
@@ -420,7 +421,7 @@ class TestMarkerUtils(unittest.TestCase):
     def test_find_basic_loop_body(self):
         self.assertEqual(
             [
-                (k, v[0]["line_number"], v[-1]["line_number"])
+                (k, v[0].line_number, v[-1].line_number)
                 for k, v in find_basic_loop_bodies(self.parsed_x86).items()
             ],
             [(".L4", 66, 74), (".L10", 146, 154), (".L28", 290, 300)],
@@ -428,7 +429,7 @@ class TestMarkerUtils(unittest.TestCase):
 
         self.assertEqual(
             [
-                (k, v[0]["line_number"], v[-1]["line_number"])
+                (k, v[0].line_number, v[-1].line_number)
                 for k, v in find_basic_loop_bodies(self.parsed_AArch).items()
             ],
             [

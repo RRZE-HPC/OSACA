@@ -334,7 +334,7 @@ def inspect(args, output_file=sys.stdout):
     # Reduce to marked kernel or chosen section and add semantics
     if args.lines:
         line_range = get_line_range(args.lines)
-        kernel = [line for line in parsed_code if line["line_number"] in line_range]
+        kernel = [line for line in parsed_code if line.line_number in line_range]
         print_length_warning = False
     else:
         kernel = reduce_to_section(parsed_code, isa)
@@ -431,10 +431,7 @@ def get_unmatched_instruction_ratio(kernel):
     """Return ratio of unmatched from total instructions in kernel."""
     unmatched_counter = 0
     for instruction in kernel:
-        if (
-            INSTR_FLAGS.TP_UNKWN in instruction["flags"]
-            and INSTR_FLAGS.LT_UNKWN in instruction["flags"]
-        ):
+        if INSTR_FLAGS.TP_UNKWN in instruction.flags and INSTR_FLAGS.LT_UNKWN in instruction.flags:
             unmatched_counter += 1
     return unmatched_counter / len(kernel)
 

@@ -865,8 +865,8 @@ instruction_forms:
           offset: "*"
           index: "*"
           scale: "*"
-          pre-indexed: "*"
-          post-indexed: "*"
+          pre_indexed: "*"
+          post_indexed: "*"
           source: true
           destination: false
     - name: [ldr, ldur, ldrb, ldrh, ldrsb, ldrsh, ldrsw]
@@ -880,8 +880,8 @@ instruction_forms:
           offset: "*"
           index: "*"
           scale: "*"
-          pre-indexed: "*"
-          post-indexed: "*"
+          pre_indexed: "*"
+          post_indexed: "*"
           source: true
           destination: false
     - name: mov
@@ -910,8 +910,8 @@ instruction_forms:
           offset: "*"
           index: "*"
           scale: "*"
-          pre-indexed: "*"
-          post-indexed: "*"
+          pre_indexed: "*"
+          post_indexed: "*"
           source: false
           destination: true
     - name: [str, stur]
@@ -925,8 +925,8 @@ instruction_forms:
           offset: "*"
           index: "*"
           scale: "*"
-          pre-indexed: "*"
-          post-indexed: "*"
+          pre_indexed: "*"
+          post_indexed: "*"
           source: false
           destination: true
     - name: cmp

@@ -6,7 +6,9 @@ Unit tests for base assembly parser
 import os
 import unittest
 
-from osaca.parser import AttrDict, BaseParser
+from osaca.parser import BaseParser
+from osaca.parser.register import RegisterOperand
+from osaca.parser.immediate import ImmediateOperand
 
 
 class TestBaseParser(unittest.TestCase):
@@ -44,8 +46,8 @@ class TestBaseParser(unittest.TestCase):
             self.parser.parse_instruction(instr1)
 
     def test_register_funcs(self):
-        reg_a1 = AttrDict({"name": "rax"})
-        reg_a2 = AttrDict({"name": "eax"})
+        reg_a1 = RegisterOperand(name="rax")
+        reg_a2 = RegisterOperand(name="eax")
         register_string = "v1.2d"
         with self.assertRaises(NotImplementedError):
             self.parser.is_reg_dependend_of(reg_a1, reg_a2)
@@ -61,7 +63,7 @@ class TestBaseParser(unittest.TestCase):
             self.parser.get_full_reg_name(reg_a1)
 
     def test_normalize_imd(self):
-        imd_hex_1 = {"value": "0x4f"}
+        imd_hex_1 = ImmediateOperand(value="0x4f")
         with self.assertRaises(NotImplementedError):
             self.parser.normalize_imd(imd_hex_1)
 
