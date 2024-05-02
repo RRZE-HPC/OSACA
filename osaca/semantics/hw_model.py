@@ -261,10 +261,10 @@ class MachineModel(object):
         elif o["class"] == "prfop":
             new_operands.append(
                 PrefetchOperand(
-                type_id=o["type"] if "type" in o else None,
-                target=o["target"] if "target" in o else None,
-                policy=o["policy"] if "policy" in o else None,
-            )
+                    type_id=o["type"] if "type" in o else None,
+                    target=o["target"] if "target" in o else None,
+                    policy=o["policy"] if "policy" in o else None,
+                )
             )
         else:
             new_operands.append(o)

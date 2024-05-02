@@ -234,7 +234,7 @@ class TestParserAArch64(unittest.TestCase):
         instruction_form_5 = InstructionForm(
             mnemonic="prfm",
             operands=[
-                PrefetchOperand(type_id=["PLD"],target=["L1"],policy=["KEEP"]),
+                PrefetchOperand(type_id=["PLD"], target=["L1"], policy=["KEEP"]),
                 MemoryOperand(
                     offset=ImmediateOperand(value=2048),
                     base=RegisterOperand(prefix="x", name="26"),
