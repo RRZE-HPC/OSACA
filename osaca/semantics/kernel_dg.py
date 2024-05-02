@@ -9,6 +9,10 @@ from multiprocessing import Manager, Process, cpu_count
 
 import networkx as nx
 from osaca.semantics import INSTR_FLAGS, ArchSemantics, MachineModel
+from osaca.parser.memory import MemoryOperand
+from osaca.parser.register import RegisterOperand
+from osaca.parser.immediate import ImmediateOperand
+from osaca.parser.flag import FlagOperand
 
 
 class KernelDG(nx.DiGraph):
@@ -59,43 +63,42 @@ class KernelDG(nx.DiGraph):
         # 3. get LT value and set as edge weight
         dg = nx.DiGraph()
         for i, instruction_form in enumerate(kernel):
-            dg.add_node(instruction_form["line_number"])
-            dg.nodes[instruction_form["line_number"]]["instruction_form"] = instruction_form
+            dg.add_node(instruction_form.line_number)
+            dg.nodes[instruction_form.line_number]["instruction_form"] = instruction_form
             # add load as separate node if existent
             if (
-                INSTR_FLAGS.HAS_LD in instruction_form["flags"]
-                and INSTR_FLAGS.LD not in instruction_form["flags"]
+                INSTR_FLAGS.HAS_LD in instruction_form.flags
+                and INSTR_FLAGS.LD not in instruction_form.flags
             ):
                 # add new node
-                dg.add_node(instruction_form["line_number"] + 0.1)
-                dg.nodes[instruction_form["line_number"] + 0.1][
-                    "instruction_form"
-                ] = instruction_form
+                dg.add_node(instruction_form.line_number + 0.1)
+                dg.nodes[instruction_form.line_number + 0.1]["instruction_form"] = instruction_form
                 # and set LD latency as edge weight
                 dg.add_edge(
-                    instruction_form["line_number"] + 0.1,
-                    instruction_form["line_number"],
-                    latency=instruction_form["latency"] - instruction_form["latency_wo_load"],
+                    instruction_form.line_number + 0.1,
+                    instruction_form.line_number,
+                    latency=instruction_form.latency - instruction_form.latency_wo_load,
                 )
             for dep, dep_flags in self.find_depending(
                 instruction_form, kernel[i + 1 :], flag_dependencies
             ):
+                # print(instruction_form.line_number,"\t",dep.line_number,"\n")
                 edge_weight = (
-                    instruction_form["latency"]
-                    if "mem_dep" in dep_flags or "latency_wo_load" not in instruction_form
-                    else instruction_form["latency_wo_load"]
+                    instruction_form.latency
+                    if "mem_dep" in dep_flags or instruction_form.latency_wo_load is None
+                    else instruction_form.latency_wo_load
                 )
                 if "storeload_dep" in dep_flags and self.model is not None:
                     edge_weight += self.model.get("store_to_load_forward_latency", 0)
                 if "p_indexed" in dep_flags and self.model is not None:
                     edge_weight = self.model.get("p_index_latency", 1)
                 dg.add_edge(
-                    instruction_form["line_number"],
-                    dep["line_number"],
+                    instruction_form.line_number,
+                    dep.line_number,
                     latency=edge_weight,
                 )
 
-                dg.nodes[dep["line_number"]]["instruction_form"] = dep
+                dg.nodes[dep.line_number]["instruction_form"] = dep
         return dg
 
     def check_for_loopcarried_dep(self, kernel, timeout=10, flag_dependencies=False):
@@ -114,7 +117,7 @@ class KernelDG(nx.DiGraph):
         tmp_kernel = [] + kernel
         for orig_iform in kernel:
             temp_iform = copy.copy(orig_iform)
-            temp_iform["line_number"] += offset
+            temp_iform.line_number += offset
             tmp_kernel.append(temp_iform)
         # get dependency graph
         dg = self.create_DG(tmp_kernel, flag_dependencies)
@@ -224,26 +227,26 @@ class KernelDG(nx.DiGraph):
 
     def get_critical_path(self):
         """Find and return critical path after the creation of a directed graph."""
-        max_latency_instr = max(self.kernel, key=lambda k: k["latency"])
+        max_latency_instr = max(self.kernel, key=lambda k: k.latency)
         if nx.algorithms.dag.is_directed_acyclic_graph(self.dg):
             longest_path = nx.algorithms.dag.dag_longest_path(self.dg, weight="latency")
             # TODO verify that we can remove the next two lince due to earlier initialization
             for line_number in longest_path:
-                self._get_node_by_lineno(int(line_number))["latency_cp"] = 0
+                self._get_node_by_lineno(int(line_number)).latency_cp = 0
             # set cp latency to instruction
             path_latency = 0.0
             for s, d in nx.utils.pairwise(longest_path):
                 node = self._get_node_by_lineno(int(s))
-                node["latency_cp"] = self.dg.edges[(s, d)]["latency"]
-                path_latency += node["latency_cp"]
+                node.latency_cp = self.dg.edges[(s, d)]["latency"]
+                path_latency += node.latency_cp
             # add latency for last instruction
             node = self._get_node_by_lineno(int(longest_path[-1]))
-            node["latency_cp"] = node["latency"]
-            if max_latency_instr["latency"] > path_latency:
-                max_latency_instr["latency_cp"] = float(max_latency_instr["latency"])
+            node.latency_cp = node.latency
+            if max_latency_instr.latency > path_latency:
+                max_latency_instr.latency_cp = float(max_latency_instr.latency)
                 return [max_latency_instr]
             else:
-                return [x for x in self.kernel if x["line_number"] in longest_path]
+                return [x for x in self.kernel if x.line_number in longest_path]
         else:
             # split to DAG
             raise NotImplementedError("Kernel is cyclic.")
@@ -272,8 +275,8 @@ class KernelDG(nx.DiGraph):
         if instruction_form.semantic_operands is None:
             return
         for dst in chain(
-            instruction_form.semantic_operands.destination,
-            instruction_form.semantic_operands.src_dst,
+            instruction_form.semantic_operands["destination"],
+            instruction_form.semantic_operands["src_dst"],
         ):
             # TODO instructions before must be considered as well, if they update registers
             # not used by insruction_form. E.g., validation/build/A64FX/gcc/O1/gs-2d-5pt.marked.s
@@ -282,27 +285,31 @@ class KernelDG(nx.DiGraph):
             for i, instr_form in enumerate(instructions):
                 self._update_reg_changes(instr_form, register_changes)
                 # print("  TO", instr_form.line, register_changes)
-                if "register" in dst:
+                if isinstance(dst, RegisterOperand):
                     # read of register
-                    if self.is_read(dst.register, instr_form):
-                        if dst.get("pre_indexed", False) or dst.get("post_indexed", False):
+                    if self.is_read(dst, instr_form):
+                        if (
+                            dst.pre_indexed
+                            or dst.post_indexed
+                            or (isinstance(dst.post_indexed, dict))
+                        ):
                             yield instr_form, ["p_indexed"]
                         else:
                             yield instr_form, []
                     # write to register -> abort
-                    if self.is_written(dst.register, instr_form):
+                    if self.is_written(dst, instr_form):
                         break
-                if "flag" in dst and flag_dependencies:
+                if isinstance(dst, FlagOperand) and flag_dependencies:
                     # read of flag
-                    if self.is_read(dst.flag, instr_form):
+                    if self.is_read(dst, instr_form):
                         yield instr_form, []
                     # write to flag -> abort
-                    if self.is_written(dst.flag, instr_form):
+                    if self.is_written(dst, instr_form):
                         break
-                if "memory" in dst:
+                if isinstance(dst, MemoryOperand):
                     # base register is altered during memory access
-                    if "pre_indexed" in dst.memory:
-                        if self.is_written(dst.memory.base, instr_form):
+                    if dst.pre_indexed:
+                        if self.is_written(dst.base, instr_form):
                             break
                     # if dst.memory.base:
                     #    if self.is_read(dst.memory.base, instr_form):
@@ -310,18 +317,18 @@ class KernelDG(nx.DiGraph):
                     # if dst.memory.index:
                     #    if self.is_read(dst.memory.index, instr_form):
                     #        yield instr_form, []
-                    if "post_indexed" in dst.memory:
+                    if dst.post_indexed:
                         # Check for read of base register until overwrite
-                        if self.is_written(dst.memory.base, instr_form):
+                        if self.is_written(dst.base, instr_form):
                             break
                     # TODO record register changes
                     #      (e.g., mov, leaadd, sub, inc, dec) in instructions[:i]
                     #      and pass to is_memload and is_memstore to consider relevance.
                     # load from same location (presumed)
-                    if self.is_memload(dst.memory, instr_form, register_changes):
+                    if self.is_memload(dst, instr_form, register_changes):
                         yield instr_form, ["storeload_dep"]
                     # store to same location (presumed)
-                    if self.is_memstore(dst.memory, instr_form, register_changes):
+                    if self.is_memstore(dst, instr_form, register_changes):
                         break
                 self._update_reg_changes(instr_form, register_changes, only_postindexed=True)
 
@@ -365,32 +372,28 @@ class KernelDG(nx.DiGraph):
         if instruction_form.semantic_operands is None:
             return is_read
         for src in chain(
-            instruction_form.semantic_operands.source,
-            instruction_form.semantic_operands.src_dst,
+            instruction_form.semantic_operands["source"],
+            instruction_form.semantic_operands["src_dst"],
         ):
-            if "register" in src:
-                is_read = self.parser.is_reg_dependend_of(register, src.register) or is_read
-            if "flag" in src:
-                is_read = self.parser.is_flag_dependend_of(register, src.flag) or is_read
-            if "memory" in src:
-                if src.memory.base is not None:
-                    is_read = self.parser.is_reg_dependend_of(register, src.memory.base) or is_read
-                if src.memory.index is not None:
-                    is_read = (
-                        self.parser.is_reg_dependend_of(register, src.memory.index) or is_read
-                    )
+            if isinstance(src, RegisterOperand):
+                is_read = self.parser.is_reg_dependend_of(register, src) or is_read
+            if isinstance(src, FlagOperand):
+                is_read = self.parser.is_flag_dependend_of(register, src) or is_read
+            if isinstance(src, MemoryOperand):
+                if src.base is not None:
+                    is_read = self.parser.is_reg_dependend_of(register, src.base) or is_read
+                if src.index is not None and isinstance(src.index, RegisterOperand):
+                    is_read = self.parser.is_reg_dependend_of(register, src.index) or is_read
         # Check also if read in destination memory address
         for dst in chain(
-            instruction_form.semantic_operands.destination,
-            instruction_form.semantic_operands.src_dst,
+            instruction_form.semantic_operands["destination"],
+            instruction_form.semantic_operands["src_dst"],
         ):
-            if "memory" in dst:
-                if dst.memory.base is not None:
-                    is_read = self.parser.is_reg_dependend_of(register, dst.memory.base) or is_read
-                if dst.memory.index is not None:
-                    is_read = (
-                        self.parser.is_reg_dependend_of(register, dst.memory.index) or is_read
-                    )
+            if isinstance(dst, MemoryOperand):
+                if dst.base is not None:
+                    is_read = self.parser.is_reg_dependend_of(register, dst.base) or is_read
+                if dst.index is not None:
+                    is_read = self.parser.is_reg_dependend_of(register, dst.index) or is_read
         return is_read
 
     def is_memload(self, mem, instruction_form, register_changes={}):
@@ -398,29 +401,37 @@ class KernelDG(nx.DiGraph):
         if instruction_form.semantic_operands is None:
             return False
         for src in chain(
-            instruction_form.semantic_operands.source,
-            instruction_form.semantic_operands.src_dst,
+            instruction_form.semantic_operands["source"],
+            instruction_form.semantic_operands["src_dst"],
         ):
             # Here we check for mem dependecies only
-            if "memory" not in src:
+            if not isinstance(src, MemoryOperand):
                 continue
-            src = src.memory
+            # src = src.memory
 
             # determine absolute address change
             addr_change = 0
-            if src.offset and "value" in src.offset:
+            if isinstance(src.offset, ImmediateOperand) and src.offset.value is not None:
                 addr_change += src.offset.value
             if mem.offset:
                 addr_change -= mem.offset.value
             if mem.base and src.base:
                 base_change = register_changes.get(
-                    src.base.get("prefix", "") + src.base.name,
-                    {"name": src.base.get("prefix", "") + src.base.name, "value": 0},
+                    (src.base.prefix if src.base.prefix is not None else "") + src.base.name,
+                    {
+                        "name": (src.base.prefix if src.base.prefix is not None else "")
+                        + src.base.name,
+                        "value": 0,
+                    },
                 )
                 if base_change is None:
                     # Unknown change occurred
                     continue
-                if mem.base.get("prefix", "") + mem.base["name"] != base_change["name"]:
+                if (
+                    mem.base.prefix
+                    if mem.base.prefix is not None
+                    else "" + mem.base.name != base_change["name"]
+                ):
                     # base registers do not match
                     continue
                 addr_change += base_change["value"]
@@ -429,8 +440,12 @@ class KernelDG(nx.DiGraph):
                 continue
             if mem.index and src.index:
                 index_change = register_changes.get(
-                    src.index.get("prefix", "") + src.index.name,
-                    {"name": src.index.get("prefix", "") + src.index.name, "value": 0},
+                    (src.index.prefix if src.index.prefix is not None else "") + src.index.name,
+                    {
+                        "name": (src.index.prefix if src.index.prefix is not None else "")
+                        + src.index.name,
+                        "value": 0,
+                    },
                 )
                 if index_change is None:
                     # Unknown change occurred
@@ -438,7 +453,11 @@ class KernelDG(nx.DiGraph):
                 if mem.scale != src.scale:
                     # scale factors do not match
                     continue
-                if mem.index.get("prefix", "") + mem.index["name"] != index_change["name"]:
+                if (
+                    mem.index.prefix
+                    if mem.index.prefix is not None
+                    else "" + mem.index.name != index_change["name"]
+                ):
                     # index registers do not match
                     continue
                 addr_change += index_change["value"] * src.scale
@@ -456,28 +475,24 @@ class KernelDG(nx.DiGraph):
         if instruction_form.semantic_operands is None:
             return is_written
         for dst in chain(
-            instruction_form.semantic_operands.destination,
-            instruction_form.semantic_operands.src_dst,
+            instruction_form.semantic_operands["destination"],
+            instruction_form.semantic_operands["src_dst"],
         ):
-            if "register" in dst:
-                is_written = self.parser.is_reg_dependend_of(register, dst.register) or is_written
-            if "flag" in dst:
-                is_written = self.parser.is_flag_dependend_of(register, dst.flag) or is_written
-            if "memory" in dst:
-                if "pre_indexed" in dst.memory or "post_indexed" in dst.memory:
-                    is_written = (
-                        self.parser.is_reg_dependend_of(register, dst.memory.base) or is_written
-                    )
+            if isinstance(dst, RegisterOperand):
+                is_written = self.parser.is_reg_dependend_of(register, dst) or is_written
+            if isinstance(dst, FlagOperand):
+                is_written = self.parser.is_flag_dependend_of(register, dst) or is_written
+            if isinstance(dst, MemoryOperand):
+                if dst.pre_indexed or dst.post_indexed:
+                    is_written = self.parser.is_reg_dependend_of(register, dst.base) or is_written
         # Check also for possible pre- or post-indexing in memory addresses
         for src in chain(
-            instruction_form.semantic_operands.source,
-            instruction_form.semantic_operands.src_dst,
+            instruction_form.semantic_operands["source"],
+            instruction_form.semantic_operands["src_dst"],
         ):
-            if "memory" in src:
-                if "pre_indexed" in src.memory or "post_indexed" in src.memory:
-                    is_written = (
-                        self.parser.is_reg_dependend_of(register, src.memory.base) or is_written
-                    )
+            if isinstance(src, MemoryOperand):
+                if src.pre_indexed or src.post_indexed:
+                    is_written = self.parser.is_reg_dependend_of(register, src.base) or is_written
         return is_written
 
     def is_memstore(self, mem, instruction_form, register_changes={}):
@@ -486,11 +501,11 @@ class KernelDG(nx.DiGraph):
         if instruction_form.semantic_operands is None:
             return is_store
         for dst in chain(
-            instruction_form.semantic_operands.destination,
-            instruction_form.semantic_operands.src_dst,
+            instruction_form.semantic_operands["destination"],
+            instruction_form.semantic_operands["src_dst"],
         ):
-            if "memory" in dst:
-                is_store = mem == dst["memory"] or is_store
+            if isinstance(dst, MemoryOperand):
+                is_store = mem == dst or is_store
         return is_store
 
     def export_graph(self, filepath=None):
@@ -503,11 +518,11 @@ class KernelDG(nx.DiGraph):
         """
         graph = copy.deepcopy(self.dg)
         cp = self.get_critical_path()
-        cp_line_numbers = [x["line_number"] for x in cp]
+        cp_line_numbers = [x.line_number for x in cp]
         lcd = self.get_loopcarried_dependencies()
         lcd_line_numbers = {}
         for dep in lcd:
-            lcd_line_numbers[dep] = [x["line_number"] for x, lat in lcd[dep]["dependencies"]]
+            lcd_line_numbers[dep] = [x.line_number for x, lat in lcd[dep]["dependencies"]]
         # add color scheme
         graph.graph["node"] = {"colorscheme": "accent8"}
         graph.graph["edge"] = {"colorscheme": "accent8"}
@@ -518,7 +533,7 @@ class KernelDG(nx.DiGraph):
             max_line_number = max(lcd_line_numbers[dep])
             graph.add_edge(max_line_number, min_line_number)
             graph.edges[max_line_number, min_line_number]["latency"] = [
-                lat for x, lat in lcd[dep]["dependencies"] if x["line_number"] == max_line_number
+                lat for x, lat in lcd[dep]["dependencies"] if x.line_number == max_line_number
             ]
 
         # add label to edges
@@ -527,7 +542,7 @@ class KernelDG(nx.DiGraph):
 
         # add CP values to graph
         for n in cp:
-            graph.nodes[n["line_number"]]["instruction_form"]["latency_cp"] = n["latency_cp"]
+            graph.nodes[n.line_number]["instruction_form"].latency_cp = n.latency_cp
 
         # color CP and LCD
         for n in graph.nodes:
@@ -546,8 +561,8 @@ class KernelDG(nx.DiGraph):
         # color edges
         for e in graph.edges:
             if (
-                graph.nodes[e[0]]["instruction_form"]["line_number"] in cp_line_numbers
-                and graph.nodes[e[1]]["instruction_form"]["line_number"] in cp_line_numbers
+                graph.nodes[e[0]]["instruction_form"].line_number in cp_line_numbers
+                and graph.nodes[e[1]]["instruction_form"].line_number in cp_line_numbers
                 and e[0] < e[1]
             ):
                 bold_edge = True
@@ -559,9 +574,8 @@ class KernelDG(nx.DiGraph):
                     graph.edges[e]["penwidth"] = 3
             for dep in lcd_line_numbers:
                 if (
-                    graph.nodes[e[0]]["instruction_form"]["line_number"] in lcd_line_numbers[dep]
-                    and graph.nodes[e[1]]["instruction_form"]["line_number"]
-                    in lcd_line_numbers[dep]
+                    graph.nodes[e[0]]["instruction_form"].line_number in lcd_line_numbers[dep]
+                    and graph.nodes[e[1]]["instruction_form"].line_number in lcd_line_numbers[dep]
                 ):
                     graph.edges[e]["color"] = graph.nodes[e[1]]["fillcolor"]
 
@@ -574,12 +588,12 @@ class KernelDG(nx.DiGraph):
                 graph.nodes[n]["fontsize"] = 11.0
             else:
                 node = graph.nodes[n]["instruction_form"]
-                if node["instruction"] is not None:
-                    mapping[n] = "{}: {}".format(n, node["instruction"])
+                if node.mnemonic is not None:
+                    mapping[n] = "{}: {}".format(n, node.mnemonic)
                 else:
-                    label = "label" if node["label"] else None
-                    label = "directive" if node["directive"] else label
-                    label = "comment" if node["comment"] and label is None else label
+                    label = "label" if node.label is not None else None
+                    label = "directive" if node.directive is not None else label
+                    label = "comment" if node.comment is not None and label is None else label
                     mapping[n] = "{}: {}".format(n, label)
                     graph.nodes[n]["fontname"] = "italic"
                     graph.nodes[n]["fontsize"] = 11.0
