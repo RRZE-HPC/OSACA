@@ -287,17 +287,13 @@ class ISASemantics(object):
                     dict_key = (
                         "src_dst"
                         if op.source and op.destination
-                        else "source"
-                        if op.source
-                        else "destination"
+                        else "source" if op.source else "destination"
                     )
                 else:
                     dict_key = (
                         "src_dst"
                         if op["source"] and op["destination"]
-                        else "source"
-                        if op["source"]
-                        else "destination"
+                        else "source" if op["source"] else "destination"
                     )
                 op_dict[dict_key].append(op)
 

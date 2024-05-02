@@ -1,4 +1,5 @@
 """Open Source Architecture Code Analyzer"""
+
 name = "osaca"
 __version__ = "0.5.3"
 

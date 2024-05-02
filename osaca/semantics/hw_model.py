@@ -124,9 +124,9 @@ class MachineModel(object):
                     new_iform = InstructionForm(
                         mnemonic=iform["name"].upper() if "name" in iform else None,
                         operands=iform["operands"] if "operands" in iform else [],
-                        hidden_operands=iform["hidden_operands"]
-                        if "hidden_operands" in iform
-                        else [],
+                        hidden_operands=(
+                            iform["hidden_operands"] if "hidden_operands" in iform else []
+                        ),
                         directive_id=iform["directive"] if "directive" in iform else None,
                         comment_id=iform["comment"] if "comment" in iform else None,
                         line=iform["line"] if "line" in iform else None,
@@ -136,14 +136,16 @@ class MachineModel(object):
                         uops=iform["uops"] if "uops" in iform else None,
                         port_pressure=iform["port_pressure"] if "port_pressure" in iform else None,
                         operation=iform["operation"] if "operation" in iform else None,
-                        breaks_dependency_on_equal_operands=iform[
-                            "breaks_dependency_on_equal_operands"
-                        ]
-                        if "breaks_dependency_on_equal_operands" in iform
-                        else False,
-                        semantic_operands=iform["semantic_operands"]
-                        if "semantic_operands" in iform
-                        else {"source": [], "destination": [], "src_dst": []},
+                        breaks_dependency_on_equal_operands=(
+                            iform["breaks_dependency_on_equal_operands"]
+                            if "breaks_dependency_on_equal_operands" in iform
+                            else False
+                        ),
+                        semantic_operands=(
+                            iform["semantic_operands"]
+                            if "semantic_operands" in iform
+                            else {"source": [], "destination": [], "src_dst": []}
+                        ),
                     )
                     # List containing classes with same name/instruction
                     self._data["instruction_forms_dict"][iform["name"]].append(new_iform)
