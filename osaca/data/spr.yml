@@ -2,9 +2,9 @@ osaca_version: 0.5.3
 micro_architecture: Sapphire Rapids
 arch_code: SPR
 isa: x86
-ROB_size: ~ 
+ROB_size: ~
 retired_uOps_per_cycle: ~
-scheduler_size: ~ 
+scheduler_size: ~
 hidden_loads: false
 load_latency: {gpr: 5.0, mm: 5.0, xmm: 5.0, ymm: 5.0, zmm: 5.0}
 load_throughput:
@@ -13,7 +13,7 @@ load_throughput:
 - {dst: xmm, base: "*", index: "*", offset: "*", scale: "*", port_pressure: [[1, ['2', '3', '11']]]}
 - {dst: gpr, base: "*", index: "*", offset: "*", scale: "*", port_pressure: [[1, ['2', '3', '11']]]}
 load_throughput_default: [[1, ['2', '3', '11']]]
-store_throughput: 
+store_throughput:
 - {src: zmm, base: "*", index: "*", offset: "*", scale: "*", port_pressure:  [[1, '78'], [1, '4'], [1, '9']]}
 - {src: ymm, base: "*", index: "*", offset: "*", scale: "*", port_pressure:  [[1, '78'], [1, '49']]}
 - {src: xmm, base: "*", index: "*", offset: "*", scale: "*", port_pressure:  [[1, '78'], [1, '49']]}
@@ -2946,7 +2946,7 @@ instruction_forms:
     name: xmm                                    # ibench
   - class: register                              # ibench
     name: xmm                                    # ibench
-  latency: 5                                     # ibench
+  latency: 4                                     # ibench
   port_pressure: [[1, '01']]                     # ibench
   throughput: 0.5                                # ibench
   uops: 1                                        # ibench
@@ -2959,7 +2959,7 @@ instruction_forms:
   - class: register                              # ibench
     name: xmm                                    # ibench
     mask: True                                   # ibench
-  latency: 5                                     # ibench
+  latency: 4                                     # ibench
   port_pressure: [[1, '01']]                     # ibench
   throughput: 0.5                                # ibench
   uops: 1                                        # ibench
@@ -3338,7 +3338,7 @@ instruction_forms:
   port_pressure: [[1, '01']]                     # ibench
   throughput: 0.5                                # ibench
   uops: 1                                        # ibench
-- name: vgatherdpd  # with load                                                   # ibench
+- name: [vgatherdpd, vgatherqpd]  # with load                                                   # ibench
   operands:                                                                       # ibench
   - class: register                                                               # ibench
     name: xmm                                                                     # ibench
@@ -3353,7 +3353,7 @@ instruction_forms:
   port_pressure: [[1, '015'], [1, '15'], [1, '0'], [3, ['2','3','11']]]  # ibench
   throughput: 1.0                                                                 # ibench
   uops: 9                                                                         # ibench
-- name: vgatherdpd  # with load                                                   # ibench
+- name: [vgatherdpd, vgatherqpd]  # with load                                                   # ibench
   operands:                                                                       # ibench
   - class: register                                                               # ibench
     name: ymm                                                                     # ibench
@@ -3368,7 +3368,7 @@ instruction_forms:
   port_pressure: [[1, '015'], [1, '15'], [1, '0'], [6, ['2','3','11']]]  # ibench
   throughput: 2.0                                                                 # ibench
   uops: 16                                                                        # ibench
-- name: vgatherdpd  # with load                                                   # ibench
+- name: [vgatherdpd, vgatherqpd]  # with load                                                   # ibench
   operands:                                                                       # ibench
   - class: register                                                               # ibench
     name: zmm                                                                     # ibench
@@ -3383,7 +3383,7 @@ instruction_forms:
   port_pressure: [[1, '015'], [1, '15'], [1, '0'], [9, ['2','3','11']]]  # ibench
   throughput: 3.0                                                                 # ibench
   uops: 31                                                                       # ibench
-- name: vgatherdpd  # with load                                                   # ibench
+- name: [vgatherdpd, vgatherqpd]  # with load                                                   # ibench
   operands:                                                                       # ibench
   - class: memory                                                                 # ibench
     base: "*"                                                                     # ibench
@@ -3397,7 +3397,7 @@ instruction_forms:
   port_pressure: [[1, '015'], [1, '15'], [1, '0'], [3, ['2','3','11']]]  # ibench
   throughput: 1.0                                                                 # ibench
   uops: 9                                                                         # ibench
-- name: vgatherdpd  # with load                                                   # ibench
+- name: [vgatherdpd, vgatherqpd]  # with load                                                   # ibench
   operands:                                                                       # ibench
   - class: memory                                                                 # ibench
     base: "*"                                                                     # ibench
@@ -3411,7 +3411,7 @@ instruction_forms:
   port_pressure: [[1, '015'], [1, '15'], [1, '0'], [6, ['2','3','11']]]  # ibench
   throughput: 2.0                                                                 # ibench
   uops: 16                                                                        # ibench
-- name: vgatherdpd  # with load                                                   # ibench
+- name: [vgatherdpd, vgatherqpd]  # with load                                                   # ibench
   operands:                                                                       # ibench
   - class: memory                                                                 # ibench
     base: "*"                                                                     # ibench
@@ -3520,7 +3520,7 @@ instruction_forms:
     name: xmm                 # ibench
   - class: register           # ibench
     name: xmm                 # ibench
-  latency: 5                  # ibench
+  latency: 4                  # ibench
   port_pressure: [[1, '01']]  # ibench
   throughput: 0.5             # ibench
   uops: 1                     # ibench
@@ -3712,7 +3712,7 @@ instruction_forms:
   port_pressure: [[1, '01']]  # ibench
   throughput: 0.5             # ibench
   uops: 1                     # ibench
-- name: vpaddd                    # ibench
+- name: [vpaddd, vpaddq]                    # ibench
   operands:                       # ibench
   - class: register               # ibench
     name: xmm                     # ibench
@@ -3724,7 +3724,7 @@ instruction_forms:
   port_pressure: [[1, '015']]     # ibench
   throughput: 0.3333333333333333  # ibench
   uops: 1                         # ibench
-- name: vpaddd                    # ibench
+- name: [vpaddd, vpaddq]                    # ibench
   operands:                       # ibench
   - class: register               # ibench
     name: ymm                     # ibench
@@ -3736,7 +3736,7 @@ instruction_forms:
   port_pressure: [[1, '015']]     # ibench
   throughput: 0.3333333333333333  # ibench
   uops: 1                         # ibench
-- name: vpaddd                # ibench
+- name: [vpaddd, vpaddq]                # ibench
   operands:                   # ibench
   - class: register           # ibench
     name: zmm                 # ibench
@@ -3748,7 +3748,7 @@ instruction_forms:
   port_pressure: [[1, '05']]  # ibench
   throughput: 0.5             # ibench
   uops: 1                     # ibench
-- name: vpaddd                    # ibench
+- name: [vpaddd, vpaddq]                    # ibench
   operands:                       # ibench
   - class: register               # ibench
     name: xmm                     # ibench
@@ -3761,7 +3761,7 @@ instruction_forms:
   port_pressure: [[1, '015']]     # ibench
   throughput: 0.3333333333333333  # ibench
   uops: 1                         # ibench
-- name: vpaddd                    # ibench
+- name: [vpaddd, vpaddq]                    # ibench
   operands:                       # ibench
   - class: register               # ibench
     name: ymm                     # ibench
@@ -3774,7 +3774,7 @@ instruction_forms:
   port_pressure: [[1, '015']]     # ibench
   throughput: 0.3333333333333333  # ibench
   uops: 1                         # ibench
-- name: vpaddd                # ibench
+- name: [vpaddd, vpaddq]                # ibench
   operands:                   # ibench
   - class: register           # ibench
     name: zmm                 # ibench
@@ -4079,6 +4079,15 @@ instruction_forms:
   port_pressure: [[1, ['0','1','5','6','11']]]
   throughput: 0.20
   uops: 1
+- name: vcvtdq2pd                                 # uops.info
+  operands:                                       # uops.info
+  - class: register                               # uops.info
+    name: ymm                                     # uops.info
+  - class: register                               # uops.info
+    name: zmm                                     # uops.info
+  latency: 7                                      # uops.info
+  port_pressure: [[1, '0'], [1, '5']]           # uops.info
+  throughput: 1                                   # uops.info
 - name: vcvtss2si                                 # uops.info
   operands:                                       # uops.info
   - class: register                               # uops.info
@@ -4258,7 +4267,7 @@ instruction_forms:
   throughput: 0.5             # uops.info
   uops: 1                     # uops.info
 ############## ||                  #################
-############## \/ assumed from ICX ################# 
+############## \/ assumed from ICX #################
 - name: vinsertf128
   operands:
   - class: immediate
@@ -4413,6 +4422,28 @@ instruction_forms:
   port_pressure: [[1, '5']]
   throughput: 1.0
   uops: 1
+- name: vcvtsi2sd
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 4
+  port_pressure: [[1, '01'], [1, '5']]
+  throughput: 1.0
+  uops: 3
+- name: vcvtdq2pd
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: ymm
+  latency: 7
+  port_pressure: [[1, '01'], [1, '5']]
+  throughput: 1.0
+  uops: 2
 - name: vcvtsi2ss
   operands:
   - class: register
@@ -4421,9 +4452,9 @@ instruction_forms:
     name: xmm
   - class: register
     name: xmm
-  latency: 2
-  port_pressure: [[1, '01'], [2, '5']]
-  throughput: 2.0
+  latency: 4
+  port_pressure: [[1, '01'], [1, '5']]
+  throughput: 1.0
   uops: 3
 - name: [vextractf128, vextracti128]
   operands:
@@ -4599,6 +4630,20 @@ instruction_forms:
   port_pressure: [[1, '5']]  # uops.info
   throughput: 1.0            # uops.info
   uops: 1                    # uops.info
+- name: vpinsrd              # asmbench
+  operands:                  # asmbench
+  - class: immediate         # asmbench
+    imd: int                 # asmbench
+  - class: register          # asmbench
+    name: gpr                # asmbench
+  - class: register          # asmbench
+    name: xmm                # asmbench
+  - class: register          # asmbench
+    name: xmm                # asmbench
+  latency: 1                 # asmbench
+  port_pressure: [[1, '15'], [1, '1']]  # asmbench
+  throughput: 1.0            # asmbench
+  uops: 2                    # asmbench
 - name: vpalignr             # asmbench
   operands:                  # asmbench
   - class: immediate         # asmbench
@@ -4725,7 +4770,7 @@ instruction_forms:
   port_pressure: [[1, '5']]  # asmbench
   throughput: 1.0            # asmbench
   uops: 1                    # asmbench
-- name: vpermd               # asmbench
+- name: [vpermd, vpermt2q]               # asmbench
   operands:                  # asmbench
   - class: register          # asmbench
     name: zmm                # asmbench
@@ -4737,7 +4782,7 @@ instruction_forms:
   port_pressure: [[1, '5']]  # asmbench
   throughput: 1.0            # asmbench
   uops: 1                    # asmbench
-- name: vpermd               # asmbench
+- name: [vpermd, vpermt2q]               # asmbench
   operands:                  # asmbench
   - class: register          # asmbench
     name: zmm                # asmbench
@@ -4797,6 +4842,156 @@ instruction_forms:
     name: zmm                # asmbench
     mask: True               # asmbench
   latency: 3                 # asmbench
+  port_pressure: [[1, '5']]  # asmbench
+  throughput: 1.0            # asmbench
+  uops: 1                    # asmbench
+- name: [vpermilpd, vpermilps]   # asmbench
+  operands:                  # asmbench
+  - class: register          # asmbench
+    name: xmm                # asmbench
+  - class: register          # asmbench
+    name: xmm                # asmbench
+  - class: register          # asmbench
+    name: xmm                # asmbench
+  latency: 1                 # asmbench
+  port_pressure: [[1, '5']]  # asmbench
+  throughput: 1.0            # asmbench
+  uops: 1                    # asmbench
+- name: [vpermilpd, vpermilps]   # asmbench
+  operands:                  # asmbench
+  - class: register          # asmbench
+    name: xmm                # asmbench
+  - class: register          # asmbench
+    name: xmm                # asmbench
+  - class: register          # asmbench
+    name: xmm                # asmbench
+    mask: True               # asmbench
+  latency: 1                 # asmbench
+  port_pressure: [[1, '5']]  # asmbench
+  throughput: 1.0            # asmbench
+  uops: 1                    # asmbench
+- name: [vpermilpd, vpermilps]   # asmbench
+  operands:                  # asmbench
+  - class: register          # asmbench
+    name: ymm                # asmbench
+  - class: register          # asmbench
+    name: ymm                # asmbench
+  - class: register          # asmbench
+    name: ymm                # asmbench
+  latency: 1                 # asmbench
+  port_pressure: [[1, '5']]  # asmbench
+  throughput: 1.0            # asmbench
+  uops: 1                    # asmbench
+- name: [vpermilpd, vpermilps]   # asmbench
+  operands:                  # asmbench
+  - class: register          # asmbench
+    name: ymm                # asmbench
+  - class: register          # asmbench
+    name: ymm                # asmbench
+  - class: register          # asmbench
+    name: ymm                # asmbench
+    mask: True               # asmbench
+  latency: 1                 # asmbench
+  port_pressure: [[1, '5']]  # asmbench
+  throughput: 1.0            # asmbench
+  uops: 1                    # asmbench
+- name: [vpermilpd, vpermilps]   # asmbench
+  operands:                  # asmbench
+  - class: register          # asmbench
+    name: zmm                # asmbench
+  - class: register          # asmbench
+    name: zmm                # asmbench
+  - class: register          # asmbench
+    name: zmm                # asmbench
+  latency: 1                 # asmbench
+  port_pressure: [[1, '5']]  # asmbench
+  throughput: 1.0            # asmbench
+  uops: 1                    # asmbench
+- name: [vpermilpd, vpermilps]   # asmbench
+  operands:                  # asmbench
+  - class: register          # asmbench
+    name: zmm                # asmbench
+  - class: register          # asmbench
+    name: zmm                # asmbench
+  - class: register          # asmbench
+    name: zmm                # asmbench
+    mask: True               # asmbench
+  latency: 1                 # asmbench
+  port_pressure: [[1, '5']]  # asmbench
+  throughput: 1.0            # asmbench
+  uops: 1                    # asmbench
+- name: [vpermilpd, vpermilps]   # asmbench
+  operands:                  # asmbench
+  - class: immediate
+    imd: int
+  - class: register          # asmbench
+    name: xmm                # asmbench
+  - class: register          # asmbench
+    name: xmm                # asmbench
+  latency: 1                 # asmbench
+  port_pressure: [[1, '5']]  # asmbench
+  throughput: 1.0            # asmbench
+  uops: 1                    # asmbench
+- name: [vpermilpd, vpermilps]   # asmbench
+  operands:                  # asmbench
+  - class: immediate
+    imd: int
+  - class: register          # asmbench
+    name: xmm                # asmbench
+  - class: register          # asmbench
+    name: xmm                # asmbench
+    mask: True               # asmbench
+  latency: 1                 # asmbench
+  port_pressure: [[1, '5']]  # asmbench
+  throughput: 1.0            # asmbench
+  uops: 1                    # asmbench
+- name: [vpermilpd, vpermilps]   # asmbench
+  operands:                  # asmbench
+  - class: immediate
+    imd: int
+  - class: register          # asmbench
+    name: ymm                # asmbench
+  - class: register          # asmbench
+    name: ymm                # asmbench
+  latency: 1                 # asmbench
+  port_pressure: [[1, '5']]  # asmbench
+  throughput: 1.0            # asmbench
+  uops: 1                    # asmbench
+- name: [vpermilpd, vpermilps]   # asmbench
+  operands:                  # asmbench
+  - class: immediate
+    imd: int
+  - class: register          # asmbench
+    name: ymm                # asmbench
+  - class: register          # asmbench
+    name: ymm                # asmbench
+    mask: True               # asmbench
+  latency: 1                 # asmbench
+  port_pressure: [[1, '5']]  # asmbench
+  throughput: 1.0            # asmbench
+  uops: 1                    # asmbench
+- name: [vpermilpd, vpermilps]   # asmbench
+  operands:                  # asmbench
+  - class: immediate
+    imd: int
+  - class: register          # asmbench
+    name: zmm                # asmbench
+  - class: register          # asmbench
+    name: zmm                # asmbench
+  latency: 1                 # asmbench
+  port_pressure: [[1, '5']]  # asmbench
+  throughput: 1.0            # asmbench
+  uops: 1                    # asmbench
+- name: [vpermilpd, vpermilps]   # asmbench
+  operands:                  # asmbench
+  - class: immediate
+    imd: int
+  - class: register          # asmbench
+    name: zmm                # asmbench
+  - class: register          # asmbench
+    name: zmm                # asmbench
+    mask: True               # asmbench
+  latency: 1                 # asmbench
   port_pressure: [[1, '5']]  # asmbench
   throughput: 1.0            # asmbench
   uops: 1                    # asmbench
@@ -5002,180 +5197,180 @@ instruction_forms:
   port_pressure: [[1, '05']]  # uops.info
   throughput: 0.5             # uops.info
   uops: 1                     # uops.info
-- name: VCMPPS                                           
-  operands:                                               
-  - class: immediate                                      
-    imd: int                                              
-  - class: register                                       
-    name: xmm                                             
-  - class: register                                       
-    name: xmm                                             
-  - class: register                                       
-    name: xmm                                             
-  latency: 4                                              
-  port_pressure: [[1, '01']]                              
-  throughput: 0.5                                         
-  uops: 1                                                 
-- name: VCMPPS                                            
-  operands:                                               
-  - class: immediate                                      
-    imd: int                                              
-  - class: register                                       
-    name: ymm                                             
-  - class: register                                       
-    name: ymm                                             
-  - class: register                                       
-    name: ymm                                             
-  latency: 4                                              
-  port_pressure: [[1, '01']]                              
-  throughput: 0.5                                         
-  uops: 1                                                 
-- name: VCMPPD                                            
-  operands:                                               
-  - class: immediate                                      
-    imd: int                                              
-  - class: register                                       
-    name: xmm                                             
-  - class: register                                       
-    name: xmm                                             
-  - class: register                                       
-    name: xmm                                             
-  latency: 4                                              
-  port_pressure: [[1, '01']]                              
-  throughput: 0.5                                         
-  uops: 1                                                 
-- name: VCMPPD                                            
-  operands:                                               
-  - class: immediate                                      
-    imd: int                                              
-  - class: register                                       
-    name: ymm                                             
-  - class: register                                       
-    name: ymm                                             
-  - class: register                                       
-    name: ymm                                             
-  latency: 4                                              
-  port_pressure: [[1, '01']]                              
-  throughput: 0.5                                         
-  uops: 1                                                 
-- name: VCMPPS                                            
-  operands:                                               
-  - class: immediate                                      
-    imd: int                                              
-  - class: register                                       
-    name: zmm                                             
-  - class: register                                       
-    name: zmm                                             
-  - class: register                                       
-    name: k                                               
-  latency: 3                                              
-  port_pressure: [[1, '5']]                               
-  throughput: 1.0                                         
-  uops: 1                                                 
-- name: VCMPPS                                            
-  operands:                                               
-  - class: immediate                                      
-    imd: int                                              
-  - class: register                                       
-    name: zmm                                             
-  - class: register                                       
-    name: zmm                                             
-  - class: register                                       
-    name: k                                               
-    mask: True
-  latency: 3                                              
-  port_pressure: [[1, '5']]                               
-  throughput: 1.0                                         
-  uops: 1                                                 
-- name: VCMPPS                                            
-  operands:                                               
-  - class: immediate                                      
-    imd: int                                              
-  - class: register                                       
-    name: xmm                                             
-  - class: register                                       
-    name: xmm                                             
-  - class: register                                       
-    name: k                                               
-    mask: True
-  latency: 3                                              
-  port_pressure: [[1, '5']]                               
-  throughput: 1.0                                         
-  uops: 1                                                 
-- name: VCMPPS                                            
-  operands:                                               
-  - class: immediate                                      
-    imd: int                                              
-  - class: register                                       
-    name: ymm                                             
-  - class: register                                       
-    name: ymm                                             
-  - class: register                                       
+- name: VCMPPS
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 4
+  port_pressure: [[1, '01']]
+  throughput: 0.5
+  uops: 1
+- name: VCMPPS
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  latency: 4
+  port_pressure: [[1, '01']]
+  throughput: 0.5
+  uops: 1
+- name: VCMPPD
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 4
+  port_pressure: [[1, '01']]
+  throughput: 0.5
+  uops: 1
+- name: VCMPPD
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  latency: 4
+  port_pressure: [[1, '01']]
+  throughput: 0.5
+  uops: 1
+- name: VCMPPS
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: zmm
+  - class: register
+    name: zmm
+  - class: register
     name: k
-    mask: True  
-  latency: 3                                              
-  port_pressure: [[1, '5']]                               
-  throughput: 1.0                                         
-  uops: 1                                                 
-- name: VCMPPD                                            
-  operands:                                               
-  - class: immediate                                      
-    imd: int                                              
-  - class: register                                       
-    name: zmm                                             
-  - class: register                                       
-    name: zmm                                             
-  - class: register                                       
-    name: k                                               
-  latency: 3                                              
-  port_pressure: [[1, '5']]                               
-  throughput: 1.0                                         
-  uops: 1                                                 
-- name: VCMPPD                                            
-  operands:                                               
-  - class: immediate                                      
-    imd: int                                              
-  - class: register                                       
-    name: zmm                                             
-  - class: register                                       
-    name: zmm                                             
-  - class: register                                       
-    name: k                                               
+  latency: 3
+  port_pressure: [[1, '5']]
+  throughput: 1.0
+  uops: 1
+- name: VCMPPS
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: zmm
+  - class: register
+    name: zmm
+  - class: register
+    name: k
     mask: True
-  latency: 3                                              
-  port_pressure: [[1, '5']]                               
-  throughput: 1.0                                         
-  uops: 1                                                 
-- name: VCMPPD                                            
-  operands:                                               
-  - class: immediate                                      
-    imd: int                                              
-  - class: register                                       
-    name: xmm                                             
-  - class: register                                       
-    name: xmm                                             
-  - class: register                                       
-    name: k                                               
+  latency: 3
+  port_pressure: [[1, '5']]
+  throughput: 1.0
+  uops: 1
+- name: VCMPPS
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: k
     mask: True
-  latency: 3                                              
-  port_pressure: [[1, '5']]                               
-  throughput: 1.0                                         
-  uops: 1                                                 
-- name: VCMPPD                                            
-  operands:                                               
-  - class: immediate                                      
-    imd: int                                              
-  - class: register                                       
-    name: ymm                                             
-  - class: register                                       
-    name: ymm                                             
-  - class: register                                       
-    name: k                                               
+  latency: 3
+  port_pressure: [[1, '5']]
+  throughput: 1.0
+  uops: 1
+- name: VCMPPS
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  - class: register
+    name: k
     mask: True
-  latency: 3                                              
-  port_pressure: [[1, '5']]                               
-  throughput: 1.0                                         
-  uops: 1                                                 
+  latency: 3
+  port_pressure: [[1, '5']]
+  throughput: 1.0
+  uops: 1
+- name: VCMPPD
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: zmm
+  - class: register
+    name: zmm
+  - class: register
+    name: k
+  latency: 3
+  port_pressure: [[1, '5']]
+  throughput: 1.0
+  uops: 1
+- name: VCMPPD
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: zmm
+  - class: register
+    name: zmm
+  - class: register
+    name: k
+    mask: True
+  latency: 3
+  port_pressure: [[1, '5']]
+  throughput: 1.0
+  uops: 1
+- name: VCMPPD
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: k
+    mask: True
+  latency: 3
+  port_pressure: [[1, '5']]
+  throughput: 1.0
+  uops: 1
+- name: VCMPPD
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  - class: register
+    name: k
+    mask: True
+  latency: 3
+  port_pressure: [[1, '5']]
+  throughput: 1.0
+  uops: 1
 - name: vpunpckhqdq
   operands:
   - class: register
@@ -5215,203 +5410,213 @@ instruction_forms:
 
 ########### /\                  ##########
 ########### || assumed from ICX ##########
-- name: AND                                                          
-  operands:                                                          
-  - class: immediate                                                 
-    imd: int                                                         
-  - class: register                                                  
-    name: gpr                                                        
-  latency: 1                                                         
-  port_pressure: [[1, ['0','1','5','6','11']]]                                       
-  throughput: 0.20                                                   
-  uops: 1                                                            
-- name: RET                                                          
-  operands: []                                                       
-  latency: 0                                                         
-  port_pressure: [[1, '49'], [1, '78']]                              
-  throughput: 0.5                                                    
-  uops: 2                                                            
-- name: CALL                                                         
-  operands:                                                          
-  - class: identifier                                                
-  latency: 0                                                         
-  port_pressure: [[1, '49'], [1, '78']]                              
-  throughput: 0.5                                                    
-  uops: 2                                                            
-- name: TEST                                                         
-  operands:                                                          
-  - class: immediate                                                 
-    imd: int                                                         
-  - class: register                                                  
-    name: gpr                                                        
-  latency: 1                                                         
-  port_pressure: [[1, ['0','1','5','6','11']]]                                       
-  throughput: 0.20                                                   
-  uops: 1                                                            
-- name: TEST                                                         
-  operands:                                                          
-  - class: register                                                  
-    name: gpr                                                        
-  - class: register                                                  
-    name: gpr                                                        
-  latency: 1                                                         
-  port_pressure: [[1, ['0','1','5','6','11']]]                                       
+- name: AND
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: gpr
+  latency: 1
+  port_pressure: [[1, ['0','1','5','6','11']]]
   throughput: 0.20
-  uops: 1                                                            
-- name: PTEST                                                        
-  operands:                                                          
-  - class: register                                                  
-    name: xmm                                                        
-  - class: register                                                  
-    name: xmm                                                        
-  latency: 4                                                         
-  port_pressure: [[1, '0'], [1, '5']]                                
-  throughput: 1.0                                                    
-  uops: 2                                                            
-- name: VPTEST                                                       
-  operands:                                                          
-  - class: register                                                  
-    name: xmm                                                        
-  - class: register                                                  
-    name: xmm                                                        
-  latency: 4                                                         
-  port_pressure: [[1, '0'], [1, '5']]                                
-  throughput: 1.0                                                    
-  uops: 2                                                            
-- name: VPTEST                                                       
-  operands:                                                          
-  - class: register                                                  
-    name: ymm                                                        
-  - class: register                                                  
-    name: ymm                                                        
-  latency: 6                                                         
-  port_pressure: [[1, '0'], [1, '5']]                                
-  throughput: 1.0                                                    
-  uops: 2                                                            
+  uops: 1
+- name: RET
+  operands: []
+  latency: 0
+  port_pressure: [[1, '49'], [1, '78']]
+  throughput: 0.5
+  uops: 2
+- name: CALL
+  operands:
+  - class: identifier
+  latency: 0
+  port_pressure: [[1, '49'], [1, '78']]
+  throughput: 0.5
+  uops: 2
+- name: TEST
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: gpr
+  latency: 1
+  port_pressure: [[1, ['0','1','5','6','11']]]
+  throughput: 0.20
+  uops: 1
+- name: TEST
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: 1
+  port_pressure: [[1, ['0','1','5','6','11']]]
+  throughput: 0.20
+  uops: 1
+- name: PTEST
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 4
+  port_pressure: [[1, '0'], [1, '5']]
+  throughput: 1.0
+  uops: 2
+- name: VPTEST
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 4
+  port_pressure: [[1, '0'], [1, '5']]
+  throughput: 1.0
+  uops: 2
+- name: VPTEST
+  operands:
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  latency: 6
+  port_pressure: [[1, '0'], [1, '5']]
+  throughput: 1.0
+  uops: 2
 - name: [VTESTPD, VTESTPS]
-  operands:                                                          
-  - class: register                                                  
-    name: xmm                                                        
-  - class: register                                                  
-    name: xmm                                                        
-  latency: 3                                                         
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 3
   port_pressure: [[1, '0']]
-  throughput: 1.0                                                    
-  uops: 1                                                            
+  throughput: 1.0
+  uops: 1
 - name: [VTESTPD, VTESTPS]
-  operands:                                                          
-  - class: register                                                  
-    name: ymm                                                        
-  - class: register                                                  
-    name: ymm                                                        
-  latency: 5                                                         
+  operands:
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  latency: 5
   port_pressure: [[1, '0']]
-  throughput: 1.0                                                    
-  uops: 1                                                            
-- name: VXORPD                                                       
-  operands:                                                          
-  - class: register                                                  
-    name: xmm                                                        
-  - class: register                                                  
-    name: xmm                                                        
-  - class: register                                                  
-    name: xmm                                                        
-  latency: 1                                                         
-  port_pressure: [[1, ['0','1','5','6','11']]]                                       
+  throughput: 1.0
+  uops: 1
+- name: VXORPD
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, ['0','1','5','6','11']]]
   throughput: 0.20
-  uops: 1                                                            
-- name: VXORPD                                                       
-  operands:                                                          
-  - class: register                                                  
-    name: ymm                                                        
-  - class: register                                                  
-    name: ymm                                                        
-  - class: register                                                  
-    name: ymm                                                        
-  latency: 1                                                         
-  port_pressure: [[1, ['0','1','5','6','11']]]                                       
+  uops: 1
+- name: VXORPD
+  operands:
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  latency: 1
+  port_pressure: [[1, ['0','1','5','6','11']]]
   throughput: 0.20
-  uops: 1                                                            
-- name: VXORPS                                                       
-  operands:                                                          
-  - class: register                                                  
-    name: xmm                                                        
-  - class: register                                                  
-    name: xmm                                                        
-  - class: register                                                  
-    name: xmm                                                        
-  latency: 1                                                         
-  port_pressure: [[1, ['0','1','5','6','11']]]                                       
+  uops: 1
+- name: VXORPS
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, ['0','1','5','6','11']]]
   throughput: 0.20
-  uops: 1                                                            
-- name: VXORPS                                                       
-  operands:                                                          
-  - class: register                                                  
-    name: ymm                                                        
-  - class: register                                                  
-    name: ymm                                                        
-  - class: register                                                  
-    name: ymm                                                        
-  latency: 1                                                         
-  port_pressure: [[1, ['0','1','5','6','11']]]                                       
+  uops: 1
+- name: VXORPS
+  operands:
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  latency: 1
+  port_pressure: [[1, ['0','1','5','6','11']]]
   throughput: 0.20
-  uops: 1                                                            
-- name: VBROADCASTSS                                                 
-  operands:                                                          
-  - class: register                                                  
-    name: xmm                                                        
-  - class: register                                                  
-    name: xmm                                                        
-  latency: 1                                                         
-  port_pressure: [[1, '5']]                                          
-  throughput: 1.0                                                    
-  uops: 1                                                            
-- name: [VBROADCASTSD, VBROADCASTSS]                                 
-  operands:                                                          
-  - class: register                                                  
-    name: xmm                                                        
-  - class: register                                                  
-    name: ymm                                                        
-  latency: 3                                                         
-  port_pressure: [[1, '5']]                                          
-  throughput: 1.0                                                    
-  uops: 1                                                            
-- name: [VBROADCASTSD, VBROADCASTSS]                                 
-  operands:                                                          
-  - class: register                                                  
-    name: xmm                                                        
-  - class: register                                                  
-    name: zmm                                                        
-  latency: 3                                                         
-  port_pressure: [[1, '5']]                                          
-  throughput: 1.0                                                    
-  uops: 1                                                            
-- name: [VBROADCASTSD, VBROADCASTSS]                            
-  operands:                                                     
+  uops: 1
+- name: VPBROADCASTD
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: zmm
+  latency: 3
+  port_pressure: [[1, '5']]
+  throughput: 1.0
+  uops: 1
+- name: VBROADCASTSS
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '5']]
+  throughput: 1.0
+  uops: 1
+- name: [VBROADCASTSD, VBROADCASTSS]
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: ymm
+  latency: 3
+  port_pressure: [[1, '5']]
+  throughput: 1.0
+  uops: 1
+- name: [VBROADCASTSD, VBROADCASTSS]
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: zmm
+  latency: 3
+  port_pressure: [[1, '5']]
+  throughput: 1.0
+  uops: 1
+- name: [VBROADCASTSD, VBROADCASTSS]
+  operands:
   - class: memory
     base: "*"
     offset: "*"
     index: "*"
     scale: "*"
-  - class: register                                                
-    name: ymm                                                      
-  latency: 5                                                       
-  port_pressure: [[1, '23'], [1, ['2D', '3D']], [1, '015']]       
-  throughput: 1.0                                                  
-  uops: 1                                                          
-- name: [VBROADCASTSD, VBROADCASTSS]                               
-  operands:                                                        
+  - class: register
+    name: ymm
+  latency: 5
+  port_pressure: [[1, '23'], [1, ['2D', '3D']], [1, '015']]
+  throughput: 1.0
+  uops: 1
+- name: [VBROADCASTSD, VBROADCASTSS]
+  operands:
   - class: memory
     base: "*"
     offset: "*"
     index: "*"
     scale: "*"
-  - class: register                                                
-    name: zmm                                                      
-  latency: 5                                                       
-  port_pressure: [[1, '23'], [1, ['2D', '3D']], [1, '015']]      
-  throughput: 1.0                                                  
-  uops: 1                                                          
+  - class: register
+    name: zmm
+  latency: 5
+  port_pressure: [[1, '23'], [1, ['2D', '3D']], [1, '015']]
+  throughput: 1.0
+  uops: 1
 - name: vandpd
   operands:
   - class: register
@@ -5460,5 +5665,73 @@ instruction_forms:
     name: zmm
   latency: 3
   port_pressure: [[1, '5']]
+  throughput: 1.0
+  uops: 1
+- name: vmovd
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1.0, ['0', '1', '5', '6', '10']]]
+  throughput: 0.2
+  uops: 1.0
+- name: vmov
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1.0, ['0', '1', '5', '6', '10']]]
+  throughput: 0.2
+  uops: 1.0
+- name: [vpor, vpxor, vpord, vpxord]
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '015']]
+  throughput: 0.3333333
+  uops: 1
+- name: [vpor, vpxor, vpord, vpxord]
+  operands:
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  latency: 1
+  port_pressure: [[1, '015']]
+  throughput: 0.3333333
+  uops: 1
+- name: [vpor, vpxor, vpord, vpxord]
+  operands:
+  - class: register
+    name: zmm
+  - class: register
+    name: zmm
+  - class: register
+    name: zmm
+  latency: 1
+  port_pressure: [[1, '05']]
+  throughput: 0.5
+  uops: 1
+- name: [kxorb, kxorw, kxord, kxorq, kxnorb, kxnorw, kxnord, kxnorq]
+  operands:
+  - class: register
+    name: k
+  - class: register
+    name: k
+  - class: register
+    name: k
+  latency: 1
+  port_pressure: [[1, '0']]
   throughput: 1.0
   uops: 1
