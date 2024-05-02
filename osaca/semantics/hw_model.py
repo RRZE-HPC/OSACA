@@ -428,21 +428,6 @@ class MachineModel(object):
         return data_ports
 
     @staticmethod
-    def get_full_instruction_name(instruction_form):
-        """Get one instruction name string including the mnemonic and all operands."""
-        operands = []
-        for op in instruction_form.operands:
-            op_attrs = []
-            if op.name is not None:
-                op_attrs.append("name:" + op.name)
-            if op.prefix is not None:
-                op_attrs.append("prefix:" + op.prefix)
-            if op.shape is not None:
-                op_attrs.append("shape:" + op.shape)
-            operands.append("{}({})".format("register", ",".join(op_attrs)))
-        return "{}  {}".format(instruction_form.mnemonic.lower(), ",".join(operands))
-
-    @staticmethod
     def get_isa_for_arch(arch):
         """Return ISA for given micro-arch ``arch``."""
         arch_dict = {
