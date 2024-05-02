@@ -12,7 +12,6 @@ from osaca.parser.register import RegisterOperand
 from osaca.parser.identifier import IdentifierOperand
 from osaca.parser.immediate import ImmediateOperand
 from osaca.parser.condition import ConditionOperand
-from osaca.parser.flag import FlagOperand
 from osaca.parser.prefetch import PrefetchOperand
 
 

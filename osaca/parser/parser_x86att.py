@@ -7,14 +7,12 @@ import pyparsing as pp
 
 from osaca.parser import BaseParser
 from osaca.parser.instruction_form import InstructionForm
-from osaca.parser.operand import Operand
 from osaca.parser.directive import DirectiveOperand
 from osaca.parser.memory import MemoryOperand
 from osaca.parser.label import LabelOperand
 from osaca.parser.register import RegisterOperand
 from osaca.parser.identifier import IdentifierOperand
 from osaca.parser.immediate import ImmediateOperand
-from osaca.parser.flag import FlagOperand
 
 
 class ParserX86ATT(BaseParser):
