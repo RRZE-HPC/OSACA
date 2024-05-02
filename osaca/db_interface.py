@@ -602,6 +602,12 @@ def _get_full_instruction_name(instruction_form):
             if op.shape is not None:
                 op_attrs.append("shape:" + op.shape)
             operands.append("{}({})".format("register", ",".join(op_attrs)))
+        elif isinstance(op, MemoryOperand):
+            operands.append("mem")
+        elif isinstance(op, ImmediateOperand):
+            operands.append("imd")
+        else:
+            operands.append("<op>")
     return "{}  {}".format(instruction_form["name"].lower(), ",".join(operands))
 
 

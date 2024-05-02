@@ -175,17 +175,6 @@ class TestSemanticTools(unittest.TestCase):
             test_mm_arm.get_instruction("b.someOtherName", [IdentifierOperand()]),
         )
 
-        # test full instruction name
-        self.assertEqual(
-            MachineModel.get_full_instruction_name(instr_form_x86_1),
-            "vaddpd  register(name:xmm),register(name:xmm),register(name:xmm)",
-        )
-        self.assertEqual(
-            MachineModel.get_full_instruction_name(instr_form_arm_1),
-            "fadd  register(prefix:v,shape:s),register(prefix:v,shape:s),"
-            + "register(prefix:v,shape:s)",
-        )
-
         # test get_store_tp
         self.assertEqual(
             test_mm_x86.get_store_throughput(

@@ -146,6 +146,34 @@ class TestDBInterface(unittest.TestCase):
         instr_3 = ["vfmadd132pd", (True, "")]
         self.assertEqual(dbi._scrape_from_felixcloutier(instr_3[0]), instr_3[1])
 
+    def test_human_readable_instr_name(self):
+        instr_form_x86 = dict(
+            name="vaddpd",
+            operands=[
+                RegisterOperand(name="xmm"),
+                RegisterOperand(name="xmm"),
+                RegisterOperand(name="xmm"),
+            ],
+        )
+        instr_form_arm = dict(
+            name="fadd",
+            operands=[
+                RegisterOperand(prefix="v", shape="s"),
+                RegisterOperand(prefix="v", shape="s"),
+                RegisterOperand(prefix="v", shape="s"),
+            ],
+        )
+        # test full instruction name
+        self.assertEqual(
+            _get_full_instruction_name(instr_form_x86),
+            "vaddpd  register(name:xmm),register(name:xmm),register(name:xmm)",
+        )
+        self.assertEqual(
+            _get_full_instruction_name(instr_form_arm),
+            "fadd  register(prefix:v,shape:s),register(prefix:v,shape:s),"
+            + "register(prefix:v,shape:s)",
+        )
+
     ##################
     # Helper functions
     ##################
