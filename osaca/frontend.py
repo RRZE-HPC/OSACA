@@ -85,9 +85,11 @@ class Frontend(object):
                 self._get_port_pressure(
                     instruction_form.port_pressure, port_len, separator=sep_list
                 ),
-                self._get_flag_symbols(instruction_form.flags)
-                if instruction_form.mnemonic is not None
-                else " ",
+                (
+                    self._get_flag_symbols(instruction_form.flags)
+                    if instruction_form.mnemonic is not None
+                    else " "
+                ),
                 instruction_form.line.strip().replace("\t", " "),
             )
             line = line if show_lineno else col_sep + col_sep.join(line.split(col_sep)[1:])
@@ -366,9 +368,11 @@ class Frontend(object):
                     cp_kernel if line_number in cp_lines else None,
                     lcd_lines.get(line_number),
                 ),
-                self._get_flag_symbols(instruction_form.flags)
-                if instruction_form.mnemonic is not None
-                else " ",
+                (
+                    self._get_flag_symbols(instruction_form.flags)
+                    if instruction_form.mnemonic is not None
+                    else " "
+                ),
                 instruction_form.line.strip().replace("\t", " "),
             )
         s += "\n"
