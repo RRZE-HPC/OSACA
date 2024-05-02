@@ -199,6 +199,7 @@ class TestCLI(unittest.TestCase):
         )
         output = StringIO()
         osaca.run(args, output_file=output)
+
         # WARNING for length
         self.assertTrue(
             output.getvalue().count(

@@ -29,7 +29,7 @@ IACA models the front end and therefore predicts better in scenarios where this 
 
 ### Pre Indexed
 idx = ('TX2','gcc', 'O2','gs-2d-5pt')
-decent with pre-indexed support
+decent with pre_indexed support
 
 ### Undetected memory dependency
 ('A64FX','gcc', 'O1','gs-2d-5pt')
