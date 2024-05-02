@@ -10,6 +10,10 @@ from collections import OrderedDict
 import ruamel.yaml
 
 from osaca.semantics import MachineModel
+from osaca.parser.memory import MemoryOperand
+from osaca.parser.register import RegisterOperand
+from osaca.parser.immediate import ImmediateOperand
+from osaca.parser.instruction_form import InstructionForm
 
 
 def sanity_check(arch: str, verbose=False, internet_check=False, output_file=sys.stdout):
@@ -141,17 +145,17 @@ def _get_asmbench_output(input_data, isa):
             break
         else:
             i_form = input_data[i].strip()
-            mnemonic = i_form.split("-")[0]
+            mnemonic_parsed = i_form.split("-")[0]
             operands = i_form.split("-")[1].split("_")
             operands = [_create_db_operand(op, isa) for op in operands]
-            entry = {
-                "name": mnemonic,
-                "operands": operands,
-                "throughput": _validate_measurement(float(input_data[i + 2].split()[1]), "tp"),
-                "latency": _validate_measurement(float(input_data[i + 1].split()[1]), "lt"),
-                "port_pressure": None,
-            }
-            if not entry["throughput"] or not entry["latency"]:
+            entry = InstructionForm(
+                mnemonic=mnemonic_parsed,
+                operands=operands,
+                throughput=_validate_measurement(float(input_data[i + 2].split()[1]), "tp"),
+                latency=_validate_measurement(float(input_data[i + 1].split()[1]), "lt"),
+                port_pressure=None,
+            )
+            if not entry.throughput or not entry.latency:
                 warnings.warn(
                     "Your measurement for {} looks suspicious".format(i_form)
                     + " and was not added. Please inspect your benchmark."
@@ -172,28 +176,28 @@ def _get_ibench_output(input_data, isa):
             # add only TP/LT value
             entry = db_entries[key]
         else:
-            mnemonic = instruction.split("-")[0]
+            mnemonic_parsed = instruction.split("-")[0]
             operands = instruction.split("-")[1].split("_")
             operands = [_create_db_operand(op, isa) for op in operands]
-            entry = {
-                "name": mnemonic,
-                "operands": operands,
-                "throughput": None,
-                "latency": None,
-                "port_pressure": None,
-            }
+            entry = InstructionForm(
+                mnemonic=mnemonic_parsed,
+                operands=operands,
+                throughput=None,
+                latency=None,
+                port_pressure=None,
+            )
         if "TP" in instruction:
-            entry["throughput"] = _validate_measurement(float(line.split()[1]), "tp")
-            if not entry["throughput"]:
+            entry.throughput = _validate_measurement(float(line.split()[1]), "tp")
+            if not entry.throughput:
                 warnings.warn(
-                    "Your THROUGHPUT measurement for {} looks suspicious".format(key)
+                    "Your throughput measurement for {} looks suspicious".format(key)
                     + " and was not added. Please inspect your benchmark."
                 )
         elif "LT" in instruction:
-            entry["latency"] = _validate_measurement(float(line.split()[1]), "lt")
-            if not entry["latency"]:
+            entry.latency = _validate_measurement(float(line.split()[1]), "lt")
+            if not entry.latency:
                 warnings.warn(
-                    "Your LATENCY measurement for {} looks suspicious".format(key)
+                    "Your latency measurement for {} looks suspicious".format(key)
                     + " and was not added. Please inspect your benchmark."
                 )
         db_entries[key] = entry
@@ -251,8 +255,8 @@ def _create_db_operand_aarch64(operand):
             "offset": "imd" if "o" in operand else None,
             "index": "gpr" if "i" in operand else None,
             "scale": 8 if "s" in operand else 1,
-            "pre-indexed": True if "r" in operand else False,
-            "post-indexed": True if "p" in operand else False,
+            "pre_indexed": True if "r" in operand else False,
+            "post_indexed": True if "p" in operand else False,
         }
     else:
         raise ValueError("Parameter {} is not a valid operand code".format(operand))
@@ -430,22 +434,6 @@ def _check_sanity_arch_db(arch_mm, isa_mm, internet_check=True):
         if arch_mm._check_for_duplicate(instr_form["name"], instr_form["operands"]):
             duplicate_instr_arch.append(instr_form)
 
-        # Check operands
-        for operand in instr_form["operands"]:
-            if operand["class"] == "register" and not ("name" in operand or "prefix" in operand):
-                # Missing 'name' key
-                bad_operand.append(instr_form)
-            elif operand["class"] == "memory" and (
-                "base" not in operand
-                or "offset" not in operand
-                or "index" not in operand
-                or "scale" not in operand
-            ):
-                # Missing at least one key necessary for memory operands
-                bad_operand.append(instr_form)
-            elif operand["class"] == "immediate" and "imd" not in operand:
-                # Missing 'imd' key
-                bad_operand.append(instr_form)
     # every entry exists twice --> uniquify
     tmp_list = []
     for _ in range(0, len(duplicate_instr_arch)):
@@ -602,15 +590,25 @@ def _get_sanity_report_verbose(
 
 
 def _get_full_instruction_name(instruction_form):
-    """Get full instruction form name/identifier string out of given instruction form."""
+    """Get one instruction name string including the mnemonic and all operands."""
     operands = []
     for op in instruction_form["operands"]:
-        op_attrs = [
-            y + ":" + str(op[y])
-            for y in list(filter(lambda x: True if x != "class" else False, op))
-        ]
-        operands.append("{}({})".format(op["class"], ",".join(op_attrs)))
-    return "{}  {}".format(instruction_form["name"], ",".join(operands))
+        if isinstance(op, RegisterOperand):
+            op_attrs = []
+            if op.name is not None:
+                op_attrs.append("name:" + op.name)
+            if op.prefix is not None:
+                op_attrs.append("prefix:" + op.prefix)
+            if op.shape is not None:
+                op_attrs.append("shape:" + op.shape)
+            operands.append("{}({})".format("register", ",".join(op_attrs)))
+        elif isinstance(op, MemoryOperand):
+            operands.append("mem")
+        elif isinstance(op, ImmediateOperand):
+            operands.append("imd")
+        else:
+            operands.append("<op>")
+    return "{}  {}".format(instruction_form["name"].lower(), ",".join(operands))
 
 
 def __represent_none(self, data):

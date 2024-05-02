@@ -5,7 +5,14 @@ import re
 
 import pyparsing as pp
 
-from osaca.parser import AttrDict, BaseParser
+from osaca.parser import BaseParser
+from osaca.parser.instruction_form import InstructionForm
+from osaca.parser.directive import DirectiveOperand
+from osaca.parser.memory import MemoryOperand
+from osaca.parser.label import LabelOperand
+from osaca.parser.register import RegisterOperand
+from osaca.parser.identifier import IdentifierOperand
+from osaca.parser.immediate import ImmediateOperand
 
 
 class ParserX86ATT(BaseParser):
@@ -32,7 +39,7 @@ class ParserX86ATT(BaseParser):
         # Comment - either '#' or '//' (icc)
         self.comment = (pp.Literal("#") | pp.Literal("//")) + pp.Group(
             pp.ZeroOrMore(pp.Word(pp.printables))
-        ).setResultsName(self.COMMENT_ID)
+        ).setResultsName(self.comment_id)
         # Define x86 assembly identifier
         relocation = pp.Combine(pp.Literal("@") + pp.Word(pp.alphas))
         id_offset = pp.Word(pp.nums) + pp.Suppress(pp.Literal("+"))
@@ -64,7 +71,7 @@ class ParserX86ATT(BaseParser):
             (label_identifier | numeric_identifier).setResultsName("name")
             + pp.Literal(":")
             + pp.Optional(self.comment)
-        ).setResultsName(self.LABEL_ID)
+        ).setResultsName(self.label_id)
         # Register: pp.Regex('^%[0-9a-zA-Z]+{}{z},?')
         self.register = pp.Group(
             pp.Literal("%")
@@ -81,16 +88,16 @@ class ParserX86ATT(BaseParser):
                     + pp.Suppress(pp.Literal("}"))
                 )
             )
-        ).setResultsName(self.REGISTER_ID)
+        ).setResultsName(self.register_id)
         # Immediate: pp.Regex('^\$(-?[0-9]+)|(0x[0-9a-fA-F]+),?')
         symbol_immediate = "$"
         immediate = pp.Group(
             pp.Literal(symbol_immediate) + (hex_number | decimal_number | identifier)
-        ).setResultsName(self.IMMEDIATE_ID)
+        ).setResultsName(self.immediate_id)
 
         # Memory preparations
         offset = pp.Group(hex_number | decimal_number | identifier).setResultsName(
-            self.IMMEDIATE_ID
+            self.immediate_id
         )
         scale = pp.Word("1248", exact=1)
         # Segment register extension
@@ -112,7 +119,7 @@ class ParserX86ATT(BaseParser):
             pp.Optional(pp.Suppress(pp.Literal("*")))
             + self.register.setResultsName("base")
             + pp.Literal(":")
-            + segment_extension.setResultsName(self.SEGMENT_EXT_ID)
+            + segment_extension.setResultsName(self.segment_ext)
         )
         # Memory: offset | seg:seg_ext | offset(base, index, scale){mask}
         memory_abs = pp.Suppress(pp.Literal("*")) + (offset | self.register).setResultsName(
@@ -139,7 +146,7 @@ class ParserX86ATT(BaseParser):
             | memory_abs
             | memory_segmentation
             | (hex_number | pp.Word(pp.nums)).setResultsName("offset")
-        ).setResultsName(self.MEMORY_ID)
+        ).setResultsName(self.memory_id)
 
         # Directive
         # parameter can be any quoted string or sequence of characters besides '#' (for comments)
@@ -157,7 +164,7 @@ class ParserX86ATT(BaseParser):
             + pp.Word(pp.alphanums + "_").setResultsName("name")
             + pp.ZeroOrMore(directive_parameter).setResultsName("parameters")
             + pp.Optional(self.comment)
-        ).setResultsName(self.DIRECTIVE_ID)
+        ).setResultsName(self.directive_id)
 
         # Instructions
         # Mnemonic
@@ -199,57 +206,41 @@ class ParserX86ATT(BaseParser):
         :type line_number: int, optional
         :return: ``dict`` -- parsed asm line (comment, label, directive or instruction form)
         """
-        instruction_form = AttrDict(
-            {
-                self.INSTRUCTION_ID: None,
-                self.OPERANDS_ID: [],
-                self.DIRECTIVE_ID: None,
-                self.COMMENT_ID: None,
-                self.LABEL_ID: None,
-                "line": line,
-                "line_number": line_number,
-            }
-        )
+        instruction_form = InstructionForm(line=line, line_number=line_number)
         result = None
 
         # 1. Parse comment
         try:
             result = self.process_operand(self.comment.parseString(line, parseAll=True).asDict())
-            result = AttrDict.convert_dict(result)
-            instruction_form[self.COMMENT_ID] = " ".join(result[self.COMMENT_ID])
+            instruction_form.comment = " ".join(result[self.comment_id])
         except pp.ParseException:
             pass
 
         # 2. Parse label
         if result is None:
             try:
+                # returns tuple with label operand and comment, if any
                 result = self.process_operand(self.label.parseString(line, parseAll=True).asDict())
-                result = AttrDict.convert_dict(result)
-                instruction_form[self.LABEL_ID] = result[self.LABEL_ID]["name"]
-                if self.COMMENT_ID in result[self.LABEL_ID]:
-                    instruction_form[self.COMMENT_ID] = " ".join(
-                        result[self.LABEL_ID][self.COMMENT_ID]
-                    )
+                instruction_form.label = result[0].name
+                if result[1] is not None:
+                    instruction_form.comment = " ".join(result[1])
             except pp.ParseException:
                 pass
 
         # 3. Parse directive
         if result is None:
             try:
+                # returns tuple with directive operand and comment, if any
                 result = self.process_operand(
                     self.directive.parseString(line, parseAll=True).asDict()
                 )
-                result = AttrDict.convert_dict(result)
-                instruction_form[self.DIRECTIVE_ID] = AttrDict(
-                    {
-                        "name": result[self.DIRECTIVE_ID]["name"],
-                        "parameters": result[self.DIRECTIVE_ID]["parameters"],
-                    }
+                instruction_form.directive = DirectiveOperand(
+                    name=result[0].name,
+                    parameters=result[0].parameters,
                 )
-                if self.COMMENT_ID in result[self.DIRECTIVE_ID]:
-                    instruction_form[self.COMMENT_ID] = " ".join(
-                        result[self.DIRECTIVE_ID][self.COMMENT_ID]
-                    )
+
+                if result[1] is not None:
+                    instruction_form.comment = " ".join(result[1])
             except pp.ParseException:
                 pass
 
@@ -261,10 +252,9 @@ class ParserX86ATT(BaseParser):
                 raise ValueError(
                     "Could not parse instruction on line {}: {!r}".format(line_number, line)
                 )
-            instruction_form[self.INSTRUCTION_ID] = result[self.INSTRUCTION_ID]
-            instruction_form[self.OPERANDS_ID] = result[self.OPERANDS_ID]
-            instruction_form[self.COMMENT_ID] = result[self.COMMENT_ID]
-
+            instruction_form.mnemonic = result.mnemonic
+            instruction_form.operands = result.operands
+            instruction_form.comment = result.comment
         return instruction_form
 
     def parse_instruction(self, instruction):
@@ -275,7 +265,6 @@ class ParserX86ATT(BaseParser):
         :returns: `dict` -- parsed instruction form
         """
         result = self.instruction_parser.parseString(instruction, parseAll=True).asDict()
-        result = AttrDict.convert_dict(result)
         operands = []
         # Add operands to list
         # Check first operand
@@ -290,86 +279,113 @@ class ParserX86ATT(BaseParser):
         # Check fourth operand
         if "operand4" in result:
             operands.append(self.process_operand(result["operand4"]))
-        return_dict = AttrDict(
-            {
-                self.INSTRUCTION_ID: result["mnemonic"].split(",")[0],
-                self.OPERANDS_ID: operands,
-                self.COMMENT_ID: " ".join(result[self.COMMENT_ID])
-                if self.COMMENT_ID in result
-                else None,
-            }
+        return_dict = InstructionForm(
+            mnemonic=result["mnemonic"].split(",")[0],
+            operands=operands,
+            comment_id=" ".join(result[self.comment_id]) if self.comment_id in result else None,
         )
+
         return return_dict
 
     def process_operand(self, operand):
         """Post-process operand"""
         # For the moment, only used to structure memory addresses
-        if self.MEMORY_ID in operand:
-            return self.process_memory_address(operand[self.MEMORY_ID])
-        if self.IMMEDIATE_ID in operand:
-            return self.process_immediate(operand[self.IMMEDIATE_ID])
-        if self.LABEL_ID in operand:
-            return self.process_label(operand[self.LABEL_ID])
-        if self.DIRECTIVE_ID in operand:
-            return self.process_directive(operand[self.DIRECTIVE_ID])
+        if self.memory_id in operand:
+            return self.process_memory_address(operand[self.memory_id])
+        if self.immediate_id in operand:
+            return self.process_immediate(operand[self.immediate_id])
+        if self.label_id in operand:
+            return self.process_label(operand[self.label_id])
+        if self.directive_id in operand:
+            return self.process_directive(operand[self.directive_id])
+        if self.register_id in operand:
+            return self.process_register(operand[self.register_id])
+        if self.identifier in operand:
+            return self.process_identifier(operand[self.identifier])
         return operand
 
+    def process_register(self, operand):
+        return RegisterOperand(
+            prefix=operand["prefix"] if "prefix" in operand else None,
+            name=operand["name"],
+            shape=operand["shape"] if "shape" in operand else None,
+            lanes=operand["lanes"] if "lanes" in operand else None,
+            index=operand["index"] if "index" in operand else None,
+            predication=operand["predication"] if "predication" in operand else None,
+        )
+
     def process_directive(self, directive):
-        directive_new = {"name": directive["name"], "parameters": []}
-        if "parameters" in directive:
-            directive_new["parameters"] = directive["parameters"]
-        if "comment" in directive:
-            directive_new["comment"] = directive["comment"]
-        return AttrDict({self.DIRECTIVE_ID: directive_new})
+        directive_new = DirectiveOperand(
+            name=directive["name"],
+            parameters=directive["parameters"] if "parameters" in directive else [],
+        )
+        return directive_new, directive["comment"] if "comment" in directive else None
 
     def process_memory_address(self, memory_address):
         """Post-process memory address operand"""
         # Remove unecessarily created dictionary entries during memory address parsing
         offset = memory_address.get("offset", None)
         base = memory_address.get("base", None)
+        baseOp = None
+        indexOp = None
         index = memory_address.get("index", None)
         scale = 1 if "scale" not in memory_address else int(memory_address["scale"], 0)
         if isinstance(offset, str) and base is None and index is None:
             try:
-                offset = {"value": int(offset, 0)}
+                offset = ImmediateOperand(value=int(offset, 0))
             except ValueError:
-                offset = {"value": offset}
+                offset = ImmediateOperand(value=offset)
         elif offset is not None and "value" in offset:
-            offset["value"] = int(offset["value"], 0)
-        new_dict = AttrDict({"offset": offset, "base": base, "index": index, "scale": scale})
+            offset = ImmediateOperand(value=int(offset["value"], 0))
+        if base is not None:
+            baseOp = RegisterOperand(
+                name=base["name"], prefix=base["prefix"] if "prefix" in base else None
+            )
+        if index is not None:
+            indexOp = RegisterOperand(
+                name=index["name"], prefix=index["prefix"] if "prefix" in index else None
+            )
+        if isinstance(offset, dict) and "identifier" in offset:
+            offset = IdentifierOperand(name=offset["identifier"]["name"])
+        new_dict = MemoryOperand(offset=offset, base=baseOp, index=indexOp, scale=scale)
         # Add segmentation extension if existing
-        if self.SEGMENT_EXT_ID in memory_address:
-            new_dict[self.SEGMENT_EXT_ID] = memory_address[self.SEGMENT_EXT_ID]
-        return AttrDict({self.MEMORY_ID: new_dict})
+        if self.segment_ext in memory_address:
+            new_dict.segment_ext = memory_address[self.segment_ext]
+        return new_dict
 
     def process_label(self, label):
         """Post-process label asm line"""
         # remove duplicated 'name' level due to identifier
         label["name"] = label["name"][0]["name"]
-        return AttrDict({self.LABEL_ID: label})
+        return LabelOperand(name=label["name"]), label["comment"] if "comment" in label else None
 
     def process_immediate(self, immediate):
         """Post-process immediate operand"""
         if "identifier" in immediate:
             # actually an identifier, change declaration
-            return immediate
+            return self.process_identifier(immediate["identifier"])
         # otherwise just make sure the immediate is a decimal
-        immediate["value"] = int(immediate["value"], 0)
-        return AttrDict({self.IMMEDIATE_ID: immediate})
+        new_immediate = ImmediateOperand(value=int(immediate["value"], 0))
+        return new_immediate
+
+    def process_identifier(self, identifier):
+        return IdentifierOperand(name=identifier["name"])
 
     def get_full_reg_name(self, register):
         """Return one register name string including all attributes"""
         # nothing to do
-        return register["name"]
+        return register.name
 
     def normalize_imd(self, imd):
         """Normalize immediate to decimal based representation"""
-        if "value" in imd:
-            if isinstance(imd["value"], str):
+        if isinstance(imd, IdentifierOperand):
+            return imd
+        if imd.value is not None:
+            if isinstance(imd.value, str):
                 # return decimal
-                return int(imd["value"], 0)
+                return int(imd.value, 0)
             else:
-                return imd["value"]
+                return imd.value
         # identifier
         return imd
 
@@ -377,15 +393,12 @@ class ParserX86ATT(BaseParser):
         """Check if ``flag_a`` is dependent on ``flag_b``"""
         # we assume flags are independent of each other, e.g., CF can be read while ZF gets written
         # TODO validate this assumption
-        if flag_a.name == flag_b.name:
-            return True
-        return False
+        return flag_a.name == flag_b.name
 
     def is_reg_dependend_of(self, reg_a, reg_b):
         """Check if ``reg_a`` is dependent on ``reg_b``"""
-        # Normalize name
-        reg_a_name = reg_a["name"].upper()
-        reg_b_name = reg_b["name"].upper()
+        reg_a_name = reg_a.name.upper()
+        reg_b_name = reg_b.name.upper()
 
         # Check if they are the same registers
         if reg_a_name == reg_b_name:
@@ -426,8 +439,8 @@ class ParserX86ATT(BaseParser):
 
     def is_basic_gpr(self, register):
         """Check if register is a basic general purpose register (ebi, rax, ...)"""
-        if any(char.isdigit() for char in register["name"]) or any(
-            register["name"].lower().startswith(x) for x in ["mm", "xmm", "ymm", "zmm"]
+        if any(char.isdigit() for char in register.name) or any(
+            register.name.lower().startswith(x) for x in ["mm", "xmm", "ymm", "zmm"]
         ):
             return False
         return True
@@ -438,13 +451,13 @@ class ParserX86ATT(BaseParser):
             return False
         if self.is_basic_gpr(register):
             return True
-        return re.match(r"R([0-9]+)[DWB]?", register["name"], re.IGNORECASE)
+        return re.match(r"R([0-9]+)[DWB]?", register.name, re.IGNORECASE)
 
     def is_vector_register(self, register):
         """Check if register is a vector register"""
-        if register is None:
+        if register is None or register.name is None:
             return False
-        if register["name"].rstrip(string.digits).lower() in [
+        if register.name.rstrip(string.digits).lower() in [
             "mm",
             "xmm",
             "ymm",
@@ -460,5 +473,5 @@ class ParserX86ATT(BaseParser):
         if self.is_gpr(register):
             return "gpr"
         elif self.is_vector_register(register):
-            return register["name"].rstrip(string.digits).lower()
+            return register.name.rstrip(string.digits).lower()
         raise ValueError
