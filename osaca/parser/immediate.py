@@ -36,8 +36,8 @@ class ImmediateOperand(Operand):
         return self._imd_type
 
     @imd_type.setter
-    def imd_type(self, type):
-        self._imd_type = imd_type
+    def imd_type(self, itype):
+        self._imd_type = itype
 
     @identifier.setter
     def identifier(self, identifier):

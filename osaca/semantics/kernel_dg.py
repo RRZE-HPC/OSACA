@@ -12,7 +12,6 @@ from osaca.semantics import INSTR_FLAGS, ArchSemantics, MachineModel
 from osaca.parser.memory import MemoryOperand
 from osaca.parser.register import RegisterOperand
 from osaca.parser.immediate import ImmediateOperand
-from osaca.parser.operand import Operand
 from osaca.parser.flag import FlagOperand
 
 

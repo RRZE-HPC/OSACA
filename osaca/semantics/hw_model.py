@@ -11,7 +11,6 @@ from pathlib import Path
 
 import ruamel.yaml
 from osaca import __version__, utils
-from copy import deepcopy
 from osaca.parser import ParserX86ATT
 from osaca.parser.instruction_form import InstructionForm
 from osaca.parser.operand import Operand
