@@ -100,8 +100,8 @@ The usage of OSACA can be listed as:
   shows the program’s version number.
 --arch ARCH
   needs to be replaced with the target architecture abbreviation.
-  Possible options are ``SNB``, ``IVB``, ``HSW``, ``BDW``, ``SKX``, ``CSX``, ``ICL`` (Client), ``ICX`` (Server) for the latest Intel micro architectures starting from Intel Sandy Bridge and ``ZEN1``, ``ZEN2``, and ``ZEN3`` for AMD Zen architectures.
-  Furthermore, ``TX2`` for Marvell`s ARM-based ThunderX2 , ``N1`` for ARM's Neoverse, ``A72`` for ARM Cortex-A72, ``TSV110`` for the HiSilicon TaiShan v110, ``A64FX`` for Fujitsu's HPC ARM architecture, and ``M1`` for the Apple M1-Firestorm performance core are available.
+  Possible options are ``SNB``, ``IVB``, ``HSW``, ``BDW``, ``SKX``, ``CSX``, ``ICL`` (Client), ``ICX`` (Server), ``SPR`` for the latest Intel micro architectures starting from Intel Sandy Bridge and ``ZEN1``, ``ZEN2``, and ``ZEN3`` for AMD Zen architectures.
+  Furthermore, ``TX2`` for Marvell`s ARM-based ThunderX2 , ``N1`` for ARM's Neoverse, ``A72`` for ARM Cortex-A72, ``TSV110`` for the HiSilicon TaiShan v110, ``A64FX`` for Fujitsu's HPC ARM architecture, ``M1`` for the Apple M1-Firestorm performance core, and ``V2`` for the Neoverse V2 (used in NVIDIA's Grace CPU) are available.
   If no micro-architecture is given, OSACA assumes a default architecture for x86/AArch64.
 --fixed
   Run the throughput analysis with fixed port utilization for all suitable ports per instruction.
@@ -142,51 +142,57 @@ Supported microarchitectures
 -----------------------------
 **x86 CPUs**
 
-+---------+----------------+------------+
-|Designer | Model/microarch| OSACA flag |
-+=========+================+============+
-| |       | Sandy Bridge   |  ``SNB``   |
-| |       +----------------+------------+
-| |       | Ivy Bridge     |  ``IVB``   |
-| |       +----------------+------------+
-| |       | Haswell        |  ``HSW``   |
-| | Intel +----------------+------------+
-| |       | Broadwell      |  ``BDW``   |
-|         +----------------+------------+
-|         | Skylake-X      |  ``SKX``   |
-|         +----------------+------------+
-|         | Cascadelake-X  |  ``CSX``   |
-|         +----------------+------------+
-|         | Icelake client |  ``ICL``   |
-|         +----------------+------------+
-|         | Icelake server |  ``ICX``   |
-+---------+----------------+------------+
-| |       | Naples / Zen 1 |  ``ZEN1``  |
-|         +----------------+------------+
-| | AMD   | Rome / Zen 2   |  ``ZEN2``  |
-|         +----------------+------------+
-| |       | Milan / Zen 3  |  ``ZEN3``  |
-+---------+----------------+------------+
++----------+-----------------+------------+
+| Designer | Model/microarch | OSACA flag |
++==========+=================+============+
+| Intel    | Sandy Bridge    | ``SNB``    |
++----------+-----------------+------------+
+| Intel    | Ivy Bridge      | ``IVB``    |
++----------+-----------------+------------+
+| Intel    | Haswell         | ``HSW``    |
++----------+-----------------+------------+
+| Intel    | Broadwell       | ``BDW``    |
++----------+-----------------+------------+
+| Intel    | Skylake-X       | ``SKX``    |
++----------+-----------------+------------+
+| Intel    | Cascadelake-X   | ``CSX``    |
++----------+-----------------+------------+
+| Intel    | Icelake client  | ``ICL``    |
++----------+-----------------+------------+
+| Intel    | Icelake server  | ``ICX``    |
++----------+-----------------+------------+
+| Intel    | Sapphire Rapids | ``SPR``    |
++----------+-----------------+------------+
+| AMD      | Naples / Zen 1  | ``ZEN1``   |
++----------+-----------------+------------+
+| AMD      | Rome / Zen 2    | ``ZEN2``   |
++----------+-----------------+------------+
+| AMD      | Milan / Zen 3   | ``ZEN3``   |
++----------+-----------------+------------+
 
 **ARM AArch64 CPUs**
 
-+---------+----------------+------------+
-|Designer | Model/microarch| OSACA flag |
-+=========+================+============+
-| |       | Cortex-A72     |  ``A72``   |
-|         +----------------+------------+
-| | ARM   | Neoverse N1    |  ``N1``    |
-+---------+----------------+------------+
-| Marvell | ThunderX2      |  ``TX2``   |
-+---------+----------------+------------+
-| Fujitsu | FX700/A64FX    |  ``A64FX`` |
-+---------+----------------+------------+
-|HiSilicon| TaiShan v110   |  ``TSV110``|
-+---------+----------------+------------+
-| Apple   | M1-Firestorm   |  ``M1``    |
-+---------+----------------+------------+
++-----------+-------------------+-------------+
+| Designer  | Model/microarch   | OSACA flag  |
++===========+===================+=============+
+| ARM       | Cortex-A72        | ``A72``     |
++-----------+-------------------+-------------+
+| ARM       | Neoverse N1       | ``N1``      |
++-----------+-------------------+-------------+
+| ARM       | Neoverse V2       | ``V2``      |
++-----------+-------------------+-------------+
+| Marvell   | ThunderX2         | ``TX2``     |
++-----------+-------------------+-------------+
+| Fujitsu   | FX700/A64FX       | ``A64FX``   |
++-----------+-------------------+-------------+
+| HiSilicon | TaiShan v110      | ``TSV110``  |
++-----------+-------------------+-------------+
+| Apple     | M1-Firestorm      | ``M1``      |
++-----------+-------------------+-------------+
+| NVIDIA    | Neoverse V2/Grace | ``V2``      |
++-----------+-------------------+-------------+
 
-______________________
+----
 
 Hereinafter OSACA's scope of function will be described.
 

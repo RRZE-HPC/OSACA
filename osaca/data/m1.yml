@@ -24,7 +24,7 @@ port_model_scheme: |
   |  36  | |  36  | |  36  | |     36      | |             48              | |  24  | |  26  | |  16  | |  12  | |      28     | |  28  |
   +------+ +------+ +------+ +-------------+ +-----------------------------+ +------+ +------+ +------+ +------+ +-------------+ +------+
    0 |FP0   1 |FP1   2 |FP2   3 |FP3          4 |D0   5 |D1   6 |D2   7 |D3   8 |INT0  9 |INT1 10 |INT2 11 |INT3 12 |INT4        13 |INT5
-     \/       \/       \/       \/              \/      \/      \/      \/      \/       \/       \/       \/       \/              \/   
+     \/       \/       \/       \/              \/      \/      \/      \/      \/       \/       \/       \/       \/              \/
   +------+ +------+ +------+ +------+ +----+ +-----+ +-----+ +-----+ +-----+ +------+ +------+ +------+ +------+ +------+ +----+ +------+
   | ALU  | | ALU  | | ALU  | | ALU  | | DV | | LD  | | ST  | | LD  | | LD  | | ALU  | | ALU  | | ALU  | | ALU  | | ALU  | | DV | | ALU  |
   +------+ +------+ +------+ +------+ +----+ +-----+ +-----+ +-----+ +-----+ +------+ +------+ +------+ +------+ +------+ +----+ +------+
@@ -37,15 +37,15 @@ port_model_scheme: |
                     +------+ +------+                                        +------+ +------+ +------+                          +------+
                     | FCSEL| | FCSEL|                                        | FLAGS| | FLAGS| |MOV FP|  silly                   | FMA  |
                     +------+ +------+                                        +------+ +------+ +------+                          +------+
-                    +------+ +------+                                        
-                    | 2INT | | 2INT |                                        
-                    +------+ +------+                                        
-                             +------+                                        
-                             | RCP  |                                        
-                             +------+                                        
-                             +------+                                        
-                             | SHA  |                                        
-                             +------+                                        
+                    +------+ +------+
+                    | 2INT | | 2INT |
+                    +------+ +------+
+                             +------+
+                             | RCP  |
+                             +------+
+                             +------+
+                             | SHA  |
+                             +------+
 instruction_forms:
 - name: [adc, adcs]
   operands:
@@ -105,7 +105,7 @@ instruction_forms:
 - name: adds
   operands:
   - class: register
-    prefix: '*' 
+    prefix: '*'
   - class: register
     prefix: '*'
   - class: register
@@ -116,7 +116,7 @@ instruction_forms:
 - name: adds
   operands:
   - class: register
-    prefix: '*' 
+    prefix: '*'
   - class: register
     prefix: '*'
   - class: immediate
@@ -127,7 +127,7 @@ instruction_forms:
 - name: adr
   operands:
   - class: register
-    prefix: '*' 
+    prefix: '*'
   - class: identifier
   throughput: 0.5
   latency: ~  # 	1*p89
@@ -1521,7 +1521,7 @@ instruction_forms:
   throughput: 0.16666666
   latency: ~  #   1*p89,10,11,12,13
   port_pressure: [[1, ['8', '9', '10', '11', '12', '13']]]
-- name: [orn, orr] 
+- name: [orn, orr]
   operands:
   - class: register
     prefix: x
@@ -1532,7 +1532,7 @@ instruction_forms:
   throughput: 0.2
   latency: 1.0  # 	1*p89,10,12,13
   port_pressure: [[1, ['8', '9', '10', '12', '13']]]
-- name: [orn, orr] 
+- name: [orn, orr]
   operands:
   - class: register
     prefix: x
@@ -1543,7 +1543,7 @@ instruction_forms:
   throughput: 0.16666666
   latency: 1.0  # 	1*p89,10,11,12,13
   port_pressure: [[1, ['8', '9', '10', '11', '12', '13']]]
-- name: [orn, orr] 
+- name: [orn, orr]
   operands:
   - class: register
     prefix: w
@@ -1554,7 +1554,7 @@ instruction_forms:
   throughput: 0.2
   latency: 1.0  # 	1*p89,10,12,13
   port_pressure: [[1, ['8', '9', '10', '12', '13']]]
-- name: [orn, orr] 
+- name: [orn, orr]
   operands:
   - class: register
     prefix: w
@@ -1596,8 +1596,8 @@ instruction_forms:
   latency: ~
   port_pressure: []
 - name: ret
-  operands: 
-  - class: identifier 
+  operands:
+  - class: identifier
   throughput: 0.0
   latency: ~
   port_pressure: []
@@ -1650,7 +1650,7 @@ instruction_forms:
 - name: [scvtf, ucvtf]
   operands:
   - class: register
-    prefix: s 
+    prefix: s
   - class: register
     prefix: w
   throughput: 0.33333333
@@ -1659,7 +1659,7 @@ instruction_forms:
 - name: [scvtf, ucvtf]
   operands:
   - class: register
-    prefix: d 
+    prefix: d
   - class: register
     prefix: x
   throughput: 0.33333333
@@ -1668,7 +1668,7 @@ instruction_forms:
 - name: [scvtf, ucvtf]
   operands:
   - class: register
-    prefix: d 
+    prefix: d
   - class: register
     prefix: x
   - class: immediate
@@ -1679,7 +1679,7 @@ instruction_forms:
 - name: [scvtf, ucvtf]
   operands:
   - class: register
-    prefix: s 
+    prefix: s
   - class: register
     prefix: w
   - class: immediate
@@ -2831,9 +2831,9 @@ instruction_forms:
     prefix: "*"
   - class: register
     prefix: "*"
-  - class: immediate 
+  - class: immediate
     imd: int
-  - class: immediate 
+  - class: immediate
     imd: int
   throughput: 0.16666666
   latency: 1.0  # 	1*p89,10,11,12,13
@@ -2912,7 +2912,7 @@ instruction_forms:
     prefix: s
   - class: immediate
     imd: int
-  - class: condition 
+  - class: condition
     ccode: "*"
   throughput: 1.0
   latency: 1.0  # 	1*p3
@@ -3617,7 +3617,7 @@ instruction_forms:
     width: '*'
   throughput: 0.25
   latency: 2.0   # 1*p0123
-  port_pressure: [[1, '0123']] 
+  port_pressure: [[1, '0123']]
 - name: [fmla, fmls]
   operands:
   - class: register

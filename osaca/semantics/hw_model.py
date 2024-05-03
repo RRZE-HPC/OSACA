@@ -438,6 +438,7 @@ class MachineModel(object):
             "tx2": "aarch64",
             "n1": "aarch64",
             "m1": "aarch64",
+            "v2": "aarch64",
             "zen1": "x86",
             "zen+": "x86",
             "zen2": "x86",
@@ -458,6 +459,7 @@ class MachineModel(object):
             "cfl": "x86",
             "icl": "x86",
             "icx": "x86",
+            "spr": "x86",
         }
         arch = arch.lower()
         if arch in arch_dict:
