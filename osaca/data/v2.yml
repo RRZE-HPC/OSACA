@@ -147,7 +147,7 @@ instruction_forms:
     prefix: '*'
   - class: identifier
   throughput: 0.25
-  latency: ~  # 	1*p67
+  latency: 1.0  # 	1*p67
   port_pressure: [[1, '2367']]
 - name: and
   operands:
@@ -2827,9 +2827,18 @@ instruction_forms:
 - name: fabs
   operands:
   - class: register
-    prefix: '*'
+    prefix: x
   - class: register
-    prefix: '*'
+    prefix: x
+  throughput: 0.25
+  latency: 1.0  # 	1*p0123
+  port_pressure: [[1, '0123']]
+- name: fabs
+  operands:
+  - class: register
+    prefix: w
+  - class: register
+    prefix: w
   throughput: 0.25
   latency: 1.0  # 	1*p0123
   port_pressure: [[1, '0123']]
@@ -3030,11 +3039,22 @@ instruction_forms:
 - name: [fmax, fmaxnm, fmin, fminnm]
   operands:
   - class: register
-    prefix: '*'
+    prefix: x
   - class: register
-    prefix: '*'
+    prefix: x
   - class: register
-    prefix: '*'
+    prefix: x
+  throughput: 0.25
+  latency: 2.0  # 	1*p8,9,10,11
+  port_pressure: [[1, ['8', '9', '10', '11']]]
+- name: [fmax, fmaxnm, fmin, fminnm]
+  operands:
+  - class: register
+    prefix: w
+  - class: register
+    prefix: w
+  - class: register
+    prefix: w
   throughput: 0.25
   latency: 2.0  # 	1*p8,9,10,11
   port_pressure: [[1, ['8', '9', '10', '11']]]
@@ -3046,6 +3066,7 @@ instruction_forms:
     imd: '*'
   latency: 2.0  # 	1*p8,9,10,11
   port_pressure: [[1, ['8', '9', '10', '11']]]
+  throughput: 0.25
 - name: fmov
   operands:
   - class: register
@@ -3107,11 +3128,22 @@ instruction_forms:
 - name: [fmul, fnmul]
   operands:
   - class: register
-    prefix: '*'
+    prefix: x
   - class: register
-    prefix: '*'
+    prefix: x
   - class: register
-    prefix: '*'
+    prefix: x
+  throughput: 0.25
+  latency: 3.0  # 	1*p89,10,11
+  port_pressure: [[1, ['8', '9', '10', '11']]]
+- name: [fmul, fnmul]
+  operands:
+  - class: register
+    prefix: w
+  - class: register
+    prefix: w
+  - class: register
+    prefix: w
   throughput: 0.25
   latency: 3.0  # 	1*p89,10,11
   port_pressure: [[1, ['8', '9', '10', '11']]]
