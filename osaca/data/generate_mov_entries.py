@@ -1019,7 +1019,7 @@ spr_mov_instructions = [
     ("vmovaps zmm zmm", ("1*p0,1,5,6,10", 1)),
     ("vmovaps zmm mem", ("", 0)),
     ("vmovaps mem zmm", ("", 0)),
-    ## https://www.felixcloutier.com/x86/movd:movq
+    # # https://www.felixcloutier.com/x86/movd:movq
     # ("movd gpr mm", ("1*p5", 1)),
     # ("movd mem mm", ("", 0)),
     # ("movq gpr mm", ("1*p5", 1)),
@@ -1044,7 +1044,7 @@ spr_mov_instructions = [
     # ("vmovd xmm mem", ("", 0)),
     # ("vmovq xmm gpr", ("1*p0", 1)),
     # ("vmovq xmm mem", ("", 0)),
-    ## https://www.felixcloutier.com/x86/movddup
+    # # https://www.felixcloutier.com/x86/movddup
     # ("movddup xmm xmm", ("1*p5", 1)),
     # ("movddup mem xmm", ("", 0)),
     # ("vmovddup xmm xmm", ("1*p5", 1)),
@@ -1129,37 +1129,37 @@ spr_mov_instructions = [
     ("vmovdqu64 zmm zmm", ("1*p0,1,5,6,10", 1)),
     ("vmovdqu64 mem zmm", ("", 0)),
     ("vmovdqu64 zmm mem", ("", 0)),
-    ## https://www.felixcloutier.com/x86/movhlps
+    # # https://www.felixcloutier.com/x86/movhlps
     # ("movhlps xmm xmm", ("1*p5", 1)),
     # ("vmovhlps xmm xmm xmm", ("1*p5", 1)),
-    ## https://www.felixcloutier.com/x86/movhpd
+    # # https://www.felixcloutier.com/x86/movhpd
     # ("movhpd mem xmm", ("1*p5", 1)),
     # ("vmovhpd mem xmm xmm", ("1*p5", 1)),
     # ("movhpd xmm mem", ("", 0)),
     # ("vmovhpd mem xmm", ("", 0)),
-    ## https://www.felixcloutier.com/x86/movhps
+    # # https://www.felixcloutier.com/x86/movhps
     # ("movhps mem xmm", ("1*p5", 1)),
     # ("vmovhps mem xmm xmm", ("1*p5", 1)),
     # ("movhps xmm mem", ("", 0)),
     # ("vmovhps mem xmm", ("", 0)),
-    ## https://www.felixcloutier.com/x86/movlhps
+    # # https://www.felixcloutier.com/x86/movlhps
     # ("movlhps xmm xmm", ("1*p5", 1)),
     # ("vmovlhps xmm xmm xmm", ("1*p5", 1)),
-    ## https://www.felixcloutier.com/x86/movlpd
+    # # https://www.felixcloutier.com/x86/movlpd
     # ("movlpd mem xmm", ("1*p5", 1)),
     # ("vmovlpd mem xmm xmm", ("1*p5", 1)),
     # ("movlpd xmm mem", ("", 0)),
     # ("vmovlpd mem xmm", ("1*p5", 1)),
-    ## https://www.felixcloutier.com/x86/movlps
+    # # https://www.felixcloutier.com/x86/movlps
     # ("movlps mem xmm", ("1*p5", 1)),
     # ("vmovlps mem xmm xmm", ("1*p5", 1)),
     # ("movlps xmm mem", ("", 0)),
     # ("vmovlps mem xmm", ("1*p5", 1)),
-    ## https://www.felixcloutier.com/x86/movmskpd
+    # # https://www.felixcloutier.com/x86/movmskpd
     # ("movmskpd xmm gpr", ("1*p0", 1)),
     # ("vmovmskpd xmm gpr", ("1*p0", 1)),
     # ("vmovmskpd ymm gpr", ("1*p0", 1)),
-    ## https://www.felixcloutier.com/x86/movmskps
+    # # https://www.felixcloutier.com/x86/movmskps
     # ("movmskps xmm gpr", ("1*p0", 1)),
     # ("vmovmskps xmm gpr", ("1*p0", 1)),
     # ("vmovmskps ymm gpr", ("1*p0", 1)),
@@ -1207,7 +1207,7 @@ spr_mov_instructions = [
     ("vmovsd xmm xmm xmm", ("1*p0,1,5,6,10", 1)),
     ("vmovsd mem xmm", ("", 0)),
     ("vmovsd xmm mem", ("", 0)),
-    ## https://www.felixcloutier.com/x86/movshdup
+    # # https://www.felixcloutier.com/x86/movshdup
     # ("movshdup xmm xmm", ("1*p15", 1)),
     # ("movshdup mem xmm", ("", 0)),
     # ("vmovshdup xmm xmm", ("1*p15", 1)),
@@ -1216,7 +1216,7 @@ spr_mov_instructions = [
     # ("vmovshdup mem ymm", ("", 0)),
     # ("vmovshdup zmm zmm", ("1*p5", 1)),
     # ("vmovshdup mem zmm", ("", 0)),
-    ## https://www.felixcloutier.com/x86/movsldup
+    # # https://www.felixcloutier.com/x86/movsldup
     # ("movsldup xmm xmm", ("1*p15", 1)),
     # ("movsldup mem xmm", ("", 0)),
     # ("vmovsldup xmm xmm", ("1*p15", 1)),
@@ -1272,7 +1272,7 @@ spr_mov_instructions = [
     ("vmovups zmm zmm", ("1*p0,1,5,6,10", 1)),
     ("vmovups mem zmm", ("", 0)),
     ("vmovups zmm mem", ("", 0)),
-    ## https://www.felixcloutier.com/x86/movzx
+    # # https://www.felixcloutier.com/x86/movzx
     # ("movzx gpr gpr", ("1*p0,1,5,6,10", 1)),
     # ("movzx mem gpr", ("", 0)),
     # ("movzb gpr gpr", ("1*p0,1,5,6,10", 1)),  # AT&T version
@@ -1283,7 +1283,7 @@ spr_mov_instructions = [
     # ("movzl mem gpr", ("", 0)),  # AT&T version
     # ("movzq gpr gpr", ("1*p0156", 1)),  # AT&T version
     # ("movzq mem gpr", ("", 0)),  # AT&T version
-    ## https://www.felixcloutier.com/x86/cmovcc
+    # # https://www.felixcloutier.com/x86/cmovcc
     # ("cmova gpr gpr", ("2*p06", 1)),
     # ("cmova mem gpr", ("", 0)),
     # ("cmovae gpr gpr", ("1*p06", 1)),
@@ -1342,11 +1342,11 @@ spr_mov_instructions = [
     # ("cmovs mem gpr", ("", 0)),
     # ("cmovz gpr gpr", ("1*p06", 1)),
     # ("cmovz mem gpr", ("", 0)),
-    ## https://www.felixcloutier.com/x86/pmovmskb
+    # # https://www.felixcloutier.com/x86/pmovmskb
     # ("pmovmskb mm gpr", ("1*p0", 1)),
     # ("pmovmskb xmm gpr", ("1*p0", 1)),
     # ("vpmovmskb xmm gpr", ("1*p0", 1)),
-    ## https://www.felixcloutier.com/x86/pmovsx
+    # # https://www.felixcloutier.com/x86/pmovsx
     # ("pmovsxbw xmm xmm", ("1*p15", 1)),
     # ("pmovsxbw mem xmm", ("1*p15", 1)),
     # ("pmovsxbd xmm xmm", ("1*p15", 1)),
@@ -1367,7 +1367,7 @@ spr_mov_instructions = [
     # ("vpmovsxbq mem ymm", ("1*p5", 1)),
     # ("vpmovsxbw ymm zmm", ("1*p5", 3)),
     # ("vpmovsxbw mem zmm", ("1*p5", 1)),
-    ## https://www.felixcloutier.com/x86/pmovzx
+    # # https://www.felixcloutier.com/x86/pmovzx
     # ("pmovzxbw xmm xmm", ("1*p15", 1)),
     # ("pmovzxbw mem xmm", ("1*p15", 1)),
     # ("vpmovzxbw xmm xmm", ("1*p15", 1)),
@@ -1377,7 +1377,7 @@ spr_mov_instructions = [
     # ("vpmovzxbw ymm zmm", ("1*p5", 1)),
     # ("vpmovzxbw mem zmm", ("1*p5", 1)),
     ##################################################################
-    ## https://www.felixcloutier.com/x86/movbe
+    # # https://www.felixcloutier.com/x86/movbe
     # ("movbe gpr mem", ("1*p15", 6)),
     # ("movbe mem gpr", ("1*p15", 6)),
     ################################################
