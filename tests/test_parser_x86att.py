@@ -112,6 +112,9 @@ class TestParserX86ATT(unittest.TestCase):
         instr5 = "mov %ebx,var(,1)"
         instr6 = "lea (,%rax,8),%rbx"
         instr7 = "vinsertf128 $0x1, %xmm0, %ymm1, %ymm1"
+        instr8 = "cmpb $0, %fs:var@TPOFF"
+        instr9 = "movq	%rdi, %fs:var@TPOFF-8(%rcx)"
+        instr10 = "movq	$624, %fs:var@TPOFF+4992"
 
         parsed_1 = self.parser.parse_instruction(instr1)
         parsed_2 = self.parser.parse_instruction(instr2)
@@ -120,6 +123,9 @@ class TestParserX86ATT(unittest.TestCase):
         parsed_5 = self.parser.parse_instruction(instr5)
         parsed_6 = self.parser.parse_instruction(instr6)
         parsed_7 = self.parser.parse_instruction(instr7)
+        parsed_8 = self.parser.parse_instruction(instr8)
+        parsed_9 = self.parser.parse_instruction(instr9)
+        parsed_10 = self.parser.parse_instruction(instr10)
 
         self.assertEqual(parsed_1.mnemonic, "vcvtsi2ss")
         self.assertEqual(parsed_1.operands[0].name, "edx")
@@ -161,6 +167,27 @@ class TestParserX86ATT(unittest.TestCase):
         self.assertEqual(parsed_7.operands[1].name, "xmm0")
         self.assertEqual(parsed_7.operands[2].name, "ymm1")
         self.assertEqual(parsed_7.operands[3].name, "ymm1")
+
+        self.assertEqual(parsed_8.mnemonic, "cmpb")
+        self.assertEqual(parsed_8.operands[0].value, 0)
+        self.assertEqual(parsed_8.operands[1].base.name, "fs")
+        self.assertEqual(parsed_8.operands[1].segment_ext[0]['offset']['identifier']['name'], "var")
+        self.assertEqual(parsed_8.operands[1].segment_ext[0]['offset']['identifier']['relocation'], "@TPOFF")
+
+        self.assertEqual(parsed_9.mnemonic, "movq")
+        self.assertEqual(parsed_9.operands[0].name, "rdi")
+        self.assertEqual(parsed_9.operands[1].base.name, "fs")
+        self.assertEqual(parsed_9.operands[1].segment_ext[0]['offset']['identifier']['name'], "var")
+        self.assertEqual(parsed_9.operands[1].segment_ext[0]['offset']['identifier']['relocation'], "@TPOFF")
+        self.assertEqual(parsed_9.operands[1].segment_ext[0]['offset']['identifier']['offset'][0], "-8")
+        self.assertEqual(parsed_9.operands[1].segment_ext[0]['base']['name'], "rcx")
+
+        self.assertEqual(parsed_10.mnemonic, "movq")
+        self.assertEqual(parsed_10.operands[0].value, 624)
+        self.assertEqual(parsed_10.operands[1].base.name, "fs")
+        self.assertEqual(parsed_10.operands[1].segment_ext[0]['offset']['identifier']['name'], "var")
+        self.assertEqual(parsed_10.operands[1].segment_ext[0]['offset']['identifier']['relocation'], "@TPOFF")
+        self.assertEqual(parsed_10.operands[1].segment_ext[0]['offset']['identifier']['offset'][0], "4992")
 
     def test_parse_line(self):
         line_comment = "# -- Begin  main"
