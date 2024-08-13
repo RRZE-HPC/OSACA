@@ -52,6 +52,7 @@ class ParserX86ATT(BaseParser):
                 joinString="::",
             ).setResultsName("name")
             + pp.Optional(relocation).setResultsName("relocation")
+            + pp.Optional(pp.Suppress(pp.Optional(pp.Literal("+"))) + decimal_number).setResultsName("offset")
         ).setResultsName("identifier")
         # Label
         label_rest = pp.Word(pp.alphanums + "$_.+-()")
@@ -106,13 +107,13 @@ class ParserX86ATT(BaseParser):
             ^ pp.Word(pp.nums)
             ^ pp.Group(
                 pp.Optional(offset.setResultsName("offset"))
-                + pp.Literal("(")
+                + pp.Optional(pp.Literal("(")
                 + pp.Optional(self.register.setResultsName("base"))
                 + pp.Optional(pp.Suppress(pp.Literal(",")))
                 + pp.Optional(self.register.setResultsName("index"))
                 + pp.Optional(pp.Suppress(pp.Literal(",")))
                 + pp.Optional(scale.setResultsName("scale"))
-                + pp.Literal(")")
+                + pp.Literal(")"))
             )
         )
         memory_segmentation = (
