@@ -4553,8 +4553,8 @@ instruction_forms:
   operands:                                     # docs
   - class: identifier                           # docs
   latency: 1                                    # docs
-  port_pressure: [[1, ['6', '10']], [1, '13']]  # docs
-  throughput: 0.5                               # docs
+  port_pressure: [[1, ['6', '10']], [1, ['13']]]  # docs
+  throughput: 1.0                               # docs
   uops: 2                                       # docs
 - name: test                    # uops.info
   operands:                     # uops.info

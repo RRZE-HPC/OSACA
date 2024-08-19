@@ -43,6 +43,66 @@ port_model_scheme: |
              +-------+
 
 instruction_forms:
+##########################################
+# assume all jmp instruction 0
+- name: [jo, jno, js, jns, jp, jpe, jnp, jpo]
+  operands:
+  - class: identifier
+  throughput: 0.0
+  latency: 0.0
+  port_pressure: []
+- name: [jc, jb, jae, jnb, jna, jbe, ja, jnbe]
+  operands:
+  - class: identifier
+  throughput: 0.0
+  latency: 0.0
+  port_pressure: []
+- name: [je, jz, jne, jnz, jl, jnge]
+  operands:
+  - class: identifier
+  throughput: 0.0
+  latency: 0.0
+  port_pressure: []
+- name: [jge, jnl, jle, jng, jg, jnle]
+  operands:
+  - class: identifier
+  throughput: 0.0
+  latency: 0.0
+  port_pressure: []
+- name: jmp
+  operands:
+  - class: identifier
+  throughput: 0.0
+  latency: 0.0
+  port_pressure: []
+##########################################
+- name: call                                    # docs
+  operands:                                     # docs
+  - class: identifier                           # docs
+  latency: 1                                    # docs
+  port_pressure: [[1, '4567'], [1, ['10']]]     # docs
+  throughput: 0.5                               # docs
+  uops: 2                                       # docs
+- name: [or, and, xor, test, not] # uops.info
+  operands:                     # uops.info
+  - class: register             # uops.info
+    name: gpr                   # uops.info
+  - class: register             # uops.info
+    name: gpr                   # uops.info
+  latency: 1                    # uops.info
+  port_pressure: [[1, '6789']]  # uops.info
+  throughput: 0.25              # uops.info
+  uops: 1                       # uops.info
+- name: [or, and, xor, test, not] # uops.info
+  operands:                     # uops.info
+  - class: immediate
+    imd: int
+  - class: register             # uops.info
+    name: gpr                   # uops.info
+  latency: 1                    # uops.info
+  port_pressure: [[1, '6789']]  # uops.info
+  throughput: 0.25              # uops.info
+  uops: 1                       # uops.info
 - name: vmovdqa
   operands:
   - class: register
@@ -905,7 +965,7 @@ instruction_forms:
 - name: lea
   operands:
   - class: memory
-    base: gpr
+    base: '*'
     offset: '*'
     index: '*'
     scale: '*'
@@ -923,6 +983,15 @@ instruction_forms:
   throughput: 0.0
   latency: 0.0
   port_pressure: []
+- name: [mov, movabs]
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: gpr
+  throughput: 0.25
+  latency: 1.0
+  port_pressure: [[1, '4567']]
 - name: [movsxd, movslq]  # JH: assumed from agner and port model
   operands:
   - class: register
@@ -967,7 +1036,7 @@ instruction_forms:
     name: xmm
   - class: register
     name: xmm
-  throughput: ~     #8.5
+  throughput: 8.5
   latency: 20.0
   port_pressure: [[1, '3'], [8.5, ['3DV']]]
 - name: sqrtss
@@ -976,9 +1045,32 @@ instruction_forms:
     name: xmm
   - class: register
     name: xmm
-  throughput: ~     #5.5
+  throughput: 5.5
   latency: 14.0
   port_pressure: [[1, '3'], [5.5, ['3DV']]]
+- name: vsqrtsd
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  throughput: 8.5
+  latency: 20.0
+  port_pressure: [[1, '3'], [8.5, ['3DV']]]
+- name: vsqrtss
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  throughput: 5.5
+  latency: 14.0
+  port_pressure: [[1, '3'], [5.5, ['3DV']]]
+
 - name: sub
   operands:
   - class: register
@@ -1215,7 +1307,7 @@ instruction_forms:
   latency: 3.0  # 	1*p01
   port_pressure: [[1, '01']]
   uops: 1
-- name: [shl, shr]
+- name: [shl, shr, sal, sar]
   operands:
   - class: immediate
     imd: int
