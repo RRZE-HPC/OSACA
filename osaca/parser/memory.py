@@ -15,6 +15,7 @@ class MemoryOperand(Operand):
         pre_indexed=False,
         post_indexed=False,
         indexed_val=None,
+        src=None,
         dst=None,
         source=False,
         destination=False,
@@ -29,6 +30,8 @@ class MemoryOperand(Operand):
         self._pre_indexed = pre_indexed
         self._post_indexed = post_indexed
         self._indexed_val = indexed_val
+        # type of register we store from (`src`) or load to (`dst`)
+        self._src = src
         self._dst = dst
 
     @property
@@ -70,6 +73,14 @@ class MemoryOperand(Operand):
     @property
     def indexed_val(self):
         return self._indexed_val
+
+    @property
+    def src(self):
+        return self._src
+
+    @src.setter
+    def src(self, src):
+        self._src = src
 
     @property
     def dst(self):

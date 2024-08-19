@@ -179,6 +179,7 @@ class MachineModel(object):
                                     offset=m["offset"],
                                     scale=m["scale"],
                                     index=m["index"],
+                                    src=m["src"] if "src" in m else None,
                                 ),
                                 m["port_pressure"],
                             )
@@ -408,8 +409,8 @@ class MachineModel(object):
             st_tp = [
                 tp
                 for tp in st_tp
-                if "src" in tp[0]
-                and self._check_operands(src_reg, RegisterOperand(name=tp[0]["src"]))
+                if tp[0].src is not None
+                and self._check_operands(src_reg, RegisterOperand(name=tp[0].src))
             ]
         if len(st_tp) > 0:
             return st_tp.copy()
