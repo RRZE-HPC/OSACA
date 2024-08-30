@@ -444,6 +444,7 @@ class MachineModel(object):
             "zen+": "x86",
             "zen2": "x86",
             "zen3": "x86",
+            "zen4": "x86",
             "con": "x86",  # Intel Conroe
             "wol": "x86",  # Intel Wolfdale
             "snb": "x86",
