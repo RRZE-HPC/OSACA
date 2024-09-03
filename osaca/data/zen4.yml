@@ -9,11 +9,11 @@ scheduler_size: ~
 hidden_loads: false
 load_latency: {gpr: 4.0, mm: 4.0, xmm: 4.0, ymm: 4.0, zmm: 4.0}
 load_throughput:
-- {dst: gpr, base: "*", index: "*", offset: "*", scale: "*", port_pressure:  [[1, ['1', '3', '5']]]}
-- {dst: xmm, base: "*", index: "*", offset: "*", scale: "*", port_pressure:  [[1, ['1', '3']]]}
-- {dst: ymm, base: "*", index: "*", offset: "*", scale: "*", port_pressure:  [[1, ['1', '3']]]}
-- {dst: zmm, base: "*", index: "*", offset: "*", scale: "*", port_pressure:  [[2, ['1', '3']]]}
-load_throughput_default: [[1, '13']]
+- {dst: gpr, base: "*", index: "*", offset: "*", scale: "*", port_pressure:  [[1, '135'], [1, ['1D', '3D', '5D']]]}
+- {dst: xmm, base: "*", index: "*", offset: "*", scale: "*", port_pressure:  [[1, '135'], [1, ['1D', '3D']]]}
+- {dst: ymm, base: "*", index: "*", offset: "*", scale: "*", port_pressure:  [[1, '135'], [1, ['1D', '3D']]]}
+- {dst: zmm, base: "*", index: "*", offset: "*", scale: "*", port_pressure:  [[2, '135'], [2, ['1D', '3D']]]}
+load_throughput_default: [[1, '135'], [1, ['1D', '3D']]]
 store_throughput:
 - {src: gpr, base: "*", index: "*", offset: "*", scale: "*", port_pressure:  [[1, ['1', '3']], [1, ['8', '13']]]}
 - {src: xmm, base: "*", index: "*", offset: "*", scale: "*", port_pressure:  [[1, ['1', '3']], [1, ['13']]]}
@@ -21,7 +21,7 @@ store_throughput:
 - {src: zmm, base: "*", index: "*", offset: "*", scale: "*", port_pressure:  [[2, ['1', '3']], [2, ['13']]]}
 store_throughput_default: [[1 , ['1', '3']], [1, ['13']]]
 store_to_load_forward_latency: 0.0
-ports: ['0', '1', '2', '3', '4', 4D, '5', '6', '7', '8', '9', 9D, '10', '11', 11D, '12', '13']
+ports: ['0', '1', 1D, '2', '3', 3D, '4', 4DV, '5', 5D, '6', '7', '8', '9', 9DV, '10', '11', 11DV, '12', '13']
 port_model_scheme: |
   +--------------------------------------------------------------+  +-------------------------------------------------------+
   |   INT0-7                    4x24 OoO scheduler               |  |2x32       FP0       FP2       FP1       FP3           |
@@ -131,7 +131,7 @@ instruction_forms:
   - class: immediate
     imd: int
   latency: 4
-  port_pressure: [1, ['1', '3', '5']] 
+  port_pressure: [[1, '135'], [1, ['1D', '3D', '5D']]] 
   throughput: 0.3333333333333333
   uops: 1
 - name: pop
@@ -139,7 +139,7 @@ instruction_forms:
   - class: register
     name: gpr
   latency: 4
-  port_pressure: [1, ['1', '3', '5']] 
+  port_pressure: [[1, '135'], [1, ['1D', '3D', '5D']]] 
   throughput: 0.3333333333333333
   uops: 1
 - name: pop
@@ -150,7 +150,7 @@ instruction_forms:
     index: "*"
     scale: "*"
   latency: 12
-  port_pressure: [1, ['1', '3', '5']]
+  port_pressure: [[1, '135'], [1, ['1D', '3D', '5D']]] 
   throughput: 0.3333333333333333
   uops: 2
 ##########################################
@@ -187,7 +187,7 @@ instruction_forms:
   - class: register                                   
     name: gpr                                         
   latency: 4
-  port_pressure: [[1, '135']]              
+  port_pressure: [[1, '135'], [1, ['1D', '3D', '5D']]] 
   throughput: 0.3333333333333333                      
   uops: 1                                             
 - name: mov                                           
@@ -256,7 +256,7 @@ instruction_forms:
   - class: register                                   
     name: xmm                                         
   latency: 4                                          
-  port_pressure: [[1, ['1', '3']]]              
+  port_pressure: [[1, '135'], [1, ['1D', '3D']]] 
   throughput: 0.5 
   uops: 1                                             
 - name: vmovapd                                       
@@ -292,7 +292,7 @@ instruction_forms:
   - class: register                                   
     name: xmm                                         
   latency: 4                                          
-  port_pressure: [[1, ['1', '3']]]              
+  port_pressure: [[1, '135'], [1, ['1D', '3D']]] 
   throughput: 0.5 
   uops: 1                                             
 - name: vmovapd                                       
@@ -328,7 +328,7 @@ instruction_forms:
   - class: register                                   
     name: ymm                                         
   latency: 4                                          
-  port_pressure: [[1, ['1', '3']]]              
+  port_pressure: [[1, '135'], [1, ['1D', '3D']]] 
   throughput: 0.5 
   uops: 1                                             
 - name: vmovapd                                       
@@ -363,8 +363,8 @@ instruction_forms:
     scale: "*"                                        
   - class: register                                   
     name: zmm                                         
-  latency: 4                                          
-  port_pressure: [[2, ['1', '3']]]            
+  latency: 4
+  port_pressure: [[2, '135'], [2, ['1D', '3D']]] 
   throughput: 1.0                                  
   uops: 2                                     
 - name: movaps                                        
@@ -400,7 +400,7 @@ instruction_forms:
   - class: register                                   
     name: xmm                                         
   latency: 4                                          
-  port_pressure: [[1, ['1', '3']]]              
+  port_pressure: [[1, '135'], [1, ['1D', '3D']]]
   throughput: 0.5 
   uops: 1                                             
 - name: vmovaps                                       
@@ -436,7 +436,7 @@ instruction_forms:
   - class: register                                   
     name: xmm                                         
   latency: 4                                          
-  port_pressure: [[1, ['1', '3']]]              
+  port_pressure: [[1, '135'], [1, ['1D', '3D']]]
   throughput: 0.5 
   uops: 1                                             
 - name: vmovaps                                       
@@ -472,7 +472,7 @@ instruction_forms:
   - class: register                                   
     name: ymm                                         
   latency: 4                                          
-  port_pressure: [[1, ['1', '3']]]              
+  port_pressure: [[1, '135'], [1, ['1D', '3D']]]
   throughput: 0.5 
   uops: 1                                             
 - name: vmovaps                                       
@@ -508,7 +508,7 @@ instruction_forms:
   - class: register                                   
     name: zmm                                         
   latency: 4                                          
-  port_pressure: [[2, ['1', '3']]]            
+  port_pressure: [[2, '135'], [2, ['1D', '3D']]]
   throughput: 1.0 
   uops: 2 
 - name: movdqa                                        
@@ -531,7 +531,7 @@ instruction_forms:
   - class: register                                   
     name: xmm                                         
   latency: 4                                          
-  port_pressure: [[1, ['1', '3']]]              
+  port_pressure: [[1, '135'], [1, ['1D', '3D']]]
   throughput: 0.5 
   uops: 1                                             
 - name: movdqa  # with store                          
@@ -567,7 +567,7 @@ instruction_forms:
   - class: register                                   
     name: xmm                                         
   latency: 4                                          
-  port_pressure: [[1, ['1', '3']]]              
+  port_pressure: [[1, '135'], [1, ['1D', '3D']]]
   throughput: 0.5 
   uops: 1                                             
 - name: vmovdqa  # with store                         
@@ -603,7 +603,7 @@ instruction_forms:
   - class: register                                   
     name: ymm                                         
   latency: 4                                          
-  port_pressure: [[1, ['1', '3']]]              
+  port_pressure: [[1, '135'], [1, ['1D', '3D']]]
   throughput: 0.5 
   uops: 1                                             
 - name: vmovdqa  # with store                         
@@ -639,7 +639,7 @@ instruction_forms:
   - class: register                                   
     name: xmm                                         
   latency: 4                                          
-  port_pressure: [[1, ['1', '3']]]              
+  port_pressure: [[1, '135'], [1, ['1D', '3D']]]
   throughput: 0.5 
   uops: 1                                             
 - name: vmovdqa32  # with store                       
@@ -675,7 +675,7 @@ instruction_forms:
   - class: register                                   
     name: ymm                                         
   latency: 4                                          
-  port_pressure: [[1, ['1', '3']]]              
+  port_pressure: [[1, '135'], [1, ['1D', '3D']]]
   throughput: 0.5 
   uops: 1                                             
 - name: vmovdqa32  # with store                       
@@ -711,7 +711,7 @@ instruction_forms:
   - class: register                                   
     name: zmm                                         
   latency: 4                                          
-  port_pressure: [[2, ['1', '3']]]            
+  port_pressure: [[2, '135'], [2, ['1D', '3D']]]
   throughput: 1.0 
   uops: 2 
 - name: vmovdqa32  # with store                       
@@ -747,7 +747,7 @@ instruction_forms:
   - class: register                                   
     name: xmm                                         
   latency: 4                                          
-  port_pressure: [[1, ['1', '3']]]              
+  port_pressure: [[1, '135'], [1, ['1D', '3D']]]
   throughput: 0.5 
   uops: 1                                             
 - name: vmovdqa64  # with store                       
@@ -783,7 +783,7 @@ instruction_forms:
   - class: register                                   
     name: ymm                                         
   latency: 4                                          
-  port_pressure: [[1, ['1', '3']]]              
+  port_pressure: [[1, '135'], [1, ['1D', '3D']]]
   throughput: 0.5 
   uops: 1                                             
 - name: vmovdqa64  # with store                       
@@ -819,7 +819,7 @@ instruction_forms:
   - class: register                                   
     name: zmm                                         
   latency: 4                                          
-  port_pressure: [[2, ['1', '3']]]            
+  port_pressure: [[2, '135'], [2, ['1D', '3D']]]
   throughput: 1.0 
   uops: 2 
 - name: vmovdqa64  # with store                       
@@ -855,7 +855,7 @@ instruction_forms:
   - class: register                                   
     name: xmm                                         
   latency: 4                                          
-  port_pressure: [[1, ['1', '3']]]              
+  port_pressure: [[1, '135'], [1, ['1D', '3D']]]
   throughput: 0.5 
   uops: 1                                             
 - name: movdqu  # with store                          
@@ -891,7 +891,7 @@ instruction_forms:
   - class: register                                   
     name: xmm                                         
   latency: 4                                          
-  port_pressure: [[1, ['1', '3']]]              
+  port_pressure: [[1, '135'], [1, ['1D', '3D']]]
   throughput: 0.5 
   uops: 1                                             
 - name: vmovdqu  # with store                         
@@ -927,7 +927,7 @@ instruction_forms:
   - class: register                                   
     name: ymm                                         
   latency: 4                                          
-  port_pressure: [[1, ['1', '3']]]              
+  port_pressure: [[1, '135'], [1, ['1D', '3D']]]
   throughput: 0.5 
   uops: 1                                             
 - name: vmovdqu  # with store                         
@@ -963,7 +963,7 @@ instruction_forms:
   - class: register                                   
     name: xmm                                         
   latency: 4                                          
-  port_pressure: [[1, ['1', '3']]]              
+  port_pressure: [[1, '135'], [1, ['1D', '3D']]]
   throughput: 0.5 
   uops: 1                                             
 - name: vmovdqu8  # with store                        
@@ -999,7 +999,7 @@ instruction_forms:
   - class: register                                   
     name: ymm                                         
   latency: 4                                          
-  port_pressure: [[1, ['1', '3']]]              
+  port_pressure: [[1, '135'], [1, ['1D', '3D']]]
   throughput: 0.5 
   uops: 1                                             
 - name: vmovdqu8  # with store                        
@@ -1035,7 +1035,7 @@ instruction_forms:
   - class: register                                   
     name: zmm                                         
   latency: 4                                          
-  port_pressure: [[2, ['1', '3']]]            
+  port_pressure: [[2, '135'], [2, ['1D', '3D']]]
   throughput: 1.0 
   uops: 2 
 - name: vmovdqu8  # with store                        
@@ -1071,7 +1071,7 @@ instruction_forms:
   - class: register                                   
     name: xmm                                         
   latency: 4                                          
-  port_pressure: [[1, ['1', '3']]]              
+  port_pressure: [[1, '135'], [1, ['1D', '3D']]]
   throughput: 0.5 
   uops: 1                                             
 - name: vmovdqu16  # with store                       
@@ -1107,7 +1107,7 @@ instruction_forms:
   - class: register                                   
     name: ymm                                         
   latency: 4                                          
-  port_pressure: [[1, ['1', '3']]]              
+  port_pressure: [[1, '135'], [1, ['1D', '3D']]]
   throughput: 0.5 
   uops: 1                                             
 - name: vmovdqu16  # with store                       
@@ -1143,7 +1143,7 @@ instruction_forms:
   - class: register                                   
     name: zmm                                         
   latency: 4                                          
-  port_pressure: [[2, ['1', '3']]]            
+  port_pressure: [[2, '135'], [2, ['1D', '3D']]]
   throughput: 1.0 
   uops: 2 
 - name: vmovdqu16  # with store                       
@@ -1179,7 +1179,7 @@ instruction_forms:
   - class: register                                   
     name: xmm                                         
   latency: 4                                          
-  port_pressure: [[1, ['1', '3']]]              
+  port_pressure: [[1, '135'], [1, ['1D', '3D']]]
   throughput: 0.5 
   uops: 1                                             
 - name: vmovdqu32  # with store                       
@@ -1215,7 +1215,7 @@ instruction_forms:
   - class: register                                   
     name: ymm                                         
   latency: 4                                          
-  port_pressure: [[1, ['1', '3']]]              
+  port_pressure: [[1, '135'], [1, ['1D', '3D']]]
   throughput: 0.5 
   uops: 1                                             
 - name: vmovdqu32  # with store                       
@@ -1251,7 +1251,7 @@ instruction_forms:
   - class: register                                   
     name: zmm                                         
   latency: 4                                          
-  port_pressure: [[2, ['1', '3']]]            
+  port_pressure: [[2, '135'], [2, ['1D', '3D']]]
   throughput: 1.0 
   uops: 2 
 - name: vmovdqu32  # with store                       
@@ -1287,7 +1287,7 @@ instruction_forms:
   - class: register                                   
     name: xmm                                         
   latency: 4                                          
-  port_pressure: [[1, ['1', '3']]]              
+  port_pressure: [[1, '135'], [1, ['1D', '3D']]]
   throughput: 0.5 
   uops: 1                                             
 - name: vmovdqu64  # with store                       
@@ -1323,7 +1323,7 @@ instruction_forms:
   - class: register                                   
     name: ymm                                         
   latency: 4                                          
-  port_pressure: [[1, ['1', '3']]]              
+  port_pressure: [[1, '135'], [1, ['1D', '3D']]]
   throughput: 0.5 
   uops: 1                                             
 - name: vmovdqu64  # with store                       
@@ -1359,7 +1359,7 @@ instruction_forms:
   - class: register                                   
     name: zmm                                         
   latency: 4                                          
-  port_pressure: [[2, ['1', '3']]]            
+  port_pressure: [[2, '135'], [2, ['1D', '3D']]]
   throughput: 1.0 
   uops: 2 
 - name: vmovdqu64  # with store                       
@@ -1437,7 +1437,7 @@ instruction_forms:
   - class: register                                   
     name: xmm                                         
   latency: 4                                          
-  port_pressure: [[1, ['1', '3']]]              
+  port_pressure: [[1, '135'], [1, ['1D', '3D']]]
   throughput: 0.5 
   uops: 1                                             
 - name: vmovntdqa  # with load                        
@@ -1450,7 +1450,7 @@ instruction_forms:
   - class: register                                   
     name: xmm                                         
   latency: 4                                          
-  port_pressure: [[1, ['1', '3']]]              
+  port_pressure: [[1, '135'], [1, ['1D', '3D']]]
   throughput: 0.5 
   uops: 1                                             
 - name: vmovntdqa  # with load                        
@@ -1463,7 +1463,7 @@ instruction_forms:
   - class: register                                   
     name: ymm                                         
   latency: 4                                          
-  port_pressure: [[1, ['1', '3']]]              
+  port_pressure: [[1, '135'], [1, ['1D', '3D']]]
   throughput: 0.5 
   uops: 1                                             
 - name: vmovntdqa  # with load                        
@@ -1476,7 +1476,7 @@ instruction_forms:
   - class: register                                   
     name: zmm                                         
   latency: 4                                          
-  port_pressure: [[2, ['1', '3']]]            
+  port_pressure: [[2, '135'], [2, ['1D', '3D']]]
   throughput: 1.0 
   uops: 2 
 - name: movnti  # with store                          
@@ -1629,7 +1629,7 @@ instruction_forms:
   - class: register                                   
     name: mm                                          
   latency: 4                                          
-  port_pressure: [[1, ['1', '3']]]              
+  port_pressure: [[1, '135'], [1, ['1D', '3D']]]
   throughput: 0.5 
   uops: 1                                             
 - name: movq  # with store                            
@@ -1665,7 +1665,7 @@ instruction_forms:
   - class: register                                   
     name: xmm                                         
   latency: 4                                          
-  port_pressure: [[1, ['1', '3']]]              
+  port_pressure: [[1, '135'], [1, ['1D', '3D']]]
   throughput: 0.5 
   uops: 1                                             
 - name: movq  # with store                            
@@ -1701,7 +1701,7 @@ instruction_forms:
   - class: register                                   
     name: xmm                                         
   latency: 4                                          
-  port_pressure: [[1, ['1', '3']]]              
+  port_pressure: [[1, '135'], [1, ['1D', '3D']]]
   throughput: 0.5 
   uops: 1                                             
 - name: vmovq  # with store                           
@@ -1737,7 +1737,7 @@ instruction_forms:
   - class: register                                   
     name: xmm                                         
   latency: 4                                          
-  port_pressure: [[1, ['1', '3']]]              
+  port_pressure: [[1, '135'], [1, ['1D', '3D']]]
   throughput: 0.5 
   uops: 1                                             
 - name: movsd  # with store                           
@@ -1775,7 +1775,7 @@ instruction_forms:
   - class: register                                   
     name: xmm                                         
   latency: 4                                          
-  port_pressure: [[1, ['1', '3']]]              
+  port_pressure: [[1, '135'], [1, ['1D', '3D']]]
   throughput: 0.5 
   uops: 1                                             
 - name: vmovsd  # with store                          
@@ -1811,7 +1811,7 @@ instruction_forms:
   - class: register                                   
     name: xmm                                         
   latency: 4                                          
-  port_pressure: [[1, ['1', '3']]]              
+  port_pressure: [[1, '135'], [1, ['1D', '3D']]]
   throughput: 0.5 
   uops: 1                                             
 - name: vmovss                                        
@@ -1836,7 +1836,7 @@ instruction_forms:
   - class: register                                   
     name: xmm                                         
   latency: 4                                          
-  port_pressure: [[1, ['1', '3']]]              
+  port_pressure: [[1, '135'], [1, ['1D', '3D']]]
   throughput: 0.5 
   uops: 1                                             
 - name: vmovss                                        
@@ -1872,7 +1872,7 @@ instruction_forms:
   - class: register                                   
     name: xmm                                         
   latency: 4                                          
-  port_pressure: [[1, ['1', '3']]]              
+  port_pressure: [[1, '135'], [1, ['1D', '3D']]]
   throughput: 0.5 
   uops: 1                                             
 - name: movsx                                         
@@ -1895,8 +1895,8 @@ instruction_forms:
   - class: register                                   
     name: gpr                                         
   latency: 4                                          
-  port_pressure:  [1, ['1', '3', '5']]
-  throughput: 0.5 
+  port_pressure: [[1, '135'], [1, ['1D', '3D', '5D']]] 
+  throughput: 0.333333333
   uops: 1                                             
 - name: movsxd                                        
   operands:                                           
@@ -1918,8 +1918,8 @@ instruction_forms:
   - class: register                                   
     name: gpr                                         
   latency: 4                                          
-  port_pressure: [1, ['1', '3', '5']] 
-  throughput: 0.5 
+  port_pressure: [[1, '135'], [1, ['1D', '3D', '5D']]] 
+  throughput: 0.3333333
   uops: 1                                             
 - name: movsb                                         
   operands:                                           
@@ -1941,8 +1941,8 @@ instruction_forms:
   - class: register                                   
     name: gpr                                         
   latency: 4                                          
-  port_pressure: [1, ['1', '3', '5']] 
-  throughput: 0.5 
+  port_pressure: [[1, '135'], [1, ['1D', '3D', '5D']]] 
+  throughput: 0.333333333333
   uops: 1                                             
 - name: movsw                                         
   operands:                                           
@@ -1964,8 +1964,8 @@ instruction_forms:
   - class: register                                   
     name: gpr                                         
   latency: 4                                          
-  port_pressure: [1, ['1', '3', '5']] 
-  throughput: 0.5 
+  port_pressure: [[1, '135'], [1, ['1D', '3D', '5D']]] 
+  throughput: 0.3333333333
   uops: 1                                             
 - name: movsl                                         
   operands:                                           
@@ -1987,8 +1987,8 @@ instruction_forms:
   - class: register                                   
     name: gpr                                         
   latency: 4                                          
-  port_pressure: [1, ['1', '3', '5']] 
-  throughput: 0.5 
+  port_pressure: [[1, '135'], [1, ['1D', '3D', '5D']]] 
+  throughput: 0.333333333 
   uops: 1                                             
 - name: movsq                                         
   operands:                                           
@@ -2010,8 +2010,8 @@ instruction_forms:
   - class: register                                   
     name: gpr                                         
   latency: 4                                          
-  port_pressure: [1, ['1', '3', '5']] 
-  throughput: 0.5 
+  port_pressure: [[1, '135'], [1, ['1D', '3D', '5D']]] 
+  throughput: 0.333333333333333 
   uops: 1                                             
 - name: movupd                                        
   operands:                                           
@@ -2033,7 +2033,7 @@ instruction_forms:
   - class: register                                   
     name: xmm                                         
   latency: 4                                          
-  port_pressure: [1, ['1', '3', '5']] 
+  port_pressure: [[1, '135'], [1, ['1D', '3D']]] 
   throughput: 0.5 
   uops: 1                                             
 - name: movupd  # with store                          
@@ -2069,7 +2069,7 @@ instruction_forms:
   - class: register                                   
     name: xmm                                         
   latency: 4                                          
-  port_pressure: [[1, ['1', '3']]]              
+  port_pressure: [[1, '135'], [1, ['1D', '3D']]]
   throughput: 0.5 
   uops: 1                                             
 - name: vmovupd  # with store                         
@@ -2105,7 +2105,7 @@ instruction_forms:
   - class: register                                   
     name: ymm                                         
   latency: 4                                          
-  port_pressure: [[1, ['1', '3']]]              
+  port_pressure: [[1, '135'], [1, ['1D', '3D']]]
   throughput: 0.5 
   uops: 1                                             
 - name: vmovupd  # with store                         
@@ -2141,7 +2141,7 @@ instruction_forms:
   - class: register                                   
     name: zmm                                         
   latency: 4                                          
-  port_pressure: [[2, ['1', '3']]]            
+  port_pressure: [[2, '135'], [2, ['1D', '3D']]]
   throughput: 1.0 
   uops: 2 
 - name: vmovupd  # with store                         
@@ -2177,7 +2177,7 @@ instruction_forms:
   - class: register                                   
     name: xmm                                         
   latency: 4                                          
-  port_pressure: [[1, ['1', '3']]]              
+  port_pressure: [[1, '135'], [1, ['1D', '3D']]]
   throughput: 0.5 
   uops: 1                                             
 - name: movups  # with store                          
@@ -2213,7 +2213,7 @@ instruction_forms:
   - class: register                                   
     name: xmm                                         
   latency: 4                                          
-  port_pressure: [[1, ['1', '3']]]              
+  port_pressure: [[1, '135'], [1, ['1D', '3D']]]
   throughput: 0.5 
   uops: 1                                             
 - name: vmovups  # with store                         
@@ -2249,7 +2249,7 @@ instruction_forms:
   - class: register                                   
     name: ymm                                         
   latency: 4                                          
-  port_pressure: [[1, ['1', '3']]]              
+  port_pressure: [[1, '135'], [1, ['1D', '3D']]]
   throughput: 0.5 
   uops: 1                                             
 - name: vmovups  # with store                         
@@ -2285,7 +2285,7 @@ instruction_forms:
   - class: register                                   
     name: zmm                                         
   latency: 4                                          
-  port_pressure: [[2, ['1', '3']]]            
+  port_pressure: [[2, '135'], [2, ['1D', '3D']]]
   throughput: 1.0 
   uops: 2 
 - name: vmovups  # with store                         
@@ -2471,7 +2471,7 @@ instruction_forms:
   - class: register                      # ibench
     name: xmm                            # ibench
   latency: 21                            # ibench
-  port_pressure: [[17, ['9D', '11D']], [1, ['9', '11']]]  # ibench
+  port_pressure: [[17, ['9DV', '11DV']], [1, ['9', '11']]]  # ibench
   throughput: 8.5                        # ibench
   uops: 1                                # ibench
 - name: sqrtss                           # ibench
@@ -2481,7 +2481,7 @@ instruction_forms:
   - class: register                      # ibench
     name: xmm                            # ibench
   latency: 15                            # ibench
-  port_pressure: [[10, ['9D', '11D']], [1, ['9', '11']]]  # ibench
+  port_pressure: [[10, ['9DV', '11DV']], [1, ['9', '11']]]  # ibench
   throughput: 5.0                        # ibench
   uops: 1                                # ibench
 - name: vsqrtsd                          # ibench
@@ -2493,7 +2493,7 @@ instruction_forms:
   - class: register                      # ibench
     name: xmm                            # ibench
   latency: 21                            # ibench
-  port_pressure: [[17, ['9D', '11D']], [1, ['9', '11']]]  # ibench
+  port_pressure: [[17, ['9DV', '11DV']], [1, ['9', '11']]]  # ibench
   throughput: 8.5                        # ibench
   uops: 1                                # ibench
 - name: vsqrtss                          # ibench
@@ -2505,7 +2505,7 @@ instruction_forms:
   - class: register                      # ibench
     name: xmm                            # ibench
   latency: 15                            # ibench
-  port_pressure: [[10, ['9D', '11D']], [1, ['9', '11']]]  # ibench
+  port_pressure: [[10, ['9DV', '11DV']], [1, ['9', '11']]]  # ibench
   throughput: 5.0                        # ibench
   uops: 1                                # ibench
 - name: sub                     # ibench
@@ -2737,7 +2737,7 @@ instruction_forms:
   - class: register                      # ibench
     name: xmm                            # ibench
   latency: 13                            # ibench
-  port_pressure: [[1, ['9', '11']], [10, ['9D', '11D']]]  # ibench
+  port_pressure: [[1, ['9', '11']], [10, ['9DV', '11DV']]]  # ibench
   throughput: 5.0                        # ibench
   uops: 1                                # ibench
 - name: vdivpd                           # ibench
@@ -2749,7 +2749,7 @@ instruction_forms:
   - class: register                      # ibench
     name: ymm                            # ibench
   latency: 13                            # ibench
-  port_pressure: [[1, ['9', '11']], [10, ['9D', '11D']]]  # ibench
+  port_pressure: [[1, ['9', '11']], [10, ['9DV', '11DV']]]  # ibench
   throughput: 5.0                        # ibench
   uops: 1                                # ibench
 - name: vdivpd                              # ibench
@@ -2761,7 +2761,7 @@ instruction_forms:
   - class: register                         # ibench
     name: zmm                               # ibench
   latency: 13                               # ibench
-  port_pressure: [[1, ['9', '11']], [18, ['9D', '11D']]]  # ibench
+  port_pressure: [[1, ['9', '11']], [18, ['9DV', '11DV']]]  # ibench
   throughput: 9.0                           # ibench
   uops: 1                                   # ibench
 - name: vdivpd                              # ibench
@@ -2774,7 +2774,7 @@ instruction_forms:
     name: zmm                               # ibench
     mask: True                              # ibench
   latency: 13                               # ibench
-  port_pressure: [[1, ['9', '11']], [18, ['9D', '11D']]]  # ibench
+  port_pressure: [[1, ['9', '11']], [18, ['9DV', '11DV']]]  # ibench
   throughput: 9.0                          # ibench
   uops: 1                                  # ibench
 - name: vdivpd                             # ibench
@@ -2787,7 +2787,7 @@ instruction_forms:
     name: ymm                              # ibench
     mask: True                             # ibench
   latency: 13                              # ibench
-  port_pressure: [[1, ['9', '11']], [10, ['9D', '11D']]]  # ibench
+  port_pressure: [[1, ['9', '11']], [10, ['9DV', '11DV']]]  # ibench
   throughput: 5.0                          # ibench
   uops: 1                                  # ibench
 - name: vdivpd                             # ibench
@@ -2800,7 +2800,7 @@ instruction_forms:
     name: xmm                              # ibench
     mask: True                             # ibench
   latency: 13                              # ibench
-  port_pressure: [[1, ['9', '11']], [10, ['9D', '11D']]]  # ibench
+  port_pressure: [[1, ['9', '11']], [10, ['9DV', '11DV']]]  # ibench
   throughput: 5.0                          # ibench
   uops: 1                                  # ibench
 - name: vdivps                              # ibench
@@ -2812,7 +2812,7 @@ instruction_forms:
   - class: register                         # ibench
     name: zmm                               # ibench
   latency: 11                               # ibench
-  port_pressure: [[1, ['9', '11']], [12, ['9D', '11D']]]  # ibench
+  port_pressure: [[1, ['9', '11']], [12, ['9DV', '11DV']]]  # ibench
   throughput: 6.0                          # ibench
   uops: 1                                  # ibench
 - name: vdivps                              # ibench
@@ -2825,7 +2825,7 @@ instruction_forms:
     name: zmm                               # ibench
     mask: True                              # ibench
   latency: 11                               # ibench
-  port_pressure: [[1, ['9', '11']], [12, ['9D', '11D']]]  # ibench
+  port_pressure: [[1, ['9', '11']], [12, ['9DV', '11DV']]]  # ibench
   throughput: 6.0                          # ibench
   uops: 1                                  # ibench
 - name: vdivps                             # ibench
@@ -2838,7 +2838,7 @@ instruction_forms:
     name: ymm                              # ibench
     mask: True                             # ibench
   latency: 11                              # ibench
-  port_pressure: [[1, ['9', '11']], [6, ['9D', '11D']]]  # ibench
+  port_pressure: [[1, ['9', '11']], [6, ['9DV', '11DV']]]  # ibench
   throughput: 3.0                          # ibench
   uops: 5                                  # ibench
 - name: vdivps                             # ibench
@@ -2850,7 +2850,7 @@ instruction_forms:
   - class: register                        # ibench
     name: ymm                              # ibench
   latency: 11                              # ibench
-  port_pressure: [[1, ['9', '11']], [6, ['9D', '11D']]]  # ibench
+  port_pressure: [[1, ['9', '11']], [6, ['9DV', '11DV']]]  # ibench
   throughput: 3.0                          # ibench
   uops: 1                                  # ibench
 - name: vdivps                             # ibench
@@ -2862,7 +2862,7 @@ instruction_forms:
   - class: register                        # ibench
     name: xmm                              # ibench
   latency: 11                              # ibench
-  port_pressure: [[1, ['9', '11']], [6, ['9D', '11D']]]  # ibench
+  port_pressure: [[1, ['9', '11']], [6, ['9DV', '11DV']]]  # ibench
   throughput: 3.0                          # ibench
   uops: 1                                  # ibench
 - name: vdivps                             # ibench
@@ -2875,7 +2875,7 @@ instruction_forms:
     name: xmm                              # ibench
     mask: True                             # ibench
   latency: 11                              # ibench
-  port_pressure: [[1, ['9', '11']], [6, ['9D', '11D']]]  # ibench
+  port_pressure: [[1, ['9', '11']], [6, ['9DV', '11DV']]]  # ibench
   throughput: 3.0                          # ibench
   uops: 1                                  # ibench
 - name: vdivss                             # ibench
@@ -2888,7 +2888,7 @@ instruction_forms:
     name: xmm                              # ibench
     mask: True                             # ibench
   latency: 11                              # ibench
-  port_pressure: [[1, ['9', '11']], [6, ['9D', '11D']]]  # ibench
+  port_pressure: [[1, ['9', '11']], [6, ['9DV', '11DV']]]  # ibench
   throughput: 3.0                          # ibench
   uops: 1                                  # ibench
 - name: vdivss                             # ibench
@@ -2900,7 +2900,7 @@ instruction_forms:
   - class: register                        # ibench
     name: xmm                              # ibench
   latency: 11                              # ibench
-  port_pressure: [[1, ['9', '11']], [6, ['9D', '11D']]]  # ibench
+  port_pressure: [[1, ['9', '11']], [6, ['9DV', '11DV']]]  # ibench
   throughput: 3.0                          # ibench
   uops: 1                                  # ibench
 - name: vdivsd                             # ibench
@@ -2912,7 +2912,7 @@ instruction_forms:
   - class: register                        # ibench
     name: xmm                              # ibench
   latency: 13                              # ibench
-  port_pressure: [[1, ['9', '11']], [10, ['9D', '11D']]]  # ibench
+  port_pressure: [[1, ['9', '11']], [10, ['9DV', '11DV']]]  # ibench
   throughput: 5.0                          # ibench
   uops: 1                                  # ibench
 - name: vdivsd                             # ibench
@@ -2925,7 +2925,7 @@ instruction_forms:
     name: xmm                              # ibench
     mask: True                             # ibench
   latency: 13                              # ibench
-  port_pressure: [[1, ['9', '11']], [10, ['9D', '11D']]]  # ibench
+  port_pressure: [[1, ['9', '11']], [10, ['9DV', '11DV']]]  # ibench
   throughput: 5.0                          # ibench
   uops: 1                                  # ibench
 - name: [vfmadd213pd, vfmadd132pd, vfmadd231pd, vfnmadd213pd, vfnmadd132pd, vfnmadd231pd, vfmsub213pd, vfmsub132pd, vfmsub231pd, vfnmsub213pd, vfnmsub132pd, vfnmsub231pd]  # ibench
@@ -3138,7 +3138,7 @@ instruction_forms:
   - class: register
     name: xmm
   latency: 13
-  port_pressure: [[6, '13'], [1, ['9', '10', '11', '12']], [2, ['9', '11']], [1, ['10','11','12']]]
+  port_pressure: [[6, ['1D', '3D']], [2, ['135']], [1, ['9', '10', '11', '12']], [2, ['9', '11']], [1, ['10','11','12']]]
   throughput: 3.0
   uops: 18
 - name: [vgatherdpd, vgatherqpd]  # with load
@@ -3151,7 +3151,7 @@ instruction_forms:
   - class: register
     name: ymm
   latency: 15
-  port_pressure: [[8, '13'], [1, ['9', '10', '11', '12']], [4, ['9', '11']], [2, ['10','11','12']]]
+  port_pressure: [[8, ['1D', '3D']], [4, '135'], [1, ['9', '10', '11', '12']], [4, ['9', '11']], [2, ['10','11','12']]]
   throughput: 4.0
   uops: 24
 - name: [vgatherdpd, vgatherqpd]  # with load
@@ -3164,7 +3164,7 @@ instruction_forms:
   - class: register
     name: zmm
   latency: 26
-  port_pressure: [[22, '13'], [2, ['9', '10', '11', '12']], [8, ['9', '11']], [4, ['10','11','12']]]
+  port_pressure: [[22, ['1D', '3D']], [8, '135'], [2, ['9', '10', '11', '12']], [8, ['9', '11']], [4, ['10','11','12']]]
   throughput: 11.0
   uops: 48
 - name: [vgatherdpd, vgatherqpd]  # uops.info
@@ -3178,7 +3178,7 @@ instruction_forms:
     name: xmm
     mask: True
   latency: 14
-  port_pressure: [[8, '13'], [1, ['9', '10', '11', '12']], [2, ['9', '11']], [1, ['10','11','12']]]
+  port_pressure: [[8, ['1D', '3D']], [2, '135'], [1, ['9', '10', '11', '12']], [2, ['9', '11']], [1, ['10','11','12']]]
   throughput: 4.0
   uops: 18
 - name: [vgatherdpd, vgatherqpd]  # uops.info
@@ -3192,7 +3192,7 @@ instruction_forms:
     name: ymm
     mask: True
   latency: 15
-  port_pressure: [[8, '13'], [1, ['9', '10', '11', '12']], [4, ['9', '11']], [2, ['10','11','12']]]
+  port_pressure: [[8, ['1D', '3D']], [4, '135'], [1, ['9', '10', '11', '12']], [4, ['9', '11']], [2, ['10','11','12']]]
   throughput: 4.0
   uops: 24
 - name: [vgatherdpd, vgatherqpd]  # uops.info
@@ -3206,7 +3206,7 @@ instruction_forms:
     name: zmm
     mask: True
   latency: 26
-  port_pressure: [[22, '13'], [2, ['9', '10', '11', '12']], [8, ['9', '11']], [4, ['10','11','12']]]
+  port_pressure: [[22, ['1D', '3D']], [8, '135'], [2, ['9', '10', '11', '12']], [8, ['9', '11']], [4, ['10','11','12']]]
   throughput: 11.0
   uops: 48
 - name: vgatherdps  # with load                                                   # ibench
@@ -3219,7 +3219,7 @@ instruction_forms:
   - class: register                                                               # ibench
     name: xmm                                                                     # ibench
   latency: 15                                                                     # ibench
-  port_pressure: [[8, '13'], [1, ['9', '10', '11', '12']], [1, ['9', '11']], [2, ['10','11','12']]]
+  port_pressure: [[8, ['1D', '3D']], [4, '135'], [1, ['9', '10', '11', '12']], [1, ['9', '11']], [2, ['10','11','12']]]
   throughput: 4.0                                                                 # ibench
   uops: 24                                                                         # ibench
 - name: vgatherdps  # with load                                                   # uops.info
@@ -3232,7 +3232,7 @@ instruction_forms:
   - class: register                                                               # uops.info
     name: ymm                                                                     # uops.info
   latency: 20                                                                     # uops.info
-  port_pressure: [[16, '13'], [1, ['9', '10', '11', '12']], [2, ['9', '11']], [4, ['10','11','12']]]
+  port_pressure: [[16, ['1D', '3D']], [8, '135'], [1, ['9', '10', '11', '12']], [2, ['9', '11']], [4, ['10','11','12']]]
   throughput: 8.0                                                                 # uops.info
   uops: 42                                                                         #uops.info
 - name: vgatherdps  # with load                                                   # ibench
@@ -3246,7 +3246,7 @@ instruction_forms:
     name: xmm                                                                     # ibench
     mask: True                # ibench
   latency: 15                                                                     # ibench
-  port_pressure: [[10, '13'], [1, ['9', '10', '11', '12']], [1, ['9', '11']], [2, ['10','11','12']]]
+  port_pressure: [[10, ['1D', '3D']], [4, '135'], [1, ['9', '10', '11', '12']], [1, ['9', '11']], [2, ['10','11','12']]]
   throughput: 5.0                                                                 # ibench
   uops: 24                                                                         # ibench
 - name: vgatherdps  # with load                                                   # uops.info
@@ -3260,7 +3260,7 @@ instruction_forms:
     name: ymm                                                                     # uops.info
     mask: True                # ibench
   latency: 21                                                                     # uops.info
-  port_pressure: [[18, '13'], [1, ['9', '10', '11', '12']], [2, ['9', '11']], [4, ['10','11','12']]]
+  port_pressure: [[18, ['1D', '3D']], [8, '135'], [1, ['9', '10', '11', '12']], [2, ['9', '11']], [4, ['10','11','12']]]
   throughput: 9.0                                                                 # uops.info
   uops: 41                                                                         #uops.info
 - name: vgatherdps  # with load                                                   # uops.info
@@ -3274,7 +3274,7 @@ instruction_forms:
     name: zmm                                                                     # uops.info
     mask: True                # ibench
   latency: 35                                                                     # uops.info
-  port_pressure: [[34, '13'], [2, ['9', '10', '11', '12']], [4, ['9', '11']], [8, ['10','11','12']]]
+  port_pressure: [[34, ['1D', '3D']], [16, '135'], [2, ['9', '10', '11', '12']], [4, ['9', '11']], [8, ['10','11','12']]]
   throughput: 17.0                                                                 # uops.info
   uops: 81                                                                         #uops.info
 - name: vmulpd                # ibench
@@ -5057,7 +5057,7 @@ instruction_forms:
   throughput: 0.666666666
   uops: 1
 ########## TODO ###############
-- name: AND
+- name: [AND, OR]
   operands:
   - class: immediate
     imd: int
@@ -5067,6 +5067,17 @@ instruction_forms:
   port_pressure: [[1, '0246']]
   throughput: 0.25
   uops: 1
+- name: [AND, OR]
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: 1
+  port_pressure: [[1, '0246']]
+  throughput: 0.25
+  uops: 1
+
 - name: RET
   operands: []
   latency: 0
@@ -5213,7 +5224,7 @@ instruction_forms:
   port_pressure: [[2, ['10', '11']]]
   throughput: 1.0
   uops: 2
-- name: [VBROADCASTSD, VBROADCASTSS]
+- name: [VBROADCASTSD, VBROADCASTSS]  # with load
   operands:
   - class: memory
     base: "*"
@@ -5222,11 +5233,11 @@ instruction_forms:
     scale: "*"
   - class: register
     name: ymm
-  latency: 9
-  port_pressure: [[1, ['1', '3']], [1, ['10', '11']], [1, ['13']]]
-  throughput: 1.0
+  latency: 8
+  port_pressure: [[1, ['1D', '3D']], [1, ['10', '11']], [2, ['135']]]
+  throughput: 0.5
   uops: 1
-- name: [VBROADCASTSD, VBROADCASTSS]
+- name: [VBROADCASTSD, VBROADCASTSS] # with load
   operands:
   - class: memory
     base: "*"
@@ -5235,8 +5246,8 @@ instruction_forms:
     scale: "*"
   - class: register
     name: zmm
-  latency: 5
-  port_pressure: [[1, '23'], [1, ['2D', '3D']], [1, '015']]
+  latency: 9
+  port_pressure: [[2, ['1D', '3D']], [1, ['10', '11']], [4, ['135']]]
   throughput: 1.0
   uops: 1
 - name: vandpd
@@ -5309,6 +5320,16 @@ instruction_forms:
   port_pressure: [[1, '0']]
   throughput: 1.0
   uops: 1
+- name: vmovq
+  operands:                                           
+  - class: register                                   
+    name: xmm                                         
+  - class: register                                   
+    name: gpr                                         
+  latency: 5                                         
+  port_pressure: [[1, '8']]  
+  throughput: 1.0                              
+  uops: 1.0                                           
 - name: [vpor, vpxor, vpord, vpxord]
   operands:
   - class: register
