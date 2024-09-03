@@ -7,7 +7,7 @@ import re
 import sys
 from functools import lru_cache
 
-import ruamel.yaml
+from ruamel.yaml import YAML
 
 from osaca.db_interface import import_benchmark_output, sanity_check
 from osaca.frontend import Frontend
@@ -375,7 +375,8 @@ def inspect(args, output_file=sys.stdout):
         file=output_file,
     )
     if args.yaml_out is not None:
-        ruamel.yaml.dump(
+        yaml = YAML(typ='unsafe', pure=True)
+        yaml.dump(
             frontend.full_analysis_dict(
                 kernel,
                 kernel_graph,
