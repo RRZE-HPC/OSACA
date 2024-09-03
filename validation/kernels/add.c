@@ -2,6 +2,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <likwid.h>
+#ifdef __ARM_FEATURE_SVE
+#include <sys/prctl.h>
+#endif
 #endif
 
 #define DTYPE double
@@ -38,7 +41,11 @@ int main(int argc, char *argv[]) {
     }
     printf("kernel: add\n");
     printf("elementsize: %lu\n", sizeof(DTYPE));
-    
+#ifdef __ARM_FEATURE_SVE
+    int vl_in_bytes = prctl(PR_SVE_GET_VL) & PR_SVE_VL_LEN_MASK;
+    printf("vector length: %d bits\n", vl_in_bytes*8);
+#endif
+
     //SETUP
     DTYPE* a = malloc(maxelements*sizeof(DTYPE));
     DTYPE* b = malloc(maxelements*sizeof(DTYPE));

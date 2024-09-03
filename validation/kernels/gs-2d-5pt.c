@@ -2,6 +2,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <likwid.h>
+#ifdef __ARM_FEATURE_SVE
+#include <sys/prctl.h>
+#endif
 #endif
 
 #define DTYPE double
@@ -15,7 +18,7 @@ void kernel(DTYPE* a, const int repeat, const int cur_elementsy, const int cur_e
         for(int y=1; y<cur_elementsy-1; y++) {
             for(int x=1; x<cur_elementsx-1; x++) {
                 a[y*cur_elementsx+x] = 1.0234 * (
-                    a[(y-1)*cur_elementsx+x] + 
+                    a[(y-1)*cur_elementsx+x] +
                     a[y*cur_elementsx+x-1] +
                     a[y*cur_elementsx+x+1] +
                     a[(y+1)*cur_elementsx+x]);
@@ -48,7 +51,11 @@ int main(int argc, char *argv[]) {
     }
     printf("kernel: gs-2d-5pt\n");
     printf("elementsize: %lu\n", sizeof(DTYPE));
-    
+#ifdef __ARM_FEATURE_SVE
+    int vl_in_bytes = prctl(PR_SVE_GET_VL) & PR_SVE_VL_LEN_MASK;
+    printf("vector length: %d bits\n", vl_in_bytes*8);
+#endif
+
     //SETUP
     DTYPE* a = malloc(maxproduct*sizeof(DTYPE));
     for(int i=0; i<maxproduct; i++) {

@@ -2,6 +2,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <likwid.h>
+#ifdef __ARM_FEATURE_SVE
+#include <sys/prctl.h>
+#endif
 #endif
 
 #define DTYPE double
@@ -16,8 +19,8 @@ void kernel(DTYPE* a, DTYPE* b, const int repeat, const int cur_elementsz, const
             for(int y=1; y<cur_elementsy-1; y++) {
                 for(int x=1; x<cur_elementsx-1; x++) {
                     a[z*cur_elementsy*cur_elementsx+y*cur_elementsx+x] = 1.0234 * (
-                        b[(z+1)*cur_elementsy*cur_elementsx+y*cur_elementsx+x] + 
-                        b[z*cur_elementsy*cur_elementsx+(y-1)*cur_elementsx+x] + 
+                        b[(z+1)*cur_elementsy*cur_elementsx+y*cur_elementsx+x] +
+                        b[z*cur_elementsy*cur_elementsx+(y-1)*cur_elementsx+x] +
                         b[z*cur_elementsy*cur_elementsx+y*cur_elementsx+x-1] +
                         b[z*cur_elementsy*cur_elementsx+y*cur_elementsx+x+1] +
                         b[z*cur_elementsy*cur_elementsx+(y+1)*cur_elementsx+x] +
@@ -56,7 +59,11 @@ int main(int argc, char *argv[]) {
     }
     printf("kernel: 3d-7pt\n");
     printf("elementsize: %lu\n", sizeof(DTYPE));
-    
+#ifdef __ARM_FEATURE_SVE
+    int vl_in_bytes = prctl(PR_SVE_GET_VL) & PR_SVE_VL_LEN_MASK;
+    printf("vector length: %d bits\n", vl_in_bytes*8);
+#endif
+
     //SETUP
     DTYPE* a = malloc(maxproduct*sizeof(DTYPE));
     DTYPE* b = malloc(maxproduct*sizeof(DTYPE));
