@@ -5139,6 +5139,7 @@ instruction_forms:
     name: ymm
   latency: 3
   port_pressure: [[1, ['10', '11'], [1, '13']]]
+  throughput: 1.0
   uops: 2
 - name: [VTESTPD, VTESTPS]
   operands:
