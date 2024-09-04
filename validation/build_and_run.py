@@ -543,7 +543,7 @@ def build_mark_run_all_kernels(measurements=True, osaca=True, iaca=True, llvm_mc
                         continue
 
                     # Always redo the predictions
-                    #if overwrite:
+                    # if overwrite:
                     if True:
                         # clear all model generated information
                         for model in ["IACA", "OSACA", "LLVM-MCA", "Ithemal"]:
