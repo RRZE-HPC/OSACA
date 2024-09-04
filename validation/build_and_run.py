@@ -39,9 +39,94 @@ hosts_arch_map = {
     r"rome1": "ZEN2",
     r"warmup": "TX2",
     r"qp4-node-[0-9]+": "A64FX",
+    r"milan1": "ZEN3",
+    r"f0[0-9]+.nhr.fau.de": "ICX",
+    r"f2[0-9]+.nhr.fau.de": "SPR",
+    r"gracesup1": "V2",
+    r"genoa[1-3]": "ZEN4",
 }
 
 arch_info = {
+    "SPR": {
+        "OSACA": "SPR",
+        "LLVM-MCA": "-mcpu=sapphirerapids",
+        "Ithemal": None,
+        "IACA": None,
+        "isa": "x86",
+        "perfevents": [],
+        "cflags": {
+            "icx": {
+                "Ofast": (
+                    "-Ofast -fno-alias -march=sapphirerapids -qopt-zmm-usage=high -nolib-inline "
+                    "-ffreestanding"
+                ).split(),
+                "O3": (
+                    "-O3 -fno-alias -march=sapphirerapids -qopt-zmm-usage=high -nolib-inline "
+                    "-ffreestanding"
+                ).split(),
+                "O2": (
+                    "-O2 -fno-alias -march=sapphirerapids -qopt-zmm-usage=high -nolib-inline "
+                    "-ffreestanding"
+                ).split(),
+                "O1": (
+                    "-O1 -fno-alias -march=sapphirerapids -qopt-zmm-usage=high -nolib-inline "
+                    "-ffreestanding"
+                ).split(),
+            },
+            "clang": {
+                "Ofast": "-Ofast -march=sapphirerapids -ffreestanding".split(),
+                "O3": "-O3 -march=sapphirerapids -ffreestanding".split(),
+                "O2": "-O2 -march=sapphirerapids -ffreestanding".split(),
+                "O1": "-O1 -march=sapphirerapids -ffreestanding".split(),
+            },
+            "gcc": {
+                "Ofast": "-Ofast -march=sapphirerapids -lm -ffreestanding -falign-loops=16".split(),
+                "O3": "-O3 -march=sapphirerapids -lm -ffreestanding -falign-loops=16".split(),
+                "O2": "-O2 -march=sapphirerapids -lm -ffreestanding -falign-loops=16".split(),
+                "O1": "-O1 -march=sapphirerapids -lm -ffreestanding -falign-loops=16".split(),
+            },
+        },
+    },
+    "ICX": {
+        "IACA": "SKX",
+        "OSACA": "ICX",
+        "LLVM-MCA": "-mcpu=icelake-server",
+        "Ithemal": None,
+        "isa": "x86",
+        "perfevents": [],
+        "cflags": {
+            "icc": {
+                "Ofast": (
+                    "-Ofast -fno-alias -xCORE-AVX512 -qopt-zmm-usage=high -nolib-inline "
+                    "-ffreestanding -falign-loops"
+                ).split(),
+                "O3": (
+                    "-O3 -fno-alias -xCORE-AVX512 -qopt-zmm-usage=high -nolib-inline "
+                    "-ffreestanding -falign-loops"
+                ).split(),
+                "O2": (
+                    "-O2 -fno-alias -xCORE-AVX512 -qopt-zmm-usage=high -nolib-inline "
+                    "-ffreestanding -falign-loops"
+                ).split(),
+                "O1": (
+                    "-O1 -fno-alias -xCORE-AVX512 -qopt-zmm-usage=high -nolib-inline "
+                    "-ffreestanding -falign-loops"
+                ).split(),
+            },
+            "clang": {
+                "Ofast": "-Ofast -march=icelake-server -ffreestanding".split(),
+                "O3": "-O3 -march=icelake-server -ffreestanding".split(),
+                "O2": "-O2 -march=icelake-server -ffreestanding".split(),
+                "O1": "-O1 -march=icelake-server -ffreestanding".split(),
+            },
+            "gcc": {
+                "Ofast": "-Ofast -march=icelake-server -lm -ffreestanding -falign-loops=16".split(),
+                "O3": "-O3 -march=icelake-server -lm -ffreestanding -falign-loops=16".split(),
+                "O2": "-O2 -march=icelake-server -lm -ffreestanding -falign-loops=16".split(),
+                "O1": "-O1 -march=icelake-server -lm -ffreestanding -falign-loops=16".split(),
+            },
+        },
+    },
     "SKX": {
         "prepare": ["likwid-setFrequencies -f 2.4 -t 0".split()],
         "IACA": "SKX",
@@ -176,6 +261,69 @@ arch_info = {
             },
         },
     },
+    "ZEN3": {
+        "prepare": ["likwid-setFrequencies -f 2.1 -t 0".split()],
+        "IACA": None,
+        "OSACA": "ZEN3",
+        "LLVM-MCA": "-mcpu=znver3",
+        "Ithemal": None,
+        "isa": "x86",
+        "perfevents": [],
+        "L2_volume_metric": "L2 bandwidth [MBytes/s]",
+        "cflags": {
+            "clang-15": {
+                "Ofast": "-Ofast -march=znver3 -ffreestanding".split(),
+                "O3": "-O3 -march=znver3 -ffreestanding".split(),
+                "O2": "-O2 -march=znver3 -ffreestanding".split(),
+                "O1": "-O1 -march=znver3 -ffreestanding".split(),
+            },
+            "gcc": {
+                "Ofast": "-Ofast -march=znver3 -ffreestanding -falign-loops=16".split(),
+                "O3": "-O3 -march=znver3 -ffreestanding -falign-loops=16".split(),
+                "O2": "-O2 -march=znver3 -ffreestanding -falign-loops=16".split(),
+                "O1": "-O1 -march=znver3 -ffreestanding -falign-loops=16".split(),
+            },
+            "icc": {
+                "Ofast": (
+                    "-Ofast -xAVX2 -fno-alias -nolib-inline -ffreestanding -falign-loops"
+                ).split(),
+                "O3": "-O3 -xAVX2 -fno-alias -nolib-inline -ffreestanding -falign-loops".split(),
+                "O2": "-O2 -xAVX2 -fno-alias -nolib-inline -ffreestanding -falign-loops".split(),
+                "O1": "-O1 -xAVX2 -fno-alias -nolib-inline -ffreestanding -falign-loops".split(),
+            },
+        },
+    },
+    "ZEN4": {
+        "IACA": None,
+        "OSACA": "ZEN4",
+        "LLVM-MCA": "-mcpu=znver4",
+        "Ithemal": None,
+        "isa": "x86",
+        "perfevents": [],
+        "L2_volume_metric": "L2 bandwidth [MBytes/s]",
+        "cflags": {
+            "clang": {
+                "Ofast": "-Ofast -march=znver4 -ffreestanding".split(),
+                "O3": "-O3 -march=znver4 -ffreestanding".split(),
+                "O2": "-O2 -march=znver4 -ffreestanding".split(),
+                "O1": "-O1 -march=znver4 -ffreestanding".split(),
+            },
+            "gcc": {
+                "Ofast": "-Ofast -march=znver4 -ffreestanding -falign-loops=16".split(),
+                "O3": "-O3 -march=znver4 -ffreestanding -falign-loops=16".split(),
+                "O2": "-O2 -march=znver4 -ffreestanding -falign-loops=16".split(),
+                "O1": "-O1 -march=znver4 -ffreestanding -falign-loops=16".split(),
+            },
+            "icx": {
+                "Ofast": (
+                    "-Ofast -xAVX512 -fno-alias -nolib-inline -ffreestanding -falign-loops"
+                ).split(),
+                "O3": "-O3 -xAVX512 -fno-alias -nolib-inline -ffreestanding -falign-loops".split(),
+                "O2": "-O2 -xAVX512 -fno-alias -nolib-inline -ffreestanding -falign-loops".split(),
+                "O1": "-O1 -xAVX512 -fno-alias -nolib-inline -ffreestanding -falign-loops".split(),
+            },
+        },
+    },
     "TX2": {
         "Clock [MHz]": 2200,  # reading out via perf. counters is not supported
         "IACA": None,
@@ -225,6 +373,32 @@ arch_info = {
             },
         },
     },
+    "V2": {
+        "Clock [MHz]": 3400,  # reading out via perf. counters is not supported
+        "L2_volume_metric": "L1<->L2 data volume [GBytes]",
+        "IACA": None,
+        "OSACA": "V2",
+        "assign_optimal_throughput": True,
+        "LLVM-MCA": "-mcpu=neoverse-v2 -march=aarch64",
+        "Ithemal": None,
+        "isa": "aarch64",
+        "perfevents": [],
+        "cflags": {
+            "gcc": {
+                "Ofast": "-Ofast -msve-vector-bits=128 -march=armv9-a+sve2 -ffreestanding".split(),
+                "O3": "-O3 -msve-vector-bits=128 -march=armv9-a+sve2 -ffreestanding".split(),
+                "O2": "-O2 -msve-vector-bits=128 -march=armv9-a+sve2 -ffreestanding".split(),
+                "O1": "-O1 -msve-vector-bits=128 -march=armv9-a+sve2 -ffreestanding".split(),
+            },
+            "armclang": {
+                "Ofast": "-Ofast -target aarch64-unknown-linux-gnu -march=armv9-a+sve2 -mcpu=neoverse-v2 -ffreestanding".split(),
+                "O3": "-O3 -target aarch64-unknown-linux-gnu -march=armv9-a+sve2 -mcpu=neoverse-v2 -ffreestanding".split(),
+                "O2": "-O2 -target aarch64-unknown-linux-gnu -march=armv9-a+sve2 -mcpu=neoverse-v2 -ffreestanding".split(),
+                "O1": "-O1 -target aarch64-unknown-linux-gnu -march=armv9-a+sve2 -mcpu=neoverse-v2 -ffreestanding".split(),
+            },
+        },
+    },
+
 }
 
 
@@ -368,7 +542,9 @@ def build_mark_run_all_kernels(measurements=True, osaca=True, iaca=True, llvm_mc
                         print(":", e)
                         continue
 
-                    if overwrite:
+                    # Always redo the predictions
+                    #if overwrite:
+                    if True:
                         # clear all model generated information
                         for model in ["IACA", "OSACA", "LLVM-MCA", "Ithemal"]:
                             for k in [
@@ -598,7 +774,7 @@ def mark(asm_path, compiler, cflags, isa, overwrite=False):
     # Compile marked assembly to object for IACA
     marked_obj = Path(asm_path).with_suffix(".marked.o")
     if not marked_obj.exists():
-        check_call([compiler] + ["-c", str(marked_asm_path), "-o", str(marked_obj)])
+        check_call([compiler] + cflags + ["-c", str(marked_asm_path), "-o", str(marked_obj)])
 
     return str(marked_asm_path), str(marked_obj), pointer_increment, overwrite
 
@@ -635,7 +811,7 @@ def build_kernel(
     if not Path(f"{build_path}/compiler_version").exists():
         # Document compiler version
         with open(f"{build_path}/compiler_version", "w") as f:
-            f.write(check_output([compiler, "-v"], encoding="utf8", stderr=STDOUT))
+            f.write(check_output([compiler, "--version"], encoding="utf8", stderr=STDOUT))
 
     if overwrite:
         # build object + assembly
@@ -794,11 +970,11 @@ def get_ithemal_prediction(code, model="skl"):
 def main():
     # Check for correct LLVM-MCA version
     try:
-        llvm_mca = "LLVM version 12.0.0" in check_output(["llvm-mca", "-version"]).decode()
+        llvm_mca = "LLVM version" in check_output(["llvm-mca", "-version"]).decode()
     except FileNotFoundError:
         llvm_mca = False
 
-    build_mark_run_all_kernels(measurements="--no-measurements" not in sys.argv, llvm_mca=llvm_mca)
+    build_mark_run_all_kernels(measurements="--no-measurements" not in sys.argv, iaca=False, osaca=True, llvm_mca=llvm_mca)
     sys.exit()
 
 
