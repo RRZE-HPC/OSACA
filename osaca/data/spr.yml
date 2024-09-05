@@ -5430,10 +5430,28 @@ instruction_forms:
 
 ########### /\                  ##########
 ########### || assumed from ICX ##########
-- name: AND
+- name: [AND, OR, XOR, TEST]
   operands:
   - class: immediate
     imd: int
+  - class: register
+    name: gpr
+  latency: 1
+  port_pressure: [[1, ['0','1','5','6','11']]]
+  throughput: 0.20
+  uops: 1
+- name: [AND, OR, XOR, TEST]
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: 1
+  port_pressure: [[1, ['0','1','5','6','11']]]
+  throughput: 0.20
+  uops: 1
+- name: NOT
+  operands:
   - class: register
     name: gpr
   latency: 1
@@ -5453,26 +5471,6 @@ instruction_forms:
   port_pressure: [[1, '49'], [1, '78']]
   throughput: 0.5
   uops: 2
-- name: TEST
-  operands:
-  - class: immediate
-    imd: int
-  - class: register
-    name: gpr
-  latency: 1
-  port_pressure: [[1, ['0','1','5','6','11']]]
-  throughput: 0.20
-  uops: 1
-- name: TEST
-  operands:
-  - class: register
-    name: gpr
-  - class: register
-    name: gpr
-  latency: 1
-  port_pressure: [[1, ['0','1','5','6','11']]]
-  throughput: 0.20
-  uops: 1
 - name: PTEST
   operands:
   - class: register
@@ -5754,4 +5752,48 @@ instruction_forms:
   latency: 1
   port_pressure: [[1, '0']]
   throughput: 1.0
+  uops: 1
+- name: [knotb, knotw, knotd, knotq]
+  operands:
+  - class: register
+    name: k
+  - class: register
+    name: k
+  latency: 1
+  port_pressure: [[1, '0']]
+  throughput: 1.0
+  uops: 1
+- name: [korb, korw, kord, korq, kandb, kandw, kand, kandq, kandnb, kandnw, kandnd, kandnq]
+  operands:
+  - class: register
+    name: k
+  - class: register
+    name: k
+  - class: register
+    name: k
+  latency: 1
+  port_pressure: [[1, '0']]
+  throughput: 1.0
+  uops: 1
+- name: [ktestb, ktestw, ktestd, ktestq, kortestb, kortestw, kortestd, kortestq]
+  operands:
+  - class: register
+    name: k
+  - class: register
+    name: k
+  latency: 1
+  port_pressure: [[1, '0']]
+  throughput: 1.0
+  uops: 1
+- name: [vfpclasspd]
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: "*"
+  - class: register
+    name: k 
+  latency: 3                    # uops.info
+  port_pressure: [[1, '5']]     # uops.info
+  throughput: 1.0               # ibench
   uops: 1
