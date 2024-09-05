@@ -398,7 +398,6 @@ arch_info = {
             },
         },
     },
-
 }
 
 
@@ -974,7 +973,9 @@ def main():
     except FileNotFoundError:
         llvm_mca = False
 
-    build_mark_run_all_kernels(measurements="--no-measurements" not in sys.argv, iaca=False, osaca=True, llvm_mca=llvm_mca)
+    build_mark_run_all_kernels(
+        measurements="--no-measurements" not in sys.argv, iaca=False, osaca=True, llvm_mca=llvm_mca
+    )
     sys.exit()
 
 

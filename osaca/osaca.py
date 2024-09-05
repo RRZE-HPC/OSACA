@@ -375,7 +375,7 @@ def inspect(args, output_file=sys.stdout):
         file=output_file,
     )
     if args.yaml_out is not None:
-        yaml = YAML(typ='unsafe', pure=True)
+        yaml = YAML(typ="unsafe", pure=True)
         yaml.dump(
             frontend.full_analysis_dict(
                 kernel,
