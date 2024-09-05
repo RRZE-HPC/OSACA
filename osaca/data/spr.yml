@@ -5601,7 +5601,7 @@ instruction_forms:
   - class: register
     name: ymm
   latency: 5
-  port_pressure: [[1, '23'], [1, ['2D', '3D']], [1, '015']]
+  port_pressure: [[1, '23'], [1, '015']]
   throughput: 1.0
   uops: 1
 - name: [VBROADCASTSD, VBROADCASTSS]
@@ -5614,7 +5614,7 @@ instruction_forms:
   - class: register
     name: zmm
   latency: 5
-  port_pressure: [[1, '23'], [1, ['2D', '3D']], [1, '015']]
+  port_pressure: [[1, '23'], [1, '015']]
   throughput: 1.0
   uops: 1
 - name: vandpd
