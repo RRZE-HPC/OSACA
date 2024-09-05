@@ -316,11 +316,11 @@ arch_info = {
             },
             "icx": {
                 "Ofast": (
-                    "-Ofast -xAVX512 -fno-alias -nolib-inline -ffreestanding -falign-loops"
+                    "-Ofast -xCORE-AVX512 -fno-alias -nolib-inline -ffreestanding -falign-loops"
                 ).split(),
-                "O3": "-O3 -xAVX512 -fno-alias -nolib-inline -ffreestanding -falign-loops".split(),
-                "O2": "-O2 -xAVX512 -fno-alias -nolib-inline -ffreestanding -falign-loops".split(),
-                "O1": "-O1 -xAVX512 -fno-alias -nolib-inline -ffreestanding -falign-loops".split(),
+                "O3": "-O3 -xCORE-AVX512 -fno-alias -nolib-inline -ffreestanding -falign-loops".split(),
+                "O2": "-O2 -xCORE-AVX512 -fno-alias -nolib-inline -ffreestanding -falign-loops".split(),
+                "O1": "-O1 -xCORE-AVX512 -fno-alias -nolib-inline -ffreestanding -falign-loops".split(),
             },
         },
     },
