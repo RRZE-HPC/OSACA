@@ -2791,6 +2791,19 @@ instruction_forms:
   throughput: 0.5
   latency: 1.0  # 	1*p67
   port_pressure: [[1, '67']]
+- name: [sxtl, sxtl2]
+  operands:
+  - class: register
+    prefix: v
+    shape: d
+    width: '*'
+  - class: register
+    prefix: v
+    shape: s
+    width: '*'
+  throughput: 0.5
+  latency: 2.0  # 	1*p67
+  port_pressure: [[1, '67']]
 - name: [ubfiz, ubfm, ubfx]
   operands:
   - class: register
@@ -4647,6 +4660,17 @@ instruction_forms:
   throughput: 0.25
   latency: 2.0  # 	2*p89,10,11
   port_pressure: [[1, ['8','9','10','11']]]
+- name: [scvtf, ucvtf]
+  operands:
+  - class: register
+    prefix: v
+    shape: "*"
+  - class: register
+    prefix: v
+    shape: "*"
+  throughput: 0.5
+  latency: 3.0
+  port_pressure: [[1, ['8','10']]]
 - name: [scvtf, ucvtf]
   operands:
   - class: register

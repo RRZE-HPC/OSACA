@@ -5185,6 +5185,56 @@ instruction_forms:
   port_pressure: [[1, ['9','10','11','12']]]
   throughput: 0.25
   uops: 1
+- name: VPBROADCASTQ
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: xmm
+  latency: 6
+  port_pressure: [[1, ['10']]] #uops.info
+  throughput: 1.0
+  uops: 1
+- name: VPBROADCASTQ
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: ymm
+  latency: 6
+  port_pressure: [[1, ['10']]] #uops.info
+  throughput: 1.0
+  uops: 1
+- name: VPBROADCASTQ
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: zmm
+  latency: 6
+  port_pressure: [[2, ['10', '11']]] #uops.info
+  throughput: 1.0
+  uops: 1
+- name: VPBROADCASTD
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: xmm
+  latency: 6
+  port_pressure: [[2, ['10', '11']]] #uops.info
+  throughput: 1.0
+  uops: 2
+- name: VPBROADCASTD
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: ymm
+  latency: 6
+  port_pressure: [[2, ['10', '11']]] #uops.info
+  throughput: 1.0
+  uops: 2
 - name: VPBROADCASTD
   operands:
   - class: register

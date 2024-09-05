@@ -1696,6 +1696,26 @@ instruction_forms:
   - class: register                                   # ./generate_mov_entries.py spr
     name: xmm                                         # ./generate_mov_entries.py spr
   - class: register                                   # ./generate_mov_entries.py spr
+    name: gpr                                         # ./generate_mov_entries.py spr
+  latency: 3                                          # ./generate_mov_entries.py spr
+  port_pressure: [[1, '0']]                           # ./generate_mov_entries.py spr
+  throughput: 1.0                                     # ./generate_mov_entries.py spr
+  uops: 1                                             # ./generate_mov_entries.py spr
+- name: vmovq                                         # ./generate_mov_entries.py spr
+  operands:                                           # ./generate_mov_entries.py spr
+  - class: register                                   # ./generate_mov_entries.py spr
+    name: gpr                                         # ./generate_mov_entries.py spr
+  - class: register                                   # ./generate_mov_entries.py spr
+    name: xmm                                         # ./generate_mov_entries.py spr
+  latency: 3                                          # ./generate_mov_entries.py spr
+  port_pressure: [[1, '5']]                           # ./generate_mov_entries.py spr
+  throughput: 1.0                                     # ./generate_mov_entries.py spr
+  uops: 1                                             # ./generate_mov_entries.py spr
+- name: vmovq                                         # ./generate_mov_entries.py spr
+  operands:                                           # ./generate_mov_entries.py spr
+  - class: register                                   # ./generate_mov_entries.py spr
+    name: xmm                                         # ./generate_mov_entries.py spr
+  - class: register                                   # ./generate_mov_entries.py spr
     name: xmm                                         # ./generate_mov_entries.py spr
   latency: 1                                          # ./generate_mov_entries.py spr
   port_pressure: [[1.0, ['0', '1', '5', '6', '10']]]  # ./generate_mov_entries.py spr
