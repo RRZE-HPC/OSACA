@@ -8,7 +8,7 @@ scheduler_size: ~
 hidden_loads: false
 load_latency: {gpr: 5.0, mm: 5.0, xmm: 5.0, ymm: 5.0, zmm: 5.0}
 load_throughput:
-- {dst: zmm, base: "*", index: "*", offset: "*", scale: "*", port_pressure: [[1, '23']]}
+- {dst: zmm, base: "*", index: "*", offset: "*", scale: "*", port_pressure: [[1, '23'], [0.5, ['11']]]}
 - {dst: ymm, base: "*", index: "*", offset: "*", scale: "*", port_pressure: [[1, ['2', '3', '11']]]}
 - {dst: xmm, base: "*", index: "*", offset: "*", scale: "*", port_pressure: [[1, ['2', '3', '11']]]}
 - {dst: gpr, base: "*", index: "*", offset: "*", scale: "*", port_pressure: [[1, ['2', '3', '11']]]}
@@ -141,7 +141,7 @@ instruction_forms:
   - class: immediate
     imd: int
   latency: 5
-  port_pressure: [[1, ['2', '3', '10']]]
+  port_pressure: [[1, ['2', '3', '11']]]
   throughput: 0.3333333333333333
   uops: 2
 - name: pop
@@ -149,7 +149,7 @@ instruction_forms:
   - class: register
     name: gpr
   latency: 5
-  port_pressure: [[1, ['2', '3', '10']]]
+  port_pressure: [[1, ['2', '3', '11']]]
   throughput: 0.3333333333333333
   uops: 2
 - name: pop
@@ -160,7 +160,7 @@ instruction_forms:
     index: "*"
     scale: "*"
   latency: 5
-  port_pressure: [[1, ['2', '3', '10']]]
+  port_pressure: [[1, ['2', '3', '11']]]
   throughput: 0.3333333333333333
   uops: 2
 ##########################################
@@ -197,7 +197,7 @@ instruction_forms:
   - class: register                                   # ./generate_mov_entries.py spr
     name: gpr                                         # ./generate_mov_entries.py spr
   latency: 5                                          # ./generate_mov_entries.py spr
-  port_pressure: [[1, ['2', '3', '10']]]              # ./generate_mov_entries.py spr
+  port_pressure: [[1, ['2', '3', '11']]]              # ./generate_mov_entries.py spr
   throughput: 0.3333333333333333                      # ./generate_mov_entries.py spr
   uops: 1                                             # ./generate_mov_entries.py spr
 - name: mov                                           # ./generate_mov_entries.py spr
@@ -266,7 +266,7 @@ instruction_forms:
   - class: register                                   # ./generate_mov_entries.py spr
     name: xmm                                         # ./generate_mov_entries.py spr
   latency: 5                                          # ./generate_mov_entries.py spr
-  port_pressure: [[1, ['2', '3', '10']]]              # ./generate_mov_entries.py spr
+  port_pressure: [[1, ['2', '3', '11']]]              # ./generate_mov_entries.py spr
   throughput: 0.3333333333333333                      # ./generate_mov_entries.py spr
   uops: 1                                             # ./generate_mov_entries.py spr
 - name: vmovapd                                       # ./generate_mov_entries.py spr
@@ -302,7 +302,7 @@ instruction_forms:
   - class: register                                   # ./generate_mov_entries.py spr
     name: xmm                                         # ./generate_mov_entries.py spr
   latency: 5                                          # ./generate_mov_entries.py spr
-  port_pressure: [[1, ['2', '3', '10']]]              # ./generate_mov_entries.py spr
+  port_pressure: [[1, ['2', '3', '11']]]              # ./generate_mov_entries.py spr
   throughput: 0.3333333333333333                      # ./generate_mov_entries.py spr
   uops: 1                                             # ./generate_mov_entries.py spr
 - name: vmovapd                                       # ./generate_mov_entries.py spr
@@ -338,7 +338,7 @@ instruction_forms:
   - class: register                                   # ./generate_mov_entries.py spr
     name: ymm                                         # ./generate_mov_entries.py spr
   latency: 5                                          # ./generate_mov_entries.py spr
-  port_pressure: [[1, ['2', '3', '10']]]              # ./generate_mov_entries.py spr
+  port_pressure: [[1, ['2', '3', '11']]]              # ./generate_mov_entries.py spr
   throughput: 0.3333333333333333                      # ./generate_mov_entries.py spr
   uops: 1                                             # ./generate_mov_entries.py spr
 - name: vmovapd                                       # ./generate_mov_entries.py spr
@@ -374,7 +374,7 @@ instruction_forms:
   - class: register                                   # ./generate_mov_entries.py spr
     name: zmm                                         # ./generate_mov_entries.py spr
   latency: 5                                          # ./generate_mov_entries.py spr
-  port_pressure: [[1.5, ['2', '3', '10']]]            # ./generate_mov_entries.py spr
+  port_pressure: [[1, ['2', '3']], [0.5, ['11']]]       # ./generate_mov_entries.py spr
   throughput: 0.5                                     # ./generate_mov_entries.py spr
   uops: 1.5                                           # ./generate_mov_entries.py spr
 - name: movaps                                        # ./generate_mov_entries.py spr
@@ -410,7 +410,7 @@ instruction_forms:
   - class: register                                   # ./generate_mov_entries.py spr
     name: xmm                                         # ./generate_mov_entries.py spr
   latency: 5                                          # ./generate_mov_entries.py spr
-  port_pressure: [[1, ['2', '3', '10']]]              # ./generate_mov_entries.py spr
+  port_pressure: [[1, ['2', '3', '11']]]              # ./generate_mov_entries.py spr
   throughput: 0.3333333333333333                      # ./generate_mov_entries.py spr
   uops: 1                                             # ./generate_mov_entries.py spr
 - name: vmovaps                                       # ./generate_mov_entries.py spr
@@ -446,7 +446,7 @@ instruction_forms:
   - class: register                                   # ./generate_mov_entries.py spr
     name: xmm                                         # ./generate_mov_entries.py spr
   latency: 5                                          # ./generate_mov_entries.py spr
-  port_pressure: [[1, ['2', '3', '10']]]              # ./generate_mov_entries.py spr
+  port_pressure: [[1, ['2', '3', '11']]]              # ./generate_mov_entries.py spr
   throughput: 0.3333333333333333                      # ./generate_mov_entries.py spr
   uops: 1                                             # ./generate_mov_entries.py spr
 - name: vmovaps                                       # ./generate_mov_entries.py spr
@@ -482,7 +482,7 @@ instruction_forms:
   - class: register                                   # ./generate_mov_entries.py spr
     name: ymm                                         # ./generate_mov_entries.py spr
   latency: 5                                          # ./generate_mov_entries.py spr
-  port_pressure: [[1, ['2', '3', '10']]]              # ./generate_mov_entries.py spr
+  port_pressure: [[1, ['2', '3', '11']]]              # ./generate_mov_entries.py spr
   throughput: 0.3333333333333333                      # ./generate_mov_entries.py spr
   uops: 1                                             # ./generate_mov_entries.py spr
 - name: vmovaps                                       # ./generate_mov_entries.py spr
@@ -518,7 +518,7 @@ instruction_forms:
   - class: register                                   # ./generate_mov_entries.py spr
     name: zmm                                         # ./generate_mov_entries.py spr
   latency: 5                                          # ./generate_mov_entries.py spr
-  port_pressure: [[1.5, ['2', '3', '10']]]            # ./generate_mov_entries.py spr
+  port_pressure: [[1, ['2', '3']], [0.5, ['11']]]            # ./generate_mov_entries.py spr
   throughput: 0.5                                     # ./generate_mov_entries.py spr
   uops: 1.5                                           # ./generate_mov_entries.py spr
 - name: movdqa                                        # ./generate_mov_entries.py spr
@@ -541,7 +541,7 @@ instruction_forms:
   - class: register                                   # ./generate_mov_entries.py spr
     name: xmm                                         # ./generate_mov_entries.py spr
   latency: 5                                          # ./generate_mov_entries.py spr
-  port_pressure: [[1, ['2', '3', '10']]]              # ./generate_mov_entries.py spr
+  port_pressure: [[1, ['2', '3', '11']]]              # ./generate_mov_entries.py spr
   throughput: 0.3333333333333333                      # ./generate_mov_entries.py spr
   uops: 1                                             # ./generate_mov_entries.py spr
 - name: movdqa  # with store                          # ./generate_mov_entries.py spr
@@ -577,7 +577,7 @@ instruction_forms:
   - class: register                                   # ./generate_mov_entries.py spr
     name: xmm                                         # ./generate_mov_entries.py spr
   latency: 5                                          # ./generate_mov_entries.py spr
-  port_pressure: [[1, ['2', '3', '10']]]              # ./generate_mov_entries.py spr
+  port_pressure: [[1, ['2', '3', '11']]]              # ./generate_mov_entries.py spr
   throughput: 0.3333333333333333                      # ./generate_mov_entries.py spr
   uops: 1                                             # ./generate_mov_entries.py spr
 - name: vmovdqa  # with store                         # ./generate_mov_entries.py spr
@@ -613,7 +613,7 @@ instruction_forms:
   - class: register                                   # ./generate_mov_entries.py spr
     name: ymm                                         # ./generate_mov_entries.py spr
   latency: 5                                          # ./generate_mov_entries.py spr
-  port_pressure: [[1, ['2', '3', '10']]]              # ./generate_mov_entries.py spr
+  port_pressure: [[1, ['2', '3', '11']]]              # ./generate_mov_entries.py spr
   throughput: 0.3333333333333333                      # ./generate_mov_entries.py spr
   uops: 1                                             # ./generate_mov_entries.py spr
 - name: vmovdqa  # with store                         # ./generate_mov_entries.py spr
@@ -649,7 +649,7 @@ instruction_forms:
   - class: register                                   # ./generate_mov_entries.py spr
     name: xmm                                         # ./generate_mov_entries.py spr
   latency: 5                                          # ./generate_mov_entries.py spr
-  port_pressure: [[1, ['2', '3', '10']]]              # ./generate_mov_entries.py spr
+  port_pressure: [[1, ['2', '3', '11']]]              # ./generate_mov_entries.py spr
   throughput: 0.3333333333333333                      # ./generate_mov_entries.py spr
   uops: 1                                             # ./generate_mov_entries.py spr
 - name: vmovdqa32  # with store                       # ./generate_mov_entries.py spr
@@ -685,7 +685,7 @@ instruction_forms:
   - class: register                                   # ./generate_mov_entries.py spr
     name: ymm                                         # ./generate_mov_entries.py spr
   latency: 5                                          # ./generate_mov_entries.py spr
-  port_pressure: [[1, ['2', '3', '10']]]              # ./generate_mov_entries.py spr
+  port_pressure: [[1, ['2', '3', '11']]]              # ./generate_mov_entries.py spr
   throughput: 0.3333333333333333                      # ./generate_mov_entries.py spr
   uops: 1                                             # ./generate_mov_entries.py spr
 - name: vmovdqa32  # with store                       # ./generate_mov_entries.py spr
@@ -721,7 +721,7 @@ instruction_forms:
   - class: register                                   # ./generate_mov_entries.py spr
     name: zmm                                         # ./generate_mov_entries.py spr
   latency: 5                                          # ./generate_mov_entries.py spr
-  port_pressure: [[1.5, ['2', '3', '10']]]            # ./generate_mov_entries.py spr
+  port_pressure: [[1, ['2', '3']], [0.5, ['11']]]            # ./generate_mov_entries.py spr
   throughput: 0.5                                     # ./generate_mov_entries.py spr
   uops: 1.5                                           # ./generate_mov_entries.py spr
 - name: vmovdqa32  # with store                       # ./generate_mov_entries.py spr
@@ -757,7 +757,7 @@ instruction_forms:
   - class: register                                   # ./generate_mov_entries.py spr
     name: xmm                                         # ./generate_mov_entries.py spr
   latency: 5                                          # ./generate_mov_entries.py spr
-  port_pressure: [[1, ['2', '3', '10']]]              # ./generate_mov_entries.py spr
+  port_pressure: [[1, ['2', '3', '11']]]              # ./generate_mov_entries.py spr
   throughput: 0.3333333333333333                      # ./generate_mov_entries.py spr
   uops: 1                                             # ./generate_mov_entries.py spr
 - name: vmovdqa64  # with store                       # ./generate_mov_entries.py spr
@@ -793,7 +793,7 @@ instruction_forms:
   - class: register                                   # ./generate_mov_entries.py spr
     name: ymm                                         # ./generate_mov_entries.py spr
   latency: 5                                          # ./generate_mov_entries.py spr
-  port_pressure: [[1, ['2', '3', '10']]]              # ./generate_mov_entries.py spr
+  port_pressure: [[1, ['2', '3', '11']]]              # ./generate_mov_entries.py spr
   throughput: 0.3333333333333333                      # ./generate_mov_entries.py spr
   uops: 1                                             # ./generate_mov_entries.py spr
 - name: vmovdqa64  # with store                       # ./generate_mov_entries.py spr
@@ -829,7 +829,7 @@ instruction_forms:
   - class: register                                   # ./generate_mov_entries.py spr
     name: zmm                                         # ./generate_mov_entries.py spr
   latency: 5                                          # ./generate_mov_entries.py spr
-  port_pressure: [[1.5, ['2', '3', '10']]]            # ./generate_mov_entries.py spr
+  port_pressure: [[1, ['2', '3']], [0.5, ['11']]]            # ./generate_mov_entries.py spr
   throughput: 0.5                                     # ./generate_mov_entries.py spr
   uops: 1.5                                           # ./generate_mov_entries.py spr
 - name: vmovdqa64  # with store                       # ./generate_mov_entries.py spr
@@ -865,7 +865,7 @@ instruction_forms:
   - class: register                                   # ./generate_mov_entries.py spr
     name: xmm                                         # ./generate_mov_entries.py spr
   latency: 5                                          # ./generate_mov_entries.py spr
-  port_pressure: [[1, ['2', '3', '10']]]              # ./generate_mov_entries.py spr
+  port_pressure: [[1, ['2', '3', '11']]]              # ./generate_mov_entries.py spr
   throughput: 0.3333333333333333                      # ./generate_mov_entries.py spr
   uops: 1                                             # ./generate_mov_entries.py spr
 - name: movdqu  # with store                          # ./generate_mov_entries.py spr
@@ -901,7 +901,7 @@ instruction_forms:
   - class: register                                   # ./generate_mov_entries.py spr
     name: xmm                                         # ./generate_mov_entries.py spr
   latency: 5                                          # ./generate_mov_entries.py spr
-  port_pressure: [[1, ['2', '3', '10']]]              # ./generate_mov_entries.py spr
+  port_pressure: [[1, ['2', '3', '11']]]              # ./generate_mov_entries.py spr
   throughput: 0.3333333333333333                      # ./generate_mov_entries.py spr
   uops: 1                                             # ./generate_mov_entries.py spr
 - name: vmovdqu  # with store                         # ./generate_mov_entries.py spr
@@ -937,7 +937,7 @@ instruction_forms:
   - class: register                                   # ./generate_mov_entries.py spr
     name: ymm                                         # ./generate_mov_entries.py spr
   latency: 5                                          # ./generate_mov_entries.py spr
-  port_pressure: [[1, ['2', '3', '10']]]              # ./generate_mov_entries.py spr
+  port_pressure: [[1, ['2', '3', '11']]]              # ./generate_mov_entries.py spr
   throughput: 0.3333333333333333                      # ./generate_mov_entries.py spr
   uops: 1                                             # ./generate_mov_entries.py spr
 - name: vmovdqu  # with store                         # ./generate_mov_entries.py spr
@@ -973,7 +973,7 @@ instruction_forms:
   - class: register                                   # ./generate_mov_entries.py spr
     name: xmm                                         # ./generate_mov_entries.py spr
   latency: 5                                          # ./generate_mov_entries.py spr
-  port_pressure: [[1, ['2', '3', '10']]]              # ./generate_mov_entries.py spr
+  port_pressure: [[1, ['2', '3', '11']]]              # ./generate_mov_entries.py spr
   throughput: 0.3333333333333333                      # ./generate_mov_entries.py spr
   uops: 1                                             # ./generate_mov_entries.py spr
 - name: vmovdqu8  # with store                        # ./generate_mov_entries.py spr
@@ -1009,7 +1009,7 @@ instruction_forms:
   - class: register                                   # ./generate_mov_entries.py spr
     name: ymm                                         # ./generate_mov_entries.py spr
   latency: 5                                          # ./generate_mov_entries.py spr
-  port_pressure: [[1, ['2', '3', '10']]]              # ./generate_mov_entries.py spr
+  port_pressure: [[1, ['2', '3', '11']]]              # ./generate_mov_entries.py spr
   throughput: 0.3333333333333333                      # ./generate_mov_entries.py spr
   uops: 1                                             # ./generate_mov_entries.py spr
 - name: vmovdqu8  # with store                        # ./generate_mov_entries.py spr
@@ -1045,7 +1045,7 @@ instruction_forms:
   - class: register                                   # ./generate_mov_entries.py spr
     name: zmm                                         # ./generate_mov_entries.py spr
   latency: 5                                          # ./generate_mov_entries.py spr
-  port_pressure: [[1.5, ['2', '3', '10']]]            # ./generate_mov_entries.py spr
+  port_pressure: [[1, ['2', '3']], [0.5, ['11']]]            # ./generate_mov_entries.py spr
   throughput: 0.5                                     # ./generate_mov_entries.py spr
   uops: 1.5                                           # ./generate_mov_entries.py spr
 - name: vmovdqu8  # with store                        # ./generate_mov_entries.py spr
@@ -1081,7 +1081,7 @@ instruction_forms:
   - class: register                                   # ./generate_mov_entries.py spr
     name: xmm                                         # ./generate_mov_entries.py spr
   latency: 5                                          # ./generate_mov_entries.py spr
-  port_pressure: [[1, ['2', '3', '10']]]              # ./generate_mov_entries.py spr
+  port_pressure: [[1, ['2', '3', '11']]]              # ./generate_mov_entries.py spr
   throughput: 0.3333333333333333                      # ./generate_mov_entries.py spr
   uops: 1                                             # ./generate_mov_entries.py spr
 - name: vmovdqu16  # with store                       # ./generate_mov_entries.py spr
@@ -1117,7 +1117,7 @@ instruction_forms:
   - class: register                                   # ./generate_mov_entries.py spr
     name: ymm                                         # ./generate_mov_entries.py spr
   latency: 5                                          # ./generate_mov_entries.py spr
-  port_pressure: [[1, ['2', '3', '10']]]              # ./generate_mov_entries.py spr
+  port_pressure: [[1, ['2', '3', '11']]]              # ./generate_mov_entries.py spr
   throughput: 0.3333333333333333                      # ./generate_mov_entries.py spr
   uops: 1                                             # ./generate_mov_entries.py spr
 - name: vmovdqu16  # with store                       # ./generate_mov_entries.py spr
@@ -1153,7 +1153,7 @@ instruction_forms:
   - class: register                                   # ./generate_mov_entries.py spr
     name: zmm                                         # ./generate_mov_entries.py spr
   latency: 5                                          # ./generate_mov_entries.py spr
-  port_pressure: [[1.5, ['2', '3', '10']]]            # ./generate_mov_entries.py spr
+  port_pressure: [[1, ['2', '3']], [0.5, ['11']]]            # ./generate_mov_entries.py spr
   throughput: 0.5                                     # ./generate_mov_entries.py spr
   uops: 1.5                                           # ./generate_mov_entries.py spr
 - name: vmovdqu16  # with store                       # ./generate_mov_entries.py spr
@@ -1189,7 +1189,7 @@ instruction_forms:
   - class: register                                   # ./generate_mov_entries.py spr
     name: xmm                                         # ./generate_mov_entries.py spr
   latency: 5                                          # ./generate_mov_entries.py spr
-  port_pressure: [[1, ['2', '3', '10']]]              # ./generate_mov_entries.py spr
+  port_pressure: [[1, ['2', '3', '11']]]              # ./generate_mov_entries.py spr
   throughput: 0.3333333333333333                      # ./generate_mov_entries.py spr
   uops: 1                                             # ./generate_mov_entries.py spr
 - name: vmovdqu32  # with store                       # ./generate_mov_entries.py spr
@@ -1225,7 +1225,7 @@ instruction_forms:
   - class: register                                   # ./generate_mov_entries.py spr
     name: ymm                                         # ./generate_mov_entries.py spr
   latency: 5                                          # ./generate_mov_entries.py spr
-  port_pressure: [[1, ['2', '3', '10']]]              # ./generate_mov_entries.py spr
+  port_pressure: [[1, ['2', '3', '11']]]              # ./generate_mov_entries.py spr
   throughput: 0.3333333333333333                      # ./generate_mov_entries.py spr
   uops: 1                                             # ./generate_mov_entries.py spr
 - name: vmovdqu32  # with store                       # ./generate_mov_entries.py spr
@@ -1261,7 +1261,7 @@ instruction_forms:
   - class: register                                   # ./generate_mov_entries.py spr
     name: zmm                                         # ./generate_mov_entries.py spr
   latency: 5                                          # ./generate_mov_entries.py spr
-  port_pressure: [[1.5, ['2', '3', '10']]]            # ./generate_mov_entries.py spr
+  port_pressure: [[1, ['2', '3']], [0.5, ['11']]]            # ./generate_mov_entries.py spr
   throughput: 0.5                                     # ./generate_mov_entries.py spr
   uops: 1.5                                           # ./generate_mov_entries.py spr
 - name: vmovdqu32  # with store                       # ./generate_mov_entries.py spr
@@ -1297,7 +1297,7 @@ instruction_forms:
   - class: register                                   # ./generate_mov_entries.py spr
     name: xmm                                         # ./generate_mov_entries.py spr
   latency: 5                                          # ./generate_mov_entries.py spr
-  port_pressure: [[1, ['2', '3', '10']]]              # ./generate_mov_entries.py spr
+  port_pressure: [[1, ['2', '3', '11']]]              # ./generate_mov_entries.py spr
   throughput: 0.3333333333333333                      # ./generate_mov_entries.py spr
   uops: 1                                             # ./generate_mov_entries.py spr
 - name: vmovdqu64  # with store                       # ./generate_mov_entries.py spr
@@ -1333,7 +1333,7 @@ instruction_forms:
   - class: register                                   # ./generate_mov_entries.py spr
     name: ymm                                         # ./generate_mov_entries.py spr
   latency: 5                                          # ./generate_mov_entries.py spr
-  port_pressure: [[1, ['2', '3', '10']]]              # ./generate_mov_entries.py spr
+  port_pressure: [[1, ['2', '3', '11']]]              # ./generate_mov_entries.py spr
   throughput: 0.3333333333333333                      # ./generate_mov_entries.py spr
   uops: 1                                             # ./generate_mov_entries.py spr
 - name: vmovdqu64  # with store                       # ./generate_mov_entries.py spr
@@ -1369,7 +1369,7 @@ instruction_forms:
   - class: register                                   # ./generate_mov_entries.py spr
     name: zmm                                         # ./generate_mov_entries.py spr
   latency: 5                                          # ./generate_mov_entries.py spr
-  port_pressure: [[1.5, ['2', '3', '10']]]            # ./generate_mov_entries.py spr
+  port_pressure: [[1, ['2', '3']], [0.5, ['11']]]            # ./generate_mov_entries.py spr
   throughput: 0.5                                     # ./generate_mov_entries.py spr
   uops: 1.5                                           # ./generate_mov_entries.py spr
 - name: vmovdqu64  # with store                       # ./generate_mov_entries.py spr
@@ -1447,7 +1447,7 @@ instruction_forms:
   - class: register                                   # ./generate_mov_entries.py spr
     name: xmm                                         # ./generate_mov_entries.py spr
   latency: 5                                          # ./generate_mov_entries.py spr
-  port_pressure: [[1, ['2', '3', '10']]]              # ./generate_mov_entries.py spr
+  port_pressure: [[1, ['2', '3', '11']]]              # ./generate_mov_entries.py spr
   throughput: 0.3333333333333333                      # ./generate_mov_entries.py spr
   uops: 1                                             # ./generate_mov_entries.py spr
 - name: vmovntdqa  # with load                        # ./generate_mov_entries.py spr
@@ -1460,7 +1460,7 @@ instruction_forms:
   - class: register                                   # ./generate_mov_entries.py spr
     name: xmm                                         # ./generate_mov_entries.py spr
   latency: 5                                          # ./generate_mov_entries.py spr
-  port_pressure: [[1, ['2', '3', '10']]]              # ./generate_mov_entries.py spr
+  port_pressure: [[1, ['2', '3', '11']]]              # ./generate_mov_entries.py spr
   throughput: 0.3333333333333333                      # ./generate_mov_entries.py spr
   uops: 1                                             # ./generate_mov_entries.py spr
 - name: vmovntdqa  # with load                        # ./generate_mov_entries.py spr
@@ -1473,7 +1473,7 @@ instruction_forms:
   - class: register                                   # ./generate_mov_entries.py spr
     name: ymm                                         # ./generate_mov_entries.py spr
   latency: 5                                          # ./generate_mov_entries.py spr
-  port_pressure: [[1, ['2', '3', '10']]]              # ./generate_mov_entries.py spr
+  port_pressure: [[1, ['2', '3', '11']]]              # ./generate_mov_entries.py spr
   throughput: 0.3333333333333333                      # ./generate_mov_entries.py spr
   uops: 1                                             # ./generate_mov_entries.py spr
 - name: vmovntdqa  # with load                        # ./generate_mov_entries.py spr
@@ -1486,7 +1486,7 @@ instruction_forms:
   - class: register                                   # ./generate_mov_entries.py spr
     name: zmm                                         # ./generate_mov_entries.py spr
   latency: 5                                          # ./generate_mov_entries.py spr
-  port_pressure: [[1.5, ['2', '3', '10']]]            # ./generate_mov_entries.py spr
+  port_pressure: [[1, ['2', '3']], [0.5, ['11']]]            # ./generate_mov_entries.py spr
   throughput: 0.5                                     # ./generate_mov_entries.py spr
   uops: 1.5                                           # ./generate_mov_entries.py spr
 - name: movnti  # with store                          # ./generate_mov_entries.py spr
@@ -1639,7 +1639,7 @@ instruction_forms:
   - class: register                                   # ./generate_mov_entries.py spr
     name: mm                                          # ./generate_mov_entries.py spr
   latency: 5                                          # ./generate_mov_entries.py spr
-  port_pressure: [[1, ['2', '3', '10']]]              # ./generate_mov_entries.py spr
+  port_pressure: [[1, ['2', '3', '11']]]              # ./generate_mov_entries.py spr
   throughput: 0.3333333333333333                      # ./generate_mov_entries.py spr
   uops: 1                                             # ./generate_mov_entries.py spr
 - name: movq  # with store                            # ./generate_mov_entries.py spr
@@ -1675,7 +1675,7 @@ instruction_forms:
   - class: register                                   # ./generate_mov_entries.py spr
     name: xmm                                         # ./generate_mov_entries.py spr
   latency: 5                                          # ./generate_mov_entries.py spr
-  port_pressure: [[1, ['2', '3', '10']]]              # ./generate_mov_entries.py spr
+  port_pressure: [[1, ['2', '3', '11']]]              # ./generate_mov_entries.py spr
   throughput: 0.3333333333333333                      # ./generate_mov_entries.py spr
   uops: 1                                             # ./generate_mov_entries.py spr
 - name: movq  # with store                            # ./generate_mov_entries.py spr
@@ -1731,7 +1731,7 @@ instruction_forms:
   - class: register                                   # ./generate_mov_entries.py spr
     name: xmm                                         # ./generate_mov_entries.py spr
   latency: 5                                          # ./generate_mov_entries.py spr
-  port_pressure: [[1, ['2', '3', '10']]]              # ./generate_mov_entries.py spr
+  port_pressure: [[1, ['2', '3', '11']]]              # ./generate_mov_entries.py spr
   throughput: 0.3333333333333333                      # ./generate_mov_entries.py spr
   uops: 1                                             # ./generate_mov_entries.py spr
 - name: vmovq  # with store                           # ./generate_mov_entries.py spr
@@ -1767,7 +1767,7 @@ instruction_forms:
   - class: register                                   # ./generate_mov_entries.py spr
     name: xmm                                         # ./generate_mov_entries.py spr
   latency: 5                                          # ./generate_mov_entries.py spr
-  port_pressure: [[1, ['2', '3', '10']]]              # ./generate_mov_entries.py spr
+  port_pressure: [[1, ['2', '3', '11']]]              # ./generate_mov_entries.py spr
   throughput: 0.3333333333333333                      # ./generate_mov_entries.py spr
   uops: 1                                             # ./generate_mov_entries.py spr
 - name: movsd  # with store                           # ./generate_mov_entries.py spr
@@ -1805,7 +1805,7 @@ instruction_forms:
   - class: register                                   # ./generate_mov_entries.py spr
     name: xmm                                         # ./generate_mov_entries.py spr
   latency: 5                                          # ./generate_mov_entries.py spr
-  port_pressure: [[1, ['2', '3', '10']]]              # ./generate_mov_entries.py spr
+  port_pressure: [[1, ['2', '3', '11']]]              # ./generate_mov_entries.py spr
   throughput: 0.3333333333333333                      # ./generate_mov_entries.py spr
   uops: 1                                             # ./generate_mov_entries.py spr
 - name: vmovsd  # with store                          # ./generate_mov_entries.py spr
@@ -1841,7 +1841,7 @@ instruction_forms:
   - class: register                                   # ./generate_mov_entries.py spr
     name: xmm                                         # ./generate_mov_entries.py spr
   latency: 5                                          # ./generate_mov_entries.py spr
-  port_pressure: [[1, ['2', '3', '10']]]              # ./generate_mov_entries.py spr
+  port_pressure: [[1, ['2', '3', '11']]]              # ./generate_mov_entries.py spr
   throughput: 0.3333333333333333                      # ./generate_mov_entries.py spr
   uops: 1                                             # ./generate_mov_entries.py spr
 - name: vmovss                                        # ./generate_mov_entries.py spr
@@ -1866,7 +1866,7 @@ instruction_forms:
   - class: register                                   # ./generate_mov_entries.py spr
     name: xmm                                         # ./generate_mov_entries.py spr
   latency: 5                                          # ./generate_mov_entries.py spr
-  port_pressure: [[1, ['2', '3', '10']]]              # ./generate_mov_entries.py spr
+  port_pressure: [[1, ['2', '3', '11']]]              # ./generate_mov_entries.py spr
   throughput: 0.3333333333333333                      # ./generate_mov_entries.py spr
   uops: 1                                             # ./generate_mov_entries.py spr
 - name: vmovss                                        # ./generate_mov_entries.py spr
@@ -1902,7 +1902,7 @@ instruction_forms:
   - class: register                                   # ./generate_mov_entries.py spr
     name: xmm                                         # ./generate_mov_entries.py spr
   latency: 5                                          # ./generate_mov_entries.py spr
-  port_pressure: [[1, ['2', '3', '10']]]              # ./generate_mov_entries.py spr
+  port_pressure: [[1, ['2', '3', '11']]]              # ./generate_mov_entries.py spr
   throughput: 0.3333333333333333                      # ./generate_mov_entries.py spr
   uops: 1                                             # ./generate_mov_entries.py spr
 - name: movsx                                         # ./generate_mov_entries.py spr
@@ -1925,7 +1925,7 @@ instruction_forms:
   - class: register                                   # ./generate_mov_entries.py spr
     name: gpr                                         # ./generate_mov_entries.py spr
   latency: 5                                          # ./generate_mov_entries.py spr
-  port_pressure: [[1, ['2', '3', '10']]]              # ./generate_mov_entries.py spr
+  port_pressure: [[1, ['2', '3', '11']]]              # ./generate_mov_entries.py spr
   throughput: 0.3333333333333333                      # ./generate_mov_entries.py spr
   uops: 1                                             # ./generate_mov_entries.py spr
 - name: movsxd                                        # ./generate_mov_entries.py spr
@@ -1948,7 +1948,7 @@ instruction_forms:
   - class: register                                   # ./generate_mov_entries.py spr
     name: gpr                                         # ./generate_mov_entries.py spr
   latency: 5                                          # ./generate_mov_entries.py spr
-  port_pressure: [[1, ['2', '3', '10']]]              # ./generate_mov_entries.py spr
+  port_pressure: [[1, ['2', '3', '11']]]              # ./generate_mov_entries.py spr
   throughput: 0.3333333333333333                      # ./generate_mov_entries.py spr
   uops: 1                                             # ./generate_mov_entries.py spr
 - name: movsb                                         # ./generate_mov_entries.py spr
@@ -1971,7 +1971,7 @@ instruction_forms:
   - class: register                                   # ./generate_mov_entries.py spr
     name: gpr                                         # ./generate_mov_entries.py spr
   latency: 5                                          # ./generate_mov_entries.py spr
-  port_pressure: [[1, ['2', '3', '10']]]              # ./generate_mov_entries.py spr
+  port_pressure: [[1, ['2', '3', '11']]]              # ./generate_mov_entries.py spr
   throughput: 0.3333333333333333                      # ./generate_mov_entries.py spr
   uops: 1                                             # ./generate_mov_entries.py spr
 - name: movsw                                         # ./generate_mov_entries.py spr
@@ -1994,7 +1994,7 @@ instruction_forms:
   - class: register                                   # ./generate_mov_entries.py spr
     name: gpr                                         # ./generate_mov_entries.py spr
   latency: 5                                          # ./generate_mov_entries.py spr
-  port_pressure: [[1, ['2', '3', '10']]]              # ./generate_mov_entries.py spr
+  port_pressure: [[1, ['2', '3', '11']]]              # ./generate_mov_entries.py spr
   throughput: 0.3333333333333333                      # ./generate_mov_entries.py spr
   uops: 1                                             # ./generate_mov_entries.py spr
 - name: movsl                                         # ./generate_mov_entries.py spr
@@ -2017,7 +2017,7 @@ instruction_forms:
   - class: register                                   # ./generate_mov_entries.py spr
     name: gpr                                         # ./generate_mov_entries.py spr
   latency: 5                                          # ./generate_mov_entries.py spr
-  port_pressure: [[1, ['2', '3', '10']]]              # ./generate_mov_entries.py spr
+  port_pressure: [[1, ['2', '3', '11']]]              # ./generate_mov_entries.py spr
   throughput: 0.3333333333333333                      # ./generate_mov_entries.py spr
   uops: 1                                             # ./generate_mov_entries.py spr
 - name: movsq                                         # ./generate_mov_entries.py spr
@@ -2040,7 +2040,7 @@ instruction_forms:
   - class: register                                   # ./generate_mov_entries.py spr
     name: gpr                                         # ./generate_mov_entries.py spr
   latency: 5                                          # ./generate_mov_entries.py spr
-  port_pressure: [[1, ['2', '3', '10']]]              # ./generate_mov_entries.py spr
+  port_pressure: [[1, ['2', '3', '11']]]              # ./generate_mov_entries.py spr
   throughput: 0.3333333333333333                      # ./generate_mov_entries.py spr
   uops: 1                                             # ./generate_mov_entries.py spr
 - name: movupd                                        # ./generate_mov_entries.py spr
@@ -2063,7 +2063,7 @@ instruction_forms:
   - class: register                                   # ./generate_mov_entries.py spr
     name: xmm                                         # ./generate_mov_entries.py spr
   latency: 5                                          # ./generate_mov_entries.py spr
-  port_pressure: [[1, ['2', '3', '10']]]              # ./generate_mov_entries.py spr
+  port_pressure: [[1, ['2', '3', '11']]]              # ./generate_mov_entries.py spr
   throughput: 0.3333333333333333                      # ./generate_mov_entries.py spr
   uops: 1                                             # ./generate_mov_entries.py spr
 - name: movupd  # with store                          # ./generate_mov_entries.py spr
@@ -2099,7 +2099,7 @@ instruction_forms:
   - class: register                                   # ./generate_mov_entries.py spr
     name: xmm                                         # ./generate_mov_entries.py spr
   latency: 5                                          # ./generate_mov_entries.py spr
-  port_pressure: [[1, ['2', '3', '10']]]              # ./generate_mov_entries.py spr
+  port_pressure: [[1, ['2', '3', '11']]]              # ./generate_mov_entries.py spr
   throughput: 0.3333333333333333                      # ./generate_mov_entries.py spr
   uops: 1                                             # ./generate_mov_entries.py spr
 - name: vmovupd  # with store                         # ./generate_mov_entries.py spr
@@ -2135,7 +2135,7 @@ instruction_forms:
   - class: register                                   # ./generate_mov_entries.py spr
     name: ymm                                         # ./generate_mov_entries.py spr
   latency: 5                                          # ./generate_mov_entries.py spr
-  port_pressure: [[1, ['2', '3', '10']]]              # ./generate_mov_entries.py spr
+  port_pressure: [[1, ['2', '3', '11']]]              # ./generate_mov_entries.py spr
   throughput: 0.3333333333333333                      # ./generate_mov_entries.py spr
   uops: 1                                             # ./generate_mov_entries.py spr
 - name: vmovupd  # with store                         # ./generate_mov_entries.py spr
@@ -2171,7 +2171,7 @@ instruction_forms:
   - class: register                                   # ./generate_mov_entries.py spr
     name: zmm                                         # ./generate_mov_entries.py spr
   latency: 5                                          # ./generate_mov_entries.py spr
-  port_pressure: [[1.5, ['2', '3', '10']]]            # ./generate_mov_entries.py spr
+  port_pressure: [[1, ['2', '3']], [0.5, ['11']]]            # ./generate_mov_entries.py spr
   throughput: 0.5                                     # ./generate_mov_entries.py spr
   uops: 1.5                                           # ./generate_mov_entries.py spr
 - name: vmovupd  # with store                         # ./generate_mov_entries.py spr
@@ -2207,7 +2207,7 @@ instruction_forms:
   - class: register                                   # ./generate_mov_entries.py spr
     name: xmm                                         # ./generate_mov_entries.py spr
   latency: 5                                          # ./generate_mov_entries.py spr
-  port_pressure: [[1, ['2', '3', '10']]]              # ./generate_mov_entries.py spr
+  port_pressure: [[1, ['2', '3', '11']]]              # ./generate_mov_entries.py spr
   throughput: 0.3333333333333333                      # ./generate_mov_entries.py spr
   uops: 1                                             # ./generate_mov_entries.py spr
 - name: movups  # with store                          # ./generate_mov_entries.py spr
@@ -2243,7 +2243,7 @@ instruction_forms:
   - class: register                                   # ./generate_mov_entries.py spr
     name: xmm                                         # ./generate_mov_entries.py spr
   latency: 5                                          # ./generate_mov_entries.py spr
-  port_pressure: [[1, ['2', '3', '10']]]              # ./generate_mov_entries.py spr
+  port_pressure: [[1, ['2', '3', '11']]]              # ./generate_mov_entries.py spr
   throughput: 0.3333333333333333                      # ./generate_mov_entries.py spr
   uops: 1                                             # ./generate_mov_entries.py spr
 - name: vmovups  # with store                         # ./generate_mov_entries.py spr
@@ -2279,7 +2279,7 @@ instruction_forms:
   - class: register                                   # ./generate_mov_entries.py spr
     name: ymm                                         # ./generate_mov_entries.py spr
   latency: 5                                          # ./generate_mov_entries.py spr
-  port_pressure: [[1, ['2', '3', '10']]]              # ./generate_mov_entries.py spr
+  port_pressure: [[1, ['2', '3', '11']]]              # ./generate_mov_entries.py spr
   throughput: 0.3333333333333333                      # ./generate_mov_entries.py spr
   uops: 1                                             # ./generate_mov_entries.py spr
 - name: vmovups  # with store                         # ./generate_mov_entries.py spr
@@ -2315,7 +2315,7 @@ instruction_forms:
   - class: register                                   # ./generate_mov_entries.py spr
     name: zmm                                         # ./generate_mov_entries.py spr
   latency: 5                                          # ./generate_mov_entries.py spr
-  port_pressure: [[1.5, ['2', '3', '10']]]            # ./generate_mov_entries.py spr
+  port_pressure: [[1, ['2', '3']], [0.5, ['11']]]            # ./generate_mov_entries.py spr
   throughput: 0.5                                     # ./generate_mov_entries.py spr
   uops: 1.5                                           # ./generate_mov_entries.py spr
 - name: vmovups  # with store                         # ./generate_mov_entries.py spr
@@ -3041,7 +3041,7 @@ instruction_forms:
     name: xmm                                    # ibench
   - class: register                              # ibench
     name: xmm                                    # ibench
-  latency: 5                                     # ibench
+  latency: 4                                     # ibench
   port_pressure: [[1, '01']]                     # ibench
   throughput: 0.5                                # ibench
   uops: 1                                        # ibench
@@ -3054,7 +3054,7 @@ instruction_forms:
   - class: register                              # ibench
     name: xmm                                    # ibench
     mask: True                                   # ibench
-  latency: 5                                     # ibench
+  latency: 4                                     # ibench
   port_pressure: [[1, '01']]                     # ibench
   throughput: 0.5                                # ibench
   uops: 1                                        # ibench
@@ -3066,7 +3066,7 @@ instruction_forms:
     name: ymm                                    # ibench
   - class: register                              # ibench
     name: ymm                                    # ibench
-  latency: 5                                     # ibench
+  latency: 4                                     # ibench
   port_pressure: [[1, '01']]                     # ibench
   throughput: 0.5                                # ibench
   uops: 1                                        # ibench
@@ -3079,7 +3079,7 @@ instruction_forms:
   - class: register                              # ibench
     name: ymm                                    # ibench
     mask: True                                   # ibench
-  latency: 5                                     # ibench
+  latency: 4                                     # ibench
   port_pressure: [[1, '01']]                     # ibench
   throughput: 0.5                                # ibench
   uops: 1                                        # ibench
@@ -3116,7 +3116,7 @@ instruction_forms:
     name: xmm                                    # ibench
   - class: register                              # ibench
     name: xmm                                    # ibench
-  latency: 5                                     # ibench
+  latency: 4                                     # ibench
   port_pressure: [[1, '01']]                     # ibench
   throughput: 0.5                                # ibench
   uops: 1                                        # ibench
@@ -3129,7 +3129,7 @@ instruction_forms:
   - class: register                              # ibench
     name: xmm                                    # ibench
     mask: True                                   # ibench
-  latency: 5                                     # ibench
+  latency: 4                                     # ibench
   port_pressure: [[1, '01']]                     # ibench
   throughput: 0.5                                # ibench
   uops: 1                                        # ibench
@@ -3142,7 +3142,7 @@ instruction_forms:
   - class: register                              # ibench
     name: xmm                                    # ibench
     mask: True                                   # ibench
-  latency: 5                                     # ibench
+  latency: 4                                     # ibench
   port_pressure: [[1, '01']]                     # ibench
   throughput: 0.5                                # ibench
   uops: 1                                        # ibench
@@ -3154,7 +3154,7 @@ instruction_forms:
     name: xmm                                    # ibench
   - class: register                              # ibench
     name: xmm                                    # ibench
-  latency: 5                                     # ibench
+  latency: 4                                     # ibench
   port_pressure: [[1, '01']]                     # ibench
   throughput: 0.5                                # ibench
   uops: 1                                        # ibench
@@ -3166,7 +3166,7 @@ instruction_forms:
     name: xmm                                    # ibench
   - class: register                              # ibench
     name: xmm                                    # ibench
-  latency: 5                                     # ibench
+  latency: 4                                     # ibench
   port_pressure: [[1, '01']]                     # ibench
   throughput: 0.5                                # ibench
   uops: 1                                        # ibench
@@ -3179,7 +3179,7 @@ instruction_forms:
   - class: register                              # ibench
     name: xmm                                    # ibench
     mask: True                                   # ibench
-  latency: 5                                     # ibench
+  latency: 4                                     # ibench
   port_pressure: [[1, '01']]                     # ibench
   throughput: 0.5                                # ibench
   uops: 1                                        # ibench
@@ -3192,7 +3192,7 @@ instruction_forms:
   - class: register                              # ibench
     name: ymm                                    # ibench
     mask: True                                   # ibench
-  latency: 5                                     # ibench
+  latency: 4                                     # ibench
   port_pressure: [[1, '01']]                     # ibench
   throughput: 0.5                                # ibench
   uops: 1                                        # ibench
@@ -3204,7 +3204,7 @@ instruction_forms:
     name: ymm                                    # ibench
   - class: register                              # ibench
     name: ymm                                    # ibench
-  latency: 5                                     # ibench
+  latency: 4                                     # ibench
   port_pressure: [[1, '01']]                     # ibench
   throughput: 0.5                                # ibench
   uops: 1                                        # ibench
@@ -3241,7 +3241,7 @@ instruction_forms:
     name: xmm                                    # ibench
   - class: register                              # ibench
     name: xmm                                    # ibench
-  latency: 5                                     # ibench
+  latency: 4                                     # ibench
   port_pressure: [[1, '01']]                     # ibench
   throughput: 0.5                                # ibench
   uops: 1                                        # ibench
@@ -3254,7 +3254,7 @@ instruction_forms:
   - class: register                              # ibench
     name: xmm                                    # ibench
     mask: True                                   # ibench
-  latency: 5                                     # ibench
+  latency: 4                                     # ibench
   port_pressure: [[1, '01']]                     # ibench
   throughput: 0.5                                # ibench
   uops: 1                                        # ibench
@@ -3266,7 +3266,7 @@ instruction_forms:
     name: ymm                                    # ibench
   - class: register                              # ibench
     name: ymm                                    # ibench
-  latency: 5                                     # ibench
+  latency: 4                                     # ibench
   port_pressure: [[1, '01']]                     # ibench
   throughput: 0.5                                # ibench
   uops: 1                                        # ibench
@@ -3279,7 +3279,7 @@ instruction_forms:
   - class: register                              # ibench
     name: ymm                                    # ibench
     mask: True                                   # ibench
-  latency: 5                                     # ibench
+  latency: 4                                     # ibench
   port_pressure: [[1, '01']]                     # ibench
   throughput: 0.5                                # ibench
   uops: 1                                        # ibench
@@ -3316,7 +3316,7 @@ instruction_forms:
     name: xmm                                    # ibench
   - class: register                              # ibench
     name: xmm                                    # ibench
-  latency: 5                                     # ibench
+  latency: 4                                     # ibench
   port_pressure: [[1, '01']]                     # ibench
   throughput: 0.5                                # ibench
   uops: 1                                        # ibench
@@ -3329,7 +3329,7 @@ instruction_forms:
   - class: register                              # ibench
     name: xmm                                    # ibench
     mask: True                                   # ibench
-  latency: 5                                     # ibench
+  latency: 4                                     # ibench
   port_pressure: [[1, '01']]                     # ibench
   throughput: 0.5                                # ibench
   uops: 1                                        # ibench
@@ -3342,7 +3342,7 @@ instruction_forms:
   - class: register                              # ibench
     name: xmm                                    # ibench
     mask: True                                   # ibench
-  latency: 5                                     # ibench
+  latency: 4                                     # ibench
   port_pressure: [[1, '01']]                     # ibench
   throughput: 0.5                                # ibench
   uops: 1                                        # ibench
@@ -3354,7 +3354,7 @@ instruction_forms:
     name: xmm                                    # ibench
   - class: register                              # ibench
     name: xmm                                    # ibench
-  latency: 5                                     # ibench
+  latency: 4                                     # ibench
   port_pressure: [[1, '01']]                     # ibench
   throughput: 0.5                                # ibench
   uops: 1                                        # ibench
