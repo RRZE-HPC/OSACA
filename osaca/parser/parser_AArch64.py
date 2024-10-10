@@ -411,12 +411,12 @@ class ParserAArch64(BaseParser):
 
     def process_register_operand(self, operand):
         return RegisterOperand(
-            prefix=operand["prefix"],
+            prefix=operand["prefix"].lower(),
             name=operand["name"],
-            shape=operand["shape"] if "shape" in operand else None,
+            shape=operand["shape"].lower() if "shape" in operand else None,
             lanes=operand["lanes"] if "lanes" in operand else None,
             index=operand["index"] if "index" in operand else None,
-            predication=operand["predication"] if "predication" in operand else None,
+            predication=operand["predication"].lower() if "predication" in operand else None,
         )
 
     def process_memory_address(self, memory_address):
