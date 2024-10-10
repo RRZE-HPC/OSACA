@@ -3532,6 +3532,84 @@ instruction_forms:
   port_pressure: [[1, '015'], [1, '15'], [1, '0'], [15, ['2','3','11']]]  # ibench
   throughput: 5.0                                                                 # uops.info
   uops: 39                                                                         #uops.info
+- name: [vscatterdpd, vscatterqpd]  # with store                                                   # ibench
+  operands:                                                                       # ibench
+  - class: register                                                               # ibench
+    name: xmm                                                                     # ibench
+  - class: memory                                                                 # ibench
+    base: "*"                                                                     # ibench
+    offset: "*"                                                                   # ibench
+    index: "*"                                                                    # ibench
+    scale: "*"                                                                    # ibench
+  latency: 0                                                                     # ibench
+  port_pressure: [[1, '0'], [1, '01'], [1, '0156'], [8, '78'], [8, '49']]  # ibench
+  throughput: 4.0                                                                 # ibench
+  uops: 8                                                                         # ibench
+- name: [vscatterdpd, vscatterqpd]  # with store                                                   # ibench
+  operands:                                                                       # ibench
+  - class: register                                                               # ibench
+    name: ymm                                                                     # ibench
+  - class: memory                                                                 # ibench
+    base: "*"                                                                     # ibench
+    offset: "*"                                                                   # ibench
+    index: "*"                                                                    # ibench
+    scale: "*"                                                                    # ibench
+  latency: 0                                                                     # ibench
+  port_pressure: [[1, '0'], [1, '01'], [1, '0156'], [10, '78'], [10, '49']]  # ibench
+  throughput: 5.0                                                                 # ibench
+  uops: 12                                                                         # ibench
+- name: [vscatterdpd, vscatterqpd]  # with store                                                   # ibench
+  operands:                                                                       # ibench
+  - class: register                                                               # ibench
+    name: zmm                                                                     # ibench
+  - class: memory                                                                 # ibench
+    base: "*"                                                                     # ibench
+    offset: "*"                                                                   # ibench
+    index: "*"                                                                    # ibench
+    scale: "*"                                                                    # ibench
+  latency: 0                                                                     # ibench
+  port_pressure: [[2, '0'], [1, '0156'], [14, '78'], [14, '49']]  # ibench
+  throughput: 7.0                                                                 # ibench
+  uops: 20                                                                         # ibench
+- name: vscatterdps  # with store                                                   # ibench
+  operands:                                                                       # ibench
+  - class: register                                                               # ibench
+    name: xmm                                                                     # ibench
+  - class: memory                                                                 # ibench
+    base: "*"                                                                     # ibench
+    offset: "*"                                                                   # ibench
+    index: "*"                                                                    # ibench
+    scale: "*"                                                                    # ibench
+  latency: 0                                                                     # ibench
+  port_pressure: [[1, '0'], [1, '01'], [1, '0156'], [10, '78'], [10, '49']]  # ibench
+  throughput: 5.0                                                                 # ibench
+  uops: 12                                                                         # ibench
+- name: vscatterdps  # with store                                                   # ibench
+  operands:                                                                       # ibench
+  - class: register                                                               # ibench
+    name: ymm                                                                     # ibench
+  - class: memory                                                                 # ibench
+    base: "*"                                                                     # ibench
+    offset: "*"                                                                   # ibench
+    index: "*"                                                                    # ibench
+    scale: "*"                                                                    # ibench
+  latency: 0                                                                     # ibench
+  port_pressure: [[1, '0'], [1, '01'], [1, '0156'], [14, '78'], [14, '49']]  # ibench
+  throughput: 7.0                                                                 # ibench
+  uops: 20                                                                         # ibench
+- name: vscatterdps  # with store                                                   # ibench
+  operands:                                                                       # ibench
+  - class: register                                                               # ibench
+    name: zmm                                                                     # ibench
+  - class: memory                                                                 # ibench
+    base: "*"                                                                     # ibench
+    offset: "*"                                                                   # ibench
+    index: "*"                                                                    # ibench
+    scale: "*"                                                                    # ibench
+  latency: 0                                                                     # ibench
+  port_pressure: [[2, '0'], [1, '0156'], [22, '78'], [22, '49']]  # ibench
+  throughput: 11.0                                                                 # ibench
+  uops: 36                                                                         # ibench
 - name: vmulpd                # ibench
   operands:                   # ibench
   - class: register           # ibench
@@ -5427,7 +5505,6 @@ instruction_forms:
   port_pressure: [[1, '5']]
   throughput: 1.0
   uops: 1
-
 ########### /\                  ##########
 ########### || assumed from ICX ##########
 - name: [AND, OR, XOR, TEST]
