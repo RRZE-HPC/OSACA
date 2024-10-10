@@ -26,14 +26,14 @@ class RegisterOperand(Operand):
         super().__init__(source, destination)
         self._name = name
         self._width = width
-        self._prefix = prefix
+        self._prefix = prefix.lower() if prefix else None
         self._regtype = regtype
         self._lanes = lanes
-        self._shape = shape
+        self._shape = shape.lower() if shape else None
         self._index = index
         self._mask = mask
         self._zeroing = zeroing
-        self._predication = predication
+        self._predication = predication.lower() if predication else None
         self._pre_indexed = pre_indexed
         self._post_indexed = post_indexed
         self._shift = shift
@@ -93,7 +93,7 @@ class RegisterOperand(Operand):
 
     @prefix.setter
     def prefix(self, prefix):
-        self._prefix = prefix
+        self._prefix = prefix.lower()
 
     @property
     def regtype(self):
