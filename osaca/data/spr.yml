@@ -2370,6 +2370,18 @@ instruction_forms:
   port_pressure: [[1, ['0','1','5','6','10']]]  # ibench
   throughput: 0.2             # ibench
   uops: 1                     # ibench
+- name: pdep
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: 3
+  port_pressure: [[1, '1']]
+  throughput: 1.0
+  uops: 1
 - name: addpd                 # ibench
   operands:                   # ibench
   - class: register           # ibench
@@ -5674,7 +5686,7 @@ instruction_forms:
   port_pressure: [[1, '5']]
   throughput: 1.0
   uops: 1
-- name: VBROADCASTSS
+- name: [VBROADCASTSS, VBROADCASTI32X2]
   operands:
   - class: register
     name: xmm
@@ -5684,7 +5696,7 @@ instruction_forms:
   port_pressure: [[1, '5']]
   throughput: 1.0
   uops: 1
-- name: [VBROADCASTSD, VBROADCASTSS]
+- name: [VBROADCASTSD, VBROADCASTSS, VBROADCASTI32X2]
   operands:
   - class: register
     name: xmm
@@ -5694,7 +5706,7 @@ instruction_forms:
   port_pressure: [[1, '5']]
   throughput: 1.0
   uops: 1
-- name: [VBROADCASTSD, VBROADCASTSS]
+- name: [VBROADCASTSD, VBROADCASTSS, VBROADCASTI32X2]
   operands:
   - class: register
     name: xmm
@@ -5704,7 +5716,20 @@ instruction_forms:
   port_pressure: [[1, '5']]
   throughput: 1.0
   uops: 1
-- name: [VBROADCASTSD, VBROADCASTSS]
+- name: VBROADCASTI32X2 # with load
+  operands:
+  - class: memory
+    base: "*"
+    offset: "*"
+    index: "*"
+    scale: "*"
+  - class: register
+    name: xmm
+  latency: 4
+  port_pressure: [[1, ['2', '3', '11']]]
+  throughput: 0.33333333
+  uops: 1
+- name: [VBROADCASTSD, VBROADCASTSS, VBROADCASTI64X2, VBROADCASTI32X4] # with load
   operands:
   - class: memory
     base: "*"
@@ -5714,10 +5739,10 @@ instruction_forms:
   - class: register
     name: ymm
   latency: 5
-  port_pressure: [[1, '23'], [1, '015']]
-  throughput: 1.0
+  port_pressure: [[1, ['2', '3', '11']]]
+  throughput: 0.333333
   uops: 1
-- name: [VBROADCASTSD, VBROADCASTSS]
+- name: [VBROADCASTSD, VBROADCASTSS, VBROADCASTI32X4, VBROADCASTI32X8, VBROADCASTI64X2, VBROADCASTI64X4] # with load
   operands:
   - class: memory
     base: "*"
@@ -5727,7 +5752,7 @@ instruction_forms:
   - class: register
     name: zmm
   latency: 5
-  port_pressure: [[1, '23'], [1, '015']]
+  port_pressure: [[1, '23'], [0.5, ['11']]]
   throughput: 1.0
   uops: 1
 - name: vandpd
@@ -5891,4 +5916,10 @@ instruction_forms:
   latency: 3                    # uops.info
   port_pressure: [[1, '5']]     # uops.info
   throughput: 1.0               # ibench
+  uops: 1
+- name: [cltq, cdq, cdqe] 
+  operands: []
+  latency: 1                    # uops.info
+  port_pressure: [[1, '06']]    # uops.info
+  throughput: 0.5               # uops.info 
   uops: 1
