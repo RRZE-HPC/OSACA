@@ -2362,6 +2362,14 @@ instruction_forms:
   port_pressure: [[1, ['0','1','5','6','10']]]  # ibench
   throughput: 0.20              # ibench
   uops: 1                       # ibench
+- name: neg                   # ibench
+  operands:                   # ibench
+  - class: register           # ibench
+    name: gpr                 # ibench
+  latency: 1                  # ibench
+  port_pressure: [[1, ['0','1','5','6','10']]]  # ibench
+  throughput: 0.2             # ibench
+  uops: 1                     # ibench
 - name: addpd                 # ibench
   operands:                   # ibench
   - class: register           # ibench
@@ -2557,6 +2565,16 @@ instruction_forms:
   latency: 1                    # ibench
   port_pressure: [[1, ['0','1','5','6','10']]]  # ibench
   throughput: 0.20              # ibench
+  uops: 1                       # ibench
+- name: imul                    # ibench
+  operands:                     # ibench
+  - class: register             # ibench
+    name: gpr                   # ibench
+  - class: register             # ibench
+    name: gpr                   # ibench
+  latency: 3                    # ibench
+  port_pressure: [[1, '1']]     # ibench
+  throughput: 1.00              # ibench
   uops: 1                       # ibench
 - name: vaddpd                # ibench
   operands:                   # ibench
@@ -3542,7 +3560,7 @@ instruction_forms:
     index: "*"                                                                    # ibench
     scale: "*"                                                                    # ibench
   latency: 0                                                                     # ibench
-  port_pressure: [[1, '0'], [1, '01'], [1, '0156'], [8, '78'], [8, '49']]  # ibench
+  port_pressure: [[1, '0'], [1, '01'], [1, ['0','1','5','6','10']], [8, '78'], [8, '49']]  # ibench
   throughput: 4.0                                                                 # ibench
   uops: 8                                                                         # ibench
 - name: [vscatterdpd, vscatterqpd]  # with store                                                   # ibench
@@ -3555,7 +3573,7 @@ instruction_forms:
     index: "*"                                                                    # ibench
     scale: "*"                                                                    # ibench
   latency: 0                                                                     # ibench
-  port_pressure: [[1, '0'], [1, '01'], [1, '0156'], [10, '78'], [10, '49']]  # ibench
+  port_pressure: [[1, '0'], [1, '01'], [1, ['0','1','5','6','10']], [10, '78'], [10, '49']]  # ibench
   throughput: 5.0                                                                 # ibench
   uops: 12                                                                         # ibench
 - name: [vscatterdpd, vscatterqpd]  # with store                                                   # ibench
@@ -3568,7 +3586,7 @@ instruction_forms:
     index: "*"                                                                    # ibench
     scale: "*"                                                                    # ibench
   latency: 0                                                                     # ibench
-  port_pressure: [[2, '0'], [1, '0156'], [14, '78'], [14, '49']]  # ibench
+  port_pressure: [[2, '0'], [1, ['0','1','5','6','10']], [14, '78'], [14, '49']]  # ibench
   throughput: 7.0                                                                 # ibench
   uops: 20                                                                         # ibench
 - name: vscatterdps  # with store                                                   # ibench
@@ -3581,7 +3599,7 @@ instruction_forms:
     index: "*"                                                                    # ibench
     scale: "*"                                                                    # ibench
   latency: 0                                                                     # ibench
-  port_pressure: [[1, '0'], [1, '01'], [1, '0156'], [10, '78'], [10, '49']]  # ibench
+  port_pressure: [[1, '0'], [1, '01'], [1, ['0','1','5','6','10']], [10, '78'], [10, '49']]  # ibench
   throughput: 5.0                                                                 # ibench
   uops: 12                                                                         # ibench
 - name: vscatterdps  # with store                                                   # ibench
@@ -3594,7 +3612,7 @@ instruction_forms:
     index: "*"                                                                    # ibench
     scale: "*"                                                                    # ibench
   latency: 0                                                                     # ibench
-  port_pressure: [[1, '0'], [1, '01'], [1, '0156'], [14, '78'], [14, '49']]  # ibench
+  port_pressure: [[1, '0'], [1, '01'], [1, ['0','1','5','6','10']], [14, '78'], [14, '49']]  # ibench
   throughput: 7.0                                                                 # ibench
   uops: 20                                                                         # ibench
 - name: vscatterdps  # with store                                                   # ibench
@@ -3607,7 +3625,7 @@ instruction_forms:
     index: "*"                                                                    # ibench
     scale: "*"                                                                    # ibench
   latency: 0                                                                     # ibench
-  port_pressure: [[2, '0'], [1, '0156'], [22, '78'], [22, '49']]  # ibench
+  port_pressure: [[2, '0'], [1, ['0','1','5','6','10']], [22, '78'], [22, '49']]  # ibench
   throughput: 11.0                                                                 # ibench
   uops: 36                                                                         # ibench
 - name: vmulpd                # ibench
@@ -4174,7 +4192,7 @@ instruction_forms:
   - class: register
     name: gpr
   latency: 1
-  port_pressure: [[1, ['0','1','5','6','11']]]
+  port_pressure: [[1, ['0','1','5','6','10']]]
   throughput: 0.20
   uops: 1
 - name: vcvtdq2pd                                 # uops.info
@@ -4343,7 +4361,7 @@ instruction_forms:
   - class: register                                           # uops.info
     name: gpr                                                 # uops.info
   latency: 1                                                  # uops.info
-  port_pressure: [[1, ['0','1','5','6','11']]]                                # uops.info
+  port_pressure: [[1, ['0','1','5','6','10']]]                                # uops.info
   throughput: 0.2                                             # uops.info
   uops: 1                                                     # uops.info
 - name: [shl, shr, sal, sar]  # uops.info
@@ -5514,7 +5532,7 @@ instruction_forms:
   - class: register
     name: gpr
   latency: 1
-  port_pressure: [[1, ['0','1','5','6','11']]]
+  port_pressure: [[1, ['0','1','5','6','10']]]
   throughput: 0.20
   uops: 1
 - name: [AND, OR, XOR, TEST]
@@ -5524,7 +5542,7 @@ instruction_forms:
   - class: register
     name: gpr
   latency: 1
-  port_pressure: [[1, ['0','1','5','6','11']]]
+  port_pressure: [[1, ['0','1','5','6','10']]]
   throughput: 0.20
   uops: 1
 - name: NOT
@@ -5532,7 +5550,7 @@ instruction_forms:
   - class: register
     name: gpr
   latency: 1
-  port_pressure: [[1, ['0','1','5','6','11']]]
+  port_pressure: [[1, ['0','1','5','6','10']]]
   throughput: 0.20
   uops: 1
 - name: RET
@@ -5607,7 +5625,7 @@ instruction_forms:
   - class: register
     name: xmm
   latency: 1
-  port_pressure: [[1, ['0','1','5','6','11']]]
+  port_pressure: [[1, ['0','1','5','6','10']]]
   throughput: 0.20
   uops: 1
 - name: VXORPD
@@ -5619,7 +5637,7 @@ instruction_forms:
   - class: register
     name: ymm
   latency: 1
-  port_pressure: [[1, ['0','1','5','6','11']]]
+  port_pressure: [[1, ['0','1','5','6','10']]]
   throughput: 0.20
   uops: 1
 - name: VXORPS
@@ -5631,7 +5649,7 @@ instruction_forms:
   - class: register
     name: xmm
   latency: 1
-  port_pressure: [[1, ['0','1','5','6','11']]]
+  port_pressure: [[1, ['0','1','5','6','10']]]
   throughput: 0.20
   uops: 1
 - name: VXORPS
@@ -5643,7 +5661,7 @@ instruction_forms:
   - class: register
     name: ymm
   latency: 1
-  port_pressure: [[1, ['0','1','5','6','11']]]
+  port_pressure: [[1, ['0','1','5','6','10']]]
   throughput: 0.20
   uops: 1
 - name: VPBROADCASTD
@@ -5769,7 +5787,7 @@ instruction_forms:
   - class: register
     name: xmm
   latency: 1
-  port_pressure: [[1.0, ['0', '1', '5', '6', '10']]]
+  port_pressure: [[1, ['0', '1', '5', '6', '10']]]
   throughput: 0.2
   uops: 1.0
 - name: vmov
@@ -5779,7 +5797,7 @@ instruction_forms:
   - class: register
     name: xmm
   latency: 1
-  port_pressure: [[1.0, ['0', '1', '5', '6', '10']]]
+  port_pressure: [[1, ['0', '1', '5', '6', '10']]]
   throughput: 0.2
   uops: 1.0
 - name: [vpor, vpxor, vpord, vpxord]
