@@ -44,8 +44,8 @@ SUPPORTED_ARCHS = [
     "V2",
 ]
 DEFAULT_ARCHS = {
-    "aarch64": "A64FX",
-    "x86": "ICX",
+    "aarch64": "V2",
+    "x86": "SPR",
 }
 
 
