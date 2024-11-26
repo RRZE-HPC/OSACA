@@ -5123,6 +5123,81 @@ instruction_forms:
   port_pressure: [[1, '5']]  # asmbench
   throughput: 1.0            # asmbench
   uops: 1                    # asmbench
+- name: [vpermt2ps, vpermi2ps]   # asmbench
+  operands:                  # asmbench
+  - class: register          # asmbench
+    name: xmm                # asmbench
+  - class: register          # asmbench
+    name: xmm                # asmbench
+  - class: register          # asmbench
+    name: xmm                # asmbench
+  latency: 3                 # asmbench
+  port_pressure: [[1, '5']]  # asmbench
+  throughput: 1.0            # asmbench
+  uops: 1                    # asmbench
+- name: [vpermt2ps, vpermi2ps]   # asmbench
+  operands:                  # asmbench
+  - class: register          # asmbench
+    name: xmm                # asmbench
+  - class: register          # asmbench
+    name: xmm                # asmbench
+  - class: register          # asmbench
+    name: xmm                # asmbench
+    mask: True               # asmbench
+  latency: 3                 # asmbench
+  port_pressure: [[1, '5']]  # asmbench
+  throughput: 1.0            # asmbench
+  uops: 1                    # asmbench
+- name: [vpermt2ps, vpermi2ps]   # asmbench
+  operands:                  # asmbench
+  - class: register          # asmbench
+    name: ymm                # asmbench
+  - class: register          # asmbench
+    name: ymm                # asmbench
+  - class: register          # asmbench
+    name: ymm                # asmbench
+  latency: 3                 # asmbench
+  port_pressure: [[1, '5']]  # asmbench
+  throughput: 1.0            # asmbench
+  uops: 1                    # asmbench
+- name: [vpermt2ps, vpermi2ps]   # asmbench
+  operands:                  # asmbench
+  - class: register          # asmbench
+    name: ymm                # asmbench
+  - class: register          # asmbench
+    name: ymm                # asmbench
+  - class: register          # asmbench
+    name: ymm                # asmbench
+    mask: True               # asmbench
+  latency: 3                 # asmbench
+  port_pressure: [[1, '5']]  # asmbench
+  throughput: 1.0            # asmbench
+  uops: 1                    # asmbench
+- name: [vpermt2ps, vpermi2ps]   # asmbench
+  operands:                  # asmbench
+  - class: register          # asmbench
+    name: zmm                # asmbench
+  - class: register          # asmbench
+    name: zmm                # asmbench
+  - class: register          # asmbench
+    name: zmm                # asmbench
+  latency: 3                 # asmbench
+  port_pressure: [[1, '5']]  # asmbench
+  throughput: 1.0            # asmbench
+  uops: 1                    # asmbench
+- name: [vpermt2ps, vpermi2ps]   # asmbench
+  operands:                  # asmbench
+  - class: register          # asmbench
+    name: zmm                # asmbench
+  - class: register          # asmbench
+    name: zmm                # asmbench
+  - class: register          # asmbench
+    name: zmm                # asmbench
+    mask: True               # asmbench
+  latency: 3                 # asmbench
+  port_pressure: [[1, '5']]  # asmbench
+  throughput: 1.0            # asmbench
+  uops: 1                    # asmbench
 - name: [vunpckhpd, vunpckhps, vunpcklpd, vunpcklps]  # asmbench
   operands:                                           # asmbench
   - class: register                                   # asmbench
