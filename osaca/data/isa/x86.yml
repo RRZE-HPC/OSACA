@@ -4415,7 +4415,7 @@ instruction_forms:
           name: "xmm"
           source: true
           destination: true
-    - name: [shl, shr, shlq, shrq]
+    - name: [sal, sar, salq, sarq, shl, shr, shlq, shrq]
       operands:
         - class: "immediate"
           imd: "int"
