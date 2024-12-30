@@ -553,7 +553,7 @@ class KernelDG(nx.DiGraph):
                         graph.nodes[n]["style"] = "filled"
                     else:
                         graph.nodes[n]["style"] += ",filled"
-                    graph.nodes[n]["fillcolor"] = 2 + col
+                    graph.nodes[n]["fillcolor"] = 2 + col % 11
 
         # color edges
         for e in graph.edges:
