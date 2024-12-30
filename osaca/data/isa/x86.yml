@@ -2621,7 +2621,7 @@ instruction_forms:
           name: "ZF"
           source: true
           destination: true
-    - name: comisd
+    - name: ["comisd", "ucomisd"]
       operands:
         - class: "register"
           name: "xmm"
@@ -2656,7 +2656,7 @@ instruction_forms:
           name: "PF"
           source: false
           destination: true
-    - name: comisd
+    - name: ["comisd", "ucomisd"]
       operands:
         - class: "register"
           name: "xmm"
