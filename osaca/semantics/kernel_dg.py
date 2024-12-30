@@ -521,8 +521,8 @@ class KernelDG(nx.DiGraph):
         for dep in lcd:
             lcd_line_numbers[dep] = [x.line_number for x, lat in lcd[dep]["dependencies"]]
         # add color scheme
-        graph.graph["node"] = {"colorscheme": "accent8"}
-        graph.graph["edge"] = {"colorscheme": "accent8"}
+        graph.graph["node"] = {"colorscheme": "set312"}
+        graph.graph["edge"] = {"colorscheme": "set312"}
 
         # create LCD edges
         for dep in lcd_line_numbers:
