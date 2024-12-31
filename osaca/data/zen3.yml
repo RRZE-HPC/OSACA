@@ -5525,3 +5525,31 @@ instruction_forms:
   port_pressure: [[1, '7']]
   throughput: 1.0
   uops: 1
+- name: [vshufpd, vshufps]   #asmbench
+  operands:
+  - class: immediate
+    name: int
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '12']]
+  throughput: 0.5
+  uops: 1
+- name: [vshufpd, vshufps]   #asmbench
+  operands:
+  - class: immediate
+    name: int
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  latency: 1
+  port_pressure: [[1, '12']]
+  throughput: 0.5
+  uops: 1
