@@ -34,13 +34,13 @@ port_model_scheme: |
   +------+ +-----+ +-----+ +-----+ +-----+ +-----+                  +------+ +-------+ +-------+ +-------+ +-------+
   |BRANCH| |  LD | | SHF | |  LD | | SHF | | iLD |                  |  F2I | |AVX FMA| |AVX ADD| |AVX FMA| |AVX ADD|
   +------+ +-----+ +-----+ +-----+ +-----+ +-----+                  +------+ +-------+ +-------+ +-------+ +-------+
-                    //MUL           //DIV                                    +-------+ +-------+ +-------+
-                                                                             |  DIV  | | CONV/ | |  DIV  |
-                                                                             +-------+ |  SHUF | +-------+
-                                                                                       +-------+ +-------+ 
-                                                                                       |//AVX  | 
-                                                                                       |//SHUF |
-                                                                                       +-------+
+                    //MUL           //DIV                                    +-------+ +-------+ +-------+ +-------+
+                                                                             |  DIV  | | CONV/ | |  DIV  | | AVX   |
+                                                                             +-------+ |  SHUF | +-------+ |  SHUF |
+                                                                                       +-------+ +-------+ +-------+
+                                                                                       | AVX   | | AVX   |
+                                                                                       |  SHUF | |  SHUF |
+                                                                                       +-------+ +-------+
 
 instruction_forms:
 ##########################################
@@ -5441,3 +5441,93 @@ instruction_forms:
   port_pressure: [[2, ['10', '12']]]
   throughput: 1.0
   uops: 1
+- name: [vshufpd, vshufps]   #asmbench
+  operands:
+  - class: immediate
+    name: int
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '123']]
+  throughput: 0.33333
+  uops: 1
+- name: [vshufpd, vshufps]   #asmbench
+  operands:
+  - class: immediate
+    name: int
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  latency: 1
+  port_pressure: [[1, '123']]
+  throughput: 0.33333
+  uops: 1
+- name: [vshufpd, vshufps]   #asmbench
+  operands:
+  - class: immediate
+    name: int
+  - class: register
+    name: zmm
+  - class: register
+    name: zmm
+  - class: register
+    name: zmm
+  latency: 1
+  port_pressure: [[2, '123']]
+  throughput: 0.66666
+  uops: 2
+- name: [vshufpd, vshufps]   #asmbench
+  operands:
+  - class: immediate
+    name: int
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  - class: register
+    name: k
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '123']]
+  throughput: 0.33333
+  uops: 1
+- name: [vshufpd, vshufps]   #asmbench
+  operands:
+  - class: immediate
+    name: int
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  - class: register
+    name: k
+  - class: register
+    name: ymm
+  latency: 1
+  port_pressure: [[1, '123']]
+  throughput: 0.33333
+  uops: 1
+- name: [vshufpd, vshufps]   #asmbench
+  operands:
+  - class: immediate
+    name: int
+  - class: register
+    name: zmm
+  - class: register
+    name: zmm
+  - class: register
+    name: k
+  - class: register
+    name: zmm
+  latency: 1
+  port_pressure: [[2, '123']]
+  throughput: 0.66666
+  uops: 2
