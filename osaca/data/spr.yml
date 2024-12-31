@@ -2988,7 +2988,7 @@ instruction_forms:
   port_pressure: [[1, '0'], [4, ['0DV']]]  # ibench
   throughput: 4.0                          # ibench
   uops: 4                                  # ibench
-- name: [vfmadd213pd, vfmadd132pd, vfmadd231pd, vfnmadd213pd, vfnmadd132pd, vfnmadd231pd]  # ibench
+- name: [vfmadd213pd, vfmadd132pd, vfmadd231pd, vfnmadd213pd, vfnmadd132pd, vfnmadd231pd, vfmaddsub213pd, vfmaddsub132pd, vfmaddsub231pd]  # ibench
   operands:                                      # ibench
   - class: register                              # ibench
     name: xmm                                    # ibench
@@ -3000,7 +3000,7 @@ instruction_forms:
   port_pressure: [[1, '01']]                     # ibench
   throughput: 0.5                                # ibench
   uops: 1                                        # ibench
-- name: [vfmadd213pd, vfmadd132pd, vfmadd231pd, vfnmadd213pd, vfnmadd132pd, vfnmadd231pd]  # ibench
+- name: [vfmadd213pd, vfmadd132pd, vfmadd231pd, vfnmadd213pd, vfnmadd132pd, vfnmadd231pd, vfmaddsub213pd, vfmaddsub132pd, vfmaddsub231pd]  # ibench
   operands:                                      # ibench
   - class: register                              # ibench
     name: xmm                                    # ibench
@@ -3013,7 +3013,7 @@ instruction_forms:
   port_pressure: [[1, '01']]                     # ibench
   throughput: 0.5                                # ibench
   uops: 1                                        # ibench
-- name: [vfmadd213pd, vfmadd132pd, vfmadd231pd, vfnmadd213pd, vfnmadd132pd, vfnmadd231pd]  # ibench
+- name: [vfmadd213pd, vfmadd132pd, vfmadd231pd, vfnmadd213pd, vfnmadd132pd, vfnmadd231pd, vfmaddsub213pd, vfmaddsub132pd, vfmaddsub231pd]  # ibench
   operands:                                      # ibench
   - class: register                              # ibench
     name: ymm                                    # ibench
@@ -3026,7 +3026,7 @@ instruction_forms:
   port_pressure: [[1, '01']]                     # ibench
   throughput: 0.5                                # ibench
   uops: 1                                        # ibench
-- name: [vfmadd213pd, vfmadd132pd, vfmadd231pd, vfnmadd213pd, vfnmadd132pd, vfnmadd231pd]  # ibench
+- name: [vfmadd213pd, vfmadd132pd, vfmadd231pd, vfnmadd213pd, vfnmadd132pd, vfnmadd231pd, vfmaddsub213pd, vfmaddsub132pd, vfmaddsub231pd]  # ibench
   operands:                                      # ibench
   - class: register                              # ibench
     name: ymm                                    # ibench
@@ -3038,7 +3038,7 @@ instruction_forms:
   port_pressure: [[1, '01']]                     # ibench
   throughput: 0.5                                # ibench
   uops: 1                                        # ibench
-- name: [vfmadd213pd, vfmadd132pd, vfmadd231pd, vfnmadd213pd, vfnmadd132pd, vfnmadd231pd]  # ibench
+- name: [vfmadd213pd, vfmadd132pd, vfmadd231pd, vfnmadd213pd, vfnmadd132pd, vfnmadd231pd, vfmaddsub213pd, vfmaddsub132pd, vfmaddsub231pd]  # ibench
   operands:                                      # ibench
   - class: register                              # ibench
     name: zmm                                    # ibench
@@ -3050,82 +3050,7 @@ instruction_forms:
   port_pressure: [[1, '05']]                     # ibench
   throughput: 0.5                                # ibench
   uops: 1                                        # ibench
-- name: [vfmadd213pd, vfmadd132pd, vfmadd231pd, vfnmadd213pd, vfnmadd132pd, vfnmadd231pd]  # ibench
-  operands:                                      # ibench
-  - class: register                              # ibench
-    name: zmm                                    # ibench
-  - class: register                              # ibench
-    name: zmm                                    # ibench
-  - class: register                              # ibench
-    name: zmm                                    # ibench
-    mask: True                                   # ibench
-  latency: 4                                     # ibench
-  port_pressure: [[1, '05']]                     # ibench
-  throughput: 0.5                                # ibench
-  uops: 1                                        # ibench
-- name: [vfmadd213ps, vfmadd132ps, vfmadd231ps, vfnmadd213ps, vfnmadd132ps, vfnmadd231ps]  # ibench
-  operands:                                      # ibench
-  - class: register                              # ibench
-    name: xmm                                    # ibench
-  - class: register                              # ibench
-    name: xmm                                    # ibench
-  - class: register                              # ibench
-    name: xmm                                    # ibench
-  latency: 4                                     # ibench
-  port_pressure: [[1, '01']]                     # ibench
-  throughput: 0.5                                # ibench
-  uops: 1                                        # ibench
-- name: [vfmadd213ps, vfmadd132ps, vfmadd231ps, vfnmadd213ps, vfnmadd132ps, vfnmadd231ps]  # ibench
-  operands:                                      # ibench
-  - class: register                              # ibench
-    name: xmm                                    # ibench
-  - class: register                              # ibench
-    name: xmm                                    # ibench
-  - class: register                              # ibench
-    name: xmm                                    # ibench
-    mask: True                                   # ibench
-  latency: 4                                     # ibench
-  port_pressure: [[1, '01']]                     # ibench
-  throughput: 0.5                                # ibench
-  uops: 1                                        # ibench
-- name: [vfmadd213ps, vfmadd132ps, vfmadd231ps, vfnmadd213ps, vfnmadd132ps, vfnmadd231ps]  # ibench
-  operands:                                      # ibench
-  - class: register                              # ibench
-    name: ymm                                    # ibench
-  - class: register                              # ibench
-    name: ymm                                    # ibench
-  - class: register                              # ibench
-    name: ymm                                    # ibench
-  latency: 4                                     # ibench
-  port_pressure: [[1, '01']]                     # ibench
-  throughput: 0.5                                # ibench
-  uops: 1                                        # ibench
-- name: [vfmadd213ps, vfmadd132ps, vfmadd231ps, vfnmadd213ps, vfnmadd132ps, vfnmadd231ps]  # ibench
-  operands:                                      # ibench
-  - class: register                              # ibench
-    name: ymm                                    # ibench
-  - class: register                              # ibench
-    name: ymm                                    # ibench
-  - class: register                              # ibench
-    name: ymm                                    # ibench
-    mask: True                                   # ibench
-  latency: 4                                     # ibench
-  port_pressure: [[1, '01']]                     # ibench
-  throughput: 0.5                                # ibench
-  uops: 1                                        # ibench
-- name: [vfmadd213ps, vfmadd132ps, vfmadd231ps, vfnmadd213ps, vfnmadd132ps, vfnmadd231ps]  # ibench
-  operands:                                      # ibench
-  - class: register                              # ibench
-    name: zmm                                    # ibench
-  - class: register                              # ibench
-    name: zmm                                    # ibench
-  - class: register                              # ibench
-    name: zmm                                    # ibench
-  latency: 4                                     # ibench
-  port_pressure: [[1, '05']]                     # ibench
-  throughput: 0.5                                # ibench
-  uops: 1                                        # ibench
-- name: [vfmadd213ps, vfmadd132ps, vfmadd231ps, vfnmadd213ps, vfnmadd132ps, vfnmadd231ps]  # ibench
+- name: [vfmadd213pd, vfmadd132pd, vfmadd231pd, vfnmadd213pd, vfnmadd132pd, vfnmadd231pd, vfmaddsub213pd, vfmaddsub132pd, vfmaddsub231pd]  # ibench
   operands:                                      # ibench
   - class: register                              # ibench
     name: zmm                                    # ibench
@@ -3138,7 +3063,7 @@ instruction_forms:
   port_pressure: [[1, '05']]                     # ibench
   throughput: 0.5                                # ibench
   uops: 1                                        # ibench
-- name: [vfmadd213sd, vfmadd132sd, vfmadd231sd, vfnmadd213sd, vfnmadd132sd, vfnmadd231sd]  # ibench
+- name: [vfmadd213ps, vfmadd132ps, vfmadd231ps, vfnmadd213ps, vfnmadd132ps, vfnmadd231ps, vfmaddsub213ps, vfmaddsub132ps, vfmaddsub231ps]  # ibench
   operands:                                      # ibench
   - class: register                              # ibench
     name: xmm                                    # ibench
@@ -3150,20 +3075,7 @@ instruction_forms:
   port_pressure: [[1, '01']]                     # ibench
   throughput: 0.5                                # ibench
   uops: 1                                        # ibench
-- name: [vfmadd213sd, vfmadd132sd, vfmadd231sd, vfnmadd213sd, vfnmadd132sd, vfnmadd231sd]  # ibench
-  operands:                                      # ibench
-  - class: register                              # ibench
-    name: xmm                                    # ibench
-  - class: register                              # ibench
-    name: xmm                                    # ibench
-  - class: register                              # ibench
-    name: xmm                                    # ibench
-    mask: True                                   # ibench
-  latency: 4                                     # ibench
-  port_pressure: [[1, '01']]                     # ibench
-  throughput: 0.5                                # ibench
-  uops: 1                                        # ibench
-- name: [vfmadd213ss, vfmadd132ss, vfmadd231ss, vfnmadd213ss, vfnmadd132ss, vfnmadd231ss]  # ibench
+- name: [vfmadd213ps, vfmadd132ps, vfmadd231ps, vfnmadd213ps, vfnmadd132ps, vfnmadd231ps, vfmaddsub213ps, vfmaddsub132ps, vfmaddsub231ps]  # ibench
   operands:                                      # ibench
   - class: register                              # ibench
     name: xmm                                    # ibench
@@ -3176,44 +3088,19 @@ instruction_forms:
   port_pressure: [[1, '01']]                     # ibench
   throughput: 0.5                                # ibench
   uops: 1                                        # ibench
-- name: [vfmadd213ss, vfmadd132ss, vfmadd231ss, vfnmadd213ss, vfnmadd132ss, vfnmadd231ss]  # ibench
+- name: [vfmadd213ps, vfmadd132ps, vfmadd231ps, vfnmadd213ps, vfnmadd132ps, vfnmadd231ps, vfmaddsub213ps, vfmaddsub132ps, vfmaddsub231ps]  # ibench
   operands:                                      # ibench
   - class: register                              # ibench
-    name: xmm                                    # ibench
+    name: ymm                                    # ibench
   - class: register                              # ibench
-    name: xmm                                    # ibench
+    name: ymm                                    # ibench
   - class: register                              # ibench
-    name: xmm                                    # ibench
+    name: ymm                                    # ibench
   latency: 4                                     # ibench
   port_pressure: [[1, '01']]                     # ibench
   throughput: 0.5                                # ibench
   uops: 1                                        # ibench
-- name: [vfmsub213pd, vfmsub132pd, vfmsub231pd, vfnmsub213pd, vfnmsub132pd, vfnmsub231pd]  # ibench
-  operands:                                      # ibench
-  - class: register                              # ibench
-    name: xmm                                    # ibench
-  - class: register                              # ibench
-    name: xmm                                    # ibench
-  - class: register                              # ibench
-    name: xmm                                    # ibench
-  latency: 4                                     # ibench
-  port_pressure: [[1, '01']]                     # ibench
-  throughput: 0.5                                # ibench
-  uops: 1                                        # ibench
-- name: [vfmsub213pd, vfmsub132pd, vfmsub231pd, vfnmsub213pd, vfnmsub132pd, vfnmsub231pd]  # ibench
-  operands:                                      # ibench
-  - class: register                              # ibench
-    name: xmm                                    # ibench
-  - class: register                              # ibench
-    name: xmm                                    # ibench
-  - class: register                              # ibench
-    name: xmm                                    # ibench
-    mask: True                                   # ibench
-  latency: 4                                     # ibench
-  port_pressure: [[1, '01']]                     # ibench
-  throughput: 0.5                                # ibench
-  uops: 1                                        # ibench
-- name: [vfmsub213pd, vfmsub132pd, vfmsub231pd, vfnmsub213pd, vfnmsub132pd, vfnmsub231pd]  # ibench
+- name: [vfmadd213ps, vfmadd132ps, vfmadd231ps, vfnmadd213ps, vfnmadd132ps, vfnmadd231ps, vfmaddsub213ps, vfmaddsub132ps, vfmaddsub231ps]  # ibench
   operands:                                      # ibench
   - class: register                              # ibench
     name: ymm                                    # ibench
@@ -3226,19 +3113,7 @@ instruction_forms:
   port_pressure: [[1, '01']]                     # ibench
   throughput: 0.5                                # ibench
   uops: 1                                        # ibench
-- name: [vfmsub213pd, vfmsub132pd, vfmsub231pd, vfnmsub213pd, vfnmsub132pd, vfnmsub231pd]  # ibench
-  operands:                                      # ibench
-  - class: register                              # ibench
-    name: ymm                                    # ibench
-  - class: register                              # ibench
-    name: ymm                                    # ibench
-  - class: register                              # ibench
-    name: ymm                                    # ibench
-  latency: 4                                     # ibench
-  port_pressure: [[1, '01']]                     # ibench
-  throughput: 0.5                                # ibench
-  uops: 1                                        # ibench
-- name: [vfmsub213pd, vfmsub132pd, vfmsub231pd, vfnmsub213pd, vfnmsub132pd, vfnmsub231pd]  # ibench
+- name: [vfmadd213ps, vfmadd132ps, vfmadd231ps, vfnmadd213ps, vfnmadd132ps, vfnmadd231ps, vfmaddsub213ps, vfmaddsub132ps, vfmaddsub231ps]  # ibench
   operands:                                      # ibench
   - class: register                              # ibench
     name: zmm                                    # ibench
@@ -3250,7 +3125,7 @@ instruction_forms:
   port_pressure: [[1, '05']]                     # ibench
   throughput: 0.5                                # ibench
   uops: 1                                        # ibench
-- name: [vfmsub213pd, vfmsub132pd, vfmsub231pd, vfnmsub213pd, vfnmsub132pd, vfnmsub231pd]  # ibench
+- name: [vfmadd213ps, vfmadd132ps, vfmadd231ps, vfnmadd213ps, vfnmadd132ps, vfnmadd231ps, vfmaddsub213ps, vfmaddsub132ps, vfmaddsub231ps]  # ibench
   operands:                                      # ibench
   - class: register                              # ibench
     name: zmm                                    # ibench
@@ -3263,7 +3138,7 @@ instruction_forms:
   port_pressure: [[1, '05']]                     # ibench
   throughput: 0.5                                # ibench
   uops: 1                                        # ibench
-- name: [vfmsub213ps, vfmsub132ps, vfmsub231ps, vfnmsub213ps, vfnmsub132ps, vfnmsub231ps]  # ibench
+- name: [vfmadd213sd, vfmadd132sd, vfmadd231sd, vfnmadd213sd, vfnmadd132sd, vfnmadd231sd, vfmaddsub213sd, vfmaddsub132sd, vfmaddsub231sd]  # ibench
   operands:                                      # ibench
   - class: register                              # ibench
     name: xmm                                    # ibench
@@ -3275,7 +3150,7 @@ instruction_forms:
   port_pressure: [[1, '01']]                     # ibench
   throughput: 0.5                                # ibench
   uops: 1                                        # ibench
-- name: [vfmsub213ps, vfmsub132ps, vfmsub231ps, vfnmsub213ps, vfnmsub132ps, vfnmsub231ps]  # ibench
+- name: [vfmadd213sd, vfmadd132sd, vfmadd231sd, vfnmadd213sd, vfnmadd132sd, vfnmadd231sd, vfmaddsub213sd, vfmaddsub132sd, vfmaddsub231sd]  # ibench
   operands:                                      # ibench
   - class: register                              # ibench
     name: xmm                                    # ibench
@@ -3288,19 +3163,57 @@ instruction_forms:
   port_pressure: [[1, '01']]                     # ibench
   throughput: 0.5                                # ibench
   uops: 1                                        # ibench
-- name: [vfmsub213ps, vfmsub132ps, vfmsub231ps, vfnmsub213ps, vfnmsub132ps, vfnmsub231ps]  # ibench
+- name: [vfmadd213ss, vfmadd132ss, vfmadd231ss, vfnmadd213ss, vfnmadd132ss, vfnmadd231ss, vfmaddsub213ss, vfmaddsub132ss, vfmaddsub231ss]  # ibench
   operands:                                      # ibench
   - class: register                              # ibench
-    name: ymm                                    # ibench
+    name: xmm                                    # ibench
   - class: register                              # ibench
-    name: ymm                                    # ibench
+    name: xmm                                    # ibench
   - class: register                              # ibench
-    name: ymm                                    # ibench
+    name: xmm                                    # ibench
+    mask: True                                   # ibench
   latency: 4                                     # ibench
   port_pressure: [[1, '01']]                     # ibench
   throughput: 0.5                                # ibench
   uops: 1                                        # ibench
-- name: [vfmsub213ps, vfmsub132ps, vfmsub231ps, vfnmsub213ps, vfnmsub132ps, vfnmsub231ps]  # ibench
+- name: [vfmadd213ss, vfmadd132ss, vfmadd231ss, vfnmadd213ss, vfnmadd132ss, vfnmadd231ss, vfmaddsub213ss, vfmaddsub132ss, vfmaddsub231ss]  # ibench
+  operands:                                      # ibench
+  - class: register                              # ibench
+    name: xmm                                    # ibench
+  - class: register                              # ibench
+    name: xmm                                    # ibench
+  - class: register                              # ibench
+    name: xmm                                    # ibench
+  latency: 4                                     # ibench
+  port_pressure: [[1, '01']]                     # ibench
+  throughput: 0.5                                # ibench
+  uops: 1                                        # ibench
+- name: [vfmsub213pd, vfmsub132pd, vfmsub231pd, vfnmsub213pd, vfnmsub132pd, vfnmsub231pd, vfmaddsub213pd, vfmaddsub132pd, vfmaddsub231pd]  # ibench
+  operands:                                      # ibench
+  - class: register                              # ibench
+    name: xmm                                    # ibench
+  - class: register                              # ibench
+    name: xmm                                    # ibench
+  - class: register                              # ibench
+    name: xmm                                    # ibench
+  latency: 4                                     # ibench
+  port_pressure: [[1, '01']]                     # ibench
+  throughput: 0.5                                # ibench
+  uops: 1                                        # ibench
+- name: [vfmsub213pd, vfmsub132pd, vfmsub231pd, vfnmsub213pd, vfnmsub132pd, vfnmsub231pd, vfmaddsub213pd, vfmaddsub132pd, vfmaddsub231pd]  # ibench
+  operands:                                      # ibench
+  - class: register                              # ibench
+    name: xmm                                    # ibench
+  - class: register                              # ibench
+    name: xmm                                    # ibench
+  - class: register                              # ibench
+    name: xmm                                    # ibench
+    mask: True                                   # ibench
+  latency: 4                                     # ibench
+  port_pressure: [[1, '01']]                     # ibench
+  throughput: 0.5                                # ibench
+  uops: 1                                        # ibench
+- name: [vfmsub213pd, vfmsub132pd, vfmsub231pd, vfnmsub213pd, vfnmsub132pd, vfnmsub231pd, vfmaddsub213pd, vfmaddsub132pd, vfmaddsub231pd]  # ibench
   operands:                                      # ibench
   - class: register                              # ibench
     name: ymm                                    # ibench
@@ -3313,7 +3226,19 @@ instruction_forms:
   port_pressure: [[1, '01']]                     # ibench
   throughput: 0.5                                # ibench
   uops: 1                                        # ibench
-- name: [vfmsub213ps, vfmsub132ps, vfmsub231ps, vfnmsub213ps, vfnmsub132ps, vfnmsub231ps]  # ibench
+- name: [vfmsub213pd, vfmsub132pd, vfmsub231pd, vfnmsub213pd, vfnmsub132pd, vfnmsub231pd, vfmaddsub213pd, vfmaddsub132pd, vfmaddsub231pd]  # ibench
+  operands:                                      # ibench
+  - class: register                              # ibench
+    name: ymm                                    # ibench
+  - class: register                              # ibench
+    name: ymm                                    # ibench
+  - class: register                              # ibench
+    name: ymm                                    # ibench
+  latency: 4                                     # ibench
+  port_pressure: [[1, '01']]                     # ibench
+  throughput: 0.5                                # ibench
+  uops: 1                                        # ibench
+- name: [vfmsub213pd, vfmsub132pd, vfmsub231pd, vfnmsub213pd, vfnmsub132pd, vfnmsub231pd, vfmaddsub213pd, vfmaddsub132pd, vfmaddsub231pd]  # ibench
   operands:                                      # ibench
   - class: register                              # ibench
     name: zmm                                    # ibench
@@ -3325,7 +3250,7 @@ instruction_forms:
   port_pressure: [[1, '05']]                     # ibench
   throughput: 0.5                                # ibench
   uops: 1                                        # ibench
-- name: [vfmsub213ps, vfmsub132ps, vfmsub231ps, vfnmsub213ps, vfnmsub132ps, vfnmsub231ps]  # ibench
+- name: [vfmsub213pd, vfmsub132pd, vfmsub231pd, vfnmsub213pd, vfnmsub132pd, vfnmsub231pd, vfmaddsub213pd, vfmaddsub132pd, vfmaddsub231pd]  # ibench
   operands:                                      # ibench
   - class: register                              # ibench
     name: zmm                                    # ibench
@@ -3338,7 +3263,7 @@ instruction_forms:
   port_pressure: [[1, '05']]                     # ibench
   throughput: 0.5                                # ibench
   uops: 1                                        # ibench
-- name: [vfmsub213sd, vfmsub132sd, vfmsub231sd, vfnmsub213sd, vfnmsub132sd, vfnmsub231sd]  # ibench
+- name: [vfmsub213ps, vfmsub132ps, vfmsub231ps, vfnmsub213ps, vfnmsub132ps, vfnmsub231ps, vfmaddsub213ps, vfmaddsub132ps, vfmaddsub231ps]  # ibench
   operands:                                      # ibench
   - class: register                              # ibench
     name: xmm                                    # ibench
@@ -3350,20 +3275,7 @@ instruction_forms:
   port_pressure: [[1, '01']]                     # ibench
   throughput: 0.5                                # ibench
   uops: 1                                        # ibench
-- name: [vfmsub213sd, vfmsub132sd, vfmsub231sd, vfnmsub213sd, vfnmsub132sd, vfnmsub231sd]  # ibench
-  operands:                                      # ibench
-  - class: register                              # ibench
-    name: xmm                                    # ibench
-  - class: register                              # ibench
-    name: xmm                                    # ibench
-  - class: register                              # ibench
-    name: xmm                                    # ibench
-    mask: True                                   # ibench
-  latency: 4                                     # ibench
-  port_pressure: [[1, '01']]                     # ibench
-  throughput: 0.5                                # ibench
-  uops: 1                                        # ibench
-- name: [vfmsub213ss, vfmsub132ss, vfmsub231ss, vfnmsub213ss, vfnmsub132ss, vfnmsub231ss]  # ibench
+- name: [vfmsub213ps, vfmsub132ps, vfmsub231ps, vfnmsub213ps, vfnmsub132ps, vfnmsub231ps, vfmaddsub213ps, vfmaddsub132ps, vfmaddsub231ps]  # ibench
   operands:                                      # ibench
   - class: register                              # ibench
     name: xmm                                    # ibench
@@ -3376,7 +3288,95 @@ instruction_forms:
   port_pressure: [[1, '01']]                     # ibench
   throughput: 0.5                                # ibench
   uops: 1                                        # ibench
-- name: [vfmsub213ss, vfmsub132ss, vfmsub231ss, vfnmsub213ss, vfnmsub132ss, vfnmsub231ss]  # ibench
+- name: [vfmsub213ps, vfmsub132ps, vfmsub231ps, vfnmsub213ps, vfnmsub132ps, vfnmsub231ps, vfmaddsub213ps, vfmaddsub132ps, vfmaddsub231ps]  # ibench
+  operands:                                      # ibench
+  - class: register                              # ibench
+    name: ymm                                    # ibench
+  - class: register                              # ibench
+    name: ymm                                    # ibench
+  - class: register                              # ibench
+    name: ymm                                    # ibench
+  latency: 4                                     # ibench
+  port_pressure: [[1, '01']]                     # ibench
+  throughput: 0.5                                # ibench
+  uops: 1                                        # ibench
+- name: [vfmsub213ps, vfmsub132ps, vfmsub231ps, vfnmsub213ps, vfnmsub132ps, vfnmsub231ps, vfmaddsub213ps, vfmaddsub132ps, vfmaddsub231ps]  # ibench
+  operands:                                      # ibench
+  - class: register                              # ibench
+    name: ymm                                    # ibench
+  - class: register                              # ibench
+    name: ymm                                    # ibench
+  - class: register                              # ibench
+    name: ymm                                    # ibench
+    mask: True                                   # ibench
+  latency: 4                                     # ibench
+  port_pressure: [[1, '01']]                     # ibench
+  throughput: 0.5                                # ibench
+  uops: 1                                        # ibench
+- name: [vfmsub213ps, vfmsub132ps, vfmsub231ps, vfnmsub213ps, vfnmsub132ps, vfnmsub231ps, vfmaddsub213ps, vfmaddsub132ps, vfmaddsub231ps]  # ibench
+  operands:                                      # ibench
+  - class: register                              # ibench
+    name: zmm                                    # ibench
+  - class: register                              # ibench
+    name: zmm                                    # ibench
+  - class: register                              # ibench
+    name: zmm                                    # ibench
+  latency: 4                                     # ibench
+  port_pressure: [[1, '05']]                     # ibench
+  throughput: 0.5                                # ibench
+  uops: 1                                        # ibench
+- name: [vfmsub213ps, vfmsub132ps, vfmsub231ps, vfnmsub213ps, vfnmsub132ps, vfnmsub231ps, vfmaddsub213ps, vfmaddsub132ps, vfmaddsub231ps]  # ibench
+  operands:                                      # ibench
+  - class: register                              # ibench
+    name: zmm                                    # ibench
+  - class: register                              # ibench
+    name: zmm                                    # ibench
+  - class: register                              # ibench
+    name: zmm                                    # ibench
+    mask: True                                   # ibench
+  latency: 4                                     # ibench
+  port_pressure: [[1, '05']]                     # ibench
+  throughput: 0.5                                # ibench
+  uops: 1                                        # ibench
+- name: [vfmsub213sd, vfmsub132sd, vfmsub231sd, vfnmsub213sd, vfnmsub132sd, vfnmsub231sd, vfmaddsub213sd, vfmaddsub132sd, vfmaddsub231sd]  # ibench
+  operands:                                      # ibench
+  - class: register                              # ibench
+    name: xmm                                    # ibench
+  - class: register                              # ibench
+    name: xmm                                    # ibench
+  - class: register                              # ibench
+    name: xmm                                    # ibench
+  latency: 4                                     # ibench
+  port_pressure: [[1, '01']]                     # ibench
+  throughput: 0.5                                # ibench
+  uops: 1                                        # ibench
+- name: [vfmsub213sd, vfmsub132sd, vfmsub231sd, vfnmsub213sd, vfnmsub132sd, vfnmsub231sd, vfmaddsub213sd, vfmaddsub132sd, vfmaddsub231sd]  # ibench
+  operands:                                      # ibench
+  - class: register                              # ibench
+    name: xmm                                    # ibench
+  - class: register                              # ibench
+    name: xmm                                    # ibench
+  - class: register                              # ibench
+    name: xmm                                    # ibench
+    mask: True                                   # ibench
+  latency: 4                                     # ibench
+  port_pressure: [[1, '01']]                     # ibench
+  throughput: 0.5                                # ibench
+  uops: 1                                        # ibench
+- name: [vfmsub213ss, vfmsub132ss, vfmsub231ss, vfnmsub213ss, vfnmsub132ss, vfnmsub231ss, vfmaddsub213ss, vfmaddsub132ss, vfmaddsub231ss]  # ibench
+  operands:                                      # ibench
+  - class: register                              # ibench
+    name: xmm                                    # ibench
+  - class: register                              # ibench
+    name: xmm                                    # ibench
+  - class: register                              # ibench
+    name: xmm                                    # ibench
+    mask: True                                   # ibench
+  latency: 4                                     # ibench
+  port_pressure: [[1, '01']]                     # ibench
+  throughput: 0.5                                # ibench
+  uops: 1                                        # ibench
+- name: [vfmsub213ss, vfmsub132ss, vfmsub231ss, vfnmsub213ss, vfnmsub132ss, vfnmsub231ss, vfmaddsub213ss, vfmaddsub132ss, vfmaddsub231ss]  # ibench
   operands:                                      # ibench
   - class: register                              # ibench
     name: xmm                                    # ibench
