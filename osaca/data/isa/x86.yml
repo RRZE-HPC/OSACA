@@ -530,6 +530,110 @@ instruction_forms:
           name: "rax"
           source: false
           destination: true
+    - name: [seta, setbe, setna, setnbe]
+      operands:
+        - class: "register"
+          name: "gpr"
+          source: false
+          destination: true
+      hidden_operands:
+        - class: "flag"
+          name: "CF"
+          source: true
+          destination: false
+        - class: "flag"
+          name: "ZF"
+          source: true
+          destination: false
+    - name: [setae, setb, setc, setnae, setnb, setnc]
+      operands:
+        - class: "register"
+          name: "gpr"
+          source: false
+          destination: true
+      hidden_operands:
+        - class: "flag"
+          name: "CF"
+          source: true
+          destination: false
+    - name: [sete, setne, setnz, setz]
+      operands:
+        - class: "register"
+          name: "gpr"
+          source: false
+          destination: true
+      hidden_operands:
+        - class: "flag"
+          name: "ZF"
+          source: true
+          destination: false
+    - name: [setg, setle, setng, setnle]
+      operands:
+        - class: "register"
+          name: "gpr"
+          source: false
+          destination: true
+      hidden_operands:
+        - class: "flag"
+          name: "ZF"
+          source: true
+          destination: false
+        - class: "flag"
+          name: "SF"
+          source: true
+          destination: false
+        - class: "flag"
+          name: "OF"
+          source: true
+          destination: false
+    - name: [setge, setl, setnge, setnl]
+      operands:
+        - class: "register"
+          name: "gpr"
+          source: false
+          destination: true
+      hidden_operands:
+        - class: "flag"
+          name: "SF"
+          source: true
+          destination: false
+        - class: "flag"
+          name: "OF"
+          source: true
+          destination: false
+    - name: [setno, seto]
+      operands:
+        - class: "register"
+          name: "gpr"
+          source: false
+          destination: true
+      hidden_operands:
+        - class: "flag"
+          name: "OF"
+          source: true
+          destination: false
+    - name: [setnp, setp, setpe, setpo]
+      operands:
+        - class: "register"
+          name: "gpr"
+          source: false
+          destination: true
+      hidden_operands:
+        - class: "flag"
+          name: "PF"
+          source: true
+          destination: false
+    - name: [setns, sets]
+      operands:
+        - class: "register"
+          name: "gpr"
+          source: false
+          destination: true
+      hidden_operands:
+        - class: "flag"
+          name: "SF"
+          source: true
+          destination: false
     - name: cmova
       operands:
         - class: "register"
