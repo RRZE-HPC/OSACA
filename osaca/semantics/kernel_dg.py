@@ -551,7 +551,7 @@ class KernelDG(nx.DiGraph):
                 if n in lcd_line_numbers[dep]:
                     if "style" not in graph.nodes[n]:
                         graph.nodes[n]["style"] = "filled"
-                    else:
+                    elif ",filled" not in graph.nodes[n]["style"]:
                         graph.nodes[n]["style"] += ",filled"
                     graph.nodes[n]["fillcolor"] = 2 + col % 11
 
