@@ -528,8 +528,8 @@ class KernelDG(nx.DiGraph):
         for dep in lcd_line_numbers:
             min_line_number = min(lcd_line_numbers[dep])
             max_line_number = max(lcd_line_numbers[dep])
-            graph.add_edge(max_line_number, min_line_number)
-            graph.edges[max_line_number, min_line_number]["latency"] = [
+            graph.add_edge(min_line_number, max_line_number, dir="back")
+            graph.edges[min_line_number, max_line_number]["latency"] = [
                 lat for x, lat in lcd[dep]["dependencies"] if x.line_number == max_line_number
             ]
 
