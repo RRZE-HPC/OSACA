@@ -4771,7 +4771,7 @@ instruction_forms:
   port_pressure: [[1, '6789']]  # docs
   throughput: 0.25              # docs
   uops: 1                       # docs
-- name: [vucomiss, vucomisd]                      # ibench
+- name: [ucomiss, ucomisd]                       # ibench
   operands:                                      # ibench
   - class: register                              # ibench
     name: xmm                                    # ibench
@@ -5193,7 +5193,7 @@ instruction_forms:
   port_pressure: [[1, '23'], [1, '1']]  # uops.info
   throughput: 1.0                       # uops.info
   uops: 2                               # uops.info
-- name: [vcomiss, vcomisd]               # uops.info
+- name: [comiss, comisd]                # uops.info
   operands:                             # uops.info
   - class: register                     # uops.info
     name: xmm                           # uops.info
