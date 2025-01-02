@@ -4781,6 +4781,18 @@ instruction_forms:
   port_pressure: [[1, '23'], [1, ['12', '13']]]  # ibench
   throughput: 0.5                                # ibench
   uops: 2                                        # ibench
+- name: [roundss, roundsd, roundps, roundpd]     # Agner Fog.
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 3
+  port_pressure: [[1, '23']]
+  throughput: 0.5
+  uops: 1
 - name: mul                  # asmbench
   operands:                  # asmbench
   - class: register          # asmbench
