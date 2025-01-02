@@ -599,7 +599,10 @@ class KernelDG(nx.DiGraph):
             else:
                 graph.nodes[n]["style"] += ",filled"
             graph.nodes[n]["fillcolor"] = color
-            if (max_color >= 4 and color == 1) or (max_color >= 10 and color in (1, 2, max_color)):
+            if (
+                (max_color >= 4 and color in (1, max_color)) or
+                (max_color >= 10 and color in (1, 2, max_color - 1 , max_color))
+            ):
                 graph.nodes[n]["fontcolor"] = "white"
         for (u, v), color in edge_colors.items():
             # The backward edge of the cycle is represented as the corresponding forward
