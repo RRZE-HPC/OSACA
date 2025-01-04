@@ -59,6 +59,18 @@ class KernelDG(nx.DiGraph):
         # offset is irrelevant, but it must be a machine number to avoid silly rounding issues.
         return line_number - 0.125
 
+    @staticmethod
+    def is_load_line_number(line_number):
+        return line_number != int(line_number)
+
+    @staticmethod
+    def get_real_line_number(line_number):
+        return (
+            int(line_number + 0.125)
+            if KernelDG.is_load_line_number(line_number)
+            else line_number
+        )
+
     def create_DG(self, kernel, flag_dependencies=False):
         """
         Create directed graph from given kernel
@@ -88,6 +100,7 @@ class KernelDG(nx.DiGraph):
                 loads[instruction_form.line_number] = load_line_number
                 dg.add_node(load_line_number)
                 dg.nodes[load_line_number]["instruction_form"] = InstructionForm(
+                    mnemonic="_LOAD_",
                     line=instruction_form.line,
                     line_number=load_line_number
                 )
@@ -643,21 +656,17 @@ class KernelDG(nx.DiGraph):
         # rename node from [idx] to [idx mnemonic] and add shape
         mapping = {}
         for n in graph.nodes:
-            if int(n) != n:
-                mapping[n] = "{}: LOAD".format(int(n))
+            node = graph.nodes[n]["instruction_form"]
+            if node.mnemonic is not None:
+                mapping[n] = "{}: {}".format(KernelDG.get_real_line_number(n), node.mnemonic)
+            else:
+                label = "label" if node.label is not None else None
+                label = "directive" if node.directive is not None else label
+                label = "comment" if node.comment is not None and label is None else label
+                mapping[n] = "{}: {}".format(n, label)
                 graph.nodes[n]["fontname"] = "italic"
                 graph.nodes[n]["fontsize"] = 11.0
-            else:
-                node = graph.nodes[n]["instruction_form"]
-                if node.mnemonic is not None:
-                    mapping[n] = "{}: {}".format(n, node.mnemonic)
-                else:
-                    label = "label" if node.label is not None else None
-                    label = "directive" if node.directive is not None else label
-                    label = "comment" if node.comment is not None and label is None else label
-                    mapping[n] = "{}: {}".format(n, label)
-                    graph.nodes[n]["fontname"] = "italic"
-                    graph.nodes[n]["fontsize"] = 11.0
+            if not KernelDG.is_load_line_number(n):
                 graph.nodes[n]["shape"] = "rectangle"
 
         nx.relabel.relabel_nodes(graph, mapping, copy=False)
