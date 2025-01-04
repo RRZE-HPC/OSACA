@@ -466,7 +466,6 @@ class TestSemanticTools(unittest.TestCase):
             self.machine_model_csx,
             self.semantics_csx_intel,
         )
-        print(dg.dg.adj)
         self.assertTrue(nx.algorithms.dag.is_directed_acyclic_graph(dg.dg))
         self.assertEqual(len(list(dg.get_dependent_instruction_forms(line_number=3))), 1)
         self.assertEqual(next(dg.get_dependent_instruction_forms(line_number=3)), 5)

@@ -112,14 +112,12 @@ class KernelDG(nx.DiGraph):
                 if "p_indexed" in dep_flags and self.model is not None:
                     edge_weight = self.model.get("p_index_latency", 1)
                 if "for_load" in dep_flags and self.model is not None and dep.line_number in loads:
-                    #print("LOADDEP", instruction_form.line_number, loads[dep.line_number])
                     dg.add_edge(
                         instruction_form.line_number,
                         loads[dep.line_number],
                         latency=edge_weight,
                     )
                 else:
-                    #print("DEP", instruction_form.line_number, dep.line_number)
                     dg.add_edge(
                         instruction_form.line_number,
                         dep.line_number,
@@ -405,17 +403,13 @@ class KernelDG(nx.DiGraph):
                 is_read = self.parser.is_flag_dependend_of(register, src) or is_read
             if isinstance(src, MemoryOperand):
                 is_memory_read = False
-                #print("1", is_read)
                 if src.base is not None:
                     is_memory_read = self.parser.is_reg_dependend_of(register, src.base)
-                #print("2", is_read)
                 if src.index is not None and isinstance(src.index, RegisterOperand):
                     is_memory_read = (
                         self.parser.is_reg_dependend_of(register, src.index)
                         or is_memory_read
                     )
-                #print("3", is_read)
-                #print("FORLOAD", register, src)
                 for_load = is_memory_read
                 is_read = is_read or is_memory_read
         # Check also if read in destination memory address
@@ -566,7 +560,6 @@ class KernelDG(nx.DiGraph):
         lcd_line_numbers = {}
         for dep in lcd:
             lcd_line_numbers[dep] = [x.line_number for x, lat in lcd[dep]["dependencies"]]
-        print("LCDLN", lcd_line_numbers)
 
         # create LCD edges
         for dep in lcd_line_numbers:
@@ -579,7 +572,6 @@ class KernelDG(nx.DiGraph):
 
         # add label to edges
         for e in graph.edges:
-            print("EDGE", e)
             graph.edges[e]["label"] = graph.edges[e]["latency"]
 
         # add CP values to graph
@@ -592,8 +584,6 @@ class KernelDG(nx.DiGraph):
                 # graph.nodes[n]['color'] = 1
                 graph.nodes[n]["style"] = "bold"
                 graph.nodes[n]["penwidth"] = 4
-
-        print("CPLN", cp_line_numbers)
 
         # Make critical path edges bold.
         for u, v in zip(cp_line_numbers[:-1], cp_line_numbers[1:]):
@@ -628,7 +618,6 @@ class KernelDG(nx.DiGraph):
                         # Don’t introduce a color just for an edge.
                         if not color:
                             color = colors_used
-                        print("EC", u, v, color)
                         edge_colors[u, v] = color
         max_color = min(11, colors_used)
         colorscheme = f"spectral{max(3, max_color)}"
