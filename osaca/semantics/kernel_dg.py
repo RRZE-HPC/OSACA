@@ -55,8 +55,9 @@ class KernelDG(nx.DiGraph):
 
     @staticmethod
     def get_load_line_number(line_number):
-        # The offset is irrelevant, but it must be a machine number to avoid silly rounding issues.
-        return line_number + 0.125
+        # The line number of the load must be less than the line number of the instruction.  The
+        # offset is irrelevant, but it must be a machine number to avoid silly rounding issues.
+        return line_number - 0.125
 
     def create_DG(self, kernel, flag_dependencies=False):
         """
@@ -78,7 +79,6 @@ class KernelDG(nx.DiGraph):
             dg.add_node(instruction_form.line_number)
             dg.nodes[instruction_form.line_number]["instruction_form"] = instruction_form
             # add load as separate node if existent
-            load_line_number = None
             if (
                 INSTR_FLAGS.HAS_LD in instruction_form.flags
                 and INSTR_FLAGS.LD not in instruction_form.flags
@@ -98,7 +98,6 @@ class KernelDG(nx.DiGraph):
                     latency=instruction_form.latency - instruction_form.latency_wo_load,
                 )
         #TODO comments
-        print("LOADS", loads)
         for i, instruction_form in enumerate(kernel):
             for dep, dep_flags in self.find_depending(
                 instruction_form, kernel[i + 1 :], flag_dependencies
@@ -405,15 +404,20 @@ class KernelDG(nx.DiGraph):
             if isinstance(src, FlagOperand):
                 is_read = self.parser.is_flag_dependend_of(register, src) or is_read
             if isinstance(src, MemoryOperand):
+                is_memory_read = False
                 #print("1", is_read)
                 if src.base is not None:
-                    is_read = self.parser.is_reg_dependend_of(register, src.base) or is_read
+                    is_memory_read = self.parser.is_reg_dependend_of(register, src.base)
                 #print("2", is_read)
                 if src.index is not None and isinstance(src.index, RegisterOperand):
-                    is_read = self.parser.is_reg_dependend_of(register, src.index) or is_read
+                    is_memory_read = (
+                        self.parser.is_reg_dependend_of(register, src.index)
+                        or is_memory_read
+                    )
                 #print("3", is_read)
                 #print("FORLOAD", register, src)
-                for_load = True
+                for_load = is_memory_read
+                is_read = is_read or is_memory_read
         # Check also if read in destination memory address
         for dst in chain(
             instruction_form.semantic_operands["destination"],

@@ -458,7 +458,7 @@ class TestSemanticTools(unittest.TestCase):
         #   /  /
         #  4  /
         #    /
-        #  5.1
+        #  4.875
         #
         dg = KernelDG(
             self.kernel_x86_intel,
@@ -466,6 +466,7 @@ class TestSemanticTools(unittest.TestCase):
             self.machine_model_csx,
             self.semantics_csx_intel,
         )
+        print(dg.dg.adj)
         self.assertTrue(nx.algorithms.dag.is_directed_acyclic_graph(dg.dg))
         self.assertEqual(len(list(dg.get_dependent_instruction_forms(line_number=3))), 1)
         self.assertEqual(next(dg.get_dependent_instruction_forms(line_number=3)), 5)
@@ -473,8 +474,8 @@ class TestSemanticTools(unittest.TestCase):
         self.assertEqual(next(dg.get_dependent_instruction_forms(line_number=4)), 5)
         self.assertEqual(len(list(dg.get_dependent_instruction_forms(line_number=5))), 1)
         self.assertEqual(next(dg.get_dependent_instruction_forms(line_number=5)), 6)
-        self.assertEqual(len(list(dg.get_dependent_instruction_forms(line_number=5.1))), 1)
-        self.assertEqual(next(dg.get_dependent_instruction_forms(line_number=5.1)), 5)
+        self.assertEqual(len(list(dg.get_dependent_instruction_forms(line_number=4.875))), 1)
+        self.assertEqual(next(dg.get_dependent_instruction_forms(line_number=4.875)), 5)
         self.assertEqual(list(dg.get_dependent_instruction_forms(line_number=6)), [])
         self.assertEqual(list(dg.get_dependent_instruction_forms(line_number=7)), [])
         self.assertEqual(list(dg.get_dependent_instruction_forms(line_number=8)), [])
