@@ -56,7 +56,8 @@ class KernelDG(nx.DiGraph):
     @staticmethod
     def get_load_line_number(line_number):
         # The line number of the load must be less than the line number of the instruction.  The
-        # offset is irrelevant, but it must be a machine number to avoid silly rounding issues.
+        # offset is irrelevant, but it must be a machine number with trailing zeroes to avoid silly
+        # rounding issues.
         return line_number - 0.125
 
     @staticmethod
