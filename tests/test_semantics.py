@@ -516,7 +516,6 @@ class TestSemanticTools(unittest.TestCase):
         self.assertTrue(nx.algorithms.dag.is_directed_acyclic_graph(dg.dg))
         self.assertEqual(set(dg.get_dependent_instruction_forms(line_number=3)), {6, 8})
         self.assertEqual(set(dg.get_dependent_instruction_forms(line_number=5)), {10, 12})
-        self.assertEqual(set(dg.get_dependent_instruction_forms(line_number=5)), {10, 12})
         self.assertEqual(set(dg.get_dependent_instruction_forms(line_number=18)), {18.875})
         self.assertEqual(set(dg.get_dependent_instruction_forms(line_number=18.875)), {19})
         self.assertEqual(set(dg.get_dependent_instruction_forms(line_number=19)), set())
