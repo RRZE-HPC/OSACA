@@ -265,6 +265,13 @@ instruction_forms:
   throughput: 0.5
   latency: 0.0
   port_pressure: [[1, '01']]
+- name: [b, bl, bcc, bcs, bgt, bhi, b.lo, b.ne, b.any, b.none, bal, b.al, b.lt, b.eq, b.hs, b.gt, b.hi, bne, beq]
+  operands:
+  - class: immediate
+    imd: int
+  throughput: 0.5
+  latency: 0.0
+  port_pressure: [[1, '01']]
 - name: bfc
   operands:
   - class: register
@@ -1403,6 +1410,31 @@ instruction_forms:
   throughput: 0.25
   latency: 1.0  # 	1*p2367
   port_pressure: [[1, '2367']]
+- name: [incw, incd, inch]
+  operands:
+  - class: register
+    prefix: z
+    shape: '*'
+    width: '*'
+  - class: identifier
+  throughput: 0.25
+  latency: 2.0  # 	1*p8,9,10,11
+  port_pressure: [[1, ['8', '9', '10', '11']]]
+- name: [incw, incd, inch]
+  operands:
+  - class: register
+    prefix: x
+  - class: identifier
+  throughput: 0.5
+  latency: 2.0  # 	1*p67
+  port_pressure: [[1, '67']]
+- name: [incw, incd, inch]
+  operands:
+  - class: register
+    prefix: x
+  throughput: 0.5
+  latency: 2.0  # 	1*p67
+  port_pressure: [[1, '67']]
 - name: [madd, msub]    # NOTE: if the dependency is via the addend (fourth operand), the latency is only 1cy !!!
   operands:
   - class: register
@@ -4233,11 +4265,11 @@ instruction_forms:
   throughput: 0.5
   latency: 2.0  # 	1*p89,10,11
   port_pressure: [[2, ['8','9','10','11']]]
-- name: [ld1d, ld1sw, ld1sh, ld1sb]
+- name: [ld1d, ld1w, ld1sw, ld1sh, ld1h, ld1sb, ld1b]
   operands:
   - class: register
     prefix: z
-    shape: d
+    shape: '*'
   - class: register
     prefix: p
     predication: '*'
@@ -4251,11 +4283,11 @@ instruction_forms:
   throughput: 1.0
   latency: 6.0  # 	1*p12,13,14
   port_pressure: [[1, ['12', '13', '14']]]
-- name: [ld1d, ld1sw, ld1sh, ld1sb]
+- name: [ld1d, ld1w, ld1sw, ld1sh, ld1h, ld1sb, ld1b]
   operands:
   - class: register
     prefix: z
-    shape: d
+    shape: '*'
   - class: register
     prefix: p
     predication: '*'
@@ -4269,11 +4301,11 @@ instruction_forms:
   throughput: 1.0
   latency: 6.0  # 	1*p12,13,14
   port_pressure: [[1, ['8','9','10','11']], [1, ['12', '13', '14']]]
-- name: [ld1d, ld1sw, ld1sh, ld1sb]
+- name: [ld1d, ld1w, ld1sw, ld1sh, ld1h, ld1sb, ld1b]
   operands:
   - class: register
     prefix: z
-    shape: d
+    shape: '*'
   - class: register
     prefix: p
     predication: '*'
@@ -4291,7 +4323,7 @@ instruction_forms:
   operands:
   - class: register
     prefix: z
-    shape: d
+    shape: '*'
   - class: register
     prefix: p
     predication: '*'
@@ -4309,7 +4341,7 @@ instruction_forms:
   operands:
   - class: register
     prefix: z
-    shape: d
+    shape: '*'
   - class: register
     prefix: p
     predication: '*'
@@ -4327,7 +4359,7 @@ instruction_forms:
   operands:
   - class: register
     prefix: z
-    shape: d
+    shape: '*'
   - class: register
     prefix: p
     predication: '*'
@@ -4345,10 +4377,10 @@ instruction_forms:
   operands:
   - class: register
     prefix: z
-    shape: d
+    shape: '*'
   - class: register
     prefix: z
-    shape: d
+    shape: '*'
   - class: register
     prefix: p
     predication: '*'
@@ -4366,10 +4398,10 @@ instruction_forms:
   operands:
   - class: register
     prefix: z
-    shape: d
+    shape: '*'
   - class: register
     prefix: z
-    shape: d
+    shape: '*'
   - class: register
     prefix: p
     predication: '*'
@@ -4387,10 +4419,10 @@ instruction_forms:
   operands:
   - class: register
     prefix: z
-    shape: d
+    shape: '*'
   - class: register
     prefix: z
-    shape: d
+    shape: '*'
   - class: register
     prefix: p
     predication: '*'
@@ -4408,10 +4440,10 @@ instruction_forms:
   operands:
   - class: register
     prefix: z
-    shape: d
+    shape: '*'
   - class: register
     prefix: z
-    shape: d
+    shape: '*'
   - class: register
     prefix: p
     predication: '*'
@@ -4429,10 +4461,10 @@ instruction_forms:
   operands:
   - class: register
     prefix: z
-    shape: d
+    shape: '*'
   - class: register
     prefix: z
-    shape: d
+    shape: '*'
   - class: register
     prefix: p
     predication: '*'
@@ -4450,10 +4482,10 @@ instruction_forms:
   operands:
   - class: register
     prefix: z
-    shape: d
+    shape: '*'
   - class: register
     prefix: z
-    shape: d
+    shape: '*'
   - class: register
     prefix: p
     predication: '*'
@@ -4562,7 +4594,7 @@ instruction_forms:
   operands:
   - class: register
     prefix: z
-    shape: d
+    shape: '*'
   - class: register
     prefix: p
   - class: memory
@@ -4579,10 +4611,10 @@ instruction_forms:
   operands:
   - class: register
     prefix: z
-    shape: d
+    shape: '*'
   - class: register
     prefix: z
-    shape: d
+    shape: '*'
   - class: register
     prefix: p
     predication: '*'
@@ -4600,10 +4632,10 @@ instruction_forms:
   operands:
   - class: register
     prefix: z
-    shape: d
+    shape: '*'
   - class: register
     prefix: z
-    shape: d
+    shape: '*'
   - class: register
     prefix: p
     predication: '*'
@@ -4638,7 +4670,7 @@ instruction_forms:
   operands:
   - class: register
     prefix: p
-    shape: d
+    shape: '*'
   - class: register
     prefix: '*'
   - class: register
@@ -4778,7 +4810,7 @@ instruction_forms:
   throughput: 0.25
   latency: 2.0  # 	1*p8,9,10,11
   port_pressure: [[1, ['8', '9', '10', '11']]]
-- name: add
+- name: [add, sub]
   operands:
   - class: register
     prefix: z
@@ -4793,7 +4825,7 @@ instruction_forms:
   throughput: 0.25
   latency: 2.0  # 	1*p8,9,10,11
   port_pressure: [[1, ['8', '9', '10', '11']]]
-- name: add
+- name: [add, sub]
   operands:
   - class: register
     prefix: z
@@ -4810,3 +4842,336 @@ instruction_forms:
   throughput: 0.25
   latency: 2.0  # 	1*p8,9,10,11
   port_pressure: [[1, ['8', '9', '10', '11']]]
+- name: [add, sub]
+  operands:
+  - class: register
+    prefix: z
+    shape: '*'
+    width: '*'
+  - class: register
+    prefix: p
+  - class: register
+    prefix: z
+    shape: '*'
+    width: '*'
+  - class: register
+    prefix: z
+    shape: '*'
+    width: '*'
+  throughput: 0.25
+  latency: 2.0  # 	1*p8,9,10,11
+  port_pressure: [[1, ['8', '9', '10', '11']]]
+- name: [sunpklo, sunpkhi]
+  operands:
+  - class: register
+    prefix: z
+    shape: '*'
+    width: '*'
+  - class: register
+    prefix: z
+    shape: '*'
+    width: '*'
+  throughput: 0.25
+  latency: 2.0  # 	1*p8,9,10,11
+  port_pressure: [[1, ['8', '9', '10', '11']]]
+- name: [punpklo, punpkhi]
+  operands:
+  - class: register
+    prefix: p
+    shape: 'h'
+  - class: register
+    prefix: p
+    shape: 'b'
+  throughput: 0.5
+  latency: 2.0  # 	1*p67
+  port_pressure: [[1, '67']]
+- name: [mla, mad]
+  operands:
+  - class: register
+    prefix: z
+    shape: 'd'
+    width: '*'
+  - class: register
+    prefix: p
+  - class: register
+    prefix: z
+    shape: 'd'
+    width: '*'
+  - class: register
+    prefix: z
+    shape: 'd'
+    width: '*'
+  throughput: 1.0
+  latency: 5.0  # 	1*p8,10
+  port_pressure: [[2, ['8', '10']]]
+- name: [mla, mad]
+  operands:
+  - class: register
+    prefix: z
+    shape: 'd'
+    width: '*'
+  - class: register
+    prefix: z
+    shape: 'd'
+    width: '*'
+  - class: register
+    prefix: z
+    shape: 'd'
+    width: '*'
+  throughput: 1.0
+  latency: 5.0  # 	1*p8,10
+  port_pressure: [[2, ['8', '10']]]
+- name: [mla, mad]
+  operands:
+  - class: register
+    prefix: z
+    shape: 's'
+    width: '*'
+  - class: register
+    prefix: p
+  - class: register
+    prefix: z
+    shape: 's'
+    width: '*'
+  - class: register
+    prefix: z
+    shape: 's'
+    width: '*'
+  throughput: 1.0
+  latency: 4.0  # 	1*p8,10
+  port_pressure: [[1, ['8', '10']]]
+- name: [mla, mad]
+  operands:
+  - class: register
+    prefix: z
+    shape: 's'
+    width: '*'
+  - class: register
+    prefix: z
+    shape: 's'
+    width: '*'
+  - class: register
+    prefix: z
+    shape: 's'
+    width: '*'
+  throughput: 1.0
+  latency: 4.0  # 	1*p8,10
+  port_pressure: [[1, ['8', '10']]]
+- name: [mla, mad]
+  operands:
+  - class: register
+    prefix: z
+    shape: 'h'
+    width: '*'
+  - class: register
+    prefix: p
+  - class: register
+    prefix: z
+    shape: 'h'
+    width: '*'
+  - class: register
+    prefix: z
+    shape: 'h'
+    width: '*'
+  throughput: 1.0
+  latency: 4.0  # 	1*p8,10
+  port_pressure: [[1, ['8', '10']]]
+- name: [mla, mad]
+  operands:
+  - class: register
+    prefix: z
+    shape: 'h'
+    width: '*'
+  - class: register
+    prefix: z
+    shape: 'h'
+    width: '*'
+  - class: register
+    prefix: z
+    shape: 'h'
+    width: '*'
+  throughput: 1.0
+  latency: 4.0  # 	1*p8,10
+  port_pressure: [[1, ['8', '10']]]
+- name: [mla, mad]
+  operands:
+  - class: register
+    prefix: z
+    shape: 'b'
+    width: '*'
+  - class: register
+    prefix: p
+  - class: register
+    prefix: z
+    shape: 'b'
+    width: '*'
+  - class: register
+    prefix: z
+    shape: 'b'
+    width: '*'
+  throughput: 1.0
+  latency: 4.0  # 	1*p8,10
+  port_pressure: [[1, ['8', '10']]]
+- name: [mla, mad]
+  operands:
+  - class: register
+    prefix: z
+    shape: 'b'
+    width: '*'
+  - class: register
+    prefix: z
+    shape: 'b'
+    width: '*'
+  - class: register
+    prefix: z
+    shape: 'b'
+    width: '*'
+  throughput: 1.0
+  latency: 4.0  # 	1*p8,10
+  port_pressure: [[1, ['8', '10']]]
+
+
+- name: mul
+  operands:
+  - class: register
+    prefix: z
+    shape: 'd'
+    width: '*'
+  - class: register
+    prefix: p
+  - class: register
+    prefix: z
+    shape: 'd'
+    width: '*'
+  - class: register
+    prefix: z
+    shape: 'd'
+    width: '*'
+  throughput: 1.0
+  latency: 5.0  # 	1*p8,10
+  port_pressure: [[2, ['8', '10']]]
+- name: mul
+  operands:
+  - class: register
+    prefix: z
+    shape: 'd'
+    width: '*'
+  - class: register
+    prefix: z
+    shape: 'd'
+    width: '*'
+  - class: register
+    prefix: z
+    shape: 'd'
+    width: '*'
+  throughput: 1.0
+  latency: 5.0  # 	1*p8,10
+  port_pressure: [[2, ['8', '10']]]
+- name: mul
+  operands:
+  - class: register
+    prefix: z
+    shape: 's'
+    width: '*'
+  - class: register
+    prefix: p
+  - class: register
+    prefix: z
+    shape: 's'
+    width: '*'
+  - class: register
+    prefix: z
+    shape: 's'
+    width: '*'
+  throughput: 1.0
+  latency: 4.0  # 	1*p8,10
+  port_pressure: [[1, ['8', '10']]]
+- name: mul
+  operands:
+  - class: register
+    prefix: z
+    shape: 's'
+    width: '*'
+  - class: register
+    prefix: z
+    shape: 's'
+    width: '*'
+  - class: register
+    prefix: z
+    shape: 's'
+    width: '*'
+  throughput: 1.0
+  latency: 4.0  # 	1*p8,10
+  port_pressure: [[1, ['8', '10']]]
+- name: mul
+  operands:
+  - class: register
+    prefix: z
+    shape: 'h'
+    width: '*'
+  - class: register
+    prefix: p
+  - class: register
+    prefix: z
+    shape: 'h'
+    width: '*'
+  - class: register
+    prefix: z
+    shape: 'h'
+    width: '*'
+  throughput: 1.0
+  latency: 4.0  # 	1*p8,10
+  port_pressure: [[1, ['8', '10']]]
+- name: mul
+  operands:
+  - class: register
+    prefix: z
+    shape: 'h'
+    width: '*'
+  - class: register
+    prefix: z
+    shape: 'h'
+    width: '*'
+  - class: register
+    prefix: z
+    shape: 'h'
+    width: '*'
+  throughput: 1.0
+  latency: 4.0  # 	1*p8,10
+  port_pressure: [[1, ['8', '10']]]
+- name: mul
+  operands:
+  - class: register
+    prefix: z
+    shape: 'b'
+    width: '*'
+  - class: register
+    prefix: p
+  - class: register
+    prefix: z
+    shape: 'b'
+    width: '*'
+  - class: register
+    prefix: z
+    shape: 'b'
+    width: '*'
+  throughput: 1.0
+  latency: 4.0  # 	1*p8,10
+  port_pressure: [[1, ['8', '10']]]
+- name: mul
+  operands:
+  - class: register
+    prefix: z
+    shape: 'b'
+    width: '*'
+  - class: register
+    prefix: z
+    shape: 'b'
+    width: '*'
+  - class: register
+    prefix: z
+    shape: 'b'
+    width: '*'
+  throughput: 1.0
+  latency: 4.0  # 	1*p8,10
+  port_pressure: [[1, ['8', '10']]]
