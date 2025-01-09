@@ -5444,7 +5444,7 @@ instruction_forms:
 - name: [vshufpd, vshufps]   #asmbench
   operands:
   - class: immediate
-    name: int
+    imd: int
   - class: register
     name: xmm
   - class: register
@@ -5458,7 +5458,7 @@ instruction_forms:
 - name: [vshufpd, vshufps]   #asmbench
   operands:
   - class: immediate
-    name: int
+    imd: int
   - class: register
     name: ymm
   - class: register
@@ -5472,7 +5472,7 @@ instruction_forms:
 - name: [vshufpd, vshufps]   #asmbench
   operands:
   - class: immediate
-    name: int
+    imd: int
   - class: register
     name: zmm
   - class: register
@@ -5486,7 +5486,7 @@ instruction_forms:
 - name: [vshufpd, vshufps]   #asmbench
   operands:
   - class: immediate
-    name: int
+    imd: int
   - class: register
     name: xmm
   - class: register
@@ -5502,7 +5502,7 @@ instruction_forms:
 - name: [vshufpd, vshufps]   #asmbench
   operands:
   - class: immediate
-    name: int
+    imd: int
   - class: register
     name: ymm
   - class: register
@@ -5518,7 +5518,7 @@ instruction_forms:
 - name: [vshufpd, vshufps]   #asmbench
   operands:
   - class: immediate
-    name: int
+    imd: int
   - class: register
     name: zmm
   - class: register
