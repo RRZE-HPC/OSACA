@@ -11,7 +11,6 @@ from pathlib import Path
 
 import ruamel.yaml
 from osaca import __version__, utils
-from osaca.parser import ParserX86ATT
 from osaca.parser.instruction_form import InstructionForm
 from osaca.parser.operand import Operand
 from osaca.parser.memory import MemoryOperand
@@ -79,7 +78,7 @@ class MachineModel(object):
             else:
                 yaml = self._create_yaml_object()
                 # otherwise load
-                with open(self._path, "r") as f:
+                with open(self._path, "r", encoding="utf8") as f:
                     if not lazy:
                         self._data = yaml.load(f)
                     else:
@@ -286,23 +285,38 @@ class MachineModel(object):
     ######################################################
 
     def get_instruction(self, name, operands):
-        """Find and return instruction data from name and operands."""
+        """Find and return instruction data from name and operands/arity."""
         # For use with dict instead of list as DB
         if name is None:
             return None
         name_matched_iforms = self._data["instruction_forms_dict"].get(name.upper(), [])
 
         try:
-            return next(
-                instruction_form
-                for instruction_form in name_matched_iforms
-                if self._match_operands(
-                    instruction_form.operands,
-                    operands,
+            # If `operands` is an integer, it represents the arity of the instruction.  This is
+            # useful to reorder the operands in the Intel syntax because in their original order
+            # they may not match the model.
+            if isinstance(operands, int):
+                arity = operands
+                return next(
+                    (
+                        instruction_form
+                        for instruction_form in name_matched_iforms
+                        if len(instruction_form.operands) == arity
+                    ),
+                    None
                 )
-            )
-        except StopIteration:
-            return None
+            else:
+                return next(
+                    (
+                        instruction_form
+                        for instruction_form in name_matched_iforms
+                        if self._match_operands(
+                            instruction_form.operands,
+                            operands
+                        )
+                    ),
+                    None
+                )
         except TypeError as e:
             print("\nname: {}\noperands: {}".format(name, operands))
             raise TypeError from e
@@ -878,6 +892,7 @@ class MachineModel(object):
         return True
 
     def _is_x86_reg_type(self, i_reg, reg, consider_masking=False):
+        from osaca.parser import ParserX86
         """Check if register type match."""
         if reg is None:
             if i_reg is None:
@@ -895,7 +910,7 @@ class MachineModel(object):
         if i_reg_name == self.WILDCARD or reg.name == self.WILDCARD:
             return True
         # differentiate between vector registers (mm, xmm, ymm, zmm) and others (gpr)
-        parser_x86 = ParserX86ATT()
+        parser_x86 = ParserX86()
         if parser_x86.is_vector_register(reg):
             if reg.name.rstrip(string.digits).lower() == i_reg_name:
                 # Consider masking and zeroing for AVX512

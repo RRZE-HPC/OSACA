@@ -114,7 +114,7 @@ class TestFrontend(unittest.TestCase):
             self.assertEqual(line.line_number, analysis_dict["Kernel"][i]["LineNumber"])
 
     def test_dict_output_AArch64(self):
-        reduced_kernel = reduce_to_section(self.kernel_AArch64, self.semantics_tx2._isa)
+        reduced_kernel = reduce_to_section(self.kernel_AArch64, self.semantics_tx2._isa, None)
         dg = KernelDG(
             reduced_kernel,
             self.parser_AArch64,

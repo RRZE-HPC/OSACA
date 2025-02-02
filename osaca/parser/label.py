@@ -20,3 +20,8 @@ class LabelOperand(Operand):
 
     def __repr__(self):
         return self.__str__()
+
+    def __eq__(self, other):
+        if isinstance(other, LabelOperand):
+            return self._name == other._name
+        return False
