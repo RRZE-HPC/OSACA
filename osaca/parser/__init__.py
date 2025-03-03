@@ -7,6 +7,7 @@ Only the parser below will be exported, so please add new parsers to __all__.
 from .base_parser import BaseParser
 from .parser_x86att import ParserX86ATT
 from .parser_AArch64 import ParserAArch64
+from .parser_RISCV import ParserRISCV
 from .instruction_form import InstructionForm
 from .operand import Operand
 
@@ -16,6 +17,7 @@ __all__ = [
     "BaseParser",
     "ParserX86ATT",
     "ParserAArch64",
+    "ParserRISCV",
     "get_parser",
 ]
 
@@ -25,5 +27,7 @@ def get_parser(isa):
         return ParserX86ATT()
     elif isa.lower() == "aarch64":
         return ParserAArch64()
+    elif isa.lower() == "riscv":
+        return ParserRISCV()
     else:
         raise ValueError("Unknown ISA {!r}.".format(isa))
