@@ -116,6 +116,62 @@ def match_lines(parser, lines, marker):
         if not marker_line:
             return matched_lines + 1
 
+
+def get_marker(isa, syntax="ATT", comment=""):
+    """Return tuple of start and end marker lines."""
+    isa = isa.lower()
+    syntax = syntax.lower()
+    if isa == "x86":
+        if syntax == "att":
+            start_marker_raw = (
+                "movl      $111, %ebx # OSACA START MARKER\n"
+                ".byte     100        # OSACA START MARKER\n"
+                ".byte     103        # OSACA START MARKER\n"
+                ".byte     144        # OSACA START MARKER\n"
+            )
+            if comment:
+                start_marker_raw += "# {}\n".format(comment)
+            end_marker_raw = (
+                "movl      $222, %ebx # OSACA END MARKER\n"
+                ".byte     100        # OSACA END MARKER\n"
+                ".byte     103        # OSACA END MARKER\n"
+                ".byte     144        # OSACA END MARKER\n"
+            )
+        else:
+            # Intel syntax
+            start_marker_raw = (
+                "movl      ebx, 111   # OSACA START MARKER\n"
+                ".byte     100        # OSACA START MARKER\n"
+                ".byte     103        # OSACA START MARKER\n"
+                ".byte     144        # OSACA START MARKER\n"
+            )
+            if comment:
+                start_marker_raw += "# {}\n".format(comment)
+            end_marker_raw = (
+                "movl      ebx, 222   # OSACA END MARKER\n"
+                ".byte     100        # OSACA END MARKER\n"
+                ".byte     103        # OSACA END MARKER\n"
+                ".byte     144        # OSACA END MARKER\n"
+            )
+    elif isa == "aarch64":
+        start_marker_raw = (
+            "mov       x1, #111    // OSACA START MARKER\n"
+            ".byte     213,3,32,31 // OSACA START MARKER\n"
+        )
+        if comment:
+            start_marker_raw += "// {}\n".format(comment)
+        # After loop
+        end_marker_raw = (
+            "mov       x1, #222    // OSACA END MARKER\n"
+            ".byte     213,3,32,31 // OSACA END MARKER\n"
+        )
+
+    parser = get_parser(isa)
+    start_marker = parser.parse_file(start_marker_raw)
+    end_marker = parser.parse_file(end_marker_raw)
+
+    return start_marker, end_marker
+
 def match_line(parser, line, marker_line):
     """
     Returns whether `line` matches `marker_line`.
