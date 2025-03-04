@@ -341,9 +341,7 @@ def inspect(args, output_file=sys.stdout):
     if args.arch:
         archs_to_try = [args.arch]
     else:
-        archs_to_try = list(DEFAULT_ARCHS)
-        archs_to_try.remove(detected_arch)
-        archs_to_try.append(detected_arch)
+        archs_to_try = [detected_arch]
     if args.syntax:
         syntaxes_to_try = [args.syntax]
     else:
@@ -462,7 +460,7 @@ def run(args, output_file=sys.stdout):
 
 
 @lru_cache()
-def get_asm_parser(arch, syntax) -> BaseParser:
+def get_asm_parser(arch, syntax="ATT") -> BaseParser:
     """
     Helper function to create the right parser for a specific architecture.
 
