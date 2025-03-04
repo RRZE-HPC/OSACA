@@ -3,6 +3,7 @@ from collections import OrderedDict
 from enum import Enum
 from functools import partial
 
+from osaca.parser import get_parser
 from osaca.parser.instruction_form import InstructionForm
 from osaca.parser.directive import DirectiveOperand
 from osaca.parser.identifier import IdentifierOperand
