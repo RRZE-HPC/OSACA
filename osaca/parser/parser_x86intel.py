@@ -13,7 +13,6 @@ from osaca.parser.instruction_form import InstructionForm
 from osaca.parser.label import LabelOperand
 from osaca.parser.memory import MemoryOperand
 from osaca.parser.register import RegisterOperand
-from osaca.semantics.hw_model import MachineModel
 
 # We assume any non-ASCII characters except control characters and line terminators can be part of
 # identifiers; this is based on the assumption that no assembler uses non-ASCII white space and
@@ -78,8 +77,8 @@ class ParserX86Intel(ParserX86):
     def normalize_instruction_form(
         self,
         instruction_form,
-        isa_model: MachineModel,
-        arch_model: MachineModel
+        isa_model,
+        arch_model
     ):
         """
         If the model indicates that this instruction has a single destination that is the last
