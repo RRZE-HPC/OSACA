@@ -34,13 +34,18 @@ class TestFrontend(unittest.TestCase):
         )
         self.machine_model_tx2 = MachineModel(arch="tx2")
         self.semantics_csx = ArchSemantics(
+            self.parser_x86,
             self.machine_model_csx,
             path_to_yaml=os.path.join(self.MODULE_DATA_DIR, "isa/x86.yml"),
         )
         self.semantics_tx2 = ArchSemantics(
+            self.parser_AArch64,
             self.machine_model_tx2,
             path_to_yaml=os.path.join(self.MODULE_DATA_DIR, "isa/aarch64.yml"),
         )
+
+        self.semantics_csx.normalize_instruction_forms(self.kernel_x86)
+        self.semantics_tx2.normalize_instruction_forms(self.kernel_AArch64)
 
         for i in range(len(self.kernel_x86)):
             self.semantics_csx.assign_src_dst(self.kernel_x86[i])
@@ -114,7 +119,7 @@ class TestFrontend(unittest.TestCase):
             self.assertEqual(line.line_number, analysis_dict["Kernel"][i]["LineNumber"])
 
     def test_dict_output_AArch64(self):
-        reduced_kernel = reduce_to_section(self.kernel_AArch64, self.semantics_tx2._isa, None)
+        reduced_kernel = reduce_to_section(self.kernel_AArch64, self.parser_AArch64)
         dg = KernelDG(
             reduced_kernel,
             self.parser_AArch64,
