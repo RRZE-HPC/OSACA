@@ -3,8 +3,6 @@
 import operator
 import re
 
-from osaca.semantics.hw_model import MachineModel
-
 
 class BaseParser(object):
     # Identifiers for operand types
@@ -53,8 +51,8 @@ class BaseParser(object):
     def normalize_instruction_form(
         self,
         instruction_form,
-        isa_model: MachineModel,
-        arch_model: MachineModel
+        isa_model,
+        arch_model
     ):
         raise NotImplementedError
 
