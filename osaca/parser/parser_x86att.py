@@ -13,7 +13,6 @@ from osaca.parser.label import LabelOperand
 from osaca.parser.register import RegisterOperand
 from osaca.parser.identifier import IdentifierOperand
 from osaca.parser.immediate import ImmediateOperand
-from osaca.semantics.hw_model import MachineModel
 
 
 class ParserX86ATT(ParserX86):
@@ -66,8 +65,8 @@ class ParserX86ATT(ParserX86):
     def normalize_instruction_form(
         self,
         instruction_form,
-        isa_model: MachineModel,
-        arch_model: MachineModel
+        isa_model,
+        arch_model
     ):
         """
         If the instruction doesn't exist in the machine model, normalize it by dropping the GAS

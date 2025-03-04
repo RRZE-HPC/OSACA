@@ -13,7 +13,6 @@ from osaca.parser.identifier import IdentifierOperand
 from osaca.parser.immediate import ImmediateOperand
 from osaca.parser.condition import ConditionOperand
 from osaca.parser.prefetch import PrefetchOperand
-from osaca.semantics.hw_model import MachineModel
 
 
 class ParserAArch64(BaseParser):
@@ -56,8 +55,8 @@ class ParserAArch64(BaseParser):
     def normalize_instruction_form(
         self,
         instruction_form,
-        isa_model: MachineModel,
-        arch_model: MachineModel
+        isa_model,
+        arch_model
     ):
         """
         If the instruction doesn't exist in the machine model, normalize it by dropping the shape
