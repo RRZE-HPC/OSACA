@@ -41,9 +41,9 @@ class TestSemanticTools(unittest.TestCase):
             cls.code_x86_memdep = f.read()
         with open(cls._find_file("kernel_x86_long_LCD.s")) as f:
             cls.code_x86_long_LCD = f.read()
-        with open(cls._find_file("kernel_x86_intel.asm")) as f:
+        with open(cls._find_file("kernel_x86_intel.s")) as f:
             cls.code_x86_intel = f.read()
-        with open(cls._find_file("kernel_x86_intel_memdep.asm")) as f:
+        with open(cls._find_file("kernel_x86_intel_memdep.s")) as f:
             cls.code_x86_intel_memdep = f.read()
         with open(cls._find_file("kernel_aarch64_memdep.s")) as f:
             cls.code_aarch64_memdep = f.read()

@@ -20,7 +20,7 @@ class TestBaseParser(unittest.TestCase):
             pass
         with open(self._find_file("triad_x86_iaca.s")) as f:
             self.triad_code = f.read()
-        with open(self._find_file("triad_x86_intel.asm")) as f:
+        with open(self._find_file("triad_x86_intel.s")) as f:
             self.triad_code_intel = f.read()
         with open(self._find_file("triad_arm_iaca.s")) as f:
             self.triad_code_arm = f.read()
