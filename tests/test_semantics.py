@@ -54,40 +54,31 @@ class TestSemanticTools(unittest.TestCase):
         with open(cls._find_file("kernel_aarch64_deps.s")) as f:
             cls.code_AArch64_deps = f.read()
         cls.kernel_x86 = reduce_to_section(
-            cls.parser_x86_att.parse_file(cls.code_x86),
-            cls.parser_x86_att
+            cls.parser_x86_att.parse_file(cls.code_x86), cls.parser_x86_att
         )
         cls.kernel_x86_memdep = reduce_to_section(
-            cls.parser_x86_att.parse_file(cls.code_x86_memdep),
-            cls.parser_x86_att
+            cls.parser_x86_att.parse_file(cls.code_x86_memdep), cls.parser_x86_att
         )
         cls.kernel_x86_long_LCD = reduce_to_section(
-            cls.parser_x86_att.parse_file(cls.code_x86_long_LCD),
-            cls.parser_x86_att
+            cls.parser_x86_att.parse_file(cls.code_x86_long_LCD), cls.parser_x86_att
         )
         cls.kernel_x86_intel = reduce_to_section(
-            cls.parser_x86_intel.parse_file(cls.code_x86_intel),
-            cls.parser_x86_intel
+            cls.parser_x86_intel.parse_file(cls.code_x86_intel), cls.parser_x86_intel
         )
         cls.kernel_x86_intel_memdep = reduce_to_section(
-            cls.parser_x86_intel.parse_file(cls.code_x86_intel_memdep),
-            cls.parser_x86_intel
+            cls.parser_x86_intel.parse_file(cls.code_x86_intel_memdep), cls.parser_x86_intel
         )
         cls.kernel_AArch64 = reduce_to_section(
-            cls.parser_AArch64.parse_file(cls.code_AArch64),
-            cls.parser_AArch64
+            cls.parser_AArch64.parse_file(cls.code_AArch64), cls.parser_AArch64
         )
         cls.kernel_aarch64_memdep = reduce_to_section(
-            cls.parser_AArch64.parse_file(cls.code_aarch64_memdep),
-            cls.parser_AArch64
+            cls.parser_AArch64.parse_file(cls.code_aarch64_memdep), cls.parser_AArch64
         )
         cls.kernel_aarch64_SVE = reduce_to_section(
-            cls.parser_AArch64.parse_file(cls.code_AArch64_SVE),
-            cls.parser_AArch64
+            cls.parser_AArch64.parse_file(cls.code_AArch64_SVE), cls.parser_AArch64
         )
         cls.kernel_aarch64_deps = reduce_to_section(
-            cls.parser_AArch64.parse_file(cls.code_AArch64_deps),
-            cls.parser_AArch64
+            cls.parser_AArch64.parse_file(cls.code_AArch64_deps), cls.parser_AArch64
         )
 
         # set up machine models
@@ -438,10 +429,7 @@ class TestSemanticTools(unittest.TestCase):
         #     5_______>9
         #
         dg = KernelDG(
-            self.kernel_x86,
-            self.parser_x86_att,
-            self.machine_model_csx,
-            self.semantics_csx
+            self.kernel_x86, self.parser_x86_att, self.machine_model_csx, self.semantics_csx
         )
         self.assertTrue(nx.algorithms.dag.is_directed_acyclic_graph(dg.dg))
         self.assertEqual(len(list(dg.get_dependent_instruction_forms(line_number=3))), 1)
@@ -472,7 +460,7 @@ class TestSemanticTools(unittest.TestCase):
             self.kernel_x86_intel,
             self.parser_x86_intel,
             self.machine_model_csx,
-            self.semantics_csx_intel
+            self.semantics_csx_intel,
         )
         self.assertTrue(nx.algorithms.dag.is_directed_acyclic_graph(dg.dg))
         self.assertEqual(len(list(dg.get_dependent_instruction_forms(line_number=3))), 1)
@@ -589,10 +577,7 @@ class TestSemanticTools(unittest.TestCase):
 
     def test_cyclic_dag(self):
         dg = KernelDG(
-            self.kernel_x86,
-            self.parser_x86_att,
-            self.machine_model_csx,
-            self.semantics_csx
+            self.kernel_x86, self.parser_x86_att, self.machine_model_csx, self.semantics_csx
         )
         dg.dg.add_edge(100, 101, latency=1.0)
         dg.dg.add_edge(101, 102, latency=2.0)
@@ -659,10 +644,7 @@ class TestSemanticTools(unittest.TestCase):
         lcd_id = "8"
         lcd_id2 = "5"
         dg = KernelDG(
-            self.kernel_x86,
-            self.parser_x86_att,
-            self.machine_model_csx,
-            self.semantics_csx
+            self.kernel_x86, self.parser_x86_att, self.machine_model_csx, self.semantics_csx
         )
         lc_deps = dg.get_loopcarried_dependencies()
         # self.assertEqual(len(lc_deps), 2)
@@ -695,7 +677,7 @@ class TestSemanticTools(unittest.TestCase):
             self.kernel_x86_intel,
             self.parser_x86_intel,
             self.machine_model_csx,
-            self.semantics_csx_intel
+            self.semantics_csx_intel,
         )
         lc_deps = dg.get_loopcarried_dependencies()
         # self.assertEqual(len(lc_deps), 2)
@@ -804,14 +786,10 @@ class TestSemanticTools(unittest.TestCase):
         self.semantics_csx_intel.normalize_instruction_form(instr_form_w_c)
         self.semantics_csx_intel.assign_src_dst(instr_form_w_c)
 
-        instr_form_rw_ymm_1 = self.parser_x86_intel.parse_line(
-            "vinsertf128 ymm1, ymm0, xmm1, 1"
-        )
+        instr_form_rw_ymm_1 = self.parser_x86_intel.parse_line("vinsertf128 ymm1, ymm0, xmm1, 1")
         self.semantics_csx_intel.normalize_instruction_form(instr_form_rw_ymm_1)
         self.semantics_csx_intel.assign_src_dst(instr_form_rw_ymm_1)
-        instr_form_rw_ymm_2 = self.parser_x86_intel.parse_line(
-            "vinsertf128 ymm1, ymm1, xmm0, 1"
-        )
+        instr_form_rw_ymm_2 = self.parser_x86_intel.parse_line("vinsertf128 ymm1, ymm1, xmm0, 1")
         self.semantics_csx_intel.normalize_instruction_form(instr_form_rw_ymm_2)
         self.semantics_csx_intel.assign_src_dst(instr_form_rw_ymm_2)
         instr_form_r_ymm = self.parser_x86_intel.parse_line("vmovapd ymm0, ymm1")
