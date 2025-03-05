@@ -23,7 +23,7 @@ jobs:
         sudo apt-get -y install graphviz libgraphviz-dev pkg-config
         python -m pip install pygraphviz
         #python -m pip install "kerncraft>=0.8.16"
-        python -m pip install git+https://github.com/RRZE-HPC/kerncraft.git
+        python -m pip install git+https://github.com/RRZE-HPC/kerncraft.git@7caff4e2ecdbef595013041ba0131e37ed33c72c
         python -m pip install -e .
     - name: Test
       run: |
