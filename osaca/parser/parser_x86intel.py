@@ -1,8 +1,6 @@
 #!/usr/bin/env python3
 
 import pyparsing as pp
-import re
-import string
 import unicodedata
 
 from osaca.parser import ParserX86
@@ -24,6 +22,7 @@ NON_ASCII_PRINTABLE_CHARACTERS = "".join(
     chr(cp) for cp in range(0x80, 0x10FFFF + 1)
     if unicodedata.category(chr(cp)) not in ("Cc", "Zl", "Zp", "Cs", "Cn")
 )
+
 
 # References:
 #   ASM386 Assembly Language Reference, document number 469165-003, https://mirror.math.princeton.edu/pub/oldlinux/Linux.old/Ref-docs/asm-ref.pdf.
@@ -146,16 +145,18 @@ class ParserX86Intel(ParserX86):
 
         # A hack to help with comparison instruction: if the instruction is in the model, and has
         # exactly two sources, swap its operands.
-        if (model and
-            not has_destination and
-            len(instruction_form.operands) == 2
+        if (
+            model
+            and not has_destination
+            and len(instruction_form.operands) == 2
             and not isa_model.get_instruction(
                 mnemonic,
                 instruction_form.operands
             ) and not arch_model.get_instruction(
                 mnemonic,
                 instruction_form.operands
-            )):
+            )
+        ):
             instruction_form.operands.reverse()
 
         # If the instruction has a well-known data type, append a suffix.
@@ -174,7 +175,6 @@ class ParserX86Intel(ParserX86):
                     ):
                         instruction_form.mnemonic = suffixed_mnemonic
                         break
-
 
     def construct_parser(self):
         """Create parser for x86 Intel ISA."""
@@ -353,12 +353,15 @@ class ParserX86Intel(ParserX86):
             (pp.Literal("+") ^ pp.Literal("-")).setResultsName("sign")
             + integer_number | identifier
         ).setResultsName(self.immediate_id)
-        pre_displacement = pp.Group(integer_number + pp.Literal("+")
+        pre_displacement = pp.Group(
+            integer_number + pp.Literal("+")
         ).setResultsName(self.immediate_id)
         indexed = pp.Group(
             index_register.setResultsName("index")
-            + pp.Optional(pp.Literal("*")
-            + scale.setResultsName("scale"))
+            + pp.Optional(
+                pp.Literal("*")
+                + scale.setResultsName("scale")
+            )
         ).setResultsName("indexed")
         register_expression = pp.Group(
             pp.Literal("[")
@@ -370,7 +373,7 @@ class ParserX86Intel(ParserX86):
                     + pp.Literal("+")
                     + indexed).setResultsName("base_and_indexed")
                 ^ indexed
-               ).setResultsName("non_displacement")
+            ).setResultsName("non_displacement")
             + pp.Optional(pp.Group(post_displacement).setResultsName("post_displacement"))
             + pp.Literal("]")
         ).setResultsName("register_expression")
@@ -472,7 +475,7 @@ class ParserX86Intel(ParserX86):
             pp.CaselessKeyword("ALIAS")
             | pp.CaselessKeyword("ALIGN")
             | pp.CaselessKeyword("ASSUME")
-            #| pp.CaselessKeyword("BYTE")
+            # | pp.CaselessKeyword("BYTE")
             | pp.CaselessKeyword("CATSTR")
             | pp.CaselessKeyword("COMM")
             | pp.CaselessKeyword("COMMENT")
@@ -482,7 +485,7 @@ class ParserX86Intel(ParserX86):
             | pp.CaselessKeyword("DQ")
             | pp.CaselessKeyword("DT")
             | pp.CaselessKeyword("DW")
-            #| pp.CaselessKeyword("DWORD")
+            # | pp.CaselessKeyword("DWORD")
             | pp.CaselessKeyword("ECHO")
             | pp.CaselessKeyword("END")
             | pp.CaselessKeyword("ENDP")
@@ -491,14 +494,14 @@ class ParserX86Intel(ParserX86):
             | pp.CaselessKeyword("EVEN")
             | pp.CaselessKeyword("EXTRN")
             | pp.CaselessKeyword("EXTERNDEF")
-            #| pp.CaselessKeyword("FWORD")
+            # | pp.CaselessKeyword("FWORD")
             | pp.CaselessKeyword("GROUP")
             | pp.CaselessKeyword("INCLUDE")
             | pp.CaselessKeyword("INCLUDELIB")
             | pp.CaselessKeyword("INSTR")
             | pp.CaselessKeyword("INVOKE")
             | pp.CaselessKeyword("LABEL")
-            #| pp.CaselessKeyword("MMWORD")
+            # | pp.CaselessKeyword("MMWORD")
             | pp.CaselessKeyword("OPTION")
             | pp.CaselessKeyword("ORG")
             | pp.CaselessKeyword("PAGE")
@@ -507,27 +510,27 @@ class ParserX86Intel(ParserX86):
             | pp.CaselessKeyword("PROTO")
             | pp.CaselessKeyword("PUBLIC")
             | pp.CaselessKeyword("PUSHCONTEXT")
-            #| pp.CaselessKeyword("QWORD")
-            #| pp.CaselessKeyword("REAL10")
-            #| pp.CaselessKeyword("REAL4")
-            #| pp.CaselessKeyword("REAL8")
+            # | pp.CaselessKeyword("QWORD")
+            # | pp.CaselessKeyword("REAL10")
+            # | pp.CaselessKeyword("REAL4")
+            # | pp.CaselessKeyword("REAL8")
             | pp.CaselessKeyword("RECORD")
-            #| pp.CaselessKeyword("SBYTE")
-            #| pp.CaselessKeyword("SDWORD")
+            # | pp.CaselessKeyword("SBYTE")
+            # | pp.CaselessKeyword("SDWORD")
             | pp.CaselessKeyword("SEGMENT")
             | pp.CaselessKeyword("SIZESTR")
             | pp.CaselessKeyword("STRUCT")
             | pp.CaselessKeyword("SUBSTR")
             | pp.CaselessKeyword("SUBTITLE")
-            #| pp.CaselessKeyword("SWORD")
-            #| pp.CaselessKeyword("TBYTE")
+            # | pp.CaselessKeyword("SWORD")
+            # | pp.CaselessKeyword("TBYTE")
             | pp.CaselessKeyword("TEXTEQU")
             | pp.CaselessKeyword("TITLE")
             | pp.CaselessKeyword("TYPEDEF")
             | pp.CaselessKeyword("UNION")
-            #| pp.CaselessKeyword("WORD")
-            #| pp.CaselessKeyword("XMMWORD")
-            #| pp.CaselessKeyword("YMMWORD")
+            # | pp.CaselessKeyword("WORD")
+            # | pp.CaselessKeyword("XMMWORD")
+            # | pp.CaselessKeyword("YMMWORD")
         )
         self.directive = pp.Group(
             pp.Optional(~directive_keywords + directive_identifier)

@@ -1,17 +1,15 @@
 #!/usr/bin/env python3
 from collections import OrderedDict
 from enum import Enum
-from functools import partial
 
 from osaca.parser import get_parser
-from osaca.parser.instruction_form import InstructionForm
-from osaca.parser.directive import DirectiveOperand
 from osaca.parser.identifier import IdentifierOperand
 from osaca.parser.immediate import ImmediateOperand
 from osaca.parser.memory import MemoryOperand
 from osaca.parser.register import RegisterOperand
 
 COMMENT_MARKER = {"start": "OSACA-BEGIN", "end": "OSACA-END"}
+
 
 # State of marker matching.
 #   No: we have determined that the code doesn't match the marker.
@@ -173,6 +171,7 @@ def get_marker(isa, syntax="ATT", comment=""):
 
     return start_marker, end_marker
 
+
 def match_line(parser, line, marker_line):
     """
     Returns whether `line` matches `marker_line`.
@@ -198,6 +197,7 @@ def match_line(parser, line, marker_line):
     else:
         return Matching.No
 
+
 def match_operands(line_operands, marker_line_operands):
     if len(line_operands) != len(marker_line_operands):
         return False
@@ -206,6 +206,7 @@ def match_operands(line_operands, marker_line_operands):
         for line_operand, marker_line_operand in
         zip(line_operands, marker_line_operands)
     )
+
 
 def match_operand(line_operand, marker_line_operand):
     if (
@@ -221,13 +222,14 @@ def match_operand(line_operand, marker_line_operand):
     ):
         return True
     if (
-        isinstance(line_operand, MemoryOperand)
-        and isinstance(marker_line_operand, MemoryOperand)
-        and match_operand(line_operand.base, marker_line_operand.base)
-        and match_operand(line_operand.offset, line_operand.offset)
-        ):
+            isinstance(line_operand, MemoryOperand)
+            and isinstance(marker_line_operand, MemoryOperand)
+            and match_operand(line_operand.base, marker_line_operand.base)
+            and match_operand(line_operand.offset, line_operand.offset)
+    ):
         return True
     return False
+
 
 def match_parameters(parser, line_parameters, marker_line_parameters):
     """
@@ -238,13 +240,10 @@ def match_parameters(parser, line_parameters, marker_line_parameters):
     :return: Matching. In case of partial match, `marker_line_parameters` is modified and should be
                        reused for matching the next line in the parsed assembly code.
     """
-    line_parameter_count = len(line_parameters)
-    marker_line_parameter_count = len(marker_line_parameters)
-
     # The elements of `marker_line_parameters` are consumed as they are matched.
     for line_parameter in line_parameters:
         if not marker_line_parameters:
-            break;
+            break
         marker_line_parameter = marker_line_parameters[0]
         if not match_parameter(parser, line_parameter, marker_line_parameter):
             return Matching.No
@@ -253,6 +252,7 @@ def match_parameters(parser, line_parameters, marker_line_parameters):
         return Matching.Partial
     else:
         return Matching.Full
+
 
 def match_parameter(parser, line_parameter, marker_line_parameter):
     if line_parameter.lower() == marker_line_parameter.lower():

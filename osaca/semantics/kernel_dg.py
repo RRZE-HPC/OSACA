@@ -1,8 +1,6 @@
 #!/usr/bin/env python3
 
 import copy
-import os
-import signal
 import time
 from itertools import chain
 from multiprocessing import Manager, Process, cpu_count
