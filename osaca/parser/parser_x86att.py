@@ -1,8 +1,5 @@
 #!/usr/bin/env python3
 
-import string
-import re
-
 import pyparsing as pp
 
 from osaca.parser import ParserX86
@@ -34,11 +31,11 @@ class ParserX86ATT(ParserX86):
                 InstructionForm(
                     mnemonic="mov",
                     operands=[ImmediateOperand(value=111), RegisterOperand(name="ebx")]
-                 ),
-                 InstructionForm(
-                     mnemonic="movl",
-                     operands=[ImmediateOperand(value=111), RegisterOperand(name="ebx")]
-                 )
+                ),
+                InstructionForm(
+                    mnemonic="movl",
+                    operands=[ImmediateOperand(value=111), RegisterOperand(name="ebx")]
+                )
             ],
             InstructionForm(
                 directive_id=DirectiveOperand(name="byte", parameters=["100", "103", "144"])
@@ -51,11 +48,11 @@ class ParserX86ATT(ParserX86):
                 InstructionForm(
                     mnemonic="mov",
                     operands=[ImmediateOperand(value=222), RegisterOperand(name="ebx")]
-                 ),
-                 InstructionForm(
-                     mnemonic="movl",
-                     operands=[ImmediateOperand(value=222), RegisterOperand(name="ebx")]
-                 )
+                ),
+                InstructionForm(
+                    mnemonic="movl",
+                    operands=[ImmediateOperand(value=222), RegisterOperand(name="ebx")]
+                )
             ],
             InstructionForm(
                 directive_id=DirectiveOperand(name="byte", parameters=["100", "103", "144"])

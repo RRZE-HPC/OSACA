@@ -6,8 +6,6 @@ Unit tests for x86 Intel assembly parser
 import os
 import unittest
 
-from pyparsing import ParseException
-
 from osaca.parser import ParserX86Intel, InstructionForm
 from osaca.parser.directive import DirectiveOperand
 from osaca.parser.identifier import IdentifierOperand
@@ -134,13 +132,13 @@ class TestParserX86Intel(unittest.TestCase):
         self.assertEqual(parsed_4.mnemonic, "mov")
         self.assertEqual(parsed_4.operands[0],
                          RegisterOperand(name="EAX"))
-        self.assertEqual(parsed_4.operands[1],
-                         MemoryOperand(offset=ImmediateOperand(
-                                            identifier="cur_elements$",
-                                            value=104
-                                       ),
-                                       base=RegisterOperand(name="RBP")))
-
+        self.assertEqual(
+            parsed_4.operands[1],
+            MemoryOperand(
+                offset=ImmediateOperand(identifier="cur_elements$", value=104),
+                base=RegisterOperand(name="RBP")
+            )
+        )
         self.assertEqual(parsed_5.mnemonic, "mov")
         self.assertEqual(parsed_5.operands[0],
                          MemoryOperand(offset=ImmediateOperand(value=24),
@@ -252,18 +250,21 @@ class TestParserX86Intel(unittest.TestCase):
         self.assertEqual(parsed[0].line_number, 1)
         # Check specifically that the values of the symbols defined by "=" were correctly
         # propagated.
-        self.assertEqual(parsed[69],
-                         InstructionForm(mnemonic="mov",
-                                         operands=[MemoryOperand(
-                                                        base=RegisterOperand("RBP"),
-                                                        offset=ImmediateOperand(
-                                                            value=4,
-                                                            identifier="r$1"
-                                                        )
-                                                    ),
-                                                   ImmediateOperand(value=0)],
-                                         line="\tmov\tDWORD PTR r$1[rbp], 0",
-                                         line_number=73))
+        self.assertEqual(
+            parsed[69],
+            InstructionForm(
+                mnemonic="mov",
+                operands=[
+                    MemoryOperand(
+                        base=RegisterOperand("RBP"),
+                        offset=ImmediateOperand(value=4, identifier="r$1")
+                    ),
+                    ImmediateOperand(value=0)
+                ],
+                line="\tmov\tDWORD PTR r$1[rbp], 0",
+                line_number=73
+            )
+        )
         # Check a few lines to make sure that we produced something reasonable.
         self.assertEqual(parsed[60],
                          InstructionForm(mnemonic="mov",

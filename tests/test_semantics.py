@@ -314,11 +314,11 @@ class TestSemanticTools(unittest.TestCase):
 
     def test_src_dst_assignment_x86_intel(self):
         for instruction_form in self.kernel_x86_intel:
-             with self.subTest(instruction_form=instruction_form):
-                 if instruction_form.semantic_operands is not None:
-                     self.assertTrue("source" in instruction_form.semantic_operands)
-                     self.assertTrue("destination" in instruction_form.semantic_operands)
-                     self.assertTrue("src_dst" in instruction_form.semantic_operands)
+            with self.subTest(instruction_form=instruction_form):
+                if instruction_form.semantic_operands is not None:
+                    self.assertTrue("source" in instruction_form.semantic_operands)
+                    self.assertTrue("destination" in instruction_form.semantic_operands)
+                    self.assertTrue("src_dst" in instruction_form.semantic_operands)
 
     def test_src_dst_assignment_AArch64(self):
         for instruction_form in self.kernel_AArch64:

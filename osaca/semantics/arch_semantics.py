@@ -1,7 +1,5 @@
 #!/usr/bin/env python3
 """Semantics opbject responsible for architecture specific semantic operations"""
-
-from dis import Instruction
 import sys
 import warnings
 from itertools import chain

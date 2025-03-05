@@ -11,7 +11,7 @@ from ruamel.yaml import YAML
 
 from osaca.db_interface import import_benchmark_output, sanity_check
 from osaca.frontend import Frontend
-from osaca.parser import BaseParser, ParserAArch64, ParserX86, ParserX86ATT, ParserX86Intel
+from osaca.parser import BaseParser, ParserAArch64, ParserX86ATT, ParserX86Intel
 from osaca.semantics import (
     INSTR_FLAGS,
     ArchSemantics,
@@ -355,7 +355,7 @@ def inspect(args, output_file=sys.stdout):
         (arch, syntax)
         for arch in archs_to_try
         for syntax in syntaxes_to_try
-        if (syntax != None) == (MachineModel.get_isa_for_arch(arch) == "x86")
+        if (syntax is not None) == (MachineModel.get_isa_for_arch(arch) == "x86")
     ]
 
     # Parse file.
