@@ -243,9 +243,7 @@ def check_arguments(args, parser):
             "Microarchitecture not supported. Please see --help for all valid architecture codes."
         )
     if args.syntax and args.arch and MachineModel.get_isa_for_arch(args.arch) != "x86":
-        parser.error(
-            "Syntax can only be explicitly specified for an x86 microarchitecture"
-        )
+        parser.error("Syntax can only be explicitly specified for an x86 microarchitecture")
     if args.syntax and args.syntax.upper() not in SUPPORTED_SYNTAXES:
         parser.error(
             "Assembly syntax not supported. Please see --help for all valid assembly syntaxes."

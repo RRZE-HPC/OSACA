@@ -19,7 +19,8 @@ from osaca.parser.register import RegisterOperand
 # It is appropriate for tools, such as this one, which process source code but do not fully validate
 # it (in this case, that’s the job of the assembler).
 NON_ASCII_PRINTABLE_CHARACTERS = "".join(
-    chr(cp) for cp in range(0x80, 0x10FFFF + 1)
+    chr(cp)
+    for cp in range(0x80, 0x10FFFF + 1)
     if unicodedata.category(chr(cp)) not in ("Cc", "Zl", "Zp", "Cs", "Cn")
 )
 
@@ -51,11 +52,10 @@ class ParserX86Intel(ParserX86):
                 mnemonic="mov",
                 operands=[
                     MemoryOperand(
-                        base=RegisterOperand(name="GS"),
-                        offset=ImmediateOperand(value=111)
+                        base=RegisterOperand(name="GS"), offset=ImmediateOperand(value=111)
                     ),
-                    ImmediateOperand(value=111)
-                ]
+                    ImmediateOperand(value=111),
+                ],
             ),
         ]
 
@@ -65,20 +65,14 @@ class ParserX86Intel(ParserX86):
                 mnemonic="mov",
                 operands=[
                     MemoryOperand(
-                        base=RegisterOperand(name="GS"),
-                        offset=ImmediateOperand(value=222)
+                        base=RegisterOperand(name="GS"), offset=ImmediateOperand(value=222)
                     ),
-                    ImmediateOperand(value=222)
-                ]
+                    ImmediateOperand(value=222),
+                ],
             ),
         ]
 
-    def normalize_instruction_form(
-        self,
-        instruction_form,
-        isa_model,
-        arch_model
-    ):
+    def normalize_instruction_form(self, instruction_form, isa_model, arch_model):
         """
         If the model indicates that this instruction has a single destination that is the last
         operand, move the first operand to the last position.  This effectively converts the Intel
@@ -95,23 +89,14 @@ class ParserX86Intel(ParserX86):
         # The model may only contain the VEX-encoded instruction and we may have the non-VEX-encoded
         # one, or vice-versa.  Note that this doesn't work when the arguments differ between VEX-
         # encoded and non-VEX-encoded, e.g., for psubq.
-        if not arch_model.get_instruction(
-            mnemonic,
-            len(instruction_form.operands)
-        ):
-            if mnemonic[0] == 'v':
+        if not arch_model.get_instruction(mnemonic, len(instruction_form.operands)):
+            if mnemonic[0] == "v":
                 unvexed_mnemonic = mnemonic[1:]
-                if arch_model.get_instruction(
-                    unvexed_mnemonic,
-                    len(instruction_form.operands)
-                ):
+                if arch_model.get_instruction(unvexed_mnemonic, len(instruction_form.operands)):
                     mnemonic = unvexed_mnemonic
             else:
-                vexed_mnemonic = 'v' + mnemonic
-                if arch_model.get_instruction(
-                    vexed_mnemonic,
-                    len(instruction_form.operands)
-                ):
+                vexed_mnemonic = "v" + mnemonic
+                if arch_model.get_instruction(vexed_mnemonic, len(instruction_form.operands)):
                     mnemonic = vexed_mnemonic
             instruction_form.mnemonic = mnemonic
 
@@ -149,13 +134,8 @@ class ParserX86Intel(ParserX86):
             model
             and not has_destination
             and len(instruction_form.operands) == 2
-            and not isa_model.get_instruction(
-                mnemonic,
-                instruction_form.operands
-            ) and not arch_model.get_instruction(
-                mnemonic,
-                instruction_form.operands
-            )
+            and not isa_model.get_instruction(mnemonic, instruction_form.operands)
+            and not arch_model.get_instruction(mnemonic, instruction_form.operands)
         ):
             instruction_form.operands.reverse()
 
@@ -167,11 +147,9 @@ class ParserX86Intel(ParserX86):
                 if suffix:
                     suffixed_mnemonic = mnemonic + suffix
                     if isa_model.get_instruction(
-                        suffixed_mnemonic,
-                        len(instruction_form.operands)
+                        suffixed_mnemonic, len(instruction_form.operands)
                     ) or arch_model.get_instruction(
-                        suffixed_mnemonic,
-                        len(instruction_form.operands)
+                        suffixed_mnemonic, len(instruction_form.operands)
                     ):
                         instruction_form.mnemonic = suffixed_mnemonic
                         break
@@ -179,18 +157,10 @@ class ParserX86Intel(ParserX86):
     def construct_parser(self):
         """Create parser for x86 Intel ISA."""
         # Numeric literal.
-        binary_number = pp.Combine(
-            pp.Word("01") + pp.CaselessLiteral("B")
-        )
-        octal_number = pp.Combine(
-            pp.Word("01234567") + pp.CaselessLiteral("O")
-        )
-        decimal_number = pp.Combine(
-            pp.Optional(pp.Literal("-")) + pp.Word(pp.nums)
-        )
-        hex_number = pp.Combine(
-            pp.Word(pp.hexnums) + pp.CaselessLiteral("H")
-        )
+        binary_number = pp.Combine(pp.Word("01") + pp.CaselessLiteral("B"))
+        octal_number = pp.Combine(pp.Word("01234567") + pp.CaselessLiteral("O"))
+        decimal_number = pp.Combine(pp.Optional(pp.Literal("-")) + pp.Word(pp.nums))
+        hex_number = pp.Combine(pp.Word(pp.hexnums) + pp.CaselessLiteral("H"))
         float_number = pp.Combine(
             pp.Optional(pp.Literal("-")) + pp.Word(pp.nums) + pp.Word(".", pp.nums)
         ).setResultsName("value")
@@ -316,9 +286,8 @@ class ParserX86Intel(ParserX86):
             pp.CaselessKeyword("ST")
             + pp.Optional(pp.Literal("(") + pp.Word("01234567") + pp.Literal(")"))
         ).setResultsName("name")
-        xmm_register = (
-            pp.Combine(pp.CaselessLiteral("XMM") + pp.Word(pp.nums))
-            | pp.Combine(pp.CaselessLiteral("XMM1") + pp.Word("012345"))
+        xmm_register = pp.Combine(pp.CaselessLiteral("XMM") + pp.Word(pp.nums)) | pp.Combine(
+            pp.CaselessLiteral("XMM1") + pp.Word("012345")
         )
         simd_register = (
             pp.Combine(pp.CaselessLiteral("MM") + pp.Word("01234567"))
@@ -350,18 +319,15 @@ class ParserX86Intel(ParserX86):
         index_register = self.register
         scale = pp.Word("1248", exact=1)
         post_displacement = pp.Group(
-            (pp.Literal("+") ^ pp.Literal("-")).setResultsName("sign")
-            + integer_number | identifier
+            (pp.Literal("+") ^ pp.Literal("-")).setResultsName("sign") + integer_number
+            | identifier
         ).setResultsName(self.immediate_id)
-        pre_displacement = pp.Group(
-            integer_number + pp.Literal("+")
-        ).setResultsName(self.immediate_id)
+        pre_displacement = pp.Group(integer_number + pp.Literal("+")).setResultsName(
+            self.immediate_id
+        )
         indexed = pp.Group(
             index_register.setResultsName("index")
-            + pp.Optional(
-                pp.Literal("*")
-                + scale.setResultsName("scale")
-            )
+            + pp.Optional(pp.Literal("*") + scale.setResultsName("scale"))
         ).setResultsName("indexed")
         register_expression = pp.Group(
             pp.Literal("[")
@@ -369,9 +335,8 @@ class ParserX86Intel(ParserX86):
             + pp.Group(
                 base_register.setResultsName("base")
                 ^ pp.Group(
-                    base_register.setResultsName("base")
-                    + pp.Literal("+")
-                    + indexed).setResultsName("base_and_indexed")
+                    base_register.setResultsName("base") + pp.Literal("+") + indexed
+                ).setResultsName("base_and_indexed")
                 ^ indexed
             ).setResultsName("non_displacement")
             + pp.Optional(pp.Group(post_displacement).setResultsName("post_displacement"))
@@ -379,9 +344,9 @@ class ParserX86Intel(ParserX86):
         ).setResultsName("register_expression")
 
         # Immediate.
-        immediate = pp.Group(
-            integer_number | float_number | identifier
-        ).setResultsName(self.immediate_id)
+        immediate = pp.Group(integer_number | float_number | identifier).setResultsName(
+            self.immediate_id
+        )
 
         # Expressions.
         # The ASM86 manual has weird expressions on page 130 (displacement outside of the register
@@ -410,21 +375,16 @@ class ParserX86Intel(ParserX86):
         ptr_expression = pp.Group(
             data_type + pp.CaselessKeyword("PTR") + address_expression
         ).setResultsName("ptr_expression")
-        short_expression = pp.Group(
-            pp.CaselessKeyword("SHORT") + identifier
-        ).setResultsName("short_expression")
+        short_expression = pp.Group(pp.CaselessKeyword("SHORT") + identifier).setResultsName(
+            "short_expression"
+        )
 
         # Instructions.
-        mnemonic = pp.Word(
-            pp.alphas, pp.alphanums
-        ).setResultsName("mnemonic")
+        mnemonic = pp.Word(pp.alphas, pp.alphanums).setResultsName("mnemonic")
         operand = pp.Group(
             self.register
             | pp.Group(
-                offset_expression
-                | ptr_expression
-                | short_expression
-                | address_expression
+                offset_expression | ptr_expression | short_expression | address_expression
             ).setResultsName(self.memory_id)
             | immediate
         )
@@ -622,8 +582,11 @@ class ParserX86Intel(ParserX86):
             mnemonic=parse_result.mnemonic,
             operands=operands,
             label_id=None,
-            comment_id=" ".join(parse_result[self.comment_id])
-                       if self.comment_id in parse_result else None,
+            comment_id=(
+                " ".join(parse_result[self.comment_id])
+                if self.comment_id in parse_result
+                else None
+            ),
         )
 
         return return_dict
@@ -642,9 +605,7 @@ class ParserX86Intel(ParserX86):
     def parse_register(self, register_string):
         """Parse register string"""
         try:
-            return self.process_operand(
-                self.register.parseString(register_string, parseAll=True)
-            )
+            return self.process_operand(self.register.parseString(register_string, parseAll=True))
         except pp.ParseException:
             return None
 
@@ -668,10 +629,7 @@ class ParserX86Intel(ParserX86):
         # TODO: This is putting the identifier in the parameters.  No idea if it's right.
         parameters = [directive.identifier.name] if "identifier" in directive else []
         parameters.extend(directive.parameters)
-        directive_new = DirectiveOperand(
-            name=directive.name,
-            parameters=parameters or None
-        )
+        directive_new = DirectiveOperand(name=directive.name, parameters=parameters or None)
         # Interpret the "=" directives because the generated assembly is full of symbols that are
         # defined there.
         if directive.name == "=":
@@ -707,11 +665,14 @@ class ParserX86Intel(ParserX86):
         )
         displacement_op = (
             self.process_immediate(post_displacement.immediate)
-            if post_displacement else displacement_op
+            if post_displacement
+            else displacement_op
         )
         base_op = RegisterOperand(name=base.name) if base else None
         index_op = RegisterOperand(name=index.name) if index else None
-        new_memory = MemoryOperand(offset=displacement_op, base=base_op, index=index_op, scale=scale)
+        new_memory = MemoryOperand(
+            offset=displacement_op, base=base_op, index=index_op, scale=scale
+        )
         return new_memory
 
     def process_address_expression(self, address_expression, data_type=None):
@@ -719,19 +680,23 @@ class ParserX86Intel(ParserX86):
         # brackets, and an offset.  How all of this works together is somewhat mysterious.
         immediate_operand = (
             self.process_immediate(address_expression.immediate)
-            if "immediate" in address_expression else None
+            if "immediate" in address_expression
+            else None
         )
         register_expression = (
             self.process_register_expression(address_expression.register_expression)
-            if "register_expression" in address_expression else None
+            if "register_expression" in address_expression
+            else None
         )
         segment = (
             self.process_register(address_expression.segment)
-            if "segment" in address_expression else None
+            if "segment" in address_expression
+            else None
         )
         identifier = (
             self.process_identifier(address_expression.identifier)
-            if "identifier" in address_expression else None
+            if "identifier" in address_expression
+            else None
         )
         if register_expression:
             if immediate_operand:
@@ -756,7 +721,8 @@ class ParserX86Intel(ParserX86):
         # TODO: Record that this is an offset expression.
         displacement = (
             self.process_immediate(offset_expression.displacement)
-            if "displacement" in offset_expression else None
+            if "displacement" in offset_expression
+            else None
         )
         identifier = self.process_identifier(offset_expression.identifier)
         identifier.offset = displacement
@@ -765,8 +731,7 @@ class ParserX86Intel(ParserX86):
     def process_ptr_expression(self, ptr_expression):
         # TODO: Do something with the data_type.
         return self.process_address_expression(
-            ptr_expression.address_expression,
-            ptr_expression.data_type
+            ptr_expression.address_expression, ptr_expression.data_type
         )
 
     def process_short_expression(self, short_expression):
@@ -790,8 +755,10 @@ class ParserX86Intel(ParserX86):
         # Remove duplicated 'name' level due to identifier.  Note that there is no place to put the
         # comment, if any.
         label["name"] = label["name"]["name"]
-        return (LabelOperand(name=label.name),
-                self.make_instruction(label) if "mnemonic" in label else None)
+        return (
+            LabelOperand(name=label.name),
+            self.make_instruction(label) if "mnemonic" in label else None,
+        )
 
     def process_immediate(self, immediate):
         """Post-process immediate operand"""
@@ -806,8 +773,7 @@ class ParserX86Intel(ParserX86):
         if identifier.name in self._equ:
             # Actually an immediate, change declaration.
             new_immediate = ImmediateOperand(
-                identifier=identifier.name,
-                value=self._equ[identifier.name]
+                identifier=identifier.name, value=self._equ[identifier.name]
             )
             new_immediate.value = self.normalize_imd(new_immediate)
             return new_immediate
@@ -816,13 +782,13 @@ class ParserX86Intel(ParserX86):
     def normalize_imd(self, imd):
         """Normalize immediate to decimal based representation"""
         if isinstance(imd.value, str):
-            if '.' in imd.value:
+            if "." in imd.value:
                 return float(imd.value)
             # Now parse depending on the base.
-            base = {'B': 2, 'O': 8, 'H': 16}.get(imd.value[-1], 10)
+            base = {"B": 2, "O": 8, "H": 16}.get(imd.value[-1], 10)
             value = 0
-            negative = imd.value[0] == '-'
-            positive = imd.value[0] == '+'
+            negative = imd.value[0] == "-"
+            positive = imd.value[0] == "+"
             start = +(negative or positive)
             stop = len(imd.value) if base == 10 else -1
             for c in imd.value[start:stop]:

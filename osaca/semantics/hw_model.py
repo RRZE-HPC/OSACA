@@ -303,19 +303,16 @@ class MachineModel(object):
                         for instruction_form in name_matched_iforms
                         if len(instruction_form.operands) == arity
                     ),
-                    None
+                    None,
                 )
             else:
                 return next(
                     (
                         instruction_form
                         for instruction_form in name_matched_iforms
-                        if self._match_operands(
-                            instruction_form.operands,
-                            operands
-                        )
+                        if self._match_operands(instruction_form.operands, operands)
                     ),
-                    None
+                    None,
                 )
         except TypeError as e:
             print("\nname: {}\noperands: {}".format(name, operands))
@@ -893,6 +890,7 @@ class MachineModel(object):
 
     def _is_x86_reg_type(self, i_reg, reg, consider_masking=False):
         from osaca.parser import ParserX86
+
         """Check if register type match."""
         if reg is None:
             if i_reg is None:

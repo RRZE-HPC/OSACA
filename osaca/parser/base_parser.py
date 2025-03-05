@@ -48,12 +48,7 @@ class BaseParser(object):
 
     # Performs all the normalization needed to match the instruction to the ISO/arch model.  This
     # method must set the `normalized` property of the instruction and must be idempotent.
-    def normalize_instruction_form(
-        self,
-        instruction_form,
-        isa_model,
-        arch_model
-    ):
+    def normalize_instruction_form(self, instruction_form, isa_model, arch_model):
         raise NotImplementedError
 
     @staticmethod

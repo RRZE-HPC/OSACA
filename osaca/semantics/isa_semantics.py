@@ -83,7 +83,9 @@ class ISASemantics(object):
         if assign_default:
             # no irregular operand structure, apply default
             op_dict["source"] = self._parser.get_regular_source_operands(instruction_form)
-            op_dict["destination"] = self._parser.get_regular_destination_operands(instruction_form)
+            op_dict["destination"] = self._parser.get_regular_destination_operands(
+                instruction_form
+            )
             op_dict["src_dst"] = []
         # post-process pre- and post-indexing for aarch64 memory operands
         if self._parser.isa() == "aarch64":
