@@ -25,7 +25,7 @@ class TestMarkerUtils(unittest.TestCase):
             triad_code_arm = f.read()
         with open(self._find_file("triad_x86_iaca.s")) as f:
             triad_code_x86_att = f.read()
-        with open(self._find_file("triad_x86_intel_iaca.asm")) as f:
+        with open(self._find_file("triad_x86_intel_iaca.s")) as f:
             triad_code_x86_intel = f.read()
         self.parsed_AArch = self.parser_AArch.parse_file(triad_code_arm)
         self.parsed_x86_att = self.parser_x86_att.parse_file(triad_code_x86_att)
