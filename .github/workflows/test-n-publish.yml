@@ -24,7 +24,6 @@ jobs:
         python -m pip install pygraphviz
         #python -m pip install "kerncraft>=0.8.16"
         python -m pip install git+https://github.com/RRZE-HPC/kerncraft.git
-        pip uninstall osaca
         python -m pip install -e .
     - name: Test
       run: |
