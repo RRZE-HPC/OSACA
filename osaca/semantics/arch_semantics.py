@@ -19,9 +19,7 @@ class ArchSemantics(ISASemantics):
 
     def normalize_instruction_form(self, instruction_form):
         self.parser.normalize_instruction_form(
-            instruction_form,
-            self.isa_model,
-            self._machine_model
+            instruction_form, self.isa_model, self._machine_model
         )
 
     def normalize_instruction_forms(self, instruction_forms):

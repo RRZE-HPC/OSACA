@@ -34,30 +34,25 @@ class ParserAArch64(BaseParser):
         return [
             InstructionForm(
                 mnemonic="mov",
-                operands=[RegisterOperand(name="1", prefix="x"), ImmediateOperand(value=111)]
+                operands=[RegisterOperand(name="1", prefix="x"), ImmediateOperand(value=111)],
             ),
             InstructionForm(
                 directive_id=DirectiveOperand(name="byte", parameters=["213", "3", "32", "31"])
-            )
+            ),
         ]
 
     def end_marker(self):
         return [
             InstructionForm(
                 mnemonic="mov",
-                operands=[RegisterOperand(name="1", prefix="x"), ImmediateOperand(value=222)]
+                operands=[RegisterOperand(name="1", prefix="x"), ImmediateOperand(value=222)],
             ),
             InstructionForm(
                 directive_id=DirectiveOperand(name="byte", parameters=["213", "3", "32", "31"])
-            )
+            ),
         ]
 
-    def normalize_instruction_form(
-        self,
-        instruction_form,
-        isa_model,
-        arch_model
-    ):
+    def normalize_instruction_form(self, instruction_form, isa_model, arch_model):
         """
         If the instruction doesn't exist in the machine model, normalize it by dropping the shape
         suffix.

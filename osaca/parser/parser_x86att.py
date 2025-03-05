@@ -30,16 +30,16 @@ class ParserX86ATT(ParserX86):
             [
                 InstructionForm(
                     mnemonic="mov",
-                    operands=[ImmediateOperand(value=111), RegisterOperand(name="ebx")]
+                    operands=[ImmediateOperand(value=111), RegisterOperand(name="ebx")],
                 ),
                 InstructionForm(
                     mnemonic="movl",
-                    operands=[ImmediateOperand(value=111), RegisterOperand(name="ebx")]
-                )
+                    operands=[ImmediateOperand(value=111), RegisterOperand(name="ebx")],
+                ),
             ],
             InstructionForm(
                 directive_id=DirectiveOperand(name="byte", parameters=["100", "103", "144"])
-            )
+            ),
         ]
 
     def end_marker(self):
@@ -47,24 +47,19 @@ class ParserX86ATT(ParserX86):
             [
                 InstructionForm(
                     mnemonic="mov",
-                    operands=[ImmediateOperand(value=222), RegisterOperand(name="ebx")]
+                    operands=[ImmediateOperand(value=222), RegisterOperand(name="ebx")],
                 ),
                 InstructionForm(
                     mnemonic="movl",
-                    operands=[ImmediateOperand(value=222), RegisterOperand(name="ebx")]
-                )
+                    operands=[ImmediateOperand(value=222), RegisterOperand(name="ebx")],
+                ),
             ],
             InstructionForm(
                 directive_id=DirectiveOperand(name="byte", parameters=["100", "103", "144"])
-            )
+            ),
         ]
 
-    def normalize_instruction_form(
-        self,
-        instruction_form,
-        isa_model,
-        arch_model
-    ):
+    def normalize_instruction_form(self, instruction_form, isa_model, arch_model):
         """
         If the instruction doesn't exist in the machine model, normalize it by dropping the GAS
         suffix.

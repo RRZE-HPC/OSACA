@@ -193,7 +193,9 @@ def match_line(parser, line, marker_line):
         and marker_line.directive
         and line.directive.name == marker_line.directive.name
     ):
-        return match_parameters(parser, line.directive.parameters, marker_line.directive.parameters)
+        return match_parameters(
+            parser, line.directive.parameters, marker_line.directive.parameters
+        )
     else:
         return Matching.No
 
@@ -203,8 +205,7 @@ def match_operands(line_operands, marker_line_operands):
         return False
     return all(
         match_operand(line_operand, marker_line_operand)
-        for line_operand, marker_line_operand in
-        zip(line_operands, marker_line_operands)
+        for line_operand, marker_line_operand in zip(line_operands, marker_line_operands)
     )
 
 
@@ -222,10 +223,10 @@ def match_operand(line_operand, marker_line_operand):
     ):
         return True
     if (
-            isinstance(line_operand, MemoryOperand)
-            and isinstance(marker_line_operand, MemoryOperand)
-            and match_operand(line_operand.base, marker_line_operand.base)
-            and match_operand(line_operand.offset, line_operand.offset)
+        isinstance(line_operand, MemoryOperand)
+        and isinstance(marker_line_operand, MemoryOperand)
+        and match_operand(line_operand.base, marker_line_operand.base)
+        and match_operand(line_operand.offset, line_operand.offset)
     ):
         return True
     return False
