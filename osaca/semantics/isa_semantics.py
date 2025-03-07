@@ -87,6 +87,22 @@ class ISASemantics(object):
                 instruction_form
             )
             op_dict["src_dst"] = []
+            # handle Xd! registers in aarch64
+            if any(
+                [
+                    isinstance(op, RegisterOperand) and op.pre_indexed
+                    for op in instruction_form.operands
+                ]
+            ):
+                src_dst_regs = [
+                    op
+                    for op in instruction_form.operands
+                    if (isinstance(op, RegisterOperand) and op.pre_indexed)
+                ]
+                for reg in src_dst_regs:
+                    if reg in op_dict["source"]:
+                        op_dict["source"].remove(reg)
+                        op_dict["src_dst"].append(reg)
         # post-process pre- and post-indexing for aarch64 memory operands
         if self._parser.isa() == "aarch64":
             for operand in [op for op in op_dict["source"] if isinstance(op, MemoryOperand)]:
@@ -178,7 +194,11 @@ class ISASemantics(object):
 
                 base_name = (o.base.prefix if o.base.prefix is not None else "") + o.base.name
                 reg_operand_names = {base_name: "op1"}
-                operand_state = {"op1": {"name": base_name, "value": o.offset.value}}
+                if o.offset:
+                    operand_state = {"op1": {"name": base_name, "value": o.offset.value}}
+                else:
+                    # no offset (e.g., with Arm9 memops) -> base is updated
+                    operand_state = {"op1": None}
 
         if isa_data is not None and isa_data.operation is not None:
             for i, o in enumerate(instruction_form.operands):

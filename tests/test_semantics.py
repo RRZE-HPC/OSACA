@@ -53,6 +53,10 @@ class TestSemanticTools(unittest.TestCase):
             cls.code_AArch64_SVE = f.read()
         with open(cls._find_file("kernel_aarch64_deps.s")) as f:
             cls.code_AArch64_deps = f.read()
+        with open(cls._find_file("mops_aarch64.s")) as f:
+            cls.mops_1_code = f.read()
+        cls.mops_2_code = cls.mops_1_code.replace("//ALT1 ", "")
+
         cls.kernel_x86 = reduce_to_section(
             cls.parser_x86_att.parse_file(cls.code_x86), cls.parser_x86_att
         )
@@ -548,6 +552,56 @@ class TestSemanticTools(unittest.TestCase):
             self.semantics_a64fx,
         )
         # TODO check for correct analysis
+
+    def test_mops_deps_AArch64(self):
+        self.kernel_mops_1 = reduce_to_section(
+            self.parser_AArch64.parse_file(self.mops_1_code), self.parser_AArch64
+        )
+        self.kernel_mops_2 = reduce_to_section(
+            self.parser_AArch64.parse_file(self.mops_2_code), self.parser_AArch64
+        )
+        self.semantics_a64fx.normalize_instruction_forms(self.kernel_mops_1)
+        self.semantics_a64fx.normalize_instruction_forms(self.kernel_mops_2)
+        for i in range(len(self.kernel_mops_1)):
+            self.semantics_a64fx.assign_src_dst(self.kernel_mops_1[i])
+        for i in range(len(self.kernel_mops_2)):
+            self.semantics_a64fx.assign_src_dst(self.kernel_mops_2[i])
+
+        mops_dest = MemoryOperand(
+            offset=None,
+            base=RegisterOperand(prefix="x", name="3"),
+            index=None,
+            scale=1,
+            pre_indexed=True,
+        )
+        mops_src = MemoryOperand(
+            offset=None,
+            base=RegisterOperand(prefix="x", name="1"),
+            index=None,
+            scale=1,
+            pre_indexed=True,
+        )
+        mops_n = RegisterOperand(prefix="x", name="2", pre_indexed=True)
+        mops_x1 = RegisterOperand(prefix="x", name="1")
+        for instruction_form in self.kernel_mops_1[:-1]:
+            with self.subTest(instruction_form=instruction_form):
+                if not instruction_form.line.startswith("//"):
+                    self.assertTrue(mops_dest in instruction_form.semantic_operands["destination"])
+                    self.assertTrue(mops_src in instruction_form.semantic_operands["source"])
+                    self.assertTrue(mops_n in instruction_form.semantic_operands["src_dst"])
+                    self.assertTrue(
+                        mops_dest.base in instruction_form.semantic_operands["src_dst"]
+                    )
+                    self.assertTrue(mops_src.base in instruction_form.semantic_operands["src_dst"])
+        for instruction_form in self.kernel_mops_2[-2:-1]:
+            with self.subTest(instruction_form=instruction_form):
+                if not instruction_form.line.startswith("//"):
+                    self.assertTrue(mops_dest in instruction_form.semantic_operands["destination"])
+                    self.assertTrue(mops_x1 in instruction_form.semantic_operands["source"])
+                    self.assertTrue(mops_n in instruction_form.semantic_operands["src_dst"])
+                    self.assertTrue(
+                        mops_dest.base in instruction_form.semantic_operands["src_dst"]
+                    )
 
     def test_hidden_load(self):
         machine_model_hld = MachineModel(

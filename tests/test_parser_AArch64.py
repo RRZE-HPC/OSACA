@@ -23,6 +23,9 @@ class TestParserAArch64(unittest.TestCase):
         self.parser = ParserAArch64()
         with open(self._find_file("triad_arm_iaca.s")) as f:
             self.triad_code = f.read()
+        with open(self._find_file("mops_aarch64.s")) as f:
+            self.mops_1_code = f.read()
+        self.mops_2_code = self.mops_1_code.replace("//ALT1 ", "")
 
     ##################
     # Test
@@ -172,6 +175,12 @@ class TestParserAArch64(unittest.TestCase):
         self.assertEqual(parsed_9.operands[0].name, "0")
         self.assertEqual(parsed_9.operands[0].prefix, "x")
         self.assertEqual(parsed_9.operands[3].ccode, "CC")
+
+    def test_mops(self):
+        parsed_1 = self.parser.parse_file(self.mops_1_code)
+        parsed_2 = self.parser.parse_file(self.mops_1_code)
+        self.assertEqual(len(parsed_1), 8)
+        self.assertEqual(len(parsed_2), 8)
 
     def test_parse_line(self):
         line_comment = "// -- Begin  main"
