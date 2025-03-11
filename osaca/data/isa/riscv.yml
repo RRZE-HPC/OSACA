@@ -1,0 +1,688 @@
+---
+osaca_version: 0.6.1
+isa: riscv
+# Contains all operand-irregular instruction forms OSACA supports for RISC-V.
+# Operand-regular for a RISC-V instruction form with N operands in the shape of
+#   mnemonic op1 ... opN
+# means that op1 is the only destination operand and op2 to op(N) are source operands.
+# For vector instructions with suffixes (.v, .vv, .vf), the operand behavior follows
+# the base instruction pattern.
+instruction_forms:
+  - name: addi
+    operands:
+      - class: register
+        prefix: x
+        source: false
+        destination: true
+      - class: register
+        prefix: x
+        source: true
+        destination: false
+      - class: immediate
+        imd: 'int'
+        source: true
+        destination: false
+  - name: add
+    operands:
+      - class: register
+        prefix: x
+        source: false
+        destination: true
+      - class: register
+        prefix: x
+        source: true
+        destination: false
+      - class: register
+        prefix: x
+        source: true
+        destination: false
+  - name: sub
+    operands:
+      - class: register
+        prefix: x
+        source: false
+        destination: true
+      - class: register
+        prefix: x
+        source: true
+        destination: false
+      - class: register
+        prefix: x
+        source: true
+        destination: false
+  - name: mul
+    operands:
+      - class: register
+        prefix: x
+        source: false
+        destination: true
+      - class: register
+        prefix: x
+        source: true
+        destination: false
+      - class: register
+        prefix: x
+        source: true
+        destination: false
+  - name: div
+    operands:
+      - class: register
+        prefix: x
+        source: false
+        destination: true
+      - class: register
+        prefix: x
+        source: true
+        destination: false
+      - class: register
+        prefix: x
+        source: true
+        destination: false
+  - name: and
+    operands:
+      - class: register
+        prefix: x
+        source: false
+        destination: true
+      - class: register
+        prefix: x
+        source: true
+        destination: false
+      - class: register
+        prefix: x
+        source: true
+        destination: false
+  - name: or
+    operands:
+      - class: register
+        prefix: x
+        source: false
+        destination: true
+      - class: register
+        prefix: x
+        source: true
+        destination: false
+      - class: register
+        prefix: x
+        source: true
+        destination: false
+  - name: xor
+    operands:
+      - class: register
+        prefix: x
+        source: false
+        destination: true
+      - class: register
+        prefix: x
+        source: true
+        destination: false
+      - class: register
+        prefix: x
+        source: true
+        destination: false
+  - name: sll
+    operands:
+      - class: register
+        prefix: x
+        source: false
+        destination: true
+      - class: register
+        prefix: x
+        source: true
+        destination: false
+      - class: register
+        prefix: x
+        source: true
+        destination: false
+  - name: srl
+    operands:
+      - class: register
+        prefix: x
+        source: false
+        destination: true
+      - class: register
+        prefix: x
+        source: true
+        destination: false
+      - class: register
+        prefix: x
+        source: true
+        destination: false
+  - name: sra
+    operands:
+      - class: register
+        prefix: x
+        source: false
+        destination: true
+      - class: register
+        prefix: x
+        source: true
+        destination: false
+      - class: register
+        prefix: x
+        source: true
+        destination: false
+  - name: lw
+    operands:
+      - class: register
+        prefix: x
+        source: false
+        destination: true
+      - class: memory
+        base: "*"
+        offset: "*"
+        index: "*"
+        scale: "*"
+        pre_indexed: "*"
+        post_indexed: "*"
+        source: true
+        destination: false
+  - name: sw
+    operands:
+      - class: register
+        prefix: x
+        source: true
+        destination: false
+      - class: memory
+        base: "*"
+        offset: "*"
+        index: "*"
+        scale: "*"
+        pre_indexed: "*"
+        post_indexed: "*"
+        source: false
+        destination: true
+  - name: lb
+    operands:
+      - class: register
+        prefix: x
+        source: false
+        destination: true
+      - class: memory
+        base: "*"
+        offset: "*"
+        index: "*"
+        scale: "*"
+        pre_indexed: "*"
+        post_indexed: "*"
+        source: true
+        destination: false
+  - name: sb
+    operands:
+      - class: register
+        prefix: x
+        source: true
+        destination: false
+      - class: memory
+        base: "*"
+        offset: "*"
+        index: "*"
+        scale: "*"
+        pre_indexed: "*"
+        post_indexed: "*"
+        source: false
+        destination: true
+  - name: lh
+    operands:
+      - class: register
+        prefix: x
+        source: false
+        destination: true
+      - class: memory
+        base: "*"
+        offset: "*"
+        index: "*"
+        scale: "*"
+        pre_indexed: "*"
+        post_indexed: "*"
+        source: true
+        destination: false
+  - name: sh
+    operands:
+      - class: register
+        prefix: x
+        source: true
+        destination: false
+      - class: memory
+        base: "*"
+        offset: "*"
+        index: "*"
+        scale: "*"
+        pre_indexed: "*"
+        post_indexed: "*"
+        source: false
+        destination: true
+  - name: beq
+    operands:
+      - class: register
+        prefix: x
+        source: true
+        destination: false
+      - class: register
+        prefix: x
+        source: true
+        destination: false
+      - class: identifier
+        source: true
+        destination: false
+  - name: bne
+    operands:
+      - class: register
+        prefix: x
+        source: true
+        destination: false
+      - class: register
+        prefix: x
+        source: true
+        destination: false
+      - class: identifier
+        source: true
+        destination: false
+  - name: blt
+    operands:
+      - class: register
+        prefix: x
+        source: true
+        destination: false
+      - class: register
+        prefix: x
+        source: true
+        destination: false
+      - class: identifier
+        source: true
+        destination: false
+  - name: bge
+    operands:
+      - class: register
+        prefix: x
+        source: true
+        destination: false
+      - class: register
+        prefix: x
+        source: true
+        destination: false
+      - class: identifier
+        source: true
+        destination: false
+  - name: jal
+    operands:
+      - class: register
+        prefix: x
+        source: false
+        destination: true
+      - class: identifier
+        source: true
+        destination: false
+  - name: jalr
+    operands:
+      - class: register
+        prefix: x
+        source: false
+        destination: true
+      - class: register
+        prefix: x
+        source: true
+        destination: false
+      - class: immediate
+        imd: 'int'
+        source: true
+        destination: false
+  - name: lui
+    operands:
+      - class: register
+        prefix: x
+        source: false
+        destination: true
+      - class: immediate
+        imd: 'int'
+        source: true
+        destination: false
+  - name: auipc
+    operands:
+      - class: register
+        prefix: x
+        source: false
+        destination: true
+      - class: immediate
+        imd: 'int'
+        source: true
+        destination: false
+  - name: li
+    operands:
+      - class: register
+        prefix: x
+        source: false
+        destination: true
+      - class: immediate
+        imd: 'int'
+        source: true
+        destination: false
+  - name: mv
+    operands:
+      - class: register
+        prefix: x
+        source: false
+        destination: true
+      - class: register
+        prefix: x
+        source: true
+        destination: false
+  - name: ret
+    operands: []
+  - name: j
+    operands:
+      - class: identifier
+        source: true
+        destination: false
+  - name: jr
+    operands:
+      - class: register
+        prefix: x
+        source: true
+        destination: false
+  # Floating-point instructions
+  - name: flw
+    operands:
+      - class: register
+        prefix: f
+        source: false
+        destination: true
+      - class: memory
+        base: "*"
+        offset: "*"
+        index: "*"
+        scale: "*"
+        pre_indexed: "*"
+        post_indexed: "*"
+        source: true
+        destination: false
+  - name: fsw
+    operands:
+      - class: register
+        prefix: f
+        source: true
+        destination: false
+      - class: memory
+        base: "*"
+        offset: "*"
+        index: "*"
+        scale: "*"
+        pre_indexed: "*"
+        post_indexed: "*"
+        source: false
+        destination: true
+  - name: fadd
+    operands:
+      - class: register
+        prefix: f
+        source: false
+        destination: true
+      - class: register
+        prefix: f
+        source: true
+        destination: false
+      - class: register
+        prefix: f
+        source: true
+        destination: false
+  - name: fsub
+    operands:
+      - class: register
+        prefix: f
+        source: false
+        destination: true
+      - class: register
+        prefix: f
+        source: true
+        destination: false
+      - class: register
+        prefix: f
+        source: true
+        destination: false
+  - name: fmul
+    operands:
+      - class: register
+        prefix: f
+        source: false
+        destination: true
+      - class: register
+        prefix: f
+        source: true
+        destination: false
+      - class: register
+        prefix: f
+        source: true
+        destination: false
+  - name: fdiv
+    operands:
+      - class: register
+        prefix: f
+        source: false
+        destination: true
+      - class: register
+        prefix: f
+        source: true
+        destination: false
+      - class: register
+        prefix: f
+        source: true
+        destination: false
+  - name: fmv.x.w
+    operands:
+      - class: register
+        prefix: x
+        source: false
+        destination: true
+      - class: register
+        prefix: f
+        source: true
+        destination: false
+  - name: fmv.w.x
+    operands:
+      - class: register
+        prefix: f
+        source: false
+        destination: true
+      - class: register
+        prefix: x
+        source: true
+        destination: false
+  # Vector instructions
+  - name: vsetvli
+    operands:
+      - class: register
+        prefix: x
+        source: false
+        destination: true
+      - class: register
+        prefix: x
+        source: true
+        destination: false
+      - class: identifier
+        source: true
+        destination: false
+      - class: identifier
+        source: true
+        destination: false
+      - class: identifier
+        source: true
+        destination: false
+      - class: identifier
+        source: true
+        destination: false
+  - name: vsetivli
+    operands:
+      - class: register
+        prefix: x
+        source: false
+        destination: true
+      - class: immediate
+        imd: 'int'
+        source: true
+        destination: false
+      - class: identifier
+        source: true
+        destination: false
+      - class: identifier
+        source: true
+        destination: false
+      - class: identifier
+        source: true
+        destination: false
+      - class: identifier
+        source: true
+        destination: false
+  - name: vle32.v
+    operands:
+      - class: register
+        prefix: v
+        source: false
+        destination: true
+      - class: memory
+        base: "*"
+        offset: "*"
+        index: "*"
+        scale: "*"
+        pre_indexed: "*"
+        post_indexed: "*"
+        source: true
+        destination: false
+  - name: vse32.v
+    operands:
+      - class: register
+        prefix: v
+        source: true
+        destination: false
+      - class: memory
+        base: "*"
+        offset: "*"
+        index: "*"
+        scale: "*"
+        pre_indexed: "*"
+        post_indexed: "*"
+        source: false
+        destination: true
+  - name: vadd.vv
+    operands:
+      - class: register
+        prefix: v
+        source: false
+        destination: true
+      - class: register
+        prefix: v
+        source: true
+        destination: false
+      - class: register
+        prefix: v
+        source: true
+        destination: false
+  - name: vfmv.v.f
+    operands:
+      - class: register
+        prefix: v
+        source: false
+        destination: true
+      - class: register
+        prefix: f
+        source: true
+        destination: false
+  - name: vfmadd.vv
+    operands:
+      - class: register
+        prefix: v
+        source: false
+        destination: true
+      - class: register
+        prefix: v
+        source: true
+        destination: false
+      - class: register
+        prefix: v
+        source: true
+        destination: false
+  - name: vfmacc.vf
+    operands:
+      - class: register
+        prefix: v
+        source: true
+        destination: true
+      - class: register
+        prefix: f
+        source: true
+        destination: false
+      - class: register
+        prefix: v
+        source: true
+        destination: false
+  # CSR instructions
+  - name: csrr
+    operands:
+      - class: register
+        prefix: x
+        source: false
+        destination: true
+      - class: identifier
+        source: true
+        destination: false
+  - name: csrw
+    operands:
+      - class: identifier
+        source: false
+        destination: true
+      - class: register
+        prefix: x
+        source: true
+        destination: false
+  - name: csrs
+    operands:
+      - class: identifier
+        source: true
+        destination: true
+      - class: register
+        prefix: x
+        source: true
+        destination: false
+  - name: csrc
+    operands:
+      - class: identifier
+        source: true
+        destination: true
+      - class: register
+        prefix: x
+        source: true
+        destination: false
+  # Atomic instructions
+  - name: lr.w
+    operands:
+      - class: register
+        prefix: x
+        source: false
+        destination: true
+      - class: memory
+        base: "*"
+        offset: "*"
+        index: "*"
+        scale: "*"
+        pre_indexed: "*"
+        post_indexed: "*"
+        source: true
+        destination: false
+  - name: sc.w
+    operands:
+      - class: register
+        prefix: x
+        source: false
+        destination: true
+      - class: register
+        prefix: x
+        source: true
+        destination: false
+      - class: memory
+        base: "*"
+        offset: "*"
+        index: "*"
+        scale: "*"
+        pre_indexed: "*"
+        post_indexed: "*"
+        source: true
+        destination: true 

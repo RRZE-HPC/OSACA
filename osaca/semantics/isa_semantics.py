@@ -2,7 +2,7 @@
 from itertools import chain
 
 from osaca import utils
-from osaca.parser import ParserAArch64, ParserX86ATT
+from osaca.parser import ParserAArch64, ParserX86ATT, ParserRISCV
 from osaca.parser.memory import MemoryOperand
 from osaca.parser.operand import Operand
 from osaca.parser.register import RegisterOperand
@@ -36,7 +36,11 @@ class ISASemantics(object):
             self._parser = ParserX86ATT()
         elif self._isa == "aarch64":
             self._parser = ParserAArch64()
-
+        elif self._isa == "riscv":
+            self._parser = ParserRISCV()
+        else:
+            raise ValueError("Unknown ISA {!r}.".format(isa))
+        
     def process(self, instruction_forms):
         """Process a list of instruction forms."""
         for i in instruction_forms:
@@ -72,6 +76,12 @@ class ISASemantics(object):
             isa_data = self._isa_model.get_instruction(
                 instruction_form.mnemonic[:suffix_start], instruction_form.operands
             )
+        if isa_data is None and self._isa == "riscv" and "." in instruction_form.mnemonic:
+            # Check for instruction without vector/FP suffix (.v, .vv, .vf, .s, .d etc.)
+            suffix_start = instruction_form.mnemonic.index(".")
+            isa_data = self._isa_model.get_instruction(
+                instruction_form.mnemonic[:suffix_start], instruction_form.operands
+            )
         operands = instruction_form.operands
         op_dict = {}
 
@@ -103,6 +113,16 @@ class ISASemantics(object):
                     and "." in instruction_form.mnemonic
                 ):
                     # Check for instruction without shape/cc suffix
+                    suffix_start = instruction_form.mnemonic.index(".")
+                    isa_data_reg = self._isa_model.get_instruction(
+                        instruction_form.mnemonic[:suffix_start], operands_reg
+                    )
+                if (
+                    isa_data_reg is None
+                    and self._isa == "riscv"
+                    and "." in instruction_form.mnemonic
+                ):
+                    # Check for instruction without vector/FP suffix (.v, .vv, .vf, .s, .d etc.)
                     suffix_start = instruction_form.mnemonic.index(".")
                     isa_data_reg = self._isa_model.get_instruction(
                         instruction_form.mnemonic[:suffix_start], operands_reg
@@ -185,6 +205,12 @@ class ISASemantics(object):
             )
         if isa_data is None and self._isa == "aarch64" and "." in instruction_form.mnemonic:
             # Check for instruction without shape/cc suffix
+            suffix_start = instruction_form.mnemonic.index(".")
+            isa_data = self._isa_model.get_instruction(
+                instruction_form.mnemonic[:suffix_start], instruction_form.operands
+            )
+        if isa_data is None and self._isa == "riscv" and "." in instruction_form.mnemonic:
+            # Check for instruction without vector/FP suffix (.v, .vv, .vf, .s, .d etc.)
             suffix_start = instruction_form.mnemonic.index(".")
             isa_data = self._isa_model.get_instruction(
                 instruction_form.mnemonic[:suffix_start], instruction_form.operands
@@ -329,6 +355,10 @@ class ISASemantics(object):
             return [op for op in instruction_form.operands[0:-1]]
         elif self._isa == "aarch64":
             return [op for op in instruction_form.operands[1:]]
+        elif self._isa == "riscv":
+            # For RISC-V, the first operand is typically the destination,
+            # and the rest are sources
+            return [op for op in instruction_form.operands[1:]]
         else:
             raise ValueError("Unsupported ISA {}.".format(self._isa))
 
@@ -342,6 +372,9 @@ class ISASemantics(object):
             return instruction_form.operands[-1:]
         if self._isa == "aarch64":
             # return first operand
+            return instruction_form.operands[:1]
+        elif self._isa == "riscv":
+            # For RISC-V, the first operand is typically the destination
             return instruction_form.operands[:1]
         else:
             raise ValueError("Unsupported ISA {}.".format(self._isa))
