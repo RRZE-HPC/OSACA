@@ -244,10 +244,12 @@ def check_arguments(args, parser):
         )
     if args.syntax and args.arch and MachineModel.get_isa_for_arch(args.arch) != "x86":
         parser.error("Syntax can only be explicitly specified for an x86 microarchitecture")
-    if args.syntax and args.syntax.upper() not in SUPPORTED_SYNTAXES:
-        parser.error(
-            "Assembly syntax not supported. Please see --help for all valid assembly syntaxes."
-        )
+    if args.syntax:
+        args.syntax = args.syntax.upper()
+        if args.syntax not in SUPPORTED_SYNTAXES:
+            parser.error(
+                "Assembly syntax not supported. Please see --help for all valid assembly syntaxes."
+            )
     if "import_data" in args and args.import_data not in supported_import_files:
         parser.error(
             "Microbenchmark not supported for data import. Please see --help for all valid "
