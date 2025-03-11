@@ -208,6 +208,16 @@ class ArchSemantics(ISASemantics):
                 instruction_data = self._machine_model.get_instruction(
                     instruction_form.mnemonic[:suffix_start], instruction_form.operands
                 )
+            if (
+                instruction_data is None
+                and self._isa == "riscv"
+                and "." in instruction_form.mnemonic
+            ):
+                # Check for instruction without shape suffix (e.g., fadd.s -> fadd)
+                suffix_start = instruction_form.mnemonic.index(".")
+                instruction_data = self._machine_model.get_instruction(
+                    instruction_form.mnemonic[:suffix_start], instruction_form.operands
+                )
             if instruction_data:
                 # instruction form in DB
                 (
@@ -247,6 +257,16 @@ class ArchSemantics(ISASemantics):
                         and "." in instruction_form.mnemonic
                     ):
                         # Check for instruction without shape/cc suffix
+                        suffix_start = instruction_form.mnemonic.index(".")
+                        instruction_data_reg = self._machine_model.get_instruction(
+                            instruction_form.mnemonic[:suffix_start], operands
+                        )
+                    if (
+                        instruction_data_reg is None
+                        and self._isa == "riscv"
+                        and "." in instruction_form.mnemonic
+                    ):
+                        # Check for instruction without vector suffix (.v, .vv, .vf, etc.)
                         suffix_start = instruction_form.mnemonic.index(".")
                         instruction_data_reg = self._machine_model.get_instruction(
                             instruction_form.mnemonic[:suffix_start], operands
@@ -447,6 +467,8 @@ class ArchSemantics(ISASemantics):
             else:
                 register = RegisterOperand(name=reg_type + regtype)
         elif self._isa == "aarch64":
+            register = RegisterOperand(name=regtype, prefix=reg_type)
+        elif self._isa == "riscv":
             register = RegisterOperand(name=regtype, prefix=reg_type)
         return register
 

@@ -234,7 +234,11 @@ def _create_db_operand(operand, isa):
         return _create_db_operand_aarch64(operand)
     elif isa == "x86":
         return _create_db_operand_x86(operand)
-
+    elif isa == "riscv":
+        return _create_db_operand_riscv(operand)
+    else:
+        raise ValueError(f"Unsupported ISA: {isa}")
+    
 
 def _create_db_operand_aarch64(operand):
     """Get DB operand for AArch64 by operand string."""
@@ -282,6 +286,30 @@ def _create_db_operand_x86(operand):
         raise ValueError("Parameter {} is not a valid operand code".format(operand))
 
 
+def _create_db_operand_riscv(operand):
+    """Get DB operand for RISC-V by operand string."""
+    if operand == "i":
+        return {"class": "immediate", "imd": "int"}
+    elif operand == "x":
+        return {"class": "register", "prefix": "x"}  # Integer register
+    elif operand == "f":
+        return {"class": "register", "prefix": "f"}  # Floating point register
+    elif operand == "v":
+        return {"class": "register", "prefix": "v"}  # Vector register
+    elif operand.startswith("m"):
+        return {
+            "class": "memory",
+            "base": "x" if "b" in operand else None,
+            "offset": "int" if "o" in operand else None,
+            "index": None,  # RISC-V doesn't use index registers in memory addressing
+            "scale": 1,
+            "pre_indexed": False,  # RISC-V doesn't have pre/post indexing like AArch64
+            "post_indexed": False,
+        }
+    else:
+        raise ValueError(f"Parameter {operand} is not a valid operand code for RISC-V")
+    
+    
 ########################
 # HELPERS SANITY CHECK #
 ########################
@@ -383,11 +411,29 @@ def _check_sanity_arch_db(arch_mm, isa_mm, internet_check=True):
     # prefixes of instruction forms which we assume to have non-default operands
     suspicious_prefixes_x86 = ["vfm", "fm"]
     suspicious_prefixes_arm = ["fml", "ldp", "stp", "str"]
+    suspicious_prefixes_riscv = [
+        "vfm",     # Vector floating-point multiply
+        "vle",     # Vector load
+        "vse",     # Vector store
+        "vset",    # Vector configuration
+        "vfmacc",  # Vector FMA
+        "vsetvl",  # Vector length setting
+        "vfmv",    # Vector floating-point move
+        "vadd",    # Vector add
+        "vsub",    # Vector subtract
+        "vmul",    # Vector multiply
+    ]
+    
+    # Default to empty list if ISA not recognized
+    suspicious_prefixes = []
+
     # already known to be default-operand instruction forms with 2 operands
     if arch_mm.get_ISA().lower() == "aarch64":
         suspicious_prefixes = suspicious_prefixes_arm
     if arch_mm.get_ISA().lower() == "x86":
         suspicious_prefixes = suspicious_prefixes_x86
+    if arch_mm.get_ISA().lower() == "riscv":
+        suspicious_prefixes = suspicious_prefixes_riscv
 
     # returned lists
     missing_throughput = []

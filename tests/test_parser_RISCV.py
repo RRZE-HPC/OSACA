@@ -196,9 +196,9 @@ class TestParserRISCV(unittest.TestCase):
         self.assertGreater(len(parsed), 80)  # More than 80 lines should be parsed
         
         # Test parsing specific parts of the file
-        # Find vector_add label
-        vector_add_idx = next((i for i, instr in enumerate(parsed) if instr.label == "vector_add"), None)
-        self.assertIsNotNone(vector_add_idx)
+        # Find saxpy_vec label (which is the vector routine in the updated file)
+        vector_idx = next((i for i, instr in enumerate(parsed) if instr.label == "saxpy_vec"), None)
+        self.assertIsNotNone(vector_idx)
         
         # Find floating-point instructions
         flw_idx = next((i for i, instr in enumerate(parsed) if instr.mnemonic == "flw"), None)

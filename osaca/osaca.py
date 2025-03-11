@@ -11,7 +11,7 @@ from ruamel.yaml import YAML
 
 from osaca.db_interface import import_benchmark_output, sanity_check
 from osaca.frontend import Frontend
-from osaca.parser import BaseParser, ParserAArch64, ParserX86ATT
+from osaca.parser import BaseParser, ParserAArch64, ParserX86ATT, ParserRISCV
 from osaca.semantics import (
     INSTR_FLAGS,
     ArchSemantics,
@@ -42,10 +42,12 @@ SUPPORTED_ARCHS = [
     "A72",
     "M1",
     "V2",
+    "RV64",
 ]
 DEFAULT_ARCHS = {
     "aarch64": "V2",
     "x86": "SPR",
+    "riscv": "RV64",
 }
 
 
@@ -430,7 +432,10 @@ def get_asm_parser(arch) -> BaseParser:
         return ParserX86ATT()
     elif isa == "aarch64":
         return ParserAArch64()
-
+    elif isa == "riscv":
+        return ParserRISCV()
+    else:
+        raise ValueError("Unknown ISA: {}".format(isa))
 
 def get_unmatched_instruction_ratio(kernel):
     """Return ratio of unmatched from total instructions in kernel."""
