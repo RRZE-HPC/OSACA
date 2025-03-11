@@ -339,7 +339,9 @@ def inspect(args, output_file=sys.stdout):
     if args.arch:
         archs_to_try = [args.arch]
     else:
-        archs_to_try = [detected_arch]
+        archs_to_try = list(DEFAULT_ARCHS.values())
+        archs_to_try.remove(detected_arch)
+        archs_to_try.append(detected_arch)
     if args.syntax:
         syntaxes_to_try = [args.syntax]
     else:
