@@ -25,6 +25,8 @@ class TestParserX86Intel(unittest.TestCase):
             self.triad_iaca_code = f.read()
         with open(self._find_file("gs_x86_icc.s")) as f:
             self.gs_icc_code = f.read()
+        with open(self._find_file("gs_x86_gcc.s")) as f:
+            self.gs_gcc_code = f.read()
 
     ##################
     # Test
@@ -100,6 +102,7 @@ class TestParserX86Intel(unittest.TestCase):
         instr11 = "\tlea\trcx, OFFSET FLAT:??_R0N@8+8"
         instr12 = "\tvfmadd213sd xmm0, xmm1, QWORD PTR __real@bfc5555555555555"
         instr13 = "\tjmp\t$LN18@operator"
+        instr14 = "vaddsd  xmm0, xmm0, QWORD PTR [rdx+8+rax*8]"
 
         parsed_1 = self.parser.parse_instruction(instr1)
         parsed_2 = self.parser.parse_instruction(instr2)
@@ -114,6 +117,7 @@ class TestParserX86Intel(unittest.TestCase):
         parsed_11 = self.parser.parse_instruction(instr11)
         parsed_12 = self.parser.parse_instruction(instr12)
         parsed_13 = self.parser.parse_instruction(instr13)
+        parsed_14 = self.parser.parse_instruction(instr14)
 
         self.assertEqual(parsed_1.mnemonic, "sub")
         self.assertEqual(parsed_1.operands[0], RegisterOperand(name="RSP"))
@@ -203,6 +207,17 @@ class TestParserX86Intel(unittest.TestCase):
 
         self.assertEqual(parsed_13.mnemonic, "jmp")
         self.assertEqual(parsed_13.operands[0], IdentifierOperand(name="$LN18@operator"))
+
+        self.assertEqual(parsed_14.mnemonic, "vaddsd")
+        self.assertEqual(parsed_14.operands[0],
+                         RegisterOperand(name="XMM0"))
+        self.assertEqual(parsed_14.operands[1],
+                         RegisterOperand(name="XMM0"))
+        self.assertEqual(parsed_14.operands[2],
+                         MemoryOperand(base=RegisterOperand(name="RDX"),
+                                       offset=ImmediateOperand(value=8),
+                                       index=RegisterOperand(name="RAX"),
+                                       scale=8))
 
     def test_parse_line(self):
         line_comment = "; -- Begin  main"
@@ -343,6 +358,27 @@ class TestParserX86Intel(unittest.TestCase):
             ),
         )
         self.assertEqual(len(parsed), 227)
+
+    def test_parse_file4(self):
+        parsed = self.parser.parse_file(self.gs_gcc_code)
+        self.assertEqual(parsed[0].line_number, 1)
+        # Check a few lines to make sure that we produced something reasonable.
+        self.assertEqual(parsed[61],
+                         InstructionForm(mnemonic="vaddsd",
+                                         operands=[RegisterOperand("XMM0"),
+                                                   RegisterOperand("XMM0"),
+                                                   MemoryOperand(base=RegisterOperand("RDX"),
+                                                                 index=RegisterOperand("RAX"),
+                                                                 scale=8,
+                                                                 offset=ImmediateOperand(value=8))],
+                                         line="        vaddsd  xmm0, xmm0, QWORD PTR [rdx+8+rax*8]",
+                                         line_number=62))
+        self.assertEqual(parsed[101],
+                         InstructionForm(directive_id=DirectiveOperand(name=".long",
+                                                                       parameters=["1072939201"]),
+                                         line="        .long   1072939201",
+                                         line_number=102))
+        self.assertEqual(len(parsed), 102)
 
     def test_normalize_imd(self):
         imd_binary = ImmediateOperand(value="1001111B")
