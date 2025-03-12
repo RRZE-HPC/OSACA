@@ -25,6 +25,8 @@ class TestParserX86Intel(unittest.TestCase):
             self.triad_iaca_code = f.read()
         with open(self._find_file("gs_x86_icc.s")) as f:
             self.gs_icc_code = f.read()
+        with open(self._find_file("gs_x86_gcc.s")) as f:
+            self.gs_gcc_code = f.read()
 
     ##################
     # Test
@@ -343,6 +345,40 @@ class TestParserX86Intel(unittest.TestCase):
             ),
         )
         self.assertEqual(len(parsed), 227)
+
+    def test_parse_file4(self):
+        parsed = self.parser.parse_file(self.gs_gcc_code)
+        self.assertEqual(parsed[0].line_number, 1)
+        # Check a few lines to make sure that we produced something reasonable.
+        self.assertEqual(
+            parsed[61],
+            InstructionForm(
+                mnemonic="vaddsd",
+                operands=[
+                    RegisterOperand("XMM0"),
+                    RegisterOperand("XMM0"),
+                    MemoryOperand(
+                        base=RegisterOperand("RDX"),
+                        index=RegisterOperand("RAX"),
+                        scale=8,
+                        offset=ImmediateOperand(value=8),
+                    ),
+                ],
+                comment_id=None,
+                line="        vaddsd  xmm0, xmm0, QWORD PTR [rdx+8+rax*8]",
+                line_number=62,
+            ),
+        )
+        self.assertEqual(
+            parsed[95],
+            InstructionForm(
+                directive_id=DirectiveOperand(name=".long", parameters=["0"]),
+                line="        .long   0",
+                line_number=96,
+            ),
+        )
+        self.assertEqual(len(parsed), 103)
+
 
     def test_normalize_imd(self):
         imd_binary = ImmediateOperand(value="1001111B")
