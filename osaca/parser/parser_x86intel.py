@@ -318,28 +318,45 @@ class ParserX86Intel(ParserX86):
         base_register = self.register
         index_register = self.register
         scale = pp.Word("1248", exact=1)
-        post_displacement = pp.Group(
-            (pp.Literal("+") ^ pp.Literal("-")).setResultsName("sign") + integer_number
-            | identifier
-        ).setResultsName(self.immediate_id)
-        pre_displacement = pp.Group(integer_number + pp.Literal("+")).setResultsName(
-            self.immediate_id
+
+        base = base_register.setResultsName("base")
+        displacement = pp.Group(
+            pp.Group(
+                integer_number ^ identifier
+            ).setResultsName(self.immediate_id)
+        ).setResultsName("displacement")
+        short_indexed = index_register.setResultsName("index")
+        long_indexed = (
+            index_register.setResultsName("index")
+            + pp.Literal("*")
+            + scale.setResultsName("scale")
         )
         indexed = pp.Group(
-            index_register.setResultsName("index")
-            + pp.Optional(pp.Literal("*") + scale.setResultsName("scale"))
+            short_indexed
+            ^ long_indexed
         ).setResultsName("indexed")
+        operator = pp.Word("+-", exact=1)
+
+        # Syntax:
+        #   `base` always preceedes `indexed`.
+        #   `short_indexed` is only allowed if it follows `base`, not alone.
+        #   `displacement` can go anywhere.
+        # It's easier to list all the alternatives than to represent these rules using complicated
+        # `Optional` and what not.
         register_expression = pp.Group(
             pp.Literal("[")
-            + pp.Optional(pp.Group(pre_displacement).setResultsName("pre_displacement"))
-            + pp.Group(
-                base_register.setResultsName("base")
-                ^ pp.Group(
-                    base_register.setResultsName("base") + pp.Literal("+") + indexed
-                ).setResultsName("base_and_indexed")
-                ^ indexed
-            ).setResultsName("non_displacement")
-            + pp.Optional(pp.Group(post_displacement).setResultsName("post_displacement"))
+            + (
+                base
+                ^ (base + operator + displacement)
+                ^ (base + operator + displacement + operator + indexed)
+                ^ (base + operator + indexed)
+                ^ (base + operator + indexed + operator + displacement)
+                ^ (displacement + operator + base)
+                ^ (displacement + operator + base + operator + indexed)
+                ^ (displacement + operator + pp.Group(long_indexed).setResultsName("indexed"))
+                ^ pp.Group(long_indexed).setResultsName("indexed")
+                ^ (pp.Group(long_indexed).setResultsName("indexed") + operator + displacement)
+               )
             + pp.Literal("]")
         ).setResultsName("register_expression")
 
@@ -640,33 +657,16 @@ class ParserX86Intel(ParserX86):
         return RegisterOperand(name=operand.name)
 
     def process_register_expression(self, register_expression):
-        pre_displacement = register_expression.get("pre_displacement")
-        post_displacement = register_expression.get("post_displacement")
-        non_displacement = register_expression.get("non_displacement")
-        base = None
-        indexed = None
-        if non_displacement:
-            base_and_indexed = non_displacement.get("base_and_indexed")
-            if base_and_indexed:
-                base = base_and_indexed.get("base")
-                indexed = base_and_indexed.get("indexed")
-            else:
-                base = non_displacement.get("base")
-                if not base:
-                    indexed = non_displacement.get("indexed")
+        base = register_expression.get("base")
+        displacement = register_expression.get("displacement")
+        indexed = register_expression.get("indexed")
+        index = None
+        scale = 1
         if indexed:
             index = indexed.get("index")
             scale = int(indexed.get("scale", "1"), 0)
-        else:
-            index = None
-            scale = 1
         displacement_op = (
-            self.process_immediate(pre_displacement.immediate) if pre_displacement else None
-        )
-        displacement_op = (
-            self.process_immediate(post_displacement.immediate)
-            if post_displacement
-            else displacement_op
+            self.process_immediate(displacement.immediate) if displacement else None
         )
         base_op = RegisterOperand(name=base.name) if base else None
         index_op = RegisterOperand(name=index.name) if index else None
