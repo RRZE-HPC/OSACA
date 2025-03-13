@@ -22,6 +22,16 @@ instruction_forms:
         imd: 'int'
         source: true
         destination: false
+    operation: "op1['value'] = op2['value'] + op3['value']; op1['name'] = op2['name']"
+    hidden_operands:
+      - class: flag
+        name: "Z"
+        source: false
+        destination: true
+      - class: flag
+        name: "N"
+        source: false
+        destination: true
   - name: add
     operands:
       - class: register
@@ -36,6 +46,16 @@ instruction_forms:
         prefix: x
         source: true
         destination: false
+    operation: "op1['value'] = op2['value'] + op3['value']; op1['name'] = op2['name']"
+    hidden_operands:
+      - class: flag
+        name: "Z"
+        source: false
+        destination: true
+      - class: flag
+        name: "N"
+        source: false
+        destination: true
   - name: sub
     operands:
       - class: register
@@ -50,6 +70,16 @@ instruction_forms:
         prefix: x
         source: true
         destination: false
+    operation: "op1['value'] = op2['value'] - op3['value']; op1['name'] = op2['name']"
+    hidden_operands:
+      - class: flag
+        name: "Z"
+        source: false
+        destination: true
+      - class: flag
+        name: "N"
+        source: false
+        destination: true
   - name: mul
     operands:
       - class: register
@@ -64,6 +94,16 @@ instruction_forms:
         prefix: x
         source: true
         destination: false
+    operation: "op1['value'] = op2['value'] * op3['value']; op1['name'] = op2['name']"
+    hidden_operands:
+      - class: flag
+        name: "Z"
+        source: false
+        destination: true
+      - class: flag
+        name: "N"
+        source: false
+        destination: true
   - name: div
     operands:
       - class: register
@@ -78,6 +118,16 @@ instruction_forms:
         prefix: x
         source: true
         destination: false
+    operation: "op1['value'] = op2['value'] / op3['value']; op1['name'] = op2['name']"
+    hidden_operands:
+      - class: flag
+        name: "Z"
+        source: false
+        destination: true
+      - class: flag
+        name: "N"
+        source: false
+        destination: true
   - name: and
     operands:
       - class: register
@@ -92,6 +142,16 @@ instruction_forms:
         prefix: x
         source: true
         destination: false
+    operation: "op1['value'] = op2['value'] & op3['value']; op1['name'] = op2['name']"
+    hidden_operands:
+      - class: flag
+        name: "Z"
+        source: false
+        destination: true
+      - class: flag
+        name: "N"
+        source: false
+        destination: true
   - name: or
     operands:
       - class: register
@@ -106,6 +166,16 @@ instruction_forms:
         prefix: x
         source: true
         destination: false
+    operation: "op1['value'] = op2['value'] | op3['value']; op1['name'] = op2['name']"
+    hidden_operands:
+      - class: flag
+        name: "Z"
+        source: false
+        destination: true
+      - class: flag
+        name: "N"
+        source: false
+        destination: true
   - name: xor
     operands:
       - class: register
@@ -120,6 +190,16 @@ instruction_forms:
         prefix: x
         source: true
         destination: false
+    operation: "op1['value'] = op2['value'] ^ op3['value']; op1['name'] = op2['name']"
+    hidden_operands:
+      - class: flag
+        name: "Z"
+        source: false
+        destination: true
+      - class: flag
+        name: "N"
+        source: false
+        destination: true
   - name: sll
     operands:
       - class: register
@@ -134,6 +214,16 @@ instruction_forms:
         prefix: x
         source: true
         destination: false
+    operation: "op1['value'] = op2['value'] << op3['value']; op1['name'] = op2['name']"
+    hidden_operands:
+      - class: flag
+        name: "Z"
+        source: false
+        destination: true
+      - class: flag
+        name: "N"
+        source: false
+        destination: true
   - name: srl
     operands:
       - class: register
@@ -148,6 +238,16 @@ instruction_forms:
         prefix: x
         source: true
         destination: false
+    operation: "op1['value'] = op2['value'] >> op3['value']; op1['name'] = op2['name']"
+    hidden_operands:
+      - class: flag
+        name: "Z"
+        source: false
+        destination: true
+      - class: flag
+        name: "N"
+        source: false
+        destination: true
   - name: sra
     operands:
       - class: register
@@ -162,6 +262,16 @@ instruction_forms:
         prefix: x
         source: true
         destination: false
+    operation: "op1['value'] = op2['value'] >> op3['value']; op1['name'] = op2['name']"
+    hidden_operands:
+      - class: flag
+        name: "Z"
+        source: false
+        destination: true
+      - class: flag
+        name: "N"
+        source: false
+        destination: true
   - name: lw
     operands:
       - class: register
@@ -177,6 +287,7 @@ instruction_forms:
         post_indexed: "*"
         source: true
         destination: false
+    operation: "op1['value'] = memory[op2['value']]; op1['name'] = op2['name']"
   - name: sw
     operands:
       - class: register
@@ -192,6 +303,7 @@ instruction_forms:
         post_indexed: "*"
         source: false
         destination: true
+    operation: "memory[op2['value']] = op1['value']"
   - name: lb
     operands:
       - class: register
@@ -207,6 +319,7 @@ instruction_forms:
         post_indexed: "*"
         source: true
         destination: false
+    operation: "op1['value'] = memory[op2['value']]; op1['name'] = op2['name']"
   - name: sb
     operands:
       - class: register
@@ -222,6 +335,7 @@ instruction_forms:
         post_indexed: "*"
         source: false
         destination: true
+    operation: "memory[op2['value']] = op1['value']"
   - name: lh
     operands:
       - class: register
@@ -237,6 +351,7 @@ instruction_forms:
         post_indexed: "*"
         source: true
         destination: false
+    operation: "op1['value'] = memory[op2['value']]; op1['name'] = op2['name']"
   - name: sh
     operands:
       - class: register
@@ -252,6 +367,7 @@ instruction_forms:
         post_indexed: "*"
         source: false
         destination: true
+    operation: "memory[op2['value']] = op1['value']"
   - name: beq
     operands:
       - class: register
@@ -263,6 +379,11 @@ instruction_forms:
         source: true
         destination: false
       - class: identifier
+        source: true
+        destination: false
+    hidden_operands:
+      - class: flag
+        name: "Z"
         source: true
         destination: false
   - name: bne
@@ -278,6 +399,11 @@ instruction_forms:
       - class: identifier
         source: true
         destination: false
+    hidden_operands:
+      - class: flag
+        name: "Z"
+        source: true
+        destination: false
   - name: blt
     operands:
       - class: register
@@ -289,6 +415,11 @@ instruction_forms:
         source: true
         destination: false
       - class: identifier
+        source: true
+        destination: false
+    hidden_operands:
+      - class: flag
+        name: "N"
         source: true
         destination: false
   - name: bge
@@ -304,6 +435,11 @@ instruction_forms:
       - class: identifier
         source: true
         destination: false
+    hidden_operands:
+      - class: flag
+        name: "N"
+        source: true
+        destination: false
   - name: jal
     operands:
       - class: register
@@ -313,6 +449,7 @@ instruction_forms:
       - class: identifier
         source: true
         destination: false
+    operation: "op1['value'] = pc + 4; pc = op2['value']"
   - name: jalr
     operands:
       - class: register
@@ -327,6 +464,7 @@ instruction_forms:
         imd: 'int'
         source: true
         destination: false
+    operation: "op1['value'] = pc + 4; pc = op2['value'] + op3['value']"
   - name: lui
     operands:
       - class: register
@@ -337,6 +475,7 @@ instruction_forms:
         imd: 'int'
         source: true
         destination: false
+    operation: "op1['value'] = op2['value'] << 12"
   - name: auipc
     operands:
       - class: register
@@ -347,6 +486,7 @@ instruction_forms:
         imd: 'int'
         source: true
         destination: false
+    operation: "op1['value'] = pc + (op2['value'] << 12)"
   - name: li
     operands:
       - class: register
@@ -357,6 +497,7 @@ instruction_forms:
         imd: 'int'
         source: true
         destination: false
+    operation: "op1['value'] = op2['value']"
   - name: mv
     operands:
       - class: register
@@ -367,19 +508,28 @@ instruction_forms:
         prefix: x
         source: true
         destination: false
+    operation: "op1['value'] = op2['value']"
   - name: ret
-    operands: []
+    operands:
+      - class: register
+        prefix: x
+        name: "1"  # x1 is the return address register (ra)
+        source: true
+        destination: false
+    operation: "pc = op1['value']"
   - name: j
     operands:
       - class: identifier
         source: true
         destination: false
+    operation: "pc = op1['value']"
   - name: jr
     operands:
       - class: register
         prefix: x
         source: true
         destination: false
+    operation: "pc = op1['value']"
   # Floating-point instructions
   - name: flw
     operands:
@@ -396,6 +546,7 @@ instruction_forms:
         post_indexed: "*"
         source: true
         destination: false
+    operation: "op1['value'] = memory[op2['value']]; op1['name'] = op2['name']"
   - name: fsw
     operands:
       - class: register
@@ -411,6 +562,7 @@ instruction_forms:
         post_indexed: "*"
         source: false
         destination: true
+    operation: "memory[op2['value']] = op1['value']"
   - name: fadd
     operands:
       - class: register
@@ -425,6 +577,12 @@ instruction_forms:
         prefix: f
         source: true
         destination: false
+    operation: "op1['value'] = op2['value'] + op3['value']; op1['name'] = op2['name']"
+    hidden_operands:
+      - class: flag
+        name: "FSR"
+        source: true
+        destination: true
   - name: fsub
     operands:
       - class: register
@@ -439,6 +597,12 @@ instruction_forms:
         prefix: f
         source: true
         destination: false
+    operation: "op1['value'] = op2['value'] - op3['value']; op1['name'] = op2['name']"
+    hidden_operands:
+      - class: flag
+        name: "FSR"
+        source: true
+        destination: true
   - name: fmul
     operands:
       - class: register
@@ -453,6 +617,12 @@ instruction_forms:
         prefix: f
         source: true
         destination: false
+    operation: "op1['value'] = op2['value'] * op3['value']; op1['name'] = op2['name']"
+    hidden_operands:
+      - class: flag
+        name: "FSR"
+        source: true
+        destination: true
   - name: fdiv
     operands:
       - class: register
@@ -467,6 +637,12 @@ instruction_forms:
         prefix: f
         source: true
         destination: false
+    operation: "op1['value'] = op2['value'] / op3['value']; op1['name'] = op2['name']"
+    hidden_operands:
+      - class: flag
+        name: "FSR"
+        source: true
+        destination: true
   - name: fmv.x.w
     operands:
       - class: register
@@ -477,6 +653,7 @@ instruction_forms:
         prefix: f
         source: true
         destination: false
+    operation: "op1['value'] = op2['value']"
   - name: fmv.w.x
     operands:
       - class: register
@@ -487,6 +664,7 @@ instruction_forms:
         prefix: x
         source: true
         destination: false
+    operation: "op1['value'] = op2['value']"
   # Vector instructions
   - name: vsetvli
     operands:
@@ -510,6 +688,12 @@ instruction_forms:
       - class: identifier
         source: true
         destination: false
+    operation: "op1['value'] = min(op2['value'], op3['value']); vtype = op4['value']; vsew = op5['value']; vlmul = op6['value']"
+    hidden_operands:
+      - class: flag
+        name: "VSR"
+        source: true
+        destination: true
   - name: vsetivli
     operands:
       - class: register
@@ -532,6 +716,12 @@ instruction_forms:
       - class: identifier
         source: true
         destination: false
+    operation: "op1['value'] = min(op2['value'], op3['value']); vtype = op4['value']; vsew = op5['value']; vlmul = op6['value']"
+    hidden_operands:
+      - class: flag
+        name: "VSR"
+        source: true
+        destination: true
   - name: vle32.v
     operands:
       - class: register
@@ -547,6 +737,12 @@ instruction_forms:
         post_indexed: "*"
         source: true
         destination: false
+    operation: "op1['value'] = memory[op2['value']]; op1['name'] = op2['name']"
+    hidden_operands:
+      - class: flag
+        name: "VSR"
+        source: true
+        destination: true
   - name: vse32.v
     operands:
       - class: register
@@ -562,6 +758,12 @@ instruction_forms:
         post_indexed: "*"
         source: false
         destination: true
+    operation: "memory[op2['value']] = op1['value']"
+    hidden_operands:
+      - class: flag
+        name: "VSR"
+        source: true
+        destination: true
   - name: vadd.vv
     operands:
       - class: register
@@ -576,6 +778,12 @@ instruction_forms:
         prefix: v
         source: true
         destination: false
+    operation: "op1['value'] = op2['value'] + op3['value']; op1['name'] = op2['name']"
+    hidden_operands:
+      - class: flag
+        name: "VSR"
+        source: true
+        destination: true
   - name: vfmv.v.f
     operands:
       - class: register
@@ -586,6 +794,12 @@ instruction_forms:
         prefix: f
         source: true
         destination: false
+    operation: "op1['value'] = op2['value']"
+    hidden_operands:
+      - class: flag
+        name: "VSR"
+        source: true
+        destination: true
   - name: vfmadd.vv
     operands:
       - class: register
@@ -600,6 +814,12 @@ instruction_forms:
         prefix: v
         source: true
         destination: false
+    operation: "op1['value'] = op2['value'] * op3['value'] + op1['value']; op1['name'] = op2['name']"
+    hidden_operands:
+      - class: flag
+        name: "VSR"
+        source: true
+        destination: true
   - name: vfmacc.vf
     operands:
       - class: register
@@ -614,6 +834,12 @@ instruction_forms:
         prefix: v
         source: true
         destination: false
+    operation: "op1['value'] = op2['value'] * op3['value'] + op1['value']"
+    hidden_operands:
+      - class: flag
+        name: "VSR"
+        source: true
+        destination: true
   # CSR instructions
   - name: csrr
     operands:
@@ -624,6 +850,12 @@ instruction_forms:
       - class: identifier
         source: true
         destination: false
+    operation: "op1['value'] = csr[op2['value']]"
+    hidden_operands:
+      - class: flag
+        name: "CSR"
+        source: true
+        destination: true
   - name: csrw
     operands:
       - class: identifier
@@ -633,6 +865,12 @@ instruction_forms:
         prefix: x
         source: true
         destination: false
+    operation: "csr[op1['value']] = op2['value']"
+    hidden_operands:
+      - class: flag
+        name: "CSR"
+        source: true
+        destination: true
   - name: csrs
     operands:
       - class: identifier
@@ -642,6 +880,12 @@ instruction_forms:
         prefix: x
         source: true
         destination: false
+    operation: "csr[op1['value']] |= op2['value']"
+    hidden_operands:
+      - class: flag
+        name: "CSR"
+        source: true
+        destination: true
   - name: csrc
     operands:
       - class: identifier
@@ -651,6 +895,12 @@ instruction_forms:
         prefix: x
         source: true
         destination: false
+    operation: "csr[op1['value']] &= ~op2['value']"
+    hidden_operands:
+      - class: flag
+        name: "CSR"
+        source: true
+        destination: true
   # Atomic instructions
   - name: lr.w
     operands:
@@ -667,6 +917,12 @@ instruction_forms:
         post_indexed: "*"
         source: true
         destination: false
+    operation: "op1['value'] = memory[op2['value']]; memory[op2['value']] = reserved"
+    hidden_operands:
+      - class: flag
+        name: "CSR"
+        source: true
+        destination: true
   - name: sc.w
     operands:
       - class: register
@@ -684,5 +940,11 @@ instruction_forms:
         scale: "*"
         pre_indexed: "*"
         post_indexed: "*"
+        source: true
+        destination: true
+    operation: "if (memory[op3['value']] == reserved) { memory[op3['value']] = op2['value']; op1['value'] = 0; } else { op1['value'] = 1; }"
+    hidden_operands:
+      - class: flag
+        name: "CSR"
         source: true
         destination: true 
