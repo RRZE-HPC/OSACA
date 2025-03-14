@@ -1,3 +1,4 @@
+# Produced with gcc 14.2 with -O3 -march=sapphirerapids -fopenmp-simd -mprefer-vector-width=512, https://godbolt.org/z/drE47x1b4.
 .LC3:
         .string "%f\n"
 main:
@@ -56,7 +57,6 @@ main:
         mov     eax, 1
         mov     rsi, QWORD PTR [rbp+0]
         vmovsd  xmm0, QWORD PTR [rdx]
-# OSACA-BEGIN
 .L7:
         vaddsd  xmm0, xmm0, QWORD PTR [rcx+rax*8]
         vaddsd  xmm0, xmm0, QWORD PTR [rdx+8+rax*8]
@@ -66,7 +66,6 @@ main:
         inc     rax
         cmp     rax, 199
         jne     .L7
-# OSACA-END
         vmovsd  xmm0, QWORD PTR [rdx+1592]
         add     rbp, 8
         vmovsd  QWORD PTR [rcx+8], xmm0
