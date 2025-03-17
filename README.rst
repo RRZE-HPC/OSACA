@@ -34,7 +34,7 @@ Getting started
 ===============
 OSACA is as a python module with a command line interface.
 
-OSACA is also integrated into the `Compiler Explorer at godbolt.org <https://godbolt.org>`_, which allows using OSACA from a browser without any installation. To analyze an assembly snippet, go to https://godbolt.org change language to "Analysis", insert an AArch64 or AT&T(!) x86 assembly code and make sure OSACA is selected in the corresponding analysis panel, e.g., https://godbolt.org/z/shK4f8. When analyzing a high-level language code, use the "Add tool..." menu in the compiler output panel to add OSACA analysis, e.g. https://godbolt.org/z/hbMoPn. To change the micro architecture model, add ``--arch`` and µarch shortname (e.g., ``SKX`` for Skylake, ``ZEN2``, ``N1`` for ARM Neoverse) to the "Compiler options..." (when using "Analysis" mode) or "Arguments" (when analyzing compiler output of a high-level code).
+OSACA is also integrated into the `Compiler Explorer at godbolt.org <https://godbolt.org>`_, which allows using OSACA from a browser without any installation. To analyze an assembly snippet, go to https://godbolt.org change language to "Analysis", insert an AArch64 or x86 assembly code and make sure OSACA is selected in the corresponding analysis panel, e.g., https://godbolt.org/z/shK4f8. When analyzing a high-level language code, use the "Add tool..." menu in the compiler output panel to add OSACA analysis, e.g. https://godbolt.org/z/hbMoPn. To change the micro architecture model, add ``--arch`` and µarch shortname (e.g., ``SKX`` for Skylake, ``ZEN2``, ``N1`` for ARM Neoverse) to the "Compiler options..." (when using "Analysis" mode) or "Arguments" (when analyzing compiler output of a high-level code).
 
 Installation
 ------------
