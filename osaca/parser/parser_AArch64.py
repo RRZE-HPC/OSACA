@@ -26,7 +26,53 @@ class ParserAArch64(BaseParser):
 
     def __init__(self):
         super().__init__()
-        self.isa = "aarch64"
+
+    def isa(self):
+        return "aarch64"
+
+    def start_marker(self):
+        return [
+            InstructionForm(
+                mnemonic="mov",
+                operands=[RegisterOperand(name="1", prefix="x"), ImmediateOperand(value=111)],
+            ),
+            InstructionForm(
+                directive_id=DirectiveOperand(name="byte", parameters=["213", "3", "32", "31"])
+            ),
+        ]
+
+    def end_marker(self):
+        return [
+            InstructionForm(
+                mnemonic="mov",
+                operands=[RegisterOperand(name="1", prefix="x"), ImmediateOperand(value=222)],
+            ),
+            InstructionForm(
+                directive_id=DirectiveOperand(name="byte", parameters=["213", "3", "32", "31"])
+            ),
+        ]
+
+    def normalize_instruction_form(self, instruction_form, isa_model, arch_model):
+        """
+        If the instruction doesn't exist in the machine model, normalize it by dropping the shape
+        suffix.
+        """
+        if instruction_form.normalized:
+            return
+        instruction_form.normalized = True
+
+        mnemonic = instruction_form.mnemonic
+        if not mnemonic:
+            return
+        model = arch_model.get_instruction(mnemonic, instruction_form.operands)
+        if not model:
+            if "." in mnemonic:
+                # Check for instruction without shape/cc suffix.
+                suffix_start = mnemonic.index(".")
+                mnemonic = mnemonic[:suffix_start]
+                model = arch_model.get_instruction(mnemonic, instruction_form.operands)
+                if model:
+                    instruction_form.mnemonic = mnemonic
 
     def construct_parser(self):
         """Create parser for ARM AArch64 ISA."""
@@ -591,6 +637,21 @@ class ParserAArch64(BaseParser):
         if register.index is not None:
             name += "[" + str(register.index) + "]"
         return name
+
+    def get_regular_source_operands(self, instruction_form):
+        """Get source operand of given instruction form assuming regular src/dst behavior."""
+        # if there is only one operand, assume it is a source operand
+        if len(instruction_form.operands) == 1:
+            return [instruction_form.operands[0]]
+        return [op for op in instruction_form.operands[1:]]
+
+    def get_regular_destination_operands(self, instruction_form):
+        """Get destination operand of given instruction form assuming regular src/dst behavior."""
+        # if there is only one operand, assume no destination
+        if len(instruction_form.operands) == 1:
+            return []
+        # return first operand
+        return instruction_form.operands[:1]
 
     def normalize_imd(self, imd):
         """Normalize immediate to decimal based representation"""

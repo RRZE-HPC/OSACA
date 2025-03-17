@@ -7,7 +7,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [3.8, 3.9, "3.10", "3.11"]
+        python-version: ["3.10", "3.11", "3.12", "3.13"]
     steps:
     - uses: actions/checkout@v3
     - uses: actions/setup-python@v4
@@ -18,11 +18,13 @@ jobs:
       run: |
         python -m pip install wheel
         python -m pip install --upgrade pip
+        python -m pip install setuptools
         python -m pip install codecov requests
         python -m pip install bs4
         sudo apt-get -y install graphviz libgraphviz-dev pkg-config
         python -m pip install pygraphviz
-        python -m pip install "kerncraft>=0.8.16"
+        #python -m pip install "kerncraft>=0.8.16"
+        python -m pip install git+https://github.com/RRZE-HPC/kerncraft.git@7caff4e2ecdbef595013041ba0131e37ed33c72c
         python -m pip install -e .
     - name: Test
       run: |
