@@ -1,7 +1,7 @@
 """Open Source Architecture Code Analyzer"""
 
 name = "osaca"
-__version__ = "0.6.1"
+__version__ = "0.7.0"
 
 # To trigger travis deployment to pypi, do the following:
 # 1. Increment __version___
