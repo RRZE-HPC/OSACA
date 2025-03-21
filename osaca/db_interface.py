@@ -238,7 +238,7 @@ def _create_db_operand(operand, isa):
         return _create_db_operand_riscv(operand)
     else:
         raise ValueError(f"Unsupported ISA: {isa}")
-    
+
 
 def _create_db_operand_aarch64(operand):
     """Get DB operand for AArch64 by operand string."""
@@ -308,8 +308,8 @@ def _create_db_operand_riscv(operand):
         }
     else:
         raise ValueError(f"Parameter {operand} is not a valid operand code for RISC-V")
-    
-    
+
+
 ########################
 # HELPERS SANITY CHECK #
 ########################
@@ -412,16 +412,18 @@ def _check_sanity_arch_db(arch_mm, isa_mm, internet_check=True):
     suspicious_prefixes_x86 = ["vfm", "fm"]
     suspicious_prefixes_arm = ["fml", "ldp", "stp", "str"]
     suspicious_prefixes_riscv = [
-        "vfm",     # Vector floating-point multiply
-        "vle",     # Vector load
-        "vse",     # Vector store
-        "vset",    # Vector configuration
-        "vfmacc",  # Vector FMA
-        "vsetvl",  # Vector length setting
-        "vfmv",    # Vector floating-point move
-        "vadd",    # Vector add
-        "vsub",    # Vector subtract
-        "vmul",    # Vector multiply
+        "vse",     # Vector store (register is source, memory is destination)
+        "vfmacc",  # Vector FMA with accumulation (first operand is both source and destination)
+        "vfmadd",  # Vector FMA with addition (first operand is implicitly both source and destination)
+        "vset",    # Vector configuration (complex operand pattern)
+        "csrs",    # CSR Set (first operand is both source and destination)
+        "csrc",    # CSR Clear (first operand is both source and destination)
+        "csrsi",   # CSR Set Immediate (first operand is both source and destination)
+        "csrci",   # CSR Clear Immediate (first operand is both source and destination)
+        "amo",     # Atomic memory operations (read-modify-write to memory)
+        "lr",      # Load-Reserved (part of atomic operations)
+        "sc",      # Store-Conditional (part of atomic operations)
+        "czero",   # Conditional zero instructions (Zicond extension)
     ]
     
     # Default to empty list if ISA not recognized

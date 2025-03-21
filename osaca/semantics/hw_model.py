@@ -423,6 +423,8 @@ class MachineModel(object):
             return self._is_AArch64_mem_type(i_mem, mem)
         if self._data["isa"].lower() == "x86":
             return self._is_x86_mem_type(i_mem, mem)
+        if self._data["isa"].lower() == "riscv":
+            return self._is_RISCV_mem_type(i_mem, mem)
 
     def get_data_ports(self):
         """Return all data ports (i.e., ports with D-suffix) of current model."""
@@ -463,6 +465,8 @@ class MachineModel(object):
             "icl": "x86",
             "icx": "x86",
             "spr": "x86",
+            "rv64": "riscv",  # RISC-V 64-bit
+            "rv32": "riscv",  # RISC-V 32-bit
         }
         arch = arch.lower()
         if arch in arch_dict:
@@ -706,6 +710,24 @@ class MachineModel(object):
         else:
             raise ValueError("Parameter {} is not a valid operand code".format(operand))
 
+    def _create_db_operand_riscv(self, operand):
+        """Create instruction form operand for DB out of operand string."""
+        if operand == "i":
+            return ImmediateOperand(imd_type="int")
+        elif operand in ["x", "a", "s", "t", "f", "v"]:
+            return RegisterOperand(prefix=operand)
+        elif operand.startswith("m"):
+            return MemoryOperand(
+                base="x" if "b" in operand else None,
+                offset="imd" if "o" in operand else None,
+                index="gpr" if "i" in operand else None,
+                scale=1,  # RISC-V doesn't use scaling
+                pre_indexed=False,  # RISC-V doesn't use pre/post indexing
+                post_indexed=False,
+            )
+        else:
+            raise ValueError("Parameter {} is not a valid operand code".format(operand))
+
     def _check_for_duplicate(self, name, operands):
         """
         Check if instruction form exists at least twice in DB.
@@ -750,6 +772,8 @@ class MachineModel(object):
             return self._check_AArch64_operands(i_operand, operand)
         if self._data["isa"].lower() == "x86":
             return self._check_x86_operands(i_operand, operand)
+        if self._data["isa"].lower() == "riscv":
+            return self._check_RISCV_operands(i_operand, operand)
 
     def _check_AArch64_operands(self, i_operand, operand):
         """Check if the types of operand ``i_operand`` and ``operand`` match."""
@@ -830,6 +854,51 @@ class MachineModel(object):
         if isinstance(operand, IdentifierOperand):
             return isinstance(i_operand, IdentifierOperand)
         return self._compare_db_entries(i_operand, operand)
+
+    def _check_RISCV_operands(self, i_operand, operand):
+        """Check if the types of operand ``i_operand`` and ``operand`` match."""
+        # register
+        if isinstance(operand, RegisterOperand):
+            if not isinstance(i_operand, RegisterOperand):
+                return False
+            return self._is_RISCV_reg_type(i_operand, operand)
+        # memory
+        if isinstance(operand, MemoryOperand):
+            if not isinstance(i_operand, MemoryOperand):
+                return False
+            return self._is_RISCV_mem_type(i_operand, operand)
+        # immediate
+        if isinstance(i_operand, ImmediateOperand) and i_operand.imd_type == self.WILDCARD:
+            return isinstance(operand, ImmediateOperand) and (operand.value is not None)
+
+        if isinstance(i_operand, ImmediateOperand) and i_operand.imd_type == "int":
+            return (
+                isinstance(operand, ImmediateOperand)
+                and operand.imd_type == "int"
+                and operand.value is not None
+            )
+
+        if isinstance(i_operand, ImmediateOperand) and i_operand.imd_type == "float":
+            return (
+                isinstance(operand, ImmediateOperand)
+                and operand.imd_type == "float"
+                and operand.value is not None
+            )
+
+        if isinstance(i_operand, ImmediateOperand) and i_operand.imd_type == "double":
+            return (
+                isinstance(operand, ImmediateOperand)
+                and operand.imd_type == "double"
+                and operand.value is not None
+            )
+
+        # identifier
+        if isinstance(operand, IdentifierOperand) or (
+            isinstance(operand, ImmediateOperand) and operand.identifier is not None
+        ):
+            return isinstance(i_operand, IdentifierOperand)
+        # no match
+        return False
 
     def _compare_db_entries(self, operand_1, operand_2):
         """Check if operand types in DB format (i.e., not parsed) match."""
@@ -931,6 +1000,43 @@ class MachineModel(object):
                 return True
         return False
 
+    def _is_RISCV_reg_type(self, i_reg, reg):
+        """Check if register type match for RISC-V."""
+        # check for wildcards
+        if reg.prefix == self.WILDCARD or i_reg.prefix == self.WILDCARD:
+            return True
+        
+        # First handle potentially None values to avoid AttributeError
+        if reg.name is None or i_reg.name is None:
+            # If both have same prefix, they might still match
+            if reg.prefix == i_reg.prefix:
+                return True
+            # If we can't determine canonical names, be conservative and return False
+            return False
+        
+        # Check for ABI name (a0, t0, etc.) vs x-prefix registers (x10, x5, etc.)
+        if (reg.prefix is None and i_reg.prefix == "x") or (reg.prefix == "x" and i_reg.prefix is None):
+            try:
+                # Need to check if they refer to the same register
+                from osaca.parser import ParserRISCV
+                parser = ParserRISCV()
+                reg_canonical = parser._get_canonical_reg_name(reg)
+                i_reg_canonical = parser._get_canonical_reg_name(i_reg)
+                if reg_canonical == i_reg_canonical:
+                    return True
+            except (AttributeError, KeyError):
+                # If we can't determine canonical names, be conservative
+                return False
+        
+        # Check for direct prefix matches
+        if reg.prefix == i_reg.prefix:
+            # For vector registers, check lanes if present
+            if reg.prefix == "v" and reg.lanes is not None and i_reg.lanes is not None:
+                return reg.lanes == i_reg.lanes or self.WILDCARD in (reg.lanes + i_reg.lanes)
+            return True
+            
+        return False
+    
     def _is_AArch64_mem_type(self, i_mem, mem):
         """Check if memory addressing type match."""
         if (
@@ -1026,6 +1132,35 @@ class MachineModel(object):
                 or i_mem.scale == self.WILDCARD
                 or (mem.scale != 1 and i_mem.scale != 1)
             )
+        ):
+            return True
+        return False
+
+    def _is_RISCV_mem_type(self, i_mem, mem):
+        """Check if memory addressing type match for RISC-V."""
+        if (
+            # check base
+            (
+                (mem.base is None and i_mem.base is None)
+                or i_mem.base == self.WILDCARD
+                or (isinstance(mem.base, RegisterOperand) and 
+                    (mem.base.prefix == i_mem.base or 
+                     (mem.base.name is not None and i_mem.base is not None)))
+            )
+            # check offset
+            and (
+                mem.offset == i_mem.offset
+                or i_mem.offset == self.WILDCARD
+                or (
+                    mem.offset is not None
+                    and isinstance(mem.offset, ImmediateOperand)
+                    and i_mem.offset == "imd"
+                )
+            )
+            # RISC-V doesn't use index registers in its memory addressing
+            and (mem.index is None and i_mem.index is None)
+            # RISC-V doesn't use scaling in its memory addressing
+            and (mem.scale == 1 and i_mem.scale == 1)
         ):
             return True
         return False
