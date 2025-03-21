@@ -1,1 +1,656 @@
-#TODO
+---
+osaca_version: 0.6.1
+micro_architecture: rv64
+arch_code: rv64
+isa: riscv
+
+# RV64 core parameters
+ROB_size: 96
+retired_uOps_per_cycle: 3
+scheduler_size: 84
+hidden_loads: false
+
+# Pipeline ports (simplified model)
+ports:
+  - ALU
+  - MEM
+  - DIV
+  - FP
+
+port_model_scheme: |
+  ALU: Integer arithmetic and logic operations
+  MEM: Load/store and address generation
+  DIV: Integer division operations
+  FP: Floating-point operations and vector instructions
+
+# Load latency in cycles by register type
+load_latency:
+  gpr: 3
+  fpr: 3
+  vr: 4
+
+# Simplified load throughput model
+load_throughput_default: [[1, ["MEM"]]]
+store_throughput_default: [[1, ["MEM"]]]
+store_to_load_forward_latency: 4
+
+# Instruction forms - listed by category
+instruction_forms:
+  # Basic integer arithmetic (latency 1, throughput 1)
+  - name: ADD
+    operands: 
+      - class: register
+        name: gpr
+      - class: register
+        name: gpr
+      - class: register
+        name: gpr
+    latency: 1
+    throughput: 1
+    port_pressure: [[1, ["ALU"]]]
+    
+  - name: ADDI
+    operands: 
+      - class: register
+        name: gpr
+      - class: register
+        name: gpr
+      - class: immediate
+        imd: int
+    latency: 1
+    throughput: 1
+    port_pressure: [[1, ["ALU"]]]
+    
+  - name: SUB
+    operands: 
+      - class: register
+        name: gpr
+      - class: register
+        name: gpr
+      - class: register
+        name: gpr
+    latency: 1
+    throughput: 1
+    port_pressure: [[1, ["ALU"]]]
+    
+  - name: LUI
+    operands: 
+      - class: register
+        name: gpr
+      - class: immediate
+        imd: int
+    latency: 1
+    throughput: 1
+    port_pressure: [[1, ["ALU"]]]
+    
+  - name: AUIPC
+    operands: 
+      - class: register
+        name: gpr
+      - class: immediate
+        imd: int
+    latency: 1
+    throughput: 1
+    port_pressure: [[1, ["ALU"]]]
+
+  # Logical operations
+  - name: AND
+    operands: 
+      - class: register
+        name: gpr
+      - class: register
+        name: gpr
+      - class: register
+        name: gpr
+    latency: 1
+    throughput: 1
+    port_pressure: [[1, ["ALU"]]]
+    
+  - name: ANDI
+    operands: 
+      - class: register
+        name: gpr
+      - class: register
+        name: gpr
+      - class: immediate
+        imd: int
+    latency: 1
+    throughput: 1
+    port_pressure: [[1, ["ALU"]]]
+    
+  - name: OR
+    operands: 
+      - class: register
+        name: gpr
+      - class: register
+        name: gpr
+      - class: register
+        name: gpr
+    latency: 1
+    throughput: 1
+    port_pressure: [[1, ["ALU"]]]
+    
+  - name: ORI
+    operands: 
+      - class: register
+        name: gpr
+      - class: register
+        name: gpr
+      - class: immediate
+        imd: int
+    latency: 1
+    throughput: 1
+    port_pressure: [[1, ["ALU"]]]
+    
+  - name: XOR
+    operands: 
+      - class: register
+        name: gpr
+      - class: register
+        name: gpr
+      - class: register
+        name: gpr
+    latency: 1
+    throughput: 1
+    port_pressure: [[1, ["ALU"]]]
+    
+  - name: XORI
+    operands: 
+      - class: register
+        name: gpr
+      - class: register
+        name: gpr
+      - class: immediate
+        imd: int
+    latency: 1
+    throughput: 1
+    port_pressure: [[1, ["ALU"]]]
+
+  # Shifts
+  - name: SLL
+    operands: 
+      - class: register
+        name: gpr
+      - class: register
+        name: gpr
+      - class: register
+        name: gpr
+    latency: 1
+    throughput: 1
+    port_pressure: [[1, ["ALU"]]]
+    
+  - name: SLLI
+    operands: 
+      - class: register
+        name: gpr
+      - class: register
+        name: gpr
+      - class: immediate
+        imd: int
+    latency: 1
+    throughput: 1
+    port_pressure: [[1, ["ALU"]]]
+    
+  - name: SRL
+    operands: 
+      - class: register
+        name: gpr
+      - class: register
+        name: gpr
+      - class: register
+        name: gpr
+    latency: 1
+    throughput: 1
+    port_pressure: [[1, ["ALU"]]]
+    
+  - name: SRLI
+    operands: 
+      - class: register
+        name: gpr
+      - class: register
+        name: gpr
+      - class: immediate
+        imd: int
+    latency: 1
+    throughput: 1
+    port_pressure: [[1, ["ALU"]]]
+    
+  - name: SRA
+    operands: 
+      - class: register
+        name: gpr
+      - class: register
+        name: gpr
+      - class: register
+        name: gpr
+    latency: 1
+    throughput: 1
+    port_pressure: [[1, ["ALU"]]]
+    
+  - name: SRAI
+    operands: 
+      - class: register
+        name: gpr
+      - class: register
+        name: gpr
+      - class: immediate
+        imd: int
+    latency: 1
+    throughput: 1
+    port_pressure: [[1, ["ALU"]]]
+
+  # Multiplication
+  - name: MUL
+    operands: 
+      - class: register
+        name: gpr
+      - class: register
+        name: gpr
+      - class: register
+        name: gpr
+    latency: 3
+    throughput: 1
+    port_pressure: [[1, ["ALU"]]]
+    
+  - name: MULH
+    operands: 
+      - class: register
+        name: gpr
+      - class: register
+        name: gpr
+      - class: register
+        name: gpr
+    latency: 3
+    throughput: 1
+    port_pressure: [[1, ["ALU"]]]
+
+  # Division (higher latency)
+  - name: DIV
+    operands: 
+      - class: register
+        name: gpr
+      - class: register
+        name: gpr
+      - class: register
+        name: gpr
+    latency: 10
+    throughput: 10
+    port_pressure: [[1, ["DIV"]]]
+    
+  - name: DIVU
+    operands: 
+      - class: register
+        name: gpr
+      - class: register
+        name: gpr
+      - class: register
+        name: gpr
+    latency: 10
+    throughput: 10
+    port_pressure: [[1, ["DIV"]]]
+    
+  - name: REM
+    operands: 
+      - class: register
+        name: gpr
+      - class: register
+        name: gpr
+      - class: register
+        name: gpr
+    latency: 10
+    throughput: 10
+    port_pressure: [[1, ["DIV"]]]
+    
+  - name: REMU
+    operands: 
+      - class: register
+        name: gpr
+      - class: register
+        name: gpr
+      - class: register
+        name: gpr
+    latency: 10
+    throughput: 10
+    port_pressure: [[1, ["DIV"]]]
+
+  # Memory operations
+  - name: LW
+    operands: 
+      - class: register
+        name: gpr
+      - class: memory
+        base: gpr
+        offset: imd
+        index: null
+        scale: 1
+    latency: 3
+    throughput: 1
+    port_pressure: [[1, ["MEM"]]]
+    
+  - name: LD
+    operands: 
+      - class: register
+        name: gpr
+      - class: memory
+        base: gpr
+        offset: imd
+        index: null
+        scale: 1
+    latency: 3
+    throughput: 1
+    port_pressure: [[1, ["MEM"]]]
+    
+  - name: SW
+    operands: 
+      - class: register
+        name: gpr
+      - class: memory
+        base: gpr
+        offset: imd
+        index: null
+        scale: 1
+    latency: 1
+    throughput: 1
+    port_pressure: [[1, ["MEM"]]]
+    
+  - name: SD
+    operands: 
+      - class: register
+        name: gpr
+      - class: memory
+        base: gpr
+        offset: imd
+        index: null
+        scale: 1
+    latency: 1
+    throughput: 1
+    port_pressure: [[1, ["MEM"]]]
+
+  # Control flow
+  - name: BEQ
+    operands: 
+      - class: register
+        name: gpr
+      - class: register
+        name: gpr
+      - class: identifier
+    latency: 1
+    throughput: 1
+    port_pressure: [[1, ["ALU"]]]
+    
+  - name: BNE
+    operands: 
+      - class: register
+        name: gpr
+      - class: register
+        name: gpr
+      - class: identifier
+    latency: 1
+    throughput: 1
+    port_pressure: [[1, ["ALU"]]]
+    
+  - name: BLT
+    operands: 
+      - class: register
+        name: gpr
+      - class: register
+        name: gpr
+      - class: identifier
+    latency: 1
+    throughput: 1
+    port_pressure: [[1, ["ALU"]]]
+    
+  - name: BGE
+    operands: 
+      - class: register
+        name: gpr
+      - class: register
+        name: gpr
+      - class: identifier
+    latency: 1
+    throughput: 1
+    port_pressure: [[1, ["ALU"]]]
+    
+  - name: JAL
+    operands: 
+      - class: register
+        name: gpr
+      - class: identifier
+    latency: 1
+    throughput: 1
+    port_pressure: [[1, ["ALU"]]]
+    
+  - name: JALR
+    operands: 
+      - class: register
+        name: gpr
+      - class: register
+        name: gpr
+      - class: immediate
+        imd: int
+    latency: 1
+    throughput: 1
+    port_pressure: [[1, ["ALU"]]]
+
+  # Floating point operations
+  - name: FLW
+    operands: 
+      - class: register
+        prefix: f
+      - class: memory
+        base: gpr
+        offset: imd
+        index: null
+        scale: 1
+    latency: 3
+    throughput: 1
+    port_pressure: [[1, ["MEM"]]]
+    
+  - name: FLD
+    operands: 
+      - class: register
+        prefix: f
+      - class: memory
+        base: gpr
+        offset: imd
+        index: null
+        scale: 1
+    latency: 3
+    throughput: 1
+    port_pressure: [[1, ["MEM"]]]
+    
+  - name: FSW
+    operands: 
+      - class: register
+        prefix: f
+      - class: memory
+        base: gpr
+        offset: imd
+        index: null
+        scale: 1
+    latency: 1
+    throughput: 1
+    port_pressure: [[1, ["MEM"]]]
+    
+  - name: FSD
+    operands: 
+      - class: register
+        prefix: f
+      - class: memory
+        base: gpr
+        offset: imd
+        index: null
+        scale: 1
+    latency: 1
+    throughput: 1
+    port_pressure: [[1, ["MEM"]]]
+    
+  - name: FADD.S
+    operands: 
+      - class: register
+        prefix: f
+      - class: register
+        prefix: f
+      - class: register
+        prefix: f
+    latency: 3
+    throughput: 1
+    port_pressure: [[1, ["FP"]]]
+    
+  - name: FSUB.S
+    operands: 
+      - class: register
+        prefix: f
+      - class: register
+        prefix: f
+      - class: register
+        prefix: f
+    latency: 3
+    throughput: 1
+    port_pressure: [[1, ["FP"]]]
+    
+  - name: FMUL.S
+    operands: 
+      - class: register
+        prefix: f
+      - class: register
+        prefix: f
+      - class: register
+        prefix: f
+    latency: 3
+    throughput: 1
+    port_pressure: [[1, ["FP"]]]
+    
+  - name: FDIV.S
+    operands: 
+      - class: register
+        prefix: f
+      - class: register
+        prefix: f
+      - class: register
+        prefix: f
+    latency: 10
+    throughput: 10
+    port_pressure: [[1, ["FP"]]]
+    
+  - name: FMADD.S
+    operands: 
+      - class: register
+        prefix: f
+      - class: register
+        prefix: f
+      - class: register
+        prefix: f
+      - class: register
+        prefix: f
+    latency: 4
+    throughput: 1
+    port_pressure: [[1, ["FP"]]]
+
+  # Vector instructions
+  - name: VSETVLI
+    operands: 
+      - class: register
+        name: gpr
+      - class: register
+        name: gpr
+      - class: identifier
+    latency: 1
+    throughput: 1
+    port_pressure: [[1, ["ALU"]]]
+    
+  - name: VLE32.V
+    operands: 
+      - class: register
+        prefix: v
+      - class: memory
+        base: gpr
+        offset: null
+        index: null
+        scale: 1
+    latency: 4
+    throughput: 1
+    port_pressure: [[1, ["MEM"]]]
+    
+  - name: VSE32.V
+    operands: 
+      - class: register
+        prefix: v
+      - class: memory
+        base: gpr
+        offset: null
+        index: null
+        scale: 1
+    latency: 1
+    throughput: 1
+    port_pressure: [[1, ["MEM"]]]
+    
+  - name: VFMACC.VF
+    operands: 
+      - class: register
+        prefix: v
+      - class: register
+        prefix: f
+      - class: register
+        prefix: v
+    latency: 4
+    throughput: 1
+    port_pressure: [[1, ["FP"]]]
+    
+  - name: VFMADD.VV
+    operands: 
+      - class: register
+        prefix: v
+      - class: register
+        prefix: v
+      - class: register
+        prefix: v
+    latency: 4
+    throughput: 1
+    port_pressure: [[1, ["FP"]]]
+
+  # CSR instructions
+  - name: CSRR
+    operands: 
+      - class: register
+        name: gpr
+      - class: identifier
+    latency: 1
+    throughput: 1
+    port_pressure: [[1, ["ALU"]]]
+    
+  - name: CSRW
+    operands: 
+      - class: identifier
+      - class: register
+        name: gpr
+    latency: 1
+    throughput: 1
+    port_pressure: [[1, ["ALU"]]]
+    
+  # Pseudo-instructions
+  - name: MV
+    operands: 
+      - class: register
+        name: gpr
+      - class: register
+        name: gpr
+    latency: 1
+    throughput: 1
+    port_pressure: [[1, ["ALU"]]]
+    
+  - name: LI
+    operands: 
+      - class: register
+        name: gpr
+      - class: immediate
+        imd: int
+    latency: 1
+    throughput: 1
+    port_pressure: [[1, ["ALU"]]]
+    
+  - name: RET
+    operands: []
+    latency: 1
+    throughput: 1
+    port_pressure: [[1, ["ALU"]]]

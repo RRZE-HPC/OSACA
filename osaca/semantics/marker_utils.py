@@ -2,7 +2,7 @@
 #!/usr/bin/env python3
 from collections import OrderedDict
 
-from osaca.parser import ParserAArch64, ParserX86ATT, get_parser
+from osaca.parser import ParserAArch64, ParserX86ATT, ParserRISCV, get_parser
 from osaca.parser.register import RegisterOperand
 from osaca.parser.identifier import IdentifierOperand
 from osaca.parser.immediate import ImmediateOperand
@@ -23,6 +23,8 @@ def reduce_to_section(kernel, isa):
         start, end = find_marked_kernel_x86ATT(kernel)
     elif isa == "aarch64":
         start, end = find_marked_kernel_AArch64(kernel)
+    elif isa == "riscv":
+        start, end = find_marked_kernel_RISCV(kernel)
     else:
         raise ValueError("ISA not supported.")
     if start == -1:
@@ -71,6 +73,25 @@ def find_marked_kernel_x86ATT(lines):
     )
 
 
+def find_marked_kernel_RISCV(lines):
+    """
+    Find marked section for RISC-V
+
+    :param list lines: kernel
+    :returns: `tuple of int` -- start and end line of marked section
+    """
+    nop_bytes = [19, 0, 0, 0]  # RISC-V NOP (addi x0, x0, 0)
+    return find_marked_section(
+        lines,
+        ParserRISCV(),
+        ["li"],
+        "a1",
+        [111, 222],
+        nop_bytes,
+        comments=COMMENT_MARKER,
+    )
+
+
 def get_marker(isa, comment=""):
     """Return tuple of start and end marker lines."""
     isa = isa.lower()
@@ -100,6 +121,18 @@ def get_marker(isa, comment=""):
         end_marker_raw = (
             "mov       x1, #222    // OSACA END MARKER\n"
             ".byte     213,3,32,31 // OSACA END MARKER\n"
+        )
+    elif isa == "riscv":
+        start_marker_raw = (
+            "li        a1, 111    # OSACA START MARKER\n"
+            ".byte     19,0,0,0   # OSACA START MARKER\n"
+        )
+        if comment:
+            start_marker_raw += "# {}\n".format(comment)
+        # After loop
+        end_marker_raw = (
+            "li        a1, 222    # OSACA END MARKER\n"
+            ".byte     19,0,0,0   # OSACA END MARKER\n"
         )
 
     parser = get_parser(isa)
