@@ -849,6 +849,9 @@ class TestSemanticTools(unittest.TestCase):
         instr_form_r_ymm = self.parser_x86_intel.parse_line("vmovapd ymm0, ymm1")
         self.semantics_csx_intel.normalize_instruction_form(instr_form_r_ymm)
         self.semantics_csx_intel.assign_src_dst(instr_form_r_ymm)
+        instr_form_rw_sar = self.parser_x86_intel.parse_line("sar rcx, 43")
+        self.semantics_csx_intel.normalize_instruction_form(instr_form_rw_sar)
+        self.semantics_csx_intel.assign_src_dst(instr_form_rw_sar)
         self.assertTrue(dag.is_read(reg_rcx, instr_form_r_c))
         self.assertFalse(dag.is_read(reg_rcx, instr_form_non_r_c))
         self.assertFalse(dag.is_read(reg_rcx, instr_form_w_c))
@@ -860,6 +863,8 @@ class TestSemanticTools(unittest.TestCase):
         self.assertTrue(dag.is_written(reg_ymm1, instr_form_rw_ymm_1))
         self.assertTrue(dag.is_written(reg_ymm1, instr_form_rw_ymm_2))
         self.assertFalse(dag.is_written(reg_ymm1, instr_form_r_ymm))
+        self.assertTrue(dag.is_read(reg_rcx, instr_form_rw_sar))
+        self.assertTrue(dag.is_written(reg_rcx, instr_form_rw_sar))
 
     def test_is_read_is_written_AArch64(self):
         # independent form HW model
