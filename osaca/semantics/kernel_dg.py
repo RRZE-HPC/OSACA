@@ -646,8 +646,8 @@ class KernelDG(nx.DiGraph):
                 graph.nodes[n]["style"] += ",filled"
             graph.nodes[n]["fillcolor"] = color
             if (
-                (max_color >= 4 and color in (1, max_color)) or
-                (max_color >= 10 and color in (1, 2, max_color - 1 , max_color))
+                (max_color >= 4 and color in (1, max_color)) 
+                or (max_color >= 10 and color in (1, 2, max_color - 1 , max_color))
             ):
                 graph.nodes[n]["fontcolor"] = "white"
         for (u, v), color in edge_colors.items():
