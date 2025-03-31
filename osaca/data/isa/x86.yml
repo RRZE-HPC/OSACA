@@ -2621,6 +2621,79 @@ instruction_forms:
           name: "ZF"
           source: true
           destination: true
+    - name: ["comisd", "ucomisd"]
+      operands:
+        - class: "register"
+          name: "xmm"
+          source: true
+          destination: false
+        - class: "register"
+          name: "xmm"
+          source: true
+          destination: false
+      hidden_operands:
+        - class: "flag"
+          name: "CF"
+          source: false
+          destination: true
+        - class: "flag"
+          name: "OF"
+          source: false
+          destination: true
+        - class: "flag"
+          name: "SF"
+          source: false
+          destination: true
+        - class: "flag"
+          name: "ZF"
+          source: false
+          destination: true
+        - class: "flag"
+          name: "AF"
+          source: false
+          destination: true
+        - class: "flag"
+          name: "PF"
+          source: false
+          destination: true
+    - name: ["comisd", "ucomisd"]
+      operands:
+        - class: "register"
+          name: "xmm"
+          source: true
+          destination: false
+        - class: "memory"
+          base: "*"
+          offset: "*"
+          index: "*"
+          scale: "*"
+          source: true
+          destination: false
+      hidden_operands:
+        - class: "flag"
+          name: "CF"
+          source: false
+          destination: true
+        - class: "flag"
+          name: "OF"
+          source: false
+          destination: true
+        - class: "flag"
+          name: "SF"
+          source: false
+          destination: true
+        - class: "flag"
+          name: "ZF"
+          source: false
+          destination: true
+        - class: "flag"
+          name: "AF"
+          source: false
+          destination: true
+        - class: "flag"
+          name: "PF"
+          source: false
+          destination: true
     - name: dec
       operands:
         - class: "register"
@@ -3613,7 +3686,7 @@ instruction_forms:
         - class: "register"
           name: "gpr"
           source: true
-          destination: true 
+          destination: true
     - name: sbb
       operands:
         - class: "register"
@@ -4342,7 +4415,7 @@ instruction_forms:
           name: "xmm"
           source: true
           destination: true
-    - name: [shl, shr, shlq, shrq]
+    - name: [sal, sar, salq, sarq, shl, shr, shlq, shrq]
       operands:
         - class: "immediate"
           imd: "int"
