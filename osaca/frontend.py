@@ -80,7 +80,7 @@ class Frontend(object):
         s += lineno_filler + self._get_port_number_line(port_len) + "\n"
         s += separator + "\n"
         for instruction_form in kernel:
-            line = "{:4d} {} {} {}".format(
+            line = "{:4.0f} {} {} {}".format(
                 instruction_form.line_number,
                 self._get_port_pressure(
                     instruction_form.port_pressure, port_len, separator=sep_list
@@ -113,7 +113,7 @@ class Frontend(object):
         s = "\n\nLatency Analysis Report\n-----------------------\n"
         for instruction_form in cp_kernel:
             s += (
-                "{:4d} {} {:4.1f} {}{}{} {}".format(
+                "{:4.0f} {} {:4.1f} {}{}{} {}".format(
                     instruction_form.line_number,
                     separator,
                     instruction_form.latency_cp,
@@ -147,8 +147,8 @@ class Frontend(object):
         )
         # TODO find a way to overcome padding for different tab-lengths
         for dep in sorted(dep_dict.keys()):
-            s += "{:4d} {} {:4.1f} {} {:36}{} {}\n".format(
-                int(dep.split("-")[0]),
+            s += "{:4.0f} {} {:4.1f} {} {:36}{} {}\n".format(
+                float(dep.split("-")[0]),
                 separator,
                 dep_dict[dep]["latency"],
                 separator,
@@ -358,7 +358,7 @@ class Frontend(object):
             line_number = instruction_form.line_number
             used_ports = [list(uops[1]) for uops in instruction_form.port_uops]
             used_ports = list(set([p for uops_ports in used_ports for p in uops_ports]))
-            s += "{:4d} {}{} {} {}\n".format(
+            s += "{:4.0f} {}{} {} {}\n".format(
                 line_number,
                 self._get_port_pressure(
                     instruction_form.port_pressure, port_len, used_ports, sep_list
