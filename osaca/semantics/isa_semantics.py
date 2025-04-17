@@ -7,6 +7,7 @@ from osaca.parser.memory import MemoryOperand
 from osaca.parser.operand import Operand
 from osaca.parser.register import RegisterOperand
 from osaca.parser.immediate import ImmediateOperand
+from osaca.parser.instruction_form import InstructionForm
 
 from .hw_model import MachineModel
 
@@ -299,7 +300,25 @@ class ISASemantics(object):
             "destination": [],
             "src_dst": [],
         }
+        instruction_form = None
+        
+        # Create a temporary instruction form if we need to use get_regular_*_operands
+        if len(operands) > 0:
+            instruction_form = InstructionForm(
+                mnemonic="temp",
+                operands=operands
+            )
+            
         try:
+            # Special handling for RISC-V InstructionForm objects
+            if isinstance(isa_data, InstructionForm):
+                # For RISC-V, first operand is destination, rest are sources
+                if len(operands) > 0:
+                    op_dict["destination"] = [operands[0]]
+                if len(operands) > 1:
+                    op_dict["source"] = operands[1:]
+                return op_dict
+                
             # Get operands distribution
             for idx, op_flag in enumerate(isa_data["operands"]):
                 op = operands[idx]
@@ -315,14 +334,15 @@ class ISASemantics(object):
                             op_flag, idx, str(isa_data)
                         )
                     )
-        except (ValueError, KeyError, IndexError) as e:
+        except (ValueError, KeyError, IndexError, TypeError) as e:
             # TODO: add logger with debugging message
             # print(str(e), operands)
             # if instruction has no operands in ISA model yaml, assign regular semantic
             # i.e., first operand is destination, others are sources
-            op_dict["source"] = self._parser.get_regular_source_operands(instruction_form)
-            op_dict["destination"] = self._parser.get_regular_destination_operands(instruction_form)
-            op_dict["src_dst"] = []
+            if instruction_form:
+                op_dict["source"] = self._parser.get_regular_source_operands(instruction_form)
+                op_dict["destination"] = self._parser.get_regular_destination_operands(instruction_form)
+                op_dict["src_dst"] = []
         return op_dict
 
     def _has_load(self, instruction_form):

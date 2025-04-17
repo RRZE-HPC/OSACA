@@ -74,11 +74,10 @@ class ParserRISCV(BaseParser):
         vector_identifier = pp.Word(pp.alphas, pp.alphanums)
         special_identifier = pp.Word(pp.alphas + "%")
         
-        # First character of an identifier 
         first = pp.Word(pp.alphas + "_.", exact=1)
-        # Rest of the identifier
         rest = pp.Word(pp.alphanums + "_.")
-        # PLT suffix (@plt) for calls to shared libraries
+        
+        # Extension for PLT symbols like printf@plt
         plt_suffix = pp.Optional(pp.Literal("@") + pp.Word(pp.alphas))
         
         identifier = pp.Group(
