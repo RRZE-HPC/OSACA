@@ -111,7 +111,8 @@ def extract_model(tree, arch, skip_mem=True):
         print("Skipping...", file=sys.stderr)
         return None
     mm = MachineModel(isa=isa)
-    parser = get_parser(isa)
+    # The model uses the AT&T syntax.
+    parser = get_parser(isa, "ATT")
 
     for instruction_tag in tree.findall(".//instruction"):
         ignore = False

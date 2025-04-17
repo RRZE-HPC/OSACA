@@ -12,36 +12,46 @@ from osaca.semantics import (
     find_jump_labels,
     find_basic_loop_bodies,
 )
-from osaca.parser import ParserAArch64, ParserX86ATT
+from osaca.parser import ParserAArch64, ParserX86ATT, ParserX86Intel
 
 
 class TestMarkerUtils(unittest.TestCase):
     @classmethod
     def setUpClass(self):
         self.parser_AArch = ParserAArch64()
-        self.parser_x86 = ParserX86ATT()
+        self.parser_x86_att = ParserX86ATT()
+        self.parser_x86_intel = ParserX86Intel()
         with open(self._find_file("triad_arm_iaca.s")) as f:
             triad_code_arm = f.read()
         with open(self._find_file("triad_x86_iaca.s")) as f:
-            triad_code_x86 = f.read()
+            triad_code_x86_att = f.read()
+        with open(self._find_file("triad_x86_intel_iaca.s")) as f:
+            triad_code_x86_intel = f.read()
         self.parsed_AArch = self.parser_AArch.parse_file(triad_code_arm)
-        self.parsed_x86 = self.parser_x86.parse_file(triad_code_x86)
+        self.parsed_x86_att = self.parser_x86_att.parse_file(triad_code_x86_att)
+        self.parsed_x86_intel = self.parser_x86_intel.parse_file(triad_code_x86_intel)
 
     #################
     # Test
     #################
 
     def test_marker_detection_AArch64(self):
-        kernel = reduce_to_section(self.parsed_AArch, "AArch64")
+        kernel = reduce_to_section(self.parsed_AArch, ParserAArch64())
         self.assertEqual(len(kernel), 138)
         self.assertEqual(kernel[0].line_number, 307)
         self.assertEqual(kernel[-1].line_number, 444)
 
-    def test_marker_detection_x86(self):
-        kernel = reduce_to_section(self.parsed_x86, "x86")
+    def test_marker_detection_x86_att(self):
+        kernel = reduce_to_section(self.parsed_x86_att, ParserX86ATT())
         self.assertEqual(len(kernel), 9)
         self.assertEqual(kernel[0].line_number, 146)
         self.assertEqual(kernel[-1].line_number, 154)
+
+    def test_marker_detection_x86_intel(self):
+        kernel = reduce_to_section(self.parsed_x86_intel, ParserX86Intel())
+        self.assertEqual(len(kernel), 7)
+        self.assertEqual(kernel[0].line_number, 111)
+        self.assertEqual(kernel[-1].line_number, 117)
 
     def test_marker_matching_AArch64(self):
         # preparation
@@ -108,7 +118,7 @@ class TestMarkerUtils(unittest.TestCase):
                             bytes_end=bytes_var_2,
                         ):
                             sample_parsed = self.parser_AArch.parse_file(sample_code)
-                            sample_kernel = reduce_to_section(sample_parsed, "AArch64")
+                            sample_kernel = reduce_to_section(sample_parsed, ParserAArch64())
                             self.assertEqual(len(sample_kernel), kernel_length)
                             kernel_start = len(
                                 list(
@@ -179,8 +189,8 @@ class TestMarkerUtils(unittest.TestCase):
                             mov_end=mov_end_var,
                             bytes_end=bytes_var_2,
                         ):
-                            sample_parsed = self.parser_x86.parse_file(sample_code)
-                            sample_kernel = reduce_to_section(sample_parsed, "x86")
+                            sample_parsed = self.parser_x86_att.parse_file(sample_code)
+                            sample_kernel = reduce_to_section(sample_parsed, ParserX86ATT())
                             self.assertEqual(len(sample_kernel), kernel_length)
                             kernel_start = len(
                                 list(
@@ -190,7 +200,7 @@ class TestMarkerUtils(unittest.TestCase):
                                     )
                                 )
                             )
-                            parsed_kernel = self.parser_x86.parse_file(
+                            parsed_kernel = self.parser_x86_att.parse_file(
                                 kernel, start_line=kernel_start
                             )
                             self.assertEqual(sample_kernel, parsed_kernel)
@@ -222,7 +232,7 @@ class TestMarkerUtils(unittest.TestCase):
         for test_name, pro, kernel, epi in samples:
             code = pro + kernel + epi
             parsed = self.parser_AArch.parse_file(code)
-            test_kernel = reduce_to_section(parsed, "AArch64")
+            test_kernel = reduce_to_section(parsed, ParserAArch64())
             if kernel:
                 kernel_length = len(kernel.strip().split("\n"))
             else:
@@ -230,7 +240,7 @@ class TestMarkerUtils(unittest.TestCase):
             self.assertEqual(
                 len(test_kernel),
                 kernel_length,
-                msg="Invalid exctracted kernel length on {!r} sample".format(test_name),
+                msg="Invalid extracted kernel length on {!r} sample".format(test_name),
             )
             if pro:
                 kernel_start = len((pro).strip().split("\n"))
@@ -240,7 +250,7 @@ class TestMarkerUtils(unittest.TestCase):
             self.assertEqual(
                 test_kernel,
                 parsed_kernel,
-                msg="Invalid exctracted kernel on {!r}".format(test_name),
+                msg="Invalid extracted kernel on {!r}".format(test_name),
             )
 
     def test_marker_special_cases_x86(self):
@@ -269,8 +279,8 @@ class TestMarkerUtils(unittest.TestCase):
 
         for test_name, pro, kernel, epi in samples:
             code = pro + kernel + epi
-            parsed = self.parser_x86.parse_file(code)
-            test_kernel = reduce_to_section(parsed, "x86")
+            parsed = self.parser_x86_att.parse_file(code)
+            test_kernel = reduce_to_section(parsed, ParserX86ATT())
             if kernel:
                 kernel_length = len(kernel.strip().split("\n"))
             else:
@@ -278,23 +288,23 @@ class TestMarkerUtils(unittest.TestCase):
             self.assertEqual(
                 len(test_kernel),
                 kernel_length,
-                msg="Invalid exctracted kernel length on {!r} sample".format(test_name),
+                msg="Invalid extracted kernel length on {!r} sample".format(test_name),
             )
             if pro:
                 kernel_start = len((pro).strip().split("\n"))
             else:
                 kernel_start = 0
-            parsed_kernel = self.parser_x86.parse_file(kernel, start_line=kernel_start)
+            parsed_kernel = self.parser_x86_att.parse_file(kernel, start_line=kernel_start)
 
             self.assertEqual(
                 test_kernel,
                 parsed_kernel,
-                msg="Invalid exctracted kernel on {!r}".format(test_name),
+                msg="Invalid extracted kernel on {!r}".format(test_name),
             )
 
     def test_find_jump_labels(self):
         self.assertEqual(
-            find_jump_labels(self.parsed_x86),
+            find_jump_labels(self.parsed_x86_att),
             OrderedDict(
                 [
                     (".LFB24", 10),
@@ -358,7 +368,7 @@ class TestMarkerUtils(unittest.TestCase):
         self.assertEqual(
             [
                 (k, v[0].line_number, v[-1].line_number)
-                for k, v in find_basic_blocks(self.parsed_x86).items()
+                for k, v in find_basic_blocks(self.parsed_x86_att).items()
             ],
             [
                 (".LFB24", 11, 56),
@@ -422,7 +432,7 @@ class TestMarkerUtils(unittest.TestCase):
         self.assertEqual(
             [
                 (k, v[0].line_number, v[-1].line_number)
-                for k, v in find_basic_loop_bodies(self.parsed_x86).items()
+                for k, v in find_basic_loop_bodies(self.parsed_x86_att).items()
             ],
             [(".L4", 66, 74), (".L10", 146, 154), (".L28", 290, 300)],
         )

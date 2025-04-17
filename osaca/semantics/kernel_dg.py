@@ -1,10 +1,8 @@
 #!/usr/bin/env python3
 
 import copy
-import os
-import signal
 import time
-from itertools import chain
+from itertools import chain, groupby
 from multiprocessing import Manager, Process, cpu_count
 
 import networkx as nx
@@ -38,7 +36,8 @@ class KernelDG(nx.DiGraph):
             self.kernel, timeout, flag_dependencies
         )
 
-    def _extend_path(self, dst_list, kernel, dg, offset):
+    @classmethod
+    def _extend_path(cls, dst_list, kernel, dg, offset):
         for instr in kernel:
             generator_path = nx.algorithms.simple_paths.all_simple_paths(
                 dg, instr.line_number, instr.line_number + offset
@@ -138,7 +137,7 @@ class KernelDG(nx.DiGraph):
                 all_paths = manager.list()
                 processes = [
                     Process(
-                        target=self._extend_path,
+                        target=KernelDG._extend_path,
                         args=(all_paths, instr_section, dg, offset),
                     )
                     for instr_section in instrs
@@ -164,9 +163,7 @@ class KernelDG(nx.DiGraph):
                         # terminate running processes
                         for p in processes:
                             if p.is_alive():
-                                # Python 3.6 does not support Process.kill().
-                                # Can be changed to `p.kill()` after EoL (01/22) of Py3.6
-                                os.kill(p.pid, signal.SIGKILL)
+                                p.kill()
                             p.join()
                 all_paths = list(all_paths)
         else:
@@ -186,11 +183,11 @@ class KernelDG(nx.DiGraph):
             for s, d in nx.utils.pairwise(path):
                 edge_lat = dg.edges[s, d]["latency"]
                 # map source node back to original line numbers
-                if s >= offset:
+                if s > offset:
                     s -= offset
                 lat_path.append((s, edge_lat))
                 lat_sum += edge_lat
-            if d >= offset:
+            if d > offset:
                 d -= offset
             lat_path.sort()
 
@@ -413,7 +410,7 @@ class KernelDG(nx.DiGraph):
             addr_change = 0
             if isinstance(src.offset, ImmediateOperand) and src.offset.value is not None:
                 addr_change += src.offset.value
-            if mem.offset:
+            if isinstance(mem.offset, ImmediateOperand) and mem.offset.value is not None:
                 addr_change -= mem.offset.value
             if mem.base and src.base:
                 base_change = register_changes.get(
@@ -523,16 +520,13 @@ class KernelDG(nx.DiGraph):
         lcd_line_numbers = {}
         for dep in lcd:
             lcd_line_numbers[dep] = [x.line_number for x, lat in lcd[dep]["dependencies"]]
-        # add color scheme
-        graph.graph["node"] = {"colorscheme": "accent8"}
-        graph.graph["edge"] = {"colorscheme": "accent8"}
 
         # create LCD edges
         for dep in lcd_line_numbers:
             min_line_number = min(lcd_line_numbers[dep])
             max_line_number = max(lcd_line_numbers[dep])
-            graph.add_edge(max_line_number, min_line_number)
-            graph.edges[max_line_number, min_line_number]["latency"] = [
+            graph.add_edge(min_line_number, max_line_number, dir="back")
+            graph.edges[min_line_number, max_line_number]["latency"] = [
                 lat for x, lat in lcd[dep]["dependencies"] if x.line_number == max_line_number
             ]
 
@@ -544,21 +538,14 @@ class KernelDG(nx.DiGraph):
         for n in cp:
             graph.nodes[n.line_number]["instruction_form"].latency_cp = n.latency_cp
 
-        # color CP and LCD
+        # Make the critical path bold.
         for n in graph.nodes:
             if n in cp_line_numbers:
                 # graph.nodes[n]['color'] = 1
                 graph.nodes[n]["style"] = "bold"
                 graph.nodes[n]["penwidth"] = 4
-            for col, dep in enumerate(lcd):
-                if n in lcd_line_numbers[dep]:
-                    if "style" not in graph.nodes[n]:
-                        graph.nodes[n]["style"] = "filled"
-                    else:
-                        graph.nodes[n]["style"] += ",filled"
-                    graph.nodes[n]["fillcolor"] = 2 + col
 
-        # color edges
+        # Make critical path edges bold.
         for e in graph.edges:
             if (
                 graph.nodes[e[0]]["instruction_form"].line_number in cp_line_numbers
@@ -572,12 +559,56 @@ class KernelDG(nx.DiGraph):
                 if bold_edge:
                     graph.edges[e]["style"] = "bold"
                     graph.edges[e]["penwidth"] = 3
-            for dep in lcd_line_numbers:
-                if (
-                    graph.nodes[e[0]]["instruction_form"].line_number in lcd_line_numbers[dep]
-                    and graph.nodes[e[1]]["instruction_form"].line_number in lcd_line_numbers[dep]
-                ):
-                    graph.edges[e]["color"] = graph.nodes[e[1]]["fillcolor"]
+
+        # Color the cycles created by loop-carried dependencies, longest first, never recoloring
+        # any node or edge, so that the longest LCD and most long chains that are involved in the
+        # loop are legible.
+        lcd_by_latencies = sorted(
+            (
+                (latency, list(deps))
+                for latency, deps in groupby(lcd, lambda dep: lcd[dep]["latency"])
+            ),
+            reverse=True
+        )
+        node_colors = {}
+        edge_colors = {}
+        colors_used = 0
+        for i, (latency, deps) in enumerate(lcd_by_latencies):
+            color = None
+            for dep in deps:
+                path = lcd_line_numbers[dep]
+                for n in path:
+                    if n not in node_colors:
+                        if not color:
+                            color = colors_used + 1
+                            colors_used += 1
+                        node_colors[n] = color
+                for u, v in zip(path, path[1:] + [path[0]]):
+                    if (u, v) not in edge_colors:
+                        # Don’t introduce a color just for an edge.
+                        if not color:
+                            color = colors_used
+                        edge_colors[u, v] = color
+        max_color = min(11, colors_used)
+        colorscheme = f"spectral{max(3, max_color)}"
+        graph.graph["node"] = {"colorscheme" : colorscheme}
+        graph.graph["edge"] = {"colorscheme" : colorscheme}
+        for n, color in node_colors.items():
+            if "style" not in graph.nodes[n]:
+                graph.nodes[n]["style"] = "filled"
+            else:
+                graph.nodes[n]["style"] += ",filled"
+            graph.nodes[n]["fillcolor"] = color
+            if (
+                (max_color >= 4 and color in (1, max_color)) or
+                (max_color >= 10 and color in (1, 2, max_color - 1 , max_color))
+            ):
+                graph.nodes[n]["fontcolor"] = "white"
+        for (u, v), color in edge_colors.items():
+            # The backward edge of the cycle is represented as the corresponding forward
+            # edge with the attribute dir=back.
+            edge = graph.edges[u, v] if (u, v) in graph.edges else graph.edges[v, u]
+            edge["color"] = color
 
         # rename node from [idx] to [idx mnemonic] and add shape
         mapping = {}

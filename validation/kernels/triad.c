@@ -7,6 +7,12 @@
 #endif
 #endif
 
+#define USE_IACA 0
+
+#if USE_IACA
+#include "intel\iacaMarks.h"
+#endif
+
 #define DTYPE double
 
 void dummy(void *);
@@ -16,7 +22,13 @@ void kernel(DTYPE* a, DTYPE* b, DTYPE* c, const DTYPE s, const int repeat, const
 {
     for(int r=0; r < repeat; r++) {
         for(int i=0; i<cur_elements; i++) {
+#if USE_IACA
+            IACA_VC64_START
+#endif
             a[i] = b[i] + s * c[i];
+#if USE_IACA
+            IACA_VC64_END
+#endif
         }
         dummy((void*)a);
     }

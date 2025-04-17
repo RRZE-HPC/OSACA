@@ -34,7 +34,7 @@ Getting started
 ===============
 OSACA is as a python module with a command line interface.
 
-OSACA is also integrated into the `Compiler Explorer at godbolt.org <https://godbolt.org>`_, which allows using OSACA from a browser without any installation. To analyze an assembly snippet, go to https://godbolt.org change language to "Analysis", insert an AArch64 or AT&T(!) x86 assembly code and make sure OSACA is selected in the corresponding analysis panel, e.g., https://godbolt.org/z/shK4f8. When analyzing a high-level language code, use the "Add tool..." menu in the compiler output panel to add OSACA analysis, e.g. https://godbolt.org/z/hbMoPn. To change the micro architecture model, add ``--arch`` and µarch shortname (e.g., ``SKX`` for Skylake, ``ZEN2``, ``N1`` for ARM Neoverse) to the "Compiler options..." (when using "Analysis" mode) or "Arguments" (when analyzing compiler output of a high-level code).
+OSACA is also integrated into the `Compiler Explorer at godbolt.org <https://godbolt.org>`_, which allows using OSACA from a browser without any installation. To analyze an assembly snippet, go to https://godbolt.org change language to "Analysis", insert an AArch64 or x86 assembly code and make sure OSACA is selected in the corresponding analysis panel, e.g., https://godbolt.org/z/shK4f8. When analyzing a high-level language code, use the "Add tool..." menu in the compiler output panel to add OSACA analysis, e.g. https://godbolt.org/z/hbMoPn. To change the micro architecture model, add ``--arch`` and µarch shortname (e.g., ``SKX`` for Skylake, ``ZEN2``, ``N1`` for ARM Neoverse) to the "Compiler options..." (when using "Analysis" mode) or "Arguments" (when analyzing compiler output of a high-level code).
 
 Installation
 ------------
@@ -100,9 +100,9 @@ The usage of OSACA can be listed as:
   shows the program’s version number.
 --arch ARCH
   needs to be replaced with the target architecture abbreviation.
-  Possible options are ``SNB``, ``IVB``, ``HSW``, ``BDW``, ``SKX``, ``CSX``, ``ICL`` (Client), ``ICX`` (Server), ``SPR`` for the latest Intel micro architectures starting from Intel Sandy Bridge and ``ZEN[1-4]`` for AMD Zen architectures.
-  Furthermore, ``TX2`` for Marvell`s ARM-based ThunderX2 , ``N1`` for ARM's Neoverse, ``A72`` for ARM Cortex-A72, ``TSV110`` for the HiSilicon TaiShan v110, ``A64FX`` for Fujitsu's HPC ARM architecture, ``M1`` for the Apple M1-Firestorm performance core, and ``V2`` for the Neoverse V2 (used in NVIDIA's Grace CPU) are available.
-  If no micro-architecture is given, OSACA assumes a default architecture for x86/AArch64.
+  See `the table of supported microarchitectures below <https://github.com/RRZE-HPC/OSACA?tab=readme-ov-file#supported-microarchitectures>`__ for all possible options. If no micro-architecture is given, OSACA assumes a default architecture for x86/AArch64.
+--syntax SYNTAX
+  Define the assembly syntax (ATT, Intel) for x86. If no syntax is given, OSACA tries to determine automatically the syntax to use.
 --fixed
   Run the throughput analysis with fixed port utilization for all suitable ports per instruction.
   Otherwise, OSACA will print out the optimal port utilization for the kernel.
