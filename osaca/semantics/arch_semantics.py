@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 """Semantics opbject responsible for architecture specific semantic operations"""
-
 import sys
 import warnings
 from itertools import chain
@@ -14,12 +13,22 @@ from osaca.parser.register import RegisterOperand
 
 
 class ArchSemantics(ISASemantics):
-    GAS_SUFFIXES = "bswlqt"
-
-    def __init__(self, machine_model: MachineModel, path_to_yaml=None):
-        super().__init__(machine_model.get_ISA().lower(), path_to_yaml=path_to_yaml)
+    def __init__(self, parser, machine_model: MachineModel, path_to_yaml=None):
+        super().__init__(parser, path_to_yaml=path_to_yaml)
         self._machine_model = machine_model
-        self._isa = machine_model.get_ISA().lower()
+
+    def normalize_instruction_form(self, instruction_form):
+        self.parser.normalize_instruction_form(
+            instruction_form, self.isa_model, self._machine_model
+        )
+
+    def normalize_instruction_forms(self, instruction_forms):
+        for instruction_form in instruction_forms:
+            self.normalize_instruction_form(instruction_form)
+
+    def _check_normalized(self, instruction_forms):
+        for instruction_form in instruction_forms:
+            instruction_form.check_normalized()
 
     # SUMMARY FUNCTION
     def add_semantics(self, kernel):
@@ -29,6 +38,7 @@ class ArchSemantics(ISASemantics):
 
         :param list kernel: kernel to apply semantics
         """
+        self._check_normalized(kernel)
         for instruction_form in kernel:
             self.assign_src_dst(instruction_form)
             self.assign_tp_lt(instruction_form)
@@ -41,6 +51,7 @@ class ArchSemantics(ISASemantics):
 
         :param list kernel: kernel to apply optimal port utilization
         """
+        self._check_normalized(kernel)
         INC = 0.01
         kernel.reverse()
         port_list = self._machine_model.get_ports()
@@ -137,6 +148,7 @@ class ArchSemantics(ISASemantics):
 
     def set_hidden_loads(self, kernel):
         """Hide loads behind stores if architecture supports hidden loads (depricated)"""
+        self._check_normalized(kernel)
         loads = [instr for instr in kernel if INSTR_FLAGS.HAS_LD in instr.flags]
         stores = [instr for instr in kernel if INSTR_FLAGS.HAS_ST in instr.flags]
         # Filter instructions including load and store
@@ -176,6 +188,7 @@ class ArchSemantics(ISASemantics):
     # mark instruction form with semantic flags
     def assign_tp_lt(self, instruction_form):
         """Assign throughput and latency to an instruction form."""
+        instruction_form.check_normalized()
         flags = []
         port_number = len(self._machine_model["ports"])
         if instruction_form.mnemonic is None:
@@ -189,35 +202,6 @@ class ArchSemantics(ISASemantics):
             instruction_data = self._machine_model.get_instruction(
                 instruction_form.mnemonic, instruction_form.operands
             )
-            if (
-                not instruction_data
-                and self._isa == "x86"
-                and instruction_form.mnemonic[-1] in self.GAS_SUFFIXES
-            ):
-                # check for instruction without GAS suffix
-                instruction_data = self._machine_model.get_instruction(
-                    instruction_form.mnemonic[:-1], instruction_form.operands
-                )
-            if (
-                instruction_data is None
-                and self._isa == "aarch64"
-                and "." in instruction_form.mnemonic
-            ):
-                # Check for instruction without shape/cc suffix
-                suffix_start = instruction_form.mnemonic.index(".")
-                instruction_data = self._machine_model.get_instruction(
-                    instruction_form.mnemonic[:suffix_start], instruction_form.operands
-                )
-            if (
-                instruction_data is None
-                and self._isa == "riscv"
-                and "." in instruction_form.mnemonic
-            ):
-                # Check for instruction without shape suffix (e.g., fadd.s -> fadd)
-                suffix_start = instruction_form.mnemonic.index(".")
-                instruction_data = self._machine_model.get_instruction(
-                    instruction_form.mnemonic[:suffix_start], instruction_form.operands
-                )
             if instruction_data:
                 # instruction form in DB
                 (
@@ -242,35 +226,6 @@ class ArchSemantics(ISASemantics):
                     instruction_data_reg = self._machine_model.get_instruction(
                         instruction_form.mnemonic, operands
                     )
-                    if (
-                        not instruction_data_reg
-                        and self._isa == "x86"
-                        and instruction_form.mnemonic[-1] in self.GAS_SUFFIXES
-                    ):
-                        # check for instruction without GAS suffix
-                        instruction_data_reg = self._machine_model.get_instruction(
-                            instruction_form.mnemonic[:-1], operands
-                        )
-                    if (
-                        instruction_data_reg is None
-                        and self._isa == "aarch64"
-                        and "." in instruction_form.mnemonic
-                    ):
-                        # Check for instruction without shape/cc suffix
-                        suffix_start = instruction_form.mnemonic.index(".")
-                        instruction_data_reg = self._machine_model.get_instruction(
-                            instruction_form.mnemonic[:suffix_start], operands
-                        )
-                    if (
-                        instruction_data_reg is None
-                        and self._isa == "riscv"
-                        and "." in instruction_form.mnemonic
-                    ):
-                        # Check for instruction without vector suffix (.v, .vv, .vf, etc.)
-                        suffix_start = instruction_form.mnemonic.index(".")
-                        instruction_data_reg = self._machine_model.get_instruction(
-                            instruction_form.mnemonic[:suffix_start], operands
-                        )
                     if instruction_data_reg:
                         assign_unknown = False
                         reg_type = self._parser.get_reg_type(
@@ -330,7 +285,7 @@ class ArchSemantics(ISASemantics):
                             #   - all mem operands in src_dst are pre-/post_indexed
                             # since it is no mem store
                             if (
-                                self._isa == "aarch64"
+                                self._parser.isa() == "aarch64"
                                 and not isinstance(
                                     instruction_form.semantic_operands["destination"],
                                     MemoryOperand,
@@ -426,6 +381,7 @@ class ArchSemantics(ISASemantics):
 
     def _handle_instruction_found(self, instruction_data, port_number, instruction_form, flags):
         """Apply performance data to instruction if it was found in the archDB"""
+        instruction_form.check_normalized()
         throughput = instruction_data.throughput
         port_pressure = self._machine_model.average_port_pressure(instruction_data.port_pressure)
         instruction_form.port_uops = instruction_data.port_pressure
@@ -461,14 +417,14 @@ class ArchSemantics(ISASemantics):
 
     def convert_op_to_reg(self, reg_type, regtype="0"):
         """Create register operand for a memory addressing operand"""
-        if self._isa == "x86":
+        if self._parser.isa() == "x86":
             if reg_type == "gpr":
                 register = RegisterOperand(name="r" + str(int(regtype) + 9))
             else:
                 register = RegisterOperand(name=reg_type + regtype)
-        elif self._isa == "aarch64":
+        elif self._parser.isa() == "aarch64":
             register = RegisterOperand(name=regtype, prefix=reg_type)
-        elif self._isa == "riscv":
+        elif self._parser.isa() == "riscv":
             register = RegisterOperand(name=regtype, prefix=reg_type)
         return register
 

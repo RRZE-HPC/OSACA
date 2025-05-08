@@ -19,6 +19,7 @@ class InstructionForm:
         port_pressure=None,
         operation=None,
         breaks_dependency_on_equal_operands=False,
+        normalized=False,
     ):
         self._mnemonic = mnemonic
         self._operands = operands
@@ -33,6 +34,7 @@ class InstructionForm:
         self._operation = operation
         self._uops = uops
         self._breaks_dependency_on_equal_operands = breaks_dependency_on_equal_operands
+        self._normalized = normalized
         self._latency = latency
         self._throughput = throughput
         self._latency_cp = []
@@ -41,6 +43,10 @@ class InstructionForm:
         self._port_pressure = port_pressure
         self._port_uops = []
         self._flags = []
+
+    def check_normalized(self):
+        if not self._normalized:
+            raise AssertionError("Unnormalized instruction")
 
     @property
     def semantic_operands(self):
@@ -114,6 +120,10 @@ class InstructionForm:
     def breaks_dependency_on_equal_operands(self):
         return self._breaks_dependency_on_equal_operands
 
+    @property
+    def normalized(self):
+        return self._normalized
+
     @semantic_operands.setter
     def semantic_operands(self, semantic_operands):
         self._semantic_operands = semantic_operands
@@ -141,6 +151,10 @@ class InstructionForm:
     @breaks_dependency_on_equal_operands.setter
     def breaks_dependency_on_equal_operands(self, boolean):
         self._breaks_dependency_on_equal_operands = boolean
+
+    @normalized.setter
+    def normalized(self, normalized):
+        self._normalized = normalized
 
     @mnemonic.setter
     def mnemonic(self, mnemonic):
