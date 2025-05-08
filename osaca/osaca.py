@@ -107,8 +107,8 @@ def create_parser(parser=None):
         "--arch",
         type=str,
         help="Define architecture (SNB, IVB, HSW, BDW, SKX, CSX, ICL, ICX, SPR, ZEN1, ZEN2, ZEN3, "
-        "ZEN4, TX2, N1, A64FX, TSV110, A72, M1, V2). If no architecture is given, OSACA assumes a "
-        "default uarch for x86/AArch64.",
+        "ZEN4, TX2, N1, A64FX, TSV110, A72, M1, V2, RV64). If no architecture is given, OSACA assumes a "
+        "default uarch for the detected ISA.",
     )
     parser.add_argument(
         "--fixed",
@@ -325,15 +325,28 @@ def inspect(args, output_file=sys.stdout):
     except Exception as e:
         # probably the wrong parser based on heuristic
         if args.arch is None:
-            # change ISA and try again
-            arch = (
-                DEFAULT_ARCHS["x86"]
-                if BaseParser.detect_ISA(code) == "aarch64"
-                else DEFAULT_ARCHS["aarch64"]
-            )
-            isa = MachineModel.get_isa_for_arch(arch)
-            parser = get_asm_parser(arch)
-            parsed_code = parser.parse_file(code)
+            # Try all supported ISAs in order if auto-detection may have failed
+            detected_isa = BaseParser.detect_ISA(code)
+            fallback_isas = ["x86", "aarch64", "riscv"]
+            # Remove already tried ISA from fallback options
+            if detected_isa in fallback_isas:
+                fallback_isas.remove(detected_isa)
+            
+            # Try each remaining ISA until one works
+            for fallback_isa in fallback_isas:
+                try:
+                    arch = DEFAULT_ARCHS[fallback_isa]
+                    isa = MachineModel.get_isa_for_arch(arch)
+                    parser = get_asm_parser(arch)
+                    parsed_code = parser.parse_file(code)
+                    # If parsing succeeds, break out of the loop
+                    break
+                except Exception:
+                    # Continue trying with next ISA
+                    continue
+            else:
+                # If none of the parsers work, raise the original exception
+                raise e
         else:
             raise e
 

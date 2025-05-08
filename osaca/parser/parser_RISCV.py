@@ -1,11 +1,8 @@
 #!/usr/bin/env python3
 import re
 import os
-import logging
 from copy import deepcopy
 import pyparsing as pp
-
-logger = logging.getLogger(__name__)
 
 from osaca.parser import BaseParser
 from osaca.parser.instruction_form import InstructionForm
@@ -30,7 +27,32 @@ class ParserRISCV(BaseParser):
 
     def __init__(self):
         super().__init__()
-        self.isa = "riscv"
+        # Initialize parser, but don't set 'isa' directly as an attribute
+        self._isa_str = "riscv"
+
+    def isa(self):
+        """Return the ISA string."""
+        return self._isa_str
+
+    def start_marker(self):
+        """Return the OSACA start marker for RISC-V assembly."""
+        # Parse the RISC-V start marker (li a1, 111 followed by NOP)
+        # This matches how start marker is defined in marker_utils.py for RISC-V
+        marker_str = (
+            "li        a1, 111    # OSACA START MARKER\n"
+            ".byte     19,0,0,0   # OSACA START MARKER\n"
+        )
+        return self.parse_file(marker_str)
+
+    def end_marker(self):
+        """Return the OSACA end marker for RISC-V assembly."""
+        # Parse the RISC-V end marker (li a1, 222 followed by NOP)
+        # This matches how end marker is defined in marker_utils.py for RISC-V
+        marker_str = (
+            "li        a1, 222    # OSACA END MARKER\n"
+            ".byte     19,0,0,0   # OSACA END MARKER\n"
+        )
+        return self.parse_file(marker_str)
 
     def construct_parser(self):
         """Create parser for RISC-V ISA."""
@@ -52,10 +74,15 @@ class ParserRISCV(BaseParser):
         vector_identifier = pp.Word(pp.alphas, pp.alphanums)
         special_identifier = pp.Word(pp.alphas + "%")
         
+        # First character of an identifier 
         first = pp.Word(pp.alphas + "_.", exact=1)
+        # Rest of the identifier
         rest = pp.Word(pp.alphanums + "_.")
+        # PLT suffix (@plt) for calls to shared libraries
+        plt_suffix = pp.Optional(pp.Literal("@") + pp.Word(pp.alphas))
+        
         identifier = pp.Group(
-            pp.Combine(first + pp.Optional(rest)).setResultsName("name")
+            (pp.Combine(first + pp.Optional(rest) + plt_suffix)).setResultsName("name")
             + pp.Optional(
                 pp.Suppress(pp.Literal("+"))
                 + (hex_number | decimal_number).setResultsName("offset")
@@ -346,7 +373,6 @@ class ParserRISCV(BaseParser):
             return return_dict
             
         except Exception as e:
-            logger.debug(f"Error parsing instruction: {instruction} - {str(e)}")
             # For special vector instructions or ones with % in them
             if "%" in instruction or instruction.startswith("v"):
                 parts = instruction.split("#")[0].strip().split(None, 1)
@@ -640,4 +666,53 @@ class ParserRISCV(BaseParser):
         elif name.startswith("csr"):
             return "csr"  # Control and Status Register
             
-        return "unknown" 
+        return "unknown"
+
+    def normalize_instruction_form(self, instruction_form, isa_model, arch_model):
+        """
+        Normalize instruction form for RISC-V instructions.
+        
+        :param instruction_form: instruction form to normalize
+        :param isa_model: ISA model to use for normalization
+        :param arch_model: architecture model to use for normalization
+        """
+        if instruction_form.normalized:
+            return
+            
+        if instruction_form.mnemonic is None:
+            instruction_form.normalized = True
+            return
+            
+        # Normalize the mnemonic if needed
+        if instruction_form.mnemonic:
+            # Handle any RISC-V specific mnemonic normalization
+            # For example, convert aliases or pseudo-instructions to their base form
+            pass
+            
+        # Normalize the operands if needed
+        for i, operand in enumerate(instruction_form.operands):
+            if isinstance(operand, ImmediateOperand):
+                # Normalize immediate operands
+                instruction_form.operands[i] = self.normalize_imd(operand)
+            elif isinstance(operand, RegisterOperand):
+                # Convert register names to canonical form if needed
+                pass
+                
+        instruction_form.normalized = True 
+
+    def get_regular_source_operands(self, instruction_form):
+        """Get source operand of given instruction form assuming regular src/dst behavior."""
+        # For RISC-V, the first operand is typically the destination,
+        # and the rest are sources
+        if len(instruction_form.operands) == 1:
+            return [instruction_form.operands[0]]
+        else:
+            return [op for op in instruction_form.operands[1:]]
+    
+    def get_regular_destination_operands(self, instruction_form):
+        """Get destination operand of given instruction form assuming regular src/dst behavior."""
+        # For RISC-V, the first operand is typically the destination
+        if len(instruction_form.operands) == 1:
+            return []
+        else:
+            return instruction_form.operands[:1] 
