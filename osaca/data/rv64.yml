@@ -1,5 +1,5 @@
 ---
-osaca_version: 0.6.1
+osaca_version: 0.7.0
 micro_architecture: rv64
 arch_code: rv64
 isa: riscv

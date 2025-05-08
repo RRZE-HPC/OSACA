@@ -1,5 +1,5 @@
 ---
-osaca_version: 0.6.1
+osaca_version: 0.7.0
 isa: riscv
 # Contains all operand-irregular instruction forms OSACA supports for RISC-V.
 # Operand-regular for a RISC-V instruction form with N operands in the shape of
@@ -8,259 +8,6 @@ isa: riscv
 # For vector instructions with suffixes (.v, .vv, .vf), the operand behavior follows
 # the base instruction pattern.
 instruction_forms:
-- name: addi
-  operands:
-  - class: register
-    prefix: x
-    source: false
-    destination: true
-  - class: register
-    prefix: x
-    source: true
-    destination: false
-  - class: immediate
-    imd: int
-    source: true
-    destination: false
-  hidden_operands:
-  - class: flag
-    name: Z
-    source: false
-    destination: true
-  - class: flag
-    name: N
-    source: false
-    destination: true
-- name: add
-  operands:
-  - class: register
-    prefix: x
-    source: false
-    destination: true
-  - class: register
-    prefix: x
-    source: true
-    destination: false
-  - class: register
-    prefix: x
-    source: true
-    destination: false
-  hidden_operands:
-  - class: flag
-    name: Z
-    source: false
-    destination: true
-  - class: flag
-    name: N
-    source: false
-    destination: true
-- name: sub
-  operands:
-  - class: register
-    prefix: x
-    source: false
-    destination: true
-  - class: register
-    prefix: x
-    source: true
-    destination: false
-  - class: register
-    prefix: x
-    source: true
-    destination: false
-  hidden_operands:
-  - class: flag
-    name: Z
-    source: false
-    destination: true
-  - class: flag
-    name: N
-    source: false
-    destination: true
-- name: mul
-  operands:
-  - class: register
-    prefix: x
-    source: false
-    destination: true
-  - class: register
-    prefix: x
-    source: true
-    destination: false
-  - class: register
-    prefix: x
-    source: true
-    destination: false
-  hidden_operands:
-  - class: flag
-    name: Z
-    source: false
-    destination: true
-  - class: flag
-    name: N
-    source: false
-    destination: true
-- name: div
-  operands:
-  - class: register
-    prefix: x
-    source: false
-    destination: true
-  - class: register
-    prefix: x
-    source: true
-    destination: false
-  - class: register
-    prefix: x
-    source: true
-    destination: false
-  hidden_operands:
-  - class: flag
-    name: Z
-    source: false
-    destination: true
-  - class: flag
-    name: N
-    source: false
-    destination: true
-- name: and
-  operands:
-  - class: register
-    prefix: x
-    source: false
-    destination: true
-  - class: register
-    prefix: x
-    source: true
-    destination: false
-  - class: register
-    prefix: x
-    source: true
-    destination: false
-  hidden_operands:
-  - class: flag
-    name: Z
-    source: false
-    destination: true
-  - class: flag
-    name: N
-    source: false
-    destination: true
-- name: or
-  operands:
-  - class: register
-    prefix: x
-    source: false
-    destination: true
-  - class: register
-    prefix: x
-    source: true
-    destination: false
-  - class: register
-    prefix: x
-    source: true
-    destination: false
-  hidden_operands:
-  - class: flag
-    name: Z
-    source: false
-    destination: true
-  - class: flag
-    name: N
-    source: false
-    destination: true
-- name: xor
-  operands:
-  - class: register
-    prefix: x
-    source: false
-    destination: true
-  - class: register
-    prefix: x
-    source: true
-    destination: false
-  - class: register
-    prefix: x
-    source: true
-    destination: false
-  hidden_operands:
-  - class: flag
-    name: Z
-    source: false
-    destination: true
-  - class: flag
-    name: N
-    source: false
-    destination: true
-- name: sll
-  operands:
-  - class: register
-    prefix: x
-    source: false
-    destination: true
-  - class: register
-    prefix: x
-    source: true
-    destination: false
-  - class: register
-    prefix: x
-    source: true
-    destination: false
-  hidden_operands:
-  - class: flag
-    name: Z
-    source: false
-    destination: true
-  - class: flag
-    name: N
-    source: false
-    destination: true
-- name: srl
-  operands:
-  - class: register
-    prefix: x
-    source: false
-    destination: true
-  - class: register
-    prefix: x
-    source: true
-    destination: false
-  - class: register
-    prefix: x
-    source: true
-    destination: false
-  hidden_operands:
-  - class: flag
-    name: Z
-    source: false
-    destination: true
-  - class: flag
-    name: N
-    source: false
-    destination: true
-- name: sra
-  operands:
-  - class: register
-    prefix: x
-    source: false
-    destination: true
-  - class: register
-    prefix: x
-    source: true
-    destination: false
-  - class: register
-    prefix: x
-    source: true
-    destination: false
-  hidden_operands:
-  - class: flag
-    name: Z
-    source: false
-    destination: true
-  - class: flag
-    name: N
-    source: false
-    destination: true
 - name: lw
   operands:
   - class: register
@@ -364,11 +111,6 @@ instruction_forms:
   - class: identifier
     source: true
     destination: false
-  hidden_operands:
-  - class: flag
-    name: Z
-    source: true
-    destination: false
 - name: bne
   operands:
   - class: register
@@ -380,11 +122,6 @@ instruction_forms:
     source: true
     destination: false
   - class: identifier
-    source: true
-    destination: false
-  hidden_operands:
-  - class: flag
-    name: Z
     source: true
     destination: false
 - name: blt
@@ -400,11 +137,6 @@ instruction_forms:
   - class: identifier
     source: true
     destination: false
-  hidden_operands:
-  - class: flag
-    name: N
-    source: true
-    destination: false
 - name: bge
   operands:
   - class: register
@@ -418,11 +150,6 @@ instruction_forms:
   - class: identifier
     source: true
     destination: false
-  hidden_operands:
-  - class: flag
-    name: N
-    source: true
-    destination: false
 - name: jal
   operands:
   - class: register
@@ -430,67 +157,6 @@ instruction_forms:
     source: false
     destination: true
   - class: identifier
-    source: true
-    destination: false
-- name: jalr
-  operands:
-  - class: register
-    prefix: x
-    source: false
-    destination: true
-  - class: register
-    prefix: x
-    source: true
-    destination: false
-  - class: immediate
-    imd: int
-    source: true
-    destination: false
-- name: lui
-  operands:
-  - class: register
-    prefix: x
-    source: false
-    destination: true
-  - class: immediate
-    imd: int
-    source: true
-    destination: false
-- name: auipc
-  operands:
-  - class: register
-    prefix: x
-    source: false
-    destination: true
-  - class: immediate
-    imd: int
-    source: true
-    destination: false
-- name: li
-  operands:
-  - class: register
-    prefix: x
-    source: false
-    destination: true
-  - class: immediate
-    imd: int
-    source: true
-    destination: false
-- name: mv
-  operands:
-  - class: register
-    prefix: x
-    source: false
-    destination: true
-  - class: register
-    prefix: x
-    source: true
-    destination: false
-- name: ret
-  operands:
-  - class: register
-    prefix: x
-    name: '1'      # x1 is the return address register (ra)
     source: true
     destination: false
 - name: j
@@ -534,82 +200,6 @@ instruction_forms:
     post_indexed: '*'
     source: false
     destination: true
-- name: fadd
-  operands:
-  - class: register
-    prefix: f
-    source: false
-    destination: true
-  - class: register
-    prefix: f
-    source: true
-    destination: false
-  - class: register
-    prefix: f
-    source: true
-    destination: false
-  hidden_operands:
-  - class: flag
-    name: FSR
-    source: true
-    destination: true
-- name: fsub
-  operands:
-  - class: register
-    prefix: f
-    source: false
-    destination: true
-  - class: register
-    prefix: f
-    source: true
-    destination: false
-  - class: register
-    prefix: f
-    source: true
-    destination: false
-  hidden_operands:
-  - class: flag
-    name: FSR
-    source: true
-    destination: true
-- name: fmul
-  operands:
-  - class: register
-    prefix: f
-    source: false
-    destination: true
-  - class: register
-    prefix: f
-    source: true
-    destination: false
-  - class: register
-    prefix: f
-    source: true
-    destination: false
-  hidden_operands:
-  - class: flag
-    name: FSR
-    source: true
-    destination: true
-- name: fdiv
-  operands:
-  - class: register
-    prefix: f
-    source: false
-    destination: true
-  - class: register
-    prefix: f
-    source: true
-    destination: false
-  - class: register
-    prefix: f
-    source: true
-    destination: false
-  hidden_operands:
-  - class: flag
-    name: FSR
-    source: true
-    destination: true
 - name: fmv.x.w
   operands:
   - class: register
@@ -652,11 +242,6 @@ instruction_forms:
   - class: identifier
     source: true
     destination: false
-  hidden_operands:
-  - class: flag
-    name: VSR
-    source: false
-    destination: true
 - name: vsetivli
   operands:
   - class: register
@@ -673,11 +258,6 @@ instruction_forms:
   - class: identifier
     source: true
     destination: false
-  hidden_operands:
-  - class: flag
-    name: VSR
-    source: false
-    destination: true
 - name: vle32.v
   operands:
   - class: register
@@ -693,11 +273,6 @@ instruction_forms:
     post_indexed: '*'
     source: true
     destination: false
-  hidden_operands:
-  - class: flag
-    name: VSR
-    source: true
-    destination: true
 - name: vse32.v
   operands:
   - class: register
@@ -713,30 +288,6 @@ instruction_forms:
     post_indexed: '*'
     source: false
     destination: true
-  hidden_operands:
-  - class: flag
-    name: VSR
-    source: true
-    destination: true
-- name: vadd.vv
-  operands:
-  - class: register
-    prefix: v
-    source: false
-    destination: true
-  - class: register
-    prefix: v
-    source: true
-    destination: false
-  - class: register
-    prefix: v
-    source: true
-    destination: false
-  hidden_operands:
-  - class: flag
-    name: VSR
-    source: true
-    destination: true
 - name: vfmv.v.f
   operands:
   - class: register
@@ -747,30 +298,6 @@ instruction_forms:
     prefix: f
     source: true
     destination: false
-  hidden_operands:
-  - class: flag
-    name: VSR
-    source: true
-    destination: true
-- name: vfmadd.vv
-  operands:
-  - class: register
-    prefix: v
-    source: false
-    destination: true
-  - class: register
-    prefix: v
-    source: true
-    destination: false
-  - class: register
-    prefix: v
-    source: true
-    destination: false
-  hidden_operands:
-  - class: flag
-    name: VSR
-    source: true
-    destination: true
 - name: vfmacc.vf
   operands:
   - class: register
@@ -785,12 +312,7 @@ instruction_forms:
     prefix: v
     source: true
     destination: false
-  hidden_operands:
-  - class: flag
-    name: VSR
-    source: true
-    destination: true
-  # CSR instructions
+# CSR instructions
 - name: csrr
   operands:
   - class: register
@@ -798,11 +320,6 @@ instruction_forms:
     source: false
     destination: true
   - class: identifier
-    source: true
-    destination: false
-  hidden_operands:
-  - class: flag
-    name: CSR
     source: true
     destination: false
 - name: csrw
@@ -814,11 +331,6 @@ instruction_forms:
     prefix: x
     source: true
     destination: false
-  hidden_operands:
-  - class: flag
-    name: CSR
-    source: false
-    destination: true
 - name: csrs
   operands:
   - class: identifier
@@ -828,11 +340,6 @@ instruction_forms:
     prefix: x
     source: true
     destination: false
-  hidden_operands:
-  - class: flag
-    name: CSR
-    source: true
-    destination: true
 - name: csrc
   operands:
   - class: identifier
@@ -842,12 +349,7 @@ instruction_forms:
     prefix: x
     source: true
     destination: false
-  hidden_operands:
-  - class: flag
-    name: CSR
-    source: true
-    destination: true
-  # Atomic instructions
+# Atomic instructions
 - name: lr.w
   operands:
   - class: register
@@ -863,11 +365,6 @@ instruction_forms:
     post_indexed: '*'
     source: true
     destination: false
-  hidden_operands:
-  - class: flag
-    name: CSR
-    source: true
-    destination: true
 - name: sc.w
   operands:
   - class: register
@@ -885,10 +382,5 @@ instruction_forms:
     scale: '*'
     pre_indexed: '*'
     post_indexed: '*'
-    source: true
-    destination: true
-  hidden_operands:
-  - class: flag
-    name: CSR
     source: true
     destination: true
