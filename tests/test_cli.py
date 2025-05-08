@@ -12,7 +12,7 @@ from unittest.mock import patch
 
 import osaca.osaca as osaca
 from osaca.db_interface import sanity_check
-from osaca.parser import ParserAArch64, ParserX86ATT
+from osaca.parser import ParserAArch64, ParserX86ATT, ParserX86Intel
 from osaca.semantics import MachineModel
 
 
@@ -83,6 +83,7 @@ class TestCLI(unittest.TestCase):
 
     def test_get_parser(self):
         self.assertTrue(isinstance(osaca.get_asm_parser("csx"), ParserX86ATT))
+        self.assertTrue(isinstance(osaca.get_asm_parser("csx", "intel"), ParserX86Intel))
         self.assertTrue(isinstance(osaca.get_asm_parser("tx2"), ParserAArch64))
         with self.assertRaises(ValueError):
             osaca.get_asm_parser("UNKNOWN")

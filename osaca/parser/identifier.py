@@ -41,3 +41,12 @@ class IdentifierOperand(Operand):
 
     def __repr__(self):
         return self.__str__()
+
+    def __eq__(self, other):
+        if isinstance(other, IdentifierOperand):
+            return (
+                self._name == other._name
+                and self._offset == other._offset
+                and self._relocation == other._relocation
+            )
+        return False
