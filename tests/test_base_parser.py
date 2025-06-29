@@ -28,6 +28,8 @@ class TestBaseParser(unittest.TestCase):
             self.x86_code = f.read()
         with open(self._find_file("kernel_aarch64.s")) as f:
             self.aarch64_code = f.read()
+        with open(self._find_file("kernel_riscv.s")) as f:
+            self.riscv_code = f.read()
 
     ##################
     # Test
@@ -75,6 +77,7 @@ class TestBaseParser(unittest.TestCase):
         self.assertEqual(BaseParser.detect_ISA(self.triad_code_arm), ("aarch64", None))
         self.assertEqual(BaseParser.detect_ISA(self.x86_code), ("x86", "ATT"))
         self.assertEqual(BaseParser.detect_ISA(self.aarch64_code), ("aarch64", None))
+        self.assertEqual(BaseParser.detect_ISA(self.riscv_code), ("riscv", None))
 
     ##################
     # Helper functions

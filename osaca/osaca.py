@@ -300,6 +300,11 @@ def insert_byte_marker(args):
         )
         sys.exit(1)
 
+    # Check if ISA is RISC-V and raise NotImplementedError
+    isa = MachineModel.get_isa_for_arch(args.arch)
+    if isa == "riscv":
+        raise NotImplementedError("Marker insertion is not supported for RISC-V architecture.")
+
     assembly = args.file.read()
     unmarked_assembly = io.StringIO(assembly)
     marked_assembly = io.StringIO()
@@ -308,7 +313,7 @@ def insert_byte_marker(args):
         output_file=marked_assembly,
         block_selection="manual",
         pointer_increment="auto_with_manual_fallback",
-        isa=MachineModel.get_isa_for_arch(args.arch),
+        isa=isa,
     )
 
     marked_assembly.seek(0)

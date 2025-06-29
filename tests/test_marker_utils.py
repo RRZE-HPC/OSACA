@@ -12,7 +12,7 @@ from osaca.semantics import (
     find_jump_labels,
     find_basic_loop_bodies,
 )
-from osaca.parser import ParserAArch64, ParserX86ATT, ParserX86Intel
+from osaca.parser import ParserAArch64, ParserX86ATT, ParserX86Intel, ParserRISCV
 
 
 class TestMarkerUtils(unittest.TestCase):
@@ -21,15 +21,21 @@ class TestMarkerUtils(unittest.TestCase):
         self.parser_AArch = ParserAArch64()
         self.parser_x86_att = ParserX86ATT()
         self.parser_x86_intel = ParserX86Intel()
+        self.parser_RISCV = ParserRISCV()
+        
         with open(self._find_file("triad_arm_iaca.s")) as f:
             triad_code_arm = f.read()
         with open(self._find_file("triad_x86_iaca.s")) as f:
             triad_code_x86_att = f.read()
         with open(self._find_file("triad_x86_intel_iaca.s")) as f:
             triad_code_x86_intel = f.read()
+        with open(self._find_file("kernel_riscv.s")) as f:
+            kernel_code_riscv = f.read()
+            
         self.parsed_AArch = self.parser_AArch.parse_file(triad_code_arm)
         self.parsed_x86_att = self.parser_x86_att.parse_file(triad_code_x86_att)
         self.parsed_x86_intel = self.parser_x86_intel.parse_file(triad_code_x86_intel)
+        self.parsed_RISCV = self.parser_RISCV.parse_file(kernel_code_riscv)
 
     #################
     # Test
@@ -52,6 +58,12 @@ class TestMarkerUtils(unittest.TestCase):
         self.assertEqual(len(kernel), 7)
         self.assertEqual(kernel[0].line_number, 111)
         self.assertEqual(kernel[-1].line_number, 117)
+
+    def test_marker_detection_RISCV(self):
+        kernel = reduce_to_section(self.parsed_RISCV, ParserRISCV())
+        # The exact number of instructions and line numbers will depend on the RISC-V test file
+        # but we can at least test that reduce_to_section works for RISC-V
+        self.assertGreater(len(kernel), 0)
 
     def test_marker_matching_AArch64(self):
         # preparation
@@ -205,6 +217,71 @@ class TestMarkerUtils(unittest.TestCase):
                             )
                             self.assertEqual(sample_kernel, parsed_kernel)
 
+    def test_marker_matching_RISCV(self):
+        # preparation for RISC-V specific markers
+        bytes_1_line = ".byte     19,0,0,0\n"
+        bytes_2_lines = ".byte     19,0\n" + ".byte     0,0\n"
+        bytes_hex_line = ".byte     0x13,0x0,0x0,0x0\n"
+        li_start_1 = "li      a1, 111 # OSACA START MARKER\n"
+        li_start_2 = "li      a1, 111\n"
+        li_end_1 = "li      a1, 222 # OSACA END MARKER\n"
+        li_end_2 = "li      a1, 222\n"
+        prologue = "addi    sp, sp, -16\n" + "sd      ra, 8(sp)\n" + ".p2align    2\n"
+        kernel = (
+            ".L4:\n"
+            + "lw        a5, 0(a0)\n"
+            + "addi      a0, a0, 4\n"
+            + "addi      a2, a2, -1\n"
+            + "add       a3, a3, a5\n"
+            + "bnez      a2, .L4\n"
+        )
+        epilogue = ".L5:\n" + "mv      a0, a3\n" + "ret\n"
+        kernel_length = len(list(filter(None, kernel.split("\n"))))
+
+        bytes_variations = [
+            bytes_1_line,
+            bytes_2_lines,
+            bytes_hex_line,
+        ]
+        li_start_variations = [li_start_1, li_start_2]
+        li_end_variations = [li_end_1, li_end_2]
+        
+        # actual tests for RISC-V
+        for li_start_var in li_start_variations:
+            for bytes_var_1 in bytes_variations:
+                for li_end_var in li_end_variations:
+                    for bytes_var_2 in bytes_variations:
+                        sample_code = (
+                            prologue
+                            + li_start_var
+                            + bytes_var_1
+                            + kernel
+                            + li_end_var
+                            + bytes_var_2
+                            + epilogue
+                        )
+                        with self.subTest(
+                            li_start=li_start_var,
+                            bytes_start=bytes_var_1,
+                            li_end=li_end_var,
+                            bytes_end=bytes_var_2,
+                        ):
+                            sample_parsed = self.parser_RISCV.parse_file(sample_code)
+                            sample_kernel = reduce_to_section(sample_parsed, ParserRISCV())
+                            self.assertEqual(len(sample_kernel), kernel_length)
+                            kernel_start = len(
+                                list(
+                                    filter(
+                                        None,
+                                        (prologue + li_start_var + bytes_var_1).split("\n"),
+                                    )
+                                )
+                            )
+                            parsed_kernel = self.parser_RISCV.parse_file(
+                                kernel, start_line=kernel_start
+                            )
+                            self.assertEqual(sample_kernel, parsed_kernel)
+
     def test_marker_special_cases_AArch(self):
         bytes_line = ".byte     213,3,32,31\n"
         start_marker = "mov      x1, #111\n" + bytes_line
@@ -302,6 +379,56 @@ class TestMarkerUtils(unittest.TestCase):
                 msg="Invalid extracted kernel on {!r}".format(test_name),
             )
 
+    def test_marker_special_cases_RISCV(self):
+        bytes_line = ".byte     19,0,0,0\n"
+        start_marker = "li      a1, 111\n" + bytes_line
+        end_marker = "li      a1, 222\n" + bytes_line
+        prologue = "addi    sp, sp, -16\n" + "sd      ra, 8(sp)\n" + ".p2align    2\n"
+        kernel = (
+            ".L4:\n"
+            + "lw        a5, 0(a0)\n"
+            + "addi      a0, a0, 4\n"
+            + "addi      a2, a2, -1\n"
+            + "add       a3, a3, a5\n"
+            + "bnez      a2, .L4\n"
+        )
+        epilogue = ".L5:\n" + "mv      a0, a3\n" + "ret\n"
+
+        samples = [
+            # (test name,
+            #  ignored prologue, section to be extraced, ignored epilogue)
+            ("markers", prologue + start_marker, kernel, end_marker + epilogue),
+            ("marker at file start", start_marker, kernel, end_marker + epilogue),
+            ("no start marker", "", prologue + kernel, end_marker + epilogue),
+            ("marker at file end", prologue + start_marker, kernel, end_marker),
+            ("no end marker", prologue + start_marker, kernel + epilogue, ""),
+            ("empty kernel", prologue + start_marker, "", end_marker + epilogue),
+        ]
+
+        for test_name, pro, kernel, epi in samples:
+            code = pro + kernel + epi
+            parsed = self.parser_RISCV.parse_file(code)
+            test_kernel = reduce_to_section(parsed, ParserRISCV())
+            if kernel:
+                kernel_length = len(kernel.strip().split("\n"))
+            else:
+                kernel_length = 0
+            self.assertEqual(
+                len(test_kernel),
+                kernel_length,
+                msg="Invalid extracted kernel length on {!r} sample".format(test_name),
+            )
+            if pro:
+                kernel_start = len((pro).strip().split("\n"))
+            else:
+                kernel_start = 0
+            parsed_kernel = self.parser_RISCV.parse_file(kernel, start_line=kernel_start)
+            self.assertEqual(
+                test_kernel,
+                parsed_kernel,
+                msg="Invalid extracted kernel on {!r}".format(test_name),
+            )
+
     def test_find_jump_labels(self):
         self.assertEqual(
             find_jump_labels(self.parsed_x86_att),
@@ -363,6 +490,11 @@ class TestMarkerUtils(unittest.TestCase):
                 ]
             ),
         )
+        
+        # Check that find_jump_labels works for RISC-V
+        riscv_labels = find_jump_labels(self.parsed_RISCV)
+        self.assertIsInstance(riscv_labels, OrderedDict)
+        self.assertGreater(len(riscv_labels), 0)
 
     def test_find_basic_blocks(self):
         self.assertEqual(
@@ -427,6 +559,10 @@ class TestMarkerUtils(unittest.TestCase):
                 ("main", 575, 590),
             ],
         )
+        
+        # Check that find_basic_blocks works for RISC-V
+        riscv_blocks = find_basic_blocks(self.parsed_RISCV)
+        self.assertGreater(len(riscv_blocks), 0)
 
     def test_find_basic_loop_body(self):
         self.assertEqual(
@@ -451,6 +587,10 @@ class TestMarkerUtils(unittest.TestCase):
                 (".LBB0_35", 494, 504),
             ],
         )
+        
+        # Check that find_basic_loop_bodies works for RISC-V
+        riscv_loop_bodies = find_basic_loop_bodies(self.parsed_RISCV)
+        self.assertGreater(len(riscv_loop_bodies), 0)
 
     ##################
     # Helper functions

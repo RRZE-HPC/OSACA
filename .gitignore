@@ -1,5 +1,7 @@
 # OSACA specific files and folders
 *.*.pickle
+osaca_testfront_venv/
+examples/riscy_asm_files/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

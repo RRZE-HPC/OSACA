@@ -431,30 +431,58 @@ class ParserRISCV(BaseParser):
 
     def process_register_operand(self, operand):
         """Process register operands, including ABI name to x-register mapping"""
-        # Handle ABI names by adding the appropriate prefix
-        if "prefix" not in operand:
-            name = operand["name"].lower()
-            # Integer register ABI names
-            if name in ["zero", "ra", "sp", "gp", "tp"] or name[0] in ["t", "a", "s"]:
-                prefix = "x"
-            # Floating point register ABI names
-            elif name[0] == "f" and name[1] in ["t", "a", "s"]:
-                prefix = "f"
-            # CSR registers
-            elif name.startswith("csr"):
-                prefix = ""
-            else:
-                prefix = ""
-                
-            return RegisterOperand(
-                prefix=prefix,
-                name=name
-            )
-        else:
+        # If already has prefix (x#, f#, v#), just return as is
+        if "prefix" in operand:
             return RegisterOperand(
                 prefix=operand["prefix"].lower(),
                 name=operand["name"]
             )
+            
+        # Handle ABI names by converting to x-register numbers
+        name = operand["name"].lower()
+        
+        # ABI name mapping for integer registers
+        abi_to_x = {
+            "zero": "0", "ra": "1", "sp": "2", "gp": "3", "tp": "4",
+            "t0": "5", "t1": "6", "t2": "7",
+            "s0": "8", "fp": "8", "s1": "9",
+            "a0": "10", "a1": "11", "a2": "12", "a3": "13",
+            "a4": "14", "a5": "15", "a6": "16", "a7": "17",
+            "s2": "18", "s3": "19", "s4": "20", "s5": "21",
+            "s6": "22", "s7": "23", "s8": "24", "s9": "25",
+            "s10": "26", "s11": "27",
+            "t3": "28", "t4": "29", "t5": "30", "t6": "31"
+        }
+        
+        # Integer register ABI names
+        if name in abi_to_x:
+            return RegisterOperand(
+                prefix="x",
+                name=abi_to_x[name]
+            )
+        # Floating point register ABI names
+        elif name.startswith("f") and name[1] in ["t", "a", "s"]:
+            if name[1] == "a":  # fa0-fa7
+                idx = int(name[2:])
+                return RegisterOperand(prefix="f", name=str(idx + 10))
+            elif name[1] == "s":  # fs0-fs11
+                idx = int(name[2:])
+                if idx <= 1:
+                    return RegisterOperand(prefix="f", name=str(idx + 8))
+                else:
+                    return RegisterOperand(prefix="f", name=str(idx + 16))
+            elif name[1] == "t":  # ft0-ft11
+                idx = int(name[2:])
+                if idx <= 7:
+                    return RegisterOperand(prefix="f", name=str(idx))
+                else:
+                    return RegisterOperand(prefix="f", name=str(idx + 20))
+        # CSR registers
+        elif name.startswith("csr"):
+            return RegisterOperand(prefix="", name=name)
+            
+        # If no mapping found, return as is
+        return RegisterOperand(prefix="", name=name)
 
     def process_memory_address(self, memory_address):
         """Post-process memory address operand"""
@@ -716,3 +744,26 @@ class ParserRISCV(BaseParser):
             return []
         else:
             return instruction_form.operands[:1] 
+
+    def process_immediate_operand(self, operand):
+        """Process immediate operands, converting them to ImmediateOperand objects"""
+        if isinstance(operand, (int, str)):
+            # For raw integer values or string immediates
+            return ImmediateOperand(
+                imd_type="int",
+                value=str(operand) if isinstance(operand, int) else operand
+            )
+        elif isinstance(operand, dict) and "imd" in operand:
+            # For immediate operands from instruction definitions
+            return ImmediateOperand(
+                imd_type=operand["imd"],
+                value=operand.get("value"),
+                identifier=operand.get("identifier"),
+                shift=operand.get("shift")
+            )
+        else:
+            # For any other immediate format
+            return ImmediateOperand(
+                imd_type="int",
+                value=str(operand)
+            ) 

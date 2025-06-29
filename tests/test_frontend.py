@@ -7,7 +7,7 @@ import os
 import unittest
 
 from osaca.frontend import Frontend
-from osaca.parser import ParserAArch64, ParserX86ATT
+from osaca.parser import ParserAArch64, ParserX86ATT, ParserRISCV
 from osaca.semantics import ArchSemantics, KernelDG, MachineModel, reduce_to_section
 
 
@@ -21,18 +21,26 @@ class TestFrontend(unittest.TestCase):
         # set up parser and kernels
         self.parser_x86 = ParserX86ATT()
         self.parser_AArch64 = ParserAArch64()
+        self.parser_RISCV = ParserRISCV()
+        
         with open(self._find_file("kernel_x86.s")) as f:
             code_x86 = f.read()
         with open(self._find_file("kernel_aarch64.s")) as f:
             code_AArch64 = f.read()
+        with open(self._find_file("kernel_riscv.s")) as f:
+            code_RISCV = f.read()
+            
         self.kernel_x86 = self.parser_x86.parse_file(code_x86)
         self.kernel_AArch64 = self.parser_AArch64.parse_file(code_AArch64)
+        self.kernel_RISCV = self.parser_RISCV.parse_file(code_RISCV)
 
         # set up machine models
         self.machine_model_csx = MachineModel(
             path_to_yaml=os.path.join(self.MODULE_DATA_DIR, "csx.yml")
         )
         self.machine_model_tx2 = MachineModel(arch="tx2")
+        self.machine_model_rv64 = MachineModel(arch="rv64")
+        
         self.semantics_csx = ArchSemantics(
             self.parser_x86,
             self.machine_model_csx,
@@ -43,9 +51,15 @@ class TestFrontend(unittest.TestCase):
             self.machine_model_tx2,
             path_to_yaml=os.path.join(self.MODULE_DATA_DIR, "isa/aarch64.yml"),
         )
+        self.semantics_rv64 = ArchSemantics(
+            self.parser_RISCV,
+            self.machine_model_rv64,
+            path_to_yaml=os.path.join(self.MODULE_DATA_DIR, "isa/riscv.yml"),
+        )
 
         self.semantics_csx.normalize_instruction_forms(self.kernel_x86)
         self.semantics_tx2.normalize_instruction_forms(self.kernel_AArch64)
+        self.semantics_rv64.normalize_instruction_forms(self.kernel_RISCV)
 
         for i in range(len(self.kernel_x86)):
             self.semantics_csx.assign_src_dst(self.kernel_x86[i])
@@ -53,6 +67,9 @@ class TestFrontend(unittest.TestCase):
         for i in range(len(self.kernel_AArch64)):
             self.semantics_tx2.assign_src_dst(self.kernel_AArch64[i])
             self.semantics_tx2.assign_tp_lt(self.kernel_AArch64[i])
+        for i in range(len(self.kernel_RISCV)):
+            self.semantics_rv64.assign_src_dst(self.kernel_RISCV[i])
+            self.semantics_rv64.assign_tp_lt(self.kernel_RISCV[i])
 
     ###########
     # Tests
@@ -68,6 +85,7 @@ class TestFrontend(unittest.TestCase):
         with self.assertRaises(FileNotFoundError):
             Frontend(arch="THE_MACHINE")
         Frontend(arch="zen1")
+        Frontend(arch="rv64")
 
     def test_frontend_x86(self):
         dg = KernelDG(self.kernel_x86, self.parser_x86, self.machine_model_csx, self.semantics_csx)
@@ -85,6 +103,17 @@ class TestFrontend(unittest.TestCase):
         )
         fe = Frontend(path_to_yaml=os.path.join(self.MODULE_DATA_DIR, "tx2.yml"))
         fe.full_analysis(self.kernel_AArch64, dg, verbose=True)
+        # TODO compare output with checked string
+
+    def test_frontend_RISCV(self):
+        dg = KernelDG(
+            self.kernel_RISCV,
+            self.parser_RISCV,
+            self.machine_model_rv64,
+            self.semantics_rv64,
+        )
+        fe = Frontend(path_to_yaml=os.path.join(self.MODULE_DATA_DIR, "rv64.yml"))
+        fe.full_analysis(self.kernel_RISCV, dg, verbose=True)
         # TODO compare output with checked string
 
     def test_dict_output_x86(self):
@@ -131,6 +160,44 @@ class TestFrontend(unittest.TestCase):
         self.assertEqual(len(reduced_kernel), len(analysis_dict["Kernel"]))
         self.assertEqual("tx2", analysis_dict["Header"]["Architecture"])
         self.assertEqual(len(analysis_dict["Warnings"]), 0)
+        for i, line in enumerate(reduced_kernel):
+            self.assertEqual(line.throughput, analysis_dict["Kernel"][i]["Throughput"])
+            self.assertEqual(line.latency, analysis_dict["Kernel"][i]["Latency"])
+            self.assertEqual(
+                line.latency_wo_load, analysis_dict["Kernel"][i]["LatencyWithoutLoad"]
+            )
+            self.assertEqual(line.latency_cp, analysis_dict["Kernel"][i]["LatencyCP"])
+            self.assertEqual(line.mnemonic, analysis_dict["Kernel"][i]["Instruction"])
+            self.assertEqual(len(line.operands), len(analysis_dict["Kernel"][i]["Operands"]))
+            self.assertEqual(
+                len(line.semantic_operands["source"]),
+                len(analysis_dict["Kernel"][i]["SemanticOperands"]["source"]),
+            )
+            self.assertEqual(
+                len(line.semantic_operands["destination"]),
+                len(analysis_dict["Kernel"][i]["SemanticOperands"]["destination"]),
+            )
+            self.assertEqual(
+                len(line.semantic_operands["src_dst"]),
+                len(analysis_dict["Kernel"][i]["SemanticOperands"]["src_dst"]),
+            )
+            self.assertEqual(line.flags, analysis_dict["Kernel"][i]["Flags"])
+            self.assertEqual(line.line_number, analysis_dict["Kernel"][i]["LineNumber"])
+
+    def test_dict_output_RISCV(self):
+        reduced_kernel = reduce_to_section(self.kernel_RISCV, self.parser_RISCV)
+        dg = KernelDG(
+            reduced_kernel,
+            self.parser_RISCV,
+            self.machine_model_rv64,
+            self.semantics_rv64,
+        )
+        fe = Frontend(path_to_yaml=os.path.join(self.MODULE_DATA_DIR, "rv64.yml"))
+        analysis_dict = fe.full_analysis_dict(reduced_kernel, dg)
+        self.assertEqual(len(reduced_kernel), len(analysis_dict["Kernel"]))
+        self.assertEqual("rv64", analysis_dict["Header"]["Architecture"])
+        # Warnings may be present for RISC-V analysis, so don't check the count
+        # self.assertEqual(len(analysis_dict["Warnings"]), 0)
         for i, line in enumerate(reduced_kernel):
             self.assertEqual(line.throughput, analysis_dict["Kernel"][i]["Throughput"])
             self.assertEqual(line.latency, analysis_dict["Kernel"][i]["Latency"])

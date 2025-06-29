@@ -32,6 +32,7 @@ class TestDBInterface(unittest.TestCase):
         self.entry_csx = copy.copy(sample_entry)
         self.entry_tx2 = copy.copy(sample_entry)
         self.entry_zen1 = copy.copy(sample_entry)
+        self.entry_rv64 = copy.copy(sample_entry)
 
         self.entry_csx.port_pressure = [1.25, 0, 1.25, 0.5, 0.5, 0.5, 0.5, 0, 1.25, 1.25, 0]
         self.entry_csx.port_pressure = [[5, "0156"], [1, "23"], [1, ["2D", "3D"]]]
@@ -46,6 +47,11 @@ class TestDBInterface(unittest.TestCase):
             [1, "89"],
             [2, ["8D", "9D"]],
         ]
+        # For RV64, adapt to match its port structure
+        self.entry_rv64.port_pressure = [1, 1, 1, 1]  # [ALU, MEM, DIV, FP]
+        self.entry_rv64.port_pressure = [[1, ["ALU"]], [1, ["MEM"]], [1, ["DIV"]], [1, ["FP"]]]
+        self.entry_rv64.operands[1].prefix = "f"  # Using f prefix for floating point registers
+        self.entry_rv64.operands[1].name = "1"
 
     ###########
     # Tests
@@ -55,21 +61,26 @@ class TestDBInterface(unittest.TestCase):
         mm_csx = MachineModel("csx")
         mm_tx2 = MachineModel("tx2")
         mm_zen1 = MachineModel("zen1")
+        mm_rv64 = MachineModel("rv64")
         num_entries_csx = len(mm_csx["instruction_forms"])
         num_entries_tx2 = len(mm_tx2["instruction_forms"])
         num_entries_zen1 = len(mm_zen1["instruction_forms"])
+        num_entries_rv64 = len(mm_rv64["instruction_forms"])
 
         mm_csx.set_instruction_entry(self.entry_csx)
         mm_tx2.set_instruction_entry(self.entry_tx2)
         mm_zen1.set_instruction_entry(InstructionForm(mnemonic="empty_operation"))
+        mm_rv64.set_instruction_entry(self.entry_rv64)
 
         num_entries_csx = len(mm_csx["instruction_forms"]) - num_entries_csx
         num_entries_tx2 = len(mm_tx2["instruction_forms"]) - num_entries_tx2
         num_entries_zen1 = len(mm_zen1["instruction_forms"]) - num_entries_zen1
+        num_entries_rv64 = len(mm_rv64["instruction_forms"]) - num_entries_rv64
 
         self.assertEqual(num_entries_csx, 1)
         self.assertEqual(num_entries_tx2, 1)
         self.assertEqual(num_entries_zen1, 1)
+        self.assertEqual(num_entries_rv64, 1)
 
     def test_invalid_add(self):
         entry = InstructionForm()
@@ -84,11 +95,13 @@ class TestDBInterface(unittest.TestCase):
         sanity_check("csx", verbose=False, internet_check=False, output_file=output)
         sanity_check("tx2", verbose=False, internet_check=False, output_file=output)
         sanity_check("zen1", verbose=False, internet_check=False, output_file=output)
+        sanity_check("rv64", verbose=False, internet_check=False, output_file=output)
 
         # verbose
         sanity_check("csx", verbose=True, internet_check=False, output_file=output)
         sanity_check("tx2", verbose=True, internet_check=False, output_file=output)
         sanity_check("zen1", verbose=True, internet_check=False, output_file=output)
+        sanity_check("rv64", verbose=True, internet_check=False, output_file=output)
 
     def test_ibench_import(self):
         # only check import without dumping the DB file (takes too much time)
@@ -106,6 +119,11 @@ class TestDBInterface(unittest.TestCase):
             for _, e in entries.items():
                 self.assertIsNotNone(e.throughput)
                 self.assertIsNotNone(e.latency)
+        # TODO: Add RISC-V ibench import test when files are available
+        # Expected format:
+        # Using frequency 2.50GHz.
+        # testinstr-i_r_x-TP: 0.251 (clock cycles)    [DEBUG - result: 0.007813]
+        # testinstr-i_r_x-LT: 4.013 (clock cycles)    [DEBUG - result: 1.000000]
 
     def test_asmbench_import(self):
         # only check import without dumping the DB file (takes too much time)
@@ -127,6 +145,12 @@ class TestDBInterface(unittest.TestCase):
             del input_data[3]
             entries = dbi._get_asmbench_output(input_data, "aarch64")
             self.assertEqual(len(entries), 0)
+        # TODO: Add RISC-V asmbench import test when files are available
+        # Expected format:
+        # testinstr-i_r_x
+        # Latency: 4.013 cy
+        # Throughput: 0.501 cy
+        #
         with self.assertRaises(ValueError):
             dbi.import_benchmark_output(
                 "csx", "invalid_bench_type", self._find_file("asmbench_import_x86.dat")
@@ -163,6 +187,14 @@ class TestDBInterface(unittest.TestCase):
                 RegisterOperand(prefix="v", shape="s"),
             ],
         )
+        instr_form_riscv = dict(
+            name="fadd.s",
+            operands=[
+                RegisterOperand(prefix="f", name="7"),
+                RegisterOperand(prefix="f", name="8"),
+                RegisterOperand(prefix="f", name="9"),
+            ],
+        )
         # test full instruction name
         self.assertEqual(
             _get_full_instruction_name(instr_form_x86),
@@ -172,6 +204,11 @@ class TestDBInterface(unittest.TestCase):
             _get_full_instruction_name(instr_form_arm),
             "fadd  register(prefix:v,shape:s),register(prefix:v,shape:s),"
             + "register(prefix:v,shape:s)",
+        )
+        self.assertEqual(
+            _get_full_instruction_name(instr_form_riscv),
+            "fadd.s  register(name:7,prefix:f),register(name:8,prefix:f),"
+            + "register(name:9,prefix:f)",
         )
 
     ##################

@@ -10,6 +10,7 @@ from .hw_model import MachineModel
 from .isa_semantics import INSTR_FLAGS, ISASemantics
 from osaca.parser.memory import MemoryOperand
 from osaca.parser.register import RegisterOperand
+from osaca.parser.immediate import ImmediateOperand
 
 
 class ArchSemantics(ISASemantics):
@@ -425,7 +426,13 @@ class ArchSemantics(ISASemantics):
         elif self._parser.isa() == "aarch64":
             register = RegisterOperand(name=regtype, prefix=reg_type)
         elif self._parser.isa() == "riscv":
-            register = RegisterOperand(name=regtype, prefix=reg_type)
+            # For RISC-V, handle both register and immediate operands
+            if reg_type == "int":
+                # For immediate operands, create an ImmediateOperand
+                register = ImmediateOperand(imd_type="int")
+            else:
+                # For registers, use the x-prefix format
+                register = RegisterOperand(name=regtype, prefix=reg_type)
         return register
 
     def _nullify_data_ports(self, port_pressure):

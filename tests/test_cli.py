@@ -12,7 +12,7 @@ from unittest.mock import patch
 
 import osaca.osaca as osaca
 from osaca.db_interface import sanity_check
-from osaca.parser import ParserAArch64, ParserX86ATT, ParserX86Intel
+from osaca.parser import ParserAArch64, ParserX86ATT, ParserX86Intel, ParserRISCV
 from osaca.semantics import MachineModel
 
 
@@ -85,6 +85,7 @@ class TestCLI(unittest.TestCase):
         self.assertTrue(isinstance(osaca.get_asm_parser("csx"), ParserX86ATT))
         self.assertTrue(isinstance(osaca.get_asm_parser("csx", "intel"), ParserX86Intel))
         self.assertTrue(isinstance(osaca.get_asm_parser("tx2"), ParserAArch64))
+        self.assertTrue(isinstance(osaca.get_asm_parser("rv64"), ParserRISCV))
         with self.assertRaises(ValueError):
             osaca.get_asm_parser("UNKNOWN")
 
@@ -125,6 +126,22 @@ class TestCLI(unittest.TestCase):
         # remove copy again
         os.remove(name_copy)
 
+    def test_marker_insert_riscv(self):
+        # copy file to add markers
+        name = self._find_test_file("kernel_riscv.s")
+        name_copy = name + ".copy.s"
+        copyfile(name, name_copy)
+
+        user_input = [".L4", "64"]
+        parser = osaca.create_parser()
+        args = parser.parse_args(["--arch", "rv64", "--insert-marker", name_copy])
+        with patch("builtins.input", side_effect=user_input):
+            with self.assertRaises(NotImplementedError):
+                osaca.run(args)
+
+        # remove copy again
+        os.remove(name_copy)
+
     def test_examples(self):
         kernels = [
             "add",
@@ -137,8 +154,8 @@ class TestCLI(unittest.TestCase):
             "triad",
             "update",
         ]
-        archs = ["csx", "tx2", "zen1"]
-        comps = {"csx": ["gcc", "icc"], "tx2": ["gcc", "clang"], "zen1": ["gcc"]}
+        archs = ["csx", "tx2", "zen1", "rv64"]
+        comps = {"csx": ["gcc", "icc"], "tx2": ["gcc", "clang"], "zen1": ["gcc"], "rv64": ["gcc"]}
         parser = osaca.create_parser()
         # Analyze all asm files resulting out of kernels, archs and comps
         for k in kernels:
@@ -190,6 +207,10 @@ class TestCLI(unittest.TestCase):
         # AArch64
         kernel_aarch64 = "kernel_aarch64.s"
         args = parser.parse_args([self._find_test_file(kernel_aarch64)])
+        osaca.run(args, output_file=output)
+        # RISC-V
+        kernel_riscv = "kernel_riscv.s"
+        args = parser.parse_args([self._find_test_file(kernel_riscv)])
         osaca.run(args, output_file=output)
 
     def test_user_warnings(self):

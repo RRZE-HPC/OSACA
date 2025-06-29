@@ -8,6 +8,7 @@ suite = unittest.TestLoader().loadTestsFromNames(
     [
         "test_base_parser",
         "test_parser_x86att",
+        "test_parser_x86intel",
         "test_parser_AArch64",
         "test_parser_RISCV",
         "test_marker_utils",

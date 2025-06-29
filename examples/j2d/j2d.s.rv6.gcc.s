@@ -1,0 +1,44 @@
+j2d_riscv:
+.L5:
+	vsetvli	a5,a7,e64,m1,ta,ma
+	vle64.v	v4,0(t1)
+	vle64.v	v1,0(a0)
+	vle64.v	v3,0(t3)
+	vle64.v	v2,0(a6)
+	slli	a4,a5,3
+	sub	a7,a7,a5
+	add	t1,t1,a4
+	vfadd.vv	v1,v1,v4
+	add	a0,a0,a4
+	add	t3,t3,a4
+	add	a6,a6,a4
+	vfadd.vv	v1,v1,v3
+	vfadd.vv	v1,v1,v2
+	vfmul.vf	v1,v1,fa4
+	vse64.v	v1,0(a2)
+	add	a2,a2,a4
+	bne	a7,zero,.L5
+	addi	t5,t5,1
+	addi	a1,a1,8
+	addi	t4,t4,8
+	bne	t5,t0,.L4
+.L7:
+	fld	fa5,0(a0)
+	fld	fa1,-16(a5)
+	fld	fa2,0(a5)
+	fld	fa3,0(a6)
+	fadd.d	fa5,fa5,fa1
+	addi	a5,a5,8
+	addi	a0,a0,8
+	addi	a6,a6,8
+	addi	a2,a2,8
+	fadd.d	fa5,fa5,fa2
+	fadd.d	fa5,fa5,fa3
+	fmul.d	fa5,fa5,fa4
+	fsd	fa5,-8(a2)
+	bne	a5,t1,.L7
+	addi	t5,t5,1
+	addi	a1,a1,8
+	addi	t4,t4,8
+	bne	t5,t0,.L4
+	j	.L17

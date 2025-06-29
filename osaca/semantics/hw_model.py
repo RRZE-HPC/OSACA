@@ -873,36 +873,29 @@ class MachineModel(object):
             if not isinstance(i_operand, RegisterOperand):
                 return False
             return self._is_RISCV_reg_type(i_operand, operand)
+            
         # memory
         if isinstance(operand, MemoryOperand):
             if not isinstance(i_operand, MemoryOperand):
                 return False
             return self._is_RISCV_mem_type(i_operand, operand)
+            
         # immediate
-        if isinstance(i_operand, ImmediateOperand) and i_operand.imd_type == self.WILDCARD:
-            return isinstance(operand, ImmediateOperand) and (operand.value is not None)
-
-        if isinstance(i_operand, ImmediateOperand) and i_operand.imd_type == "int":
-            return (
-                isinstance(operand, ImmediateOperand)
-                and operand.imd_type == "int"
-                and operand.value is not None
-            )
-
-        if isinstance(i_operand, ImmediateOperand) and i_operand.imd_type == "float":
-            return (
-                isinstance(operand, ImmediateOperand)
-                and operand.imd_type == "float"
-                and operand.value is not None
-            )
-
-        if isinstance(i_operand, ImmediateOperand) and i_operand.imd_type == "double":
-            return (
-                isinstance(operand, ImmediateOperand)
-                and operand.imd_type == "double"
-                and operand.value is not None
-            )
-
+        if isinstance(operand, (ImmediateOperand, int)):
+            if not isinstance(i_operand, ImmediateOperand):
+                return False
+            if isinstance(operand, int):
+                # For raw integers, we accept them if the instruction expects an int immediate
+                if i_operand.imd_type == "int":
+                    return True
+            else:
+                # For ImmediateOperand objects, check the types match
+                if i_operand.imd_type == operand.imd_type:
+                    return True
+                if i_operand.imd_type == self.WILDCARD:
+                    return True
+            return False
+            
         # identifier
         if isinstance(operand, IdentifierOperand) or (
             isinstance(operand, ImmediateOperand) and operand.identifier is not None
@@ -1038,7 +1031,6 @@ class MachineModel(object):
                 if reg_canonical == i_reg_canonical:
                     return True
             except (AttributeError, KeyError):
-                # If we can't determine canonical names, be conservative
                 return False
         
         # Check for direct prefix matches
