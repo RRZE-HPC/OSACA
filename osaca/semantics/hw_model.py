@@ -873,13 +873,13 @@ class MachineModel(object):
             if not isinstance(i_operand, RegisterOperand):
                 return False
             return self._is_RISCV_reg_type(i_operand, operand)
-            
+
         # memory
         if isinstance(operand, MemoryOperand):
             if not isinstance(i_operand, MemoryOperand):
                 return False
             return self._is_RISCV_mem_type(i_operand, operand)
-            
+
         # immediate
         if isinstance(operand, (ImmediateOperand, int)):
             if not isinstance(i_operand, ImmediateOperand):
@@ -895,7 +895,7 @@ class MachineModel(object):
                 if i_operand.imd_type == self.WILDCARD:
                     return True
             return False
-            
+
         # identifier
         if isinstance(operand, IdentifierOperand) or (
             isinstance(operand, ImmediateOperand) and operand.identifier is not None
@@ -1011,7 +1011,7 @@ class MachineModel(object):
         # check for wildcards
         if reg.prefix == self.WILDCARD or i_reg.prefix == self.WILDCARD:
             return True
-        
+
         # First handle potentially None values to avoid AttributeError
         if reg.name is None or i_reg.name is None:
             # If both have same prefix, they might still match
@@ -1019,12 +1019,13 @@ class MachineModel(object):
                 return True
             # If we can't determine canonical names, be conservative and return False
             return False
-        
+
         # Check for ABI name (a0, t0, etc.) vs x-prefix registers (x10, x5, etc.)
         if (reg.prefix is None and i_reg.prefix == "x") or (reg.prefix == "x" and i_reg.prefix is None):
             try:
                 # Need to check if they refer to the same register
                 from osaca.parser import ParserRISCV
+
                 parser = ParserRISCV()
                 reg_canonical = parser._get_canonical_reg_name(reg)
                 i_reg_canonical = parser._get_canonical_reg_name(i_reg)
@@ -1032,16 +1033,16 @@ class MachineModel(object):
                     return True
             except (AttributeError, KeyError):
                 return False
-        
+
         # Check for direct prefix matches
         if reg.prefix == i_reg.prefix:
             # For vector registers, check lanes if present
             if reg.prefix == "v" and reg.lanes is not None and i_reg.lanes is not None:
                 return reg.lanes == i_reg.lanes or self.WILDCARD in (reg.lanes + i_reg.lanes)
             return True
-            
+
         return False
-    
+
     def _is_AArch64_mem_type(self, i_mem, mem):
         """Check if memory addressing type match."""
         if (

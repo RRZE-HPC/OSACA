@@ -661,7 +661,7 @@ instruction_forms:
     latency: 3
     throughput: 1
     port_pressure: [[1, ["FP"]]]
-
+        
   - name: VFMADD.VV
     operands: 
       - class: register

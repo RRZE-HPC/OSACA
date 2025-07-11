@@ -8,9 +8,7 @@ import unittest
 
 from pyparsing import ParseException
 
-from osaca.parser import ParserRISCV, InstructionForm
-from osaca.parser.directive import DirectiveOperand
-from osaca.parser.memory import MemoryOperand
+from osaca.parser import ParserRISCV
 from osaca.parser.register import RegisterOperand
 from osaca.parser.immediate import ImmediateOperand
 from osaca.parser.identifier import IdentifierOperand
@@ -105,7 +103,7 @@ class TestParserRISCV(unittest.TestCase):
         # Test 1: Line with label and instruction
         parsed_1 = self.parser.parse_line(".L2:")
         self.assertEqual(parsed_1.label, ".L2")
-        
+
         # Test 2: Line with instruction and comment
         parsed_2 = self.parser.parse_line("addi x10, x10, 1 # increment")
         self.assertEqual(parsed_2.mnemonic, "addi")
@@ -118,14 +116,14 @@ class TestParserRISCV(unittest.TestCase):
     def test_parse_file(self):
         parsed = self.parser.parse_file(self.riscv_code)
         self.assertGreater(len(parsed), 10)  # There should be multiple lines
-        
+
         # Find common elements that should exist in any RISC-V file
         # without being tied to specific line numbers
-        
+
         # Verify that we can find at least one label
         label_forms = [form for form in parsed if form.label is not None]
         self.assertGreater(len(label_forms), 0, "No labels found in the file")
-        
+
         # Verify that we can find at least one branch instruction
         branch_forms = [form for form in parsed if form.mnemonic and form.mnemonic.startswith("b")]
         self.assertGreater(len(branch_forms), 0, "No branch instructions found in the file")
@@ -148,7 +146,7 @@ class TestParserRISCV(unittest.TestCase):
         reg_a0 = RegisterOperand(name="a0")
         reg_t1 = RegisterOperand(name="t1")
         reg_s2 = RegisterOperand(name="s2")
-        
+
         reg_x0 = RegisterOperand(prefix="x", name="0")
         reg_x1 = RegisterOperand(prefix="x", name="1")
         reg_x2 = RegisterOperand(prefix="x", name="2")
@@ -156,7 +154,7 @@ class TestParserRISCV(unittest.TestCase):
         reg_x10 = RegisterOperand(prefix="x", name="10")
         reg_x6 = RegisterOperand(prefix="x", name="6")
         reg_x18 = RegisterOperand(prefix="x", name="18")
-        
+
         # Test canonical name conversion
         self.assertEqual(self.parser._get_canonical_reg_name(reg_zero), "x0")
         self.assertEqual(self.parser._get_canonical_reg_name(reg_ra), "x1")
@@ -164,7 +162,7 @@ class TestParserRISCV(unittest.TestCase):
         self.assertEqual(self.parser._get_canonical_reg_name(reg_a0), "x10")
         self.assertEqual(self.parser._get_canonical_reg_name(reg_t1), "x6")
         self.assertEqual(self.parser._get_canonical_reg_name(reg_s2), "x18")
-        
+
         # Test register dependency
         self.assertTrue(self.parser.is_reg_dependend_of(reg_zero, reg_x0))
         self.assertTrue(self.parser.is_reg_dependend_of(reg_ra, reg_x1))
@@ -172,29 +170,27 @@ class TestParserRISCV(unittest.TestCase):
         self.assertTrue(self.parser.is_reg_dependend_of(reg_a0, reg_x10))
         self.assertTrue(self.parser.is_reg_dependend_of(reg_t1, reg_x6))
         self.assertTrue(self.parser.is_reg_dependend_of(reg_s2, reg_x18))
-        
+
         # Test non-dependent registers
         self.assertFalse(self.parser.is_reg_dependend_of(reg_zero, reg_x1))
         self.assertFalse(self.parser.is_reg_dependend_of(reg_ra, reg_x2))
         self.assertFalse(self.parser.is_reg_dependend_of(reg_a0, reg_t1))
-        
+
         # Test floating-point registers
         reg_fa0 = RegisterOperand(prefix="f", name="a0")
-        reg_fa1 = RegisterOperand(prefix="f", name="a1")
         reg_f10 = RegisterOperand(prefix="f", name="10")
-        
+
         # Test vector registers
         reg_v1 = RegisterOperand(prefix="v", name="1")
-        reg_v2 = RegisterOperand(prefix="v", name="2")
-        
+
         # Test register type detection
         self.assertTrue(self.parser.is_gpr(reg_a0))
         self.assertTrue(self.parser.is_gpr(reg_x5))
         self.assertTrue(self.parser.is_gpr(reg_sp))
-        
+
         self.assertFalse(self.parser.is_gpr(reg_fa0))
         self.assertFalse(self.parser.is_gpr(reg_f10))
-        
+
         self.assertTrue(self.parser.is_vector_register(reg_v1))
         self.assertFalse(self.parser.is_vector_register(reg_x10))
         self.assertFalse(self.parser.is_vector_register(reg_fa0))

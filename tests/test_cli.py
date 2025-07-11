@@ -307,11 +307,13 @@ class TestCLI(unittest.TestCase):
     @staticmethod
     def _find_file(kernel, arch, comp):
         testdir = os.path.dirname(__file__)
+        # Handle special case for rv64 architecture
+        arch_prefix = arch.lower() if arch.lower() == "rv64" else arch[:3].lower()
         name = os.path.join(
             testdir,
             "../examples",
             kernel,
-            kernel + ".s." + arch[:3].lower() + "." + comp.lower() + ".s",
+            kernel + ".s." + arch_prefix + "." + comp.lower() + ".s",
         )
         if kernel == "j2d" and arch.lower() == "csx":
             name = name[:-1] + "AVX.s"
