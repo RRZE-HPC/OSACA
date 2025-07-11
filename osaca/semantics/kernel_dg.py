@@ -568,7 +568,7 @@ class KernelDG(nx.DiGraph):
                 (latency, list(deps))
                 for latency, deps in groupby(lcd, lambda dep: lcd[dep]["latency"])
             ),
-            reverse=True
+            reverse=True,
         )
         node_colors = {}
         edge_colors = {}
@@ -591,17 +591,16 @@ class KernelDG(nx.DiGraph):
                         edge_colors[u, v] = color
         max_color = min(11, colors_used)
         colorscheme = f"spectral{max(3, max_color)}"
-        graph.graph["node"] = {"colorscheme" : colorscheme}
-        graph.graph["edge"] = {"colorscheme" : colorscheme}
+        graph.graph["node"] = {"colorscheme": colorscheme}
+        graph.graph["edge"] = {"colorscheme": colorscheme}
         for n, color in node_colors.items():
             if "style" not in graph.nodes[n]:
                 graph.nodes[n]["style"] = "filled"
             else:
                 graph.nodes[n]["style"] += ",filled"
             graph.nodes[n]["fillcolor"] = color
-            if (
-                (max_color >= 4 and color in (1, max_color)) or
-                (max_color >= 10 and color in (1, 2, max_color - 1 , max_color))
+            if (max_color >= 4 and color in (1, max_color)) or (
+                max_color >= 10 and color in (1, 2, max_color - 1, max_color)
             ):
                 graph.nodes[n]["fontcolor"] = "white"
         for (u, v), color in edge_colors.items():

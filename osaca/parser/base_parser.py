@@ -1,4 +1,3 @@
-# TODO: Heuristics for detecting the RISCV ISA
 #!/usr/bin/env python3
 """Parser superclass of specific parsers."""
 import operator
@@ -72,14 +71,19 @@ class BaseParser(object):
         # 3) check for RISC-V registers (x0-x31, a0-a7, t0-t6, s0-s11) and instructions
         heuristics_riscv = [
             r"\bx[0-9]|x[1-2][0-9]|x3[0-1]\b",  # x0-x31 registers
-            r"\ba[0-7]\b",                       # a0-a7 registers
-            r"\bt[0-6]\b",                       # t0-t6 registers 
-            r"\bs[0-9]|s1[0-1]\b",               # s0-s11 registers
-            r"\bzero\b|\bra\b|\bsp\b|\bgp\b",    # zero, ra, sp, gp registers
-            r"\bvsetvli\b|\bvle\b|\bvse\b",      # RV Vector instructions
-            r"\baddi\b|\bsd\b|\bld\b|\bjal\b"    # Common RISC-V instructions
+            r"\ba[0-7]\b",  # a0-a7 registers
+            r"\bt[0-6]\b",  # t0-t6 registers
+            r"\bs[0-9]|s1[0-1]\b",  # s0-s11 registers
+            r"\bzero\b|\bra\b|\bsp\b|\bgp\b",  # zero, ra, sp, gp registers
+            r"\bvsetvli\b|\bvle\b|\bvse\b",  # RV Vector instructions
+            r"\baddi\b|\bsd\b|\bld\b|\bjal\b",  # Common RISC-V instructions
         ]
-        matches = {("x86", "ATT"): 0, ("x86", "INTEL"): 0, ("aarch64", None): 0, ("riscv", None): 0}
+        matches = {
+            ("x86", "ATT"): 0,
+            ("x86", "INTEL"): 0,
+            ("aarch64", None): 0,
+            ("riscv", None): 0,
+        }
 
         for h in heuristics_x86ATT:
             matches[("x86", "ATT")] += len(re.findall(h, file_content))

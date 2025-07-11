@@ -1,4 +1,3 @@
-# TODO
 #!/usr/bin/env python3
 from collections import OrderedDict
 from enum import Enum
@@ -174,8 +173,7 @@ def get_marker(isa, syntax="ATT", comment=""):
             start_marker_raw += "# {}\n".format(comment)
         # After loop
         end_marker_raw = (
-            "li        a1, 222    # OSACA END MARKER\n"
-            ".byte     19,0,0,0   # OSACA END MARKER\n"
+            "li        a1, 222    # OSACA END MARKER\n" ".byte     19,0,0,0   # OSACA END MARKER\n"
         )
 
     parser = get_parser(isa)

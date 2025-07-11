@@ -1,5 +1,4 @@
-# TODO
-#!/usr/bin/env python3
+#!/usr/bin/env python3w
 
 import hashlib
 import os
@@ -1021,7 +1020,9 @@ class MachineModel(object):
             return False
 
         # Check for ABI name (a0, t0, etc.) vs x-prefix registers (x10, x5, etc.)
-        if (reg.prefix is None and i_reg.prefix == "x") or (reg.prefix == "x" and i_reg.prefix is None):
+        if (reg.prefix is None and i_reg.prefix == "x") or (
+            reg.prefix == "x" and i_reg.prefix is None
+        ):
             try:
                 # Need to check if they refer to the same register
                 from osaca.parser import ParserRISCV
@@ -1149,9 +1150,13 @@ class MachineModel(object):
             (
                 (mem.base is None and i_mem.base is None)
                 or i_mem.base == self.WILDCARD
-                or (isinstance(mem.base, RegisterOperand) and 
-                    (mem.base.prefix == i_mem.base or 
-                     (mem.base.name is not None and i_mem.base is not None)))
+                or (
+                    isinstance(mem.base, RegisterOperand)
+                    and (
+                        mem.base.prefix == i_mem.base
+                        or (mem.base.name is not None and i_mem.base is not None)
+                    )
+                )
             )
             # check offset
             and (

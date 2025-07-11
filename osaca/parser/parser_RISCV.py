@@ -46,8 +46,7 @@ class ParserRISCV(BaseParser):
         # Parse the RISC-V end marker (li a1, 222 followed by NOP)
         # This matches how end marker is defined in marker_utils.py for RISC-V
         marker_str = (
-            "li        a1, 222    # OSACA END MARKER\n"
-            ".byte     19,0,0,0   # OSACA END MARKER\n"
+            "li        a1, 222    # OSACA END MARKER\n" ".byte     19,0,0,0   # OSACA END MARKER\n"
         )
         return self.parse_file(marker_str)
 
@@ -107,9 +106,7 @@ class ParserRISCV(BaseParser):
 
         # Label
         self.label = pp.Group(
-            identifier.setResultsName("name")
-            + pp.Literal(":")
-            + pp.Optional(self.comment)
+            identifier.setResultsName("name") + pp.Literal(":") + pp.Optional(self.comment)
         ).setResultsName(self.label_id)
 
         # Directive
@@ -119,21 +116,13 @@ class ParserRISCV(BaseParser):
         )
 
         directive_parameter = (
-            pp.quotedString
-            | directive_option
-            | identifier
-            | hex_number
-            | decimal_number
+            pp.quotedString | directive_option | identifier | hex_number | decimal_number
         )
-        commaSeparatedList = pp.delimitedList(
-            pp.Optional(directive_parameter), delim=","
-        )
+        commaSeparatedList = pp.delimitedList(pp.Optional(directive_parameter), delim=",")
         self.directive = pp.Group(
             pp.Literal(".")
             + pp.Word(pp.alphanums + "_").setResultsName("name")
-            + (pp.OneOrMore(directive_parameter) ^ commaSeparatedList).setResultsName(
-                "parameters"
-            )
+            + (pp.OneOrMore(directive_parameter) ^ commaSeparatedList).setResultsName("parameters")
             + pp.Optional(self.comment)
         ).setResultsName(self.directive_id)
 
@@ -193,12 +182,7 @@ class ParserRISCV(BaseParser):
 
         # Combined register definition
         register = pp.Group(
-            integer_reg_x
-            | integer_reg_abi
-            | fp_reg_f
-            | fp_reg_abi
-            | vector_reg
-            | csr_reg
+            integer_reg_x | integer_reg_abi | fp_reg_f | fp_reg_abi | vector_reg | csr_reg
         ).setResultsName(self.register_id)
 
         self.register = register
@@ -218,9 +202,7 @@ class ParserRISCV(BaseParser):
         # Handle additional vector parameters
         additional_params = pp.ZeroOrMore(
             pp.Suppress(pp.Literal(","))
-            + pp.Word(pp.alphas + pp.nums).setResultsName(
-                "vector_param", listAllMatches=True
-            )
+            + pp.Word(pp.alphas + pp.nums).setResultsName("vector_param", listAllMatches=True)
         )
 
         # Main instruction parser
@@ -260,9 +242,7 @@ class ParserRISCV(BaseParser):
 
         # 1. Parse comment
         try:
-            result = self.process_operand(
-                self.comment.parseString(line, parseAll=True).asDict()
-            )
+            result = self.process_operand(self.comment.parseString(line, parseAll=True).asDict())
             instruction_form.comment = " ".join(result[self.comment_id])
         except pp.ParseException:
             pass
@@ -280,9 +260,7 @@ class ParserRISCV(BaseParser):
         if result is None:
             try:
                 # returns tuple with label operand and comment, if any
-                result = self.process_operand(
-                    self.label.parseString(line, parseAll=True).asDict()
-                )
+                result = self.process_operand(self.label.parseString(line, parseAll=True).asDict())
                 instruction_form.label = result[0].name
                 if result[1] is not None:
                     instruction_form.comment = " ".join(result[1])
@@ -371,15 +349,11 @@ class ParserRISCV(BaseParser):
                 if "#" in instruction:
                     comment = instruction.split("#", 1)[1].strip()
 
-                return InstructionForm(
-                    mnemonic=mnemonic, operands=operands, comment_id=comment
-                )
+                return InstructionForm(mnemonic=mnemonic, operands=operands, comment_id=comment)
 
         # Regular instruction parsing
         try:
-            result = self.instruction_parser.parseString(
-                instruction, parseAll=True
-            ).asDict()
+            result = self.instruction_parser.parseString(instruction, parseAll=True).asDict()
             operands = []
 
             # Process operands
@@ -410,9 +384,7 @@ class ParserRISCV(BaseParser):
                 mnemonic=result["mnemonic"],
                 operands=operands,
                 comment_id=(
-                    " ".join(result[self.comment_id])
-                    if self.comment_id in result
-                    else None
+                    " ".join(result[self.comment_id]) if self.comment_id in result else None
                 ),
             )
             return return_dict
@@ -446,9 +418,7 @@ class ParserRISCV(BaseParser):
                 if "#" in instruction:
                     comment = instruction.split("#", 1)[1].strip()
 
-                return InstructionForm(
-                    mnemonic=mnemonic, operands=operands, comment_id=comment
-                )
+                return InstructionForm(mnemonic=mnemonic, operands=operands, comment_id=comment)
             else:
                 raise
 
@@ -569,9 +539,7 @@ class ParserRISCV(BaseParser):
         elif name.startswith("f") and name[1] in ["t", "a", "s"]:
             if name[1] == "a":  # fa0-fa7
                 idx = int(name[2:])
-                return RegisterOperand(
-                    prefix="f", name=str(idx + 10), regtype="float", width=64
-                )
+                return RegisterOperand(prefix="f", name=str(idx + 10), regtype="float", width=64)
             elif name[1] == "s":  # fs0-fs11
                 idx = int(name[2:])
                 if idx <= 1:
@@ -585,9 +553,7 @@ class ParserRISCV(BaseParser):
             elif name[1] == "t":  # ft0-ft11
                 idx = int(name[2:])
                 if idx <= 7:
-                    return RegisterOperand(
-                        prefix="f", name=str(idx), regtype="float", width=64
-                    )
+                    return RegisterOperand(prefix="f", name=str(idx), regtype="float", width=64)
                 else:
                     return RegisterOperand(
                         prefix="f", name=str(idx + 20), regtype="float", width=64
@@ -675,9 +641,7 @@ class ParserRISCV(BaseParser):
 
         # Handle numeric values with validation
         if "value" in immediate:
-            value = int(
-                immediate["value"], 0
-            )  # Convert to integer, handling hex/decimal
+            value = int(immediate["value"], 0)  # Convert to integer, handling hex/decimal
 
             # Determine immediate type and validate range based on instruction type
             if hasattr(self, "current_instruction"):
@@ -714,9 +678,7 @@ class ParserRISCV(BaseParser):
                     return ImmediateOperand(imd_type="S", value=value)
 
                 # B-type instructions (13-bit signed immediate for branches, must be even)
-                elif any(
-                    x in mnemonic for x in ["beq", "bne", "blt", "bge", "bltu", "bgeu"]
-                ):
+                elif any(x in mnemonic for x in ["beq", "bne", "blt", "bge", "bltu", "bgeu"]):
                     if not -4096 <= value <= 4095 or value % 2 != 0:
                         raise ValueError(
                             f"Immediate value {value} out of range or not even "

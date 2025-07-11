@@ -487,6 +487,7 @@ def get_asm_parser(arch, syntax="ATT") -> BaseParser:
     else:
         raise ValueError("Unknown ISA: {}".format(isa))
 
+
 def get_unmatched_instruction_ratio(kernel):
     """Return ratio of unmatched from total instructions in kernel."""
     unmatched_counter = 0

@@ -412,20 +412,20 @@ def _check_sanity_arch_db(arch_mm, isa_mm, internet_check=True):
     suspicious_prefixes_x86 = ["vfm", "fm"]
     suspicious_prefixes_arm = ["fml", "ldp", "stp", "str"]
     suspicious_prefixes_riscv = [
-        "vse",     # Vector store (register is source, memory is destination)
+        "vse",  # Vector store (register is source, memory is destination)
         "vfmacc",  # Vector FMA with accumulation (first operand is both source and destination)
         "vfmadd",  # Vector FMA with addition (first operand is implicitly both source and destination)
-        "vset",    # Vector configuration (complex operand pattern)
-        "csrs",    # CSR Set (first operand is both source and destination)
-        "csrc",    # CSR Clear (first operand is both source and destination)
-        "csrsi",   # CSR Set Immediate (first operand is both source and destination)
-        "csrci",   # CSR Clear Immediate (first operand is both source and destination)
-        "amo",     # Atomic memory operations (read-modify-write to memory)
-        "lr",      # Load-Reserved (part of atomic operations)
-        "sc",      # Store-Conditional (part of atomic operations)
-        "czero",   # Conditional zero instructions (Zicond extension)
+        "vset",  # Vector configuration (complex operand pattern)
+        "csrs",  # CSR Set (first operand is both source and destination)
+        "csrc",  # CSR Clear (first operand is both source and destination)
+        "csrsi",  # CSR Set Immediate (first operand is both source and destination)
+        "csrci",  # CSR Clear Immediate (first operand is both source and destination)
+        "amo",  # Atomic memory operations (read-modify-write to memory)
+        "lr",  # Load-Reserved (part of atomic operations)
+        "sc",  # Store-Conditional (part of atomic operations)
+        "czero",  # Conditional zero instructions (Zicond extension)
     ]
-    
+
     # Default to empty list if ISA not recognized
     suspicious_prefixes = []
 
