@@ -80,6 +80,8 @@ class Frontend(object):
         s += lineno_filler + self._get_port_number_line(port_len) + "\n"
         s += separator + "\n"
         for instruction_form in kernel:
+            if KernelDG.is_load_line_number(instruction_form.line_number):
+                continue
             line = "{:4d} {} {} {}".format(
                 instruction_form.line_number,
                 self._get_port_pressure(
@@ -112,6 +114,8 @@ class Frontend(object):
         """
         s = "\n\nLatency Analysis Report\n-----------------------\n"
         for instruction_form in cp_kernel:
+            if KernelDG.is_load_line_number(instruction_form.line_number):
+                continue
             s += (
                 "{:4d} {} {:4.1f} {}{}{} {}".format(
                     instruction_form.line_number,
@@ -147,8 +151,11 @@ class Frontend(object):
         )
         # TODO find a way to overcome padding for different tab-lengths
         for dep in sorted(dep_dict.keys()):
-            s += "{:4d} {} {:4.1f} {} {:36}{} {}\n".format(
-                int(dep.split("-")[0]),
+            dep0 = float(dep.split("-")[0])
+            if KernelDG.is_load_line_number(dep0):
+                continue
+            s += "{:4.0f} {} {:4.1f} {} {:36}{} {}\n".format(
+                dep0,
                 separator,
                 dep_dict[dep]["latency"],
                 separator,
@@ -356,6 +363,8 @@ class Frontend(object):
             if show_cmnts is False and self._is_comment(instruction_form):
                 continue
             line_number = instruction_form.line_number
+            if KernelDG.is_load_line_number(line_number):
+                continue
             used_ports = [list(uops[1]) for uops in instruction_form.port_uops]
             used_ports = list(set([p for uops_ports in used_ports for p in uops_ports]))
             s += "{:4d} {}{} {} {}\n".format(

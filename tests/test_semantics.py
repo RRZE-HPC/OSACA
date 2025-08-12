@@ -89,6 +89,9 @@ class TestSemanticTools(unittest.TestCase):
         cls.machine_model_csx = MachineModel(
             path_to_yaml=os.path.join(cls.MODULE_DATA_DIR, "csx.yml")
         )
+        cls.machine_model_skx = MachineModel(
+            path_to_yaml=os.path.join(cls.MODULE_DATA_DIR, "skx.yml")
+        )
         cls.machine_model_tx2 = MachineModel(
             path_to_yaml=os.path.join(cls.MODULE_DATA_DIR, "tx2.yml")
         )
@@ -105,6 +108,11 @@ class TestSemanticTools(unittest.TestCase):
         cls.semantics_csx_intel = ArchSemantics(
             cls.parser_x86_intel,
             cls.machine_model_csx,
+            path_to_yaml=os.path.join(cls.MODULE_DATA_DIR, "isa/x86.yml"),
+        )
+        cls.semantics_skx_intel = ArchSemantics(
+            cls.parser_x86_intel,
+            cls.machine_model_skx,
             path_to_yaml=os.path.join(cls.MODULE_DATA_DIR, "isa/x86.yml"),
         )
         cls.semantics_aarch64 = ISASemantics(cls.parser_AArch64)
@@ -136,10 +144,10 @@ class TestSemanticTools(unittest.TestCase):
         for i in range(len(cls.kernel_x86_intel)):
             cls.semantics_csx_intel.assign_src_dst(cls.kernel_x86_intel[i])
             cls.semantics_csx_intel.assign_tp_lt(cls.kernel_x86_intel[i])
-        cls.semantics_csx_intel.normalize_instruction_forms(cls.kernel_x86_intel_memdep)
+        cls.semantics_skx_intel.normalize_instruction_forms(cls.kernel_x86_intel_memdep)
         for i in range(len(cls.kernel_x86_intel_memdep)):
-            cls.semantics_csx_intel.assign_src_dst(cls.kernel_x86_intel_memdep[i])
-            cls.semantics_csx_intel.assign_tp_lt(cls.kernel_x86_intel_memdep[i])
+            cls.semantics_skx_intel.assign_src_dst(cls.kernel_x86_intel_memdep[i])
+            cls.semantics_skx_intel.assign_tp_lt(cls.kernel_x86_intel_memdep[i])
         cls.semantics_tx2.normalize_instruction_forms(cls.kernel_AArch64)
         for i in range(len(cls.kernel_AArch64)):
             cls.semantics_tx2.assign_src_dst(cls.kernel_AArch64[i])
@@ -458,7 +466,7 @@ class TestSemanticTools(unittest.TestCase):
         #   /  /
         #  4  /
         #    /
-        #  5.1
+        #  4.875
         #
         dg = KernelDG(
             self.kernel_x86_intel,
@@ -473,8 +481,8 @@ class TestSemanticTools(unittest.TestCase):
         self.assertEqual(next(dg.get_dependent_instruction_forms(line_number=4)), 5)
         self.assertEqual(len(list(dg.get_dependent_instruction_forms(line_number=5))), 1)
         self.assertEqual(next(dg.get_dependent_instruction_forms(line_number=5)), 6)
-        self.assertEqual(len(list(dg.get_dependent_instruction_forms(line_number=5.1))), 1)
-        self.assertEqual(next(dg.get_dependent_instruction_forms(line_number=5.1)), 5)
+        self.assertEqual(len(list(dg.get_dependent_instruction_forms(line_number=4.875))), 1)
+        self.assertEqual(next(dg.get_dependent_instruction_forms(line_number=4.875)), 5)
         self.assertEqual(list(dg.get_dependent_instruction_forms(line_number=6)), [])
         self.assertEqual(list(dg.get_dependent_instruction_forms(line_number=7)), [])
         self.assertEqual(list(dg.get_dependent_instruction_forms(line_number=8)), [])
@@ -502,12 +510,15 @@ class TestSemanticTools(unittest.TestCase):
         dg = KernelDG(
             self.kernel_x86_intel_memdep,
             self.parser_x86_intel,
-            self.machine_model_csx,
-            self.semantics_csx_intel,
+            self.machine_model_skx,
+            self.semantics_skx_intel,
         )
         self.assertTrue(nx.algorithms.dag.is_directed_acyclic_graph(dg.dg))
         self.assertEqual(set(dg.get_dependent_instruction_forms(line_number=3)), {6, 8})
         self.assertEqual(set(dg.get_dependent_instruction_forms(line_number=5)), {10, 12})
+        self.assertEqual(set(dg.get_dependent_instruction_forms(line_number=18)), {18.875})
+        self.assertEqual(set(dg.get_dependent_instruction_forms(line_number=18.875)), {19})
+        self.assertEqual(set(dg.get_dependent_instruction_forms(line_number=19)), set())
         with self.assertRaises(ValueError):
             dg.get_dependent_instruction_forms()
         # test dot creation
