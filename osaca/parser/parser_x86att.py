@@ -75,10 +75,19 @@ class ParserX86ATT(ParserX86):
         if not model:
             # Check for instruction without GAS suffix.
             if mnemonic[-1] in self.GAS_SUFFIXES:
-                mnemonic = mnemonic[:-1]
-                model = arch_model.get_instruction(mnemonic, instruction_form.operands)
-                if model:
-                    instruction_form.mnemonic = mnemonic
+                nongas_mnemonic = mnemonic[:-1]
+                if arch_model.get_instruction(nongas_mnemonic, instruction_form.operands):
+                    mnemonic = nongas_mnemonic
+            # Check for non-VEX version and vice-versa
+            elif mnemonic[0] == "v":
+                unvexed_mnemonic = mnemonic[1:]
+                if arch_model.get_instruction(unvexed_mnemonic, len(instruction_form.operands)):
+                    mnemonic = unvexed_mnemonic
+            else:
+                vexed_mnemonic = "v" + mnemonic
+                if arch_model.get_instruction(vexed_mnemonic, len(instruction_form.operands)):
+                    mnemonic = vexed_mnemonic
+            instruction_form.mnemonic = mnemonic
 
     def construct_parser(self):
         """Create parser for x86 AT&T ISA."""
