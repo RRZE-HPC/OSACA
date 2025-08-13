@@ -3746,17 +3746,6 @@ instruction_forms:
   throughput: 0.25
   latency: 3.0  # 	1*p89,10,11
   port_pressure: [[1, ['8','9','10','11']]]
-- name: [UNKNONWfmul]
-  operands:
-  - class: register
-    prefix: d
-  - class: register
-    prefix: d
-  - class: register
-    prefix: d
-  throughput: 0.25
-  latency: 30.0  # 	1*p89,10,11
-  port_pressure: [[20, ['8','9','10','11']]]
 - name: [fmul, fmulx]
   operands:
   - class: register
