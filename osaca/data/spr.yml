@@ -3,7 +3,8 @@ micro_architecture: Sapphire Rapids
 arch_code: SPR
 isa: x86
 ROB_size: ~
-retired_uOps_per_cycle: ~
+dispatched_uOps_per_cycle: 6
+retired_uOps_per_cycle: 8
 scheduler_size: ~
 hidden_loads: false
 load_latency: {gpr: 5.0, mm: 5.0, xmm: 5.0, ymm: 5.0, zmm: 5.0}
@@ -2788,7 +2789,17 @@ instruction_forms:
   port_pressure: [[1, '15']]  # ibench
   throughput: 0.5             # ibench
   uops: 1                     # ibench
-- name: vdivpd                           # ibench
+- name: divpd                   # ibench
+  operands:                              # ibench
+  - class: register                      # ibench
+    name: xmm                            # ibench
+  - class: register                      # ibench
+    name: xmm                            # ibench
+  latency: 14                            # ibench
+  port_pressure: [[1, '0'], [4, ['0DV']]]  # ibench
+  throughput: 4.0                        # ibench
+  uops: 4                                # ibench
+- name: vdivpd                   # ibench
   operands:                              # ibench
   - class: register                      # ibench
     name: xmm                            # ibench
@@ -3840,6 +3851,16 @@ instruction_forms:
   port_pressure: [[1, '01']]  # ibench
   throughput: 0.5             # ibench
   uops: 1                     # ibench
+- name: [paddd, paddq]                    # ibench
+  operands:                       # ibench
+  - class: register               # ibench
+    name: xmm                     # ibench
+  - class: register               # ibench
+    name: xmm                     # ibench
+  latency: 1                      # ibench
+  port_pressure: [[1, '015']]     # ibench
+  throughput: 0.3333333333333333  # ibench
+  uops: 1                         # ibench
 - name: [vpaddd, vpaddq]                    # ibench
   operands:                       # ibench
   - class: register               # ibench
@@ -4313,6 +4334,16 @@ instruction_forms:
   port_pressure: [[1, '05']]  # ibench
   throughput: 0.5             # ibench
   uops: 1                     # ibench
+- name: subsd                # ibench
+  operands:                   # ibench
+  - class: register           # ibench
+    name: xmm                 # ibench
+  - class: register           # ibench
+    name: xmm                 # ibench
+  latency: 2                  # ibench
+  port_pressure: [[1, '15']]  # ibench
+  throughput: 0.5             # ibench
+  uops: 1                     # ibench
 - name: vsubsd                # ibench
   operands:                   # ibench
   - class: register           # ibench
@@ -4562,6 +4593,16 @@ instruction_forms:
   port_pressure: [[1, '01'], [1, '5']]
   throughput: 1.0
   uops: 3
+- name: [cvtdq2pd, vcvtdq2pd]
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 5
+  port_pressure: [[1, '01'], [1, '5']]
+  throughput: 1.0
+  uops: 2
 - name: vcvtdq2pd
   operands:
   - class: register
@@ -5866,6 +5907,18 @@ instruction_forms:
   port_pressure: [[1, '05']]
   throughput: 0.5
   uops: 1
+- name: [vpshufd, pshufd]   # uops.info
+  operands:
+  - class: immediate
+    imd: int
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1
+  port_pressure: [[1, '15']]
+  throughput: 1.0
+  uops: 1
 - name: vshuff64x2
   operands:
   - class: immediate
@@ -5992,7 +6045,7 @@ instruction_forms:
   port_pressure: [[1, '5']]     # uops.info
   throughput: 1.0               # ibench
   uops: 1
-- name: [cltq, cdq, cdqe] 
+- name: [cltq, cdq, cdqe]
   operands: []
   latency: 1                    # uops.info
   port_pressure: [[1, '06']]    # uops.info

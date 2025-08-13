@@ -35,9 +35,9 @@ port_model_scheme: |
   | BR | | BR |  | ALU  | | ALU  | | ALU  | | ALU  | | ALU  | | DV | | ALU  | | DV |  |SIMD/FP| |FPDV| |SIMD/FP| |SIMD/FP| |FPDV| |SIMD/FP|  | LD  | | LD  | | LD  | | ST  | | ST  |
   +----+ +----+  +------+ +------+ +------+ +------+ +------+ +----+ +------+ +----+  |  ALU  | +----+ |  ALU  | |  ALU  | +----+ |  ALU  |  +-----+ +-----+ +-----+ +-----+ +-----+
                                     silly    silly   +------+        +------+         +-------+        +-------+ +-------+        +-------+  +-----+ +-----+
-                                                     | MUL  |        | MUL  |         +-------+        +-------+ +-------+        +-------+  | AGU | | AGU |
-                                                     +------+        +------+         |SIMD/FP|        |SIMD/FP| |SIMD/FP|        |SIMD/FP|  +-----+ +-----+
-                                                     +------+        +------+         |  MISC |        |  MISC | |  MISC |        |  MISC |
+                                                     | MUL  |        | MUL  |         +-------+        +-------+ +-------+        +-------+  | ST  | | ST  |
+                                                     +------+        +------+         |SIMD/FP|        |SIMD/FP| |SIMD/FP|        |SIMD/FP|  | AGU | | AGU |
+                                                     +------+        +------+         |  MISC |        |  MISC | |  MISC |        |  MISC |  +-----+ +-----+
                                                      | CRC  |        | CRC  |         +-------+        +-------+ +-------+        +-------+
                                                      +------+        +------+         +-------+        +-------+ +-------+        +-------+
                                                      +------+        +------+         |  SIMD |        |  SIMD | |  SIMD |        |  SIMD |
@@ -119,6 +119,17 @@ instruction_forms:
   throughput: 0.25
   latency: 1.0  # 	1*p2367
   port_pressure: [[1, '2367']]
+- name: addvl
+  operands:
+  - class: register
+    prefix: x
+  - class: register
+    prefix: x
+  - class: immediate
+    imd: int
+  throughput: 0.5
+  latency: 2.0  # 	1*p67
+  port_pressure: [[1, '67']]
 - name: adds
   operands:
   - class: register
@@ -259,13 +270,13 @@ instruction_forms:
   throughput: 0.16666666
   latency: 1.0  # 	1*p234567
   port_pressure: [[1, '234567']]
-- name: [b, bl, bcc, bcs, bgt, bhi, b.lo, b.ne, b.any, b.none, bal, b.al, b.lt, b.eq, b.hs, b.gt, b.hi, bne, beq]
+- name: [b, bl, bcc, bcs, bgt, bhi, b.lo, b.ne, b.any, b.none, bal, b.al, b.lt, b.eq, b.hs, b.gt, b.hi, bne, beq, bmi]
   operands:
   - class: identifier
   throughput: 0.5
   latency: 0.0
   port_pressure: [[1, '01']]
-- name: [b, bl, bcc, bcs, bgt, bhi, b.lo, b.ne, b.any, b.none, bal, b.al, b.lt, b.eq, b.hs, b.gt, b.hi, bne, beq]
+- name: [b, bl, bcc, bcs, bgt, bhi, b.lo, b.ne, b.any, b.none, bal, b.al, b.lt, b.eq, b.hs, b.gt, b.hi, bne, beq, bmi]
   operands:
   - class: immediate
     imd: int
@@ -1410,7 +1421,7 @@ instruction_forms:
   throughput: 0.25
   latency: 1.0  # 	1*p2367
   port_pressure: [[1, '2367']]
-- name: [incw, incd, inch]
+- name: [incw, incd, inch, incb]
   operands:
   - class: register
     prefix: z
@@ -1420,20 +1431,20 @@ instruction_forms:
   throughput: 0.25
   latency: 2.0  # 	1*p8,9,10,11
   port_pressure: [[1, ['8', '9', '10', '11']]]
-- name: [incw, incd, inch]
+- name: [incw, incd, inch, incb]
   operands:
   - class: register
     prefix: x
   - class: identifier
   throughput: 0.5
-  latency: 2.0  # 	1*p67
+  latency: 1.0  # 	1*p67
   port_pressure: [[1, '67']]
-- name: [incw, incd, inch]
+- name: [incw, incd, inch, incb]
   operands:
   - class: register
     prefix: x
   throughput: 0.5
-  latency: 2.0  # 	1*p67
+  latency: 1.0  # 	1*p67
   port_pressure: [[1, '67']]
 - name: [madd, msub]    # NOTE: if the dependency is via the addend (fourth operand), the latency is only 1cy !!!
   operands:
@@ -2939,6 +2950,15 @@ instruction_forms:
   throughput: 1.0
   latency: 1.0  # 	1*p3
   port_pressure: [[1, '3']]
+- name: [fcmp, fcmpe]
+  operands:
+  - class: register
+    prefix: '*'
+  - class: immediate
+    imd: '*'
+  throughput: 1.0
+  latency: 1.0  # 	1*p3
+  port_pressure: [[1, '3']]
 - name: [fccmp, fccmpe]     # LT assumed from fcmp
   operands:
   - class: register
@@ -3726,6 +3746,17 @@ instruction_forms:
   throughput: 0.25
   latency: 3.0  # 	1*p89,10,11
   port_pressure: [[1, ['8','9','10','11']]]
+- name: [UNKNONWfmul]
+  operands:
+  - class: register
+    prefix: d
+  - class: register
+    prefix: d
+  - class: register
+    prefix: d
+  throughput: 0.25
+  latency: 30.0  # 	1*p89,10,11
+  port_pressure: [[20, ['8','9','10','11']]]
 - name: [fmul, fmulx]
   operands:
   - class: register
