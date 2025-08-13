@@ -3,7 +3,8 @@ micro_architecture: Ice Lake Server
 arch_code: ICX
 isa: x86
 ROB_size: 352                               # from wikichip
-retired_uOps_per_cycle: 10                  # from wikichip
+dispatched_uOps_per_cycle: 5
+retired_uOps_per_cycle: 5
 scheduler_size: 97                          # actually MORE than 97, number unknown
 hidden_loads: false
 load_latency: {gpr: 5.0, mm: 5.0, xmm: 5.0, ymm: 5.0, zmm: 5.0}
