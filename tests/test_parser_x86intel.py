@@ -103,6 +103,8 @@ class TestParserX86Intel(unittest.TestCase):
         instr12 = "\tvfmadd213sd xmm0, xmm1, QWORD PTR __real@bfc5555555555555"
         instr13 = "\tjmp\t$LN18@operator"
         instr14 = "vaddsd  xmm0, xmm0, QWORD PTR [rdx+8+rax*8]"
+        instr15 = "vextractf128 xmm1, ymm2, 0x2"
+        instr16 = "vmovupd xmm0, [rax+123R]"
 
         parsed_1 = self.parser.parse_instruction(instr1)
         parsed_2 = self.parser.parse_instruction(instr2)
@@ -118,6 +120,8 @@ class TestParserX86Intel(unittest.TestCase):
         parsed_12 = self.parser.parse_instruction(instr12)
         parsed_13 = self.parser.parse_instruction(instr13)
         parsed_14 = self.parser.parse_instruction(instr14)
+        parsed_15 = self.parser.parse_instruction(instr15)
+        parsed_16 = self.parser.parse_instruction(instr16)
 
         self.assertEqual(parsed_1.mnemonic, "sub")
         self.assertEqual(parsed_1.operands[0], RegisterOperand(name="RSP"))
@@ -218,6 +222,20 @@ class TestParserX86Intel(unittest.TestCase):
                 offset=ImmediateOperand(value=8),
                 index=RegisterOperand(name="RAX"),
                 scale=8,
+            ),
+        )
+
+        self.assertEqual(parsed_15.mnemonic, "vextractf128")
+        self.assertEqual(parsed_15.operands[0], RegisterOperand(name="XMM1"))
+        self.assertEqual(parsed_15.operands[1], RegisterOperand(name="YMM2"))
+        self.assertEqual(parsed_15.operands[2], ImmediateOperand(value=2))
+
+        self.assertEqual(parsed_16.mnemonic, "vmovupd")
+        self.assertEqual(parsed_16.operands[0], RegisterOperand(name="XMM0"))
+        self.assertEqual(
+            parsed_16.operands[1],
+            MemoryOperand(
+                base=RegisterOperand(name="RAX"), offset=ImmediateOperand(value=291)
             ),
         )
 

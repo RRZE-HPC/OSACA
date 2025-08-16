@@ -160,12 +160,15 @@ class ParserX86Intel(ParserX86):
         binary_number = pp.Combine(pp.Word("01") + pp.CaselessLiteral("B"))
         octal_number = pp.Combine(pp.Word("01234567") + pp.CaselessLiteral("O"))
         decimal_number = pp.Combine(pp.Optional(pp.Literal("-")) + pp.Word(pp.nums))
-        hex_number = pp.Combine(pp.Word(pp.hexnums) + pp.CaselessLiteral("H"))
+        hex_number_suffix = pp.Combine(pp.Word(pp.hexnums) + (pp.CaselessLiteral("H") ^ pp.CaselessLiteral("R")))
+        hex_number_0x = pp.Combine(
+            pp.Optional(pp.Literal("-")) + pp.Literal("0x") + pp.Word(pp.hexnums))
+        hex_number = (hex_number_0x ^ hex_number_suffix)
         float_number = pp.Combine(
             pp.Optional(pp.Literal("-")) + pp.Word(pp.nums) + pp.Word(".", pp.nums)
         ).setResultsName("value")
         integer_number = (
-            binary_number ^ octal_number ^ decimal_number ^ hex_number
+            hex_number ^ binary_number ^ octal_number ^ decimal_number
         ).setResultsName("value")
 
         # Comment.
@@ -793,8 +796,10 @@ class ParserX86Intel(ParserX86):
         if isinstance(imd.value, str):
             if "." in imd.value:
                 return float(imd.value)
+            if imd.value.startswith("0x"):
+                return int(imd.value, 0)
             # Now parse depending on the base.
-            base = {"B": 2, "O": 8, "H": 16}.get(imd.value[-1], 10)
+            base = {"B": 2, "O": 8, "H": 16, "R": 16}.get(imd.value[-1], 10)
             value = 0
             negative = imd.value[0] == "-"
             positive = imd.value[0] == "+"
