@@ -160,10 +160,13 @@ class ParserX86Intel(ParserX86):
         binary_number = pp.Combine(pp.Word("01") + pp.CaselessLiteral("B"))
         octal_number = pp.Combine(pp.Word("01234567") + pp.CaselessLiteral("O"))
         decimal_number = pp.Combine(pp.Optional(pp.Literal("-")) + pp.Word(pp.nums))
-        hex_number_suffix = pp.Combine(pp.Word(pp.hexnums) + (pp.CaselessLiteral("H") ^ pp.CaselessLiteral("R")))
+        hex_number_suffix = pp.Combine(
+            pp.Word(pp.hexnums) + (pp.CaselessLiteral("H") ^ pp.CaselessLiteral("R"))
+        )
         hex_number_0x = pp.Combine(
-            pp.Optional(pp.Literal("-")) + pp.Literal("0x") + pp.Word(pp.hexnums))
-        hex_number = (hex_number_0x ^ hex_number_suffix)
+            pp.Optional(pp.Literal("-")) + pp.Literal("0x") + pp.Word(pp.hexnums)
+        )
+        hex_number = hex_number_0x ^ hex_number_suffix
         float_number = pp.Combine(
             pp.Optional(pp.Literal("-")) + pp.Word(pp.nums) + pp.Word(".", pp.nums)
         ).setResultsName("value")

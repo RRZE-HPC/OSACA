@@ -234,9 +234,7 @@ class TestParserX86Intel(unittest.TestCase):
         self.assertEqual(parsed_16.operands[0], RegisterOperand(name="XMM0"))
         self.assertEqual(
             parsed_16.operands[1],
-            MemoryOperand(
-                base=RegisterOperand(name="RAX"), offset=ImmediateOperand(value=291)
-            ),
+            MemoryOperand(base=RegisterOperand(name="RAX"), offset=ImmediateOperand(value=291)),
         )
 
     def test_parse_line(self):

@@ -67,9 +67,7 @@ class KernelDG(nx.DiGraph):
     @staticmethod
     def get_real_line_number(line_number):
         return (
-            int(line_number + 0.125)
-            if KernelDG.is_load_line_number(line_number)
-            else line_number
+            int(line_number + 0.125) if KernelDG.is_load_line_number(line_number) else line_number
         )
 
     def create_DG(self, kernel, flag_dependencies=False):
@@ -100,9 +98,7 @@ class KernelDG(nx.DiGraph):
                 loads[instruction_form.line_number] = load_line_number
                 dg.add_node(load_line_number)
                 dg.nodes[load_line_number]["instruction_form"] = InstructionForm(
-                    mnemonic="_LOAD_",
-                    line=instruction_form.line,
-                    line_number=load_line_number
+                    mnemonic="_LOAD_", line=instruction_form.line, line_number=load_line_number
                 )
                 # and set LD latency as edge weight
                 dg.add_edge(
@@ -423,8 +419,7 @@ class KernelDG(nx.DiGraph):
                     is_memory_read = self.parser.is_reg_dependend_of(register, src.base)
                 if src.index is not None and isinstance(src.index, RegisterOperand):
                     is_memory_read = (
-                        self.parser.is_reg_dependend_of(register, src.index)
-                        or is_memory_read
+                        self.parser.is_reg_dependend_of(register, src.index) or is_memory_read
                     )
                 for_load = is_memory_read
                 is_read = is_read or is_memory_read
@@ -614,7 +609,7 @@ class KernelDG(nx.DiGraph):
                 (latency, list(deps))
                 for latency, deps in groupby(lcd, lambda dep: lcd[dep]["latency"])
             ),
-            reverse=True
+            reverse=True,
         )
         node_colors = {}
         edge_colors = {}
@@ -637,17 +632,16 @@ class KernelDG(nx.DiGraph):
                         edge_colors[u, v] = color
         max_color = min(11, colors_used)
         colorscheme = f"spectral{max(3, max_color)}"
-        graph.graph["node"] = {"colorscheme" : colorscheme}
-        graph.graph["edge"] = {"colorscheme" : colorscheme}
+        graph.graph["node"] = {"colorscheme": colorscheme}
+        graph.graph["edge"] = {"colorscheme": colorscheme}
         for n, color in node_colors.items():
             if "style" not in graph.nodes[n]:
                 graph.nodes[n]["style"] = "filled"
             else:
                 graph.nodes[n]["style"] += ",filled"
             graph.nodes[n]["fillcolor"] = color
-            if (
-                (max_color >= 4 and color in (1, max_color))
-                or (max_color >= 10 and color in (1, 2, max_color - 1 , max_color))
+            if (max_color >= 4 and color in (1, max_color)) or (
+                max_color >= 10 and color in (1, 2, max_color - 1, max_color)
             ):
                 graph.nodes[n]["fontcolor"] = "white"
         for (u, v), color in edge_colors.items():
