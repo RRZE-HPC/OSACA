@@ -198,6 +198,7 @@ class ParserX86Intel(ParserX86):
             | pp.CaselessKeyword("WORD")
             | pp.CaselessKeyword("XMMWORD")
             | pp.CaselessKeyword("YMMWORD")
+            | pp.CaselessKeyword("ZMMWORD")
         ).setResultsName("data_type")
 
         # Identifier.  Note that $ is not mentioned in the ASM386 Assembly Language Reference,
@@ -292,15 +293,14 @@ class ParserX86Intel(ParserX86):
             pp.CaselessKeyword("ST")
             + pp.Optional(pp.Literal("(") + pp.Word("01234567") + pp.Literal(")"))
         ).setResultsName("name")
-        xmm_register = pp.Combine(pp.CaselessLiteral("XMM") + pp.Word(pp.nums)) | pp.Combine(
-            pp.CaselessLiteral("XMM1") + pp.Word("012345")
-        )
         simd_register = (
-            pp.Combine(pp.CaselessLiteral("MM") + pp.Word("01234567"))
-            | xmm_register
+            pp.Combine(pp.CaselessLiteral("MM") + pp.Word(pp.nums))
+            | pp.Combine(pp.CaselessLiteral("XMM") + pp.Word(pp.nums))
             | pp.Combine(pp.CaselessLiteral("YMM") + pp.Word(pp.nums))
-            | pp.Combine(pp.CaselessLiteral("YMM1") + pp.Word("012345"))
-        ).setResultsName("name")
+            | pp.Combine(pp.CaselessLiteral("ZMM") + pp.Word(pp.nums))
+        ).setResultsName("name") + pp.Optional(
+            pp.Literal("{") + pp.Word(pp.alphanums).setResultsName("mask") + pp.Literal("}")
+        )
         segment_register = (
             pp.CaselessKeyword("CS")
             | pp.CaselessKeyword("DS")
@@ -401,7 +401,9 @@ class ParserX86Intel(ParserX86):
             + pp.Optional(pp.Literal("+") + immediate.setResultsName("displacement"))
         ).setResultsName("offset_expression")
         ptr_expression = pp.Group(
-            data_type + pp.CaselessKeyword("PTR") + address_expression
+            data_type
+            + (pp.CaselessKeyword("PTR") | pp.CaselessKeyword("BCST"))
+            + address_expression
         ).setResultsName("ptr_expression")
         short_expression = pp.Group(pp.CaselessKeyword("SHORT") + identifier).setResultsName(
             "short_expression"
@@ -665,7 +667,10 @@ class ParserX86Intel(ParserX86):
         return directive_new, directive.get("comment")
 
     def process_register(self, operand):
-        return RegisterOperand(name=operand.name)
+        return RegisterOperand(
+            name=operand.name,
+            mask=RegisterOperand(name=operand.mask) if "mask" in operand else None,
+        )
 
     def process_register_expression(self, register_expression):
         base = register_expression.get("base")

@@ -13,7 +13,7 @@ class RegisterOperand(Operand):
         lanes=None,
         shape=None,
         index=None,
-        mask=False,
+        mask=None,
         zeroing=False,
         predication=None,
         source=False,

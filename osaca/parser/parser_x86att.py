@@ -374,10 +374,8 @@ class ParserX86ATT(ParserX86):
         return RegisterOperand(
             prefix=operand["prefix"].lower() if "prefix" in operand else None,
             name=operand["name"],
-            shape=operand["shape"].lower() if "shape" in operand else None,
-            lanes=operand["lanes"] if "lanes" in operand else None,
             index=operand["index"] if "index" in operand else None,
-            predication=operand["predication"].lower() if "predication" in operand else None,
+            mask=RegisterOperand(name=operand["mask"]) if "mask" in operand else None,
         )
 
     def process_directive(self, directive):
