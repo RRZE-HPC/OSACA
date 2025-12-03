@@ -4373,7 +4373,7 @@ instruction_forms:
   - class: register          # uops.info 
     name: xmm                # uops.info 
   - class: register          # uops.info 
-    name: ximm                # uops.info 
+    name: xmm                # uops.info
   latency: 2                 # uops.info 
   port_pressure: [[1, ['10', '11']]]  # uops.info 
   throughput: 0.5            # uops.info 
