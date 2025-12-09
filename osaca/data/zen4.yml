@@ -4114,34 +4114,6 @@ instruction_forms:
   port_pressure: [[1, ['10', '11']]]
   throughput: 0.5
   uops: 1
-- name: vinserti32x8
-  operands:
-  - class: immediate
-    imd: int
-  - class: register
-    name: ymm
-  - class: register
-    name: zmm
-  - class: register
-    name: zmm
-  latency: 1
-  port_pressure: [[2, ['10', '11']]]
-  throughput: 1.0
-  uops: 1
-- name: vinsertf32x4
-  operands:
-  - class: immediate
-    imd: int
-  - class: register
-    name: xmm
-  - class: register
-    name: ymm
-  - class: register
-    name: ymm
-  latency: 1
-  port_pressure: [[1, ['10', '11']]]
-  throughput: 0.5
-  uops: 1
 - name: vcvtsi2sd
   operands:
   - class: register
@@ -4920,20 +4892,6 @@ instruction_forms:
   port_pressure: [[1, ['10', '12']]]
   throughput: 0.5
   uops: 1
-- name: vcmpps
-  operands:
-  - class: immediate
-    imd: int
-  - class: register
-    name: zmm
-  - class: register
-    name: zmm
-  - class: register
-    name: k
-  latency: 5
-  port_pressure: [[2, ['9', '11']]]
-  throughput: 1.0
-  uops: 2
 - name: vcmpps
   operands:
   - class: immediate
