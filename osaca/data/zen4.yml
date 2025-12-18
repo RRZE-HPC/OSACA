@@ -4268,7 +4268,7 @@ instruction_forms:
   - class: register          # uops.info
     name: xmm                # uops.info
     mask: True               # uops.info
-  latency: 4                 # uops.info
+  latency: 1                 # uops.info
   port_pressure: [[1, ['9', '10', '11', '12']]]
   throughput: 0.25
   uops: 1                    # uops.info
