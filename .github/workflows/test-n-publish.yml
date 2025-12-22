@@ -29,6 +29,8 @@ jobs:
       run: |
         coverage run -p tests/all_tests.py
     - uses: codecov/codecov-action@v5
+      with:
+          token: ${{ secrets.CODECOV_TOKEN }}
     - name: Build package
       run: |
         python setup.py build sdist bdist_wheel
