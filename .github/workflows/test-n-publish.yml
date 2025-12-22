@@ -11,11 +11,7 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - uses: actions/setup-python@v4
-    - uses: codecov/codecov-action@v5
-      with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-          slug: RRZE-HPC/OSACA
-    - name: Set up Python ${{ matrix.python-version }}
+      name: Set up Python ${{ matrix.python-version }}
       with:
         python-version: ${{ matrix.python-version }}
     - name: Install
@@ -32,6 +28,10 @@ jobs:
     - name: Test
       run: |
         coverage run -p tests/all_tests.py
+    - uses: codecov/codecov-action@v5
+      with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          slug: RRZE-HPC/OSACA
     - name: Build package
       run: |
         python setup.py build sdist bdist_wheel
