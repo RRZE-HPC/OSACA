@@ -160,7 +160,6 @@ class ParserX86ATT(ParserX86):
         ).setResultsName(self.immediate_id)
 
         # Memory preparations
-        #offset = pp.Group(identifier | hex_number | decimal_number).setResultsName(
         offset = pp.Group(hex_number | decimal_number | identifier).setResultsName(
             self.immediate_id
         )
