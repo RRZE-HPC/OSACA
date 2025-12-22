@@ -28,7 +28,7 @@ jobs:
     - name: Test
       run: |
         coverage run -p tests/all_tests.py
-    - uses: codecov/codecov-action@v3
+    - uses: codecov/codecov-action@v5
     - name: Build package
       run: |
         python setup.py build sdist bdist_wheel
