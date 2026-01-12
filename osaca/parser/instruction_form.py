@@ -5,6 +5,7 @@ class InstructionForm:
     def __init__(
         self,
         mnemonic=None,
+        llvm_name=None,
         operands=[],
         hidden_operands=[],
         directive_id=None,
@@ -22,6 +23,7 @@ class InstructionForm:
         normalized=False,
     ):
         self._mnemonic = mnemonic
+        self._llvm_name = llvm_name
         self._operands = operands
         self._hidden_operands = hidden_operands
         self._directive_id = directive_id
@@ -55,6 +57,10 @@ class InstructionForm:
     @property
     def mnemonic(self):
         return self._mnemonic
+
+    @property
+    def llvm_name(self):
+        return self._llvm_name
 
     @property
     def label(self):
@@ -160,6 +166,10 @@ class InstructionForm:
     def mnemonic(self, mnemonic):
         self._mnemonic = mnemonic
 
+    @llvm_name.setter
+    def llvm_name(self, llvm_name):
+        self._llvm_name = llvm_name
+
     @label.setter
     def label(self, label):
         self._label_id = label
@@ -203,6 +213,7 @@ class InstructionForm:
     def __str__(self):
         attributes = {
             "mnemonic": self.mnemonic,
+            "llvm_name": self._llvm_name,
             "operands": self.operands,
             "hidden_operands": self.hidden_operands,
             "directive_id": self.directive,
@@ -226,13 +237,24 @@ class InstructionForm:
 
     def __eq__(self, other):
         if isinstance(other, InstructionForm):
-            return (
-                self._mnemonic == other._mnemonic
-                and self._directive_id == other._directive_id
-                and self._comment_id == other._comment_id
-                and self._label_id == other._label_id
-                and self._line == other._line
-                and self._line_number == other._line_number
-                and self._semantic_operands == other._semantic_operands
-            )
+            if len(self._semantic_operands["source"] + self._semantic_operands["destination"] + self._semantic_operands["src_dst"]) > 0:
+                return (
+                    self._mnemonic == other._mnemonic
+                    and self._directive_id == other._directive_id
+                    and self._comment_id == other._comment_id
+                    and self._label_id == other._label_id
+                    and self._line == other._line
+                    and self._line_number == other._line_number
+                    and self._semantic_operands == other._semantic_operands
+                )
+            else:
+                return (
+                    self._mnemonic == other._mnemonic
+                    and self._directive_id == other._directive_id
+                    and self._comment_id == other._comment_id
+                    and self._label_id == other._label_id
+                    and self._line == other._line
+                    and self._line_number == other._line_number
+                    and self._operands == other._operands
+                )
         return False

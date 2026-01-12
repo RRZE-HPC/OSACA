@@ -35,6 +35,7 @@ SUPPORTED_ARCHS = [
     "ZEN2",
     "ZEN3",
     "ZEN4",
+    "ZEN5",
     "TX2",
     "N1",
     "A64FX",

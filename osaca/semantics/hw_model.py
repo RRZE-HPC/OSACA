@@ -338,6 +338,7 @@ class MachineModel(object):
     def set_instruction(
         self,
         mnemonic,
+        llvm_name=None,
         operands=None,
         latency=None,
         port_pressure=None,
@@ -353,6 +354,7 @@ class MachineModel(object):
             self._data["instruction_forms_dict"][mnemonic].append(instr_data)
 
         instr_data.mnemonic = mnemonic
+        instr_data.llvm_name = llvm_name
         instr_data.operands = operands
         instr_data.latency = latency
         instr_data.port_pressure = port_pressure
@@ -365,6 +367,7 @@ class MachineModel(object):
             raise KeyError
         self.set_instruction(
             entry.mnemonic,
+            entry.llvm_name,
             entry.operands,
             entry.latency,
             entry.port_pressure,
@@ -456,6 +459,7 @@ class MachineModel(object):
             "zen2": "x86",
             "zen3": "x86",
             "zen4": "x86",
+            "zen5": "x86",
             "con": "x86",  # Intel Conroe
             "wol": "x86",  # Intel Wolfdale
             "snb": "x86",
@@ -521,15 +525,24 @@ class MachineModel(object):
                     for key, value in instruction_form.__dict__.items()
                     if not callable(value) and not key.startswith("__")
                 )
-            if instruction_form["port_pressure"] is not None:
-                cs = ruamel.yaml.comments.CommentedSeq(instruction_form["port_pressure"])
-                cs.fa.set_flow_style()
-                instruction_form["port_pressure"] = cs
+            iform = {
+                "name": instruction_form["name"] if "name" in instruction_form else instruction_form["mnemonic"]
+            }
+            if "llvm_name" in instruction_form:
+                iform["llvm_name"] = instruction_form["llvm_name"]
             dict_operands = []
             for op in instruction_form["operands"]:
                 dict_operands.append(self.class_to_dict(op))
-            instruction_form["operands"] = dict_operands
-            formatted_instruction_forms.append(instruction_form)
+            iform["operands"] = dict_operands
+            iform["latency"] = instruction_form["latency"]
+            if instruction_form["port_pressure"] is not None:
+                cs = ruamel.yaml.comments.CommentedSeq(instruction_form["port_pressure"])
+                cs.fa.set_flow_style()
+                iform["port_pressure"] = cs
+            iform["throughput"] = instruction_form["throughput"]
+            if "uops" in instruction_form:
+                iform["uops"] = instruction_form["uops"]
+            formatted_instruction_forms.append(iform)
 
         # Replace load_throughput with styled version for RoundtripDumper
         formatted_load_throughput = []
