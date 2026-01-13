@@ -75,9 +75,7 @@ instruction_forms:
   throughput: 0.0
   latency: 0.0
   port_pressure: []
-##########################################
 # assume all cmp's equal for now
-# TODO add cmp instructions
 - name: [cmp, cmpeqpd, cmpltpd, cmplepd, cmpunordpd, cmpneqpd, cmpnltpd, cmpnlepd, cmpordpd, cmpltps, cmpleps, cmpunordps, cmpneqps, cmpnltps, cmpnleps, cmpordps]
   operands:
   - class: register
@@ -85,8 +83,8 @@ instruction_forms:
   - class: register
     name: '*'
   latency: 1.0
-  port_pressure: [[1, ['9', '10', '11']]]
-  throughput: 0.33333
+  port_pressure: [[1, ['6', '7', '8', '9', '10', '11']]]
+  throughput: 0.166667
   uops: 1
 - name: [cmp, cmpeqpd, cmpltpd, cmplepd, cmpunordpd, cmpneqpd, cmpnltpd, cmpnlepd, cmpordpd, cmpltps, cmpleps, cmpunordps, cmpneqps, cmpnltps, cmpnleps, cmpordps]
   operands:
@@ -95,10 +93,11 @@ instruction_forms:
   - class: immediate
     imd: int
   latency: 1.0
-  port_pressure: [[1, ['9', '10', '11']]]
-  throughput: 0.33333
+  port_pressure: [[1, ['6', '7', '8', '9', '10', '11']]]
+  throughput: 0.166667
   uops: 1
 ##########################################
+# ibench data
 - name: push
   operands:
   - class: immediate
@@ -153,6 +152,353 @@ instruction_forms:
   port_pressure: []
   throughput: ~
   uops: 2
+- name: lea
+  operands:
+  - class: memory
+    base: '*'
+    offset: '*'
+    index: '*'
+    scale: '*'
+  - class: register
+    name: gpr
+  latency: 1
+  port_pressure: [1, '678']
+  throughput: 0.33333
+  uops: 1
+- name: mov
+  operands:
+  - class: immediate 
+    name: int
+  - class: register
+    name: gpr
+  latency: 1.0
+  port_pressure: [[1, ['6', '7', '8', '9', '10', '11']]]
+  throughput: 0.166667
+  uops: 1
+- name: movabs
+  operands:
+  - class: immediate 
+    name: int
+  - class: register
+    name: gpr
+  latency: 1.0
+  port_pressure: [[1, ['6', '7', '8']]]
+  throughput: 0.33333
+  uops: 1
+- name: movsxd
+  operands:
+  - class: register
+    name: gpr
+  - class: register
+    name: gpr
+  latency: 1.0
+  port_pressure: [[1, ['6', '7', '8', '9', '10', '11']]]
+  throughput: 0.166667
+  uops: 1
+- name: [movapd, vmovapd, movupd, vmovupd, movups, vmovups, movaps, vmovaps]
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 0
+  port_pressure: []
+  throughput: 0.0
+  uops: 1
+- name: [vmovapd, vmovupd, vmovaps, vmovups]
+  operands:
+  - class: register
+    name: zmm
+  - class: register
+    name: zmm
+  latency: 0.0
+  port_pressure: []
+  throughput: 0
+  uops: 1
+- name: [vmovapd, vmovupd, vmovaps, vmovups]
+  operands:
+  - class: register
+    name: ymm
+  - class: register
+    name: ymm
+  latency: 0.0
+  port_pressure: []
+  throughput: 0
+  uops: 1
+- name: ptest 
+  operands:
+  - class: register
+    name: xmm
+  - class: register
+    name: xmm
+  latency: 1.0
+  port_pressure: [1, '13']
+  throughput: 0.5
+  uops: 1
+- name: [vgatherdpd, vgatherqpd]  # with load
+  operands:
+  - class: memory
+    base: "*"
+    offset: "*"
+    index: "*"
+    scale: "*"
+  - class: register
+    name: xmm
+  latency: 13
+  port_pressure: [[6, ['4D', '5D']], [2, ['12', '13', '14', '15']], [2, '0123']]
+  throughput: 3.0
+  uops: ~
+- name: [vgatherdpd, vgatherqpd]  # with load
+  operands:
+  - class: memory
+    base: "*"
+    offset: "*"
+    index: "*"
+    scale: "*"
+  - class: register
+    name: ymm
+  latency: 16
+  port_pressure: [[12, ['4D', '5D']], [4, ['12', '13', '14', '15']], [4, '0123']]
+  throughput: 6.0
+  uops: ~
+- name: [vgatherdpd, vgatherqpd]  # with load
+  operands:
+  - class: memory
+    base: "*"
+    offset: "*"
+    index: "*"
+    scale: "*"
+  - class: register
+    name: zmm
+  latency: 33
+  port_pressure: [[30, ['4D', '5D']], [8, ['12', '13', '14', '15']], [8, '0123']]
+  throughput: 15.0
+  uops: ~
+- name: [vgatherdpd, vgatherqpd]
+  operands:
+  - class: memory
+    base: "*"
+    offset: "*"
+    index: "*"
+    scale: "*"
+  - class: register
+    name: xmm
+    mask: True
+  latency: 13
+  port_pressure: [[12, ['4D', '5D']], [2, ['12', '13', '14', '15']], [2, '0123']]
+  throughput: 6.0
+  uops: ~
+- name: [vgatherdpd, vgatherqpd]
+  operands:
+  - class: memory
+    base: "*"
+    offset: "*"
+    index: "*"
+    scale: "*"
+  - class: register
+    name: ymm
+    mask: True
+  latency: 16
+  port_pressure: [[12, ['4D', '5D']], [4, ['12', '13', '14', '15']], [4, '0123']]
+  throughput: 6.0
+- name: [vgatherdpd, vgatherqpd]
+  operands:
+  - class: memory
+    base: "*"
+    offset: "*"
+    index: "*"
+    scale: "*"
+  - class: register
+    name: zmm
+    mask: True
+  latency: 33
+  port_pressure: [[30, ['4D', '5D']], [8, ['12', '13', '14', '15']], [8, '0123']]
+  throughput: 15.0
+- name: vgatherdps  # with load
+  operands:
+  - class: memory
+    base: "*"
+    offset: "*"
+    index: "*"
+    scale: "*"
+  - class: register
+    name: xmm
+  latency: 24
+  port_pressure: [[12, ['4D', '5D']], [4, ['12', '13', '14', '15']], [4, '0123']]
+  throughput: 6.0
+  uops: ~
+- name: vgatherdps  # with load
+  operands:
+  - class: memory
+    base: "*"
+    offset: "*"
+    index: "*"
+    scale: "*"
+  - class: register
+    name: ymm
+  latency: 30
+  port_pressure: [[24, ['4D', '5D']], [8, ['12', '13', '14', '15']], [8, '0123']]
+  throughput: 12.0
+  uops: ~
+- name: vgatherdps  # with load
+  operands:
+  - class: memory
+    base: "*"
+    offset: "*"
+    index: "*"
+    scale: "*"
+  - class: register
+    name: zmm
+  latency: 33
+  port_pressure: [[38, ['4D', '5D']], [16, ['12', '13', '14', '15']], [16, '0123']]
+  throughput: 19.0
+  uops: ~
+- name: vgatherdps  # with load
+  operands:
+  - class: memory
+    base: "*"
+    offset: "*"
+    index: "*"
+    scale: "*"
+  - class: register
+    name: xmm
+    mask: True
+  latency: 24
+  port_pressure: [[12, ['4D', '5D']], [4, ['12', '13', '14', '15']], [4, '0123']]
+  throughput: 6.0
+  uops: ~
+- name: vgatherdps  # with load
+  operands:
+  - class: memory
+    base: "*"
+    offset: "*"
+    index: "*"
+    scale: "*"
+  - class: register
+    name: ymm
+    mask: True
+  latency: 30
+  port_pressure: [[24, ['4D', '5D']], [8, ['12', '13', '14', '15']], [8, '0123']]
+  throughput: 12.0
+  uops: ~
+- name: vgatherdps  # with load
+  operands:
+  - class: memory
+    base: "*"
+    offset: "*"
+    index: "*"
+    scale: "*"
+  - class: register
+    name: zmm
+    mask: True
+  latency: 33
+  port_pressure: [[38, ['4D', '5D']], [16, ['12', '13', '14', '15']], [16, '0123']]
+  throughput: 19.0
+  uops: ~
+- name: vgatherqq  # with load
+  operands:
+  - class: memory
+    base: "*"
+    offset: "*"
+    index: "*"
+    scale: "*"
+  - class: register
+    name: xmm
+  latency: 15
+  port_pressure: [[6, ['4D', '5D']], [1, ['12', '13', '14', '15']], [1, '0123']]
+  throughput: 3.0
+  uops: ~
+- name: vgatherqd  # with load
+  operands:
+  - class: memory
+    base: "*"
+    offset: "*"
+    index: "*"
+    scale: "*"
+  - class: register
+    name: xmm
+  latency: 17
+  port_pressure: [[6, ['4D', '5D']], [2, ['12', '13', '14', '15']], [2, '0123']]
+  throughput: 6.0
+  uops: ~
+- name: vscatterdpd  # with store
+  operands:
+  - class: memory
+    base: "*"
+    offset: "*"
+    index: "*"
+    scale: "*"
+  - class: register
+    name: xmm
+  latency: 0
+  port_pressure: [[6, ['4', '5']], [2, ['12', '13', '14', '15']], [2, '0123']]
+  throughput: 3.0
+  uops: ~
+- name: vscatterdpd  # with store
+  operands:
+  - class: memory
+    base: "*"
+    offset: "*"
+    index: "*"
+    scale: "*"
+  - class: register
+    name: ymm
+  latency: 0
+  port_pressure: [[10, ['4', '5']], [4, ['12', '13', '14', '15']], [4, '0123']]
+  throughput: 5.0
+  uops: ~
+- name: vscatterdpd  # with store
+  operands:
+  - class: memory
+    base: "*"
+    offset: "*"
+    index: "*"
+    scale: "*"
+  - class: register
+    name: zmm
+  latency: 0
+  port_pressure: [[18, ['4', '5']], [4, ['12', '13', '14', '15']], [4, '0123']]
+  throughput: 9.0
+  uops: ~
+- name: vscatterdps  # with store
+  operands:
+  - class: memory
+    base: "*"
+    offset: "*"
+    index: "*"
+    scale: "*"
+  - class: register
+    name: xmm
+  latency: 0
+  port_pressure: [[10, ['4', '5']], [4, ['12', '13', '14', '15']], [4, '0123']]
+  throughput: 5.0
+  uops: ~
+- name: vscatterdps  # with store
+  operands:
+  - class: memory
+    base: "*"
+    offset: "*"
+    index: "*"
+    scale: "*"
+  - class: register
+    name: ymm
+  latency: 0
+  port_pressure: [[18, ['4', '5']], [8, ['12', '13', '14', '15']], [8, '0123']]
+  throughput: 9.0
+  uops: ~
+- name: vscatterdps  # with store
+  operands:
+  - class: memory
+    base: "*"
+    offset: "*"
+    index: "*"
+    scale: "*"
+  - class: register
+    name: zmm
+  latency: 0
+  port_pressure: [[34, ['4', '5']], [16, ['12', '13', '14', '15']], [16, '0123']]
+  throughput: 17.0
+  uops: ~
 ##########################################
 # WINIC data
 - name: xorps
@@ -215,7 +561,7 @@ instruction_forms:
     name: gpr
   - class: register
     name: gpr
-  latency: 0.2
+  latency: 1
   port_pressure: [[1, ['6', '7', '8', '9']]]
   throughput: 0.25
   uops: ~
@@ -224,7 +570,7 @@ instruction_forms:
   operands:
   - class: register
     name: gpr
-  latency: 0.2
+  latency: 1
   port_pressure: [[1, ['6', '7', '8', '9', '10', '11']]]
   throughput: 0.16667
   uops: ~
@@ -23132,7 +23478,7 @@ instruction_forms:
     name: zmm
   - class: register
     name: zmm
-  latency: 0.2
+  latency: 0.0
   port_pressure: []
   throughput: 0
   uops: ~
@@ -23179,7 +23525,7 @@ instruction_forms:
     name: zmm
   - class: register
     name: zmm
-  latency: 0.2
+  latency: 0.0
   port_pressure: []
   throughput: 0
   uops: ~
@@ -23488,7 +23834,7 @@ instruction_forms:
     name: zmm
   - class: register
     name: zmm
-  latency: 0.2
+  latency: 0.0
   port_pressure: []
   throughput: 0
   uops: ~
@@ -23511,7 +23857,7 @@ instruction_forms:
     name: ymm
   - class: register
     name: ymm
-  latency: 0.2
+  latency: 0.0
   port_pressure: []
   throughput: 0
   uops: ~
@@ -23534,7 +23880,7 @@ instruction_forms:
     name: xmm
   - class: register
     name: xmm
-  latency: 0.2
+  latency: 0.0
   port_pressure: []
   throughput: 0
   uops: ~
@@ -23557,7 +23903,7 @@ instruction_forms:
     name: zmm
   - class: register
     name: zmm
-  latency: 0.2
+  latency: 0.0
   port_pressure: []
   throughput: 0
   uops: ~
@@ -23580,7 +23926,7 @@ instruction_forms:
     name: ymm
   - class: register
     name: ymm
-  latency: 0.2
+  latency: 0.0
   port_pressure: []
   throughput: 0
   uops: ~
@@ -23603,7 +23949,7 @@ instruction_forms:
     name: xmm
   - class: register
     name: xmm
-  latency: 0.2
+  latency: 0.0
   port_pressure: []
   throughput: 0
   uops: ~
@@ -23626,7 +23972,7 @@ instruction_forms:
     name: zmm
   - class: register
     name: zmm
-  latency: 0.2
+  latency: 0.0
   port_pressure: []
   throughput: 0
   uops: ~
@@ -23649,7 +23995,7 @@ instruction_forms:
     name: ymm
   - class: register
     name: ymm
-  latency: 0.2
+  latency: 0.0
   port_pressure: []
   throughput: 0
   uops: ~
@@ -23672,7 +24018,7 @@ instruction_forms:
     name: xmm
   - class: register
     name: xmm
-  latency: 0.2
+  latency: 0.0
   port_pressure: []
   throughput: 0
   uops: ~
@@ -23695,7 +24041,7 @@ instruction_forms:
     name: zmm
   - class: register
     name: zmm
-  latency: 0.2
+  latency: 0.0
   port_pressure: []
   throughput: 0
   uops: ~
@@ -23718,7 +24064,7 @@ instruction_forms:
     name: ymm
   - class: register
     name: ymm
-  latency: 0.2
+  latency: 0.0
   port_pressure: []
   throughput: 0
   uops: ~
@@ -23741,7 +24087,7 @@ instruction_forms:
     name: xmm
   - class: register
     name: xmm
-  latency: 0.2
+  latency: 0.0
   port_pressure: []
   throughput: 0
   uops: ~
@@ -23764,7 +24110,7 @@ instruction_forms:
     name: zmm
   - class: register
     name: zmm
-  latency: 0.2
+  latency: 0.0
   port_pressure: []
   throughput: 0
   uops: ~
@@ -23787,7 +24133,7 @@ instruction_forms:
     name: ymm
   - class: register
     name: ymm
-  latency: 0.2
+  latency: 0.0
   port_pressure: []
   throughput: 0
   uops: ~
@@ -23810,7 +24156,7 @@ instruction_forms:
     name: xmm
   - class: register
     name: xmm
-  latency: 0.2
+  latency: 0.0
   port_pressure: []
   throughput: 0
   uops: ~
@@ -23833,7 +24179,7 @@ instruction_forms:
     name: zmm
   - class: register
     name: zmm
-  latency: 0.2
+  latency: 0.0
   port_pressure: []
   throughput: 0
   uops: ~
@@ -23856,7 +24202,7 @@ instruction_forms:
     name: ymm
   - class: register
     name: ymm
-  latency: 0.2
+  latency: 0.0
   port_pressure: []
   throughput: 0
   uops: ~
@@ -23879,7 +24225,7 @@ instruction_forms:
     name: xmm
   - class: register
     name: xmm
-  latency: 0.2
+  latency: 0.0
   port_pressure: []
   throughput: 0
   uops: ~
@@ -23890,7 +24236,7 @@ instruction_forms:
     name: xmm
   - class: register
     name: xmm
-  latency: 0.2
+  latency: 0.0
   port_pressure: []
   throughput: 0
   uops: ~
@@ -23993,7 +24339,7 @@ instruction_forms:
     name: zmm
   - class: register
     name: zmm
-  latency: 0.2
+  latency: 0.0
   port_pressure: []
   throughput: 0
   uops: ~
@@ -24040,7 +24386,7 @@ instruction_forms:
     name: zmm
   - class: register
     name: zmm
-  latency: 0.2
+  latency: 0.0
   port_pressure: []
   throughput: 0
   uops: ~
@@ -35013,7 +35359,7 @@ instruction_forms:
 - name: stc
   llvm_name: STC
   operands: []
-  latency: 0.1
+  latency: 1.0
   port_pressure: [[1, ['6', '7', '8', '9', '10', '11']]]
   throughput: 0.16666666666666666
   uops: ~
@@ -37120,9 +37466,9 @@ instruction_forms:
     name: gpr
   - class: register
     name: gpr
-  latency: 0.1
+  latency: 0
   port_pressure: []
-  throughput: 0.09
+  throughput: 0.0
   uops: ~
 - name: pxor
   llvm_name: MMX_PXORrr
@@ -39189,7 +39535,7 @@ instruction_forms:
 - name: cqo
   llvm_name: CQO
   operands: []
-  latency: 0.3
+  latency: 1
   port_pressure: [[1, ['6', '7', '8']]]
   throughput: 0.3333333333333333
   uops: ~
@@ -39290,7 +39636,7 @@ instruction_forms:
 - name: cdq
   llvm_name: CDQ
   operands: []
-  latency: 0.3
+  latency: 1
   port_pressure: [[1, ['6', '7', '8']]]
   throughput: 0.3333333333333333
   uops: ~
@@ -39663,3 +40009,4 @@ instruction_forms:
   port_pressure: [[1, ['6', '7', '8', '9', '10', '11']]]
   throughput: 0.16666666666666666
   uops: ~
+###########################################################
