@@ -526,7 +526,11 @@ class MachineModel(object):
                     if not callable(value) and not key.startswith("__")
                 )
             iform = {
-                "name": instruction_form["name"] if "name" in instruction_form else instruction_form["mnemonic"]
+                "name": (
+                    instruction_form["name"]
+                    if "name" in instruction_form
+                    else instruction_form["mnemonic"]
+                )
             }
             if "llvm_name" in instruction_form:
                 iform["llvm_name"] = instruction_form["llvm_name"]

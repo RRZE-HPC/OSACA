@@ -237,7 +237,14 @@ class InstructionForm:
 
     def __eq__(self, other):
         if isinstance(other, InstructionForm):
-            if len(self._semantic_operands["source"] + self._semantic_operands["destination"] + self._semantic_operands["src_dst"]) > 0:
+            if (
+                len(
+                    self._semantic_operands["source"]
+                    + self._semantic_operands["destination"]
+                    + self._semantic_operands["src_dst"]
+                )
+                > 0
+            ):
                 return (
                     self._mnemonic == other._mnemonic
                     and self._directive_id == other._directive_id
