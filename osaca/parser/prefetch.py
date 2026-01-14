@@ -38,3 +38,12 @@ class PrefetchOperand(Operand):
 
     def __repr__(self):
         return self.__str__()
+
+    def __eq__(self, other):
+        if isinstance(other, PrefetchOperand):
+            return (
+                self._type_id == other._type_id
+                and self._target == other._target
+                and self._policy == other._policy
+            )
+        return False

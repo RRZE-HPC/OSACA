@@ -52,7 +52,7 @@ class TestParserX86Intel(unittest.TestCase):
             InstructionForm(
                 mnemonic="call",
                 operands=[
-                    {"identifier": {"name": "__CheckForDebuggerJustMyCode"}},
+                    IdentifierOperand(name="__CheckForDebuggerJustMyCode"),
                 ],
                 directive_id=None,
                 comment_id=None,
@@ -253,7 +253,7 @@ class TestParserX86Intel(unittest.TestCase):
         instruction_form_2 = InstructionForm(
             mnemonic="ret",
             operands=[
-                {"immediate": {"value": 0}},
+                ImmediateOperand(value=0),
             ],
             directive_id=None,
             comment_id=None,

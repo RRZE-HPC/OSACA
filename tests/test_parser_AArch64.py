@@ -15,6 +15,7 @@ from osaca.parser.register import RegisterOperand
 from osaca.parser.immediate import ImmediateOperand
 from osaca.parser.identifier import IdentifierOperand
 from osaca.parser.prefetch import PrefetchOperand
+from osaca.parser.condition import ConditionOperand
 
 
 class TestParserAArch64(unittest.TestCase):
@@ -316,7 +317,7 @@ class TestParserAArch64(unittest.TestCase):
                 RegisterOperand(prefix="x", name="11"),
                 ImmediateOperand(value=1, imd_type="int"),
                 ImmediateOperand(value=3, imd_type="int"),
-                {"condition": "EQ"},
+                ConditionOperand(ccode="EQ"),
             ],
             directive_id=None,
             comment_id=None,

@@ -11,6 +11,7 @@ from pyparsing import ParseException
 from osaca.parser import ParserX86ATT, InstructionForm
 from osaca.parser.register import RegisterOperand
 from osaca.parser.immediate import ImmediateOperand
+from osaca.parser.memory import MemoryOperand
 
 
 class TestParserX86ATT(unittest.TestCase):
@@ -241,15 +242,13 @@ class TestParserX86ATT(unittest.TestCase):
         instruction_form_4 = InstructionForm(
             mnemonic="lea",
             operands=[
-                {
-                    "memory": {
-                        "offset": {"value": 2},
-                        "base": {"name": "rax"},
-                        "index": {"name": "rax"},
-                        "scale": 1,
-                    }
-                },
-                {"register": {"name": "ecx"}},
+                    MemoryOperand(
+                        offset=ImmediateOperand(value=2),
+                        base=RegisterOperand(name="rax"),
+                        index=RegisterOperand(name="rax"),
+                        scale=1,
+                    ),
+                    RegisterOperand(name="ecx"),
             ],
             directive_id=None,
             comment_id="12.9",
