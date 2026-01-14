@@ -168,7 +168,7 @@ instruction_forms:
 - name: mov
   operands:
   - class: immediate 
-    name: int
+    imd: int
   - class: register
     name: gpr
   latency: 1.0
@@ -178,7 +178,7 @@ instruction_forms:
 - name: movabs
   operands:
   - class: immediate 
-    name: int
+    imd: int
   - class: register
     name: gpr
   latency: 1.0
