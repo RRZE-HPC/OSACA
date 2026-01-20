@@ -398,7 +398,7 @@ class ParserX86Intel(ParserX86):
             # outputs.
             + pp.Literal(":")
             + identifier.setResultsName("identifier")
-            + pp.Optional(pp.Literal("+") + immediate.setResultsName("displacement"))
+            + pp.Optional(operator_displacement + immediate.setResultsName("displacement"))
         ).setResultsName("offset_expression")
         ptr_expression = pp.Group(
             data_type
