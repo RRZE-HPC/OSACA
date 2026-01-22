@@ -226,6 +226,16 @@ class ArchSemantics(ISASemantics):
                     instruction_data_reg = self._machine_model.get_instruction(
                         instruction_form.mnemonic, operands
                     )
+                    # also try without GAS suffixes in case of AT&T syntax
+                    if (
+                        not instruction_data_reg
+                        and self._parser.isa() == "x86"
+                        and self._parser.syntax() == "ATT"
+                    ):
+                        if instruction_form.mnemonic[-1] in self._parser.GAS_SUFFIXES:
+                            instruction_data_reg = self._machine_model.get_instruction(
+                                instruction_form.mnemonic[:-1], operands
+                            )
                     if instruction_data_reg:
                         assign_unknown = False
                         reg_type = self._parser.get_reg_type(
