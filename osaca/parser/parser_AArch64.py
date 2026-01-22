@@ -30,6 +30,9 @@ class ParserAArch64(BaseParser):
     def isa(self):
         return "aarch64"
 
+    def syntax(self):
+        return "Armv8/Armv9"
+
     def start_marker(self):
         return [
             InstructionForm(

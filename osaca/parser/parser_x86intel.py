@@ -42,6 +42,9 @@ class ParserX86Intel(ParserX86):
         super().__init__()
         self._equ = {}
 
+    def syntax(self):
+        return "INTEL"
+
     # The IACA manual says: "For For Microsoft* Visual C++ compiler, 64-bit version, use
     # IACA_VC64_START and IACA_VC64_END, instead" (of IACA_START and IACA_END).
     # TODO: Inconveniently, the code generated with optimization disabled (/Od) has two

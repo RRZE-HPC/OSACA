@@ -29,6 +29,10 @@ class BaseParser(object):
         # Done in derived classes
         raise NotImplementedError
 
+    def syntax(self):
+        # Done in derived classes
+        raise NotImplementedError
+
     # The marker functions return lists of `InstructionForm` that are used to find the IACA markers
     # in the parsed code.  In addition to just a list, the marker may have a structure like
     # [I1, [I2, I3], I4, ...] where the nested list indicates that at least one of I2 and I3 must

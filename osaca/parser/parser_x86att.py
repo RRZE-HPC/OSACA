@@ -25,6 +25,9 @@ class ParserX86ATT(ParserX86):
     def __init__(self):
         super().__init__()
 
+    def syntax(self):
+        return "ATT"
+
     def start_marker(self):
         return [
             [
@@ -79,13 +82,20 @@ class ParserX86ATT(ParserX86):
                 if arch_model.get_instruction(nongas_mnemonic, instruction_form.operands):
                     mnemonic = nongas_mnemonic
             # Check for non-VEX version and vice-versa
+            # Take the other version only if the GAS suffix check did not find anything
             elif mnemonic[0] == "v":
                 unvexed_mnemonic = mnemonic[1:]
-                if arch_model.get_instruction(unvexed_mnemonic, len(instruction_form.operands)):
+                if (
+                    not arch_model.get_instruction(mnemonic, len(instruction_form.operands))
+                    and arch_model.get_instruction(unvexed_mnemonic, len(instruction_form.operands))
+                ):
                     mnemonic = unvexed_mnemonic
             else:
                 vexed_mnemonic = "v" + mnemonic
-                if arch_model.get_instruction(vexed_mnemonic, len(instruction_form.operands)):
+                if (
+                    not arch_model.get_instruction(mnemonic, len(instruction_form.operands))
+                    and arch_model.get_instruction(vexed_mnemonic, len(instruction_form.operands))
+                ):
                     mnemonic = vexed_mnemonic
             instruction_form.mnemonic = mnemonic
 
