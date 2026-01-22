@@ -162,7 +162,7 @@ instruction_forms:
   - class: register
     name: gpr
   latency: 1
-  port_pressure: [1, '678']
+  port_pressure: [[1, '678']]
   throughput: 0.33333
   uops: 1
 - name: mov
@@ -205,7 +205,7 @@ instruction_forms:
   port_pressure: []
   throughput: 0.0
   uops: 1
-- name: [vmovapd, vmovupd, vmovaps, vmovups]
+- name: [movapd, vmovapd, movupd, vmovupd, movups, vmovups, movaps, vmovaps]
   operands:
   - class: register
     name: zmm
@@ -215,7 +215,7 @@ instruction_forms:
   port_pressure: []
   throughput: 0
   uops: 1
-- name: [vmovapd, vmovupd, vmovaps, vmovups]
+- name: [movapd, vmovapd, movupd, vmovupd, movups, vmovups, movaps, vmovaps]
   operands:
   - class: register
     name: ymm
@@ -232,7 +232,7 @@ instruction_forms:
   - class: register
     name: xmm
   latency: 1.0
-  port_pressure: [1, '13']
+  port_pressure: [[1, '13']]
   throughput: 0.5
   uops: 1
 - name: [vgatherdpd, vgatherqpd]  # with load
