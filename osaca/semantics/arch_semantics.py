@@ -53,22 +53,19 @@ class ArchSemantics(ISASemantics):
         """
         self._check_normalized(kernel)
         INC = 0.01
-        kernel.reverse()
         port_list = self._machine_model.get_ports()
         multiple_assignments = False
+        best_kernel = None
+        best_kernel_tp = sys.maxsize
         for idx, instruction_form in enumerate(kernel[start:], start):
-            multiple_assignments = False
             # if iform has multiple possible port assignments, check all in a DFS manner and take the best
             if isinstance(instruction_form.port_uops, dict):
-                best_kernel = None
-                best_kernel_tp = sys.maxsize
                 for port_util_alt in list(instruction_form.port_uops.values())[1:]:
                     k_tmp = deepcopy(kernel)
                     k_tmp[idx].port_uops = deepcopy(port_util_alt)
                     k_tmp[idx].port_pressure = self._machine_model.average_port_pressure(
                         k_tmp[idx].port_uops
                     )
-                    k_tmp.reverse()
                     self.assign_optimal_throughput(k_tmp, idx)
                     if max(self.get_throughput_sum(k_tmp)) < best_kernel_tp:
                         best_kernel = k_tmp
@@ -139,7 +136,6 @@ class ArchSemantics(ISASemantics):
                         port_sums = self._to_list(
                             itemgetter(*indices)(self.get_throughput_sum(kernel))
                         )
-        kernel.reverse()
         if multiple_assignments:
             if max(self.get_throughput_sum(kernel)) > best_kernel_tp:
                 for i, instr in enumerate(best_kernel):

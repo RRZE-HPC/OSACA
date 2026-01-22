@@ -56,6 +56,8 @@ class TestSemanticTools(unittest.TestCase):
         with open(cls._find_file("mops_aarch64.s")) as f:
             cls.mops_1_code = f.read()
         cls.mops_2_code = cls.mops_1_code.replace("//ALT1 ", "")
+        with open(cls._find_file("kernel_aarch64_multiple_assignments_a64fx.s")) as f:
+            cls.code_mult_assign = f.read()
 
         cls.kernel_x86 = reduce_to_section(
             cls.parser_x86_att.parse_file(cls.code_x86), cls.parser_x86_att
@@ -84,6 +86,10 @@ class TestSemanticTools(unittest.TestCase):
         cls.kernel_aarch64_deps = reduce_to_section(
             cls.parser_AArch64.parse_file(cls.code_AArch64_deps), cls.parser_AArch64
         )
+        cls.kernel_aarch64_mult_assign = reduce_to_section(
+            cls.parser_AArch64.parse_file(cls.code_mult_assign), cls.parser_AArch64
+        )
+
 
         # set up machine models
         cls.machine_model_csx = MachineModel(
@@ -164,6 +170,10 @@ class TestSemanticTools(unittest.TestCase):
         for i in range(len(cls.kernel_aarch64_deps)):
             cls.semantics_a64fx.assign_src_dst(cls.kernel_aarch64_deps[i])
             cls.semantics_a64fx.assign_tp_lt(cls.kernel_aarch64_deps[i])
+        cls.semantics_a64fx.normalize_instruction_forms(cls.kernel_aarch64_mult_assign)
+        for i in range(len(cls.kernel_aarch64_mult_assign)):
+            cls.semantics_a64fx.assign_src_dst(cls.kernel_aarch64_mult_assign[i])
+            cls.semantics_a64fx.assign_tp_lt(cls.kernel_aarch64_mult_assign[i])
 
     ###########
     # Tests
@@ -389,6 +399,15 @@ class TestSemanticTools(unittest.TestCase):
         k2i1_pp = [round(x, 2) for x in tmp_kernel_2[0].port_pressure]
         self.assertEqual(k1i1_pp, [0.33, 0.0, 0.33, 0.0, 0.0, 0.0, 0.0, 0.0, 0.33, 0.0, 0.0])
         self.assertEqual(k2i1_pp, [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0])
+
+    def test_multiple_assignment_througput(self):
+        tmp_massign = deepcopy(self.kernel_aarch64_mult_assign)
+        self.semantics_a64fx.add_semantics(tmp_massign)
+        self.semantics_a64fx.assign_optimal_throughput(tmp_massign)
+        # 9p0 + (8p0|8p2) + (8p0|8p2)
+        # --> best case: 9p0,16p2
+        k_pp = self.semantics_a64fx.get_throughput_sum(tmp_massign)
+        self.assertEqual(k_pp, [9.0, 0.0, 0.0, 16.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
 
     def test_optimal_throughput_assignment_x86_intel(self):
         kernel_fixed = deepcopy(self.kernel_x86_intel)
