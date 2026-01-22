@@ -293,7 +293,7 @@ instruction_forms:
     imd: int
   throughput: 0.5
   latency: 2.0  # 	1*p67
-  port_pressure: [[1, ['67']]]
+  port_pressure: [[1, '67']]
 - name: [bfi, bfm]
   operands:
   - class: register
@@ -306,7 +306,7 @@ instruction_forms:
     imd: int
   throughput: 0.5
   latency: 2.0  # 	1*p67
-  port_pressure: [[1, ['67']]]
+  port_pressure: [[1, '67']]
 - name: bic
   operands:
   - class: register
@@ -3034,7 +3034,7 @@ instruction_forms:
     shape: d
     width: '*'
   throughput: 5.0
-  latency: 12.0  # 	1*p8,10
+  latency: 13.0  # 	1*p8,10
   port_pressure: [[1, ['8', '10']], [10, ['8DV', '10DV']]]
 - name: fdiv
   operands:
@@ -3045,7 +3045,7 @@ instruction_forms:
   - class: register
     prefix: d
   throughput: 2.5
-  latency: 12.0  # 	1*p
+  latency: 13.0  # 	1*p
   port_pressure: [[1, ['8', '10']], [5, ['8DV', '10DV']]]
 - name: fdiv
   operands:
