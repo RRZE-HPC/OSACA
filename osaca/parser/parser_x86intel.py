@@ -398,7 +398,7 @@ class ParserX86Intel(ParserX86):
             # outputs.
             + pp.Literal(":")
             + identifier.setResultsName("identifier")
-            + pp.Optional(pp.Literal("+") + immediate.setResultsName("displacement"))
+            + pp.Optional(operator_displacement + immediate.setResultsName("displacement"))
         ).setResultsName("offset_expression")
         ptr_expression = pp.Group(
             data_type
@@ -742,7 +742,7 @@ class ParserX86Intel(ParserX86):
             if "displacement" in offset_expression
             else None
         )
-        if displacement and "operator_disp" == "-":
+        if displacement and offset_expression.get("operator_disp") == "-":
             displacement.value *= -1
         identifier = self.process_identifier(offset_expression.identifier)
         identifier.offset = displacement
