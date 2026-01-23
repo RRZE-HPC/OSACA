@@ -398,6 +398,7 @@ def inspect(args, output_file=sys.stdout):
     # Do optimal schedule for kernel throughput if wished
     if not args.fixed:
         semantics.assign_optimal_throughput(kernel)
+        semantics.assign_optimal_throughput(kernel)
 
     # Create DiGrahps
     kernel_graph = KernelDG(
