@@ -106,6 +106,198 @@ def import_benchmark_output(arch, bench_type, filepath, output=sys.stdout):
         mm.dump(stream=output)
 
 
+def create_isa_file_from_WINIC(source_path, output_path):
+    """
+    Uses an output of WINIC to create an ISA file for OSACA (Compatible with WINIC 0.2.0).
+    To quickly create a suitable input file, set WINIC to do no actual benchmark runs and to include empty entries in its output.
+    winic -f 1.5 LAT --no-report -o out.yaml --runs 0 --keep-empty-entries
+    """
+
+    with open(source_path, "r") as file:
+        raw_content = file.read()
+    yaml_input = yaml.safe_load(raw_content)
+    instructions = yaml_input["instructions"]
+    isa = yaml_input["isa"]
+
+    result = []
+    for entry in instructions:
+        result_entry = {"name": entry["name"], "operands": []}
+        for operand in entry["operands"]:
+            result_operand = {"class": operand["class"]}
+            if operand["class"] == "register":
+                try:
+                    if isa == "x86":
+                        result_operand["name"] = _llvm_op_to_osaca_op_x86(operand["name"])
+                    if isa == "aarch64":
+                        key, val = _llvm_op_to_osaca_op_AArch64(operand["name"])
+                        result_operand[key] = val
+                except KeyError:
+                    continue  # ignore register types we don't need
+            elif operand["class"] == "immediate":
+                result_operand["imd"] = "int"  # WINIC output doesn't provide immediate width so assume int
+            else:
+                print("unknown operand type: ", operand["class"])
+
+            result_operand["source"] = operand["read"]
+            result_operand["destination"] = operand["write"]
+            result_entry["operands"].append(result_operand)
+
+        # collect implicit operands
+        implicit_reads = set()
+        implicit_writes = set()
+        for lat in entry["operandLatencies"]:
+            if not lat["sourceOperand"].isdigit():
+                implicit_reads.add(lat["sourceOperand"])
+            if not lat["targetOperand"].isdigit():
+                implicit_writes.add(lat["targetOperand"])
+
+        for operand_name in implicit_reads.union(implicit_writes):
+            result_operand = {}
+            if operand_name == "EFLAGS" or operand_name == "NZCV":
+                result_operand["class"] = "flag"
+                result_operand["name"] = "all"
+            else:
+                result_operand["class"] = "register"
+                try:
+                    if isa == "x86":
+                        result_operand["name"] = _llvm_op_to_osaca_op_x86(operand_name)
+                    if isa == "aarch64":
+                        key, val = _llvm_op_to_osaca_op_AArch64(operand_name)
+                        result_operand[key] = val
+                except KeyError:
+                    continue  # ignore register types we don't need
+            result_operand["source"] = operand_name in implicit_reads
+            result_operand["destination"] = operand_name in implicit_writes
+            if "hidden_operands" not in result_entry:
+                result_entry["hidden_operands"] = []
+            result_entry["hidden_operands"].append(result_operand)
+
+        result.append(result_entry)
+
+    # deduplicate entries
+    unique_result = []
+    seen = set()
+    for entry in result:
+        key = _freeze(entry)
+        if key not in seen:
+            seen.add(key)
+            unique_result.append(entry)
+
+    with open(output_path, "w") as f:
+        yaml.safe_dump({"isa": isa, "instruction_forms": unique_result}, f, sort_keys=False)
+    return unique_result
+
+
+##################
+# HELPERS WINIC #
+##################
+
+
+def _llvm_op_to_osaca_op_x86(operand_name: str) -> str:
+    manual_mappings = {
+        "VR64": "mm",
+        "VR128": "xmm",
+        "VR128X": "xmm",
+        "VR256": "ymm",
+        "VR256X": "ymm",
+        "VR512": "zmm",
+        "VR512": "zmm",
+        "VR512_0_15": "zmm",
+        "LOW32_ADDR_ACCESS_RBP": "gpr",
+        "LOW32_ADDR_ACCESS": "gpr",
+        "LOW32_ADDR_ACCESS_RBP_with_sub_8bit": "gpr",
+        "LOW32_ADDR_ACCESS_RBP_with_sub_16bit_in_GR16_NOREX": "gpr",
+        "LOW32_ADDR_ACCESS_RBP_with_sub_16bit_in_GR16_NOREX2": "gpr",
+        "LOW32_ADDR_ACCESS_RBP_with_sub_32bit": "gpr",
+        "CCR": "flag",
+        "RSP": "rsp",
+        "RDI": "rdi",
+        "ESP": "esp",
+        "MXCSR": "mxcsr",
+        "FPCCR": "fpsw",
+        "LOW32_ADDR_ACCESS_RBP_with_sub_8bit_with_sub_32bit": "rbp",
+        "LOW32_ADDR_ACCESS_with_sub_32bit": "rip",
+        "TILE": "tile",
+        "TILEPAIR": "tile",
+        "RST": "rst",
+        "DFCCR": "df",
+        # "CONTROL_REG": "unhandled",
+        # "DEBUG_REG": "unhandled",
+        # "SEGMENT_REG": "unhandled",
+    }
+    # classes
+    if operand_name.startswith("GR"):
+        return "gpr"
+    if operand_name.startswith("VK"):
+        return "mask"
+    if operand_name.startswith("FR"):
+        return "xmm"
+    if operand_name.startswith("RFP"):
+        return "fp"
+
+    # registers
+    if any(operand_name.startswith(prefix) for prefix in ["XMM", "YMM", "ZMM"]):
+        return operand_name.lower()
+
+    for prefix in ["A", "B", "C", "D"]:
+        if operand_name in [f"{prefix}X", f"{prefix}L", f"{prefix}H", f"E{prefix}X", f"R{prefix}X"]:
+            return operand_name.lower()
+
+    return manual_mappings[operand_name]
+
+
+def _llvm_op_to_osaca_op_AArch64(operand_name: str) -> tuple[str, str]:
+    """
+    Returns a tuple (key, value) e.g. (name, x15) or (prefix, x)
+    """
+    manual_mappings = {
+        "FPCR": "fpcr",
+        "FPMR": "fpmr",
+        "VG": "vl",  # see PTRUE_B
+        "SP": "sp",
+    }
+    # classes
+    # skipping GPR64sponly GPR32sponly
+    # skipping MatrixIndex, those do not work in WINIC, OSACA does not support them anyways i think
+    if operand_name.startswith("GPR64"):
+        return ("prefix", "x")
+    if operand_name.startswith("GPR32"):
+        return ("prefix", "w")
+    if operand_name.startswith("ZPR"):
+        return ("prefix", "*")
+    if operand_name.startswith("FPR8"):
+        return ("prefix", "b")
+    if operand_name.startswith("FPR16"):
+        return ("prefix", "h")
+    if operand_name.startswith("FPR32"):
+        return ("prefix", "s")
+    if operand_name.startswith("FPR64"):
+        return ("prefix", "d")
+    if operand_name.startswith("FPR128") or operand_name.startswith("QQ"):
+        return ("prefix", "q")
+    if operand_name.startswith("PP"):
+        return ("prefix", "p")  # approve? (predicate regs)
+    # bfmlal  za0.d, { z0.h - z1.h }, { z2.h - z3.h }
+    # matrix reg[matrix index] {ZPR} {ZPR_4b}
+    if operand_name.startswith("MPR"):
+        return ("prefix", "za")  # approve? (matrix regs)
+
+    # registers
+    for i in range(32):
+        manual_mappings[f"X{i}"] = ("name", f"x{i}")
+
+    return ("name", manual_mappings[operand_name])
+
+
+def _freeze(obj):
+    # AI, converts dicts to comparable tuples
+    if isinstance(obj, dict):
+        return tuple(sorted((k, _freeze(v)) for k, v in obj.items()))
+    if isinstance(obj, list):
+        return tuple(_freeze(v) for v in obj)
+    return obj
+
+
 ##################
 # HELPERS IBENCH #
 ##################
