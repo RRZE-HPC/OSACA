@@ -115,7 +115,7 @@ def create_isa_file_from_WINIC(source_path, output_path):
 
     with open(source_path, "r") as file:
         raw_content = file.read()
-    yaml_input = yaml.safe_load(raw_content)
+    yaml_input = ruamel.yaml.YAML().load(raw_content)
     instructions = yaml_input["instructions"]
     isa = yaml_input["isa"]
 
@@ -184,7 +184,7 @@ def create_isa_file_from_WINIC(source_path, output_path):
             unique_result.append(entry)
 
     with open(output_path, "w") as f:
-        yaml.safe_dump({"isa": isa, "instruction_forms": unique_result}, f, sort_keys=False)
+        ruamel.yaml.YAML().dump({"isa": isa, "instruction_forms": unique_result}, f)
     return unique_result
 
 
