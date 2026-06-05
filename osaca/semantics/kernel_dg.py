@@ -635,6 +635,7 @@ class KernelDG(nx.DiGraph):
         graph.graph["node"] = {"colorscheme": colorscheme}
         graph.graph["edge"] = {"colorscheme": colorscheme}
         for n, color in node_colors.items():
+            color = min(color, max_color)
             if "style" not in graph.nodes[n]:
                 graph.nodes[n]["style"] = "filled"
             else:
@@ -645,6 +646,7 @@ class KernelDG(nx.DiGraph):
             ):
                 graph.nodes[n]["fontcolor"] = "white"
         for (u, v), color in edge_colors.items():
+            color = min(color, max_color)
             # The backward edge of the cycle is represented as the corresponding forward
             # edge with the attribute dir=back.
             edge = graph.edges[u, v] if (u, v) in graph.edges else graph.edges[v, u]
