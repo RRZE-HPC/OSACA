@@ -2897,6 +2897,21 @@ instruction_forms:
           name: "xmm"
           source: true
           destination: true
+    - name: mul
+      operands:
+        - class: "register"
+          name: "gpr"
+          source: true
+          destination: false
+      hidden_operands:
+        - class: "register"
+          name: "rdx"
+          source: false
+          destination: true
+        - class: "register"
+          name: "rax"
+          source: true
+          destination: true
     - name: mulsd
       operands:
         - class: "register"
