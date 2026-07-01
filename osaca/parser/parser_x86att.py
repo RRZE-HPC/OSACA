@@ -76,19 +76,15 @@ class ParserX86ATT(ParserX86):
             return
         model = arch_model.get_instruction(mnemonic, instruction_form.operands)
         if not model:
-            # Check for instruction without GAS suffix.
-            if mnemonic[-1] in self.GAS_SUFFIXES:
-                nongas_mnemonic = mnemonic[:-1]
-                if arch_model.get_instruction(nongas_mnemonic, instruction_form.operands):
-                    mnemonic = nongas_mnemonic
             # Check for non-VEX version and vice-versa
-            # Take the other version only if the GAS suffix check did not find anything
-            elif mnemonic[0] == "v":
+            found_VEX_alt = False
+            if mnemonic[0] == "v":
                 unvexed_mnemonic = mnemonic[1:]
                 if (
                     not arch_model.get_instruction(mnemonic, len(instruction_form.operands))
                     and arch_model.get_instruction(unvexed_mnemonic, len(instruction_form.operands))
                 ):
+                    found_VEX_alt = True
                     mnemonic = unvexed_mnemonic
             else:
                 vexed_mnemonic = "v" + mnemonic
@@ -96,7 +92,13 @@ class ParserX86ATT(ParserX86):
                     not arch_model.get_instruction(mnemonic, len(instruction_form.operands))
                     and arch_model.get_instruction(vexed_mnemonic, len(instruction_form.operands))
                 ):
+                    found_VEX_alt = True
                     mnemonic = vexed_mnemonic
+            # Check for instruction without GAS suffix.
+            if mnemonic[-1] in self.GAS_SUFFIXES and not found_VEX_alt:
+                nongas_mnemonic = mnemonic[:-1]
+                if arch_model.get_instruction(nongas_mnemonic, instruction_form.operands):
+                    mnemonic = nongas_mnemonic
             instruction_form.mnemonic = mnemonic
 
     def construct_parser(self):
