@@ -245,7 +245,9 @@ class TestParserX86Intel(unittest.TestCase):
         self.assertEqual(parsed_17.operands[0], RegisterOperand(name="RCX"))
         self.assertEqual(
             parsed_17.operands[1],
-            MemoryOperand(offset=IdentifierOperand(name="??_R0M@8", offset=ImmediateOperand(value=-4))),
+            MemoryOperand(
+                offset=IdentifierOperand(name="??_R0M@8", offset=ImmediateOperand(value=-4))
+            ),
         )
 
         self.assertEqual(parsed_18.mnemonic, "lea")

@@ -80,18 +80,16 @@ class ParserX86ATT(ParserX86):
             found_VEX_alt = False
             if mnemonic[0] == "v":
                 unvexed_mnemonic = mnemonic[1:]
-                if (
-                    not arch_model.get_instruction(mnemonic, len(instruction_form.operands))
-                    and arch_model.get_instruction(unvexed_mnemonic, len(instruction_form.operands))
-                ):
+                if not arch_model.get_instruction(
+                    mnemonic, len(instruction_form.operands)
+                ) and arch_model.get_instruction(unvexed_mnemonic, len(instruction_form.operands)):
                     found_VEX_alt = True
                     mnemonic = unvexed_mnemonic
             else:
                 vexed_mnemonic = "v" + mnemonic
-                if (
-                    not arch_model.get_instruction(mnemonic, len(instruction_form.operands))
-                    and arch_model.get_instruction(vexed_mnemonic, len(instruction_form.operands))
-                ):
+                if not arch_model.get_instruction(
+                    mnemonic, len(instruction_form.operands)
+                ) and arch_model.get_instruction(vexed_mnemonic, len(instruction_form.operands)):
                     found_VEX_alt = True
                     mnemonic = vexed_mnemonic
             # Check for instruction without GAS suffix.
