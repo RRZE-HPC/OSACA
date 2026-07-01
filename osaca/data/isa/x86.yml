@@ -2897,6 +2897,21 @@ instruction_forms:
           name: "xmm"
           source: true
           destination: true
+    - name: mul
+      operands:
+        - class: "register"
+          name: "gpr"
+          source: true
+          destination: false
+      hidden_operands:
+        - class: "register"
+          name: "rdx"
+          source: false
+          destination: true
+        - class: "register"
+          name: "rax"
+          source: true
+          destination: true
     - name: mulsd
       operands:
         - class: "register"
@@ -4025,7 +4040,7 @@ instruction_forms:
           source: true
           destination: false
       # TODO sets MXCSR
-    - name: [vfmadd132pd, vfmadd213pd, vfmadd231pd]
+    - name: [vfmadd132pd, vfmadd213pd, vfmadd231pd, vfnmadd132pd, vfnmadd213pd, vfnmadd231pd]
       operands:
         - class: "register"
           name: "*"
@@ -4053,7 +4068,7 @@ instruction_forms:
           name: "*"
           source: true
           destination: true
-    - name: [vfmadd132sd, vfmadd213sd, vfmadd231sd]
+    - name: [vfmadd132sd, vfmadd213sd, vfmadd231sd, vfnmadd132sd, vfnmadd213sd, vfnmadd231sd]
       operands:
         - class: "register"
           name: "xmm"
@@ -4081,7 +4096,7 @@ instruction_forms:
           name: "xmm"
           source: true
           destination: true
-    - name: [vfmaddsub132pd, vfmaddsub213pd, vfmaddsub231pd]
+    - name: [vfmaddsub132pd, vfmaddsub213pd, vfmaddsub231pd, vfnmaddsub132pd, vfnmaddsub213pd, vfnmaddsub231pd]
       operands:
         - class: "register"
           name: "*"
