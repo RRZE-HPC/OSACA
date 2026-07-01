@@ -242,13 +242,13 @@ class TestParserX86ATT(unittest.TestCase):
         instruction_form_4 = InstructionForm(
             mnemonic="lea",
             operands=[
-                    MemoryOperand(
-                        offset=ImmediateOperand(value=2),
-                        base=RegisterOperand(name="rax"),
-                        index=RegisterOperand(name="rax"),
-                        scale=1,
-                    ),
-                    RegisterOperand(name="ecx"),
+                MemoryOperand(
+                    offset=ImmediateOperand(value=2),
+                    base=RegisterOperand(name="rax"),
+                    index=RegisterOperand(name="rax"),
+                    scale=1,
+                ),
+                RegisterOperand(name="ecx"),
             ],
             directive_id=None,
             comment_id="12.9",

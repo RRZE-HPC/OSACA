@@ -90,7 +90,6 @@ class TestSemanticTools(unittest.TestCase):
             cls.parser_AArch64.parse_file(cls.code_mult_assign), cls.parser_AArch64
         )
 
-
         # set up machine models
         cls.machine_model_csx = MachineModel(
             path_to_yaml=os.path.join(cls.MODULE_DATA_DIR, "csx.yml")
