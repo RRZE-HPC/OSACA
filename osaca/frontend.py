@@ -2,6 +2,7 @@
 """
 Frontend interface for OSACA. Does everything necessary for analysis report generation.
 """
+
 import io
 import os
 import re

@@ -2,6 +2,7 @@
 """
 Unit tests for DB interface
 """
+
 import os
 import unittest
 from io import StringIO

@@ -128,14 +128,14 @@ class KernelDG(nx.DiGraph):
                         instruction_form.line_number,
                         loads[dep.line_number],
                         latency=edge_weight,
-                        operand=operand
+                        operand=operand,
                     )
                 else:
                     dg.add_edge(
                         instruction_form.line_number,
                         dep.line_number,
                         latency=edge_weight,
-                        operand=operand
+                        operand=operand,
                     )
 
                 dg.nodes[dep.line_number]["instruction_form"] = dep
@@ -253,7 +253,7 @@ class KernelDG(nx.DiGraph):
                     (self._get_node_by_lineno(dg, ln), lat) for ln, lat in involved_lines
                 ],
                 "latency": lat_sum,
-                "operand": loop_carrying_operand
+                "operand": loop_carrying_operand,
             }
         return loopcarried_deps_dict
 
@@ -675,7 +675,8 @@ class KernelDG(nx.DiGraph):
                     edge["labeltooltip"] = tooltip
         # rename node from [idx] to [idx mnemonic] and add shape
         comments = [
-            n for n, node in graph.nodes.items()
+            n
+            for n, node in graph.nodes.items()
             if node["instruction_form"].comment is not None
             and not node["instruction_form"].mnemonic
             and not node["instruction_form"].label

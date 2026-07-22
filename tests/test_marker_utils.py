@@ -2,6 +2,7 @@
 """
 Unit tests for IACA/OSACA marker utilities
 """
+
 import os
 import unittest
 from collections import OrderedDict

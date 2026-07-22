@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """CLI for OSACA"""
+
 import argparse
 import io
 import os
@@ -19,7 +20,6 @@ from osaca.semantics import (
     MachineModel,
     reduce_to_section,
 )
-
 
 SUPPORTED_ARCHS = [
     "SNB",

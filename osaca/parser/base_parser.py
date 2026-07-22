@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Parser superclass of specific parsers."""
+
 import operator
 import re
 
