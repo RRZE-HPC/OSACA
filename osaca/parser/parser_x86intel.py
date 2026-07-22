@@ -206,9 +206,9 @@ class ParserX86Intel(ParserX86):
 
         # Identifier.  Note that $ is not mentioned in the ASM386 Assembly Language Reference,
         # but it is mentioned in the MASM syntax.  < and > apparently show up in C++ mangled names.
-        # ICC allows ".", at least in labels.
-        first = pp.Word(pp.alphas + NON_ASCII_PRINTABLE_CHARACTERS + ".$?@_<>", exact=1)
-        rest = pp.Word(pp.alphanums + NON_ASCII_PRINTABLE_CHARACTERS + ".$?@_<>")
+        # ICC allows ".", at least in labels.  ' is emitted by MSVC.
+        first = pp.Word(pp.alphas + NON_ASCII_PRINTABLE_CHARACTERS + ".$?@_<>'", exact=1)
+        rest = pp.Word(pp.alphanums + NON_ASCII_PRINTABLE_CHARACTERS + ".$?@_<>'")
         identifier = pp.Group(
             pp.Combine(first + pp.Optional(rest)).setResultsName("name")
         ).setResultsName("identifier")
@@ -443,9 +443,9 @@ class ParserX86Intel(ParserX86):
 
         # Directives.
         # The identifiers at the beginnig of a directive cannot start with a "." otherwise we end up
-        # with ambiguities.
-        directive_first = pp.Word(pp.alphas + NON_ASCII_PRINTABLE_CHARACTERS + "$?@_<>", exact=1)
-        directive_rest = pp.Word(pp.alphanums + NON_ASCII_PRINTABLE_CHARACTERS + ".$?@_<>")
+        # with ambiguities.  ' is emitted by MSVC.
+        directive_first = pp.Word(pp.alphas + NON_ASCII_PRINTABLE_CHARACTERS + "$?@_<>'", exact=1)
+        directive_rest = pp.Word(pp.alphanums + NON_ASCII_PRINTABLE_CHARACTERS + ".$?@_<>'")
         directive_identifier = pp.Group(
             pp.Combine(directive_first + pp.Optional(directive_rest)).setResultsName("name")
         ).setResultsName("identifier")
