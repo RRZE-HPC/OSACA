@@ -31,6 +31,7 @@ SUPPORTED_ARCHS = [
     "ICL",
     "ICX",
     "SPR",
+    "GNR",
     "ZEN1",
     "ZEN2",
     "ZEN3",
@@ -46,7 +47,7 @@ SUPPORTED_ARCHS = [
 ]
 DEFAULT_ARCHS = {
     "aarch64": "V2",
-    "x86": "SPR",
+    "x86": "GNR",
 }
 SUPPORTED_SYNTAXES = [
     "ATT",
@@ -109,7 +110,7 @@ def create_parser(parser=None):
     parser.add_argument(
         "--arch",
         type=str,
-        help="Define architecture (SNB, IVB, HSW, BDW, SKX, CSX, ICL, ICX, SPR, ZEN1, ZEN2, ZEN3, "
+        help="Define architecture (SNB, IVB, HSW, BDW, SKX, CSX, ICL, ICX, SPR, GNR, ZEN1, ZEN2, ZEN3, "
         "ZEN4, TX2, N1, A64FX, TSV110, A72, M1, V2). If no architecture is given, OSACA assumes a "
         "default uarch for x86/AArch64.",
     )
