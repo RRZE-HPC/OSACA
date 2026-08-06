@@ -4592,6 +4592,94 @@ instruction_forms:
   port_pressure: [[3, ['0DV']], [1, '0']]  # ibench
   throughput: 3.0                        # ibench
   uops: 4                                # ibench
+- name: vsqrtpd                          # ibench
+  operands:                              # ibench
+  - class: register                      # ibench
+    name: xmm                            # ibench
+  - class: register                      # ibench
+    name: xmm                            # ibench
+  - class: register                      # ibench
+    name: xmm                            # ibench
+  latency: 22                            # ibench
+  port_pressure: [[6, ['0DV']], [1, '0']]  # ibench
+  throughput: 6.0                        # ibench
+  uops: 7                                # ibench
+- name: vsqrtpd                          # ibench
+  operands:                              # ibench
+  - class: register                      # ibench
+    name: ymm                            # ibench
+  - class: register                      # ibench
+    name: ymm                            # ibench
+  - class: register                      # ibench
+    name: ymm                            # ibench
+  latency: 22                            # ibench
+  port_pressure: [[12, ['0DV']], [1, '0']]  # ibench
+  throughput: 12.0                        # ibench
+  uops: 13                                # ibench
+- name: vsqrtps                          # ibench
+  operands:                              # ibench
+  - class: register                      # ibench
+    name: xmm                            # ibench
+  - class: register                      # ibench
+    name: xmm                            # ibench
+  - class: register                      # ibench
+    name: xmm                            # ibench
+  latency: 16                            # ibench
+  port_pressure: [[3, ['0DV']], [1, '0']]  # ibench
+  throughput: 3.0                        # ibench
+  uops: 4                                # ibench
+- name: vsqrtps                          # ibench
+  operands:                              # ibench
+  - class: register                      # ibench
+    name: ymm                            # ibench
+  - class: register                      # ibench
+    name: ymm                            # ibench
+  - class: register                      # ibench
+    name: ymm                            # ibench
+  latency: 16                            # ibench
+  port_pressure: [[6, ['0DV']], [1, '0']]  # ibench
+  throughput: 6.0                        # ibench
+  uops: 7                                # ibench
+- name: vsqrtpd                          # ibench
+  operands:                              # ibench
+  - class: register                      # ibench
+    name: xmm                            # ibench
+  - class: register                      # ibench
+    name: xmm                            # ibench
+  latency: 22                            # ibench
+  port_pressure: [[6, ['0DV']], [1, '0']]  # ibench
+  throughput: 6.0                        # ibench
+  uops: 7                                # ibench
+- name: vsqrtpd                          # ibench
+  operands:                              # ibench
+  - class: register                      # ibench
+    name: ymm                            # ibench
+  - class: register                      # ibench
+    name: ymm                            # ibench
+  latency: 22                            # ibench
+  port_pressure: [[12, ['0DV']], [1, '0']]  # ibench
+  throughput: 12.0                        # ibench
+  uops: 13                                # ibench
+- name: vsqrtps                          # ibench
+  operands:                              # ibench
+  - class: register                      # ibench
+    name: xmm                            # ibench
+  - class: register                      # ibench
+    name: xmm                            # ibench
+  latency: 16                            # ibench
+  port_pressure: [[3, ['0DV']], [1, '0']]  # ibench
+  throughput: 3.0                        # ibench
+  uops: 4                                # ibench
+- name: vsqrtps                          # ibench
+  operands:                              # ibench
+  - class: register                      # ibench
+    name: ymm                            # ibench
+  - class: register                      # ibench
+    name: ymm                            # ibench
+  latency: 16                            # ibench
+  port_pressure: [[6, ['0DV']], [1, '0']]  # ibench
+  throughput: 6.0                        # ibench
+  uops: 7                                # ibench
 - name: sub                     # ibench
   operands:                     # ibench
   - class: immediate            # ibench
@@ -7190,6 +7278,16 @@ instruction_forms:
   latency: 1                                                         # model_importer.py instructions.xml ICL
   port_pressure: [[1, '015']]                                        # model_importer.py instructions.xml ICL
   throughput: 0.3333333333333333                                     # model_importer.py instructions.xml ICL
+  uops: 1                                                            # model_importer.py instructions.xml ICL
+- name: VPBROADCASTD                                                 # model_importer.py instructions.xml ICL
+  operands:                                                          # model_importer.py instructions.xml ICL
+  - class: register                                                  # model_importer.py instructions.xml ICL
+    name: gpr                                                        # model_importer.py instructions.xml ICL
+  - class: register                                                  # model_importer.py instructions.xml ICL
+    name: xmm                                                        # model_importer.py instructions.xml ICL
+  latency: 1                                                         # model_importer.py instructions.xml ICL
+  port_pressure: [[1, '5']]                                          # model_importer.py instructions.xml ICL
+  throughput: 1.0                                                    # model_importer.py instructions.xml ICL
   uops: 1                                                            # model_importer.py instructions.xml ICL
 - name: VBROADCASTSS                                                 # model_importer.py instructions.xml ICL
   operands:                                                          # model_importer.py instructions.xml ICL
