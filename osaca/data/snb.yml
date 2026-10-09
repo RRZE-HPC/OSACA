@@ -6,7 +6,7 @@ ROB_size: ~
 retired_uOps_per_cycle: ~
 scheduler_size: ~
 hidden_loads: ~
-ports: ['0', '1', '5', '2', '3', 2D, 3D, '4']
+ports: ['0', '1', '2', '2D', '3', '3D', '4', '5']
 port_model_scheme: ~
 load_throughput: []
 load_latency: {gpr: 4.0, mm: 4.0, xmm: 4.0, ymm: 4.0}
