@@ -270,13 +270,13 @@ instruction_forms:
   throughput: 0.16666666
   latency: 1.0  # 	1*p234567
   port_pressure: [[1, '234567']]
-- name: [b, bl, bcc, bcs, bgt, bhi, b.lo, b.ne, b.any, b.none, bal, b.al, b.lt, b.eq, b.hs, b.gt, b.hi, bne, beq, bmi]
+- name: [b, bl, bcc, bcs, bge, bgt, bhi, b.lo, b.ne, b.any, b.none, bal, b.al, b.lt, b.eq, b.hs, b.gt, b.hi, bne, beq, bmi]
   operands:
   - class: identifier
   throughput: 0.5
   latency: 0.0
   port_pressure: [[1, '01']]
-- name: [b, bl, bcc, bcs, bgt, bhi, b.lo, b.ne, b.any, b.none, bal, b.al, b.lt, b.eq, b.hs, b.gt, b.hi, bne, beq, bmi]
+- name: [b, bl, bcc, bcs, bge, bgt, bhi, b.lo, b.ne, b.any, b.none, bal, b.al, b.lt, b.eq, b.hs, b.gt, b.hi, bne, beq, bmi]
   operands:
   - class: immediate
     imd: int
@@ -2847,6 +2847,17 @@ instruction_forms:
   throughput: 0.5
   latency: 2.0  # 	1*p67
   port_pressure: [[1, '67']]
+- name: [sxtl, sxtl2]
+  operands:
+  - class: register
+    shape: x
+    width: '*'
+  - class: register
+    shape: w
+    width: '*'
+  throughput: 0.5
+  latency: 2.0  # 	1*p67
+  port_pressure: [[1, '67']]
 - name: [ubfiz, ubfm, ubfx]
   operands:
   - class: register
@@ -3209,6 +3220,17 @@ instruction_forms:
     prefix: w
   - class: register
     prefix: w
+  throughput: 0.25
+  latency: 3.0  # 	1*p89,10,11
+  port_pressure: [[1, ['8', '9', '10', '11']]]
+- name: [fmul, fnmul]
+  operands:
+  - class: register
+    prefix: s
+  - class: register
+    prefix: s
+  - class: register
+    prefix: s
   throughput: 0.25
   latency: 3.0  # 	1*p89,10,11
   port_pressure: [[1, ['8', '9', '10', '11']]]
