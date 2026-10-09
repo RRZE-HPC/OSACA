@@ -323,9 +323,9 @@ instruction_forms:
     scale: "*"
   - class: register
     name: xmm
-  latency: 24
-  port_pressure: [[12, ['4D', '5D']], [4, ['12', '13', '14', '15']], [4, '0123']]
-  throughput: 6.0
+  latency: 16
+  port_pressure: [[6, ['4D', '5D']], [4, ['12', '13', '14', '15']], [4, '0123']]
+  throughput: 3.0
   uops: ~
 - name: vgatherdps  # with load
   operands:
@@ -336,9 +336,9 @@ instruction_forms:
     scale: "*"
   - class: register
     name: ymm
-  latency: 30
-  port_pressure: [[24, ['4D', '5D']], [8, ['12', '13', '14', '15']], [8, '0123']]
-  throughput: 12.0
+  latency: 22
+  port_pressure: [[11, ['4D', '5D']], [8, ['12', '13', '14', '15']], [8, '0123']]
+  throughput: 5.5
   uops: ~
 - name: vgatherdps  # with load
   operands:
@@ -349,9 +349,9 @@ instruction_forms:
     scale: "*"
   - class: register
     name: zmm
-  latency: 33
-  port_pressure: [[38, ['4D', '5D']], [16, ['12', '13', '14', '15']], [16, '0123']]
-  throughput: 19.0
+  latency: 30
+  port_pressure: [[24, ['4D', '5D']], [16, ['12', '13', '14', '15']], [16, '0123']]
+  throughput: 12.0
   uops: ~
 - name: vgatherdps  # with load
   operands:
@@ -363,9 +363,9 @@ instruction_forms:
   - class: register
     name: xmm
     mask: True
-  latency: 24
-  port_pressure: [[12, ['4D', '5D']], [4, ['12', '13', '14', '15']], [4, '0123']]
-  throughput: 6.0
+  latency: 17
+  port_pressure: [[6, ['4D', '5D']], [4, ['12', '13', '14', '15']], [4, '0123']]
+  throughput: 3.0
   uops: ~
 - name: vgatherdps  # with load
   operands:
@@ -377,9 +377,9 @@ instruction_forms:
   - class: register
     name: ymm
     mask: True
-  latency: 30
-  port_pressure: [[24, ['4D', '5D']], [8, ['12', '13', '14', '15']], [8, '0123']]
-  throughput: 12.0
+  latency: 22
+  port_pressure: [[11, ['4D', '5D']], [8, ['12', '13', '14', '15']], [8, '0123']]
+  throughput: 5.5
   uops: ~
 - name: vgatherdps  # with load
   operands:
@@ -391,9 +391,9 @@ instruction_forms:
   - class: register
     name: zmm
     mask: True
-  latency: 33
-  port_pressure: [[38, ['4D', '5D']], [16, ['12', '13', '14', '15']], [16, '0123']]
-  throughput: 19.0
+  latency: 30
+  port_pressure: [[24, ['4D', '5D']], [16, ['12', '13', '14', '15']], [16, '0123']]
+  throughput: 12.0
   uops: ~
 - name: vgatherqq  # with load
   operands:
@@ -419,6 +419,19 @@ instruction_forms:
     name: xmm
   latency: 17
   port_pressure: [[6, ['4D', '5D']], [2, ['12', '13', '14', '15']], [2, '0123']]
+  throughput: 6.0
+  uops: ~
+- name: vbroadcastf64x4  # with load
+  operands:
+  - class: memory
+    base: "*"
+    offset: "*"
+    index: "*"
+    scale: "*"
+  - class: register
+    name: zmm
+  latency: 1
+  port_pressure: [[1, ['4D', '5D']], [1, ['12', '13', '14', '15']], [1, ['1', '2']]]
   throughput: 6.0
   uops: ~
 - name: vscatterdpd  # with store
