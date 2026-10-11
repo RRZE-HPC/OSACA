@@ -56,7 +56,7 @@ After installation, OSACA can be started with the command ``osaca`` in the CLI.
 
 Dependencies:
 -------------
-Necessary equirements are:
+Necessary requirements are:
 
 -  `Python3 <https://www.python.org/>`_
 -  `Graphviz <https://www.graphviz.org/>`_ for dependency graph creation (minimal dependency is ``libgraphviz-dev`` on Ubuntu)
