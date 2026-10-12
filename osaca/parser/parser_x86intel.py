@@ -330,7 +330,7 @@ class ParserX86Intel(ParserX86):
 
         base = base_register.setResultsName("base")
         displacement = pp.Group(
-            pp.Group(integer_number ^ identifier).setResultsName(self.immediate_id)
+            ~self.register + pp.Group(integer_number ^ identifier).setResultsName(self.immediate_id)
         ).setResultsName("displacement")
         short_indexed = index_register.setResultsName("index")
         long_indexed = (
