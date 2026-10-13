@@ -107,6 +107,7 @@ class TestParserX86Intel(unittest.TestCase):
         instr16 = "vmovupd xmm0, [rax+123R]"
         instr17 = "\tlea\trcx, OFFSET FLAT:??_R0M@8-4"
         instr18 = "\tlea\trcx, OFFSET FLAT:foo+ -4"
+        instr19 = "vsubsd\txmm12, xmm12, QWORD PTR [rax+rdx]"
 
         parsed_1 = self.parser.parse_instruction(instr1)
         parsed_2 = self.parser.parse_instruction(instr2)
@@ -126,6 +127,7 @@ class TestParserX86Intel(unittest.TestCase):
         parsed_16 = self.parser.parse_instruction(instr16)
         parsed_17 = self.parser.parse_instruction(instr17)
         parsed_18 = self.parser.parse_instruction(instr18)
+        parsed_19 = self.parser.parse_instruction(instr19)
 
         self.assertEqual(parsed_1.mnemonic, "sub")
         self.assertEqual(parsed_1.operands[0], RegisterOperand(name="RSP"))
@@ -256,6 +258,13 @@ class TestParserX86Intel(unittest.TestCase):
             parsed_18.operands[1],
             MemoryOperand(offset=IdentifierOperand(name="foo", offset=ImmediateOperand(value=-4))),
         )
+
+        self.assertEqual(parsed_19.mnemonic, "vsubsd")
+        self.assertEqual(parsed_19.operands[0], RegisterOperand(name="XMM12"))
+        self.assertEqual(parsed_19.operands[1], RegisterOperand(name="XMM12"))
+        self.assertEqual(parsed_19.operands[2],
+                         MemoryOperand(base=RegisterOperand(name="RAX"),
+                                       index=RegisterOperand(name="RDX")))
 
     def test_parse_line(self):
         line_comment = "; -- Begin  main"

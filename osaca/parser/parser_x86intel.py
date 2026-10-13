@@ -204,15 +204,6 @@ class ParserX86Intel(ParserX86):
             | pp.CaselessKeyword("ZMMWORD")
         ).setResultsName("data_type")
 
-        # Identifier.  Note that $ is not mentioned in the ASM386 Assembly Language Reference,
-        # but it is mentioned in the MASM syntax.  < and > apparently show up in C++ mangled names.
-        # ICC allows ".", at least in labels.  ' is emitted by MSVC.
-        first = pp.Word(pp.alphas + NON_ASCII_PRINTABLE_CHARACTERS + ".$?@_<>'", exact=1)
-        rest = pp.Word(pp.alphanums + NON_ASCII_PRINTABLE_CHARACTERS + ".$?@_<>'")
-        identifier = pp.Group(
-            pp.Combine(first + pp.Optional(rest)).setResultsName("name")
-        ).setResultsName("identifier")
-
         # Register.
         # This follows the MASM grammar.
         special_register = (
@@ -322,6 +313,15 @@ class ParserX86Intel(ParserX86):
             | segment_register
             | pp.CaselessKeyword("RIP")
         ).setResultsName(self.register_id)
+
+        # Identifier.  Note that $ is not mentioned in the ASM386 Assembly Language Reference,
+        # but it is mentioned in the MASM syntax.  < and > apparently show up in C++ mangled names.
+        # ICC allows ".", at least in labels.  ' is emitted by MSVC.
+        first = pp.Word(pp.alphas + NON_ASCII_PRINTABLE_CHARACTERS + ".$?@_<>'", exact=1)
+        rest = pp.Word(pp.alphanums + NON_ASCII_PRINTABLE_CHARACTERS + ".$?@_<>'")
+        identifier = pp.Group(
+            ~self.register + pp.Combine(first + pp.Optional(rest)).setResultsName("name")
+        ).setResultsName("identifier")
 
         # Register expressions.
         base_register = self.register
